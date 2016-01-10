@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/simulator/win32
+/runtime/win32
+/frameworks/cocos2d-x
+*.suo
+*.tlog
+*.obj
+*.lib
+*.exp
+*.log
+*.dll
+*.pdb
+*.idb
+*.cache
+*.sdf
+*.opendb
