@@ -1,18 +1,18 @@
 
-local DraggableWithBoundary = class("DraggableWithBoundary")
+local DraggableWithinBoundary = class("DraggableWithinBoundary")
 
 local EXPORTED_METHODS = {
-	"setDragWithBoundaryEnabled",
+	"setDragWithinBoundaryEnabled",
 	"setDragBoundaryRect"
 }
 
-function DraggableWithBoundary:init_()
+function DraggableWithinBoundary:init_()
 	self.target_ = nil
 	self.boundaryRect_ = {width = display.width, height = display.height, x = 0, y = 0}
 	self:initTouchListener_()
 end
 
-function DraggableWithBoundary:initTouchListener_()
+function DraggableWithinBoundary:initTouchListener_()
 	if self.touchListener_ then return end
 
 	local function onTouchBegan(touch, event)
@@ -32,7 +32,7 @@ function DraggableWithBoundary:initTouchListener_()
 	self.touchListener_.isRegistered_ = false
 end
 
-function DraggableWithBoundary:registerListenerToTarget_()
+function DraggableWithinBoundary:registerListenerToTarget_()
 	if not self.touchListener_.isRegistered_ then
 		local eventDispatcher = self.target_:getEventDispatcher()
 		eventDispatcher:addEventListenerWithSceneGraphPriority(self.touchListener_, self.target_)
@@ -40,7 +40,7 @@ function DraggableWithBoundary:registerListenerToTarget_()
 	end
 end
 
-function DraggableWithBoundary:unregisterListenerFromTarget_()
+function DraggableWithinBoundary:unregisterListenerFromTarget_()
 	if self.touchListener_.isRegistered_ then
 		local eventDispatcher = self.target_:getEventDispatcher()
 		eventDispatcher:removeEventListener(self.touchListener_)
@@ -48,7 +48,7 @@ function DraggableWithBoundary:unregisterListenerFromTarget_()
 	end
 end
 
-function DraggableWithBoundary:bind(target)
+function DraggableWithinBoundary:bind(target)
 	self:init_()
 	require"app.components.ComponentManager".setMethods(target, self, EXPORTED_METHODS)
 
@@ -56,16 +56,16 @@ function DraggableWithBoundary:bind(target)
 	self:registerListenerToTarget_()
 end
 
-function DraggableWithBoundary:unbind(target)
-	assert(target == self.target_ , "DraggableWithBoundary:unbind() the component is not bind to the parameter target")
-	assert(self.target_, "DraggableWithBoundary:unbind() the component is not bind to any target.")
+function DraggableWithinBoundary:unbind(target)
+	assert(target == self.target_ , "DraggableWithinBoundary:unbind() the component is not bind to the parameter target")
+	assert(self.target_, "DraggableWithinBoundary:unbind() the component is not bind to any target.")
 
 	require"app.components.ComponentManager".unsetMethods(target, EXPORTED_METHODS)
 	self:unregisterListenerFromTarget_()
 	self:init_()
 end
 
-function DraggableWithBoundary:setDragWithBoundaryEnabled(isEnable)
+function DraggableWithinBoundary:setDragWithinBoundaryEnabled(isEnable)
 	if isEnable then
 		self:registerListenerToTarget_()
 	else
@@ -75,21 +75,13 @@ function DraggableWithBoundary:setDragWithBoundaryEnabled(isEnable)
 	return self.target_
 end
 
-function DraggableWithBoundary:setDragBoundaryRect(boundaryRect)
+function DraggableWithinBoundary:setDragBoundaryRect(boundaryRect)
 	self.boundaryRect_ = boundaryRect
 
 	return self.target_
 end
 
-function DraggableWithBoundary:getNewPosOnDrag_(dragDeltaX, dragDeltaY)
-	local boundingBox = self.target_:getBoundingBox()
-
-	return
-		self:getNewPosComponentOnDrag_(self.target_:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, self.boundaryRect_.width,  self.boundaryRect_.x),
-		self:getNewPosComponentOnDrag_(self.target_:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, self.boundaryRect_.height, self.boundaryRect_.y)
-end
-
-function DraggableWithBoundary:getNewPosComponentOnDrag_(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
+local function getNewPosComponentOnDrag_(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
 	local minOrigin = boundarySizeComp - targetSizeComp
 	local maxOrigin = boundaryOriginComp
 
@@ -103,4 +95,11 @@ function DraggableWithBoundary:getNewPosComponentOnDrag_(currentPosComp, dragDel
 	return dragDeltaComp + currentPosComp
 end
 
-return DraggableWithBoundary
+function DraggableWithinBoundary:getNewPosOnDrag_(dragDeltaX, dragDeltaY)
+	local boundingBox = self.target_:getBoundingBox()
+	return
+		getNewPosComponentOnDrag_(self.target_:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, self.boundaryRect_.width,  self.boundaryRect_.x),
+		getNewPosComponentOnDrag_(self.target_:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, self.boundaryRect_.height, self.boundaryRect_.y)
+end
+
+return DraggableWithinBoundary

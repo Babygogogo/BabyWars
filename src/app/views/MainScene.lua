@@ -5,8 +5,8 @@ local function createBackground_()
 	local bgSprite = display.newSprite("mainBG.png")
 		:move(display.center)
 
-	require"app.components.ComponentManager".bindComponent(bgSprite, "DraggableWithBoundary")
-
+	require"app.components.ComponentManager".bindComponent(bgSprite, "DraggableWithinBoundary")
+	
 	return bgSprite
 end
 
