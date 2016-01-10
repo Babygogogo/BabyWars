@@ -254,7 +254,7 @@ function display.wrapScene(scene, transition, time, more)
         local t = display.SCENE_TRANSITIONS[key]
         time = time or 0.2
         more = more or t[2]
-        if type(t) == "table" then
+        if type(t[1]) == "table" then -- Fixed a bug. The origin code is: if type(t) == table then
             scene = t[1]:create(time, scene, more)
         else
             scene = t:create(time, scene)

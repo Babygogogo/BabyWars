@@ -6,7 +6,7 @@ local function createBackground_()
 		:move(display.center)
 
 	require"app.components.ComponentManager".bindComponent(bgSprite, "DraggableWithinBoundary")
-	
+
 	return bgSprite
 end
 
@@ -17,7 +17,7 @@ local function createStartBtn_()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			display.runScene(require"app.views.WarScene".new())
+			display.runScene(require"app.views.WarScene".new(), "Random", 0.5)
 		end
 	end)
 
