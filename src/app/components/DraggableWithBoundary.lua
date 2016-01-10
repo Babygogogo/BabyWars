@@ -41,8 +41,11 @@ function DraggableWithBoundary:registerListenerToTarget_()
 end
 
 function DraggableWithBoundary:unregisterListenerFromTarget_()
-	local eventDispatcher = self.target_:getEventDispatcher()
-	eventDispatcher:removeEventListener(self.touchListener_)
+	if self.touchListener_.isRegistered_ then
+		local eventDispatcher = self.target_:getEventDispatcher()
+		eventDispatcher:removeEventListener(self.touchListener_)
+		self.touchListener_.isRegistered_ = false
+	end
 end
 
 function DraggableWithBoundary:bind(target)
@@ -80,26 +83,24 @@ end
 
 function DraggableWithBoundary:getNewPosOnDrag_(dragDeltaX, dragDeltaY)
 	local boundingBox = self.target_:getBoundingBox()
-	local currentX, currentY = self.target_:getPosition()
 
 	return
-		currentX + self:getDeltaComponentOnDrag_(dragDeltaX, boundingBox.width,  boundingBox.x, self.boundaryRect_.width,  self.boundaryRect_.x),
-		currentY + self:getDeltaComponentOnDrag_(dragDeltaY, boundingBox.height, boundingBox.y, self.boundaryRect_.height, self.boundaryRect_.y)
+		self:getNewPosComponentOnDrag_(self.target_:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, self.boundaryRect_.width,  self.boundaryRect_.x),
+		self:getNewPosComponentOnDrag_(self.target_:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, self.boundaryRect_.height, self.boundaryRect_.y)
 end
 
-function DraggableWithBoundary:getDeltaComponentOnDrag_(dragDelta, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
+function DraggableWithBoundary:getNewPosComponentOnDrag_(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
 	local minOrigin = boundarySizeComp - targetSizeComp
 	local maxOrigin = boundaryOriginComp
-	local delta = dragDelta
 
 	if minOrigin <= maxOrigin then
-		if delta + targetOriginComp < minOrigin then delta = minOrigin - targetOriginComp end
-		if delta + targetOriginComp > maxOrigin then delta = maxOrigin - targetOriginComp end
+		if dragDeltaComp + targetOriginComp < minOrigin then dragDeltaComp = minOrigin - targetOriginComp end
+		if dragDeltaComp + targetOriginComp > maxOrigin then dragDeltaComp = maxOrigin - targetOriginComp end
 	else
-		delta = 0
+		dragDeltaComp = 0
 	end
 
-	return delta
+	return dragDeltaComp + currentPosComp
 end
 
 return DraggableWithBoundary
