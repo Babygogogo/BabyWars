@@ -17,7 +17,7 @@ local function createStartBtn_()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			display.runScene(require"app.views.WarScene".new(), "Random", 0.5)
+			display.runScene(require"app.views.WarScene".new(), "CrossFade", 0.5)
 		end
 	end)
 
