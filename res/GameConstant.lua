@@ -1,5 +1,5 @@
 
-GameConstant = {
+local GameConstant = {
 	GridSize = {width = 48, height = 48},
 
 	Tile = {
@@ -15,7 +15,7 @@ GameConstant = {
 		Sea = {
 			Animation = "Tile_Sea_01.png",
 		},
-	}
+	},
 
 	MoveType = {
 		Infantry = {
@@ -50,7 +50,7 @@ GameConstant = {
 				Sea = 1,
 			},
 		},
-	}
+	},
 
 	Unit = {
 		Infantry = {
@@ -73,7 +73,7 @@ GameConstant = {
 			MoveRange = 5,
 			Animation = "Unit_Battleship_Idle_Orange_01.png"
 		}
-	}
+	},
 }
 
 return GameConstant

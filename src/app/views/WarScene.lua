@@ -18,6 +18,9 @@ function WarScene:ctor()
 		:move(display.cx, display.cy + 200)
 		:addTo(self)
 
+	-- TODO: This is only for testing the Tile class. Should be removed.
+	require"app.views.Tile".new({})
+		:addTo(self)
 end
 
 return WarScene
