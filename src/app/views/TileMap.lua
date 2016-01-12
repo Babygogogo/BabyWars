@@ -36,51 +36,95 @@ local function checkTileGridIndex(tileGridIndex, mapRowCount, mapColCount)
 	end
 end
 
+local function loadMapSize(mapData)
+	local rowCount, colCount = mapData.rowCount, mapData.colCount
+	local checkSizeResult, checkSizeMsg = checkMapSize(rowCount, colCount)
+
+	if (not checkSizeResult) then
+		return nil, checkSizeMsg
+	else
+		return {rowCount = rowCount, colCount = colCount}
+	end
+end
+
+local function createEmptyMap_(rowCount, colCount)
+	local map = {}
+	for i = 1, colCount do
+		map[i] = {}
+	end
+	
+	return map
+end
+
+local function createMap_(rowCount, colCount, mapData)
+	local map = createEmptyMap_(rowCount, colCount)
+	
+	local loadedTilesCount = 0
+	for _, tileData in ipairs(mapData.tiles) do
+		local tile = Tile.new(tileData)
+
+		local tileGridIndex = tile:getGridIndex()
+		local checkGridIndexResult, checkGridIndexMsg = checkTileGridIndex(tileGridIndex, rowCount, colCount)
+		if (not checkGridIndexResult) then
+			return nil, checkGridIndexMsg
+		end
+	
+		local rowIndex, colIndex = tileGridIndex.rowIndex, tileGridIndex.colIndex
+		if (map[colIndex][rowIndex] ~= nil) then
+			print(string.format("TileMap--createMap() the tile on [%d, %d] is already loaded; it will be overrided", colIndex, rowIndex))
+			loadedTilesCount = loadedTilesCount - 1
+		end
+
+		loadedTilesCount = loadedTilesCount + 1
+		map[colIndex][rowIndex] = tile
+	end
+	
+	if (loadedTilesCount ~= colCount * rowCount) then
+		return nil, "TileMap--createMap() some tiles on the map is missing."
+	end
+	
+	return map
+end
+
+local function createMap(mapData)
+	if (type(mapData) ~= "table") then
+		return nil, "TileMap--createMap() the mapData is not a tabel."
+	end
+	
+	local loadSizeResult, loadSizeMsg = loadMapSize(mapData)
+	if (loadSizeResult == nil) then
+		return nil, loadSizeMsg
+	end
+	local rowCount, colCount = loadSizeResult.rowCount, loadSizeResult.colCount
+
+	local createMapResult, createMapMsg = createMap_(rowCount, colCount, mapData)
+	if (createMapResult == nil) then
+		return nil, createMapMsg
+	end
+	
+	return {rowCount = rowCount, colCount = colCount, map = createMapResult}
+end
+
 function TileMap:ctor(params)
 	self:load(params)
 end
 
-function TileMap:clearAndResizeMap_(rowCount, colCount)
-	self.m_RowCount_ = rowCount
-	self.m_ColCount_ = colCount
-	self.m_Map_ = {}
-	for i = 1, colCount do
-		self.m_Map_[i] = {}
+function TileMap:load(params)
+	local createMapResult, createMapMsg = createMap(params)
+	if (createMapResult == nil) then
+		print(string.format("TileMap:load() failed: %s", createMapMsg))
+		return
 	end
-end
+	
+	self.m_RowCount_, self.m_ColCount_ = createMapResult.rowCount, createMapResult.colCount
+	self.m_Map_ = createMapResult.map
 
-function TileMap:loadTiles_(tiles)
-	local loadedTilesCount = 0
-	for _, tileData in ipairs(tiles) do
-		local tile = Tile.new(tileData)
-
-		local tileGridIndex = tile:getGridIndex()
-		assert(checkTileGridIndex(tileGridIndex, self.m_RowCount_, self.m_ColCount_))
-		local rowIndex, colIndex = tileGridIndex.rowIndex, tileGridIndex.colIndex
-
-		if (self.m_Map_[colIndex][rowIndex] ~= nil) then
-			error(string.format("TileMap:loadTiles_() the tile on [%d, %d] is already loaded", colIndex, rowIndex))
-		else
-			loadedTilesCount = loadedTilesCount + 1
-			self.m_Map_[colIndex][rowIndex] = tile
+	self:removeAllChildren()
+	for _, tileCol in ipairs(self.m_Map_) do
+		for __, tile in ipairs(tileCol) do
 			self:addChild(tile)
 		end
 	end
-
-	assert(loadedTilesCount == self.m_ColCount_ * self.m_RowCount_, "TileMap:loadTiles_() some tiles on the map is missing.")
-	self:setContentSize(self.m_ColCount_ * GridSize.width, self.m_RowCount_ * GridSize.height) -- TODO: Can be removed?
-	return self
-end
-
-function TileMap:load(params)
-	if (params == nil) then return end
-	
-	assert(checkMapSize(params.rowCount, params.colCount))
-	self:clearAndResizeMap_(params.rowCount, params.colCount)
-
-	self:loadTiles_(params.tiles)
-	
-	return self
 end
 
 return TileMap
