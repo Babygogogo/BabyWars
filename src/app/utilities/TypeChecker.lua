@@ -1,14 +1,6 @@
 
 local TypeChecker = {}
 
-local function isInt(checkee, checkeeName)
-	if (math.floor(checkee) == checkee) then
-		return true, string.format("%s is an integer.", checkeeName)
-	else
-		return false, string.format("%s is not an integer.", checkeeName)
-	end
-end
-
 local function isExpectedType(checkee, checkeeName, checkParams)
 	local checkeeType = type(checkee)
 	local expectedTypeNames = ""
@@ -21,6 +13,16 @@ local function isExpectedType(checkee, checkeeName, checkParams)
 	return false, string.format("%s is a %s; expected one of: %s", checkeeName, checkeeType, expectedTypeNames)
 end
 
+local function isInt(checkee, checkeeName)
+	if (not isExpectedType(checkee, checkeeName, {"number"})) then
+		return false, string.format("%s is not a number.", checkeeName)
+	elseif (math.floor(checkee) == checkee) then
+		return true, string.format("%s is an integer.", checkeeName)
+	else
+		return false, string.format("%s is a number but not an integer.", checkeeName)
+	end
+end
+
 local function check(callerName, checker, checkee, checkeeName, checkParams)
 	local checkResult, checkMsg = checker(checkee, checkeeName, checkParams)
 	if (checkResult) then
@@ -31,15 +33,17 @@ local function check(callerName, checker, checkee, checkeeName, checkParams)
 	end
 end
 
+local isIntWrapper = "isInt"
+TypeChecker[isIntWrapper] = function(param)
+	return	check(isIntWrapper, isInt, param, "param", {"number"})
+end
+
 -- GridIndex: {rowIndex : number_int, colIndex : number_int}
 local isGridIndex = "isGridIndex"
 TypeChecker[isGridIndex] = function(gridIndex)
-	return	check(isGridIndex, isExpectedType, gridIndex, 			"gridIndex",			{"table"})
-		and check(isGridIndex, isExpectedType, gridIndex.rowIndex,	"gridIndex.rowIndex",	{"number"})
-		and check(isGridIndex, isExpectedType, gridIndex.colIndex,	"gridIndex.colIndex",	{"number"})
+	return	check(isGridIndex, isExpectedType, gridIndex, "gridIndex", {"table"})
 		and	check(isGridIndex, isInt, gridIndex.rowIndex, "gridIndex.rowIndex")
 		and	check(isGridIndex, isInt, gridIndex.colIndex, "gridIndex.colIndex")
-		
 end
 
 return TypeChecker

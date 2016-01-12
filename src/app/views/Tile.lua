@@ -22,9 +22,8 @@ function Tile:load(params)
 
 	-- TODO: load data from params
 	self:setSpriteFrame("Tile_Forest_01.png")
-		:move(display.center)
 	require"app.components.ComponentManager".bindComponent(self, "GridIndexable")
-	self:setGridIndexAndPosition({rowIndex = 10, colIndex = "asdf"})
+	self:setGridIndexAndPosition({rowIndex = 10, colIndex = 10})
 
 	return self
 end

@@ -15,6 +15,7 @@
                 <LuaFile RelativePath=".\src\app\views\MainScene.lua" />
                 <LuaFile RelativePath=".\src\app\views\Tile.lua" />
                 <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
+                <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
             </Filter>
             <Filter Name="utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
