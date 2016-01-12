@@ -9,14 +9,17 @@
             <Filter Name="components" Directory=".\src\app\components" >
                 <LuaFile RelativePath=".\src\app\components\ComponentManager.lua" />
                 <LuaFile RelativePath=".\src\app\components\DraggableWithinBoundary.lua" />
+                <LuaFile RelativePath=".\src\app\components\GridIndexable.lua" />
             </Filter>
             <Filter Name="views" Directory=".\src\app\views" >
                 <LuaFile RelativePath=".\src\app\views\MainScene.lua" />
                 <LuaFile RelativePath=".\src\app\views\Tile.lua" />
                 <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
             </Filter>
+            <Filter Name="utilities" >
+                <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
+            </Filter>
         </Filter>
-        <Filter Name="BabyWars" Directory=".\src\BabyWars" />
         <Filter Name="cocos" Directory=".\src\cocos" >
             <LuaFile RelativePath=".\src\cocos\init.lua" />
             <Filter Name="3d" Directory=".\src\cocos\3d" >
@@ -114,5 +117,9 @@
                 <LuaFile RelativePath=".\src\packages\mvc\ViewBase.lua" />
             </Filter>
         </Filter>
+    </Filter>
+    <Filter Name="res" Directory=".\res" >
+        <LuaFile RelativePath=".\res\GameConstant.lua" />
+        <Filter Name="RawTextures" Directory=".\res\RawTextures" />
     </Filter>
 </Project>

@@ -62,17 +62,17 @@ local GameConstant = {
 			MoveType = "Track",
 			MoveRange = 6,
 			Animation = "Unit_Tank_Idle_Orange_01.png"
-		}
+		},
 		Bomber = {
 			MoveType = "Flying",
 			MoveRange = 7,
 			Animation = "Unit_Bomber_Idle_Orange_01.png"
-		}
+		},
 		Battleship = {
 			MoveType = "Sailing",
 			MoveRange = 5,
 			Animation = "Unit_Battleship_Idle_Orange_01.png"
-		}
+		},
 	},
 }
 
