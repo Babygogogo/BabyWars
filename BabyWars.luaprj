@@ -17,7 +17,7 @@
                 <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                 <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
             </Filter>
-            <Filter Name="utilities" >
+            <Filter Name="utilities" Directory=".\src\app\utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
             </Filter>
         </Filter>
@@ -122,5 +122,8 @@
     <Filter Name="res" Directory=".\res" >
         <LuaFile RelativePath=".\res\GameConstant.lua" />
         <Filter Name="RawTextures" Directory=".\res\RawTextures" />
+        <Filter Name="TileMaps" Directory=".\res\TileMaps" >
+            <LuaFile RelativePath=".\res\TileMaps\TestTileMap.lua" />
+        </Filter>
     </Filter>
 </Project>

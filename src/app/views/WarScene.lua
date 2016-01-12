@@ -18,9 +18,11 @@ function WarScene:ctor()
 		:move(display.cx, display.cy + 200)
 		:addTo(self)
 
-	-- TODO: This is only for testing the Tile class. Should be removed.
-	require"app.views.Tile".new({})
-		:addTo(self)
+	-- TODO: These are only for testing the TileMap class. Should be removed.
+	local tileMap = require"app.views.TileMap".new(require"res.TileMaps.TestTileMap")
+	tileMap:addTo(self)
+	require"app.components.ComponentManager".bindComponent(tileMap, "DraggableWithinBoundary")
+	tileMap:setDragBoundaryRect({x = 0, y = 0, width = display.width - 200, height = display.height})
 end
 
 return WarScene

@@ -9,8 +9,8 @@ local EXPORTED_METHODS = {
 }
 
 local function gridIndexToPosition(gridIndex)
-	return	(gridIndex.rowIndex - 0.5) * GridSize.height,
-			(gridIndex.colIndex - 0.5) * GridSize.width
+	return	(gridIndex.colIndex - 0.5) * GridSize.width,
+			(gridIndex.rowIndex - 0.5) * GridSize.height
 end
 
 function GridIndexable:init_()
