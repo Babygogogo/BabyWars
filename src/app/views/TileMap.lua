@@ -42,6 +42,9 @@ local function createEmptyMap_(mapSize)
 	return map
 end
 
+local function createTile(tileData, mapSize)
+end
+
 local function createMap_(mapSize, mapData)
 	local map = createEmptyMap_(mapSize)
 	
@@ -81,10 +84,20 @@ local function createMap(templateName)
 	if (type(mapData) ~= "table") then
 		return nil, "TileMap--createMap() the mapData is not a tabel."
 	end
+
+	if (mapData.Template ~= nil) then
+		local createTemplateMapResult, createTemplateMapMsg = createMap(mapData.Template)
+		if (createTemplateMapResult == nil) then
+			return nil, string.format("TileMap--createMap() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
+		end
+		
+		
+	end
+	
 	
 	local mapSize, loadSizeMsg = loadMapSize(mapData)
 	if (mapSize == nil) then
-		return nil, loadSizeMsg
+		return nil, string.format("TileMap--createMap() failed to load MapSize from [%s]\n%s", templateName, loadSizeMsg)
 	end
 
 	local createMapResult, createMapMsg = createMap_(mapSize, mapData)
