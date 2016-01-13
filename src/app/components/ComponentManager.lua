@@ -77,6 +77,14 @@ function ComponentManager.unbindComponent(target, ...)
 	return ComponentManager
 end
 
+function ComponentManager.hasBinded(target, componentName)
+	if (target.components_ == nil) then
+		return false
+	end
+	
+	return target.components_[componentName] ~= nil
+end
+
 function ComponentManager.setMethods(target, component, methods)
 	for _, name in ipairs(methods) do
 		assert(target[name] == nil, "ComponentManager.setMethods() the target already has a field %s", name)
