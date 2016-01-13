@@ -122,8 +122,10 @@
     <Filter Name="res" Directory=".\res" >
         <LuaFile RelativePath=".\res\GameConstant.lua" />
         <Filter Name="RawTextures" Directory=".\res\RawTextures" />
-        <Filter Name="TileMaps" Directory=".\res\TileMaps" >
-            <LuaFile RelativePath=".\res\TileMaps\TestTileMap.lua" />
+        <Filter Name="Templates" Directory=".\res\Templates" >
+            <Filter Name="TileMap" Directory=".\res\Templates\TileMap" >
+                <LuaFile RelativePath=".\res\Templates\TileMap\TileMap_Test.lua" />
+            </Filter>
         </Filter>
     </Filter>
 </Project>

@@ -19,7 +19,7 @@ function WarScene:ctor()
 		:addTo(self)
 
 	-- TODO: These are only for testing the TileMap class. Should be removed.
-	local tileMap = require"app.views.TileMap".new(require"res.TileMaps.TestTileMap")
+	local tileMap = require"app.views.TileMap".new(require"res.Templates.TileMap.TileMap_Test")
 	tileMap:addTo(self)
 	require"app.components.ComponentManager".bindComponent(tileMap, "DraggableWithinBoundary")
 	tileMap:setDragBoundaryRect({x = 0, y = 0, width = display.width - 200, height = display.height})

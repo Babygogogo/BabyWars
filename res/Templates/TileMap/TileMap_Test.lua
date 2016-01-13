@@ -1,5 +1,5 @@
 
-local TestTileMap = {
+local TileMap_Test = {
 	rowCount = 15,
 	colCount = 20,
 	
@@ -1207,4 +1207,4 @@ local TestTileMap = {
 	}
 }
 
-return TestTileMap
+return TileMap_Test
