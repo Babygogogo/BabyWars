@@ -2,10 +2,10 @@
 local TileMap = class("TileMap", function()
 	return display.newNode()
 end)
-local TypeChecker = require"app.utilities.TypeChecker"
-local Requirer = require"app.utilities.Requirer"
-local Tile = require"app.views.Tile"
-local GridSize = require"res.GameConstant".GridSize
+local Requirer		= require"app.utilities.Requirer"
+local TypeChecker	= Requirer.utility("TypeChecker")
+local Tile			= Requirer.view("Tile")
+local GridSize		= Requirer.gameConstant().GridSize
 
 local function checkMapSize(rowCount, colCount)
 	if (not TypeChecker.isInt(rowCount)) then
@@ -87,7 +87,12 @@ local function createMap_(rowCount, colCount, mapData)
 	return map
 end
 
-local function createMap(mapData)
+local function createMap(templateName)
+	if (type(templateName) ~= "string") then
+		return nil, "TileMap--createMap() the param templateName is not a string."
+	end
+	
+	local mapData = Requirer.templateTileMap(templateName)
 	if (type(mapData) ~= "table") then
 		return nil, "TileMap--createMap() the mapData is not a tabel."
 	end
@@ -108,13 +113,14 @@ end
 
 function TileMap:ctor(templateName)
 	self:load(templateName)
+	
+	return self
 end
 
 function TileMap:load(templateName)
-	local createMapResult, createMapMsg = createMap(Requirer.tileMap(templateName))
+	local createMapResult, createMapMsg = createMap(templateName)
 	if (createMapResult == nil) then
-		print(string.format("TileMap:load() failed: %s", createMapMsg))
-		return
+		return nil, "TileMap:load() failed: " .. createMapMsg
 	end
 	
 	self.m_RowCount_, self.m_ColCount_ = createMapResult.rowCount, createMapResult.colCount
@@ -126,6 +132,8 @@ function TileMap:load(templateName)
 			self:addChild(tile)
 		end
 	end
+	
+	return self
 end
 
 return TileMap

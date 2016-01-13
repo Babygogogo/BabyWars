@@ -4,16 +4,8 @@ local WarScene = class("WarScene", function()
 end)
 local Requirer = require"app.utilities.Requirer"
 
-local function createBackground_()
-	local bgSprite = display.newSprite("HelloWorld.png")
-		:move(display.center)
-
-	return bgSprite
-end
-
 function WarScene:ctor()
-	self:addChild(createBackground_())
-
+--[[
 	-- add HelloWorld label
 	cc.Label:createWithSystemFont("Hello World", "Arial", 40)
 		:move(display.cx, display.cy + 200)
@@ -24,6 +16,17 @@ function WarScene:ctor()
 	tileMap:addTo(self)
 	Requirer.component("ComponentManager").bindComponent(tileMap, "DraggableWithinBoundary")
 	tileMap:setDragBoundaryRect({x = 0, y = 0, width = display.width - 200, height = display.height})
+--]]
+
+---[[
+	local warField = Requirer.view("WarField").new()
+	local loadWarFieldResult, loadWarFieldMsg = warField:load("WarField_Test")
+	if (loadWarFieldResult == nil) then
+		print(loadWarFieldMsg)
+	end
+
+	self:addChild(warField)
+--]]
 end
 
 return WarScene

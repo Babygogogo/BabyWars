@@ -16,6 +16,7 @@
                 <LuaFile RelativePath=".\src\app\views\Tile.lua" />
                 <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                 <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
+                <LuaFile RelativePath=".\src\app\views\WarField.lua" />
             </Filter>
             <Filter Name="utilities" Directory=".\src\app\utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
@@ -126,6 +127,9 @@
         <Filter Name="Templates" Directory=".\res\Templates" >
             <Filter Name="TileMap" Directory=".\res\Templates\TileMap" >
                 <LuaFile RelativePath=".\res\Templates\TileMap\TileMap_Test.lua" />
+            </Filter>
+            <Filter Name="WarField" Directory=".\res\Templates\WarField" >
+                <LuaFile RelativePath=".\res\Templates\WarField\WarField_Test.lua" />
             </Filter>
         </Filter>
     </Filter>
