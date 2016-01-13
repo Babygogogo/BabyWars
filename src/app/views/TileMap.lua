@@ -136,4 +136,8 @@ function TileMap:load(templateName)
 	return self
 end
 
+function TileMap:getMapSize()
+	return self.m_RowCount_, self.m_ColCount_
+end
+
 return TileMap

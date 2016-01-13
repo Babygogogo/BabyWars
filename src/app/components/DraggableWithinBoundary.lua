@@ -8,7 +8,7 @@ local EXPORTED_METHODS = {
 
 function DraggableWithinBoundary:init_()
 	self.target_ = nil
-	self.boundaryRect_ = {width = display.width, height = display.height, x = 0, y = 0}
+	self.boundaryRect_ = {width = 0, height = 0, x = 0, y = 0}
 	self:initTouchListener_()
 end
 

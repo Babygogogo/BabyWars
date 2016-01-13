@@ -7,6 +7,7 @@ local function createBackground_()
 		:move(display.center)
 
 	Requirer.component("ComponentManager").bindComponent(bgSprite, "DraggableWithinBoundary")
+	bgSprite:setDragBoundaryRect({x = 0, y = 0, width = display.width, height = display.height})
 
 	return bgSprite
 end

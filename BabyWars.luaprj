@@ -12,11 +12,15 @@
                 <LuaFile RelativePath=".\src\app\components\GridIndexable.lua" />
             </Filter>
             <Filter Name="views" Directory=".\src\app\views" >
-                <LuaFile RelativePath=".\src\app\views\MainScene.lua" />
-                <LuaFile RelativePath=".\src\app\views\Tile.lua" />
-                <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
-                <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
-                <LuaFile RelativePath=".\src\app\views\WarField.lua" />
+                <Filter Name="MainScene" >
+                    <LuaFile RelativePath=".\src\app\views\MainScene.lua" />
+                </Filter>
+                <Filter Name="WarScene" >
+                    <LuaFile RelativePath=".\src\app\views\Tile.lua" />
+                    <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
+                    <LuaFile RelativePath=".\src\app\views\WarField.lua" />
+                    <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
+                </Filter>
             </Filter>
             <Filter Name="utilities" Directory=".\src\app\utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />

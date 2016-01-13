@@ -30,8 +30,12 @@ function WarScene:load(templateName)
 		return nil, "WarScene:load() failed: " .. createSceneMsg
 	end
 	
+	local warField = createSceneResult.warField
+	Requirer.component("ComponentManager").bindComponent(warField, "DraggableWithinBoundary")
+	warField:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
+	
 	self:removeAllChildren()
-		:addChild(createSceneResult.warField)
+		:addChild(warField)
 		
 	return self
 end
