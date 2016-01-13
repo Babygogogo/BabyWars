@@ -1,7 +1,9 @@
 
 local GridIndexable = class("GridIndexable")
-local GridSize = require"res.GameConstant".GridSize
-local ComponentManager = require"app.components.ComponentManager"
+local Requirer			= require"app.utilities.Requirer"
+local TypeChecker		= Requirer.utility("TypeChecker")
+local GridSize			= Requirer.gameConstant().GridSize
+local ComponentManager	= Requirer.component("ComponentManager")
 
 local EXPORTED_METHODS = {
 	"getGridIndex",
@@ -27,7 +29,7 @@ end
 
 function GridIndexable:unbind(target)
 	assert(self.m_Target_ == target , "GridIndexable:unbind() the component is not bind to the parameter target")
-	assert(self.m_Target_, "GridIndexable:unbind() the component is not bind to any m_Target.")
+	assert(self.m_Target_, "GridIndexable:unbind() the component is not bind to any target.")
 
 	ComponentManager.unsetMethods(m_Target, EXPORTED_METHODS)
 	self:init_()
@@ -38,7 +40,7 @@ function GridIndexable:getGridIndex()
 end
 
 function GridIndexable:setGridIndexAndPosition(gridIndex)
-	assert(require"app.utilities.TypeChecker".isGridIndex(gridIndex), "GridIndexable:setGridIndexAndPosition() the param gridIndex is invalid.")
+	assert(TypeChecker.isGridIndex(gridIndex), "GridIndexable:setGridIndexAndPosition() the param gridIndex is invalid.")
 
 	self.m_GridIndex_.rowIndex = gridIndex.rowIndex
 	self.m_GridIndex_.colIndex = gridIndex.colIndex

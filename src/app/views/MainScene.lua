@@ -19,7 +19,9 @@ local function createStartBtn_()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			display.runScene(Requirer.view("WarScene").new("WarScene_Test"), "CrossFade", 0.5)
+			local warScene, createWarSceneMsg = Requirer.view("WarScene").new():load("WarScene_Test")
+			assert(warScene, createWarSceneMsg)
+			display.runScene(warScene, "CrossFade", 0.5)
 		end
 	end)
 

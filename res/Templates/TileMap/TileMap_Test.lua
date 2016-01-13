@@ -465,7 +465,7 @@ local TileMap_Test = {
 			gridIndex = {rowIndex = 6, colIndex = 15},
 		},
 				{
-			template = "Plain",
+			template = "Road",
 			gridIndex = {rowIndex = 6, colIndex = 16},
 		},
 		{
@@ -524,7 +524,7 @@ local TileMap_Test = {
 			template = "Plain",
 			gridIndex = {rowIndex = 7, colIndex = 10},
 		},
-				{
+		{
 			template = "Plain",
 			gridIndex = {rowIndex = 7, colIndex = 11},
 		},
@@ -541,7 +541,7 @@ local TileMap_Test = {
 			gridIndex = {rowIndex = 7, colIndex = 14},
 		},
 		{
-			template = "Plain",
+			template = "Sea",
 			gridIndex = {rowIndex = 7, colIndex = 15},
 		},
 		{
@@ -564,7 +564,7 @@ local TileMap_Test = {
 			template = "Plain",
 			gridIndex = {rowIndex = 7, colIndex = 20},
 		},
-				{
+		{
 			template = "Plain",
 			gridIndex = {rowIndex = 8, colIndex = 1},
 		},

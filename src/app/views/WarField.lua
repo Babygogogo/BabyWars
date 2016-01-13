@@ -13,12 +13,12 @@ local function createField(templateName)
 	
 	local fieldData = Requirer.templateWarField(templateName)
 	if (type(fieldData) ~= "table") then
-		return nil, "WarField--createField() can't load field data from template: " .. templateName
+		return nil, "WarField--createField() can't load field data from template " .. templateName
 	end
 	
 	local tileMap, createTileMapMsg = TileMap.new():load(fieldData.TileMap)
 	if (tileMap == nil) then
-		return nil, "WarField--createField() can't load tile map from template: " .. fieldData["TileMap"]
+		return nil, "WarField--createField() failed to create a TileMap:\n" .. createTileMapMsg
 	end
 	local rowCount, colCount = tileMap:getMapSize()
 	
@@ -34,7 +34,7 @@ end
 function WarField:load(templateName)
 	local createFieldResult, createFieldMsg = createField(templateName)
 	if (createFieldResult == nil) then
-		return nil, "WarField:load() failed: " .. createFieldMsg
+		return nil, string.format("WarField:load() failed to load template [%s]:\n%s", templateName, createFieldMsg)
 	end
 
 	self:removeAllChildren()

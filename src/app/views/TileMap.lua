@@ -7,20 +7,6 @@ local TypeChecker	= Requirer.utility("TypeChecker")
 local Tile			= Requirer.view("Tile")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function checkMapSize(rowCount, colCount)
-	if (not TypeChecker.isInt(rowCount)) then
-		return false, "TileMap--checkMapSize() rowCount is not an integer."
-	elseif (not TypeChecker.isInt(colCount)) then
-		return false, "TileMap--checkMapSize() colCount is not an integer."
-	elseif (rowCount < 1) then
-		return false, "TileMap--checkMapSize() rowCount < 1."
-	elseif (colCount < 1) then
-		return false, "TileMap--checkMapSize() colCount < 1."
-	else
-		return true
-	end
-end
-
 local function checkTileGridIndex(tileGridIndex, mapRowCount, mapColCount)
 	if (not TypeChecker.isGridIndex(tileGridIndex)) then
 		return false, "TileMap--checkTileGridIndex() tileGridIndex is not a GridIndex."
@@ -38,13 +24,12 @@ local function checkTileGridIndex(tileGridIndex, mapRowCount, mapColCount)
 end
 
 local function loadMapSize(mapData)
-	local rowCount, colCount = mapData.rowCount, mapData.colCount
-	local checkSizeResult, checkSizeMsg = checkMapSize(rowCount, colCount)
-
-	if (not checkSizeResult) then
-		return nil, checkSizeMsg
+	local mapSize = {rowCount = mapData.rowCount, colCount = mapData.colCount}
+	if (not TypeChecker.isMapSize(mapSize)) then
+		return nil, string.format("TileMap--loadMapSize() the loaded mapSize [%s(%s), %s(%s)] is invalid.",
+									mapSize.rowCount, type(mapSize.rowCount), mapSize.colCount, type(mapSize.colCount))
 	else
-		return {rowCount = rowCount, colCount = colCount}
+		return mapSize
 	end
 end
 
@@ -120,7 +105,7 @@ end
 function TileMap:load(templateName)
 	local createMapResult, createMapMsg = createMap(templateName)
 	if (createMapResult == nil) then
-		return nil, "TileMap:load() failed: " .. createMapMsg
+		return nil, string.format("TileMap:load() failed to load template [%s]:\n%s", templateName, createMapMsg)
 	end
 	
 	self.m_RowCount_, self.m_ColCount_ = createMapResult.rowCount, createMapResult.colCount
