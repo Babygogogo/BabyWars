@@ -15,10 +15,9 @@ local function createField(templateName)
 		return nil, "WarField--createField() can't load field data from template: " .. templateName
 	end
 	
-	local tileMap = TileMap.new()
-	local loadTileMapResult, loadTileMapMsg = tileMap:load(fieldData["TileMap"])
-	if (loadTileMapResult == nil) then
-		return nil, "WarField--createField() can't load tile map from template:" .. fieldData["TileMap"]
+	local tileMap, createTileMapMsg = TileMap.new():load(fieldData.TileMap)
+	if (tileMap == nil) then
+		return nil, "WarField--createField() can't load tile map from template: " .. fieldData["TileMap"]
 	end
 	
 	return {tileMap = tileMap}

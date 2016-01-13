@@ -1,11 +1,12 @@
 
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
+local Requirer = require"app.utilities.Requirer"
 
 local function createBackground_()
 	local bgSprite = display.newSprite("mainBG.png")
 		:move(display.center)
 
-	require"app.components.ComponentManager".bindComponent(bgSprite, "DraggableWithinBoundary")
+	Requirer.component("ComponentManager").bindComponent(bgSprite, "DraggableWithinBoundary")
 
 	return bgSprite
 end
@@ -17,7 +18,7 @@ local function createStartBtn_()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			display.runScene(require"app.views.WarScene".new(), "CrossFade", 0.5)
+			display.runScene(Requirer.view("WarScene").new("WarScene_Test"), "CrossFade", 0.5)
 		end
 	end)
 

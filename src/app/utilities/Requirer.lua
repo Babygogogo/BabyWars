@@ -9,6 +9,10 @@ function Requirer.templateWarField(fieldName)
 	return require("res.Templates.WarField." .. fieldName)
 end
 
+function Requirer.templateWarScene(sceneName)
+	return require("res.Templates.WarScene." .. sceneName)
+end
+
 function Requirer.component(componentName)
 	return require("app.components." .. componentName)
 end

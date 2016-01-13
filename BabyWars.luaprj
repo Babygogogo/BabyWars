@@ -131,6 +131,9 @@
             <Filter Name="WarField" Directory=".\res\Templates\WarField" >
                 <LuaFile RelativePath=".\res\Templates\WarField\WarField_Test.lua" />
             </Filter>
+            <Filter Name="WarScene" Directory=".\res\Templates\WarScene" >
+                <LuaFile RelativePath=".\res\Templates\WarScene\WarScene_Test.lua" />
+            </Filter>
         </Filter>
     </Filter>
 </Project>
