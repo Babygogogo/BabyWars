@@ -20,9 +20,8 @@ local function createField(templateName)
 	if (tileMap == nil) then
 		return nil, "WarField--createField() failed to create a TileMap:\n" .. createTileMapMsg
 	end
-	local rowCount, colCount = tileMap:getMapSize()
 	
-	return {tileMap = tileMap, rowCount = rowCount, colCount = colCount}
+	return {tileMap = tileMap, fieldSize = tileMap:getMapSize()}
 end
 
 function WarField:ctor(templateName)
@@ -39,8 +38,8 @@ function WarField:load(templateName)
 
 	self:removeAllChildren()
 		:addChild(createFieldResult.tileMap)
-		:setContentSize(createFieldResult.colCount * GameConstant.GridSize.width,
-						createFieldResult.rowCount * GameConstant.GridSize.height)
+		:setContentSize(createFieldResult.fieldSize.colCount * GameConstant.GridSize.width,
+						createFieldResult.fieldSize.rowCount * GameConstant.GridSize.height)
 		
 	return self
 end

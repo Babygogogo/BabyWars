@@ -1,7 +1,6 @@
 
 local TileMap_Test = {
-	rowCount = 15,
-	colCount = 20,
+	MapSize = {rowCount = 15, colCount = 20},
 	
 	tiles = {
 		{
@@ -44,7 +43,7 @@ local TileMap_Test = {
 			template = "Plain",
 			gridIndex = {rowIndex = 1, colIndex = 10},
 		},
-				{
+		{
 			template = "Plain",
 			gridIndex = {rowIndex = 1, colIndex = 11},
 		},

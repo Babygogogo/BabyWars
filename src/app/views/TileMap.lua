@@ -7,13 +7,13 @@ local TypeChecker	= Requirer.utility("TypeChecker")
 local Tile			= Requirer.view("Tile")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function checkTileGridIndex(tileGridIndex, mapRowCount, mapColCount)
+local function checkTileGridIndex(tileGridIndex, mapSize)
 	if (not TypeChecker.isGridIndex(tileGridIndex)) then
 		return false, "TileMap--checkTileGridIndex() tileGridIndex is not a GridIndex."
-	elseif (tileGridIndex.rowIndex > mapRowCount) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.rowIndex > mapRowCount."
-	elseif (tileGridIndex.colIndex > mapColCount) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.colIndex > mapColCount."
+	elseif (tileGridIndex.rowIndex > mapSize.rowCount) then
+		return false, "TileMap--checkTileGridIndex() tileGridIndex.rowIndex > mapSize.rowCount."
+	elseif (tileGridIndex.colIndex > mapSize.colCount) then
+		return false, "TileMap--checkTileGridIndex() tileGridIndex.colIndex > mapSize.colCount."
 	elseif (tileGridIndex.rowIndex < 1) then
 		return false, "TileMap--checkTileGridIndex() tileGridIndex.rowIndex < 1."
 	elseif (tileGridIndex.colIndex < 1) then
@@ -24,7 +24,7 @@ local function checkTileGridIndex(tileGridIndex, mapRowCount, mapColCount)
 end
 
 local function loadMapSize(mapData)
-	local mapSize = {rowCount = mapData.rowCount, colCount = mapData.colCount}
+	local mapSize = mapData.MapSize
 	if (not TypeChecker.isMapSize(mapSize)) then
 		return nil, string.format("TileMap--loadMapSize() the loaded mapSize [%s(%s), %s(%s)] is invalid.",
 									mapSize.rowCount, type(mapSize.rowCount), mapSize.colCount, type(mapSize.colCount))
@@ -33,31 +33,31 @@ local function loadMapSize(mapData)
 	end
 end
 
-local function createEmptyMap_(rowCount, colCount)
+local function createEmptyMap_(mapSize)
 	local map = {}
-	for i = 1, colCount do
+	for i = 1, mapSize.colCount do
 		map[i] = {}
 	end
 	
 	return map
 end
 
-local function createMap_(rowCount, colCount, mapData)
-	local map = createEmptyMap_(rowCount, colCount)
+local function createMap_(mapSize, mapData)
+	local map = createEmptyMap_(mapSize)
 	
 	local loadedTilesCount = 0
 	for _, tileData in ipairs(mapData.tiles) do
 		local tile = Tile.new(tileData)
 
 		local tileGridIndex = tile:getGridIndex()
-		local checkGridIndexResult, checkGridIndexMsg = checkTileGridIndex(tileGridIndex, rowCount, colCount)
+		local checkGridIndexResult, checkGridIndexMsg = checkTileGridIndex(tileGridIndex, mapSize)
 		if (not checkGridIndexResult) then
-			return nil, checkGridIndexMsg
+			return nil, "TileMap--createMap_() the loaded tile is invalid: " .. checkGridIndexMsg
 		end
 	
 		local rowIndex, colIndex = tileGridIndex.rowIndex, tileGridIndex.colIndex
 		if (map[colIndex][rowIndex] ~= nil) then
-			print(string.format("TileMap--createMap() the tile on [%d, %d] is already loaded; it will be overrided", colIndex, rowIndex))
+			print(string.format("TileMap--createMap_() the tile on [%d, %d] is already loaded; it will be overrided", colIndex, rowIndex))
 			loadedTilesCount = loadedTilesCount - 1
 		end
 
@@ -65,8 +65,8 @@ local function createMap_(rowCount, colCount, mapData)
 		map[colIndex][rowIndex] = tile
 	end
 	
-	if (loadedTilesCount ~= colCount * rowCount) then
-		return nil, "TileMap--createMap() some tiles on the map is missing."
+	if (loadedTilesCount ~= mapSize.colCount * mapSize.rowCount) then
+		return nil, "TileMap--createMap() some tiles on the map are missing."
 	end
 	
 	return map
@@ -82,18 +82,17 @@ local function createMap(templateName)
 		return nil, "TileMap--createMap() the mapData is not a tabel."
 	end
 	
-	local loadSizeResult, loadSizeMsg = loadMapSize(mapData)
-	if (loadSizeResult == nil) then
+	local mapSize, loadSizeMsg = loadMapSize(mapData)
+	if (mapSize == nil) then
 		return nil, loadSizeMsg
 	end
-	local rowCount, colCount = loadSizeResult.rowCount, loadSizeResult.colCount
 
-	local createMapResult, createMapMsg = createMap_(rowCount, colCount, mapData)
+	local createMapResult, createMapMsg = createMap_(mapSize, mapData)
 	if (createMapResult == nil) then
 		return nil, createMapMsg
 	end
 	
-	return {rowCount = rowCount, colCount = colCount, map = createMapResult}
+	return {mapSize = mapSize, map = createMapResult}
 end
 
 function TileMap:ctor(templateName)
@@ -108,7 +107,7 @@ function TileMap:load(templateName)
 		return nil, string.format("TileMap:load() failed to load template [%s]:\n%s", templateName, createMapMsg)
 	end
 	
-	self.m_RowCount_, self.m_ColCount_ = createMapResult.rowCount, createMapResult.colCount
+	self.m_MapSize_ = createMapResult.mapSize
 	self.m_Map_ = createMapResult.map
 
 	self:removeAllChildren()
@@ -122,7 +121,7 @@ function TileMap:load(templateName)
 end
 
 function TileMap:getMapSize()
-	return self.m_RowCount_, self.m_ColCount_
+	return self.m_MapSize_
 end
 
 return TileMap
