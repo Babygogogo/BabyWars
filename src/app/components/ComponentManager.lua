@@ -1,11 +1,12 @@
 
 local ComponentManager = {}
 local registeredComponentClasses = {}
+local requirer = require"app.utilities.Requirer"
 
 local function loadComponentClass_(componentName)
 	assert(type(componentName) == "string", string.format("ComponentManager--loadComponentClass_() invalid component name \"%s\"", tostring(componentName)))
 
-	local cls = require(string.format("app.components.%s", componentName))
+	local cls = requirer.component(componentName)
 	assert(cls, string.format("ComponentManager--loadComponentClass_() component \"%s\" load failed", componentName))
 
 	if DEBUG > 1 then

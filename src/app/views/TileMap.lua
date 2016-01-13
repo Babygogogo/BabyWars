@@ -3,6 +3,7 @@ local TileMap = class("TileMap", function()
 	return display.newNode()
 end)
 local TypeChecker = require"app.utilities.TypeChecker"
+local Requirer = require"app.utilities.Requirer"
 local Tile = require"app.views.Tile"
 local GridSize = require"res.GameConstant".GridSize
 
@@ -105,12 +106,12 @@ local function createMap(mapData)
 	return {rowCount = rowCount, colCount = colCount, map = createMapResult}
 end
 
-function TileMap:ctor(params)
-	self:load(params)
+function TileMap:ctor(templateName)
+	self:load(templateName)
 end
 
-function TileMap:load(params)
-	local createMapResult, createMapMsg = createMap(params)
+function TileMap:load(templateName)
+	local createMapResult, createMapMsg = createMap(Requirer.tileMap(templateName))
 	if (createMapResult == nil) then
 		print(string.format("TileMap:load() failed: %s", createMapMsg))
 		return
