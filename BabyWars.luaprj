@@ -20,6 +20,7 @@
                     <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\WarField.lua" />
                     <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
+                    <LuaFile RelativePath=".\src\app\views\Unit.lua" />
                 </Filter>
             </Filter>
             <Filter Name="utilities" Directory=".\src\app\utilities" >
@@ -138,6 +139,9 @@
             </Filter>
             <Filter Name="WarScene" Directory=".\res\Templates\WarScene" >
                 <LuaFile RelativePath=".\res\Templates\WarScene\WarScene_Test.lua" />
+            </Filter>
+            <Filter Name="UnitMap" Directory=".\res\Templates\UnitMap" >
+                <LuaFile RelativePath=".\res\Templates\UnitMap\UnitMap_Test.lua" />
             </Filter>
         </Filter>
     </Filter>
