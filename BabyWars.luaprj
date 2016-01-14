@@ -21,6 +21,7 @@
                     <LuaFile RelativePath=".\src\app\views\WarField.lua" />
                     <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                     <LuaFile RelativePath=".\src\app\views\Unit.lua" />
+                    <LuaFile RelativePath=".\src\app\views\UnitMap.lua" />
                 </Filter>
             </Filter>
             <Filter Name="utilities" Directory=".\src\app\utilities" >
@@ -142,6 +143,7 @@
             </Filter>
             <Filter Name="UnitMap" Directory=".\res\Templates\UnitMap" >
                 <LuaFile RelativePath=".\res\Templates\UnitMap\UnitMap_Test.lua" />
+                <LuaFile RelativePath=".\res\Templates\UnitMap\UnitMap_OverwriteTest.lua" />
             </Filter>
         </Filter>
     </Filter>

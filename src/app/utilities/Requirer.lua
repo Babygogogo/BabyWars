@@ -5,6 +5,10 @@ function Requirer.templateTileMap(mapName)
 	return require("res.Templates.TileMap." .. mapName)
 end
 
+function Requirer.templateUnitMap(mapName)
+	return require("res.Templates.UnitMap." .. mapName)
+end
+
 function Requirer.templateWarField(fieldName)
 	return require("res.Templates.WarField." .. fieldName)
 end

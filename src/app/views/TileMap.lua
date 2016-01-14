@@ -141,9 +141,12 @@ function TileMap:load(templateName)
 	self.m_Map_ = createMapResult.map
 
 	self:removeAllChildren()
-	for _, tileCol in ipairs(self.m_Map_) do
-		for __, tile in ipairs(tileCol) do
-			self:addChild(tile)
+	for colIndex = 1, self.m_MapSize_.colCount do
+		for rowIndex = 1, self.m_MapSize_.rowCount do
+			local tile = self.m_Map_[colIndex][rowIndex]
+			if (tile) then
+				self:addChild(tile)
+			end
 		end
 	end
 	

@@ -6,25 +6,25 @@ local Requirer			= require"app.utilities.Requirer"
 local UnitTemplates		= Requirer.gameConstant().Unit
 local ComponentManager	= Requirer.component("ComponentManager")
 
-local function createUnit(tileData)
-	if (type(tileData) ~= "table") then
-		return nil, "Unit--createUnit() the param tileData is not a table."
+local function createUnit(unitData)
+	if (type(unitData) ~= "table") then
+		return nil, "Unit--createUnit() the param unitData is not a table."
 	end
 	
-	-- TODO: load data from tileData and handle errors
-	return {spriteFrame = UnitTemplates[tileData.Template].Animation, gridIndex = tileData.GridIndex}
+	-- TODO: load data from unitData and handle errors
+	return {spriteFrame = UnitTemplates[unitData.Template].Animation, gridIndex = unitData.GridIndex}
 end
 
-function Unit:ctor(tileData)
-	self:loadData(tileData)
+function Unit:ctor(unitData)
+	self:loadData(unitData)
 
 	return self
 end
 
-function Unit:loadData(tileData)
-	local createUnitResult, createUnitMsg = createUnit(tileData)
+function Unit:loadData(unitData)
+	local createUnitResult, createUnitMsg = createUnit(unitData)
 	if (createUnitResult == nil) then
-		return nil, "Unit:loadData() failed to load the param tileData:\n" .. createUnitMsg
+		return nil, "Unit:loadData() failed to load the param unitData:\n" .. createUnitMsg
 	end
 	
 	if (not ComponentManager.hasBinded(self, "GridIndexable")) then	
