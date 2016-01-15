@@ -7,22 +7,6 @@ local TypeChecker	= Requirer.utility("TypeChecker")
 local Tile			= Requirer.view("Tile")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function checkTileGridIndex(tileGridIndex, mapSize)
-	if (not TypeChecker.isGridIndex(tileGridIndex)) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex is not a GridIndex."
-	elseif (tileGridIndex.rowIndex > mapSize.rowCount) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.rowIndex > mapSize.rowCount."
-	elseif (tileGridIndex.colIndex > mapSize.colCount) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.colIndex > mapSize.colCount."
-	elseif (tileGridIndex.rowIndex < 1) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.rowIndex < 1."
-	elseif (tileGridIndex.colIndex < 1) then
-		return false, "TileMap--checkTileGridIndex() tileGridIndex.colIndex < 1."
-	else
-		return true
-	end
-end
-
 local function loadMapSize(mapData)
 	local mapSize = mapData.MapSize
 	if (not TypeChecker.isMapSize(mapSize)) then
@@ -43,12 +27,12 @@ local function createEmptyMap(mapSize)
 end
 
 local function createTileAndCheckIndex(tileData, mapSize)
-	local tile, createTileMsg = Tile.new():loadData(tileData)
+	local tile, createTileMsg = Tile.createInstance(tileData)
 	if (tile == nil) then
 		return nil, "TileMap--createTileAndCheckIndex() failed to create tile with param tileData.\n" .. createTileMsg
 	end
 	
-	local checkGridIndexResult, checkGridIndexMsg = checkTileGridIndex(tile:getGridIndex(), mapSize)
+	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridInMap(tile:getGridIndex(), mapSize)
 	if (not checkGridIndexResult) then
 		return nil, "TileMap--createTileAndCheckIndex() the GridIndex of the created tile is invalid.\n" .. checkGridIndexMsg
 	end
@@ -149,7 +133,7 @@ function TileMap:load(templateName)
 			end
 		end
 	end
-	
+
 	return self
 end
 

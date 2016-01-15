@@ -6,9 +6,9 @@ local Requirer			= require"app.utilities.Requirer"
 local UnitTemplates		= Requirer.gameConstant().Unit
 local ComponentManager	= Requirer.component("ComponentManager")
 
-local function createUnit(unitData)
+local function createModel(unitData)
 	if (type(unitData) ~= "table") then
-		return nil, "Unit--createUnit() the param unitData is not a table."
+		return nil, "Unit--createModel() the param unitData is not a table."
 	end
 	
 	-- TODO: load data from unitData and handle errors
@@ -16,25 +16,36 @@ local function createUnit(unitData)
 end
 
 function Unit:ctor(unitData)
-	self:loadData(unitData)
+	self:load(unitData)
 
 	return self
 end
 
-function Unit:loadData(unitData)
-	local createUnitResult, createUnitMsg = createUnit(unitData)
-	if (createUnitResult == nil) then
-		return nil, "Unit:loadData() failed to load the param unitData:\n" .. createUnitMsg
+function Unit:load(unitData)
+	local createModelResult, createModelMsg = createModel(unitData)
+	if (createModelResult == nil) then
+		return nil, "Unit:loadData() failed to load the param unitData:\n" .. createModelMsg
 	end
 	
-	if (not ComponentManager.hasBinded(self, "GridIndexable")) then	
-		ComponentManager.bindComponent(self, "GridIndexable")
-	end
+	if (createModelResult.gridIndex ~= nil) then
+		if (not ComponentManager.hasBinded(self, "GridIndexable")) then	
+			ComponentManager.bindComponent(self, "GridIndexable")
+		end
+		self:setGridIndexAndPosition(createModelResult.gridIndex)
+	end	
 	
-	self:setSpriteFrame(createUnitResult.spriteFrame)
-		:setGridIndexAndPosition(createUnitResult.gridIndex)
+	self:setSpriteFrame(createModelResult.spriteFrame)
 		
 	return self
+end
+
+function Unit.createInstance(unitData)
+	local unit, createUnitMsg = Unit.new():load(unitData)
+	if (unit == nil) then
+		return nil, "Unit.createInstance() failed:\n" .. createUnitMsg
+	else
+		return unit
+	end
 end
 
 return Unit

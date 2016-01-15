@@ -40,7 +40,10 @@ function GridIndexable:getGridIndex()
 end
 
 function GridIndexable:setGridIndexAndPosition(gridIndex)
-	assert(TypeChecker.isGridIndex(gridIndex), "GridIndexable:setGridIndexAndPosition() the param gridIndex is invalid.")
+	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridIndex(gridIndex)
+	if (checkGridIndexResult == false) then
+		error("GridIndexable:setGridIndexAndPosition() the param gridIndex is invalid:\n" .. checkGridIndexMsg)
+	end
 
 	self.m_GridIndex_.rowIndex = gridIndex.rowIndex
 	self.m_GridIndex_.colIndex = gridIndex.colIndex

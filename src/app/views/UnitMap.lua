@@ -7,22 +7,6 @@ local TypeChecker	= Requirer.utility("TypeChecker")
 local Unit			= Requirer.view("Unit")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function checkUnitGridIndex(unitGridIndex, mapSize)
-	if (not TypeChecker.isGridIndex(unitGridIndex)) then
-		return false, "UnitMap--checkUnitGridIndex() unitGridIndex is not a GridIndex."
-	elseif (unitGridIndex.rowIndex > mapSize.rowCount) then
-		return false, "UnitMap--checkUnitGridIndex() unitGridIndex.rowIndex > mapSize.rowCount."
-	elseif (unitGridIndex.colIndex > mapSize.colCount) then
-		return false, "UnitMap--checkUnitGridIndex() unitGridIndex.colIndex > mapSize.colCount."
-	elseif (unitGridIndex.rowIndex < 1) then
-		return false, "UnitMap--checkUnitGridIndex() unitGridIndex.rowIndex < 1."
-	elseif (unitGridIndex.colIndex < 1) then
-		return false, "UnitMap--checkUnitGridIndex() unitGridIndex.colIndex < 1."
-	else
-		return true
-	end
-end
-
 local function loadMapSize(mapData)
 	local mapSize = mapData.MapSize
 	if (not TypeChecker.isMapSize(mapSize)) then
@@ -43,12 +27,12 @@ local function createEmptyMap(mapSize)
 end
 
 local function createUnitAndCheckIndex(unitData, mapSize)
-	local unit, createUnitMsg = Unit.new():loadData(unitData)
+	local unit, createUnitMsg = Unit.createInstance(unitData)
 	if (unit == nil) then
 		return nil, "UnitMap--createUnitAndCheckIndex() failed to create unit with param unitData.\n" .. createUnitMsg
 	end
 	
-	local checkGridIndexResult, checkGridIndexMsg = checkUnitGridIndex(unit:getGridIndex(), mapSize)
+	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridInMap(unit:getGridIndex(), mapSize)
 	if (not checkGridIndexResult) then
 		return nil, "UnitMap--createUnitAndCheckIndex() the GridIndex of the created unit is invalid.\n" .. checkGridIndexMsg
 	end
