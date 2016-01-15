@@ -4,109 +4,60 @@ local UnitMap = class("UnitMap", function()
 end)
 local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
+local MapFunctions	= Requirer.utility("MapFunctions")
 local Unit			= Requirer.view("Unit")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function loadMapSize(mapData)
-	local mapSize = mapData.MapSize
-	if (not TypeChecker.isMapSize(mapSize)) then
-		return nil, string.format("UnitMap--loadMapSize() the loaded mapSize [%s(%s), %s(%s)] is invalid.",
-									mapSize.rowCount, type(mapSize.rowCount), mapSize.colCount, type(mapSize.colCount))
-	else
-		return mapSize
-	end
-end
-
-local function createEmptyMap(mapSize)
-	local map = {}
-	for i = 1, mapSize.colCount do
-		map[i] = {}
+local function createModel(param)
+	if (type(param) ~= "string") then
+		return nil, "UnitMap--createModel() the param is not a string."
 	end
 	
-	return map
-end
-
-local function createUnitAndCheckIndex(unitData, mapSize)
-	local unit, createUnitMsg = Unit.createInstance(unitData)
-	if (unit == nil) then
-		return nil, "UnitMap--createUnitAndCheckIndex() failed to create unit with param unitData.\n" .. createUnitMsg
-	end
-	
-	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridInMap(unit:getGridIndex(), mapSize)
-	if (not checkGridIndexResult) then
-		return nil, "UnitMap--createUnitAndCheckIndex() the GridIndex of the created unit is invalid.\n" .. checkGridIndexMsg
-	end
-	
-	return unit
-end
-
-local function loadUnitsIntoMap(map, mapSize, unitsData)
-	for _, unitData in ipairs(unitsData) do
-		local unit, createUnitMsg = createUnitAndCheckIndex(unitData, mapSize)
-		if (unit == nil) then
-			return nil, "UnitMap--loadUnitsIntoMap() failed to create a valid unit.\n" .. createUnitMsg
-		end
-		
-		local rowIndex, colIndex = unit:getGridIndex().rowIndex, unit:getGridIndex().colIndex
-		if (map[colIndex][rowIndex] ~= nil) then
-			print(string.format("UnitMap--loadUnitsIntoMap() the unit on [%d, %d] is already loaded; it will be overrided", colIndex, rowIndex))
-		end
-
-		map[colIndex][rowIndex] = unit
-	end
-	
-	return map
-end
-
-local function createMap(templateName)
-	if (type(templateName) ~= "string") then
-		return nil, "UnitMap--createMap() the param templateName is not a string."
-	end
-	
-	local mapData = Requirer.templateUnitMap(templateName)
+	local mapData = Requirer.templateUnitMap(param)
 	if (type(mapData) ~= "table") then
-		return nil, "UnitMap--createMap() the mapData is not a tabel."
+		return nil, "UnitMap--createModel() the mapData is not a tabel."
 	end
 
-	local baseMap, mapSize, loadSizeMsg
+	local baseMap, mapSize
 	if (mapData.Template ~= nil) then
-		local createTemplateMapResult, createTemplateMapMsg = createMap(mapData.Template)
+		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
 		if (createTemplateMapResult == nil) then
-			return nil, string.format("UnitMap--createMap() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
+			return nil, string.format("UnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
 		end		
 		
 		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
 	else
-		mapSize, loadSizeMsg = loadMapSize(mapData)
+		local loadSizeMsg
+		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
 		if (mapSize == nil) then
-			return nil, string.format("UnitMap--createMap() failed to load MapSize from [%s]\n%s", templateName, loadSizeMsg)
+			return nil, "UnitMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
 		end
 
-		baseMap = createEmptyMap(mapSize)
+		baseMap = MapFunctions.createEmptyMap(mapSize)
 	end	
 
-	local map, loadUnitsIntoMapMsg = loadUnitsIntoMap(baseMap, mapSize, mapData.Units)
+	local map, loadUnitsIntoMapMsg = MapFunctions.loadGridsIntoMap(Unit, mapData.Units, baseMap, mapSize)
 	if (map == nil) then
-		return nil, "UnitMap--createMap() failed to load units.\n" .. loadUnitsIntoMapMsg
+		return nil, "UnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
 	end
 	
 	return {map = map, mapSize = mapSize}
 end
 
-function UnitMap:ctor(templateName)
-	self:loadWithTemplateName(templateName)
+function UnitMap:ctor(param)
+	self:loadWithTemplateName(param)
 	
 	return self
 end
 
-function UnitMap:loadWithTemplateName(templateName)
-	local createMapResult, createMapMsg = createMap(templateName)
-	if (createMapResult == nil) then
-		return nil, string.format("UnitMap:load() failed to load template [%s].\n%s", templateName, createMapMsg)
+function UnitMap:loadWithTemplateName(param)
+	local createModelResult, createModelMsg = createModel(param)
+	if (createModelResult == nil) then
+		return nil, string.format("UnitMap:load() failed to load template [%s].\n%s", param, createModelMsg)
 	end
 	
-	self.m_Map_ = createMapResult.map
-	self.m_MapSize_ = createMapResult.mapSize
+	self.m_Map_ = createModelResult.map
+	self.m_MapSize_ = createModelResult.mapSize
 
 	self:removeAllChildren()
 	for colIndex = 1, self.m_MapSize_.colCount do

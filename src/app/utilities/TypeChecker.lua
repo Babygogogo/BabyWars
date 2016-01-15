@@ -101,7 +101,7 @@ function TypeChecker.isMapSize(mapSize)
 	})
 end
 
--- isGridInMap: (gridIndex.colIndex < mapSize.colCount) and (gridIndex.rowIndex < mapSize.rowCount)
+-- isGridInMap: (gridIndex.colIndex <= mapSize.colCount) and (gridIndex.rowIndex <= mapSize.rowCount)
 -- It's caller's responsibility to ensure that the gridIndex and mapSize is valid.
 function TypeChecker.isGridInMap(gridIndex, mapSize)
 	return batchCheck("isGridInMap", {

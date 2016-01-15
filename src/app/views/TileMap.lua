@@ -4,71 +4,9 @@ local TileMap = class("TileMap", function()
 end)
 local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
+local MapFunctions	= Requirer.utility("MapFunctions")
 local Tile			= Requirer.view("Tile")
 local GridSize		= Requirer.gameConstant().GridSize
-
-local function loadMapSize(mapData)
-	local mapSize = mapData.MapSize
-	if (not TypeChecker.isMapSize(mapSize)) then
-		return nil, string.format("TileMap--loadMapSize() the loaded mapSize [%s(%s), %s(%s)] is invalid.",
-									mapSize.rowCount, type(mapSize.rowCount), mapSize.colCount, type(mapSize.colCount))
-	else
-		return mapSize
-	end
-end
-
-local function createEmptyMap(mapSize)
-	local map = {}
-	for i = 1, mapSize.colCount do
-		map[i] = {}
-	end
-	
-	return map
-end
-
-local function createTileAndCheckIndex(tileData, mapSize)
-	local tile, createTileMsg = Tile.createInstance(tileData)
-	if (tile == nil) then
-		return nil, "TileMap--createTileAndCheckIndex() failed to create tile with param tileData.\n" .. createTileMsg
-	end
-	
-	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridInMap(tile:getGridIndex(), mapSize)
-	if (not checkGridIndexResult) then
-		return nil, "TileMap--createTileAndCheckIndex() the GridIndex of the created tile is invalid.\n" .. checkGridIndexMsg
-	end
-	
-	return tile
-end
-
-local function hasMissingTile(map, mapSize)
-	for colIndex = 1, mapSize.colCount do
-		for rowIndex = 1, mapSize.rowCount do
-			if (map[colIndex][rowIndex] == nil) then
-				return true
-			end
-		end
-	end
-	
-	return false
-end
-
-local function loadTilesIntoMap(map, mapSize, tilesData)
-	for _, tileData in ipairs(tilesData) do
-		local tile, createTileMsg = createTileAndCheckIndex(tileData, mapSize)
-		if (tile == nil) then
-			return nil, "TileMap--loadTilesIntoMap() failed to create a valid tile.\n" .. createTileMsg
-		end
-		
-		local rowIndex, colIndex = tile:getGridIndex().rowIndex, tile:getGridIndex().colIndex
-		if (map[colIndex][rowIndex] ~= nil) then
-			print(string.format("TileMap--loadTilesIntoMap() the tile on [%d, %d] is already loaded; it will be overrided", colIndex, rowIndex))
-		end
-
-		map[colIndex][rowIndex] = tile
-	end
-
-	return map
-end
 
 local function createMap(templateName)
 	if (type(templateName) ~= "string") then
@@ -89,20 +27,20 @@ local function createMap(templateName)
 		
 		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
 	else
-		mapSize, loadSizeMsg = loadMapSize(mapData)
+		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
 		if (mapSize == nil) then
-			return nil, string.format("TileMap--createMap() failed to load MapSize from [%s]\n%s", templateName, loadSizeMsg)
+			return nil, string.format("TileMap--createMap() failed to load MapSize from [%s]:\n%s", templateName, loadSizeMsg)
 		end
 
-		baseMap = createEmptyMap(mapSize)
+		baseMap = MapFunctions.createEmptyMap(mapSize)
 	end	
 
-	local map, loadTilesIntoMapMsg = loadTilesIntoMap(baseMap, mapSize, mapData.Tiles)
+	local map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, baseMap, mapSize)
 	if (map == nil) then
-		return nil, "TileMap--createMap() failed to load tiles.\n" .. loadTilesIntoMapMsg
+		return nil, "TileMap--createMap() failed to load tiles:\n" .. loadTilesIntoMapMsg
 	end
 	
-	if (hasMissingTile(map, mapSize)) then
+	if (MapFunctions.hasNilGrid(map, mapSize)) then
 		return nil, "TileMap--createMap() some tiles on the map are missing."
 	end
 	

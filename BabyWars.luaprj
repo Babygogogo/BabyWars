@@ -27,6 +27,7 @@
             <Filter Name="utilities" Directory=".\src\app\utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
                 <LuaFile RelativePath=".\src\app\utilities\Requirer.lua" />
+                <LuaFile RelativePath=".\src\app\utilities\MapFunctions.lua" />
             </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
