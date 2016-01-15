@@ -8,14 +8,21 @@ local MapFunctions	= Requirer.utility("MapFunctions")
 local Unit			= Requirer.view("Unit")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function createModel(param)
-	if (type(param) ~= "string") then
-		return nil, "UnitMap--createModel() the param is not a string."
+local function requireMapDataFrom(param)
+	local t = type(param)
+	if (t == "string") then
+		return Requirer.templateUnitMap(param)
+	elseif (t == "table") then
+		return param
+	else
+		return nil
 	end
-	
-	local mapData = Requirer.templateUnitMap(param)
-	if (type(mapData) ~= "table") then
-		return nil, "UnitMap--createModel() the mapData is not a tabel."
+end
+
+local function createModel(param)
+	local mapData = requireMapDataFrom(param)
+	if (mapData == nil) then
+		return nil, "UnitMap--createModel() failed to require MapData from param."
 	end
 
 	local baseMap, mapSize
@@ -45,15 +52,24 @@ local function createModel(param)
 end
 
 function UnitMap:ctor(param)
-	self:loadWithTemplateName(param)
+	self:load(param)
 	
 	return self
 end
 
-function UnitMap:loadWithTemplateName(param)
+function UnitMap.createInstance(param)
+	local map, createMapMsg = UnitMap.new():load(param)
+	if (map == nil) then
+		return nil, "UnitMap.createInstance() failed:\n" .. createMapMsg
+	else
+		return map
+	end
+end
+
+function UnitMap:load(param)
 	local createModelResult, createModelMsg = createModel(param)
 	if (createModelResult == nil) then
-		return nil, string.format("UnitMap:load() failed to load template [%s].\n%s", param, createModelMsg)
+		return nil, "UnitMap:load() failed to load from param:\n" .. createModelMsg
 	end
 	
 	self.m_Map_ = createModelResult.map

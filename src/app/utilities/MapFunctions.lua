@@ -33,20 +33,6 @@ function MapFunctions.hasNilGrid(map, mapSize)
 	return false
 end
 
-function MapFunctions.createGridAndCheckIndex(gridClass, gridData, mapSize)
-	local grid, createGridMsg = gridClass.createInstance(gridData)
-	if (grid == nil) then
-		return nil, "MapFunctions.createGridAndCheckIndex() failed to create a grid:\n" .. createGridMsg
-	end
-	
-	local checkGridIndexResult, checkGridIndexMsg = TypeChecker.isGridInMap(grid:getGridIndex(), mapSize)
-	if (not checkGridIndexResult) then
-		return nil, "MapFunctions.createGridAndCheckIndex() the GridIndex of the created grid is invalid:\n" .. checkGridIndexMsg
-	end
-	
-	return grid
-end
-
 function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
 	for _, gridData in ipairs(gridsData) do
 		local gridIndex = gridData.GridIndex
@@ -57,7 +43,7 @@ function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
 		
 		local rowIndex, colIndex = gridIndex.rowIndex, gridIndex.colIndex
 		if (map[colIndex][rowIndex] == nil) then
-			local grid, createGridMsg = MapFunctions.createGridAndCheckIndex(gridClass, gridData, mapSize)
+			local grid, createGridMsg = gridClass.createInstance(gridData)
 			if (grid == nil) then
 				return nil, "MapFunctions.loadGridsIntoMap() failed to create a valid grid:\n" .. createGridMsg
 			else

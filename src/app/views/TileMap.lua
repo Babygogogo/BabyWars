@@ -8,28 +8,36 @@ local MapFunctions	= Requirer.utility("MapFunctions")
 local Tile			= Requirer.view("Tile")
 local GridSize		= Requirer.gameConstant().GridSize
 
-local function createMap(templateName)
-	if (type(templateName) ~= "string") then
-		return nil, "TileMap--createMap() the param templateName is not a string."
+local function requireMapDataFrom(param)
+	local t = type(param)
+	if (t == "string") then
+		return Requirer.templateTileMap(param)
+	elseif (t == "table") then
+		return param
+	else
+		return nil
 	end
-	
-	local mapData = Requirer.templateTileMap(templateName)
-	if (type(mapData) ~= "table") then
-		return nil, "TileMap--createMap() the mapData is not a tabel."
+end
+
+local function createModel(param)
+	local mapData = requireMapDataFrom(param)
+	if (mapData == nil) then
+		return nil, "TileMap--createModel() failed to require MapData from param."
 	end
 
-	local baseMap, mapSize, loadSizeMsg
+	local baseMap, mapSize
 	if (mapData.Template ~= nil) then
-		local createTemplateMapResult, createTemplateMapMsg = createMap(mapData.Template)
+		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
 		if (createTemplateMapResult == nil) then
-			return nil, string.format("TileMap--createMap() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
+			return nil, string.format("TileMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
 		end		
 		
 		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
 	else
+		local loadSizeMsg
 		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
 		if (mapSize == nil) then
-			return nil, string.format("TileMap--createMap() failed to load MapSize from [%s]:\n%s", templateName, loadSizeMsg)
+			return nil, "TileMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
 		end
 
 		baseMap = MapFunctions.createEmptyMap(mapSize)
@@ -37,30 +45,39 @@ local function createMap(templateName)
 
 	local map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, baseMap, mapSize)
 	if (map == nil) then
-		return nil, "TileMap--createMap() failed to load tiles:\n" .. loadTilesIntoMapMsg
+		return nil, "TileMap--createModel() failed to load tiles:\n" .. loadTilesIntoMapMsg
 	end
 	
 	if (MapFunctions.hasNilGrid(map, mapSize)) then
-		return nil, "TileMap--createMap() some tiles on the map are missing."
+		return nil, "TileMap--createModel() some tiles on the map are missing."
 	end
 	
 	return {mapSize = mapSize, map = map}
 end
 
-function TileMap:ctor(templateName)
-	self:load(templateName)
+function TileMap:ctor(param)
+	self:load(param)
 	
 	return self
 end
 
-function TileMap:load(templateName)
-	local createMapResult, createMapMsg = createMap(templateName)
-	if (createMapResult == nil) then
-		return nil, string.format("TileMap:load() failed to load template [%s]:\n%s", templateName, createMapMsg)
+function TileMap.createInstance(param)
+	local map, createMapMsg = TileMap.new():load(param)
+	if (map == nil) then
+		return nil, "TileMap.createInstance() failed:\n" .. createMapMsg
+	else
+		return map
+	end
+end
+
+function TileMap:load(param)
+	local createModelResult, createModelMsg = createModel(param)
+	if (createModelResult == nil) then
+		return nil, "TileMap:load() failed to load from param:\n" .. createModelMsg
 	end
 	
-	self.m_MapSize_ = createMapResult.mapSize
-	self.m_Map_ = createMapResult.map
+	self.m_MapSize_ = createModelResult.mapSize
+	self.m_Map_ = createModelResult.map
 
 	self:removeAllChildren()
 	for colIndex = 1, self.m_MapSize_.colCount do

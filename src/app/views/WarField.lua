@@ -21,12 +21,12 @@ local function createField(templateName)
 		return nil, "WarField--createField() can't load field data from template " .. templateName
 	end
 	
-	local tileMap, createTileMapMsg = TileMap.new():load(fieldData.TileMap)
+	local tileMap, createTileMapMsg = TileMap.createInstance(fieldData.TileMap)
 	if (tileMap == nil) then
 		return nil, "WarField--createField() failed to create a TileMap:\n" .. createTileMapMsg
 	end
 	
-	local unitMap, createUnitMapMsg = UnitMap.new():loadWithTemplateName(fieldData.UnitMap)
+	local unitMap, createUnitMapMsg = UnitMap.createInstance(fieldData.UnitMap)
 	if (unitMap == nil) then
 		return nil, "WarField--createField() failed to create a UnitMap:\n" .. createUnitMapMsg
 	end
