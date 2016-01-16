@@ -18,16 +18,20 @@
                 <Filter Name="WarScene" >
                     <LuaFile RelativePath=".\src\app\views\Tile.lua" />
                     <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
-                    <LuaFile RelativePath=".\src\app\views\WarField.lua" />
-                    <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                     <LuaFile RelativePath=".\src\app\views\Unit.lua" />
                     <LuaFile RelativePath=".\src\app\views\UnitMap.lua" />
+                    <LuaFile RelativePath=".\src\app\views\WarField.lua" />
+                    <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                 </Filter>
             </Filter>
             <Filter Name="utilities" Directory=".\src\app\utilities" >
                 <LuaFile RelativePath=".\src\app\utilities\TypeChecker.lua" />
                 <LuaFile RelativePath=".\src\app\utilities\Requirer.lua" />
                 <LuaFile RelativePath=".\src\app\utilities\MapFunctions.lua" />
+            </Filter>
+            <Filter Name="officialTest" Directory=".\src\app\officialTest" >
+                <LuaFile RelativePath=".\src\app\officialTest\FastTiledMapTest.lua" />
+                <LuaFile RelativePath=".\src\app\officialTest\TileMapTest.lua" />
             </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
