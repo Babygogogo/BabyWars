@@ -71,7 +71,7 @@ function TileMap.createInstance(param)
 end
 
 function TileMap:load(param)
----[[
+--[[
 	local createModelResult, createModelMsg = createModel(param)
 	if (createModelResult == nil) then
 		return nil, "TileMap:load() failed to load from param:\n" .. createModelMsg
@@ -92,7 +92,7 @@ function TileMap:load(param)
 
 	return self
 --]]
---[[
+---[[
 	if (param == nil) then
 		return nil, "TileMap:load() the param is nil.\n"
 	end
@@ -105,8 +105,12 @@ function TileMap:load(param)
 end
 
 function TileMap:getMapSize()
+--[[
 	return self.m_MapSize_
---	return self.m_TMXMap_:getMapSize()
+--]]
+---[[
+	return self.m_TMXMap_:getMapSize()
+--]]
 end
 
 return TileMap

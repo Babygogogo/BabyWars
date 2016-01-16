@@ -13,7 +13,7 @@ local UnitMap_OverwriteTest = {
 		},
 		{
 			Template = "Tank",
-			GridIndex = {y = 6, x = 7},
+			GridIndex = {y = 8, x = 7},
 		},
 	}
 }

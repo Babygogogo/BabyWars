@@ -25,7 +25,7 @@ local UnitMap_Test = {
 		},
 		{
 			Template = "Tank",
-			GridIndex = {y = 5, x = 9},
+			GridIndex = {y = 14, x = 9},
 		},
 		{
 			Template = "Tank",
@@ -37,7 +37,7 @@ local UnitMap_Test = {
 		},
 		{
 			Template = "Tank",
-			GridIndex = {y = 9, x = 10},
+			GridIndex = {y = 9, x = 17},
 		},
 		{
 			Template = "Tank",

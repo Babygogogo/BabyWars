@@ -1,7 +1,12 @@
 
 local WarField_Test = {
---	TileMap = "res/Templates/TileMap/TileMap_Test.tmx",
+--[[
 	TileMap = "TileMap_OverwriteTest",
+--]]
+---[[
+	TileMap = "res/Templates/TileMap/TileMap_Test.tmx",
+--]]
+
 	UnitMap = "UnitMap_OverwriteTest",
 	
 }
