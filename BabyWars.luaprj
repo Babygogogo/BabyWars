@@ -29,10 +29,6 @@
                 <LuaFile RelativePath=".\src\app\utilities\Requirer.lua" />
                 <LuaFile RelativePath=".\src\app\utilities\MapFunctions.lua" />
             </Filter>
-            <Filter Name="officialTest" Directory=".\src\app\officialTest" >
-                <LuaFile RelativePath=".\src\app\officialTest\FastTiledMapTest.lua" />
-                <LuaFile RelativePath=".\src\app\officialTest\TileMapTest.lua" />
-            </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
             <LuaFile RelativePath=".\src\cocos\init.lua" />

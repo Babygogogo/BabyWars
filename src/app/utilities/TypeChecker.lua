@@ -32,10 +32,18 @@ local function isLargerThan(checkee, checkeeName, checkParams)
 end
 
 local function isEqualTo(checkee, checkeeName, checkParams)
-	if (checkee == checkParams) then
-		return true, string.format("TypeChecker--isEqualTo(): %s == %s", checkeeName, checkParams)
+	if (type(checkParams) == "table") then
+		if (checkee == checkParams.value) then
+			return true, string.format("TypeChecker--isEqualTo() %s'%s' == %s'%s'", checkeeName, checkee, checkParams.name, checkParams.value)
+		else
+			return false, string.format("TypeChecker--isEqualTo() %s'%s' ~= %s'%s'", checkeeName, checkee, checkParams.name, checkParams.value)
+		end
 	else
-		return false, string.format("TypeChecker--isEqualTo(): %s ~= %s", checkeeName, checkParams)
+		if (checkee == checkParams) then
+			return true, string.format("TypeChecker--isEqualTo(): %s == %s", checkeeName, checkParams)
+		else
+			return false, string.format("TypeChecker--isEqualTo(): %s ~= %s", checkeeName, checkParams)
+		end
 	end
 end
 
@@ -107,6 +115,15 @@ function TypeChecker.isGridInMap(gridIndex, mapSize)
 	return batchCheck("isGridInMap", {
 		{isLargerThanOrEqualTo, mapSize.width,	"mapSize.width",	{value = gridIndex.x, name = "gridIndex.x"}},
 		{isLargerThanOrEqualTo, mapSize.height,	"mapSize.height",	{value = gridIndex.y, name = "gridIndex.y"}}
+	})
+end
+
+-- isSizeEqual: (size1.width == size2.width) and (size1.height == size2.height)
+-- It's caller's responsibility to ensure that both size1 and size2 are valid.
+function TypeChecker.isSizeEqual(size1, size2)
+	return batchCheck("isSizeEqual", {
+		{isEqualTo,	size1.width,	"size1.width",	{value = size2.width,	name = "size2.width"}},
+		{isEqualTo,	size1.height,	"size1.height",	{value = size2.height,	name = "size2.height"}}
 	})
 end
 

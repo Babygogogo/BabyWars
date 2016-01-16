@@ -2,6 +2,13 @@
 local GameConstant = {
 	GridSize = {width = 48, height = 48},
 
+	TiledID_Tile_Mapping = {
+		{Template = "Sea",		View = 1},
+		{Template = "Plain",	View = 1},
+		{Template = "Road",		View = 1},
+		{Template = "Forest",	View = 1},
+	},
+	
 	Tile = {
 		Forest = {
 			Animation = "Tile_Forest_01.png",

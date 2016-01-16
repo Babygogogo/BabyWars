@@ -3,13 +3,10 @@ local WarField = class("WarField", function()
 	return display.newNode()
 end)
 local Requirer		= require"app.utilities.Requirer"
+local TypeChecker	= Requirer.utility("TypeChecker")
 local TileMap		= Requirer.view("TileMap")
 local UnitMap		= Requirer.view("UnitMap")
 local GameConstant	= Requirer.gameConstant()
-
-local function isMapSizeEqual(size1, size2)
-	return size1.width == size2.width and size1.height == size2.height
-end
 
 local function createField(templateName)
 	if (type(templateName) ~= "string") then
@@ -31,7 +28,7 @@ local function createField(templateName)
 		return nil, "WarField--createField() failed to create a UnitMap:\n" .. createUnitMapMsg
 	end
 	
-	if (not isMapSizeEqual(unitMap:getMapSize(), tileMap:getMapSize())) then
+	if (not TypeChecker.isSizeEqual(unitMap:getMapSize(), tileMap:getMapSize())) then
 		return nil, "WarField--createField() failed: the size of the UnitMap and the one of TileMap is not the same."
 	end
 	

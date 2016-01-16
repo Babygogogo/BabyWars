@@ -66,7 +66,7 @@ end
 function MapFunctions.loadTiledDataIntoMap(gridClass, tiledLayer, map, mapSize)
 	for x = 1, mapSize.width do
 		for y = 1, mapSize.height do
-			local gridData = tiledLayer[x + (y - 1) * mapSize.width]
+			local gridData = {TiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width], GridIndex = {x = x, y = y}}
 			if (map[x][y] == nil) then
 				local grid, createGridMsg = gridClass.createInstance(gridData)
 				if (grid == nil) then

@@ -29,14 +29,14 @@ local function createModel(param)
 		return nil, "TileMap--createModel() failed to require MapData from param."
 	end
 
-	local baseMap, mapSize
+	local map, mapSize
 	if (mapData.Template ~= nil) then
 		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
 		if (createTemplateMapResult == nil) then
 			return nil, string.format("TileMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
 		end		
 		
-		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
+		map, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
 	else
 		local loadSizeMsg
 		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
@@ -44,19 +44,24 @@ local function createModel(param)
 			return nil, "TileMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
 		end
 
-		baseMap = MapFunctions.createEmptyMap(mapSize)
+		map = MapFunctions.createEmptyMap(mapSize)
 	end	
 
-	local map
 	if (isTiledData(mapData)) then
+		if (not TypeChecker.isSizeEqual(mapSize, MapFunctions.loadMapSize(mapData))) then
+			return nil, "TileMap--createModel() the MapSize of the overwriting data and the one of the template data is not the same."
+		end
+
 		local loadTiledDataMsg
-		map, loadTiledDataMsg = MapFunctions.loadTiledDataIntoMap(Tile, mapData.layers[0], baseMap, mapSize)
+		map, loadTiledDataMsg = MapFunctions.loadTiledDataIntoMap(Tile, mapData.layers[1], map, mapSize)
 		if (map == nil) then
 			return nil, "TileMap--createModel() failed to load tiled data:\n" .. loadTiledDataMsg
 		end
-	else
+	end
+
+	if (mapData.Tiles ~= nil) then
 		local loadTilesIntoMapMsg
-		map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, baseMap, mapSize)
+		map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, map, mapSize)
 		if (map == nil) then
 			return nil, "TileMap--createModel() failed to load tiles:\n" .. loadTilesIntoMapMsg
 		end
