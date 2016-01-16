@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="48" tileheight="48" nextobjectid="1">
+ <tileset firstgid="1" name="BabyWarsTiles" tilewidth="48" tileheight="48" spacing="2" margin="2" tilecount="4" columns="2">
+  <image source="../../BabyWarsTiles.png" width="128" height="128"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="20" height="15">
+  <data encoding="base64" compression="zlib">
+   eJytk0sOACEIQ0V6/zPPhtk05aNx0UgiPCjRvdbahdDcn8iD55f1oHmYx/dTH57kQaiby4W/SZ3KZ5aFEOfU49+H5zKhbjbVS3GYqViexFbEGY93pfamvLMfCFambHfTHXbv8iQXRc/s/b782y9ZlT5YZgKk
+  </data>
+ </layer>
+</map>
