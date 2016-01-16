@@ -4,7 +4,7 @@ local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
 
 function MapFunctions.loadMapSize(mapData)
-	local mapSize = mapData.MapSize
+	local mapSize = mapData.MapSize or {width = mapData.width, height = mapData.height}
 	local checkSizeResult, checkSizeMsg = TypeChecker.isMapSize(mapSize)
 	if (not checkSizeResult) then
 		return nil, "MapFunctions.loadMapSize() failed to load a valid MapSize from param mapData:\n" .. checkSizeMsg
@@ -60,6 +60,32 @@ function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
 		end
 	end
 
+	return map
+end
+
+function MapFunctions.loadTiledDataIntoMap(gridClass, tiledLayer, map, mapSize)
+	for x = 1, mapSize.width do
+		for y = 1, mapSize.height do
+			local gridData = tiledLayer[x + (y - 1) * mapSize.width]
+			if (map[x][y] == nil) then
+				local grid, createGridMsg = gridClass.createInstance(gridData)
+				if (grid == nil) then
+					return nil, "MapFunctions.loadTiledDataIntoMap() failed to create a valid grid:\n" .. createGridMsg
+				else
+					map[x][y] = grid
+				end
+			else
+				print(string.format("MapFunctions.loadTiledDataIntoMap() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
+				
+				local loadGridMsg
+				map[x][y], loadGridMsg = map[x][y]:load(gridData)
+				if (map[x][y] == nil) then
+					return nil, string.format("MapFunctions.loadTiledDataIntoMap() failed to overwrite the grid on [%d, %d]:\n%s", x, y, loadGridMsg)
+				end
+			end
+		end
+	end
+	
 	return map
 end
 

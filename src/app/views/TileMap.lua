@@ -19,6 +19,10 @@ local function requireMapDataFrom(param)
 	end
 end
 
+local function isTiledData(mapData)
+	return mapData.tiledversion ~= nil
+end
+
 local function createModel(param)
 	local mapData = requireMapDataFrom(param)
 	if (mapData == nil) then
@@ -43,9 +47,19 @@ local function createModel(param)
 		baseMap = MapFunctions.createEmptyMap(mapSize)
 	end	
 
-	local map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, baseMap, mapSize)
-	if (map == nil) then
-		return nil, "TileMap--createModel() failed to load tiles:\n" .. loadTilesIntoMapMsg
+	local map
+	if (isTiledData(mapData)) then
+		local loadTiledDataMsg
+		map, loadTiledDataMsg = MapFunctions.loadTiledDataIntoMap(Tile, mapData.layers[0], baseMap, mapSize)
+		if (map == nil) then
+			return nil, "TileMap--createModel() failed to load tiled data:\n" .. loadTiledDataMsg
+		end
+	else
+		local loadTilesIntoMapMsg
+		map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, baseMap, mapSize)
+		if (map == nil) then
+			return nil, "TileMap--createModel() failed to load tiles:\n" .. loadTilesIntoMapMsg
+		end
 	end
 	
 	if (MapFunctions.hasNilGrid(map, mapSize)) then
