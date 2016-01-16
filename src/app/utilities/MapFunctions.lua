@@ -15,7 +15,7 @@ end
 
 function MapFunctions.createEmptyMap(mapSize)
 	local map = {}
-	for i = 1, mapSize.colCount do
+	for i = 1, mapSize.width do
 		map[i] = {}
 	end
 	
@@ -23,10 +23,10 @@ function MapFunctions.createEmptyMap(mapSize)
 end
 
 function MapFunctions.hasNilGrid(map, mapSize)
-	for colIndex = 1, mapSize.colCount do
-		if (map[colIndex] == nil) then return true end
-		for rowIndex = 1, mapSize.rowCount do
-			if (map[colIndex][rowIndex] == nil) then return true end
+	for x = 1, mapSize.width do
+		if (map[x] == nil) then return true end
+		for y = 1, mapSize.height do
+			if (map[x][y] == nil) then return true end
 		end
 	end
 	
@@ -41,21 +41,21 @@ function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
 			return nil, "MapFunctions.loadGridsIntoMap() find a grid that is not in the map:\n" .. checkIndexMsg
 		end
 		
-		local rowIndex, colIndex = gridIndex.rowIndex, gridIndex.colIndex
-		if (map[colIndex][rowIndex] == nil) then
+		local y, x = gridIndex.y, gridIndex.x
+		if (map[x][y] == nil) then
 			local grid, createGridMsg = gridClass.createInstance(gridData)
 			if (grid == nil) then
 				return nil, "MapFunctions.loadGridsIntoMap() failed to create a valid grid:\n" .. createGridMsg
 			else
-				map[colIndex][rowIndex] = grid
+				map[x][y] = grid
 			end
 		else
-			print(string.format("MapFunctions.loadGridsIntoMap() the grid on [%d, %d] is already loaded; overwriting it.", colIndex, rowIndex))
+			print(string.format("MapFunctions.loadGridsIntoMap() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
 	
 			local loadGridMsg
-			map[colIndex][rowIndex], loadGridMsg = map[colIndex][rowIndex]:load(gridData)
-			if (map[colIndex][rowIndex] == nil) then
-				return nil, string.format("MapFunctions.loadGridsIntoMap() failed to overwrite the grid on [%d, %d]:\n%s", colIndex, rowIndex, loadGridMsg)
+			map[x][y], loadGridMsg = map[x][y]:load(gridData)
+			if (map[x][y] == nil) then
+				return nil, string.format("MapFunctions.loadGridsIntoMap() failed to overwrite the grid on [%d, %d]:\n%s", x, y, loadGridMsg)
 			end
 		end
 	end

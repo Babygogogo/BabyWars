@@ -76,8 +76,8 @@ function UnitMap:load(param)
 	self.m_MapSize_ = createModelResult.mapSize
 
 	self:removeAllChildren()
-	for colIndex = 1, self.m_MapSize_.colCount do
-		for rowIndex = 1, self.m_MapSize_.rowCount do
+	for colIndex = 1, self.m_MapSize_.width do
+		for rowIndex = 1, self.m_MapSize_.height do
 			local unit = self.m_Map_[colIndex][rowIndex]
 			if (unit) then
 				self:addChild(unit)

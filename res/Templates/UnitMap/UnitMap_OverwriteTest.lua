@@ -5,15 +5,15 @@ local UnitMap_OverwriteTest = {
 	Units = {
 		{
 			Template = "Infantry",
-			GridIndex = {rowIndex = 1, colIndex = 2},
+			GridIndex = {y = 1, x = 2},
 		},
 		{
 			Template = "Bomber",
-			GridIndex = {rowIndex = 3, colIndex = 9},
+			GridIndex = {y = 3, x = 9},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 6, colIndex = 7},
+			GridIndex = {y = 6, x = 7},
 		},
 	}
 }

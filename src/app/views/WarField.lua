@@ -8,7 +8,7 @@ local UnitMap		= Requirer.view("UnitMap")
 local GameConstant	= Requirer.gameConstant()
 
 local function isMapSizeEqual(size1, size2)
-	return size1.colCount == size2.colCount and size1.rowCount == size2.rowCount
+	return size1.width == size2.width and size1.height == size2.height
 end
 
 local function createField(templateName)
@@ -56,8 +56,8 @@ function WarField:load(templateName)
 	self:removeAllChildren()
 		:addChild(self.m_TileMap_)
 		:addChild(self.m_UnitMap_)
-		:setContentSize(self.m_TileMap_:getMapSize().colCount * GameConstant.GridSize.width,
-						self.m_TileMap_:getMapSize().rowCount * GameConstant.GridSize.height)
+		:setContentSize(self.m_TileMap_:getMapSize().width * GameConstant.GridSize.width,
+						self.m_TileMap_:getMapSize().height * GameConstant.GridSize.height)
 		
 	return self
 end

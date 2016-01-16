@@ -1,47 +1,47 @@
 
 local UnitMap_Test = {
-	MapSize = {rowCount = 15, colCount = 20},
+	MapSize = {height = 15, width = 20},
 	
 	Units = {
 		{
 			Template = "Battleship",
-			GridIndex = {rowIndex = 1, colIndex = 1},
+			GridIndex = {y = 1, x = 1},
 		},
 		{
 			Template = "Bomber",
-			GridIndex = {rowIndex = 1, colIndex = 2},
+			GridIndex = {y = 1, x = 2},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 2, colIndex = 5},
+			GridIndex = {y = 2, x = 5},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 4, colIndex = 8},
+			GridIndex = {y = 4, x = 8},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 5, colIndex = 4},
+			GridIndex = {y = 5, x = 4},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 5, colIndex = 9},
+			GridIndex = {y = 5, x = 9},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 7, colIndex = 14},
+			GridIndex = {y = 7, x = 14},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 8, colIndex = 5},
+			GridIndex = {y = 8, x = 5},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 9, colIndex = 10},
+			GridIndex = {y = 9, x = 10},
 		},
 		{
 			Template = "Tank",
-			GridIndex = {rowIndex = 10, colIndex = 18},
+			GridIndex = {y = 10, x = 18},
 		},
 	}
 }

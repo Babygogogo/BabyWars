@@ -71,6 +71,7 @@ function TileMap.createInstance(param)
 end
 
 function TileMap:load(param)
+---[[
 	local createModelResult, createModelMsg = createModel(param)
 	if (createModelResult == nil) then
 		return nil, "TileMap:load() failed to load from param:\n" .. createModelMsg
@@ -80,9 +81,9 @@ function TileMap:load(param)
 	self.m_Map_ = createModelResult.map
 
 	self:removeAllChildren()
-	for colIndex = 1, self.m_MapSize_.colCount do
-		for rowIndex = 1, self.m_MapSize_.rowCount do
-			local tile = self.m_Map_[colIndex][rowIndex]
+	for x = 1, self.m_MapSize_.width do
+		for y = 1, self.m_MapSize_.height do
+			local tile = self.m_Map_[x][y]
 			if (tile) then
 				self:addChild(tile)
 			end
@@ -90,10 +91,22 @@ function TileMap:load(param)
 	end
 
 	return self
+--]]
+--[[
+	if (param == nil) then
+		return nil, "TileMap:load() the param is nil.\n"
+	end
+	
+	self.m_TMXMap_ = cc.TMXTiledMap:create(param)
+	self:addChild(self.m_TMXMap_)
+	
+	return self
+--]]
 end
 
 function TileMap:getMapSize()
 	return self.m_MapSize_
+--	return self.m_TMXMap_:getMapSize()
 end
 
 return TileMap

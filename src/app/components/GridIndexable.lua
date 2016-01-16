@@ -11,8 +11,8 @@ local EXPORTED_METHODS = {
 }
 
 local function gridIndexToPosition(gridIndex)
-	return	(gridIndex.colIndex - 0.5) * GridSize.width,
-			(gridIndex.rowIndex - 0.5) * GridSize.height
+	return	(gridIndex.x - 0.5) * GridSize.width,
+			(gridIndex.y - 0.5) * GridSize.height
 end
 
 function GridIndexable:init_()
@@ -45,8 +45,8 @@ function GridIndexable:setGridIndexAndPosition(gridIndex)
 		error("GridIndexable:setGridIndexAndPosition() the param gridIndex is invalid:\n" .. checkGridIndexMsg)
 	end
 
-	self.m_GridIndex_.rowIndex = gridIndex.rowIndex
-	self.m_GridIndex_.colIndex = gridIndex.colIndex
+	self.m_GridIndex_.y = gridIndex.y
+	self.m_GridIndex_.x = gridIndex.x
 	self.m_Target_:move(gridIndexToPosition(self.m_GridIndex_))
 end
 

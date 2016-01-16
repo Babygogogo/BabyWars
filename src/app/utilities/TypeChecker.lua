@@ -79,34 +79,34 @@ function TypeChecker.isInt(param)
 	return batchCheck("isInt", {{isInt, param, "param"}})
 end
 
--- GridIndex: {rowIndex : number_int > 0, colIndex : number_int > 0}
+-- GridIndex: {y : number_int > 0, x : number_int > 0}
 function TypeChecker.isGridIndex(gridIndex)
 	return	batchCheck("isGridIndex", {
 		{isExpectedType,	gridIndex,			"gridIndex",			{"table"}	},
-		{isInt,				gridIndex.rowIndex,	"gridIndex.rowIndex"				},
-		{isInt,				gridIndex.colIndex,	"gridIndex.colIndex"				},
-		{isLargerThan,		gridIndex.rowIndex,	"gridIndex.rowIndex",	0			},
-		{isLargerThan,		gridIndex.colIndex,	"gridIndex.colIndex",	0			}
+		{isInt,				gridIndex.y,	"gridIndex.y"				},
+		{isInt,				gridIndex.x,	"gridIndex.x"				},
+		{isLargerThan,		gridIndex.y,	"gridIndex.y",	0			},
+		{isLargerThan,		gridIndex.x,	"gridIndex.x",	0			}
 	})
 end
 
--- MapSize: {rowCount : number_int_ > 0, colCount : number_int_ > 0}
+-- MapSize: {height : number_int_ > 0, width : number_int_ > 0}
 function TypeChecker.isMapSize(mapSize)
 	return batchCheck("isMapSize", {
-		{isExpectedType,	mapSize,			"mapSize",			{"table"}	},
-		{isInt,				mapSize.rowCount,	"mapSize.rowCount"				},
-		{isInt,				mapSize.colCount,	"mapSize.colCount"				},
-		{isLargerThan,		mapSize.rowCount,	"mapSize.rowCount",	0			},
-		{isLargerThan,		mapSize.colCount,	"mapSize.colCount",	0			}
+		{isExpectedType,	mapSize,		"mapSize",			{"table"}	},
+		{isInt,				mapSize.height,	"mapSize.height"				},
+		{isInt,				mapSize.width,	"mapSize.width"					},
+		{isLargerThan,		mapSize.height,	"mapSize.height",	0			},
+		{isLargerThan,		mapSize.width,	"mapSize.width",	0			}
 	})
 end
 
--- isGridInMap: (gridIndex.colIndex <= mapSize.colCount) and (gridIndex.rowIndex <= mapSize.rowCount)
+-- isGridInMap: (gridIndex.x <= mapSize.width) and (gridIndex.y <= mapSize.height)
 -- It's caller's responsibility to ensure that the gridIndex and mapSize is valid.
 function TypeChecker.isGridInMap(gridIndex, mapSize)
 	return batchCheck("isGridInMap", {
-		{isLargerThanOrEqualTo, mapSize.colCount,	"mapSize.colCount",	{value = gridIndex.colIndex, name = "gridIndex.colIndex"}},
-		{isLargerThanOrEqualTo, mapSize.rowCount,	"mapSize.rowCount",	{value = gridIndex.rowIndex, name = "gridIndex.rowIndex"}}
+		{isLargerThanOrEqualTo, mapSize.width,	"mapSize.width",	{value = gridIndex.x, name = "gridIndex.x"}},
+		{isLargerThanOrEqualTo, mapSize.height,	"mapSize.height",	{value = gridIndex.y, name = "gridIndex.y"}}
 	})
 end
 
