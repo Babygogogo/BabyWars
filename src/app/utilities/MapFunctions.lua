@@ -12,9 +12,9 @@ function MapFunctions.loadMapSize(mapData)
 	local checkSizeResult, checkSizeMsg = TypeChecker.isMapSize(mapSize)
 	if (not checkSizeResult) then
 		return nil, "MapFunctions.loadMapSize() failed to load a valid MapSize from param mapData:\n" .. checkSizeMsg
-	else
-		return mapSize
 	end
+
+	return mapSize
 end
 
 function MapFunctions.createEmptyMap(mapSize)
@@ -26,10 +26,10 @@ function MapFunctions.createEmptyMap(mapSize)
 	return map
 end
 
-function MapFunctions.hasNilGrid(map, mapSize)
-	for x = 1, mapSize.width do
+function MapFunctions.hasNilGrid(map)
+	for x = 1, map.size.width do
 		if (map[x] == nil) then return true end
-		for y = 1, mapSize.height do
+		for y = 1, map.size.height do
 			if (map[x][y] == nil) then return true end
 		end
 	end
@@ -37,7 +37,8 @@ function MapFunctions.hasNilGrid(map, mapSize)
 	return false
 end
 
-function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
+function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map)
+	local mapSize = map.size
 	for _, gridData in ipairs(gridsData) do
 		local gridIndex = gridData.GridIndex
 		local checkIndexResult, checkIndexMsg = TypeChecker.isGridInMap(gridIndex, mapSize)
@@ -67,32 +68,6 @@ function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map, mapSize)
 	return map
 end
 
-function MapFunctions.loadTiledDataIntoMap(gridClass, tiledLayer, map, mapSize)
-	for x = 1, mapSize.width do
-		for y = 1, mapSize.height do
-			local gridData = {TiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width], GridIndex = {x = x, y = y}}
-			if (map[x][y] == nil) then
-				local grid, createGridMsg = gridClass.createInstance(gridData)
-				if (grid == nil) then
-					return nil, "MapFunctions.loadTiledDataIntoMap() failed to create a valid grid:\n" .. createGridMsg
-				else
-					map[x][y] = grid
-				end
-			else
-				print(string.format("MapFunctions.loadTiledDataIntoMap() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
-				
-				local loadGridMsg
-				map[x][y], loadGridMsg = map[x][y]:load(gridData)
-				if (map[x][y] == nil) then
-					return nil, string.format("MapFunctions.loadTiledDataIntoMap() failed to overwrite the grid on [%d, %d]:\n%s", x, y, loadGridMsg)
-				end
-			end
-		end
-	end
-	
-	return map
-end
-
 function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
 	local checkLayerResult, checkLayerMsg = TypeChecker.isTiledLayer(tiledLayer)
 	if (checkLayerResult == false) then
@@ -117,14 +92,13 @@ function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
 			local grid, createGridMsg = gridClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
 			if (grid == nil) then
 				return nil, "MapFunctions.createMapWithTiledLayer() failed to create a valid grid:\n" .. createGridMsg
-			else
-				map[x][y] = grid
 			end
+
+			map[x][y] = grid
 		end
 	end
 	
 	return map
 end
-
 
 return MapFunctions
