@@ -135,7 +135,6 @@
             <Filter Name="TileMap" Directory=".\res\Templates\TileMap" >
                 <LuaFile RelativePath=".\res\Templates\TileMap\TileMap_Test.lua" />
                 <LuaFile RelativePath=".\res\Templates\TileMap\TileMap_OverwriteTest.lua" />
-                <LuaFile RelativePath=".\res\Templates\TileMap\TileMap_TiledTest.lua" />
             </Filter>
             <Filter Name="WarField" Directory=".\res\Templates\WarField" >
                 <LuaFile RelativePath=".\res\Templates\WarField\WarField_Test.lua" />

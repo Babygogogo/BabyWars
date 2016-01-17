@@ -35,6 +35,10 @@ local function createModel(param)
 	end
 
 	if (mapData.Template ~= nil) then
+		if (type(mapData.Template) ~= "string") then
+			return nil, "TileMap--createModel() the template field is not the file name of a TiledData."
+		end
+
 		local templateTiledData = requireMapDataFrom(mapData.Template)
 		local checkTemplateResult, checkTemplateMsg = TypeChecker.isTiledData(templateTiledData)
 		if (checkTemplateResult == false) then
@@ -51,7 +55,7 @@ local function createModel(param)
 			return nil, "TileMap--createModel() failed to load tiles to overwrite the template map:\n" .. loadTilesMsg
 		end
 		
-		return {map = map, mapSize = map.size}
+		return map
 	else
 		local checkTiledDataResult, checkTiledDataMsg = TypeChecker.isTiledData(mapData)
 		if (checkTiledDataResult == false) then
@@ -63,7 +67,7 @@ local function createModel(param)
 			return nil, "TileMap--createModel() failed to create a map from the MapData (as TiledData):\n" .. createMapMsg
 		end
 		
-		return {map = map, mapSize = map.size}
+		return map
 	end
 end
 
@@ -88,12 +92,11 @@ function TileMap:load(param)
 		return nil, "TileMap:load() failed to load from param:\n" .. createModelMsg
 	end
 	
-	self.m_MapSize_ = createModelResult.mapSize
-	self.m_Map_ = createModelResult.map
+	self.m_Map_ = createModelResult
 
 	self:removeAllChildren()
-	for x = 1, self.m_MapSize_.width do
-		for y = 1, self.m_MapSize_.height do
+	for x = 1, self.m_Map_.size.width do
+		for y = 1, self.m_Map_.size.height do
 			local tile = self.m_Map_[x][y]
 			if (tile) then
 				self:addChild(tile)
@@ -105,7 +108,7 @@ function TileMap:load(param)
 end
 
 function TileMap:getMapSize()
-	return self.m_MapSize_
+	return self.m_Map_.size
 end
 
 return TileMap

@@ -1,7 +1,6 @@
 
 local WarField_Test = {
---	TileMap = "TileMap_OverwriteTest",
-	TileMap = "TileMap_TiledTest",
+	TileMap = "TileMap_OverwriteTest",
 	UnitMap = "UnitMap_OverwriteTest",
 }
 
