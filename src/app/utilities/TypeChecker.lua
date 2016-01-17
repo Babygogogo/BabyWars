@@ -83,6 +83,17 @@ local function batchCheck(callerName, batch)
 	return true
 end
 
+function TypeChecker.batchCheck(name, batch)
+	for _, item in ipairs(batch) do
+		local checkResult, checkMsg = item[1](unpack(item, 2))
+		if (checkResult == false) then
+			return false, name .. " failed:\n" .. checkMsg
+		end
+	end
+	
+	return true
+end
+
 function TypeChecker.isInt(param)
 	return batchCheck("isInt", {{isInt, param, "param"}})
 end
@@ -90,7 +101,7 @@ end
 -- GridIndex: {y : number_int > 0, x : number_int > 0}
 function TypeChecker.isGridIndex(gridIndex)
 	return	batchCheck("isGridIndex", {
-		{isExpectedType,	gridIndex,			"gridIndex",			{"table"}	},
+		{isExpectedType,	gridIndex,		"gridIndex",	{"table"}	},
 		{isInt,				gridIndex.y,	"gridIndex.y"				},
 		{isInt,				gridIndex.x,	"gridIndex.x"				},
 		{isLargerThan,		gridIndex.y,	"gridIndex.y",	0			},
@@ -124,6 +135,20 @@ function TypeChecker.isSizeEqual(size1, size2)
 	return batchCheck("isSizeEqual", {
 		{isEqualTo,	size1.width,	"size1.width",	{value = size2.width,	name = "size2.width"}},
 		{isEqualTo,	size1.height,	"size1.height",	{value = size2.height,	name = "size2.height"}}
+	})
+end
+
+function TypeChecker.isTiledData(tiledData)
+	return batchCheck("isTiledData", {
+		{isExpectedType,	tiledData,				"tiledData",				{"table"}	},
+		{isExpectedType,	tiledData.tiledversion,	"tiledData.tiledversion",	{"string"}	},
+		{isExpectedType,	tiledData.layers,		"tiledData.layers",			{"table"}	},
+	})
+end
+
+function TypeChecker.isTiledLayer(tiledLayer)
+	return batchCheck("isTiledLayer", {
+		{isExpectedType,	tiledLayer,		"tiledLayer",	{"table"}	}
 	})
 end
 
