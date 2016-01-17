@@ -23,55 +23,48 @@ local function isTiledData(mapData)
 	return mapData.tiledversion ~= nil
 end
 
+local function getTiledLayer(tiledData)
+	-- TODO: search the tiledData for the real TiledLayer
+	return tiledData.layers[1]
+end
+
 local function createModel(param)
 	local mapData = requireMapDataFrom(param)
 	if (mapData == nil) then
 		return nil, "TileMap--createModel() failed to require MapData from param."
 	end
 
-	local map, mapSize
 	if (mapData.Template ~= nil) then
-		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
-		if (createTemplateMapResult == nil) then
-			return nil, string.format("TileMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
-		end		
+		local templateTiledData = requireMapDataFrom(mapData.Template)
+		local checkTemplateResult, checkTemplateMsg = TypeChecker.isTiledData(templateTiledData)
+		if (checkTemplateResult == false) then
+			return nil, "TileMap--createModel() failed to require template TiledData from param."
+		end
 		
-		map, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
+		local templateMap, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledLayer(templateTiledData), Tile)
+		if (templateMap == nil) then
+			return nil, "TileMap--createModel() failed to create a template map from template TiledData:\n" .. createMapMsg
+		end
+		
+		local map, loadTilesMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, templateMap, templateMap.size)
+		if (map == nil) then
+			return nil, "TileMap--createModel() failed to load tiles to overwrite the template map:\n" .. loadTilesMsg
+		end
+		
+		return {map = map, mapSize = map.size}
 	else
-		local loadSizeMsg
-		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
-		if (mapSize == nil) then
-			return nil, "TileMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
+		local checkTiledDataResult, checkTiledDataMsg = TypeChecker.isTiledData(mapData)
+		if (checkTiledDataResult == false) then
+			return nil, "TileMap--createModel() the MapData has no template and is not TiledData:\n" .. checkTiledDataMsg
 		end
-
-		map = MapFunctions.createEmptyMap(mapSize)
-	end	
-
-	if (isTiledData(mapData)) then
-		if (not TypeChecker.isSizeEqual(mapSize, MapFunctions.loadMapSize(mapData))) then
-			return nil, "TileMap--createModel() the MapSize of the overwriting data and the one of the template data is not the same."
-		end
-
-		local loadTiledDataMsg
-		map, loadTiledDataMsg = MapFunctions.loadTiledDataIntoMap(Tile, mapData.layers[1], map, mapSize)
-		if (map == nil) then
-			return nil, "TileMap--createModel() failed to load tiled data:\n" .. loadTiledDataMsg
-		end
-	end
-
-	if (mapData.Tiles ~= nil) then
-		local loadTilesIntoMapMsg
-		map, loadTilesIntoMapMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, map, mapSize)
-		if (map == nil) then
-			return nil, "TileMap--createModel() failed to load tiles:\n" .. loadTilesIntoMapMsg
-		end
-	end
 	
-	if (MapFunctions.hasNilGrid(map, mapSize)) then
-		return nil, "TileMap--createModel() some tiles on the map are missing."
+		local map, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledLayer(mapData), Tile)
+		if (map == nil) then
+			return nil, "TileMap--createModel() failed to create a map from the MapData (as TiledData):\n" .. createMapMsg
+		end
+		
+		return {map = map, mapSize = map.size}
 	end
-	
-	return {mapSize = mapSize, map = map}
 end
 
 function TileMap:ctor(param)

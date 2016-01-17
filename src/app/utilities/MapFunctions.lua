@@ -18,7 +18,7 @@ function MapFunctions.loadMapSize(mapData)
 end
 
 function MapFunctions.createEmptyMap(mapSize)
-	local map = {}
+	local map = {size = mapSize}
 	for i = 1, mapSize.width do
 		map[i] = {}
 	end
@@ -122,6 +122,8 @@ function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
 			end
 		end
 	end
+	
+	return map
 end
 
 
