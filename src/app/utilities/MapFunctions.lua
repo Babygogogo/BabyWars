@@ -4,6 +4,10 @@ local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
 
 function MapFunctions.loadMapSize(mapData)
+	if (type(mapData) ~= "table") then
+		return nil, "MapFunctions.loadMapSize() the param mapData is not a table."
+	end
+	
 	local mapSize = mapData.MapSize or {width = mapData.width, height = mapData.height}
 	local checkSizeResult, checkSizeMsg = TypeChecker.isMapSize(mapSize)
 	if (not checkSizeResult) then
@@ -88,5 +92,37 @@ function MapFunctions.loadTiledDataIntoMap(gridClass, tiledLayer, map, mapSize)
 	
 	return map
 end
+
+function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
+	local checkLayerResult, checkLayerMsg = TypeChecker.isTiledLayer(tiledLayer)
+	if (checkLayerResult == false) then
+		return nil, "MapFunctions.createMapWithTiledLayer() the param tiledLayer is invalid:\n" .. checkLayerMsg
+	end
+
+	local mapSize = MapFunctions.loadMapSize(tiledLayer)
+	if (mapSize == nil) then
+		return nil, "MapFunctions.createMapWithTiledLayer() failed to load MapSize from param tiledLayer."
+	end
+
+	local map = MapFunctions.createEmptyMap(mapSize)
+	local width, height = mapSize.width, mapSize.height
+	for x = 1, width do
+		for y = 1, height do
+			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
+			local checkIdResult, checkIdMsg = TypeChecker.isTiledID(tiledID)
+			if (checkIdResult == false) then
+				return nil, "MapFunctions.createMapWithTiledLayer() failed to load a valid TiledID from TiledLayer:\n" .. checkIdMsg
+			end
+			
+			local grid, createGridMsg = gridClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
+			if (grid == nil) then
+				return nil, "MapFunctions.createMapWithTiledLayer() failed to create a valid grid:\n" .. createGridMsg
+			else
+				map[x][y] = grid
+			end
+		end
+	end
+end
+
 
 return MapFunctions

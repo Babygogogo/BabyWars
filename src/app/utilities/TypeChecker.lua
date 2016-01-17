@@ -148,7 +148,15 @@ end
 
 function TypeChecker.isTiledLayer(tiledLayer)
 	return batchCheck("isTiledLayer", {
-		{isExpectedType,	tiledLayer,		"tiledLayer",	{"table"}	}
+		{isExpectedType,	tiledLayer,			"tiledLayer",		{"table"}	},
+		{isExpectedType,	tiledLayer.data,	"tiledLayer.data",	{"table"}	}
+	})
+end
+
+function TypeChecker.isTiledID(tiledID)
+	return batchCheck("isTiledID", {
+		{isInt,					tiledID,	"tiledID"		},
+		{isLargerThanOrEqualTo,	tiledID,	"tiledID",	0	}
 	})
 end
 
