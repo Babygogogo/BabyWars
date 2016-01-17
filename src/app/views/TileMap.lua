@@ -19,10 +19,6 @@ local function requireMapDataFrom(param)
 	end
 end
 
-local function isTiledData(mapData)
-	return mapData.tiledversion ~= nil
-end
-
 local function getTiledLayer(tiledData)
 	-- TODO: search the tiledData for the real TiledLayer
 	return tiledData.layers[1]
@@ -34,6 +30,7 @@ local function createModel(param)
 		return nil, "TileMap--createModel() failed to require MapData from param."
 	end
 
+	local map
 	if (mapData.Template ~= nil) then
 		if (type(mapData.Template) ~= "string") then
 			return nil, "TileMap--createModel() the template field is not the file name of a TiledData."
@@ -50,25 +47,29 @@ local function createModel(param)
 			return nil, "TileMap--createModel() failed to create a template map from template TiledData:\n" .. createMapMsg
 		end
 		
-		local map, loadTilesMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, templateMap, templateMap.size)
+		local loadTilesMsg
+		map, loadTilesMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, templateMap, templateMap.size)
 		if (map == nil) then
 			return nil, "TileMap--createModel() failed to load tiles to overwrite the template map:\n" .. loadTilesMsg
 		end
-		
-		return map
 	else
 		local checkTiledDataResult, checkTiledDataMsg = TypeChecker.isTiledData(mapData)
 		if (checkTiledDataResult == false) then
 			return nil, "TileMap--createModel() the MapData has no template and is not TiledData:\n" .. checkTiledDataMsg
 		end
 	
-		local map, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledLayer(mapData), Tile)
+		local createMapMsg
+		map, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledLayer(mapData), Tile)
 		if (map == nil) then
 			return nil, "TileMap--createModel() failed to create a map from the MapData (as TiledData):\n" .. createMapMsg
 		end
-		
-		return map
 	end
+
+	if (MapFunctions.hasNilGrid(map)) then
+		return nil, "TileMap--createModel() some tiles on the map are missing."
+	end
+	
+	return map
 end
 
 function TileMap:ctor(param)

@@ -28,32 +28,26 @@ return {
       properties = {},
       terrains = {},
       tilecount = 4,
-      tiles = {
-        {
-          id = 0,
-          properties = {
-            ["View"] = "01"
-          }
-        },
-        {
-          id = 1,
-          properties = {
-            ["View"] = "01"
-          }
-        },
-        {
-          id = 2,
-          properties = {
-            ["View"] = "01"
-          }
-        },
-        {
-          id = 3,
-          properties = {
-            ["View"] = "01"
-          }
-        }
-      }
+      tiles = {}
+    },
+    {
+      name = "BabyWarsUnits",
+      firstgid = 5,
+      tilewidth = 48,
+      tileheight = 48,
+      spacing = 2,
+      margin = 2,
+      image = "../../BabyWarsUnits.png",
+      imagewidth = 128,
+      imageheight = 256,
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      properties = {},
+      terrains = {},
+      tilecount = 10,
+      tiles = {}
     }
   },
   layers = {

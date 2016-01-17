@@ -84,17 +84,11 @@ function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
 	for x = 1, width do
 		for y = 1, height do
 			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
-			local checkIdResult, checkIdMsg = TypeChecker.isTiledID(tiledID)
-			if (checkIdResult == false) then
-				return nil, "MapFunctions.createMapWithTiledLayer() failed to load a valid TiledID from TiledLayer:\n" .. checkIdMsg
-			end
-			
-			local grid, createGridMsg = gridClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
-			if (grid == nil) then
-				return nil, "MapFunctions.createMapWithTiledLayer() failed to create a valid grid:\n" .. createGridMsg
+			if (tiledID == nil) then
+				return nil, string.format("MapFunctions.createMapWithTiledLayer() failed to load a valid TiledID on '[%d, %d]' from TiledLayer.", x, y)
 			end
 
-			map[x][y] = grid
+			map[x][y] = gridClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
 		end
 	end
 	
