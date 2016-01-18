@@ -25,6 +25,10 @@ function Requirer.view(viewName)
 	return require("app.views." .. viewName)
 end
 
+function Requirer.model(modelName)
+	return require("app.models." .. modelName)
+end
+
 function Requirer.utility(utilityName)
 	return require("app.utilities." .. utilityName)
 end

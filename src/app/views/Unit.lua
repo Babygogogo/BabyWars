@@ -28,7 +28,7 @@ function Unit:load(unitData)
 	end
 	
 	if (createModelResult.gridIndex ~= nil) then
-		if (not ComponentManager.hasBinded(self, "GridIndexable")) then	
+		if (not ComponentManager.hasBound(self, "GridIndexable")) then	
 			ComponentManager.bindComponent(self, "GridIndexable")
 		end
 		self:setGridIndexAndPosition(createModelResult.gridIndex)

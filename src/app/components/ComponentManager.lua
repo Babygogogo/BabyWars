@@ -92,7 +92,7 @@ function ComponentManager.getComponent(target, componentName)
 	end
 end
 
-function ComponentManager.hasBinded(target, componentName)
+function ComponentManager.hasBound(target, componentName)
 	if (target.components_ == nil) then
 		return false
 	end

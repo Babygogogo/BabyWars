@@ -3,10 +3,31 @@ local Actor = class("Actor")
 local Requirer			= require"app.utilities.Requirer"
 local ComponentManager	= Requirer.component("ComponentManager")
 
-function Actor:ctor(...)
-	self:bindComponent(...)
+function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
+	local actor = Actor.new():setModel(modelInstance):setView(viewInstance)
+		
+	if (modelInstance.initView ~= nil) then
+		local initViewResult, initViewMsg = modelInstance.initView()
+		if (not initViewResult) then
+			return nil, "Actor.createWithModelAndViewInstance() failed to initialize view:\n" .. initViewMsg
+		end
+	end
 	
-	return self
+	return actor
+end
+
+function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
+	local model, createModelMsg = Requirer.model(modelName).createInstance(modelParam)
+	if (model == nil) then
+		return nil, string.format("Actor.createWithModelAndViewName() failed to create the model '%s':\n%s", modelName, createModelMsg)
+	end
+	
+	local view, createViewMsg = Requirer.view(viewName).createInstance(viewParam)
+	if (view == nil) then
+		return nil, string.format("Actor.createWithModelAndViewName() failed to create the view '%s':\n%s", viewName, createViewMsg)
+	end
+
+	return Actor.createWithModelAndViewInstance(model, view)
 end
 
 function Actor:bindComponent(...)
@@ -27,7 +48,7 @@ function Actor:unbindAllComponents()
 	return self
 end
 
-function Actor:hasBinded(componentName)
+function Actor:hasBound(componentName)
 	return ComponentManager.hasBinded(self, componentName)
 end
 

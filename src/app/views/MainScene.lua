@@ -4,13 +4,13 @@ local Requirer	= require"app.utilities.Requirer"
 local Actor		= Requirer.actor()
 
 local function createBackgroundActor()
-	local bgSprite = display.newSprite("mainBG.png")
+	local bgView = display.newSprite("mainBG.png")
 		:move(display.center)
 
-	Requirer.component("ComponentManager").bindComponent(bgSprite, "DraggableWithinBoundary")
-	bgSprite:setDragBoundaryRect({x = 0, y = 0, width = display.width, height = display.height})
+	Requirer.component("ComponentManager").bindComponent(bgView, "DraggableWithinBoundary")
+	bgView:setDragBoundaryRect({x = 0, y = 0, width = display.width, height = display.height})
 
-	return Actor.new():setView(bgSprite)
+	return Actor.new():setView(bgView)
 end
 
 local function createStartBtnActor()
@@ -20,7 +20,7 @@ local function createStartBtnActor()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			local warScene, createWarSceneMsg = Requirer.view("WarScene").new():load("WarScene_Test")
+			local warScene, createWarSceneMsg = Requirer.view("WarScene").createInstance("WarScene_Test")
 			assert(warScene, createWarSceneMsg)
 			display.runScene(warScene, "CrossFade", 0.5)
 		end
