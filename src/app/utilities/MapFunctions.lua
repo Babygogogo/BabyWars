@@ -37,6 +37,16 @@ function MapFunctions.hasNilGrid(map)
 	return false
 end
 
+function MapFunctions.clearAndAddGridViews(mapView, gridViews)
+	mapView:removeAllChildren()
+	local width, height = gridViews.size.width, gridViews.size.height
+	for x = 1, width do
+		for y = 1, height do
+			mapView:addChild(gridViews[x][y])
+		end
+	end
+end
+
 function MapFunctions.loadGridsIntoMap(gridClass, gridsData, map)
 	local mapSize = map.size
 	for _, gridData in ipairs(gridsData) do

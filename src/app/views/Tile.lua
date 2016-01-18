@@ -4,7 +4,7 @@ local Tile = class("Tile", function()
 end)
 local Requirer			= require"app.utilities.Requirer"
 local TileTemplates		= Requirer.gameConstant().Tile
-local TiledIdMapping	= Requirer.gameConstant().TiledID_Tile_Mapping
+local TiledIdMapping	= Requirer.gameConstant().TiledID_Mapping
 local ComponentManager	= Requirer.component("ComponentManager")
 
 local function toTileTemplate(tiledID)

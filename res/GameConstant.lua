@@ -2,11 +2,15 @@
 local GameConstant = {
 	GridSize = {width = 48, height = 48},
 
-	TiledID_Tile_Mapping = {
-		{Template = "Sea",		View = 1},
-		{Template = "Plain",	View = 1},
-		{Template = "Road",		View = 1},
-		{Template = "Forest",	View = 1},
+	TiledID_Mapping = {
+		-- Tile
+		{Template = "Sea",		View = 1},	--1
+		{Template = "Plain",	View = 1},	--2
+		{Template = "Road",		View = 1},	--3
+		{Template = "Forest",	View = 1},	--4
+		-- Unit
+		{Template = "Tank",		View = 1},	--5
+		{Template = "Tank",		View = 2},	--6
 	},
 	
 	Tile = {

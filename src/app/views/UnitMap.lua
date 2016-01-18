@@ -19,6 +19,10 @@ local function requireMapDataFrom(param)
 	end
 end
 
+local function getTiledUnitLayer(tiledData)
+	return tiledData.layers[2]
+end
+
 local function createModel(param)
 	local mapData = requireMapDataFrom(param)
 	if (mapData == nil) then
