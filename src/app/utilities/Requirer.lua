@@ -33,4 +33,8 @@ function Requirer.gameConstant()
 	return require("res.GameConstant")
 end
 
+function Requirer.actor()
+	return require("app.actor.Actor")
+end
+
 return Requirer

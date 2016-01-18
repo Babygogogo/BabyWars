@@ -29,6 +29,9 @@
                 <LuaFile RelativePath=".\src\app\utilities\Requirer.lua" />
                 <LuaFile RelativePath=".\src\app\utilities\MapFunctions.lua" />
             </Filter>
+            <Filter Name="actor" >
+                <LuaFile RelativePath=".\src\app\actor\Actor.lua" />
+            </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
             <LuaFile RelativePath=".\src\cocos\init.lua" />

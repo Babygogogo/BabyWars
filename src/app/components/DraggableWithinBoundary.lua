@@ -1,5 +1,7 @@
 
 local DraggableWithinBoundary = class("DraggableWithinBoundary")
+local Requirer			= require"app.utilities.Requirer"
+local ComponentManager	= Requirer.component("ComponentManager")
 
 local EXPORTED_METHODS = {
 	"setDragWithinBoundaryEnabled",
@@ -49,8 +51,10 @@ function DraggableWithinBoundary:unregisterListenerFromTarget_()
 end
 
 function DraggableWithinBoundary:bind(target)
+	assert(iskindof(target, "cc.Node"), "DraggableWithinBoundary:bind() the param target is not a kind of cc.Node.")
+
 	self:init_()
-	require"app.components.ComponentManager".setMethods(target, self, EXPORTED_METHODS)
+	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
 
 	self.target_ = target
 	self:registerListenerToTarget_()

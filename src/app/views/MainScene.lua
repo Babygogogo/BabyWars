@@ -1,18 +1,19 @@
 
 local MainScene = class("MainScene", cc.load("mvc").ViewBase)
-local Requirer = require"app.utilities.Requirer"
+local Requirer	= require"app.utilities.Requirer"
+local Actor		= Requirer.actor()
 
-local function createBackground_()
+local function createBackgroundActor()
 	local bgSprite = display.newSprite("mainBG.png")
 		:move(display.center)
 
 	Requirer.component("ComponentManager").bindComponent(bgSprite, "DraggableWithinBoundary")
 	bgSprite:setDragBoundaryRect({x = 0, y = 0, width = display.width, height = display.height})
 
-	return bgSprite
+	return Actor.new():setView(bgSprite)
 end
 
-local function createStartBtn_()
+local function createStartBtnActor()
 	local btn = ccui.Button:create()
 		:move(display.center)
 		:loadTextureNormal("startBtn_N.png", ccui.TextureResType.plistType)
@@ -25,12 +26,15 @@ local function createStartBtn_()
 		end
 	end)
 
-	return btn
+	return Actor.new():setView(btn)
 end
 
 function MainScene:onCreate()
-	self:addChild(createBackground_())
-	self:addChild(createStartBtn_())
+	self.m_BgActor_ = createBackgroundActor()
+	self:addChild(self.m_BgActor_:getView())
+	
+	self.m_StartBtn_ = createStartBtnActor()
+	self:addChild(self.m_StartBtn_:getView())
 end
 
 return MainScene
