@@ -2,7 +2,7 @@
 local GameConstant = {
 	GridSize = {width = 48, height = 48},
 
-	TiledID_Mapping = {
+	TiledIdMapping = {
 		-- Tile
 		{Template = "Sea",		View = 1},	--1
 		{Template = "Plain",	View = 1},	--2
@@ -13,18 +13,37 @@ local GameConstant = {
 		{Template = "Tank",		View = 2},	--6
 	},
 	
-	Tile = {
+	TileModelTemplates = {
 		Forest = {
-			Animation = "Tile_Forest_01.png",
+			DefenseBonus	= 0.2,
+			Animation		= "Tile_Forest_01.png",
 		},
 		Plain = {
-			Animation = "Tile_Plain_01.png",
+			DefenseBonus	= 0.1,
+			Animation		= "Tile_Plain_01.png",
 		},
 		Road = {
-			Animation = "Tile_Road_01.png",
+			DefenseBonus	= 0,
+			Animation		= "Tile_Road_01.png",
 		},
 		Sea = {
-			Animation = "Tile_Sea_01.png",
+			DefenseBonus	= 0,
+			Animation		= "Tile_Sea_01.png",
+		},
+	},
+	
+	TileViewTemplates = {
+		Forest = {
+			{Animation		= "Tile_Forest_01.png"},	-- Forest 1
+		},
+		Plain = {
+			{Animation		= "Tile_Plain_01.png"},		-- Plain 1
+		},
+		Road = {
+			{Animation		= "Tile_Road_01.png"},		-- Road 1
+		},
+		Sea = {
+			{Animation		= "Tile_Sea_01.png"},		-- Sea 1
 		},
 	},
 

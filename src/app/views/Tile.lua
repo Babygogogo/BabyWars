@@ -3,8 +3,8 @@ local Tile = class("Tile", function()
 	return display.newSprite()
 end)
 local Requirer			= require"app.utilities.Requirer"
-local TileTemplates		= Requirer.gameConstant().Tile
-local TiledIdMapping	= Requirer.gameConstant().TiledID_Mapping
+local TileTemplates		= Requirer.gameConstant().TileModelTemplates
+local TiledIdMapping	= Requirer.gameConstant().TiledIdMapping
 local ComponentManager	= Requirer.component("ComponentManager")
 
 local function toTileTemplate(tiledID)

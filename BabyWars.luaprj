@@ -32,6 +32,9 @@
             <Filter Name="actor" >
                 <LuaFile RelativePath=".\src\app\actor\Actor.lua" />
             </Filter>
+            <Filter Name="models" >
+                <LuaFile RelativePath=".\src\app\models\ModelTile.lua" />
+            </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
             <LuaFile RelativePath=".\src\cocos\init.lua" />
