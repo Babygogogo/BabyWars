@@ -17,7 +17,7 @@
                 </Filter>
                 <Filter Name="WarScene" >
                     <LuaFile RelativePath=".\src\app\views\Tile.lua" />
-                    <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
+                    <LuaFile RelativePath=".\src\app\views\ViewTileMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\Unit.lua" />
                     <LuaFile RelativePath=".\src\app\views\UnitMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\ViewWarField.lua" />
@@ -35,6 +35,7 @@
             <Filter Name="models" >
                 <LuaFile RelativePath=".\src\app\models\ModelTile.lua" />
                 <LuaFile RelativePath=".\src\app\models\ModelWarField.lua" />
+                <LuaFile RelativePath=".\src\app\models\ModelTileMap.lua" />
             </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >

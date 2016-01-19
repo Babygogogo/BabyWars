@@ -2,6 +2,7 @@
 local MapFunctions = {}
 local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
+local Actor			= Requirer.actor()
 
 function MapFunctions.loadMapSize(mapData)
 	assert(TypeChecker.isMapData(mapData))
@@ -116,6 +117,57 @@ function MapFunctions.createMapModelWithTiledLayer(tiledLayer, gridModelClass)
 		end
 	end
 	
+	return map
+end
+
+function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, gridModelClass, gridViewClass)
+	assert(TypeChecker.isTiledLayer(tiledLayer))
+	
+	local mapSize = MapFunctions.loadMapSize(tiledLayer)
+	local map = MapFunctions.createEmptyMap(mapSize)
+	local width, height = mapSize.width, mapSize.height
+	
+	for x = 1, width do
+		for y = 1, height do
+			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
+			assert(TypeChecker.isTiledID(tiledID))
+	
+			local gridData = {TiledID = tiledID, GridIndex = {x = x, y = y}}
+			local model = gridModelClass and gridModelClass.createInstance(gridData) or nil
+			local view = gridViewClass and gridViewClass.createInstance(gridData) or nil
+			
+			map[x][y] = Actor.createWithModelAndViewInstance(model, view)
+		end
+	end
+	
+	return map
+end
+
+function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, gridModelClass, gridViewClass)
+	local mapSize = map.size
+	assert(TypeChecker.isMapSize(mapSize))
+	
+	for _, gridData in ipairs(gridsData) do
+		local gridIndex = gridData.GridIndex
+		assert(TypeChecker.isGridIndex(gridIndex))
+		assert(TypeChecker.isGridInMap(gridIndex, mapSize))
+		
+		local x, y = gridIndex.x, gridIndex.y
+		if (map[x][y] == nil) then
+			local model = gridModelClass and gridModelClass.createInstance(gridData) or nil
+			local view = gridViewClass and gridViewClass.createInstance(gridData) or nil
+			map[x][y] = Actor.createWithModelAndViewInstance(model, view)
+		else
+			print(string.format("MapFunctions.updateGridActorsMapWithGridsData() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
+
+			local view = map[x][y]:getView()
+			if (view) then view:load(gridData) end
+
+			local model = map[x][y]:getModel()
+			if (model) then model:load(gridData) end
+		end
+	end
+
 	return map
 end
 
