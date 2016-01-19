@@ -17,14 +17,15 @@ function ViewWarField:load(param)
 end
 
 function ViewWarField.createInstance(param)
-	local view, createViewMsg = ViewWarField.new():load(param)
-	assert(view, "ViewWarField.createInstance() failed:\n" .. (createViewMsg or ""))
+	local view = ViewWarField.new():load(param)
+	assert(view, "ViewWarField.createInstance() failed.")
 
 	return view
 end
 
 function ViewWarField:setContentSizeWithMapSize(mapSize)
 	assert(TypeChecker.isMapSize(mapSize))
+
 	local gridSize = GameConstant.GridSize
 	self:setContentSize(mapSize.width * gridSize.width, mapSize.height * gridSize.height)
 	

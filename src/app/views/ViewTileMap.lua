@@ -14,8 +14,8 @@ function ViewTileMap:load(param)
 end
 
 function ViewTileMap.createInstance(param)
-	local view, createViewMsg = ViewTileMap.new():load(param)
-	assert(view, "ViewTileMap.createInstance() failed:\n" .. (createViewMsg or ""))
+	local view = ViewTileMap.new():load(param)
+	assert(view, "ViewTileMap.createInstance() failed.")
 
 	return view
 end

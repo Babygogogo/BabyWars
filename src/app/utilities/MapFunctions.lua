@@ -1,5 +1,6 @@
 
 local MapFunctions = {}
+
 local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
 local Actor			= Requirer.actor()

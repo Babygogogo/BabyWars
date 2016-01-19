@@ -19,8 +19,8 @@ local function requireFieldData(param)
 end
 
 local function createTileMapActor(tileMapData)
-	local view, createViewMsg = Requirer.view("ViewTileMap").createInstance(tileMapData)
-	assert(view, "ModelWarField--createTileMapActor() failed to create ViewTileMap:\n" .. (createViewMsg or ""))
+	local view = Requirer.view("ViewTileMap").createInstance(tileMapData)
+	assert(view, "ModelWarField--createTileMapActor() failed to create ViewTileMap.")
 	
 	local model = Requirer.model("ModelTileMap").createInstance(tileMapData)
 	assert(model, "ModelWarField--createTileMapActor() failed to create ModelTileMap.")
@@ -56,11 +56,11 @@ function ModelWarField:ctor(param)
 end
 
 function ModelWarField:load(templateName)
-	local actorsInField = createChildrenActors(templateName)
-	assert(actorsInField, "ModelWarField:load() failed to create actors in field with param.")
+	local childrenActors = createChildrenActors(templateName)
+	assert(childrenActors, "ModelWarField:load() failed to create actors in field with param.")
 		
-	self.m_TileMapActor_ = actorsInField.TileMapActor
-	self.m_UnitMapActor_ = actorsInField.UnitMapActor
+	self.m_TileMapActor_ = childrenActors.TileMapActor
+	self.m_UnitMapActor_ = childrenActors.UnitMapActor
 	
 	if (self.m_View_) then self:initView() end
 
@@ -68,8 +68,8 @@ function ModelWarField:load(templateName)
 end
 
 function ModelWarField.createInstance(param)
-	local model, createModelMsg = ModelWarField.new():load(param)
-	assert(model, "ModelWarField.createInstance() failed:\n" .. (createModelMsg or ""))
+	local model = ModelWarField.new():load(param)
+	assert(model, "ModelWarField.createInstance() failed.")
 
 	return model
 end

@@ -21,23 +21,24 @@ local function requireSceneData(param)
 end
 
 local function createWarFieldActor(warFieldData)
-	local view, createViewMsg = ViewWarField.createInstance(warFieldData)
-	assert(view, "WarScene--createWarFieldActor() failed to create ViewWarField:\n" .. (createViewMsg or ""))
+	local view = ViewWarField.createInstance(warFieldData)
+	assert(view, "WarScene--createWarFieldActor() failed to create a ViewWarField.")
+
 	ComponentManager.bindComponent(view, "DraggableWithinBoundary")
 	view:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
 	
-	local model, createModelMsg = ModelWarField.createInstance(warFieldData)
-	assert(model, "WarScene--createWarFieldActor() failed to create ModelWarField:\n" .. (createModelMsg or ""))
+	local model = ModelWarField.createInstance(warFieldData)
+	assert(model, "WarScene--createWarFieldActor() failed to create a ModelWarField.")
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end
 
-local function createActorsInScene(param)
+local function createChildrenActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
 	local warFieldActor = createWarFieldActor(sceneData.WarField)
-	assert(warFieldActor, "WarScene--createActorsInScene() failed to create WarField actor.")
+	assert(warFieldActor, "WarScene--createChildrenActors() failed to create WarField actor.")
 
 	return {WarFieldActor = warFieldActor}	
 end
@@ -49,7 +50,7 @@ function WarScene:ctor(param)
 end
 
 function WarScene:load(param)
-	local actorsInScene = createActorsInScene(param)
+	local actorsInScene = createChildrenActors(param)
 	assert(actorsInScene, "WarScene:load() failed to create actors in scene with param.")
 	
 	local warFieldActor = actorsInScene.WarFieldActor
@@ -62,8 +63,8 @@ function WarScene:load(param)
 end
 
 function WarScene.createInstance(param)
-	local warScene, createActorsInSceneMsg = WarScene.new():load(param)
-	assert(warScene, "WarScene.createInstance() failed:\n" .. (createActorsInSceneMsg or ""))
+	local warScene = WarScene.new():load(param)
+	assert(warScene, "WarScene.createInstance() failed.")
 	
 	return warScene
 end
