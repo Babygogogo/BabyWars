@@ -3,7 +3,9 @@ local WarScene = class("WarScene", function()
 	return display.newScene()
 end)
 local Requirer			= require"app.utilities.Requirer"
-local WarField			= Requirer.view("WarField")
+local Actor				= Requirer.actor()
+local ViewWarField		= Requirer.view("ViewWarField")
+local TypeChecker		= Requirer.utility("TypeChecker")
 local ComponentManager	= Requirer.component("ComponentManager")
 
 local function requireSceneData(param)
@@ -17,46 +19,49 @@ local function requireSceneData(param)
 	end
 end
 
-local function createScene(param)
+local function createViewWarFieldActor(warFieldData)
+	local actor = Actor.new()
+	
+	local view, createViewMsg = ViewWarField.createInstance(warFieldData)
+	assert(view, "WarScene--createViewWarFieldActor() failed:\n" .. (createViewMsg or ""))
+	
+	ComponentManager.bindComponent(view, "DraggableWithinBoundary")
+	view:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
+	
+	actor:setView(view)
+	return actor
+end
+
+local function createActorsInScene(param)
 	local sceneData = requireSceneData(param)
-	if (type(sceneData) ~= "table") then
-		return nil, "WarScene--createScene() failed to require SceneData from param."
-	end
+	assert(TypeChecker.isWarSceneData(sceneData))
 
-	local warField, createWarFieldMsg = WarField.new():load(sceneData.WarField)
-	if (warField == nil) then
-		return nil, "WarScene--createScene() failed to create a WarField: \n" .. createWarFieldMsg
-	end
+	local warFieldActor = createViewWarFieldActor(sceneData.WarField)
 
-	return {warField = warField}	
+	return {ViewWarFieldActor = warFieldActor}	
 end
 
 function WarScene:ctor(param)
-	self:load(param)
+	if (param) then self:load(param) end
 	
 	return self
 end
 
 function WarScene:load(param)
-	local createSceneResult, createSceneMsg = createScene(param)
-	if (createSceneResult == nil) then
-		return nil, string.format("WarScene:load() failed to load template '%s':\n%s", param, createSceneMsg)
-	end
-	
-	local warField = createSceneResult.warField
-	ComponentManager.bindComponent(warField, "DraggableWithinBoundary")
-	warField:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
-	
+	local actorsInScene = createActorsInScene(param)
+	local warFieldActor = actorsInScene.ViewWarFieldActor
+
+	self.m_ViewWarFieldActor_ = warField
 	self:removeAllChildren()
-		:addChild(warField)
+		:addChild(warFieldActor:getView())
 		
 	return self
 end
 
 function WarScene.createInstance(param)
-	local warScene, createSceneMsg = WarScene.new():load(param)
+	local warScene, createActorsInSceneMsg = WarScene.new():load(param)
 	if (warScene == nil) then
-		return nil, "WarScene.createInstance() failed:\n" .. createSceneMsg
+		return nil, "WarScene.createInstance() failed:\n" .. createActorsInSceneMsg
 	end
 	
 	return warScene

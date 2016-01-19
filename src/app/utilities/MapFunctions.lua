@@ -4,15 +4,10 @@ local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
 
 function MapFunctions.loadMapSize(mapData)
-	if (type(mapData) ~= "table") then
-		return nil, "MapFunctions.loadMapSize() the param mapData is not a table."
-	end
+	assert(TypeChecker.isMapData(mapData))
 	
 	local mapSize = mapData.MapSize or {width = mapData.width, height = mapData.height}
-	local checkSizeResult, checkSizeMsg = TypeChecker.isMapSize(mapSize)
-	if (not checkSizeResult) then
-		return nil, "MapFunctions.loadMapSize() failed to load a valid MapSize from param mapData:\n" .. checkSizeMsg
-	end
+	assert(TypeChecker.isMapSize(mapSize))
 
 	return mapSize
 end
@@ -99,6 +94,25 @@ function MapFunctions.createMapWithTiledLayer(tiledLayer, gridClass)
 			end
 
 			map[x][y] = gridClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
+		end
+	end
+	
+	return map
+end
+
+function MapFunctions.createMapModelWithTiledLayer(tiledLayer, gridModelClass)
+	assert(TypeChecker.isTiledLayer(tiledLayer))
+
+	local mapSize = MapFunctions.loadMapSize(tiledLayer)
+	local map = MapFunctions.createEmptyMap(mapSize)
+	local width, height = mapSize.width, mapSize.height
+	
+	for x = 1, width do
+		for y = 1, height do
+			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
+			assert(TypeChecker.isTiledID(tiledID))
+			
+			map[x][y] = gridModelClass.createInstance({TiledID = tiledID, GridIndex = {x = x, y = y}})
 		end
 	end
 	

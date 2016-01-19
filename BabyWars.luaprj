@@ -20,7 +20,7 @@
                     <LuaFile RelativePath=".\src\app\views\TileMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\Unit.lua" />
                     <LuaFile RelativePath=".\src\app\views\UnitMap.lua" />
-                    <LuaFile RelativePath=".\src\app\views\WarField.lua" />
+                    <LuaFile RelativePath=".\src\app\views\ViewWarField.lua" />
                     <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                 </Filter>
             </Filter>

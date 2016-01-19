@@ -160,4 +160,16 @@ function TypeChecker.isTiledID(tiledID)
 	})
 end
 
+function TypeChecker.isMapData(mapData)
+	return batchCheck("isMapData", {
+		{isExpectedType,	mapData,	"mapData",	{"table"}	}
+	})
+end
+
+function TypeChecker.isWarSceneData(warSceneData)
+	return batchCheck("isWarSceneData", {
+		{isExpectedType,	warSceneData,	"warSceneData",		{"table"}	}
+	})
+end
+
 return TypeChecker
