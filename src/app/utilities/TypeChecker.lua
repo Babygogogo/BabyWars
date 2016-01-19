@@ -13,6 +13,39 @@ local function isExpectedType(checkee, checkeeName, checkParams)
 	return false, string.format("TypeChecker--isExpectedType(): %s is a %s; expected one of: %s", checkeeName, checkeeType, expectedTypeNames)
 end
 
+local function isKindOf_(cls, name)
+    local __index = rawget(cls, "__index")
+    if type(__index) == "table" and rawget(__index, "__cname") == name then return true end
+
+    if rawget(cls, "__cname") == name then return true end
+    local __supers = rawget(cls, "__supers")
+    if not __supers then return false end
+    for _, super in ipairs(__supers) do
+        if iskindof_(super, name) then return true end
+    end
+	
+    return false
+end
+
+local function isKindOf(checkee, checkeeName, checkParam)
+	local checkeeType = type(checkee)
+	local mt
+	if (checkeeType == "userdata") then
+		if (tolua.iskindof(checkee, checkParam)) then return true end
+		mt = tolua.getpeer(checkee)
+	elseif (checkeeType == "table") then
+		mt = getmetatable(checkee)
+	else
+		return false, string.format("TypeChecker--isKindOf() %s is not a table nor a userdata, therefore can't be an object of any class.", checkeeName)
+	end
+
+    if mt then
+		return isKindOf_(mt, checkParam), ""
+    else
+	    return false, string.format("TypeChecker--isKindOf() %s has no metatable, therefore is not an object of any class.", checkeeName)
+	end
+end
+
 local function isInt(checkee, checkeeName)
 	if (not isExpectedType(checkee, checkeeName, {"number"})) then
 		return false, string.format("TypeChecker--isInt(): %s'%s' is not a number.", checkeeName, checkee)
@@ -169,6 +202,18 @@ end
 function TypeChecker.isWarSceneData(warSceneData)
 	return batchCheck("isWarSceneData", {
 		{isExpectedType,	warSceneData,	"warSceneData",		{"table"}	}
+	})
+end
+
+function TypeChecker.isWarFieldData(warFieldData)
+	return batchCheck("isWarFieldData", {
+		{isExpectedType,	warFieldData,	"warFieldData",		{"table"}	}
+	})
+end
+
+function TypeChecker.isView(view)
+	return batchCheck("isView", {
+		{isKindOf,	view,	"view",		"cc.Node"}
 	})
 end
 

@@ -34,6 +34,7 @@
             </Filter>
             <Filter Name="models" >
                 <LuaFile RelativePath=".\src\app\models\ModelTile.lua" />
+                <LuaFile RelativePath=".\src\app\models\ModelWarField.lua" />
             </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >
