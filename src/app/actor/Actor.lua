@@ -4,7 +4,11 @@ local Requirer			= require"app.utilities.Requirer"
 local ComponentManager	= Requirer.component("ComponentManager")
 
 function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
-	return Actor.new():setModel(modelInstance):setView(viewInstance)
+	local actor = Actor.new()
+	if (modelInstance) then actor:setModel(modelInstance) end
+	if (viewInstance) then actor:setView(viewInstance) end
+	
+	return actor
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)

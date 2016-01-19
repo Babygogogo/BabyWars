@@ -21,16 +21,15 @@ local function requireSceneData(param)
 end
 
 local function createWarFieldActor(warFieldData)
-	local actor = Actor.new()
-	
 	local view, createViewMsg = ViewWarField.createInstance(warFieldData)
-	assert(view, "WarScene--createWarFieldActor() failed:\n" .. (createViewMsg or ""))
-	
+	assert(view, "WarScene--createWarFieldActor() failed to create ViewWarField:\n" .. (createViewMsg or ""))
 	ComponentManager.bindComponent(view, "DraggableWithinBoundary")
 	view:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
 	
-	actor:setView(view)
-	return actor
+	local model, createModelMsg = ModelWarField.createInstance(warFieldData)
+	assert(model, "WarScene--createWarFieldActor() failed to create ModelWarField:\n" .. (createModelMsg or ""))
+
+	return Actor.createWithModelAndViewInstance(model, view)
 end
 
 local function createActorsInScene(param)
@@ -38,6 +37,7 @@ local function createActorsInScene(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
 	local warFieldActor = createWarFieldActor(sceneData.WarField)
+	assert(warFieldActor, "WarScene--createActorsInScene() failed to create WarField actor.")
 
 	return {WarFieldActor = warFieldActor}	
 end
@@ -50,9 +50,11 @@ end
 
 function WarScene:load(param)
 	local actorsInScene = createActorsInScene(param)
+	assert(actorsInScene, "WarScene:load() failed to create actors in scene with param.")
+	
 	local warFieldActor = actorsInScene.WarFieldActor
 
-	self.m_ViewWarFieldActor_ = warField
+	self.m_ViewWarFieldActor_ = warFieldActor
 	self:removeAllChildren()
 		:addChild(warFieldActor:getView())
 		
@@ -61,9 +63,7 @@ end
 
 function WarScene.createInstance(param)
 	local warScene, createActorsInSceneMsg = WarScene.new():load(param)
-	if (warScene == nil) then
-		return nil, "WarScene.createInstance() failed:\n" .. createActorsInSceneMsg
-	end
+	assert(warScene, "WarScene.createInstance() failed:\n" .. (createActorsInSceneMsg or ""))
 	
 	return warScene
 end
