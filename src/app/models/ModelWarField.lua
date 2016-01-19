@@ -21,6 +21,9 @@ end
 local function createTileMapActor(tileMapData)
 	local view, createViewMsg = Requirer.view("ViewTileMap").createInstance(tileMapData)
 	assert(view, "ModelWarField--createTileMapActor() failed to create ViewTileMap:\n" .. (createViewMsg or ""))
+	
+	local model = Requirer.model("ModelTileMap").createInstance(tileMapData)
+	assert(model, "ModelWarField--createTileMapActor() failed to create ModelTileMap.")
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end
@@ -32,16 +35,16 @@ local function createUnitMapActor(unitMapData)
 	return Actor.createWithModelAndViewInstance(model, view)
 end
 
-local function createActorsInField(param)
+local function createChildrenActors(param)
 	local warFieldData = requireFieldData(param)
 	assert(TypeChecker.isWarFieldData(warFieldData))
 	
 	local tileMapActor = createTileMapActor(warFieldData.TileMap)
-	assert(tileMapActor, "ModelWarField--createActorsInField() failed to create the TileMap actor.")
+	assert(tileMapActor, "ModelWarField--createChildrenActors() failed to create the TileMap actor.")
 	local unitMapActor = createUnitMapActor(warFieldData.UnitMap)
-	assert(unitMapActor, "ModelWarField--createActorsInField() failed to create the UnitMap actor.")
+	assert(unitMapActor, "ModelWarField--createChildrenActors() failed to create the UnitMap actor.")
 	
-	assert(TypeChecker.isSizeEqual(tileMapActor:getView():getMapSize(), unitMapActor:getView():getMapSize()))
+	assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getView():getMapSize()))
 	
 	return {TileMapActor = tileMapActor, UnitMapActor = unitMapActor}
 end
@@ -53,7 +56,7 @@ function ModelWarField:ctor(param)
 end
 
 function ModelWarField:load(templateName)
-	local actorsInField = createActorsInField(templateName)
+	local actorsInField = createChildrenActors(templateName)
 	assert(actorsInField, "ModelWarField:load() failed to create actors in field with param.")
 		
 	self.m_TileMapActor_ = actorsInField.TileMapActor
@@ -75,7 +78,7 @@ function ModelWarField:initView()
 	local view = self.m_View_
 	assert(TypeChecker.isView(view))
 
-	local mapSize = self.m_TileMapActor_:getView():getMapSize() -- TODO: replace with ...getModel():...
+	local mapSize = self.m_TileMapActor_:getModel():getMapSize()
 	view:removeAllChildren()
 		:addChild(self.m_TileMapActor_:getView())
 		:addChild(self.m_UnitMapActor_:getView())

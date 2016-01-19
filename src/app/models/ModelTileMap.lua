@@ -21,85 +21,39 @@ local function getTiledTileLayer(tiledData)
 	return tiledData.layers[1]
 end
 
-local function createModelWithTemplateAndOverwriting(mapData)
-	if (type(mapData.Template) ~= "string") then
-		return nil, "ModelTileMap--createModelWithTemplateAndOverwriting() the template field is not the file name of a TiledData."
-	end
-
-	local templateTiledData = requireMapData(mapData.Template)
-	local checkTemplateResult, checkTemplateMsg = TypeChecker.isTiledData(templateTiledData)
-	if (checkTemplateResult == false) then
-		return nil, "ModelTileMap--createModelWithTemplateAndOverwriting() failed to require template TiledData from param mapData."
-	end
-	
-	local templateMap, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledTileLayer(templateTiledData), Tile)
-	if (templateMap == nil) then
-		return nil, "ModelTileMap--createModelWithTemplateAndOverwriting() failed to create a template map from template TiledData:\n" .. createMapMsg
-	end
-	
-	local map, loadTilesMsg = MapFunctions.loadGridsIntoMap(Tile, mapData.Tiles, templateMap, templateMap.size)
-	if (map == nil) then
-		return nil, "ModelTileMap--createModelWithTemplateAndOverwriting() failed to load tiles to overwrite the template map:\n" .. loadTilesMsg
-	end
-	
-	return map
-end
-
-local function createModelWithoutTemplate(mapData)
-	local checkTiledDataResult, checkTiledDataMsg = TypeChecker.isTiledData(mapData)
-	if (checkTiledDataResult == false) then
-		return nil, "ModelTileMap--createModelWithoutTemplate() the MapData has no template and is not TiledData:\n" .. checkTiledDataMsg
-	end
-
-	local map, createMapMsg = MapFunctions.createMapWithTiledLayer(getTiledTileLayer(mapData), Tile)
-	if (map == nil) then
-		return nil, "ModelTileMap--createModelWithoutTemplate() failed to create a map from the MapData (as TiledData):\n" .. createMapMsg
-	end
-	
-	return map
-end
-
-local function createModel(param)
-	local mapData = requireMapData(param)
-	if (mapData == nil) then
-		return nil, "ModelTileMap--createModel() failed to require MapData from param."
-	end
-
-	local map, createMapMsg
-	if (mapData.Template ~= nil) then
-		map, createMapMsg = createModelWithTemplateAndOverwriting(mapData)
-	else
-		map, createMapMsg = createModelWithoutTemplate(mapData)
-	end
-	
-	if (map == nil) then
-		return nil, "ModelTileMap--createModel() failed:\n" .. createMapMsg
-	elseif (MapFunctions.hasNilGrid(map)) then
-		return nil, "ModelTileMap--createModel() some tiles on the map are missing."
-	end
-	
-	return map
-end
-
-local function createTileActorsWithTemplateAndOverwriting(mapData)
+local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateTiledData = requireMapData(mapData.Template)
 	assert(TypeChecker.isTiledData(templateTiledData))
 	
 	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), nil, Tile)
-	assert(templateMap, "ModelTileMap--createTileActorsWithTemplateAndOverwriting() failed to create the template tile actors map.")
+	assert(templateMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
 	
+	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Tiles, nil, Tile)
+	assert(overwroteMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
 	
+	return overwroteMap
+end
+
+local function createTileActorsMapWithoutTemplate(mapData)
+	assert(TypeChecker.isTiledData(mapData))
+	
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), nil, Tile)
+	assert(map, "ModelTileMap--createTileActorsMapWithoutTemplate() failed to create the map.")
+	
+	return map
 end
 
 local function createChildrenActors(param)
 	local mapData = requireMapData(param)
 	assert(TypeChecker.isMapData(mapData))
 	
-	local tileActorsMap
-	if (mapData.Template ~= nil) then
-		tileActorsMap = 
-	end
-	
+	local tileActorsMap = (mapData.Template == nil
+		and createTileActorsMapWithoutTemplate(mapData)
+		or createTileActorsMapWithTemplateAndOverwriting(mapData))
+	assert(tileActorsMap, "ModelTileMap--createChildrenActors() failed to create tile actors map.")
+	assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createChildrenActors() some tiles are missing in the created map.")
+
+	return {TileActorsMap = tileActorsMap}
 end
 
 function ModelTileMap:ctor(param)
