@@ -78,7 +78,7 @@ function ModelUnitMap:load(param)
 
 	self.m_UnitActorsMap_ = childrenActors.UnitActorsMap
 	
-	if (self.m_View_) then self:initView()
+	if (self.m_View_) then self:initView() end
 
 	return self
 end
@@ -99,7 +99,8 @@ function ModelUnitMap:initView()
 	local mapSize = self.m_UnitActorsMap_.size
 	for x = 1, mapSize.width do
 		for y = 1, mapSize.height do
-			view:addChild(self.m_UnitActorsMap_[x][y]:getView())
+			local unitActor = self.m_UnitActorsMap_[x][y]
+			if (unitActor) then view:addChild(unitActor:getView()) end
 		end
 	end
 	
@@ -107,7 +108,7 @@ function ModelUnitMap:initView()
 end
 
 function ModelUnitMap:getMapSize()
-	return self.m_MapSize_
+	return self.m_UnitActorsMap_.size
 end
 
 return ModelUnitMap

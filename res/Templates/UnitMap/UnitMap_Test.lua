@@ -2,7 +2,7 @@
 local UnitMap_Test = {
 	MapSize = {height = 15, width = 20},
 	
-	Units = {
+	Grids = {
 		{
 			Template = "Battleship",
 			GridIndex = {y = 1, x = 1},

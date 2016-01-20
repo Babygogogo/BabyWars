@@ -153,7 +153,6 @@
             </Filter>
             <Filter Name="UnitMap" Directory=".\res\Templates\UnitMap" >
                 <LuaFile RelativePath=".\res\Templates\UnitMap\UnitMap_Test.lua" />
-                <LuaFile RelativePath=".\res\Templates\UnitMap\UnitMap_OverwriteTest.lua" />
             </Filter>
         </Filter>
     </Filter>

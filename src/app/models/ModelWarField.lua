@@ -29,7 +29,10 @@ end
 
 local function createUnitMapActor(unitMapData)
 	local view = Requirer.view("ViewUnitMap").createInstance(unitMapData)
-	assert(view, "ModelWarField--createUnitMapActor() failed to create ViewUnitMap" )
+	assert(view, "ModelWarField--createUnitMapActor() failed to create ViewUnitMap.")
+
+	local model = Requirer.model("ModelUnitMap").createInstance(unitMapData)
+	assert(model, "ModelWarField--createUnitMapActor() failed to create ModelUnitMap.")
 	
 	return Actor.createWithModelAndViewInstance(model, view)
 end
@@ -43,7 +46,7 @@ local function createChildrenActors(param)
 	local unitMapActor = createUnitMapActor(warFieldData.UnitMap)
 	assert(unitMapActor, "ModelWarField--createChildrenActors() failed to create the UnitMap actor.")
 	
-	assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getView():getMapSize()))
+	assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getModel():getMapSize()))
 	
 	return {TileMapActor = tileMapActor, UnitMapActor = unitMapActor}
 end

@@ -28,7 +28,7 @@ local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), nil, Tile)
 	assert(templateMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
 	
-	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Tiles, nil, Tile)
+	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, nil, Tile)
 	assert(overwroteMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
 	
 	return overwroteMap
