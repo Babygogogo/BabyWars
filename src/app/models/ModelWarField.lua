@@ -4,7 +4,6 @@ local ModelWarField = class("ModelWarField")
 local Requirer		= require"app.utilities.Requirer"
 local Actor			= Requirer.actor()
 local TypeChecker	= Requirer.utility("TypeChecker")
-local UnitMap		= Requirer.view("UnitMap")
 local GameConstant	= Requirer.gameConstant()
 
 local function requireFieldData(param)
@@ -29,8 +28,8 @@ local function createTileMapActor(tileMapData)
 end
 
 local function createUnitMapActor(unitMapData)
-	local view, createViewMsg = UnitMap.createInstance(unitMapData)
-	assert(view, "ModelWarField--createUnitMapActor() failed:\n" .. (createViewMsg or ""))
+	local view = Requirer.view("ViewUnitMap").createInstance(unitMapData)
+	assert(view, "ModelWarField--createUnitMapActor() failed to create ViewUnitMap" )
 	
 	return Actor.createWithModelAndViewInstance(model, view)
 end

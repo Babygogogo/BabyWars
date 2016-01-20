@@ -1,5 +1,5 @@
 
-local UnitMap = class("UnitMap", function()
+local ViewUnitMap = class("ViewUnitMap", function()
 	return display.newNode()
 end)
 local Requirer		= require"app.utilities.Requirer"
@@ -26,14 +26,14 @@ end
 local function createModel(param)
 	local mapData = requireMapDataFrom(param)
 	if (mapData == nil) then
-		return nil, "UnitMap--createModel() failed to require MapData from param."
+		return nil, "ViewUnitMap--createModel() failed to require MapData from param."
 	end
 
 	local baseMap, mapSize
 	if (mapData.Template ~= nil) then
 		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
 		if (createTemplateMapResult == nil) then
-			return nil, string.format("UnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
+			return nil, string.format("ViewUnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
 		end		
 		
 		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
@@ -41,7 +41,7 @@ local function createModel(param)
 		local loadSizeMsg
 		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
 		if (mapSize == nil) then
-			return nil, "UnitMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
+			return nil, "ViewUnitMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
 		end
 
 		baseMap = MapFunctions.createEmptyMap(mapSize)
@@ -49,31 +49,31 @@ local function createModel(param)
 
 	local map, loadUnitsIntoMapMsg = MapFunctions.loadGridsIntoMap(Unit, mapData.Units, baseMap, mapSize)
 	if (map == nil) then
-		return nil, "UnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
+		return nil, "ViewUnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
 	end
 	
 	return {map = map, mapSize = mapSize}
 end
 
-function UnitMap:ctor(param)
+function ViewUnitMap:ctor(param)
 	self:load(param)
 	
 	return self
 end
 
-function UnitMap.createInstance(param)
-	local map, createMapMsg = UnitMap.new():load(param)
+function ViewUnitMap.createInstance(param)
+	local map, createMapMsg = ViewUnitMap.new():load(param)
 	if (map == nil) then
-		return nil, "UnitMap.createInstance() failed:\n" .. createMapMsg
+		return nil, "ViewUnitMap.createInstance() failed:\n" .. createMapMsg
 	else
 		return map
 	end
 end
 
-function UnitMap:load(param)
+function ViewUnitMap:load(param)
 	local createModelResult, createModelMsg = createModel(param)
 	if (createModelResult == nil) then
-		return nil, "UnitMap:load() failed to load from param:\n" .. createModelMsg
+		return nil, "ViewUnitMap:load() failed to load from param:\n" .. createModelMsg
 	end
 	
 	self.m_Map_ = createModelResult.map
@@ -92,8 +92,8 @@ function UnitMap:load(param)
 	return self
 end
 
-function UnitMap:getMapSize()
+function ViewUnitMap:getMapSize()
 	return self.m_MapSize_
 end
 
-return UnitMap
+return ViewUnitMap

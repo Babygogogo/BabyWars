@@ -19,7 +19,7 @@
                     <LuaFile RelativePath=".\src\app\views\Tile.lua" />
                     <LuaFile RelativePath=".\src\app\views\ViewTileMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\Unit.lua" />
-                    <LuaFile RelativePath=".\src\app\views\UnitMap.lua" />
+                    <LuaFile RelativePath=".\src\app\views\ViewUnitMap.lua" />
                     <LuaFile RelativePath=".\src\app\views\ViewWarField.lua" />
                     <LuaFile RelativePath=".\src\app\views\WarScene.lua" />
                 </Filter>
@@ -36,6 +36,7 @@
                 <LuaFile RelativePath=".\src\app\models\ModelTile.lua" />
                 <LuaFile RelativePath=".\src\app\models\ModelWarField.lua" />
                 <LuaFile RelativePath=".\src\app\models\ModelTileMap.lua" />
+                <LuaFile RelativePath=".\src\app\models\ModelUnitMap.lua" />
             </Filter>
         </Filter>
         <Filter Name="cocos" Directory=".\src\cocos" >

@@ -121,6 +121,15 @@ function MapFunctions.createMapModelWithTiledLayer(tiledLayer, gridModelClass)
 	return map
 end
 
+function MapFunctions.createGridActorsMapWithMapData(mapData, gridModelClass, gridViewClass)
+	assert(TypeChecker.isMapData(mapData))
+	
+	local mapSize = MapFunctions.loadMapSize(mapData)
+	local map = MapFunctions.createEmptyMap(mapSize)
+	
+	return MapFunctions.updateGridActorsMapWithGridsData(map, mapData.Grids, gridModelClass, gridViewClass)
+end
+
 function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, gridModelClass, gridViewClass)
 	assert(TypeChecker.isTiledLayer(tiledLayer))
 	
