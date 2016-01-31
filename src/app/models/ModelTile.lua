@@ -1,23 +1,15 @@
 
 local ModelTile = class("ModelModelTile")
-local Requirer			= require"app.utilities.Requirer"
-local Actor				= Requirer.actor()
-local TileTemplates		= Requirer.gameConstant().Tile
-local TiledIdMapping	= Requirer.gameConstant().TiledID_Mapping
-local ComponentManager	= Requirer.component("ComponentManager")
-local TypeChecker		= Requirer.utility("TypeChecker")
+
+local Requirer         = require"app.utilities.Requirer"
+local Actor            = Requirer.actor()
+local TileTemplates    = Requirer.gameConstant().Tile
+local TiledIdMapping   = Requirer.gameConstant().TiledID_Mapping
+local ComponentManager = Requirer.component("ComponentManager")
+local TypeChecker      = Requirer.utility("TypeChecker")
 
 local function toModelTileTemplate(tiledID)
-	return ModelTiledIdMapping[tiledID]
-end
-
-local function createModelWithTiledID(tiledID)
-	local template = toModelTileTemplate(tiledID)
-	return {spriteFrame = ModelTileTemplates[template.Template].Animation}
-end
-
-local function createModelWithTileData(tileData)
-	local Model
+	return TiledIdMapping[tiledID]
 end
 
 local function createModel(tileData)
@@ -35,28 +27,28 @@ local function createModel(tileData)
 end
 
 function ModelTile:ctor(param)
-	self:load(param)
+	if (param) then self:load(param) end
 
 	return self
 end
 
 function ModelTile:load(param)
-	local createModelResult, createModelMsg = createModel(param)
-	if (createModelResult == nil) then
-		return nil, "ModelTile:loadData() failed to load the param:\n" .. createModelMsg
-	end
+    local model = createModel(param)
+    assert(model, "ModelTile:load() failed to create the model with param.")
 	
-	self.m_GridIndex_ = createModelResult.gridIndex
-	self.m_SpriteFrame_ = createModelResult.spriteFrame
+	self.m_GridIndex_   = model.gridIndex
+	self.m_SpriteFrame_ = model.spriteFrame
+    
+    if (self.m_View_) then self:initView() end
 		
 	return self
 end
 
 function ModelTile.createInstance(param)
-	local tile = ModelTile.new():load(param)
-	assert(tile, "ModelTile.createInstance() failed.")
+	local model = ModelTile.new():load(param)
+	assert(model, "ModelTile.createInstance() failed.")
 	
-	return tile
+	return model
 end
 
 function ModelTile:initView()

@@ -29,7 +29,7 @@ end
 
 function Actor:unbindComponent(...)
 	ComponentManager.unbindComponent(self, ...)
-	
+    
 	return self
 end
 

@@ -57,8 +57,8 @@ function ModelWarField:ctor(param)
 	return self
 end
 
-function ModelWarField:load(templateName)
-	local childrenActors = createChildrenActors(templateName)
+function ModelWarField:load(param)
+	local childrenActors = createChildrenActors(param)
 	assert(childrenActors, "ModelWarField:load() failed to create actors in field with param.")
 		
 	self.m_TileMapActor_ = childrenActors.TileMapActor

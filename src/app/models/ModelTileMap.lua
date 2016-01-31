@@ -1,10 +1,10 @@
 
 local ModelTileMap = class("ModelTileMap")
 
-local Requirer		= require"app.utilities.Requirer"
-local TypeChecker	= Requirer.utility("TypeChecker")
-local MapFunctions	= Requirer.utility("MapFunctions")
-local Tile			= Requirer.view("Tile")
+local Requirer	   = require"app.utilities.Requirer"
+local TypeChecker  = Requirer.utility("TypeChecker")
+local MapFunctions = Requirer.utility("MapFunctions")
+local ViewTile     = Requirer.view("ViewTile")
 
 local function requireMapData(param)
 	local t = type(param)
@@ -25,10 +25,10 @@ local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateTiledData = requireMapData(mapData.Template)
 	assert(TypeChecker.isTiledData(templateTiledData))
 	
-	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), nil, Tile)
+	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), nil, ViewTile)
 	assert(templateMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
 	
-	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, nil, Tile)
+	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, nil, ViewTile)
 	assert(overwroteMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
 	
 	return overwroteMap
@@ -37,7 +37,7 @@ end
 local function createTileActorsMapWithoutTemplate(mapData)
 	assert(TypeChecker.isTiledData(mapData))
 	
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), nil, Tile)
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), nil, ViewTile)
 	assert(map, "ModelTileMap--createTileActorsMapWithoutTemplate() failed to create the map.")
 	
 	return map
@@ -49,7 +49,7 @@ local function createChildrenActors(param)
 	
 	local tileActorsMap = (mapData.Template == nil
 		and createTileActorsMapWithoutTemplate(mapData)
-		or createTileActorsMapWithTemplateAndOverwriting(mapData))
+		or  createTileActorsMapWithTemplateAndOverwriting(mapData))
 	assert(tileActorsMap, "ModelTileMap--createChildrenActors() failed to create tile actors map.")
 	assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createChildrenActors() some tiles are missing in the created map.")
 
@@ -88,8 +88,9 @@ function ModelTileMap:initView()
 
 	local mapSize = self.m_TileActorsMap_.size
 	for x = 1, mapSize.width do
+        local actorsMapColumn = self.m_TileActorsMap_[x]
 		for y = 1, mapSize.height do
-			view:addChild(self.m_TileActorsMap_[x][y]:getView())
+			view:addChild(actorsMapColumn[y]:getView())
 		end
 	end	
 end
