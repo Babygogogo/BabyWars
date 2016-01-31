@@ -7,60 +7,31 @@ local Requirer         = require"app.utilities.Requirer"
 local TileTemplates    = Requirer.gameConstant().TileModelTemplates
 local TiledIdMapping   = Requirer.gameConstant().TiledIdMapping
 local ComponentManager = Requirer.component("ComponentManager")
-
-local function toTileTemplate(tiledID)
-	return TiledIdMapping[tiledID]
-end
-
-local function createModel(param)
-	if (type(param) ~= "table") then
-		return nil, "ViewTile--createModel() the param is not a table."
-	end
-	
-	-- TODO: load data from param and handle errors
-	if (param.TiledID ~= nil) then
-		local template = toTileTemplate(param.TiledID)
-		if (template == nil) then
-			return nil, "ViewTile--createModel() failed to map the TiledID to a Tile template."
-		end
-		
-		return {spriteFrame = TileTemplates[template.Template].Animation, gridIndex = param.GridIndex}
-	else
-		return {spriteFrame = TileTemplates[param.Template].Animation, gridIndex = param.GridIndex}
-	end
-end
+local TypeChecker      = Requirer.utility("TypeChecker")
+local GridSize         = Requirer.gameConstant().GridSize
 
 function ViewTile:ctor(param)
-	self:load(param)
+	if (param) then self:load(param) end
 
 	return self
 end
 
 function ViewTile:load(param)
-	local createModelResult, createModelMsg = createModel(param)
-	if (createModelResult == nil) then
-		return nil, "ViewTile:loadData() failed to load the param:\n" .. createModelMsg
-	end
-	
-	if (createModelResult.gridIndex ~= nil) then
-		if (not ComponentManager.hasBound(self, "GridIndexable")) then	
-			ComponentManager.bindComponent(self, "GridIndexable")
-		end
-		self:setGridIndexAndPosition(createModelResult.gridIndex)
-	end
-	
-	self:setSpriteFrame(createModelResult.spriteFrame)
-		
-	return self
+    return self
 end
 
 function ViewTile.createInstance(param)
-	local tile, createTileMsg = ViewTile.new():load(param)
-	if (tile == nil) then
-		return nil, "ViewTile.createInstance() failed:\n" .. createTileMsg
-	else
-		return tile
-	end
+    local view = ViewTile.new():load(param)
+    assert(view, "ViewTile.createInstance() failed.")
+    
+    return view
+end
+
+function ViewTile:setPositionWithGridIndex(gridIndex)
+    assert(TypeChecker.isGridIndex(gridIndex))
+    self:move((gridIndex.x - 0.5) * GridSize.width, (gridIndex.y - 0.5) * GridSize.height)
+
+    return self
 end
 
 return ViewTile

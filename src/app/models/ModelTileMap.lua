@@ -5,6 +5,7 @@ local Requirer	   = require"app.utilities.Requirer"
 local TypeChecker  = Requirer.utility("TypeChecker")
 local MapFunctions = Requirer.utility("MapFunctions")
 local ViewTile     = Requirer.view("ViewTile")
+local ModelTile    = Requirer.model("ModelTile")
 
 local function requireMapData(param)
 	local t = type(param)
@@ -25,10 +26,10 @@ local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateTiledData = requireMapData(mapData.Template)
 	assert(TypeChecker.isTiledData(templateTiledData))
 	
-	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), nil, ViewTile)
+	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), ModelTile, ViewTile)
 	assert(templateMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
 	
-	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, nil, ViewTile)
+	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, ModelTile, ViewTile)
 	assert(overwroteMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
 	
 	return overwroteMap
@@ -37,7 +38,7 @@ end
 local function createTileActorsMapWithoutTemplate(mapData)
 	assert(TypeChecker.isTiledData(mapData))
 	
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), nil, ViewTile)
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), ModelTile, ViewTile)
 	assert(map, "ModelTileMap--createTileActorsMapWithoutTemplate() failed to create the map.")
 	
 	return map

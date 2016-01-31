@@ -3,8 +3,8 @@ local ModelTile = class("ModelModelTile")
 
 local Requirer         = require"app.utilities.Requirer"
 local Actor            = Requirer.actor()
-local TileTemplates    = Requirer.gameConstant().Tile
-local TiledIdMapping   = Requirer.gameConstant().TiledID_Mapping
+local TileTemplates    = Requirer.gameConstant().TileModelTemplates
+local TiledIdMapping   = Requirer.gameConstant().TiledIdMapping
 local ComponentManager = Requirer.component("ComponentManager")
 local TypeChecker      = Requirer.utility("TypeChecker")
 
@@ -20,9 +20,9 @@ local function createModel(tileData)
 		local template = toModelTileTemplate(tileData.TiledID)
 		assert(template, "ModelTile--createModel() failed to map the TiledID to a ModelTile template.")
 		
-		return {spriteFrame = ModelTileTemplates[template.Template].Animation, gridIndex = tileData.GridIndex}
+		return {spriteFrame = TileTemplates[template.Template].Animation, gridIndex = tileData.GridIndex}
 	else
-		return {spriteFrame = ModelTileTemplates[tileData.Template].Animation, gridIndex = tileData.GridIndex}
+		return {spriteFrame = TileTemplates[tileData.Template].Animation, gridIndex = tileData.GridIndex}
 	end
 end
 
@@ -52,7 +52,8 @@ function ModelTile.createInstance(param)
 end
 
 function ModelTile:initView()
-	assert(self.m_View_, "ModelTile:initView() no view is attached to the actor of the model.")
+    local view = self.m_View_
+	assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 	
 	view:setPositionWithGridIndex(self.m_GridIndex_)
 	view:setSpriteFrame(self.m_SpriteFrame_)
