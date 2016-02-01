@@ -27,11 +27,4 @@ function ViewTile.createInstance(param)
     return view
 end
 
-function ViewTile:setPositionWithGridIndex(gridIndex)
-    assert(TypeChecker.isGridIndex(gridIndex))
-    self:move((gridIndex.x - 0.5) * GridSize.width, (gridIndex.y - 0.5) * GridSize.height)
-
-    return self
-end
-
 return ViewTile

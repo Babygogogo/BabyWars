@@ -27,6 +27,8 @@ local function createModel(tileData)
 end
 
 function ModelTile:ctor(param)
+    ComponentManager.bindComponent(self, "GridIndexable")
+
 	if (param) then self:load(param) end
 
 	return self
@@ -36,7 +38,7 @@ function ModelTile:load(param)
     local model = createModel(param)
     assert(model, "ModelTile:load() failed to create the model with param.")
 	
-	self.m_GridIndex_   = model.gridIndex
+    self:setGridIndex(model.gridIndex)
 	self.m_SpriteFrame_ = model.spriteFrame
     
     if (self.m_View_) then self:initView() end
@@ -55,21 +57,8 @@ function ModelTile:initView()
     local view = self.m_View_
 	assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 	
-	view:setPositionWithGridIndex(self.m_GridIndex_)
+    self:setViewPositionWithGridIndex()
 	view:setSpriteFrame(self.m_SpriteFrame_)
-end
-
-function ModelTile:getGridIndex()
-	return self.m_GridIndex_
-end
-
-function ModelTile:setGridIndex(gridIndex)
-	assert(TypeChecker.isGridIndex(gridIndex))
-	self.m_GridIndex_ = gridIndex
-	
-	if (self.m_View_) then
-		self.m_View_:setPositionWithGridIndex(gridIndex)
-	end
 end
 
 return ModelTile
