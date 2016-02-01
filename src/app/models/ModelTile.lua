@@ -68,7 +68,7 @@ function ModelTile:setGridIndex(gridIndex)
 	self.m_GridIndex_ = gridIndex
 	
 	if (self.m_View_) then
-		self.m_View:setPositionWithGridIndex(gridIndex)
+		self.m_View_:setPositionWithGridIndex(gridIndex)
 	end
 end
 

@@ -4,7 +4,8 @@ local ModelUnitMap = class("ModelUnitMap")
 local Requirer		= require"app.utilities.Requirer"
 local TypeChecker	= Requirer.utility("TypeChecker")
 local MapFunctions	= Requirer.utility("MapFunctions")
-local ViewUnit		= Requirer.view("Unit")
+local ViewUnit		= Requirer.view("ViewUnit")
+local ModelUnit     = Requirer.model("ModelUnit")
 local GridSize		= Requirer.gameConstant().GridSize
 
 local function requireMapData(param)
@@ -59,8 +60,8 @@ local function createChildrenActors(param)
 	assert(TypeChecker.isMapData(mapData))
 	
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
-		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), nil, ViewUnit)
-		or MapFunctions.createGridActorsMapWithMapData(mapData, nil, ViewUnit)
+		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), ModelUnit, ViewUnit)
+		or MapFunctions.createGridActorsMapWithMapData(    mapData,                    ModelUnit, ViewUnit)
 	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
 	
 	return {UnitActorsMap = unitActorsMap}

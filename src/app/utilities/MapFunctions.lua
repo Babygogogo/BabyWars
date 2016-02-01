@@ -6,10 +6,7 @@ local TypeChecker	= Requirer.utility("TypeChecker")
 local Actor			= Requirer.actor()
 
 local function updateViewForGridActor(actor, viewClass, gridData)
-    local existingView = actor:getView()
-    if (existingView) then
-        existingView:load(gridData)
-    elseif (viewClass) then
+    if (not actor:getView()) then
         actor:setView(viewClass.createInstance(gridData))
     end
     
@@ -105,8 +102,8 @@ function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, gridModel
 		else
 			print(string.format("MapFunctions.updateGridActorsMapWithGridsData() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
 
-            updateViewForGridActor( map[x][y], gridViewClass,  gridData)
             updateModelForGridActor(map[x][y], gridModelClass, gridData)
+            updateViewForGridActor( map[x][y], gridViewClass,  gridData)
 		end
 	end
 
