@@ -13,8 +13,8 @@ local EXPORTED_METHODS = {
 }
 
 local function gridIndexToPosition(gridIndex)
-	return	gridIndex.x * GridSize.width,
-			gridIndex.y * GridSize.height
+	return	(gridIndex.x - 1) * GridSize.width,
+			(gridIndex.y - 1) * GridSize.height
 end
 
 function GridIndexable:init_()
