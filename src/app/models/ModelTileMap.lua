@@ -87,13 +87,13 @@ function ModelTileMap:initView()
 	
 	view:removeAllChildren()
 
-	local mapSize = self.m_TileActorsMap_.size
-	for x = 1, mapSize.width do
-        local actorsMapColumn = self.m_TileActorsMap_[x]
-		for y = 1, mapSize.height do
-			view:addChild(actorsMapColumn[y]:getView())
-		end
-	end	
+    local tileActors = self.m_TileActorsMap_
+	local mapSize = tileActors.size
+    for y = mapSize.height, 1, -1 do
+        for x = mapSize.width, 1, -1 do
+            view:addChild(tileActors[x][y]:getView())
+        end
+    end
 end
 
 function ModelTileMap:getMapSize()

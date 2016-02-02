@@ -1,8 +1,7 @@
 
-local ModelTile = class("ModelModelTile")
+local ModelTile = class("ModelTile")
 
 local Requirer         = require"app.utilities.Requirer"
-local Actor            = Requirer.actor()
 local TileTemplates    = Requirer.gameConstant().TileModelTemplates
 local TiledIdMapping   = Requirer.gameConstant().TiledIdMapping
 local ComponentManager = Requirer.component("ComponentManager")
@@ -14,16 +13,16 @@ end
 
 local function createModel(tileData)
 	assert(type(tileData) == "table", "ModelTile--createModel() the param tileData is not a table, therefore not a valid TileData.")
-	
+
+    local tiledID = tileData.TiledID
+    assert(TypeChecker.isTiledID(tiledID), "ModelTile--createModel() the param tileData hasn't a valid TiledID.")
+
+    local gridIndex = tileData.GridIndex
+    assert(TypeChecker.isGridIndex(gridIndex), "ModelTile--createModel() the param tileData hasn't a valid GridIndex.")
+
 	-- TODO: load data from param and handle errors
-	if (tileData.TiledID) then
-		local template = toModelTileTemplate(tileData.TiledID)
-		assert(template, "ModelTile--createModel() failed to map the TiledID to a ModelTile template.")
-		
-		return {spriteFrame = TileTemplates[template.Template].Animation, gridIndex = tileData.GridIndex}
-	else
-		return {spriteFrame = TileTemplates[tileData.Template].Animation, gridIndex = tileData.GridIndex}
-	end
+    
+    return {tiledID = tiledID, gridIndex = gridIndex}
 end
 
 function ModelTile:ctor(param)
@@ -38,8 +37,8 @@ function ModelTile:load(param)
     local model = createModel(param)
     assert(model, "ModelTile:load() failed to create the model with param.")
 	
+    self.m_TiledID_ = model.tiledID
     self:setGridIndex(model.gridIndex)
-	self.m_SpriteFrame_ = model.spriteFrame
     
     if (self.m_View_) then self:initView() end
 		
@@ -58,7 +57,7 @@ function ModelTile:initView()
 	assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 	
     self:setViewPositionWithGridIndex()
-	view:setSpriteFrame(self.m_SpriteFrame_)
+    view:updateWithTiledID(self.m_TiledID_)
 end
 
 return ModelTile

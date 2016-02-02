@@ -4,7 +4,7 @@ local TileMap_OverwriteTest = {
 	
 	Grids = {
 		{
-			Template = "Sea",
+			TiledID = 15,
 			GridIndex = {y = 1, x = 1},
 		},
 	}
