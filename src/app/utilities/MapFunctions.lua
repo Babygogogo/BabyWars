@@ -80,7 +80,9 @@ function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, gridModelCla
 			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
 			assert(TypeChecker.isTiledID(tiledID))
          
-            map[x][y] = createGridActor(gridModelClass, gridViewClass, {TiledID = tiledID, GridIndex = {x = x, y = y}})
+            if (tiledID ~= 0) then
+                map[x][y] = createGridActor(gridModelClass, gridViewClass, {TiledID = tiledID, GridIndex = {x = x, y = y}})
+            end
 		end
 	end
 	

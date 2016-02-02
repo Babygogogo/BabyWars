@@ -61,7 +61,7 @@ local function createChildrenActors(param)
 	
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
 		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), ModelUnit, ViewUnit)
-		or MapFunctions.createGridActorsMapWithMapData(    mapData,                    ModelUnit, ViewUnit)
+		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    ModelUnit, ViewUnit)
 	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
 	
 	return {UnitActorsMap = unitActorsMap}
@@ -97,14 +97,15 @@ function ModelUnitMap:initView()
 	
 	view:removeAllChildren()
 	
-	local mapSize = self.m_UnitActorsMap_.size
-	for x = 1, mapSize.width do
-		for y = 1, mapSize.height do
-			local unitActor = self.m_UnitActorsMap_[x][y]
-			if (unitActor) then view:addChild(unitActor:getView()) end
-		end
+    local unitActors = self.m_UnitActorsMap_
+	local mapSize = unitActors.size    
+    for y = mapSize.height, 1, -1 do
+        for x = mapSize.width, 1, -1 do
+            local unitActor = unitActors[x][y]
+            if (unitActor) then view:addChild(unitActor:getView()) end
+        end
 	end
-	
+    
 	return self
 end
 

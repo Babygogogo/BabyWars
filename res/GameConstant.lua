@@ -437,241 +437,241 @@ local GameConstant = {
             Animation = display.newAnimation(display.newFrames("c01_t15_s02_f%02d.png", 1, 1), 99999),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t01_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t01_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t01_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t01_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t01_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t01_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t01_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t01_s04_f%02d.png", 1, 4), 0.3),
         },
 
         -- TiledID 120 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t02_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t02_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t02_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t02_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t02_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t02_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t02_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t02_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t03_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t03_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t03_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t03_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t03_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t03_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t03_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t03_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t04_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t04_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t04_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t04_s02_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t04_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t04_s03_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 130 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t04_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t04_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t05_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t05_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t05_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t05_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t05_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t05_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t05_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t05_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t06_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t06_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t06_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t06_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t06_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t06_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t06_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t06_s04_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t07_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t07_s01_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 140 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t07_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t07_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t07_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t07_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t07_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t07_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t08_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t08_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t08_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t08_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t08_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t08_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t08_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t08_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t09_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t09_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t09_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t09_s02_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t09_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t09_s03_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 150 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t09_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t09_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t10_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t10_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t10_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t10_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t10_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t10_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t10_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t10_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t11_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t11_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t11_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t11_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t11_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t11_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t11_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t11_s04_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t12_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t12_s01_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 160 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t12_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t12_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t12_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t12_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t12_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t12_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t13_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t13_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t13_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t13_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t13_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t13_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t13_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t13_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t14_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t14_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t14_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t14_s02_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t14_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t14_s03_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 170 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t14_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t14_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t15_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t15_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t15_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t15_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t15_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t15_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t15_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t15_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t16_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t16_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t16_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t16_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t16_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t16_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t16_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t16_s04_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t17_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t17_s01_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 180 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t17_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t17_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t17_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t17_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t17_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t17_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t18_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t18_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t18_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t18_s02_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t18_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t18_s03_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t18_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t18_s04_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t19_s01_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t19_s01_f%02d.png", 1, 4), 0.3),
         },
         {
-            Animation = display.newAnimation(display.newFrames("c02_t19_s02_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t19_s02_f%02d.png", 1, 4), 0.3),
         },
 
         {
-            Animation = display.newAnimation(display.newFrames("c02_t19_s03_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t19_s03_f%02d.png", 1, 4), 0.3),
         },    -- TiledID 190 + 1
         {
-            Animation = display.newAnimation(display.newFrames("c02_t19_s04_f%02d.png", 1, 4), 0.2),
+            Animation = display.newAnimation(display.newFrames("c02_t19_s04_f%02d.png", 1, 4), 0.3),
         },
     },
     

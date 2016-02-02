@@ -6,7 +6,6 @@ end)
 local Requirer          = require"app.utilities.Requirer"
 local ComponentManager  = Requirer.component("ComponentManager")
 local TypeChecker       = Requirer.utility("TypeChecker")
-local GridSize          = Requirer.gameConstant().GridSize
 local TemplateViewTiles = Requirer.gameConstant().Mapping_TiledIdToTemplateViewTileOrUnit
 
 function ViewTile:ctor(param)
@@ -38,7 +37,7 @@ function ViewTile:updateWithTiledID(tiledID)
     if (self.m_TiledID_ == tiledID) then return end
 
     local template = TemplateViewTiles[tiledID]
-    assert(template, "ViewTile:updateWithTiledID() failed to get the template with param tiledID")
+    assert(template, "ViewTile:updateWithTiledID() failed to get the template with param tiledID.")
 
     self.m_TiledID_ = tiledID
     self:stopAllActions()

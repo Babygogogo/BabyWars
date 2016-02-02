@@ -7,12 +7,16 @@ local ComponentManager	= Requirer.component("ComponentManager")
 local TypeChecker       = Requirer.utility("TypeChecker")
 
 local function createModel(unitData)
-	if (type(unitData) ~= "table") then
-		return nil, "Unit--createModel() the param unitData is not a table."
-	end
+    assert(type(unitData) == "table", "Unit--createModel() the param unitData is not a table.")
+
+    local tiledID = unitData.TiledID
+    assert(TypeChecker.isTiledID(tiledID), "Unit--createModel() the param unitData hasn't a valid TiledID.")
 	
+    local gridIndex = unitData.GridIndex
+    assert(TypeChecker.isGridIndex(gridIndex), "Unit--createModel() the param unitData hasn't a valid GridIndex.")
+    
 	-- TODO: load data from unitData and handle errors
-	return {spriteFrame = UnitTemplates[unitData.Template].Animation, gridIndex = unitData.GridIndex}
+	return {tiledID = tiledID, gridIndex = gridIndex}
 end
 
 function ModelUnit:ctor(param)
@@ -27,8 +31,8 @@ function ModelUnit:load(param)
 	local model = createModel(param)
     assert(model, "ModelUnit:load() failed.")
 	
+    self.m_TiledID_ = model.tiledID
     self:setGridIndex(model.gridIndex)
-    self.m_SpriteFrame_ = model.spriteFrame
     
     if (self.m_View_) then self:initView() end
 		
@@ -47,7 +51,7 @@ function ModelUnit:initView()
 	assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-	view:setSpriteFrame(self.m_SpriteFrame_)
+    view:updateWithTiledID(self.m_TiledID_)
 end
 
 
