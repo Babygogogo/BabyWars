@@ -41,7 +41,8 @@ function ViewTile:updateWithTiledID(tiledID)
     assert(template, "ViewTile:updateWithTiledID() failed to get the template with param tiledID")
 
     self.m_TiledID_ = tiledID
-    self:playAnimationForever(template.Animation)
+    self:stopAllActions()
+        :playAnimationForever(template.Animation)
     
     return self
 end
