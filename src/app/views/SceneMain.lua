@@ -1,5 +1,5 @@
 
-local MainScene = class("MainScene", cc.load("mvc").ViewBase)
+local SceneMain = class("SceneMain", cc.load("mvc").ViewBase)
 local Requirer	= require"app.utilities.Requirer"
 local Actor		= Requirer.actor()
 
@@ -20,7 +20,7 @@ local function createStartBtnActor()
 
 	btn:addTouchEventListener(function(sender, eventType)
 		if eventType == ccui.TouchEventType.ended then
-			local warScene, createWarSceneMsg = Requirer.view("WarScene").createInstance("WarScene_Test")
+			local warScene, createWarSceneMsg = Requirer.view("SceneWar").createInstance("WarScene_Test")
 			assert(warScene, createWarSceneMsg)
 			display.runScene(warScene, "CrossFade", 0.5)
 		end
@@ -29,7 +29,7 @@ local function createStartBtnActor()
 	return Actor.new():setView(btn)
 end
 
-function MainScene:onCreate()
+function SceneMain:onCreate()
 	self.m_BgActor_ = createBackgroundActor()
 	self:addChild(self.m_BgActor_:getView())
 	
@@ -37,4 +37,4 @@ function MainScene:onCreate()
 	self:addChild(self.m_StartBtn_:getView())
 end
 
-return MainScene
+return SceneMain

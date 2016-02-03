@@ -1,5 +1,5 @@
 
-local WarScene = class("WarScene", function()
+local SceneWar = class("SceneWar", function()
 	return display.newScene()
 end)
 local Requirer			= require"app.utilities.Requirer"
@@ -22,13 +22,13 @@ end
 
 local function createWarFieldActor(warFieldData)
 	local view = ViewWarField.createInstance(warFieldData)
-	assert(view, "WarScene--createWarFieldActor() failed to create a ViewWarField.")
+	assert(view, "SceneWar--createWarFieldActor() failed to create a ViewWarField.")
 
 	ComponentManager.bindComponent(view, "DraggableWithinBoundary")
 	view:setDragBoundaryRect({x = 10, y = 10, width = display.width - 60, height = display.height - 10})
 	
 	local model = ModelWarField.createInstance(warFieldData)
-	assert(model, "WarScene--createWarFieldActor() failed to create a ModelWarField.")
+	assert(model, "SceneWar--createWarFieldActor() failed to create a ModelWarField.")
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end
@@ -38,20 +38,20 @@ local function createChildrenActors(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
 	local warFieldActor = createWarFieldActor(sceneData.WarField)
-	assert(warFieldActor, "WarScene--createChildrenActors() failed to create WarField actor.")
+	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create WarField actor.")
 
 	return {WarFieldActor = warFieldActor}	
 end
 
-function WarScene:ctor(param)
+function SceneWar:ctor(param)
 	if (param) then self:load(param) end
 	
 	return self
 end
 
-function WarScene:load(param)
+function SceneWar:load(param)
 	local actorsInScene = createChildrenActors(param)
-	assert(actorsInScene, "WarScene:load() failed to create actors in scene with param.")
+	assert(actorsInScene, "SceneWar:load() failed to create actors in scene with param.")
 	
 	local warFieldActor = actorsInScene.WarFieldActor
 
@@ -62,11 +62,11 @@ function WarScene:load(param)
 	return self
 end
 
-function WarScene.createInstance(param)
-	local warScene = WarScene.new():load(param)
-	assert(warScene, "WarScene.createInstance() failed.")
+function SceneWar.createInstance(param)
+	local SceneWar = SceneWar.new():load(param)
+	assert(SceneWar, "SceneWar.createInstance() failed.")
 	
-	return warScene
+	return SceneWar
 end
 
-return WarScene
+return SceneWar
