@@ -1,14 +1,12 @@
 
 local SceneMain = class("SceneMain", cc.load("mvc").ViewBase)
+
 local Requirer	= require"app.utilities.Requirer"
 local Actor		= Requirer.actor()
 
 local function createBackgroundActor()
-	local bgView = display.newSprite("mainBG.png")
+	local bgView = display.newSprite("#c03_t05_s01_f01.png")
 		:move(display.center)
-
-	Requirer.component("ComponentManager").bindComponent(bgView, "DraggableWithinBoundary")
-	bgView:setDragBoundaryRect({x = 0, y = 0, width = display.width, height = display.height})
 
 	return Actor.new():setView(bgView)
 end
@@ -30,8 +28,8 @@ local function createStartBtnActor()
 end
 
 function SceneMain:onCreate()
-	self.m_BgActor_ = createBackgroundActor()
-	self:addChild(self.m_BgActor_:getView())
+	self.m_BgActor = createBackgroundActor()
+	self:addChild(self.m_BgActor:getView())
 	
 	self.m_StartBtn_ = createStartBtnActor()
 	self:addChild(self.m_StartBtn_:getView())
