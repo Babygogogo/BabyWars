@@ -27,10 +27,20 @@ local function createStartBtnActor()
 	return Actor.new():setView(btn)
 end
 
+local function createActorMapList(mapListData)
+    local view = Requirer.view("ViewMapList").createInstance()
+    assert(view, "SceneMain--createActorMapList() failed to create ViewMapList.")
+    
+    return Actor.new():setView(view)
+end
+
 function SceneMain:onCreate()
-	self.m_BgActor = createBackgroundActor()
-	self:addChild(self.m_BgActor:getView())
+    self.m_ActorBg = createBackgroundActor()
+    self:addChild(self.m_ActorBg:getView())
 	
+    self.m_ActorMapList = createActorMapList()
+    self:addChild(self.m_ActorMapList:getView())
+
 	self.m_StartBtn_ = createStartBtnActor()
 	self:addChild(self.m_StartBtn_:getView())
 end
