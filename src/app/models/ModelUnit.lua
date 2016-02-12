@@ -22,7 +22,7 @@ end
 function ModelUnit:ctor(param)
     ComponentManager.bindComponent(self, "GridIndexable")
 
-    if (param) then self:load(unitData) end
+    if (param) then self:load(param) end
 
 	return self
 end

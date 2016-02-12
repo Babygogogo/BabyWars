@@ -186,6 +186,19 @@
                 <key>sourceSize</key>
                 <string>{960,768}</string>
             </dict>
+            <key>c03_t06_s01_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{324,936},{3,4}}</string>
+                <key>offset</key>
+                <string>{0,-1}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,2},{3,4}}</string>
+                <key>sourceSize</key>
+                <string>{3,6}</string>
+            </dict>
         </dict>
         <key>metadata</key>
         <dict>
@@ -196,7 +209,7 @@
             <key>size</key>
             <string>{964,944}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:74e2d4050b26d738ec293258188aa10e:ed40009967624cdb694bc06e4475429b:215d1941b12516cc0f89fcfb847e1dd5$</string>
+            <string>$TexturePacker:SmartUpdate:d65e93b4868a4e2f9de6d1ad61b137bc:ce1a7c501c537d2ec67367f4dd026aca:215d1941b12516cc0f89fcfb847e1dd5$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureUI.png</string>
         </dict>
