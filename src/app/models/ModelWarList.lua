@@ -12,10 +12,20 @@ local function requireListData(param)
     if (t == "table") then
         return param
     elseif (t == "string") then
-        return Requirer.warList(param)
+        return Requirer.templateWarScene(param)
     else
         return nil
     end
+end
+
+local function createListItemActor(itemData)
+    local itemModel = ModelWarListItem.createInstance(itemData)
+    assert(itemModel, "ModelWarList--createListItemActor() failed to create ModelWarListItem.")
+    
+    local itemView  = ViewWarListItem.createInstance(itemData)
+    assert(itemView, "ModelWarList--createListItemActor() failed to create ViewWarListItem.")
+    
+    return Actor.createWithModelAndViewInstance(itemModel, itemView)
 end
 
 local function createChildrenActors(param)
@@ -24,8 +34,13 @@ local function createChildrenActors(param)
     
     local actors = {}
     for _, itemData in ipairs(listData) do
-        
+        local actor = createListItemActor(itemData)
+        assert(actor, "ModelWarList--createChildrenActors() failed to create a item actor.")
+
+        actors[#actors + 1] = actor
     end
+    
+    return actors
 end
 
 function ModelWarList:ctor(param)
@@ -40,7 +55,7 @@ function ModelWarList:load(param)
 
     self.m_ItemActors = childrenActors
     
-    if (self.m_View_) then self:initView() end
+    if (self.m_View) then self:initView() end
 		
 	return self
 end
@@ -53,12 +68,13 @@ function ModelWarList.createInstance(param)
 end
 
 function ModelWarList:initView()
-    local view = self.m_View_
+    local view = self.m_View
 	assert(view, "ModelWarList:initView() no view is attached to the actor of the model.")
     
-    for _, itemActor = ipairs(self.m_ItemActors) do
+    view:removeAllItems()
+    for _, itemActor in ipairs(self.m_ItemActors) do
         local itemView = itemActor:getView()
-        if (itemView) then view:pushBackCustomItem(itemView) end
+        if (itemView) then view:pushBackItem(itemView) end
     end
 end
 

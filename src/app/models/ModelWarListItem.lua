@@ -6,15 +6,6 @@ local Actor           = Requirer.actor()
 local ViewWarListItem = Requirer.view("ViewWarListItem")
 local TypeChecker     = Requirer.utility("TypeChecker")
 
-local function createChildrenActors(listData)
-    assert(type(listData) == "table", "ModelWarListItem--createChildrenActors() the param listData is not a table.")
-    
-    local actors = {}
-    for _, itemData in ipairs(listData) do
-        
-    end
-end
-
 function ModelWarListItem:ctor(param)
     if (param) then self:load(param) end
 
@@ -22,12 +13,12 @@ function ModelWarListItem:ctor(param)
 end
 
 function ModelWarListItem:load(param)
-    local childrenActors = createChildrenActors(param)
-    assert(childrenActors, "ModelWarListItem:load() failed.")
+    assert(type(param) == "table", "ModelWarListItem:load() the param is not a table.")
 
-    self.m_ItemActors = childrenActors
+    self.m_Title = param.name
+    self.m_Data = param.data
     
-    if (self.m_View_) then self:initView() end
+    if (self.m_View) then self:initView() end
 		
 	return self
 end
@@ -40,13 +31,12 @@ function ModelWarListItem.createInstance(param)
 end
 
 function ModelWarListItem:initView()
-    local view = self.m_View_
+    local view = self.m_View
 	assert(view, "ModelWarListItem:initView() no view is attached to the actor of the model.")
+
+    view:setTitleText(self.m_Title)
     
-    for _, itemActor = ipairs(self.m_ItemActors) do
-        local itemView = itemActor:getView()
-        if (itemView) then view:pushBackCustomItem(itemView) end
-    end
+    return self
 end
 
 return ModelWarListItem

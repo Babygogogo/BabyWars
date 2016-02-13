@@ -66,4 +66,10 @@ function ViewWarList:pushBackItem(item)
     return self
 end
 
+function ViewWarList:removeAllItems()
+    self.m_ListView:removeAllItems()
+    
+    return self
+end
+
 return ViewWarList

@@ -49,34 +49,34 @@ end
 
 function Actor:setView(view)
 	assert(iskindof(view, "cc.Node"), "Actor:setView() the param view is not a kind of cc.Node.")
-	assert(view.m_Actor_ == nil, "Actor:setView() the param view already has an owner actor.")
-	assert(self.m_View_ == nil, "Actor:setView() the actor already has a view.")
+	assert(view.m_Actor == nil, "Actor:setView() the param view already has an owner actor.")
+	assert(self.m_View == nil, "Actor:setView() the actor already has a view.")
 
-	local model = self.m_Model_
-	view.m_Model_ = model
+	local model = self.m_Model
+	view.m_Model = model
 	if (model) then
-		model.m_View_ = view
+		model.m_View = view
 		if (model.initView) then model:initView() end
 	end
 	
-	self.m_View_ = view
-	view.m_Actor_ = self
+	self.m_View = view
+	view.m_Actor = self
 	
 	return self
 end
 
 function Actor:getView()
-	return self.m_View_
+	return self.m_View
 end
 
 function Actor:removeView()
-	local view = self.m_View_
+	local view = self.m_View
 	if (view) then
-		local model = self.m_Model_
-		if (model) then model.m_View_ = nil end
+		local model = self.m_Model
+		if (model) then model.m_View = nil end
 		
-		view.m_Model_, view.m_Actor_ = nil, nil
-		self.m_View_ = nil
+		view.m_Model, view.m_Actor = nil, nil
+		self.m_View = nil
 	end
 	
 	return self
@@ -85,33 +85,33 @@ end
 function Actor:setModel(model)
 	assert(type(model) == "table", "Actor:setModel() the param model is not a table.")
 	assert(model.m_Actor_ == nil, "Actor:setModel() the param model already has an owner actor.")
-	assert(self.m_Model_ == nil, "Actor:setModel() the actor already has a model.")
+	assert(self.m_Model == nil, "Actor:setModel() the actor already has a model.")
 	
-	local view = self.m_View_
-	model.m_View_ = view
+	local view = self.m_View
+	model.m_View = view
 	if (view) then
-		view.m_Model_ = model
+		view.m_Model = model
 		if (model.initView) then model:initView() end
 	end
 	
-	self.m_Model_ = model
-	model.m_Actor_ = self
+	self.m_Model = model
+	model.m_Actor = self
 	
 	return self
 end
 
 function Actor:getModel()
-	return self.m_Model_
+	return self.m_Model
 end
 
 function Actor:removeModel()
-	local model = self.m_Model_
+	local model = self.m_Model
 	if (model) then
-		local view = self.m_View_
-		if (view) then view.m_Model_ = nil end
+		local view = self.m_View
+		if (view) then view.m_Model = nil end
 
-		model.m_View_, model.m_Actor_ = nil, nil
-		self.m_Model_ = nil
+		model.m_View, model.m_Actor = nil, nil
+		self.m_Model = nil
 	end
 	
 	return self

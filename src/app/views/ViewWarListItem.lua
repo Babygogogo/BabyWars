@@ -7,7 +7,7 @@ function ViewWarListItem:ctor(param)
         :setCapInsets({x = 2, y = 0, width = 1, height = 1})
         :setContentSize(230, 45)
         :setZoomScale(-0.05)
-        :setTitleFontSize(35)
+        :setTitleFontSize(30)
         :setTitleColor({r = 0, g = 0, b = 0})
 
 	if (param) then self:load(param) end
