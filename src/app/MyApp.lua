@@ -5,7 +5,6 @@ function MyApp:onCreate()
     display.loadSpriteFrames("BabyWarsTextureTile.plist", "BabyWarsTextureTile.png")
     display.loadSpriteFrames("BabyWarsTextureUnit.plist", "BabyWarsTextureUnit.png")
     display.loadSpriteFrames("BabyWarsTextureUI.plist",   "BabyWarsTextureUI.png")
-    display.loadSpriteFrames("fruit.plist", "fruit.png")
     
     math.randomseed(os.time())
 end

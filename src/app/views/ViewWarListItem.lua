@@ -9,6 +9,11 @@ function ViewWarListItem:ctor(param)
         :setZoomScale(-0.05)
         :setTitleFontSize(30)
         :setTitleColor({r = 0, g = 0, b = 0})
+	    :addTouchEventListener(function(sender, eventType)
+            if eventType == ccui.TouchEventType.ended then
+                if (self.m_Model) then self.m_Model:onPlayerRequestEnterWar() end
+            end
+        end)
 
 	if (param) then self:load(param) end
 

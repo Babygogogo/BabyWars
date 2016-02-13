@@ -18,23 +18,13 @@ local function requireListData(param)
     end
 end
 
-local function createListItemActor(itemData)
-    local itemModel = ModelWarListItem.createInstance(itemData)
-    assert(itemModel, "ModelWarList--createListItemActor() failed to create ModelWarListItem.")
-    
-    local itemView  = ViewWarListItem.createInstance(itemData)
-    assert(itemView, "ModelWarList--createListItemActor() failed to create ViewWarListItem.")
-    
-    return Actor.createWithModelAndViewInstance(itemModel, itemView)
-end
-
 local function createChildrenActors(param)
     local listData = requireListData(param)
     assert(type(listData) == "table", "ModelWarList--createChildrenActors() failed to require list data from with param.")
     
     local actors = {}
     for _, itemData in ipairs(listData) do
-        local actor = createListItemActor(itemData)
+        local actor = Actor.createWithModelAndViewName("ModelWarListItem", itemData, "ViewWarListItem", itemData)
         assert(actor, "ModelWarList--createChildrenActors() failed to create a item actor.")
 
         actors[#actors + 1] = actor

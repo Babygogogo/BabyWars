@@ -31,10 +31,10 @@ function ModelUnit:load(param)
 	local model = createModel(param)
     assert(model, "ModelUnit:load() failed.")
 	
-    self.m_TiledID_ = model.tiledID
+    self.m_TiledID = model.tiledID
     self:setGridIndex(model.gridIndex)
     
-    if (self.m_View_) then self:initView() end
+    if (self.m_View) then self:initView() end
 		
 	return self
 end
@@ -47,11 +47,11 @@ function ModelUnit.createInstance(param)
 end
 
 function ModelUnit:initView()
-    local view = self.m_View_
+    local view = self.m_View
 	assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithTiledID(self.m_TiledID_)
+    view:updateWithTiledID(self.m_TiledID)
 end
 
 

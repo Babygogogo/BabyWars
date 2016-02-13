@@ -67,9 +67,9 @@ function ModelTileMap:load(param)
 	local childrenActors = createChildrenActors(param)
 	assert(childrenActors, "ModelTileMap:load() failed to create children actors with param.")
 	
-	self.m_TileActorsMap_ = childrenActors.TileActorsMap
+	self.m_TileActorsMap = childrenActors.TileActorsMap
 	
-	if (self.m_View_) then self:initView() end
+	if (self.m_View) then self:initView() end
 
 	return self
 end
@@ -82,12 +82,12 @@ function ModelTileMap.createInstance(param)
 end
 
 function ModelTileMap:initView()
-	local view = self.m_View_
+	local view = self.m_View
 	assert(TypeChecker.isView(view))
 	
 	view:removeAllChildren()
 
-    local tileActors = self.m_TileActorsMap_
+    local tileActors = self.m_TileActorsMap
 	local mapSize = tileActors.size
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
@@ -97,7 +97,7 @@ function ModelTileMap:initView()
 end
 
 function ModelTileMap:getMapSize()
-	return self.m_TileActorsMap_.size
+	return self.m_TileActorsMap.size
 end
 
 return ModelTileMap

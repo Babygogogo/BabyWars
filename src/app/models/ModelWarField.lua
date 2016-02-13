@@ -61,10 +61,10 @@ function ModelWarField:load(param)
 	local childrenActors = createChildrenActors(param)
 	assert(childrenActors, "ModelWarField:load() failed to create actors in field with param.")
 		
-	self.m_TileMapActor_ = childrenActors.TileMapActor
-	self.m_UnitMapActor_ = childrenActors.UnitMapActor
+	self.m_TileMapActor = childrenActors.TileMapActor
+	self.m_UnitMapActor = childrenActors.UnitMapActor
 	
-	if (self.m_View_) then self:initView() end
+	if (self.m_View) then self:initView() end
 
 	return self
 end
@@ -77,13 +77,13 @@ function ModelWarField.createInstance(param)
 end
 
 function ModelWarField:initView()
-	local view = self.m_View_
+	local view = self.m_View
 	assert(TypeChecker.isView(view))
 
-	local mapSize = self.m_TileMapActor_:getModel():getMapSize()
+	local mapSize = self.m_TileMapActor:getModel():getMapSize()
 	view:removeAllChildren()
-		:addChild(self.m_TileMapActor_:getView())
-		:addChild(self.m_UnitMapActor_:getView())
+		:addChild(self.m_TileMapActor:getView())
+		:addChild(self.m_UnitMapActor:getView())
 		:setContentSizeWithMapSize(mapSize)
 end
 

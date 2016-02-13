@@ -39,4 +39,11 @@ function ModelWarListItem:initView()
     return self
 end
 
+function ModelWarListItem:onPlayerRequestEnterWar()
+    local warScene, createWarSceneMsg = Requirer.view("SceneWar").createInstance(self.m_Data)
+    assert(warScene, createWarSceneMsg)
+        
+    display.runScene(warScene, "CrossFade", 0.5)
+end
+
 return ModelWarListItem

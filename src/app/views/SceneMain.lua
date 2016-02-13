@@ -11,22 +11,6 @@ local function createBackgroundActor()
 	return Actor.new():setView(bgView)
 end
 
-local function createStartBtnActor()
-	local btn = ccui.Button:create()
-		:move(display.center)
-		:loadTextureNormal("startBtn_N.png", ccui.TextureResType.plistType)
-
-	btn:addTouchEventListener(function(sender, eventType)
-		if eventType == ccui.TouchEventType.ended then
-			local warScene, createWarSceneMsg = Requirer.view("SceneWar").createInstance("WarScene_Test")
-			assert(warScene, createWarSceneMsg)
-			display.runScene(warScene, "CrossFade", 0.5)
-		end
-	end)
-
-	return Actor.new():setView(btn)
-end
-
 local function createActorWarList(mapListData)
     local model = Requirer.model("ModelWarList").createInstance(mapListData)
     assert(model, "SceneMain--createActorWarList() failed to create ModelWarList.")
@@ -43,9 +27,6 @@ function SceneMain:onCreate()
 	
     self.m_ActorWarList = createActorWarList("WarSceneList")
     self:addChild(self.m_ActorWarList:getView())
-
-	self.m_StartBtn_ = createStartBtnActor()
-	self:addChild(self.m_StartBtn_:getView())
 end
 
 return SceneMain

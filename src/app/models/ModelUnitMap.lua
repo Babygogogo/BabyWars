@@ -77,9 +77,9 @@ function ModelUnitMap:load(param)
 	local childrenActors = createChildrenActors(param)
 	assert(childrenActors, "ModelUnitMap:load() failed to create children actors.")
 
-	self.m_UnitActorsMap_ = childrenActors.UnitActorsMap
+	self.m_UnitActorsMap = childrenActors.UnitActorsMap
 	
-	if (self.m_View_) then self:initView() end
+	if (self.m_View) then self:initView() end
 
 	return self
 end
@@ -92,12 +92,12 @@ function ModelUnitMap.createInstance(param)
 end
 
 function ModelUnitMap:initView()
-	local view = self.m_View_
+	local view = self.m_View
 	assert(TypeChecker.isView(view))
 	
 	view:removeAllChildren()
 	
-    local unitActors = self.m_UnitActorsMap_
+    local unitActors = self.m_UnitActorsMap
 	local mapSize = unitActors.size    
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
@@ -110,7 +110,7 @@ function ModelUnitMap:initView()
 end
 
 function ModelUnitMap:getMapSize()
-	return self.m_UnitActorsMap_.size
+	return self.m_UnitActorsMap.size
 end
 
 return ModelUnitMap
