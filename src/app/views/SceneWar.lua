@@ -1,7 +1,6 @@
 
-local SceneWar = class("SceneWar", function()
-	return display.newScene()
-end)
+local SceneWar = class("SceneWar", cc.Scene)
+
 local Requirer         = require"app.utilities.Requirer"
 local Actor            = Requirer.actor()
 local ViewWarField     = Requirer.view("ViewWarField")
@@ -38,7 +37,6 @@ function SceneWar:createTouchListener()
     local views = self:getChildrenViews()
     local responsiveViewIndex = 0
 
-
    	local function onTouchBegan(touch, event)
         responsiveViewIndex = findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_BEGAN, event)
         
@@ -50,7 +48,7 @@ function SceneWar:createTouchListener()
 	end
     
     local function onTouchCancelled(touch, event)
-        responsiveViewIndex = findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
+        findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
         responsiveViewIndex = 0
     end   
      

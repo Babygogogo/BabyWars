@@ -11,21 +11,15 @@ local function createBackgroundActor()
 	return Actor.new():setView(bgView)
 end
 
-local function createActorWarList(mapListData)
-    local model = Requirer.model("ModelWarList").createInstance(mapListData)
-    assert(model, "SceneMain--createActorWarList() failed to create ModelWarList.")
-
-    local view = Requirer.view("ViewWarList").createInstance(mapListData)
-    assert(view, "SceneMain--createActorWarList() failed to create ViewWarList.")
-
-    return Actor.createWithModelAndViewInstance(model, view)
+local function createWarListActor(mapListData)
+    return Actor.createWithModelAndViewName("ModelWarList", mapListData, "ViewWarList", mapListData)
 end
 
 function SceneMain:onCreate()
     self.m_ActorBg = createBackgroundActor()
     self:addChild(self.m_ActorBg:getView())
 	
-    self.m_ActorWarList = createActorWarList("WarSceneList")
+    self.m_ActorWarList = createWarListActor("WarSceneList")
     self:addChild(self.m_ActorWarList:getView())
 end
 
