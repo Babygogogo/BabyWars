@@ -1,8 +1,7 @@
 
 local SceneMain = class("SceneMain", cc.load("mvc").ViewBase)
 
-local Requirer	= require"app.utilities.Requirer"
-local Actor		= Requirer.actor()
+local Actor	= require("global.actors.Actor")
 
 local function createBackgroundActor()
 	local bgView = display.newSprite("#c03_t05_s01_f01.png")

@@ -1,7 +1,7 @@
 
 local DraggableWithinBoundary = class("DraggableWithinBoundary")
 local Requirer			= require"app.utilities.Requirer"
-local ComponentManager	= Requirer.component("ComponentManager")
+local ComponentManager	= require("app.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
 	"setDragWithinBoundaryEnabled",

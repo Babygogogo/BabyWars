@@ -1,17 +1,16 @@
 
 local ModelUnitMap = class("ModelUnitMap")
 
-local Requirer		= require"app.utilities.Requirer"
-local TypeChecker	= Requirer.utility("TypeChecker")
-local MapFunctions	= Requirer.utility("MapFunctions")
-local ViewUnit		= Requirer.view("ViewUnit")
-local ModelUnit     = Requirer.model("ModelUnit")
-local GridSize		= Requirer.gameConstant().GridSize
+local TypeChecker	= require("app.utilities.TypeChecker")
+local MapFunctions	= require("app.utilities.MapFunctions")
+local ViewUnit		= require("app.views.ViewUnit")
+local ModelUnit     = require("app.models.ModelUnit")
+local GridSize		= require("res.data.GameConstant").GridSize
 
 local function requireMapData(param)
 	local t = type(param)
 	if (t == "string") then
-		return Requirer.templateUnitMap(param)
+		return require("data.unitMap." .. param)
 	elseif (t == "table") then
 		return param
 	else

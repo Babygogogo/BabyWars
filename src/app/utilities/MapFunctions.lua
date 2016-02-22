@@ -1,9 +1,8 @@
 
 local MapFunctions = {}
 
-local Requirer		= require"app.utilities.Requirer"
-local TypeChecker	= Requirer.utility("TypeChecker")
-local Actor			= Requirer.actor()
+local TypeChecker	= require("app.utilities.TypeChecker")
+local Actor			= require("global.actors.Actor")
 
 local function updateViewForGridActor(actor, viewClass, gridData)
     if (not actor:getView()) then

@@ -1,37 +1,36 @@
 
 local ModelWarField = class("ModelWarField")
 
-local Requirer		= require"app.utilities.Requirer"
-local Actor			= Requirer.actor()
-local TypeChecker	= Requirer.utility("TypeChecker")
-local GameConstant	= Requirer.gameConstant()
+local Actor			= require("global.actors.Actor")
+local TypeChecker	= require("app.utilities.TypeChecker")
+local GameConstant	= require("res.data.GameConstant")
 
 local function requireFieldData(param)
 	local t = type(param)
 	if (t == "table") then
 		return param
 	elseif (t == "string") then
-		return Requirer.templateWarField(param)
+		return require("data.warField." .. param)
 	else
 		return nil
 	end
 end
 
 local function createTileMapActor(tileMapData)
-	local view = Requirer.view("ViewTileMap").createInstance(tileMapData)
+	local view = require("app.views.ViewTileMap").createInstance(tileMapData)
 	assert(view, "ModelWarField--createTileMapActor() failed to create ViewTileMap.")
 	
-	local model = Requirer.model("ModelTileMap").createInstance(tileMapData)
+	local model = require("app.models.ModelTileMap").createInstance(tileMapData)
 	assert(model, "ModelWarField--createTileMapActor() failed to create ModelTileMap.")
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end
 
 local function createUnitMapActor(unitMapData)
-	local view = Requirer.view("ViewUnitMap").createInstance(unitMapData)
+	local view = require("app.views.ViewUnitMap").createInstance(unitMapData)
 	assert(view, "ModelWarField--createUnitMapActor() failed to create ViewUnitMap.")
 
-	local model = Requirer.model("ModelUnitMap").createInstance(unitMapData)
+	local model = require("app.models.ModelUnitMap").createInstance(unitMapData)
 	assert(model, "ModelWarField--createUnitMapActor() failed to create ModelUnitMap.")
 	
 	return Actor.createWithModelAndViewInstance(model, view)

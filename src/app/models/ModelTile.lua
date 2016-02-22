@@ -1,11 +1,10 @@
 
 local ModelTile = class("ModelTile")
 
-local Requirer         = require"app.utilities.Requirer"
-local TileTemplates    = Requirer.gameConstant().TileModelTemplates
-local TiledIdMapping   = Requirer.gameConstant().TiledIdMapping
-local ComponentManager = Requirer.component("ComponentManager")
-local TypeChecker      = Requirer.utility("TypeChecker")
+local TileTemplates    = require("res.data.GameConstant").TileModelTemplates
+local TiledIdMapping   = require("res.data.GameConstant").TiledIdMapping
+local ComponentManager = require("global.components.ComponentManager")
+local TypeChecker      = require("app.utilities.TypeChecker")
 
 local function toModelTileTemplate(tiledID)
 	return TiledIdMapping[tiledID]

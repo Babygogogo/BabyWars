@@ -1,12 +1,11 @@
 
 local SceneWar = class("SceneWar", cc.Scene)
 
-local Requirer         = require"app.utilities.Requirer"
-local Actor            = Requirer.actor()
-local ViewWarField     = Requirer.view("ViewWarField")
-local ModelWarField    = Requirer.model("ModelWarField")
-local TypeChecker      = Requirer.utility("TypeChecker")
-local ComponentManager = Requirer.component("ComponentManager")
+local Actor            = require("global.actors.Actor")
+local ViewWarField     = require("app.views.ViewWarField")
+local ModelWarField    = require("app.models.ModelWarField")
+local TypeChecker      = require("app.utilities.TypeChecker")
+local ComponentManager = require("global.components.ComponentManager")
 
 local function findResponsiveView(index, views, touch, touchType, event)
     if (index and views[index]) then return index, views[index] end
@@ -79,7 +78,7 @@ local function requireSceneData(param)
 	if (t == "table") then
 		return param
 	elseif (t == "string") then
-		return Requirer.templateWarScene(param)
+		return require("res.data.warScene." .. param)
 	else
 		return nil
 	end

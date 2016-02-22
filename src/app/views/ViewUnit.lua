@@ -3,11 +3,10 @@ local ViewUnit = class("ViewUnit", function()
 	return display.newSprite()
 end)
 
-local Requirer          = require"app.utilities.Requirer"
-local ComponentManager  = Requirer.component("ComponentManager")
-local TypeChecker       = Requirer.utility("TypeChecker")
-local TemplateViewUnits = Requirer.gameConstant().Mapping_TiledIdToTemplateViewTileOrUnit
-local GridSize          = Requirer.gameConstant().GridSize
+local ComponentManager  = require("global.components.ComponentManager")
+local TypeChecker       = require("app.utilities.TypeChecker")
+local TemplateViewUnits = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
+local GridSize          = require("res.data.GameConstant").GridSize
 
 function ViewUnit:createTouchListener()
     local function onTouchBegan(touch, event)

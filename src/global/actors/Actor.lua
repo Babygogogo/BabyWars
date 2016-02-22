@@ -1,7 +1,7 @@
 
-local Actor = class("Actor")
-local Requirer			= require"app.utilities.Requirer"
-local ComponentManager	= Requirer.component("ComponentManager")
+local Actor             = class("Actor")
+
+local ComponentManager	= require("global.components.ComponentManager")
 
 function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
 	local actor = Actor.new()
@@ -12,10 +12,10 @@ function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
-	local model, createModelMsg = Requirer.model(modelName).createInstance(modelParam)
+	local model, createModelMsg = require("app.models." .. modelName).createInstance(modelParam)
 	assert(model, string.format("Actor.createWithModelAndViewName() failed to create the model '%s':\n%s", modelName, createModelMsg))
 	
-	local view, createViewMsg = Requirer.view(viewName).createInstance(viewParam)
+	local view, createViewMsg = require("app.views." .. viewName).createInstance(viewParam)
 	assert(view, string.format("Actor.createWithModelAndViewName() failed to create the view '%s':\n%s", viewName, createViewMsg))
 
 	return Actor.createWithModelAndViewInstance(model, view)

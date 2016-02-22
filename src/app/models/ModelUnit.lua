@@ -1,10 +1,9 @@
 
 local ModelUnit = class("ModelUnit")
 
-local Requirer			= require"app.utilities.Requirer"
-local UnitTemplates		= Requirer.gameConstant().Unit
-local ComponentManager	= Requirer.component("ComponentManager")
-local TypeChecker       = Requirer.utility("TypeChecker")
+local UnitTemplates		= require("res.data.GameConstant").Unit
+local ComponentManager	= require("global.components.ComponentManager")
+local TypeChecker       = require("app.utilities.TypeChecker")
 
 local function createModel(unitData)
     assert(type(unitData) == "table", "Unit--createModel() the param unitData is not a table.")

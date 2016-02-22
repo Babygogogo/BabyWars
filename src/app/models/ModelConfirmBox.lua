@@ -1,9 +1,8 @@
 
 local ModelConfirmBox = class("ModelConfirmBox")
 
-local Requirer        = require"app.utilities.Requirer"
-local Actor           = Requirer.actor()
-local TypeChecker     = Requirer.utility("TypeChecker")
+local Actor           = require("global.actors.Actor")
+local TypeChecker     = require("app.utilities.TypeChecker")
 
 function ModelConfirmBox:ctor(param)
     if (param) then self:load(param) end

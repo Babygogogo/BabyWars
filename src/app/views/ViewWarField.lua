@@ -1,11 +1,8 @@
 
-local ViewWarField = class("ViewWarField", function()
-	return display.newNode()
-end)
+local ViewWarField = class("ViewWarField", cc.Node)
 
-local Requirer     = require"app.utilities.Requirer"
-local TypeChecker  = Requirer.utility("TypeChecker")
-local GameConstant = Requirer.gameConstant()
+local TypeChecker  = require("app.utilities.TypeChecker")
+local GameConstant = require("res.data.GameConstant")
 
 local BoundaryRect  = {width = display.width - 10, height = display.height - 10, x = 10, y = 10}
 

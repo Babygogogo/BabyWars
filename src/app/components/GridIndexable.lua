@@ -1,10 +1,9 @@
 
 local GridIndexable = class("GridIndexable")
 
-local Requirer			= require"app.utilities.Requirer"
-local TypeChecker		= Requirer.utility("TypeChecker")
-local GridSize			= Requirer.gameConstant().GridSize
-local ComponentManager	= Requirer.component("ComponentManager")
+local TypeChecker		= require("app.utilities.TypeChecker")
+local GridSize			= require("res.data.GameConstant").GridSize
+local ComponentManager	= require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
 	"getGridIndex",

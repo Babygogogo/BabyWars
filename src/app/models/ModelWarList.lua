@@ -1,18 +1,17 @@
 
 local ModelWarList = class("ModelWarList")
 
-local Requirer         = require"app.utilities.Requirer"
-local Actor            = Requirer.actor()
-local ViewWarListItem  = Requirer.view("ViewWarListItem")
-local ModelWarListItem = Requirer.model("ModelWarListItem")
-local TypeChecker      = Requirer.utility("TypeChecker")
+local Actor            = require("global.actors.Actor")
+local ViewWarListItem  = require("app.views.ViewWarListItem")
+local ModelWarListItem = require("app.models.ModelWarListItem")
+local TypeChecker      = require("app.utilities.TypeChecker")
 
 local function requireListData(param)
     local t = type(param)
     if (t == "table") then
         return param
     elseif (t == "string") then
-        return Requirer.templateWarScene(param)
+        return require("res.data.warScene." .. param)
     else
         return nil
     end

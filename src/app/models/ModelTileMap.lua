@@ -1,16 +1,15 @@
 
 local ModelTileMap = class("ModelTileMap")
 
-local Requirer	   = require"app.utilities.Requirer"
-local TypeChecker  = Requirer.utility("TypeChecker")
-local MapFunctions = Requirer.utility("MapFunctions")
-local ViewTile     = Requirer.view("ViewTile")
-local ModelTile    = Requirer.model("ModelTile")
+local TypeChecker  = require("app.utilities.TypeChecker")
+local MapFunctions = require("app.utilities.MapFunctions")
+local ViewTile     = require("app.views.ViewTile")
+local ModelTile    = require("app.models.ModelTile")
 
 local function requireMapData(param)
 	local t = type(param)
 	if (t == "string") then
-		return Requirer.templateTileMap(param)
+		return require("data.tileMap." .. param)
 	elseif (t == "table") then
 		return param
 	else
