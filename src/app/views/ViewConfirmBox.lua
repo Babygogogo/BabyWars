@@ -5,22 +5,20 @@ local backgroundWidth, backgroundHeight = 600, display.height * 0.5
 local textWidth,       textHeight       = 580, display.height * 0.3
 local buttonWidth,     buttonHeight     = 200, display.height * 0.1
 
-local function enableSwallowingTouchesForView(view)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
-    touchListener:setSwallowTouches(true)
+local function createTouchSwallower(node)
+    local swallower = cc.EventListenerTouchOneByOne:create()
+    swallower:setSwallowTouches(true)
         :registerScriptHandler(function(touch, event)
-            local locationInNodeSpace = view:convertToNodeSpace(touch:getLocation())
+            local locationInNodeSpace = node:convertToNodeSpace(touch:getLocation())
             local x, y = locationInNodeSpace.x, locationInNodeSpace.y
             
-            local contentSize = view:getContentSize()
+            local contentSize = node:getContentSize()
             local width, height = contentSize.width, contentSize.height
 
             return (x >= 0) and (y >= 0) and (x <= width) and (y <= height)
         end, cc.Handler.EVENT_TOUCH_BEGAN)
         
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(touchListener, view)
-    
-    return view
+    return swallower
 end
 
 local function createBackground()
@@ -32,7 +30,8 @@ local function createBackground()
         
         :setOpacity(200)
 
-    enableSwallowingTouchesForView(background)
+    background.m_TouchSwallower = createTouchSwallower(background)
+    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
     
     return background
 end
@@ -120,29 +119,33 @@ function ViewConfirmBox:initChildrenViews()
     self.m_Text = createText()
     self:addChild(self.m_Text)
     
-    self.m_ButtonYes = createButtonYes(self.onConfirmYes)
+    self.m_ButtonYes = createButtonYes(function ()
+        self:onConfirmYes()
+    end)
     self:addChild(self.m_ButtonYes)
     
-    self.m_ButtonNo = createButtonNo(self.onConfirmNo)
+    self.m_ButtonNo = createButtonNo(function ()
+        self:onConfirmNo()
+    end)
     self:addChild(self.m_ButtonNo)
     
     return self
 end
 
 function ViewConfirmBox:initTouchListener()
-    local eventDispatcher = self:getEventDispatcher()
-    
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
     
 	touchListener:registerScriptHandler(function()
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
+    
     touchListener:registerScriptHandler(function()
         self:onConfirmCancel()
-    end, cc.Handler.EVENT_TOUCH_ENDED)   
+    end, cc.Handler.EVENT_TOUCH_ENDED)
 
-    eventDispatcher:addEventListenerWithSceneGraphPriority(touchListener, self)
+    self.m_TouchListener = touchListener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
     
     return self
 end
@@ -170,15 +173,31 @@ function ViewConfirmBox:setConfirmText(text)
 end
 
 function ViewConfirmBox:onConfirmYes()
-    print("ViewConfirmBox:onConfirmYes")
+    if (self.m_Model) then self.m_Model:onConfirmYes() end
+    
+    return self
 end
 
 function ViewConfirmBox:onConfirmNo()
-    print("ViewConfirmBox:onConfirmNo")
+    if (self.m_Model) then self.m_Model:onConfirmNo() end
+
+    return self
 end
 
 function ViewConfirmBox:onConfirmCancel()
-    print("ViewConfirmBox:onConfirmCancel")
-end
+    if (self.m_Model) then self.m_Model:onConfirmCancel() end
     
+    return self
+end
+
+--[[
+function ViewConfirmBox:setEnabled(enabled)
+    self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
+    self.m_Background.m_TouchSwallower:setEnabled(enabled)
+    
+    return self
+end
+]]
+
 return ViewConfirmBox
