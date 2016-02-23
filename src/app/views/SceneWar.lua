@@ -5,29 +5,6 @@ local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ComponentManager = require("global.components.ComponentManager")
 
-local function findResponsiveView(index, views, touch, touchType, event)
-    if (index and views[index]) then
-        return index, views[index] 
-    else
-        for i, view in ipairs(views) do
-            if (view:isResponsiveToTouch(touch, touchType, event)) then
-                return i, view 
-            end
-        end
-        
-        return 0
-    end
-end
-
-local function findAndUpdateResponsiveView(viewIndex, views, touch, touchType, event)
-    local index, view = findResponsiveView(viewIndex, views, touch, touchType, event)
-    if (view) then
-        view:onTouch(touch, touchType, event)
-    end
-   
-    return index
-end
-
 local function requireSceneData(param)
 	local t = type(param)
 	if (t == "table") then
@@ -53,36 +30,54 @@ local function createChildrenActors(param)
 	return {WarFieldActor = warFieldActor}	
 end
 
-function SceneWar:getChildrenViews()
+local function getTouchableViewFromActor(actor)
+    if (not actor) then
+        return nil
+    else
+        local view = actor:getView()
+        if (view and view.handleAndSwallowTouch) then
+            return view
+        else
+            return nil
+        end
+    end
+end
+
+local function updateViewsWithTouch(views, touch, touchType, event)
+    for _, view in ipairs(views) do
+        local isTouchSwallowed = view:handleAndSwallowTouch(touch, touchType, event)
+        if (isTouchSwallowed) then
+            return
+        end
+    end
+end
+    
+function SceneWar:getTouchableChildrenViews()
     local views = {}
-    views[#views + 1] = self.m_WarFieldActor and self.m_WarFieldActor:getView() or nil
-    -- TODO: Add more children views.
+    views[#views + 1] = getTouchableViewFromActor(self.m_WarFieldActor)
+    -- TODO: Add more children views. Be careful of the order of the views!
     
     return views
 end
 
 function SceneWar:createTouchListener()
-    local views = self:getChildrenViews()
-    local responsiveViewIndex = 0
-
+    local views = self:getTouchableChildrenViews()
+    
    	local function onTouchBegan(touch, event)
-        responsiveViewIndex = findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_BEGAN, event)
-        
+        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_BEGAN, event)
     	return true
 	end
     
 	local function onTouchMoved(touch, event)
-        responsiveViewIndex = findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_MOVED, event)
+        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_MOVED, event)
 	end
     
     local function onTouchCancelled(touch, event)
-        findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
-        responsiveViewIndex = 0
+        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
     end   
      
     local function onTouchEnded(touch, event)
-        findAndUpdateResponsiveView(responsiveViewIndex, views, touch, cc.Handler.EVENT_TOUCH_ENDED, event)
-        responsiveViewIndex = 0
+        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_ENDED, event)
     end
 
     local touchListener = cc.EventListenerTouchOneByOne:create()
@@ -96,7 +91,9 @@ end
 
 function SceneWar:resetTouchListener()
     local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then eventDispatcher:removeEventListener(self.m_TouchListener) end
+    if (self.m_TouchListener) then
+        eventDispatcher:removeEventListener(self.m_TouchListener)
+    end
     
     self.m_TouchListener = self:createTouchListener()
     eventDispatcher:addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
@@ -114,11 +111,9 @@ function SceneWar:load(param)
 	local actorsInScene = createChildrenActors(param)
 	assert(actorsInScene, "SceneWar:load() failed to create actors in scene with param.")
 	
-	local warFieldActor = actorsInScene.WarFieldActor
-
-	self.m_WarFieldActor = warFieldActor
+	self.m_WarFieldActor = actorsInScene.WarFieldActor
 	self:removeAllChildren()
-		:addChild(warFieldActor:getView())
+		:addChild(self.m_WarFieldActor:getView())
 
     self:resetTouchListener()
         

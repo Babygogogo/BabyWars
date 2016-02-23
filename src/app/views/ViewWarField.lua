@@ -53,7 +53,7 @@ function ViewWarField:isResponsiveToTouch(touch, touchType, event)
     return false
 end
 
-function ViewWarField:onTouch(touch, touchType, event)
+function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
     if (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
         self:setPositionOnDrag(touch:getPreviousLocation(), touch:getLocation())
     end
