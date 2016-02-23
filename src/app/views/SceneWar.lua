@@ -2,26 +2,55 @@
 local SceneWar = class("SceneWar", cc.Scene)
 
 local Actor            = require("global.actors.Actor")
-local ViewWarField     = require("app.views.ViewWarField")
-local ModelWarField    = require("app.models.ModelWarField")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ComponentManager = require("global.components.ComponentManager")
 
 local function findResponsiveView(index, views, touch, touchType, event)
-    if (index and views[index]) then return index, views[index] end
-
-    for i, view in ipairs(views) do
-        if (view:isResponsiveToTouch(touch, touchType, event)) then return i, view end
+    if (index and views[index]) then
+        return index, views[index] 
+    else
+        for i, view in ipairs(views) do
+            if (view:isResponsiveToTouch(touch, touchType, event)) then
+                return i, view 
+            end
+        end
+        
+        return 0
     end
-    
-    return 0
 end
 
 local function findAndUpdateResponsiveView(viewIndex, views, touch, touchType, event)
     local index, view = findResponsiveView(viewIndex, views, touch, touchType, event)
-    if (view) then view:onTouch(touch, touchType, event) end
+    if (view) then
+        view:onTouch(touch, touchType, event)
+    end
    
     return index
+end
+
+local function requireSceneData(param)
+	local t = type(param)
+	if (t == "table") then
+		return param
+	elseif (t == "string") then
+		return require("res.data.warScene." .. param)
+	else
+		return nil
+	end
+end
+
+local function createWarFieldActor(warFieldData)
+    return Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField", warFieldData)
+end
+
+local function createChildrenActors(param)
+	local sceneData = requireSceneData(param)
+	assert(TypeChecker.isWarSceneData(sceneData))
+
+	local warFieldActor = createWarFieldActor(sceneData.WarField)
+	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create WarField actor.")
+
+	return {WarFieldActor = warFieldActor}	
 end
 
 function SceneWar:getChildrenViews()
@@ -73,39 +102,10 @@ function SceneWar:resetTouchListener()
     eventDispatcher:addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
 end
 
-local function requireSceneData(param)
-	local t = type(param)
-	if (t == "table") then
-		return param
-	elseif (t == "string") then
-		return require("res.data.warScene." .. param)
-	else
-		return nil
-	end
-end
-
-local function createWarFieldActor(warFieldData)
-	local view = ViewWarField.createInstance(warFieldData)
-	assert(view, "SceneWar--createWarFieldActor() failed to create a ViewWarField.")
-
-	local model = ModelWarField.createInstance(warFieldData)
-	assert(model, "SceneWar--createWarFieldActor() failed to create a ModelWarField.")
-
-	return Actor.createWithModelAndViewInstance(model, view)
-end
-
-local function createChildrenActors(param)
-	local sceneData = requireSceneData(param)
-	assert(TypeChecker.isWarSceneData(sceneData))
-
-	local warFieldActor = createWarFieldActor(sceneData.WarField)
-	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create WarField actor.")
-
-	return {WarFieldActor = warFieldActor}	
-end
-
 function SceneWar:ctor(param)
-	if (param) then self:load(param) end
+	if (param) then
+        self:load(param)
+    end
 	
 	return self
 end

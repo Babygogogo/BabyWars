@@ -1,9 +1,6 @@
 
-local ViewUnit = class("ViewUnit", function()
-	return display.newSprite()
-end)
+local ViewUnit = class("ViewUnit", cc.Sprite)
 
-local ComponentManager  = require("global.components.ComponentManager")
 local TypeChecker       = require("app.utilities.TypeChecker")
 local TemplateViewUnits = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
 local GridSize          = require("res.data.GameConstant").GridSize
