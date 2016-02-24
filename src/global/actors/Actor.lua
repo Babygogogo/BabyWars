@@ -1,22 +1,45 @@
 
-local Actor             = class("Actor")
+local Actor = class("Actor")
 
-local ComponentManager	= require("global.components.ComponentManager")
+local ComponentManager = require("global.components.ComponentManager")
+
+local function createModel(name, param)
+    if (not name) then
+        return nil
+    else
+        local model, createModelMsg = require("app.models." .. name).createInstance(param)
+        if (not model) then
+            error("Actor--createModel() failed: " .. createModelMsg)
+        else
+            return model
+        end
+    end
+end
+
+local function createView(name, param)
+    if (not name) then
+        return nil
+    else
+        local view, createViewMsg = require("app.views." .. name).createInstance(param)
+        if (not view) then
+            error("Actor--createView() failed: ".. createViewMsg)
+        else
+            return view
+        end
+    end
+end
 
 function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
 	local actor = Actor.new()
 	if (modelInstance) then actor:setModel(modelInstance) end
-	if (viewInstance) then actor:setView(viewInstance) end
+	if (viewInstance)  then actor:setView( viewInstance)  end
 	
 	return actor
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
-	local model, createModelMsg = require("app.models." .. modelName).createInstance(modelParam)
-	assert(model, string.format("Actor.createWithModelAndViewName() failed to create the model '%s':\n%s", modelName, createModelMsg))
-	
-	local view, createViewMsg = require("app.views." .. viewName).createInstance(viewParam)
-	assert(view, string.format("Actor.createWithModelAndViewName() failed to create the view '%s':\n%s", viewName, createViewMsg))
+    local model = createModel(modelName, modelParam)
+    local view  = createView( viewName,  viewParam)
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end

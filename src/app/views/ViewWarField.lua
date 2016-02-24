@@ -6,7 +6,7 @@ local GameConstant = require("res.data.GameConstant")
 
 local BoundaryRect  = {width = display.width - 10, height = display.height - 10, x = 10, y = 10}
 
-local function getNewPosComponentOnDrag_(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
+local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
 	local minOrigin = boundarySizeComp - targetSizeComp
 	local maxOrigin = boundaryOriginComp
 
@@ -24,8 +24,8 @@ function ViewWarField:setPositionOnDrag(previousDragPos, currentDragPos)
     local boundingBox = self:getBoundingBox()
     local dragDeltaX, dragDeltaY = currentDragPos.x - previousDragPos.x, currentDragPos.y - previousDragPos.y
     
-    self:move(getNewPosComponentOnDrag_(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BoundaryRect.width,  BoundaryRect.x),
-              getNewPosComponentOnDrag_(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BoundaryRect.height, BoundaryRect.y))
+    self:move(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BoundaryRect.width,  BoundaryRect.x),
+              getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BoundaryRect.height, BoundaryRect.y))
 end
 
 function ViewWarField:ctor(param)
@@ -45,27 +45,32 @@ function ViewWarField.createInstance(param)
 	return view
 end
 
-function ViewWarField:isResponsiveToTouch(touch, touchType, event)
-    if (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        return true
-    end
-    
-    return false
-end
-
 function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
-    if (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        self:setPositionOnDrag(touch:getPreviousLocation(), touch:getLocation())
+    local isTouchSwallowed = require("app.utilities.DispatchAndSwallowTouch")(self.m_TouchableChildrenViews, touch, touchType, event)
+
+    if (isTouchSwallowed) then
+        return true
+    else
+        if (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
+            self:setPositionOnDrag(touch:getPreviousLocation(), touch:getLocation())
+            return true
+        else
+            return false
+        end
     end
 end
 
 function ViewWarField:setContentSizeWithMapSize(mapSize)
-	assert(TypeChecker.isMapSize(mapSize))
-
 	local gridSize = GameConstant.GridSize
 	self:setContentSize(mapSize.width * gridSize.width, mapSize.height * gridSize.height)
 	
 	return self
+end
+
+function ViewWarField:setTouchableChildrenViews(views)
+    self.m_TouchableChildrenViews = views
+    
+    return self
 end
 
 return ViewWarField

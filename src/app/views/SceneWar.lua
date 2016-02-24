@@ -30,19 +30,6 @@ local function createChildrenActors(param)
 	return {WarFieldActor = warFieldActor}	
 end
 
-local function getTouchableViewFromActor(actor)
-    if (not actor) then
-        return nil
-    else
-        local view = actor:getView()
-        if (view and view.handleAndSwallowTouch) then
-            return view
-        else
-            return nil
-        end
-    end
-end
-
 local function updateViewsWithTouch(views, touch, touchType, event)
     for _, view in ipairs(views) do
         local isTouchSwallowed = view:handleAndSwallowTouch(touch, touchType, event)
@@ -54,7 +41,7 @@ end
     
 function SceneWar:getTouchableChildrenViews()
     local views = {}
-    views[#views + 1] = getTouchableViewFromActor(self.m_WarFieldActor)
+    views[#views + 1] = require("app.utilities.GetTouchableViewFromActor")(self.m_WarFieldActor)
     -- TODO: Add more children views. Be careful of the order of the views!
     
     return views
@@ -62,22 +49,23 @@ end
 
 function SceneWar:createTouchListener()
     local views = self:getTouchableChildrenViews()
+    local dispatchAndSwallowTouch = require("app.utilities.DispatchAndSwallowTouch")
     
    	local function onTouchBegan(touch, event)
-        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_BEGAN, event)
+        dispatchAndSwallowTouch(views, touch, cc.Handler.EVENT_TOUCH_BEGAN, event)
     	return true
 	end
     
 	local function onTouchMoved(touch, event)
-        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_MOVED, event)
+        dispatchAndSwallowTouch(views, touch, cc.Handler.EVENT_TOUCH_MOVED, event)
 	end
     
     local function onTouchCancelled(touch, event)
-        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
+        dispatchAndSwallowTouch(views, touch, cc.Handler.EVENT_TOUCH_CANCELLED, event)
     end   
      
     local function onTouchEnded(touch, event)
-        updateViewsWithTouch(views, touch, cc.Handler.EVENT_TOUCH_ENDED, event)
+        dispatchAndSwallowTouch(views, touch, cc.Handler.EVENT_TOUCH_ENDED, event)
     end
 
     local touchListener = cc.EventListenerTouchOneByOne:create()

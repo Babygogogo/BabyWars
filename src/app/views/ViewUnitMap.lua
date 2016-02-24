@@ -1,7 +1,5 @@
 
-local ViewUnitMap = class("ViewUnitMap", function()
-	return display.newNode()
-end)
+local ViewUnitMap = class("ViewUnitMap", cc.Node)
 
 function ViewUnitMap:ctor(param)
 	if (param) then self:load(param) end
@@ -18,6 +16,11 @@ function ViewUnitMap.createInstance(param)
 	assert(view, "ViewUnitMap.createInstance() failed.")
 	
 	return view
+end
+
+function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
+
+    print("ViewUnitMap:handleAndSwallowTouch")
 end
 
 return ViewUnitMap
