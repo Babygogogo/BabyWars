@@ -1,8 +1,8 @@
 
 local ModelWarListItem = class("ModelWarListItem")
 
-local Actor           = require("global.actors.Actor")
-local TypeChecker     = require("app.utilities.TypeChecker")
+local Actor       = require("global.actors.Actor")
+local TypeChecker = require("app.utilities.TypeChecker")
 
 local function createActorConfirmBox(warName, onConfirmYes)
     local modelData = {
@@ -60,7 +60,7 @@ function ModelWarListItem:onPlayerConfirmEnterWar()
     local warScene, createWarSceneMsg = require("app.views.SceneWar").createInstance(self.m_Data)
     assert(warScene, createWarSceneMsg)
         
-    display.runScene(warScene, "CrossFade", 0.5)
+    display.runScene(warScene, "Fade", 1)
     
     return self
 end

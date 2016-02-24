@@ -16,39 +16,28 @@ local function requireSceneData(param)
 	end
 end
 
-local function createWarFieldActor(warFieldData)
-    return Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField", warFieldData)
-end
-
 local function createChildrenActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
-	local warFieldActor = createWarFieldActor(sceneData.WarField)
-	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create WarField actor.")
+    local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.WarField, "ViewWarField", sceneData.WarField)
+	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create a WarField actor.")
 
-	return {WarFieldActor = warFieldActor}	
+    local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
+    assert(hudActor, "SceneWar--createChildrenActors() failed to create a HUD actor.")
+
+	return {WarFieldActor = warFieldActor, SceneWarHUDActor = hudActor}
 end
 
-local function updateViewsWithTouch(views, touch, touchType, event)
-    for _, view in ipairs(views) do
-        local isTouchSwallowed = view:handleAndSwallowTouch(touch, touchType, event)
-        if (isTouchSwallowed) then
-            return
-        end
-    end
-end
-    
-function SceneWar:getTouchableChildrenViews()
-    local views = {}
-    views[#views + 1] = require("app.utilities.GetTouchableViewFromActor")(self.m_WarFieldActor)
-    -- TODO: Add more children views. Be careful of the order of the views!
-    
-    return views
+local function initWithChildrenActors(scene, actors)
+    scene.m_WarFieldActor = actors.WarFieldActor
+    assert(scene.m_WarFieldActor, "SceneWar--initWithChildrenActors() failed to retrieve the WarField actor.")
+
+    scene.m_SceneWarHUDActor = actors.SceneWarHUDActor
+    assert(scene.m_SceneWarHUDActor, "SceneWar--initWithChildrenActors() failed to retrieve the SceneWarHUD actor.")
 end
 
-function SceneWar:createTouchListener()
-    local views = self:getTouchableChildrenViews()
+local function createTouchListener(views)
     local dispatchAndSwallowTouch = require("app.utilities.DispatchAndSwallowTouch")
     
    	local function onTouchBegan(touch, event)
@@ -77,14 +66,35 @@ function SceneWar:createTouchListener()
     return touchListener
 end
 
-function SceneWar:resetTouchListener()
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then
-        eventDispatcher:removeEventListener(self.m_TouchListener)
+local function initWithTouchListener(scene, touchListener)
+    local eventDispatcher = scene:getEventDispatcher()
+
+--[[
+    if (scene.m_TouchListener) then
+        eventDispatcher:removeEventListener(scene.m_TouchListener)
     end
+--]]
+    assert(not scene.m_TouchListener, "SceneWar-initWithTouchListener() the scene already has a touch listener.")
+
+    scene.m_TouchListener = touchListener
+    eventDispatcher:addEventListenerWithSceneGraphPriority(scene.m_TouchListener, scene)
+end
+
+local function getChildrenViewsFromButtomToTop(scene)
+    local views = {}
     
-    self.m_TouchListener = self:createTouchListener()
-    eventDispatcher:addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
+    views[#views + 1] = scene.m_WarFieldActor:getView()
+    views[#views + 1] = scene.m_SceneWarHUDActor:getView()
+    
+    return views
+end
+
+local function initWithChildrenViews(scene, viewsFromButtomToTop)
+    scene:removeAllChildren()
+
+    for _, view in ipairs(viewsFromButtomToTop) do
+        scene:addChild(view)
+    end
 end
 
 function SceneWar:ctor(param)
@@ -96,23 +106,29 @@ function SceneWar:ctor(param)
 end
 
 function SceneWar:load(param)
-	local actorsInScene = createChildrenActors(param)
-	assert(actorsInScene, "SceneWar:load() failed to create actors in scene with param.")
-	
-	self.m_WarFieldActor = actorsInScene.WarFieldActor
-	self:removeAllChildren()
-		:addChild(self.m_WarFieldActor:getView())
-
-    self:resetTouchListener()
+	initWithChildrenActors(self, createChildrenActors(param))
+    initWithTouchListener(self, createTouchListener(self:getTouchableChildrenViews()))
+    initWithChildrenViews(self, getChildrenViewsFromButtomToTop(self))
         
 	return self
 end
 
 function SceneWar.createInstance(param)
-	local SceneWar = SceneWar.new():load(param)
-	assert(SceneWar, "SceneWar.createInstance() failed.")
+	local scene = SceneWar.new():load(param)
+	assert(scene, "SceneWar.createInstance() failed.")
 	
-	return SceneWar
+	return scene
+end
+
+function SceneWar:getTouchableChildrenViews()
+    local views = {}
+    local getTouchableViewFromActor = require("app.utilities.GetTouchableViewFromActor")
+
+    -- TODO: Add more children views. Be careful of the order of the views!
+    views[#views + 1] = getTouchableViewFromActor(self.m_SceneWarHUDActor)
+    views[#views + 1] = getTouchableViewFromActor(self.m_WarFieldActor)
+    
+    return views
 end
 
 return SceneWar
