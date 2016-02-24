@@ -112,4 +112,21 @@ function ModelUnitMap:getMapSize()
 	return self.m_UnitActorsMap.size
 end
 
+function ModelUnitMap:getUnitActor(gridIndex)
+    if (not TypeChecker.isGridInMap(gridIndex, self:getMapSize())) then
+        return nil
+    else
+        return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
+    end
+end
+
+function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
+    local unitActor = self:getUnitActor(gridIndex)
+    if (unitActor) then
+        print("ModelUnitMap:handleAndSwallowTouchOnGrid() unit touched, in ", gridIndex.x, gridIndex.y)
+    end
+    
+    return false
+end
+
 return ModelUnitMap
