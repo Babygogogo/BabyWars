@@ -1,7 +1,7 @@
 
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", ccui.Button)
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 200, 100 
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 220, 100 
 local LEFT_POSITION_X = 20
 local LEFT_POSITION_Y = display.height - CONTENT_SIZE_HEIGHT - 20
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
@@ -20,6 +20,7 @@ local function initAppearance(view)
         :setZoomScale(-0.05)
 
         :setOpacity(200)
+        :setCascadeOpacityEnabled(true)
 
         :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(30)

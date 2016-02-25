@@ -1,9 +1,9 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
-local backgroundWidth, backgroundHeight = 600, display.height * 0.5
-local textWidth,       textHeight       = 580, display.height * 0.3
-local buttonWidth,     buttonHeight     = 200, display.height * 0.1
+local BACKGROUND_WIDTH, BACKGROUND_HEIGHT = 600, display.height * 0.5
+local TEXT_WIDTH,       TEXT_HEIGHT       = 580, display.height * 0.3
+local BUTTON_WIDTH,     BUTTON_HEIGHT     = 200, display.height * 0.1
 
 local function createTouchSwallower(node)
     local swallower = cc.EventListenerTouchOneByOne:create()
@@ -24,11 +24,11 @@ end
 local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - backgroundWidth) / 2, (display.height - backgroundHeight) / 2)
+        :setPosition((display.width - BACKGROUND_WIDTH) / 2, (display.height - BACKGROUND_HEIGHT) / 2)
         
-        :setContentSize(backgroundWidth, backgroundHeight)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
         
-        :setOpacity(200)
+        :setOpacity(220)
 
     background.m_TouchSwallower = createTouchSwallower(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
@@ -36,19 +36,18 @@ local function createBackground()
     return background
 end
 
-local function createText()
-    local text = ccui.Text:create()
+local function createLabel()
+    local text = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     text:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - textWidth) / 2,
-                     (display.height - textHeight) / 2 * 1.2)
+        :setPosition((display.width - TEXT_WIDTH) / 2,
+                     (display.height - TEXT_HEIGHT) / 2 * 1.2)
         
-        :ignoreContentAdaptWithSize(false)
-        :setTextHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-        :setTextVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-        :setContentSize(textWidth, textHeight)
-        
-        :setFontSize(30)
-        :setColor({r = 0, g = 0, b = 0})
+        :setDimensions(TEXT_WIDTH, TEXT_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
 --        :setText("ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n")
 
     return text
@@ -59,26 +58,29 @@ local function createButtonYes(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - buttonWidth) / 2 - buttonWidth * 0.66,
-                     (display.height - buttonHeight) / 2 - buttonHeight * 1.5)
+        :setPosition((display.width - BUTTON_WIDTH) / 2 - BUTTON_WIDTH * 0.66,
+                     (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5)
     
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
-        :setContentSize(buttonWidth, buttonHeight)
+        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
     
         :setZoomScale(-0.05)
         
+        :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(30)
-        :setTitleColor({r = 0, g = 0, b = 0})
+        :setTitleColor({r = 104, g = 248, b = 200})
         :setTitleText("Yes")
     
-        :setOpacity(180)
+        :setOpacity(200)
     
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 callback()
             end
         end)
+
+    button:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
     
     return button
 end
@@ -88,26 +90,29 @@ local function createButtonNo(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - buttonWidth) / 2 + buttonWidth * 0.66,
-                     (display.height - buttonHeight) / 2 - buttonHeight * 1.5)
+        :setPosition((display.width - BUTTON_WIDTH) / 2 + BUTTON_WIDTH * 0.66,
+                     (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5)
 
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
-        :setContentSize(buttonWidth, buttonHeight)
+        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
     
         :setZoomScale(-0.05)
     
+        :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(30)
-        :setTitleColor({r = 0, g = 0, b = 0})
+        :setTitleColor({r = 240, g = 80, b = 56})
         :setTitleText("No")
         
-        :setOpacity(180)
+        :setOpacity(200)
         
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 callback()
             end
         end)
+
+    button:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
     
     return button
 end
@@ -116,8 +121,8 @@ function ViewConfirmBox:initChildrenViews()
     self.m_Background = createBackground()
     self:addChild(self.m_Background)
     
-    self.m_Text = createText()
-    self:addChild(self.m_Text)
+    self.m_Label = createLabel()
+    self:addChild(self.m_Label)
     
     self.m_ButtonYes = createButtonYes(function ()
         self:onConfirmYes()
@@ -128,6 +133,9 @@ function ViewConfirmBox:initChildrenViews()
         self:onConfirmNo()
     end)
     self:addChild(self.m_ButtonNo)
+    
+    self:setOpacity(220)
+        :setCascadeOpacityEnabled(true)
     
     return self
 end
@@ -167,7 +175,7 @@ function ViewConfirmBox:createInstance(param)
 end
 
 function ViewConfirmBox:setConfirmText(text)
-    self.m_Text:setString(text)
+    self.m_Label:setString(text)
     
     return self
 end
