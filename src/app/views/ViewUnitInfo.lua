@@ -1,14 +1,14 @@
 
 local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 100, 160
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 110, 160
 local LEFT_POSITION_X = 20 + CONTENT_SIZE_WIDTH
 local LEFT_POSITION_Y = 20
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH * 2 - 20
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
 local function createBackground()
-    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 100})
+    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 80})
     background:ignoreAnchorPointForPosition(true)
         
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)

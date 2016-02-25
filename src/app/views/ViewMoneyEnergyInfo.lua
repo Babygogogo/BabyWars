@@ -1,5 +1,5 @@
 
-local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
+local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", ccui.Button)
 
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 200, 100 
 local LEFT_POSITION_X = 20
@@ -7,22 +7,30 @@ local LEFT_POSITION_Y = display.height - CONTENT_SIZE_HEIGHT - 20
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local function loadBackground(view)
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
-    background:ignoreAnchorPointForPosition(true)
-
+local function initAppearance(view)
+    view:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    
+        :ignoreAnchorPointForPosition(true)
+        :moveToRightSide()
+    
+        :setScale9Enabled(true)
+        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
-        
+    
+        :setZoomScale(-0.05)
+
         :setOpacity(200)
 
-    view.m_Background = background
-    view:addChild(background)
+        :setTitleFontName("res/fonts/msyhbd.ttc")
+        :setTitleFontSize(30)
+        :setTitleColor({r = 255, g = 255, b = 255})
+        :setTitleText("G:   123456\nEN: 10/0/10")
+
+    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
 end
 
 function ViewMoneyEnergyInfo:ctor(param)
-    loadBackground(self)
-    self:ignoreAnchorPointForPosition(true)
-        :moveToRightSide()
+    initAppearance(self)
     
     if (param) then
         self:load(param)
