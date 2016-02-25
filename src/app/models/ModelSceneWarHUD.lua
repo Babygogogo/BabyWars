@@ -8,10 +8,14 @@ local function createChildrenActors(param)
     assert(moneyEnergyInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a MoneyEnergyInfo actor.")
 
     local unitInfoActor = Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
-    assert(unitInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to crate a UnitInfo actor.")
+    assert(unitInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a UnitInfo actor.")
+    
+    local tileInfoActor = Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
+    assert(tileInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a TileInfo actor.")
     
     return {moneyEnergyInfoActor = moneyEnergyInfoActor,
-            unitInfoActor        = unitInfoActor}
+            unitInfoActor        = unitInfoActor,
+            tileInfoActor        = tileInfoActor}
 end
 
 local function initWithChildrenActors(model, actors)
@@ -20,6 +24,9 @@ local function initWithChildrenActors(model, actors)
     
     model.m_UnitInfoActor = actors.unitInfoActor
     assert(model.m_UnitInfoActor, "ModelSceneWarHUD-initWithChildrenActors() failed to retrieve a UnitInfo actor.")
+    
+    model.m_TileInfoActor = actors.tileInfoActor
+    assert(model.m_TileInfoActor, "ModelSceneWarHUD-initWithChildrenActors() failed to retrieve a TileInfo actor.")
 end
 
 local function getChildrenViewsFromButtomToTop(model)
@@ -27,6 +34,7 @@ local function getChildrenViewsFromButtomToTop(model)
     
     views[#views + 1] = model.m_MoneyEnergyInfoActor:getView()
     views[#views + 1] = model.m_UnitInfoActor:getView()
+    views[#views + 1] = model.m_TileInfoActor:getView()
     
     return views
 end
@@ -66,6 +74,7 @@ function ModelSceneWarHUD:getTouchableChildrenViews()
     
     views[#views + 1] = getTouchableViewFromActor(self.m_MoneyEnergyInfoActor)
     views[#views + 1] = getTouchableViewFromActor(self.m_UnitInfoActor)
+    views[#views + 1] = getTouchableViewFromActor(self.m_TileInfoActor)
     
     return views
 end

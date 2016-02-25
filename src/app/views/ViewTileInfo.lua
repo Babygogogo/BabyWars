@@ -1,10 +1,10 @@
 
-local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
+local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 100, 160
-local LEFT_POSITION_X = 20 + CONTENT_SIZE_WIDTH
+local LEFT_POSITION_X = 20
 local LEFT_POSITION_Y = 20
-local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH * 2 - 20
+local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
 local function createBackground()
@@ -16,7 +16,7 @@ local function createBackground()
     return background
 end
 
-function ViewUnitInfo:ctor(param)
+function ViewTileInfo:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :moveToRightSide()
     
@@ -29,18 +29,18 @@ function ViewUnitInfo:ctor(param)
     return self
 end
 
-function ViewUnitInfo:load(param)
+function ViewTileInfo:load(param)
     return self
 end
 
-function ViewUnitInfo.createInstance(param)
-    local view = ViewUnitInfo.new():load(param)
-    assert(view, "ViewUnitInfo.createInstance() failed.")
+function ViewTileInfo.createInstance(param)
+    local view = ViewTileInfo.new():load(param)
+    assert(view, "ViewTileInfo.createInstance() failed.")
     
     return view
 end
 
-function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
+function ViewTileInfo:handleAndSwallowTouch(touch, touchType, event)
     if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
         self.m_IsTouchMoved = false
         return false
@@ -65,16 +65,16 @@ function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
     end
 end
 
-function ViewUnitInfo:moveToLeftSide()
+function ViewTileInfo:moveToLeftSide()
     self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
     
     return self
 end
 
-function ViewUnitInfo:moveToRightSide()
+function ViewTileInfo:moveToRightSide()
     self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
     
     return self
 end
 
-return ViewUnitInfo
+return ViewTileInfo
