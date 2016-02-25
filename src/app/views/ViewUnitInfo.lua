@@ -1,48 +1,46 @@
 
-local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
+local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 200, 100 
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 200, 60
 local LEFT_POSITION_X = 20
-local LEFT_POSITION_Y = display.height - CONTENT_SIZE_HEIGHT - 20
+local LEFT_POSITION_Y = 20 + CONTENT_SIZE_HEIGHT
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local function loadBackground(view)
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+local function createBackground()
+    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 100})
     background:ignoreAnchorPointForPosition(true)
-
+        
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
         
-        :setOpacity(200)
-
-    view.m_Background = background
-    view:addChild(background)
+    return background
 end
 
-function ViewMoneyEnergyInfo:ctor(param)
-    loadBackground(self)
+function ViewUnitInfo:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :moveToRightSide()
     
+        :addChild(createBackground())
+        
     if (param) then
         self:load(param)
     end
-        
+    
     return self
 end
 
-function ViewMoneyEnergyInfo:load(param)
+function ViewUnitInfo:load(param)
     return self
 end
 
-function ViewMoneyEnergyInfo.createInstance(param)
-    local view = ViewMoneyEnergyInfo.new():load(param)
-    assert(view, "ViewMoneyEnergyInfo.createInstance() failed.")
+function ViewUnitInfo.createInstance(param)
+    local view = ViewUnitInfo.new():load(param)
+    assert(view, "ViewUnitInfo.createInstance() failed.")
     
     return view
 end
 
-function ViewMoneyEnergyInfo:handleAndSwallowTouch(touch, touchType, event)
+function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
     if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
         self.m_IsTouchMoved = false
         return false
@@ -54,7 +52,7 @@ function ViewMoneyEnergyInfo:handleAndSwallowTouch(touch, touchType, event)
     elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
         if (not self.m_IsTouchMoved) then
             local touchLocation = touch:getLocation()
-            if (touchLocation.y > display.height / 2) then
+            if (touchLocation.y <= display.height / 2) then
                 if (touchLocation.x <= display.width / 2) then
                     self:moveToRightSide()
                 else
@@ -67,16 +65,16 @@ function ViewMoneyEnergyInfo:handleAndSwallowTouch(touch, touchType, event)
     end
 end
 
-function ViewMoneyEnergyInfo:moveToLeftSide()
+function ViewUnitInfo:moveToLeftSide()
     self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
     
     return self
 end
 
-function ViewMoneyEnergyInfo:moveToRightSide()
+function ViewUnitInfo:moveToRightSide()
     self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
     
     return self
 end
 
-return ViewMoneyEnergyInfo
+return ViewUnitInfo
