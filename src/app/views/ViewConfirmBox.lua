@@ -1,11 +1,24 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
-local BACKGROUND_WIDTH, BACKGROUND_HEIGHT = 600, display.height * 0.5
-local TEXT_WIDTH,       TEXT_HEIGHT       = 580, display.height * 0.3
-local BUTTON_WIDTH,     BUTTON_HEIGHT     = 200, display.height * 0.1
+local BACKGROUND_WIDTH  = 600
+local BACKGROUND_HEIGHT = display.height * 0.5
+local BACKGROUND_POSITION_X = (display.width - BACKGROUND_WIDTH) / 2
+local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
 
-local function createTouchSwallower(node)
+local TEXT_WIDTH  = 580
+local TEXT_HEIGHT = display.height * 0.3
+local TEXT_POSITION_X = (display.width - TEXT_WIDTH) / 2
+local TEXT_POSITION_Y = (display.height - TEXT_HEIGHT) / 2 * 1.2
+
+local BUTTON_WIDTH  = 200
+local BUTTON_HEIGHT = display.height * 0.1
+local BUTTON_YES_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 - BUTTON_WIDTH  * 0.66
+local BUTTON_YES_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_NO_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH * 0.66
+local BUTTON_NO_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+
+local function createTouchSwallower(node) 
     local swallower = cc.EventListenerTouchOneByOne:create()
     swallower:setSwallowTouches(true)
         :registerScriptHandler(function(touch, event)
@@ -24,7 +37,7 @@ end
 local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - BACKGROUND_WIDTH) / 2, (display.height - BACKGROUND_HEIGHT) / 2)
+        :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
         
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
         
@@ -39,8 +52,7 @@ end
 local function createLabel()
     local text = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     text:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - TEXT_WIDTH) / 2,
-                     (display.height - TEXT_HEIGHT) / 2 * 1.2)
+        :setPosition(TEXT_POSITION_X, TEXT_POSITION_Y)
         
         :setDimensions(TEXT_WIDTH, TEXT_HEIGHT)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
@@ -58,8 +70,7 @@ local function createButtonYes(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - BUTTON_WIDTH) / 2 - BUTTON_WIDTH * 0.66,
-                     (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5)
+        :setPosition(BUTTON_YES_POSITION_X, BUTTON_YES_POSITION_Y)
     
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
@@ -90,8 +101,7 @@ local function createButtonNo(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - BUTTON_WIDTH) / 2 + BUTTON_WIDTH * 0.66,
-                     (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5)
+        :setPosition(BUTTON_NO_POSITION_X, BUTTON_NO_POSITION_Y)
 
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})

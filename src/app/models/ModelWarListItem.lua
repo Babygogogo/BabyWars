@@ -4,13 +4,20 @@ local ModelWarListItem = class("ModelWarListItem")
 local Actor       = require("global.actors.Actor")
 local TypeChecker = require("app.utilities.TypeChecker")
 
-local function createActorConfirmBox(warName, onConfirmYes)
-    local modelData = {
-        confirmText = "You are entering a war:\n" .. warName .. ".\nAre you sure?",
-        onConfirmYes = onConfirmYes
-    }
+local function createActorConfirmBox(modelItem, warName)
+    local modelBox = require("app.models.ModelConfirmBox"):create()
+    modelBox:setConfirmText("You are entering a war:\n" .. warName .. ".\nAre you sure?")
+        :setOnConfirmYes(function()
+            modelItem:onPlayerConfirmEnterWar()
+        end)
+        :setOnConfirmNo(function()
+            modelBox:setEnabled(false)
+        end)
+        :setOnConfirmCancel(function()
+            modelBox:setEnabled(false)
+        end)
     
-    return Actor.createWithModelAndViewName("ModelConfirmBox", modelData, "ViewConfirmBox")
+    return Actor.createWithModelAndViewInstance(modelBox, require("app.views.ViewConfirmBox"):create())
 end
 
 function ModelWarListItem:ctor(param)
@@ -47,11 +54,12 @@ function ModelWarListItem:initView()
 end
 
 function ModelWarListItem:onPlayerTouch()
-    self.m_ActorConfirmBox = createActorConfirmBox(self.m_Title, function()
-        self.m_ActorConfirmBox = nil
-        self:onPlayerConfirmEnterWar()
-    end)
-    self.m_View:getScene():addChild(self.m_ActorConfirmBox:getView())
+    if (self.m_ActorConfirmBox) then
+        self.m_ActorConfirmBox:getModel():setEnabled(true)
+    else
+        self.m_ActorConfirmBox = createActorConfirmBox(self, self.m_Title)
+        self.m_View:getScene():addChild(self.m_ActorConfirmBox:getView())
+    end
     
     return self
 end

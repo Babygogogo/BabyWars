@@ -13,10 +13,10 @@ end
 function ModelConfirmBox:load(param)
     assert(type(param) == "table", "ModelConfirmBox:load() the param is not a table.")
 
-    self.m_ConfirmText = param.confirmText
-    self.m_OnConfirmYes = param.onConfirmYes
-    self.m_OnConfirmNo = param.onConfirmNo
-    self.m_OnConfirmCancel = param.onConfirmCancel
+    if (param.confirmText)     then self:setConfirmText(param.confirmText)         end
+    if (param.onConfirmYes)    then self:setOnConfirmYes(param.onConfirmYes)       end
+    if (param.onConfirmNo)     then self:setOnConfirmNo(param.onConfirmNo)         end
+    if (param.onConfirmCancel) then self:setOnConfirmCancel(param.onConfirmCancel) end
     
     if (self.m_View) then self:initView() end
 		
@@ -39,33 +39,58 @@ function ModelConfirmBox:initView()
     return self
 end
 
-function ModelConfirmBox:onConfirmYes()
-    if (self.m_OnConfirmYes) then self.m_OnConfirmYes() end
-    if (self.m_View) then self.m_View:removeFromParent() end
+function ModelConfirmBox:setConfirmText(text)
+    assert(type(text) == "string", "ModelConfirmBox:setConfirmText() the param text is not a string.")
+    self.m_ConfirmText = text
     
---    print("ModelConfirmBox:onConfirmYes")
+    if (self.m_View) then
+        self.m_View:setConfirmText(text)
+    end
+    
+    return self
+end
+
+function ModelConfirmBox:setOnConfirmYes(callback)
+    assert(type(callback) == "function", "ModelConfirmBox:setOnConfirmYes() the param callback is not a function.")
+    self.m_OnConfirmYes = callback
+    
+    return self
+end
+
+function ModelConfirmBox:onConfirmYes()
+    if (self.m_OnConfirmYes) then
+        self.m_OnConfirmYes()
+    end
+    
+    return self
+end
+
+function ModelConfirmBox:setOnConfirmNo(callback)
+    assert(type(callback) == "function", "ModelConfirmBox:setOnConfirmNo() the param callback is not a function.")
+    self.m_OnConfirmNo = callback
+    
     return self
 end
 
 function ModelConfirmBox:onConfirmNo()
-    if (self.m_OnConfirmNo) then self.m_OnConfirmNo() end
-    if (self.m_View) then self.m_View:removeFromParent() end
-    
---    print("ModelConfirmBox:onConfirmNo")
+    if (self.m_OnConfirmNo) then
+        self.m_OnConfirmNo()
+    end
+
+    return self
+end
+
+function ModelConfirmBox:setOnConfirmCancel(callback)
+    assert(type(callback) == "function", "ModelConfirmBox:setOnConfirmCancel() the param callback is not a function.")
+    self.m_OnConfirmCancel = callback
+
     return self
 end
 
 function ModelConfirmBox:onConfirmCancel()
-    if (self.m_OnConfirmCancel) then self.m_OnConfirmCancel() end
-    if (self.m_View) then self.m_View:removeFromParent() end
-
---[[
-    if (self.m_View) then
-        self.m_View:setVisible(false)
-        self.m_View:getEventDispatcher():pauseEventListenersForTarget(self.m_View, true)
+    if (self.m_OnConfirmCancel) then
+        self.m_OnConfirmCancel()
     end
---]]    
---    print("ModelConfirmBox:onConfirmCancel")
     
     return self
 end
