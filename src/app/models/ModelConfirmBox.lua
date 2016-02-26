@@ -58,8 +58,23 @@ end
 function ModelConfirmBox:onConfirmCancel()
     if (self.m_OnConfirmCancel) then self.m_OnConfirmCancel() end
     if (self.m_View) then self.m_View:removeFromParent() end
-    
+
+--[[
+    if (self.m_View) then
+        self.m_View:setVisible(false)
+        self.m_View:getEventDispatcher():pauseEventListenersForTarget(self.m_View, true)
+    end
+--]]    
 --    print("ModelConfirmBox:onConfirmCancel")
+    
+    return self
+end
+
+function ModelConfirmBox:setEnabled(enabled)
+    if (self.m_View) then
+        self.m_View:setEnabled(enabled)
+    end
+
     return self
 end
 

@@ -198,6 +198,18 @@ function ViewConfirmBox:onConfirmCancel()
     return self
 end
 
+function ViewConfirmBox:setEnabled(enabled)
+    if (enabled) then
+        self:setVisible(true)
+        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+    else
+        self:setVisible(false)
+        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+    end
+
+    return self
+end
+
 --[[
 function ViewConfirmBox:setEnabled(enabled)
     self:setVisible(enabled)
