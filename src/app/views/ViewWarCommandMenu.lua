@@ -10,6 +10,9 @@ local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
 
+    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
+    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
+
     return background
 end
 
@@ -35,9 +38,30 @@ local function initWithListView(view, listView)
     view:addChild(listView)
 end
 
+local function createTouchListener(view)
+    local touchListener = cc.EventListenerTouchOneByOne:create()
+    touchListener:setSwallowTouches(true)
+    
+	touchListener:registerScriptHandler(function()
+        return true
+    end, cc.Handler.EVENT_TOUCH_BEGAN)
+    
+    touchListener:registerScriptHandler(function()
+        view:setEnabled(false)
+    end, cc.Handler.EVENT_TOUCH_ENDED)
+    
+    return touchListener
+end
+
+local function initWithTouchListener(view, touchListener)
+    view.m_TouchListener = touchListener
+    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
+end
+
 function ViewWarCommandMenu:ctor(param)
     initWithBackground(self, createBackground())
     initWithListView(self, createListView())
+    initWithTouchListener(self, createTouchListener(self))
     
     self:setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
         
@@ -47,7 +71,9 @@ function ViewWarCommandMenu:ctor(param)
         :setCascadeOpacityEnabled(true)
         :setOpacity(180)
 
-	if (param) then self:load(param) end
+	if (param) then
+        self:load(param)
+    end
 
 	return self
 end
@@ -78,6 +104,18 @@ end
 
 function ViewWarCommandMenu:removeAllItems()
     self.m_ListView:removeAllItems()
+    
+    return self
+end
+
+function ViewWarCommandMenu:setEnabled(enabled)
+    if (enabled) then
+        self:setVisible(true)
+        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+    else
+        self:setVisible(false)
+        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+    end
     
     return self
 end

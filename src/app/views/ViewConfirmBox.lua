@@ -18,22 +18,6 @@ local BUTTON_YES_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIG
 local BUTTON_NO_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH * 0.66
 local BUTTON_NO_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
 
-local function createTouchSwallower(node) 
-    local swallower = cc.EventListenerTouchOneByOne:create()
-    swallower:setSwallowTouches(true)
-        :registerScriptHandler(function(touch, event)
-            local locationInNodeSpace = node:convertToNodeSpace(touch:getLocation())
-            local x, y = locationInNodeSpace.x, locationInNodeSpace.y
-            
-            local contentSize = node:getContentSize()
-            local width, height = contentSize.width, contentSize.height
-
-            return (x >= 0) and (y >= 0) and (x <= width) and (y <= height)
-        end, cc.Handler.EVENT_TOUCH_BEGAN)
-        
-    return swallower
-end
-
 local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
@@ -43,7 +27,7 @@ local function createBackground()
         
         :setOpacity(220)
 
-    background.m_TouchSwallower = createTouchSwallower(background)
+    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
     
     return background
@@ -144,9 +128,9 @@ function ViewConfirmBox:initChildrenViews()
     end)
     self:addChild(self.m_ButtonNo)
     
-    self:setOpacity(220)
-        :setCascadeOpacityEnabled(true)
-    
+    self:setCascadeOpacityEnabled(true)
+        :setOpacity(220)
+        
     return self
 end
 
@@ -219,15 +203,5 @@ function ViewConfirmBox:setEnabled(enabled)
 
     return self
 end
-
---[[
-function ViewConfirmBox:setEnabled(enabled)
-    self:setVisible(enabled)
-    self.m_TouchListener:setEnabled(enabled)
-    self.m_Background.m_TouchSwallower:setEnabled(enabled)
-    
-    return self
-end
-]]
 
 return ViewConfirmBox
