@@ -7,21 +7,42 @@ local LEFT_POSITION_Y = 20
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local function createBackground()
-    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 80})
-    background:ignoreAnchorPointForPosition(true)
-        
+local function createButton(view)
+    local button = ccui.Button:create()
+    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    
+        :ignoreAnchorPointForPosition(true)
+    
+        :setScale9Enabled(true)
+        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
+    
+        :setZoomScale(-0.05)
         
-    return background
+        :setOpacity(160)
+    
+        :addTouchEventListener(function(sender, eventType)
+            if eventType == ccui.TouchEventType.ended then
+                if (view.m_Model) then
+                    view.m_Model:onPlayerTouch()
+                end
+            end
+        end)
+        
+    return button
+end
+
+local function initWithButton(view, button)
+    view.m_Button = button
+    view:addChild(button)
 end
 
 function ViewTileInfo:ctor(param)
+    initWithButton(self, createButton(self))
+
     self:ignoreAnchorPointForPosition(true)
         :moveToRightSide()
     
-        :addChild(createBackground())
-        
     if (param) then
         self:load(param)
     end
