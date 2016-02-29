@@ -4,17 +4,24 @@ local ModelMenuItemQuitWar = class("ModelMenuItemQuitWar")
 local Actor       = require("global.actors.Actor")
 local TypeChecker = require("app.utilities.TypeChecker")
 
-local TITLE_TEXT = "Quit"
+local TITLE_TEXT   = "Quit"
+local CONFIRM_TEXT = "You are quitting the war.\nAre you sure?"
 
-local function onConfirmYes(itemModel, boxModel)
+local function onConfirmYes()
+    local mainScene = require("app.scenes.SceneMain"):create()
+    assert(mainScene, "ModelMenuItemQuitWar-onConfirmYes() failed to create the main scene.")
+        
+    display.runScene(mainScene, "FADE", 1)
     
+    return self
 end
 
 local function createConfirmBoxActor(itemModel, warName)
     local boxModel = require("app.models.ModelConfirmBox"):create()
-    boxModel:setConfirmText(itemModel.m_ConfirmText)
+    boxModel:setConfirmText(CONFIRM_TEXT)
+    
         :setOnConfirmYes(function()
-            itemModel:onPlayerConfirmYes()
+            onConfirmYes()
         end)
         :setOnConfirmNo(function()
             boxModel:setEnabled(false)
@@ -49,7 +56,7 @@ function ModelMenuItemQuitWar:initView()
     local view = self.m_View
 	assert(view, "ModelMenuItemQuitWar:initView() no view is attached to the actor of the model.")
 
-    view:setTitleText(self.m_TitleText)
+    view:setTitleText(TITLE_TEXT)
     
     return self
 end
@@ -61,18 +68,8 @@ function ModelMenuItemQuitWar:onPlayerTouch()
         self.m_ConfirmBoxActor = createConfirmBoxActor(self, self.m_TitleText)
         self.m_View:getScene():addChild(self.m_ConfirmBoxActor:getView())
     end
-    
+
     return self
 end
-
-function ModelMenuItemQuitWar:onPlayerConfirmYes()
-    if (self.m_OnConfirmYes) then
-        self:m_OnConfirmYes()
-    end
-    
-    return self
-end
-
-function ModelMenuItemQuitWar:onPlayerConfirmNo()
 
 return ModelMenuItemQuitWar

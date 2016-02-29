@@ -6,6 +6,7 @@ end)
 local ComponentManager  = require("global.components.ComponentManager")
 local TypeChecker       = require("app.utilities.TypeChecker")
 local TemplateViewTiles = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
+local AnimationLoader   = require("app.utilities.AnimationLoader")
 
 function ViewTile:ctor(param)
     self:ignoreAnchorPointForPosition(true)
@@ -40,7 +41,9 @@ function ViewTile:updateWithTiledID(tiledID)
 
     self.m_TiledID_ = tiledID
     self:stopAllActions()
-        :playAnimationForever(template.Animation)
+--      :playAnimationForever(template.Animation)
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
+    
     
     return self
 end

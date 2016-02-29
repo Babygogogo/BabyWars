@@ -4,6 +4,7 @@ local ViewUnit = class("ViewUnit", cc.Sprite)
 local TypeChecker       = require("app.utilities.TypeChecker")
 local TemplateViewUnits = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
 local GridSize          = require("res.data.GameConstant").GridSize
+local AnimationLoader   = require("app.utilities.AnimationLoader")
 
 function ViewUnit:ctor(param)
     self:ignoreAnchorPointForPosition(true)
@@ -38,7 +39,8 @@ function ViewUnit:updateWithTiledID(tiledID)
 
     self.m_TiledID_ = tiledID
     self:stopAllActions()
-        :playAnimationForever(template.Animation)
+--        :playAnimationForever(template.Animation)
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
     
     return self
 end

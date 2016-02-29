@@ -4,24 +4,19 @@ local ModelWarCommandMenu = class("ModelWarCommandMenu")
 local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
-local function createQuitActor()
-
-end
-
 local function createChildrenActors(param)
-    local actors = {}
+    local quitWarActor = Actor.createWithModelAndViewName("ModelMenuItemQuitWar", nil, "ViewWarCommandMenuItem")
+    assert(quitWarActor, "ModelWarCommandMenu-createChildrenActors() failed to create a QuitWar actor.")
     
---    local quitActor = 
-    
-    return actors
+    return {quitWarActor = quitWarActor}
 end
 
 local function initWithChildrenActors(model, actors)
-    
+    model.m_QuitWarActor = actors.quitWarActor
 end
 
 function ModelWarCommandMenu:ctor(param)
-    self.m_ItemActors = createChildrenActors()
+    initWithChildrenActors(self, createChildrenActors())
     
     if (param) then
         self:load(param)
@@ -46,7 +41,7 @@ function ModelWarCommandMenu:initView()
 	assert(view, "ModelWarCommandMenu:initView() no view is attached to the actor of the model.")
     
     view:removeAllItems()
---    view:addChild()
+        :pushBackItem(self.m_QuitWarActor:getView())
     
     return self
 end

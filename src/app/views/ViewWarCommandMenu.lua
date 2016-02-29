@@ -1,14 +1,35 @@
 
 local ViewWarCommandMenu = class("ViewWarCommandMenu", cc.Node)
 
-local CONTENT_SIZE_WIDTH  = 250
-local CONTENT_SIZE_HEIGHT = display.height * 0.8
-local POSITION_X = (display.width - CONTENT_SIZE_WIDTH) / 2
-local POSITION_Y = (display.height - CONTENT_SIZE_HEIGHT) / 2
+local MENU_BACKGROUND_WIDTH  = 250
+local MENU_BACKGROUND_HEIGHT = display.height * 0.8
+local MENU_BACKGROUND_POSITION_X = (display.width - MENU_BACKGROUND_WIDTH) / 2
+local MENU_BACKGROUND_POSITION_Y = (display.height - MENU_BACKGROUND_HEIGHT) / 2
 
-local function createBackground()
+local LIST_WIDTH  = MENU_BACKGROUND_WIDTH - 10
+local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
+local LIST_POSITION_X = MENU_BACKGROUND_POSITION_X + 5
+local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
+
+local function createScreenBackground()
+    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
+    background:setContentSize(display.width, display.height)
+        :ignoreAnchorPointForPosition(true)
+        
+    return background
+end
+
+local function initWithScreenBackground(view, background)
+    view.m_ScreenBackground = background
+    view:addChild(background)
+end
+
+local function createMenuBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_BACKGROUND_POSITION_X, MENU_BACKGROUND_POSITION_Y)
+        
+        :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
 
     background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
@@ -16,15 +37,17 @@ local function createBackground()
     return background
 end
 
-local function initWithBackground(view, background)
-    view.m_Background = background
+local function initWithMenuBackground(view, background)
+    view.m_MenuBackground = background
     view:addChild(background)
 end
 
 local function createListView()
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(5, 6)
+        :setPosition(LIST_POSITION_X, LIST_POSITION_Y)
+        
+        :setContentSize(LIST_WIDTH, LIST_HEIGHT)
 
         :setItemsMargin(5)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
@@ -59,17 +82,15 @@ local function initWithTouchListener(view, touchListener)
 end
 
 function ViewWarCommandMenu:ctor(param)
-    initWithBackground(self, createBackground())
+    initWithScreenBackground(self, createScreenBackground())
+    initWithMenuBackground(self, createMenuBackground())
     initWithListView(self, createListView())
     initWithTouchListener(self, createTouchListener(self))
     
-    self:setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
-        
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(POSITION_X, POSITION_Y)
+    self:ignoreAnchorPointForPosition(true)
 
         :setCascadeOpacityEnabled(true)
-        :setOpacity(180)
+        :setOpacity(200)
 
 	if (param) then
         self:load(param)
@@ -87,13 +108,6 @@ function ViewWarCommandMenu.createInstance(param)
     assert(view, "ViewWarCommandMenu.createInstance() failed.")
 
     return view
-end
-
-function ViewWarCommandMenu:setContentSize(width, height)
-    self.m_Background:setContentSize(width, height)
-    self.m_ListView:setContentSize(width - 10, height - 14) -- 10/14 are the height/width of the edging of background
-    
-    return self
 end
 
 function ViewWarCommandMenu:pushBackItem(item)

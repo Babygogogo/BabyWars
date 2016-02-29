@@ -65,7 +65,7 @@ function ModelWarListItem:onPlayerTouch()
 end
 
 function ModelWarListItem:onPlayerConfirmEnterWar()
-    local warScene, createWarSceneMsg = require("app.views.SceneWar").createInstance(self.m_Data)
+    local warScene, createWarSceneMsg = require("app.scenes.SceneWar").createInstance(self.m_Data)
     assert(warScene, createWarSceneMsg)
         
     display.runScene(warScene, "Fade", 1)
