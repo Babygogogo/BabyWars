@@ -16,6 +16,24 @@ local function requireSceneData(param)
 	end
 end
 
+local function initWithEventDispatcher(scene, dispatcher)
+--    dispatcher:retain()
+    dispatcher:setEnabled(true)
+
+    scene.m_EventDispatcher = dispatcher
+    scene:setEventDispatcher(dispatcher)
+end
+
+local function initNodeEvents(scene)
+    local function onNodeEvent(event)
+        if event == "exit" then
+            scene:onExit()
+        end
+    end
+    
+    scene:registerScriptHandler(onNodeEvent)
+end
+
 local function createChildrenActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
@@ -67,17 +85,12 @@ local function createTouchListener(views)
 end
 
 local function initWithTouchListener(scene, touchListener)
-    local eventDispatcher = scene:getEventDispatcher()
-
---[[
-    if (scene.m_TouchListener) then
-        eventDispatcher:removeEventListener(scene.m_TouchListener)
-    end
---]]
     assert(not scene.m_TouchListener, "SceneWar-initWithTouchListener() the scene already has a touch listener.")
-
     scene.m_TouchListener = touchListener
+
+    local eventDispatcher = scene:getEventDispatcher()
     eventDispatcher:addEventListenerWithSceneGraphPriority(scene.m_TouchListener, scene)
+--    eventDispatcher:addEventListenerWithFixedPriority(touchListener, 1)
 end
 
 local function getChildrenViewsFromButtomToTop(scene)
@@ -98,6 +111,9 @@ local function initWithChildrenViews(scene, viewsFromButtomToTop)
 end
 
 function SceneWar:ctor(param)
+--    initWithEventDispatcher(self, cc.EventDispatcher:new())
+--    initNodeEvents(self)
+
 	if (param) then
         self:load(param)
     end
@@ -129,6 +145,11 @@ function SceneWar:getTouchableChildrenViews()
     views[#views + 1] = getTouchableViewFromActor(self.m_WarFieldActor)
     
     return views
+end
+
+function SceneWar:onExit()
+    print("SceneWar:onExit()")
+--    self.m_EventDispatcher:release()
 end
 
 return SceneWar

@@ -78,7 +78,9 @@ function ModelUnitMap:load(param)
 
 	self.m_UnitActorsMap = childrenActors.UnitActorsMap
 	
-	if (self.m_View) then self:initView() end
+	if (self.m_View) then
+        self:initView()
+    end
 
 	return self
 end
@@ -123,7 +125,12 @@ end
 function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
     local unitActor = self:getUnitActor(gridIndex)
     if (unitActor) then
-        print("ModelUnitMap:handleAndSwallowTouchOnGrid() unit touched, in ", gridIndex.x, gridIndex.y)
+        local event = cc.EventCustom:new("EvtPlayerTouchUnit")
+        event.m_UnitModel = unitActor:getModel()
+        display.getRunningScene():getEventDispatcher():dispatchEvent(event)
+    else
+        local event = cc.EventCustom:new("EvtPlayerTouchNoUnit")
+        display.getRunningScene():getEventDispatcher():dispatchEvent(event)
     end
     
     return false

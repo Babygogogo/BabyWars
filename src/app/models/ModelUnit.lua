@@ -53,5 +53,8 @@ function ModelUnit:initView()
     view:updateWithTiledID(self.m_TiledID)
 end
 
+function ModelUnit:getTiledID()
+    return self.m_TiledID
+end
 
 return ModelUnit

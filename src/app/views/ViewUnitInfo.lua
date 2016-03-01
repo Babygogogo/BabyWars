@@ -1,6 +1,8 @@
 
 local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
+local AnimationLoader = require("app.utilities.AnimationLoader")
+
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
 local LEFT_POSITION_X = 10 + CONTENT_SIZE_WIDTH
 local LEFT_POSITION_Y = 10
@@ -55,7 +57,7 @@ local function createIcon()
 
         :setScale(ICON_SCALE)
         
-        :playAnimationForever(require("app.utilities.AnimationLoader").getAnimationWithTiledID(117))
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(117))
         
     return icon
 end
@@ -159,6 +161,25 @@ local function initWithAmmoInfo(view, info)
     view:addChild(info)
 end
 
+local function moveToLeftSide(view)
+    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+end
+
+local function moveToRightSide(view)
+    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+end
+
+local function adjustPositionOnTouch(view, touch)
+    local touchLocation = touch:getLocation()
+    if (touchLocation.y <= display.height / 2) then
+        if (touchLocation.x <= display.width / 2) then
+            moveToRightSide(view)
+        else
+            moveToLeftSide(view)
+        end
+    end
+end
+
 function ViewUnitInfo:ctor(param)
     initWithButton(self, createButton(self))
     initWithIcon(self, createIcon())
@@ -167,10 +188,12 @@ function ViewUnitInfo:ctor(param)
     initWithAmmoInfo(self, createAmmoInfo())
     
     self:ignoreAnchorPointForPosition(true)
-        :moveToRightSide()
     
         :setCascadeOpacityEnabled(true)
         :setOpacity(180)
+        :setVisible(false)
+
+    moveToRightSide(self)
         
     if (param) then
         self:load(param)
@@ -201,28 +224,17 @@ function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
         return false
     elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
         if (not self.m_IsTouchMoved) then
-            local touchLocation = touch:getLocation()
-            if (touchLocation.y <= display.height / 2) then
-                if (touchLocation.x <= display.width / 2) then
-                    self:moveToRightSide()
-                else
-                    self:moveToLeftSide()
-                end
-            end
+            adjustPositionOnTouch(self, touch)
         end
-        
+
         return false
     end
 end
 
-function ViewUnitInfo:moveToLeftSide()
-    self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
-    
-    return self
-end
-
-function ViewUnitInfo:moveToRightSide()
-    self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+function ViewUnitInfo:updateWithModelUnit(model)
+    local tiledID = model:getTiledID()
+    self.m_Icon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
     
     return self
 end
