@@ -1,11 +1,21 @@
 
 local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 110, 160
-local LEFT_POSITION_X = 20
-local LEFT_POSITION_Y = 20
-local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
+local LEFT_POSITION_X = 10
+local LEFT_POSITION_Y = 10
+local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
+
+local GRID_SIZE = require("res.data.GameConstant").GridSize
+local ICON_SCALE      = 0.5
+local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
+local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * 2 * ICON_SCALE
+
+local DEFENSE_INFO_POSITION_X = 10
+local DEFENSE_INFO_POSITION_Y = 40
+local CAPTURE_INFO_POSITION_X = DEFENSE_INFO_POSITION_X
+local CAPTURE_INFO_POSITION_Y = 10
 
 local function createButton(view)
     local button = ccui.Button:create()
@@ -18,9 +28,7 @@ local function createButton(view)
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
     
         :setZoomScale(-0.05)
-        
-        :setOpacity(160)
-    
+
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 if (view.m_Model) then
@@ -37,10 +45,98 @@ local function initWithButton(view, button)
     view:addChild(button)
 end
 
+local function createIcon()
+    local icon = cc.Sprite:create()
+    icon:setAnchorPoint(0, 0)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(ICON_POSITION_X, ICON_POSITION_Y)
+
+        :setScale(ICON_SCALE)
+        
+        :playAnimationForever(require("app.utilities.AnimationLoader").getAnimationWithTiledID(1))
+        
+    return icon
+end
+
+local function initWithIcon(view, icon)
+    view.m_Icon = icon
+    view:addChild(icon)
+end
+
+local function createLabel()
+    local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
+    label:ignoreAnchorPointForPosition(true)
+        
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+    
+    return label
+end
+
+local function createDefenseInfo()
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :ignoreAnchorPointForPosition(true)
+        
+        :setScale(ICON_SCALE)
+    
+    local label = createLabel()
+    label:setPosition(30, -5)
+    
+    local info = cc.Node:create()
+    info:setCascadeOpacityEnabled(true)
+        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
+        
+        :addChild(icon)
+        :addChild(label)
+        
+    info.m_Label = label
+    
+    return info
+end
+
+local function initWithDefenseInfo(view, info)
+    view.m_DefenseInfo = info
+    view:addChild(info)
+end
+
+local function createCaptureInfo()
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :ignoreAnchorPointForPosition(true)
+        
+        :setScale(ICON_SCALE)
+        
+    local label = createLabel()
+    label:setPosition(30, -4)
+    
+    local info = cc.Node:create()
+    info:setCascadeOpacityEnabled(true)
+        :setPosition(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y)
+        
+        :addChild(icon)
+        :addChild(label)
+        
+    info.m_Label = label
+    
+    return info
+end
+
+local function initWithCaptureInfo(view, info)
+    view.m_CaptureInfo = info
+    view:addChild(info)
+end
+
 function ViewTileInfo:ctor(param)
     initWithButton(self, createButton(self))
+    initWithIcon(self, createIcon())
+    initWithDefenseInfo(self, createDefenseInfo())
+    initWithCaptureInfo(self, createCaptureInfo())
 
-    self:ignoreAnchorPointForPosition(true)
+    self:setCascadeOpacityEnabled(true)
+        :setOpacity(180)
+    
+        :ignoreAnchorPointForPosition(true)
         :moveToRightSide()
     
     if (param) then

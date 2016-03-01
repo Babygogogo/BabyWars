@@ -2,9 +2,9 @@
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", ccui.Button)
 
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 220, 100 
-local LEFT_POSITION_X = 20
-local LEFT_POSITION_Y = display.height - CONTENT_SIZE_HEIGHT - 20
-local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 20
+local LEFT_POSITION_X = 10
+local LEFT_POSITION_Y = display.height - CONTENT_SIZE_HEIGHT - 10
+local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
 local function moveToLeftSide(view)
