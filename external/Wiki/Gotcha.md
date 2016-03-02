@@ -54,6 +54,61 @@
 综上所述，我最终选择了cocos2d-lua。  
 
 # cocos2d-lua
+## 垃圾回收
+### 背景知识
+- lua的垃圾回收是自动进行的，而且能够正确处理循环引用的情况，因此程序员一般不需要为垃圾回收而操心
+- 在引擎的c++侧中，垃圾也都是自动回收的
+
+### c++侧与lua侧的cocos2d对象回收
+当我们在lua中新建一个cocos2d的对象时（以sprite为例）：
+``` lua
+    local s = cc.Sprite:create()
+```
+我们实际上是在引擎的c++侧新建了一个Sprite对象，同时使lua侧的变量s“绑定”到它。  
+
+需要注意的是，就如同在c++中调用Sprite:create()那样，上面的代码所生成的c++侧的Sprite对象是会在下一帧开始之前被自动回收的。
+如果不阻止自动回收，那么在c++侧的Sprite对象被回收之后，lua侧的s就变成了空壳，试图调用c++侧的方法（如s:setVisible()）都会以失败告终。  
+c++侧的Sprite对象被回收，并不会使得lua侧的s变成nil（另一方面，手动把s置为nil，也不会使得c++侧的Sprite对象被马上回收）。  
+
+顺带一提，阻止自动回收主要有两种方法：
+- 调用s:retain()（后续需要在合适时机调用s:release()，否则对应的c++侧的Sprite对象将无法被回收）
+- 把s加入到其他的不会被自动回收的cocos2d对象容器中，比如display.getRunningScene():addChild(s)（这其实也是在c++侧内部调用了retain()）
+
+### lua对象的析构函数？
+从lua 5.2起，如果一个对象存在名为\_\_gc的元方法，那么这个对象被回收时，该元方法将被调用，参数就是该对象。由此，我们可以在这个元方法里实现类似于析构函数的操作。  
+非常遗憾的是，在lua 5.1（也就是cocos2d-lua所使用的版本）中，仅当该对象是userdata时，\_\_gc才会被调用。因此我们无法为纯lua对象实现类似析构函数的功能了。
+
+## cc.EventDispatcher
+### 调用xxx:setEventDispatcher()后，listener无法触发？
+#### 问题描述
+首先，有以下背景知识：
+- cc.Director的实例自带一个cc.EventDispatcher的实例
+- 每个cc.Node及其子类的实例也都自带一个cc.EventDispatcher的实例，但在默认情况下，这个实例和director中的实例是同一个。
+  也就是说，在默认情况下，以下两个调用所返回的东西是一样的：  
+  cc.Director:getInstance():getEventDispatcher()  
+  some_node:getEventDispatcher()
+  
+在某些情况下（比如希望避免太多的event listener污染director中的event dispatcher），我们需要给某些特定的node设置单独的event dispatcher。  
+幸运的是，cocos2d-lua已经为我们提供了这样一个接口：cc.Node:setEventDispatcher()。Node的子类也都继承了这个方法。  
+不幸的是，这个接口实际上是有问题的：具体而言，调用之后，向新的event dispatcher里注册的任何listener，都永远不会被触发：
+```lua
+local MyScene = class("MyScene", cc.Scene)
+function MyScene:ctor()
+    local eventDispatcher = cc.EventDispatcher:new()
+    eventDispatcher:setEnabled(true) -- 新建的event listener是默认禁用的，必须调用setEnabled使其启用
+    self:setEventDispatcher(eventDispatcher)
+    
+    local listener = createSomeListener()
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self) -- listener永远不会被触发，无论是什么类型
+
+    return self
+end
+```  
+director同样有setEventDispatcher()的接口。奇怪的是，作为对比，调用此接口后，向新的event dispatcher注册的listener仍然可以顺利触发。
+
+#### 解决方案
+无（如果您知道解决方案，还望留言赐教，非常感谢！）。  
+  
 ## ccui.ListView
 ### 无法显示已添加的子节点？
 #### 解决方案  

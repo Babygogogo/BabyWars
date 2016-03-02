@@ -5,6 +5,20 @@ local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ComponentManager = require("global.components.ComponentManager")
 
+local function onCleanup(scene)
+    print("SceneWar-onCleanup")
+end
+
+local function initNodeEvents(scene)
+    local function onNodeEvent(event)
+        if event == "cleanup" then
+            onCleanup(scene)
+        end
+    end
+    
+    scene:registerScriptHandler(onNodeEvent)
+end
+
 local function requireSceneData(param)
 	local t = type(param)
 	if (t == "table") then
@@ -14,24 +28,6 @@ local function requireSceneData(param)
 	else
 		return nil
 	end
-end
-
-local function initWithEventDispatcher(scene, dispatcher)
---    dispatcher:retain()
-    dispatcher:setEnabled(true)
-
-    scene.m_EventDispatcher = dispatcher
-    scene:setEventDispatcher(dispatcher)
-end
-
-local function initNodeEvents(scene)
-    local function onNodeEvent(event)
-        if event == "exit" then
-            scene:onExit()
-        end
-    end
-    
-    scene:registerScriptHandler(onNodeEvent)
 end
 
 local function createChildrenActors(param)
@@ -111,8 +107,7 @@ local function initWithChildrenViews(scene, viewsFromButtomToTop)
 end
 
 function SceneWar:ctor(param)
---    initWithEventDispatcher(self, cc.EventDispatcher:new())
---    initNodeEvents(self)
+    initNodeEvents(self)
 
 	if (param) then
         self:load(param)
@@ -145,11 +140,6 @@ function SceneWar:getTouchableChildrenViews()
     views[#views + 1] = getTouchableViewFromActor(self.m_WarFieldActor)
     
     return views
-end
-
-function SceneWar:onExit()
-    print("SceneWar:onExit()")
---    self.m_EventDispatcher:release()
 end
 
 return SceneWar
