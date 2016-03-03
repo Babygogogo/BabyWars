@@ -40,9 +40,7 @@ local function doCachedOperations(operations)
 end
 
 function EventDispatcher:ctor(param)
-    self.m_Listeners = {}
-    self.m_NestLevelOfDispatch = 0
-    self.m_OperationCache = {}
+    self:reset()
 
     if (param) then
         self:load(param)
@@ -63,7 +61,7 @@ function EventDispatcher.createInstance(param)
 end
 
 function EventDispatcher:reset()
-    assert(self.m_NestLevelOfDispatch == 0, "EventDispatcher:reset() an dispatch is currently running.")
+    assert(self.m_NestLevelOfDispatch == 0 or self.m_NestLevelOfDispatch == nil, "EventDispatcher:reset() an dispatch is currently running.")
     
     self.m_Listeners = {}
     self.m_NestLevelOfDispatch = 0

@@ -1,5 +1,5 @@
 
-local SceneWar = class("SceneWar", cc.Scene)
+local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
 local function createTouchListener(views)
     local dispatchAndSwallowTouch = require("app.utilities.DispatchAndSwallowTouch")
@@ -31,16 +31,13 @@ local function createTouchListener(views)
 end
 
 local function initWithTouchListener(scene, touchListener)
-    assert(not scene.m_TouchListener, "SceneWar-initWithTouchListener() the scene already has a touch listener.")
+    assert(not scene.m_TouchListener, "ViewSceneWar-initWithTouchListener() the scene already has a touch listener.")
     scene.m_TouchListener = touchListener
 
     scene:getEventDispatcher():addEventListenerWithSceneGraphPriority(scene.m_TouchListener, scene)
 end
 
-function SceneWar:ctor(param)
-    self.m_Model = require("app.models.ModelSceneWar"):create()
-    self.m_Model.m_View = self
-
+function ViewSceneWar:ctor(param)
 	if (param) then
         self:load(param)
     end
@@ -48,27 +45,21 @@ function SceneWar:ctor(param)
 	return self
 end
 
-function SceneWar:load(param)
-    self.m_Model:load(param)
-    
+function ViewSceneWar:load(param)
 	return self
 end
 
-function SceneWar.createInstance(param)
-	local scene = SceneWar.new():load(param)
-	assert(scene, "SceneWar.createInstance() failed.")
+function ViewSceneWar.createInstance(param)
+	local scene = ViewSceneWar.new():load(param)
+	assert(scene, "ViewSceneWar.createInstance() failed.")
 	
 	return scene
 end
 
-function SceneWar:getModel()
-    return self.m_Model
-end
-
-function SceneWar:initTouchListener(touchableChildrenViews)
+function ViewSceneWar:initTouchListener(touchableChildrenViews)
     initWithTouchListener(self, createTouchListener(touchableChildrenViews))
     
     return self
 end
 
-return SceneWar
+return ViewSceneWar
