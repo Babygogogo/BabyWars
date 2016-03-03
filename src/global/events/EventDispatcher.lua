@@ -62,6 +62,16 @@ function EventDispatcher.createInstance(param)
     return dispatcher
 end
 
+function EventDispatcher:reset()
+    assert(self.m_NestLevelOfDispatch == 0, "EventDispatcher:reset() an dispatch is currently running.")
+    
+    self.m_Listeners = {}
+    self.m_NestLevelOfDispatch = 0
+    self.m_OperationCache = {}
+    
+    return self
+end
+
 -- You must remove listeners that you added, or the listeners will live forever.
 -- If you try to add/remove listeners during dispatch, the add/remove operations will be cached and be done when the dispatch ends.
 function EventDispatcher:addEventListener(eventName, listener)
