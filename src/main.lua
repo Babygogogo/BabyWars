@@ -16,8 +16,12 @@ local function main()
     require("app.utilities.AnimationLoader").load()
     
     math.randomseed(os.time())
-        
-    display.runScene(require("app.scenes.SceneMain"):create())
+
+    cc.Director:getInstance():setDisplayStats(true)
+    
+    local mainSceneActor = require("global.actors.Actor").createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
+    assert(mainSceneActor, "main() failed to create a main scene actor.")
+    require("global.actors.ActorManager").setAndRunRootActor(mainSceneActor)
 --]]
 end
 

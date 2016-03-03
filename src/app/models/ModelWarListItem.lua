@@ -66,7 +66,7 @@ end
 
 function ModelWarListItem:onPlayerConfirmEnterWar()
     local sceneWarActor = Actor.createWithModelAndViewName("ModelSceneWar", self.m_Data, "ViewSceneWar")
-    require("global.actors.ActorManager").setAndRunRootActor(sceneWarActor, "Fade", 1)
+    require("global.actors.ActorManager").setAndRunRootActor(sceneWarActor, "FADE", 1)
 
     return self
 end

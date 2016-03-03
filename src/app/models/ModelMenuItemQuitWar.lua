@@ -1,17 +1,17 @@
 
 local ModelMenuItemQuitWar = class("ModelMenuItemQuitWar")
 
-local Actor       = require("global.actors.Actor")
-local TypeChecker = require("app.utilities.TypeChecker")
+local Actor        = require("global.actors.Actor")
+local ActorManager = require("global.actors.ActorManager")
+local TypeChecker  = require("app.utilities.TypeChecker")
 
 local TITLE_TEXT   = "Quit"
 local CONFIRM_TEXT = "You are quitting the war.\nAre you sure?"
 
 local function onConfirmYes()
-    local mainScene = require("app.scenes.SceneMain"):create()
-    assert(mainScene, "ModelMenuItemQuitWar-onConfirmYes() failed to create the main scene.")
-        
-    display.runScene(mainScene, "FADE", 1)
+    local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
+    assert(mainSceneActor, "ModelMenuItemQuitWar-onConfirmYes() failed to create a main scene actor.")
+    ActorManager.setAndRunRootActor(mainSceneActor, "FADE", 1)
     
     return self
 end
