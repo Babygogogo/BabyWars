@@ -78,4 +78,18 @@ function ModelWarField:initView()
     return self
 end
 
+function ModelWarField:onEnter(rootActor)
+    self.m_TileMapActor:onEnter(rootActor)
+    self.m_UnitMapActor:onEnter(rootActor)
+    
+    return self
+end
+
+function ModelWarField:onCleanup(rootActor)
+    self.m_TileMapActor:onCleanup(rootActor)
+    self.m_UnitMapActor:onCleanup(rootActor)
+    
+    return self
+end
+
 return ModelWarField

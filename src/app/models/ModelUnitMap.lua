@@ -92,6 +92,18 @@ function ModelUnitMap.createInstance(param)
 	return model
 end
 
+function ModelUnitMap:onEnter(rootActor)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    
+    return self
+end
+
+function ModelUnitMap:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 function ModelUnitMap:initView()
 	local view = self.m_View
 	assert(TypeChecker.isView(view))
@@ -125,12 +137,11 @@ end
 function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
     local unitActor = self:getUnitActor(gridIndex)
     if (unitActor) then
-        local event = cc.EventCustom:new("EvtPlayerTouchUnit")
-        event.m_UnitModel = unitActor:getModel()
-        display.getRunningScene():getEventDispatcher():dispatchEvent(event)
+        local event = {name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()}
+        self.m_RootScriptEventDispatcher:dispatchEvent(event)
     else
-        local event = cc.EventCustom:new("EvtPlayerTouchNoUnit")
-        display.getRunningScene():getEventDispatcher():dispatchEvent(event)
+        local event = {name = "EvtPlayerTouchNoUnit"}
+        self.m_RootScriptEventDispatcher:dispatchEvent(event)
     end
     
     return false

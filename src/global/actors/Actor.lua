@@ -44,6 +44,7 @@ function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewP
 	return Actor.createWithModelAndViewInstance(model, view)
 end
 
+--[[
 function Actor:destroy()
     self:destroyView()
         :destroyModel()
@@ -51,19 +52,29 @@ function Actor:destroy()
 
     return self    
 end
+--]]
 
-function Actor:onEnter(scene)
+function Actor:onEnter(rootActor)
     if (self.m_Model and self.m_Model.onEnter) then
-        self.m_Model:onEnter(scene)
+        self.m_Model:onEnter(rootActor)
     end
     if (self.m_View and self.m_View.onEnter) then
-        self.m_View:onEnter(scene)
+        self.m_View:onEnter(rootActor)
     end
     
     return self
 end
 
-Actor.onCleanup = Actor.destroy
+function Actor:onCleanup(rootActor)
+    if (self.m_Model and self.m_Model.onCleanup) then
+        self.m_Model:onCleanup(rootActor)
+    end
+    if (self.m_View and self.m_View.onCleanup) then
+        self.m_View:onCleanup(rootActor)
+    end
+    
+    return self
+end
 
 function Actor:setView(view)
 	assert(iskindof(view, "cc.Node"), "Actor:setView() the param view is not a kind of cc.Node.")
@@ -100,6 +111,7 @@ function Actor:removeView()
 	return self
 end
 
+--[[
 function Actor:destroyView()
     local view = self:getView()
     if (view) then
@@ -111,6 +123,7 @@ function Actor:destroyView()
     
     return self
 end
+--]]
 
 function Actor:setModel(model)
 	assert(type(model) == "table", "Actor:setModel() the param model is not a table.")
@@ -147,6 +160,7 @@ function Actor:removeModel()
 	return self
 end
 
+--[[
 function Actor:destroyModel()
     local model = self:getModel()
     if (model) then
@@ -158,6 +172,7 @@ function Actor:destroyModel()
     
     return self
 end
+--]]
 
 --[[
 function Actor:bindComponent(...)

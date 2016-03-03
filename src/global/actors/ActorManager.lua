@@ -9,7 +9,7 @@ function ActorManager.setAndRunRootActor(actor, transition, time, more)
 end
 
 function ActorManager.getRootActor()
-    return RootActor
+    return s_RootActor
 end
 
 return ActorManager

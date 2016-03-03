@@ -5,41 +5,20 @@ local function createDetailActor()
     return require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
 end
 
-local function createEventListenerPlayerTouchUnit(model)
-    local callback = function(event)
-        if (model.m_View) then
-            model.m_View:updateWithModelUnit(event.m_UnitModel)
-            model.m_View:setVisible(true)
-        end
+local function onEvtPlayerTouchUnit(model, event)
+    if (model.m_View) then
+        model.m_View:updateWithModelUnit(event.unitModel)
+        model.m_View:setVisible(true)
     end
-
-    return cc.EventListenerCustom:create("EvtPlayerTouchUnit", callback)
 end
 
-local function initWithEventListenerPlayerTouchUnit(model, listener)
-    model.m_PlayerTouchUnitListener = listener
-    display.getRunningScene():getEventDispatcher():addEventListenerWithFixedPriority(listener, 1)
-end
-
-local function createEventListenerPlayerTouchNoUnit(model)
-    local callback = function(event)
-        if (model.m_View) then
-            model.m_View:setVisible(false)
-        end
+local function onEvtPlayerTouchNoUnit(model, event)
+    if (model.m_View) then
+        model.m_View:setVisible(false)
     end
-    
-    return cc.EventListenerCustom:create("EvtPlayerTouchNoUnit", callback)
 end
-
-local function initWithEventListenerPlayerTouchNoUnit(model, listener)
-    model.m_PlayerTouchNoUnitListener = listener
-    display.getRunningScene():getEventDispatcher():addEventListenerWithFixedPriority(listener, 1)
-end    
 
 function ModelUnitInfo:ctor(param)
-    initWithEventListenerPlayerTouchUnit(self, createEventListenerPlayerTouchUnit(self))
-    initWithEventListenerPlayerTouchNoUnit(self, createEventListenerPlayerTouchNoUnit(self))
-
     if (param) then
         self:load(param)
     end
@@ -56,6 +35,35 @@ function ModelUnitInfo.createInstance(param)
     assert(model, "ModelUnitInfo.createInstance() failed.")
     
     return model
+end
+
+function ModelUnitInfo:onEnter(rootActor)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchUnit",   self)
+                                    :addEventListener("EvtPlayerTouchNoUnit", self)
+    
+    return self
+end
+
+function ModelUnitInfo:onCleanup(rootActor)
+--[[
+    -- removeEventListener can be commented out because the dispatch itself is being destroyed.
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerTouchUnit",   self)
+                                    :removeEventListener("EvtPlayerTouchNoUnit", self)
+--]]
+    self.m_RootScriptEventDispatcher = nil
+    
+    return self
+end
+
+function ModelUnitInfo:onEvent(event)
+    if (event.name == "EvtPlayerTouchNoUnit") then
+        onEvtPlayerTouchNoUnit(self, event)
+    elseif (event.name == "EvtPlayerTouchUnit") then
+        onEvtPlayerTouchUnit(self, event)
+    end
+    
+    return self
 end
 
 function ModelUnitInfo:onPlayerTouch()

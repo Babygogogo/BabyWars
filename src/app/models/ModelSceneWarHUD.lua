@@ -68,6 +68,22 @@ function ModelSceneWarHUD.createInstance(param)
     return model
 end
 
+function ModelSceneWarHUD:onEnter(rootActor)
+    self.m_MoneyEnergyInfoActor:onEnter(rootActor)
+    self.m_TileInfoActor:onEnter(rootActor)
+    self.m_UnitInfoActor:onEnter(rootActor)
+    
+    return self
+end
+
+function ModelSceneWarHUD:onCleanup(rootActor)
+    self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
+    self.m_TileInfoActor:onCleanup(rootActor)
+    self.m_UnitInfoActor:onCleanup(rootActor)
+    
+    return self
+end
+
 function ModelSceneWarHUD:getTouchableChildrenViews()
     local views = {}
     local getTouchableViewFromActor = require("app.utilities.GetTouchableViewFromActor")

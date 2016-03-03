@@ -4,20 +4,12 @@ local ModelSceneWar = class("ModelSceneWar")
 local Actor       = require("global.actors.Actor")
 local TypeChecker = require("app.utilities.TypeChecker")
 
-local function onEnter(view)
-    print("ModelSceneWar-onEnter")
-end
-
-local function onCleanup(view)
-    print("ModelSceneWar-onCleanup")
-end
-
-local function createNodeEventHandler(model)
+local function createNodeEventHandler(model, rootActor)
     return function(event)
         if (event == "enter") then
-            onEnter(model.m_View)
+            model:onEnter(rootActor)
         elseif (event == "cleanup") then
-            onCleanup(model.m_View)
+            model:onCleanup(rootActor)
         end
     end
 end
@@ -99,13 +91,31 @@ function ModelSceneWar:initView()
         :addChild(self.m_SceneWarHUDActor:getView())
         
         :initTouchListener(getTouchableChildrenViews(self))
-        :registerScriptHandler(createNodeEventHandler(self))
+        :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
     
     return self
 end
 
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
+end
+
+function ModelSceneWar:onEnter(rootActor)
+    print("ModelSceneWar:onEnter()")
+    
+    self.m_SceneWarHUDActor:onEnter(rootActor)
+    self.m_WarFieldActor:onEnter(rootActor)
+    
+    return self
+end
+
+function ModelSceneWar:onCleanup(rootActor)
+    print("ModelSceneWar:onCleanup()")
+    
+    self.m_SceneWarHUDActor:onCleanup(rootActor)
+    self.m_WarFieldActor:onCleanup(rootActor)
+    
+    return self
 end
 
 return ModelSceneWar

@@ -121,8 +121,11 @@ function EventDispatcher:dispatchEvent(eventObj)
     local name = eventObj.name
     assert(type(name) == "string", "EventDispatcher:dispatchEvent() the param eventObj.name is not a string.")
 
-    for _, listener in ipairs(self.m_Listeners[name]) do
-        listener:onEvent(eventObj)
+    local listenersForName = self.m_Listeners[name]
+    if (listenersForName) then
+        for _, listener in ipairs(listenersForName) do
+            listener:onEvent(eventObj)
+        end
     end
     
     self.m_NestLevelOfDispatch = self.m_NestLevelOfDispatch - 1
