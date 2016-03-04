@@ -1,6 +1,6 @@
 
-return function(pos, gridSize, scale)
-    return {x = math.floor(pos.x / (gridSize.width  * scale) + 1),
-            y = math.floor(pos.y / (gridSize.height * scale) + 1)
+return function(pos, gridSize)
+    return {x = math.ceil(pos.x / (gridSize.width )),
+            y = math.ceil(pos.y / (gridSize.height))
     }
 end

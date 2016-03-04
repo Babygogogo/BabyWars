@@ -24,7 +24,7 @@ local function createChildrenActors(param)
     assert(tileMapActor, "ModelWarField-createChildrenActors() failed to create the TileMap actor.")
     local unitMapActor = Actor.createWithModelAndViewName("ModelUnitMap", warFieldData.UnitMap, "ViewUnitMap")
     assert(unitMapActor, "ModelWarField-createChildrenActors() failed to create the UnitMap actor.")
-    local cursorActor = Actor.createWithModelAndViewName(nil, nil, "ViewMapCursor")
+    local cursorActor = Actor.createWithModelAndViewName("ModelMapCursor", nil, "ViewMapCursor")
     assert(cursorActor, "ModelWarField-createChildrenActors() failed to create the cursor actor.")
 
     assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getModel():getMapSize()))
@@ -36,7 +36,6 @@ local function initWithChildrenActors(model, actors)
     model.m_TileMapActor = actors.tileMapActor
     model.m_UnitMapActor = actors.unitMapActor
     model.m_CursorActor = actors.cursorActor
-    model.m_CursorActor:getView():setPosition(320, 400)
 end
 
 function ModelWarField:ctor(param)

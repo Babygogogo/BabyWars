@@ -5,11 +5,11 @@ local GridSize    = require("res.data.GameConstant").GridSize
 local toGridIndex = require("app.utilities.ToGridIndex")
 
 function ViewUnitMap:ctor(param)
-	if (param) then self:load(param) end
+    if (param) then
+        self:load(param)
+    end
     
-    self.m_Scale = 1
-	
-	return self
+    return self
 end
 
 function ViewUnitMap:load(param)
@@ -24,7 +24,7 @@ function ViewUnitMap.createInstance(param)
 end
 
 function ViewUnitMap:worldPosToGridIndex(pos)
-    return toGridIndex(self:convertToNodeSpace(pos), GridSize, self.m_Scale)
+    return toGridIndex(self:convertToNodeSpace(pos), GridSize)
 end
 
 function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
@@ -49,11 +49,6 @@ function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
             return false
         end
     end
-end
-
-function ViewUnitMap:setScale(scale)
-    self.m_Scale = scale
-    return self
 end
 
 return ViewUnitMap
