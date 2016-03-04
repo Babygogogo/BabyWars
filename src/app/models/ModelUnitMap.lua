@@ -78,7 +78,9 @@ function ModelUnitMap:load(param)
 
 	self.m_UnitActorsMap = childrenActors.UnitActorsMap
 	
-	if (self.m_View) then self:initView() end
+	if (self.m_View) then
+        self:initView()
+    end
 
 	return self
 end
@@ -88,6 +90,18 @@ function ModelUnitMap.createInstance(param)
 	assert(model, "ModelUnitMap.createInstance() failed.")
 	
 	return model
+end
+
+function ModelUnitMap:onEnter(rootActor)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    
+    return self
+end
+
+function ModelUnitMap:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
 end
 
 function ModelUnitMap:initView()
@@ -123,7 +137,11 @@ end
 function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
     local unitActor = self:getUnitActor(gridIndex)
     if (unitActor) then
-        print("ModelUnitMap:handleAndSwallowTouchOnGrid() unit touched, in ", gridIndex.x, gridIndex.y)
+        local event = {name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()}
+        self.m_RootScriptEventDispatcher:dispatchEvent(event)
+    else
+        local event = {name = "EvtPlayerTouchNoUnit"}
+        self.m_RootScriptEventDispatcher:dispatchEvent(event)
     end
     
     return false

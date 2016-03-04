@@ -44,30 +44,36 @@ function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewP
 	return Actor.createWithModelAndViewInstance(model, view)
 end
 
-function Actor:bindComponent(...)
-	ComponentManager.bindComponent(self, ...)
-	
-	return self
-end
+--[[
+function Actor:destroy()
+    self:destroyView()
+        :destroyModel()
+--        :unbindAllComponents()
 
-function Actor:unbindComponent(...)
-	ComponentManager.unbindComponent(self, ...)
+    return self    
+end
+--]]
+
+function Actor:onEnter(rootActor)
+    if (self.m_Model and self.m_Model.onEnter) then
+        self.m_Model:onEnter(rootActor)
+    end
+    if (self.m_View and self.m_View.onEnter) then
+        self.m_View:onEnter(rootActor)
+    end
     
-	return self
+    return self
 end
 
-function Actor:unbindAllComponents()
-	ComponentManager.unbindAllComponents(self)
-	
-	return self
-end
-
-function Actor:hasBound(componentName)
-	return ComponentManager.hasBinded(self, componentName)
-end
-
-function Actor:getComponent(componentName)
-	return ComponentManager.getComponent(self, componentName)
+function Actor:onCleanup(rootActor)
+    if (self.m_Model and self.m_Model.onCleanup) then
+        self.m_Model:onCleanup(rootActor)
+    end
+    if (self.m_View and self.m_View.onCleanup) then
+        self.m_View:onCleanup(rootActor)
+    end
+    
+    return self
 end
 
 function Actor:setView(view)
@@ -105,9 +111,23 @@ function Actor:removeView()
 	return self
 end
 
+--[[
+function Actor:destroyView()
+    local view = self:getView()
+    if (view) then
+        self:removeView()
+        if (view.onCleanup) then
+            view:onCleanup()
+        end
+    end
+    
+    return self
+end
+--]]
+
 function Actor:setModel(model)
 	assert(type(model) == "table", "Actor:setModel() the param model is not a table.")
-	assert(model.m_Actor_ == nil, "Actor:setModel() the param model already has an owner actor.")
+	assert(model.m_Actor == nil, "Actor:setModel() the param model already has an owner actor.")
 	assert(self.m_Model == nil, "Actor:setModel() the actor already has a model.")
 	
 	local view = self.m_View
@@ -139,5 +159,47 @@ function Actor:removeModel()
 	
 	return self
 end
+
+--[[
+function Actor:destroyModel()
+    local model = self:getModel()
+    if (model) then
+        self:removeModel()
+        if (model.onCleanup) then
+            model:onCleanup()
+        end
+    end
+    
+    return self
+end
+--]]
+
+--[[
+function Actor:bindComponent(...)
+	ComponentManager.bindComponent(self, ...)
+	
+	return self
+end
+
+function Actor:unbindComponent(...)
+	ComponentManager.unbindComponent(self, ...)
+    
+	return self
+end
+
+function Actor:unbindAllComponents()
+	ComponentManager.unbindAllComponents(self)
+	
+	return self
+end
+
+function Actor:hasBound(componentName)
+	return ComponentManager.hasBinded(self, componentName)
+end
+
+function Actor:getComponent(componentName)
+	return ComponentManager.getComponent(self, componentName)
+end
+--]]
 
 return Actor

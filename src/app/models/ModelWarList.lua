@@ -2,8 +2,6 @@
 local ModelWarList = class("ModelWarList")
 
 local Actor            = require("global.actors.Actor")
-local ViewWarListItem  = require("app.views.ViewWarListItem")
-local ModelWarListItem = require("app.models.ModelWarListItem")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
 local function requireListData(param)

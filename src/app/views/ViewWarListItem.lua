@@ -10,14 +10,17 @@ function ViewWarListItem:ctor(param)
         
         :setZoomScale(-0.05)
         
-        :setTitleFontSize(30)
-        :setTitleColor({r = 0, g = 0, b = 0})
+        :setTitleFontName("res/fonts/msyhbd.ttc")
+        :setTitleFontSize(28)
+        :setTitleColor({r = 255, g = 255, b = 255})
         
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 if (self.m_Model) then self.m_Model:onPlayerTouch() end
             end
         end)
+        
+    self:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
 
 	if (param) then self:load(param) end
 

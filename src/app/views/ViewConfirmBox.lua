@@ -1,54 +1,49 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
-local backgroundWidth, backgroundHeight = 600, display.height * 0.5
-local textWidth,       textHeight       = 580, display.height * 0.3
-local buttonWidth,     buttonHeight     = 200, display.height * 0.1
+local BACKGROUND_WIDTH  = 600
+local BACKGROUND_HEIGHT = display.height * 0.5
+local BACKGROUND_POSITION_X = (display.width - BACKGROUND_WIDTH) / 2
+local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
 
-local function createTouchSwallower(node)
-    local swallower = cc.EventListenerTouchOneByOne:create()
-    swallower:setSwallowTouches(true)
-        :registerScriptHandler(function(touch, event)
-            local locationInNodeSpace = node:convertToNodeSpace(touch:getLocation())
-            local x, y = locationInNodeSpace.x, locationInNodeSpace.y
-            
-            local contentSize = node:getContentSize()
-            local width, height = contentSize.width, contentSize.height
+local TEXT_WIDTH  = 580
+local TEXT_HEIGHT = display.height * 0.3
+local TEXT_POSITION_X = (display.width - TEXT_WIDTH) / 2
+local TEXT_POSITION_Y = (display.height - TEXT_HEIGHT) / 2 * 1.2
 
-            return (x >= 0) and (y >= 0) and (x <= width) and (y <= height)
-        end, cc.Handler.EVENT_TOUCH_BEGAN)
-        
-    return swallower
-end
+local BUTTON_WIDTH  = 200
+local BUTTON_HEIGHT = display.height * 0.1
+local BUTTON_YES_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 - BUTTON_WIDTH  * 0.66
+local BUTTON_YES_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_NO_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH * 0.66
+local BUTTON_NO_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
 
 local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - backgroundWidth) / 2, (display.height - backgroundHeight) / 2)
+        :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
         
-        :setContentSize(backgroundWidth, backgroundHeight)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
         
-        :setOpacity(200)
+        :setOpacity(220)
 
-    background.m_TouchSwallower = createTouchSwallower(background)
+    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
     
     return background
 end
 
-local function createText()
-    local text = ccui.Text:create()
+local function createLabel()
+    local text = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     text:ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - textWidth) / 2,
-                     (display.height - textHeight) / 2 * 1.2)
+        :setPosition(TEXT_POSITION_X, TEXT_POSITION_Y)
         
-        :ignoreContentAdaptWithSize(false)
-        :setTextHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-        :setTextVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-        :setContentSize(textWidth, textHeight)
-        
-        :setFontSize(30)
-        :setColor({r = 0, g = 0, b = 0})
+        :setDimensions(TEXT_WIDTH, TEXT_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
 --        :setText("ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n ViewConfirmBox\n")
 
     return text
@@ -59,26 +54,28 @@ local function createButtonYes(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - buttonWidth) / 2 - buttonWidth * 0.66,
-                     (display.height - buttonHeight) / 2 - buttonHeight * 1.5)
+        :setPosition(BUTTON_YES_POSITION_X, BUTTON_YES_POSITION_Y)
     
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
-        :setContentSize(buttonWidth, buttonHeight)
+        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
     
         :setZoomScale(-0.05)
         
+        :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(30)
-        :setTitleColor({r = 0, g = 0, b = 0})
+        :setTitleColor({r = 104, g = 248, b = 200})
         :setTitleText("Yes")
     
-        :setOpacity(180)
+        :setOpacity(200)
     
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 callback()
             end
         end)
+
+    button:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
     
     return button
 end
@@ -88,26 +85,28 @@ local function createButtonNo(callback)
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
     
         :ignoreAnchorPointForPosition(true)
-        :setPosition((display.width - buttonWidth) / 2 + buttonWidth * 0.66,
-                     (display.height - buttonHeight) / 2 - buttonHeight * 1.5)
+        :setPosition(BUTTON_NO_POSITION_X, BUTTON_NO_POSITION_Y)
 
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
-        :setContentSize(buttonWidth, buttonHeight)
+        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
     
         :setZoomScale(-0.05)
     
+        :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(30)
-        :setTitleColor({r = 0, g = 0, b = 0})
+        :setTitleColor({r = 240, g = 80, b = 56})
         :setTitleText("No")
         
-        :setOpacity(180)
+        :setOpacity(200)
         
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 callback()
             end
         end)
+
+    button:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
     
     return button
 end
@@ -116,8 +115,8 @@ function ViewConfirmBox:initChildrenViews()
     self.m_Background = createBackground()
     self:addChild(self.m_Background)
     
-    self.m_Text = createText()
-    self:addChild(self.m_Text)
+    self.m_Label = createLabel()
+    self:addChild(self.m_Label)
     
     self.m_ButtonYes = createButtonYes(function ()
         self:onConfirmYes()
@@ -129,6 +128,9 @@ function ViewConfirmBox:initChildrenViews()
     end)
     self:addChild(self.m_ButtonNo)
     
+    self:setCascadeOpacityEnabled(true)
+        :setOpacity(220)
+        
     return self
 end
 
@@ -167,7 +169,7 @@ function ViewConfirmBox:createInstance(param)
 end
 
 function ViewConfirmBox:setConfirmText(text)
-    self.m_Text:setString(text)
+    self.m_Label:setString(text)
     
     return self
 end
@@ -190,14 +192,16 @@ function ViewConfirmBox:onConfirmCancel()
     return self
 end
 
---[[
 function ViewConfirmBox:setEnabled(enabled)
-    self:setVisible(enabled)
-    self.m_TouchListener:setEnabled(enabled)
-    self.m_Background.m_TouchSwallower:setEnabled(enabled)
-    
+    if (enabled) then
+        self:setVisible(true)
+        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+    else
+        self:setVisible(false)
+        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+    end
+
     return self
 end
-]]
 
 return ViewConfirmBox
