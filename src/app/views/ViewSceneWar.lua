@@ -41,7 +41,7 @@ function ViewSceneWar:ctor(param)
 	if (param) then
         self:load(param)
     end
-	
+
 	return self
 end
 
