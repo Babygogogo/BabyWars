@@ -4,7 +4,7 @@ local ViewWarField = class("ViewWarField", cc.Node)
 local TypeChecker  = require("app.utilities.TypeChecker")
 local GameConstant = require("res.data.GameConstant")
 
-local BoundaryRect  = {width = display.width - 10, height = display.height - 10, x = 10, y = 10}
+local BOUNDARY_RECT  = {width = display.width - 10, height = display.height - 10, x = 10, y = 10}
 
 local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundarySizeComp, boundaryOriginComp)
     local minOrigin = boundarySizeComp - targetSizeComp
@@ -22,16 +22,16 @@ end
 function ViewWarField:setPositionOnDrag(previousDragPos, currentDragPos)
     local boundingBox = self:getBoundingBox()
     local dragDeltaX, dragDeltaY = currentDragPos.x - previousDragPos.x, currentDragPos.y - previousDragPos.y
-    
-    self:move(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BoundaryRect.width,  BoundaryRect.x),
-              getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BoundaryRect.height, BoundaryRect.y))
-              
+
+    self:move(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BOUNDARY_RECT.width,  BOUNDARY_RECT.x),
+              getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BOUNDARY_RECT.height, BOUNDARY_RECT.y))
+
     return self
 end
 
 function ViewWarField:ctor(param)
 	if (param) then self:load(param) end
-	
+
 	return self
 end
 
@@ -47,6 +47,7 @@ function ViewWarField.createInstance(param)
 end
 
 function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
+--[[
     local isTouchSwallowed = require("app.utilities.DispatchAndSwallowTouch")(self.m_TouchableChildrenViews, touch, touchType, event)
 
     if (isTouchSwallowed) then
@@ -59,6 +60,7 @@ function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
             return false
         end
     end
+]]
 end
 
 function ViewWarField:setContentSizeWithMapSize(mapSize)
@@ -71,7 +73,7 @@ end
 
 function ViewWarField:setTouchableChildrenViews(views)
     self.m_TouchableChildrenViews = views
-    
+
     return self
 end
 

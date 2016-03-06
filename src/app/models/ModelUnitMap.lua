@@ -1,11 +1,12 @@
 
 local ModelUnitMap = class("ModelUnitMap")
 
-local TypeChecker  = require("app.utilities.TypeChecker")
-local MapFunctions = require("app.utilities.MapFunctions")
-local ViewUnit     = require("app.views.ViewUnit")
-local ModelUnit    = require("app.models.ModelUnit")
-local GridSize     = require("res.data.GameConstant").GridSize
+local TypeChecker        = require("app.utilities.TypeChecker")
+local MapFunctions       = require("app.utilities.MapFunctions")
+local ViewUnit           = require("app.views.ViewUnit")
+local ModelUnit          = require("app.models.ModelUnit")
+local GridSize           = require("res.data.GameConstant").GridSize
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireMapData(param)
 	local t = type(param)
@@ -33,8 +34,8 @@ local function createModel(param)
 		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
 		if (createTemplateMapResult == nil) then
 			return nil, string.format("ModelUnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
-		end		
-		
+		end
+
 		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
 	else
 		local loadSizeMsg
@@ -44,31 +45,31 @@ local function createModel(param)
 		end
 
 		baseMap = MapFunctions.createEmptyMap(mapSize)
-	end	
+	end
 
 	local map, loadUnitsIntoMapMsg = MapFunctions.loadGridsIntoMap(Unit, mapData.Units, baseMap, mapSize)
 	if (map == nil) then
 		return nil, "ModelUnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
 	end
-	
+
 	return {map = map, mapSize = mapSize}
 end
 
 local function createChildrenActors(param)
 	local mapData = requireMapData(param)
 	assert(TypeChecker.isMapData(mapData))
-	
+
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
 		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), ModelUnit, ViewUnit)
 		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    ModelUnit, ViewUnit)
 	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
-	
+
 	return {UnitActorsMap = unitActorsMap}
 end
 
 function ModelUnitMap:ctor(param)
 	if (param) then self:load(param) end
-	
+
 	return self
 end
 
@@ -77,7 +78,7 @@ function ModelUnitMap:load(param)
 	assert(childrenActors, "ModelUnitMap:load() failed to create children actors.")
 
 	self.m_UnitActorsMap = childrenActors.UnitActorsMap
-	
+
 	if (self.m_View) then
         self:initView()
     end
@@ -88,13 +89,13 @@ end
 function ModelUnitMap.createInstance(param)
 	local model = ModelUnitMap.new():load(param)
 	assert(model, "ModelUnitMap.createInstance() failed.")
-	
+
 	return model
 end
 
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    
+
     return self
 end
 
@@ -107,18 +108,18 @@ end
 function ModelUnitMap:initView()
 	local view = self.m_View
 	assert(TypeChecker.isView(view))
-	
+
 	view:removeAllChildren()
-	
+
     local unitActors = self.m_UnitActorsMap
-	local mapSize = unitActors.size    
+	local mapSize = unitActors.size
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local unitActor = unitActors[x][y]
             if (unitActor) then view:addChild(unitActor:getView()) end
         end
 	end
-    
+
 	return self
 end
 
@@ -127,7 +128,7 @@ function ModelUnitMap:getMapSize()
 end
 
 function ModelUnitMap:getUnitActor(gridIndex)
-    if (not TypeChecker.isGridInMap(gridIndex, self:getMapSize())) then
+    if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
         return nil
     else
         return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
@@ -143,7 +144,7 @@ function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
         local event = {name = "EvtPlayerTouchNoUnit"}
         self.m_RootScriptEventDispatcher:dispatchEvent(event)
     end
-    
+
     return false
 end
 

@@ -2,7 +2,7 @@
 -- ViewMapCursor is actually a node(as large as the field) that contains the cursor.
 local ViewMapCursor = class("ViewMapCursor", cc.Node)
 
-local toGridIndex = require("app.utilities.ToGridIndex")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local PULSE_IN_DURATION = 0.15
 local PULSE_OUT_DURATION = 0.15
@@ -33,7 +33,7 @@ local function createCornerPulseAction(outerX, outerY, innerX, innerY)
     local pulseIn  = cc.MoveTo:create(PULSE_IN_DURATION,  {x = innerX, y = innerY})
     local pulseOut = cc.MoveTo:create(PULSE_OUT_DURATION, {x = outerX, y = outerY})
     local interval = cc.DelayTime:create(PULSE_INTERVAL_DURATION)
-    
+
     return cc.RepeatForever:create(cc.Sequence:create(pulseIn, pulseOut, interval))
 end
 
@@ -41,11 +41,11 @@ local function createUpperLeftCorner()
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setPosition(UPPER_LEFT_CORNER_OUTER_POSITION_X, UPPER_LEFT_CORNER_OUTER_POSITION_Y)
-        
+
     corner.m_PulseAction = createCornerPulseAction(UPPER_LEFT_CORNER_OUTER_POSITION_X, UPPER_LEFT_CORNER_OUTER_POSITION_Y,
                                                    UPPER_LEFT_CORNER_INNER_POSITION_X, UPPER_LEFT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
-    
+
     return corner
 end
 
@@ -59,11 +59,11 @@ local function createUpperRightCorner()
     corner:setAnchorPoint(0.5, 0.5)
         :setRotation(90)
         :setPosition(UPPER_RIGHT_CORNER_OUTER_POSITION_X, UPPER_RIGHT_CORNER_OUTER_POSITION_Y)
-        
+
     corner.m_PulseAction = createCornerPulseAction(UPPER_RIGHT_CORNER_OUTER_POSITION_X, UPPER_RIGHT_CORNER_OUTER_POSITION_Y,
                                                    UPPER_RIGHT_CORNER_INNER_POSITION_X, UPPER_RIGHT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
-    
+
     return corner
 end
 
@@ -77,11 +77,11 @@ local function createLowerLeftCorner()
     corner:setAnchorPoint(0.5, 0.5)
         :setRotation(-90)
         :setPosition(LOWER_LEFT_CORNER_OUTER_POSITION_X, LOWER_LEFT_CORNER_OUTER_POSITION_Y)
-        
+
     corner.m_PulseAction = createCornerPulseAction(LOWER_LEFT_CORNER_OUTER_POSITION_X, LOWER_LEFT_CORNER_OUTER_POSITION_Y,
                                                    LOWER_LEFT_CORNER_INNER_POSITION_X, LOWER_LEFT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
-    
+
     return corner
 end
 
@@ -94,11 +94,11 @@ local function createLowerRightCorner()
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s07_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setPosition(LOWER_RIGHT_CORNER_OUTER_POSITION_X, LOWER_RIGHT_CORNER_OUTER_POSITION_Y)
-        
+
     corner.m_PulseAction = createCornerPulseAction(LOWER_RIGHT_CORNER_OUTER_POSITION_X, LOWER_RIGHT_CORNER_OUTER_POSITION_Y,
                                                    LOWER_RIGHT_CORNER_INNER_POSITION_X,  LOWER_RIGHT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
-    
+
     return corner
 end
 
@@ -111,12 +111,13 @@ local function createCursor()
     local cursor = cc.Node:create()
     cursor:setAnchorPoint(0.5, 0.5)
         :ignoreAnchorPointForPosition(true)
-    
+        :setPosition(0, 0)
+
     initWithUpperLeftCorner( cursor, createUpperLeftCorner())
     initWithUpperRightCorner(cursor, createUpperRightCorner())
     initWithLowerLeftCorner( cursor, createLowerLeftCorner())
     initWithLowerRightCorner(cursor, createLowerRightCorner())
-    
+
     return cursor
 end
 
@@ -129,11 +130,11 @@ function ViewMapCursor:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
     initWithCursor(self, createCursor())
-    
+
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -144,26 +145,22 @@ end
 function ViewMapCursor.createInstance(param)
     local view = ViewMapCursor:create():load(param)
     assert(view, "ViewMapCursor.createInstance() failed.")
-    
+
     return view
 end
 
 function ViewMapCursor:initWithTouchListener(listener)
     assert(not self.m_TouchListener, "ViewMapCursor:initWithTouchListener() there's already a listener.")
-    
+
     self.m_TouchListener = listener
     self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
-    
-    return self
-end
 
-function ViewMapCursor:convertWorldPosToGridIndex(pos)
-    return toGridIndex(self:convertToNodeSpace(pos), GRID_SIZE)
+    return self
 end
 
 function ViewMapCursor:setPosition(x, y)
     self.m_Cursor:setPosition(x, y)
-    
+
     return self
 end
 

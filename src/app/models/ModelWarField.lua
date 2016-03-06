@@ -24,7 +24,7 @@ local function createChildrenActors(param)
     assert(tileMapActor, "ModelWarField-createChildrenActors() failed to create the TileMap actor.")
     local unitMapActor = Actor.createWithModelAndViewName("ModelUnitMap", warFieldData.UnitMap, "ViewUnitMap")
     assert(unitMapActor, "ModelWarField-createChildrenActors() failed to create the UnitMap actor.")
-    local cursorActor = Actor.createWithModelAndViewName("ModelMapCursor", nil, "ViewMapCursor")
+    local cursorActor = Actor.createWithModelAndViewName("ModelMapCursor", {mapSize = tileMapActor:getModel():getMapSize()}, "ViewMapCursor")
     assert(cursorActor, "ModelWarField-createChildrenActors() failed to create the cursor actor.")
 
     assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getModel():getMapSize()))
@@ -63,11 +63,41 @@ function ModelWarField.createInstance(param)
 	return model
 end
 
+function ModelWarField:onEnter(rootActor)
+    self.m_TileMapActor:onEnter(rootActor)
+    self.m_UnitMapActor:onEnter(rootActor)
+    self.m_CursorActor:onEnter(rootActor)
+
+    self.m_ScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
+
+    return self
+end
+
+function ModelWarField:onCleanup(rootActor)
+    self.m_TileMapActor:onCleanup(rootActor)
+    self.m_UnitMapActor:onCleanup(rootActor)
+    self.m_CursorActor:onCleanup(rootActor)
+
+    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerDragField", self)
+    self.m_ScriptEventDispatcher = nil
+
+    return self
+end
+
+function ModelWarField:onEvent(event)
+    if (event.name == "EvtPlayerDragField") and (self.m_View) then    
+        self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
+    end
+    
+    return self
+end
+
 function ModelWarField:getTouchableChildrenViews()
     local views = {}
     views[#views + 1] = require("app.utilities.GetTouchableViewFromActor")(self.m_UnitMapActor)
     views[#views + 1] = require("app.utilities.GetTouchableViewFromActor")(self.m_TileMapActor)
-    
+
     return views
 end
 
@@ -79,25 +109,11 @@ function ModelWarField:initView()
         :addChild(self.m_TileMapActor:getView())
         :addChild(self.m_UnitMapActor:getView())
         :addChild(self.m_CursorActor:getView())
-        
+
         :setContentSizeWithMapSize(self.m_TileMapActor:getModel():getMapSize())
-        
+
         :setTouchableChildrenViews(self:getTouchableChildrenViews())
-        
-    return self
-end
 
-function ModelWarField:onEnter(rootActor)
-    self.m_TileMapActor:onEnter(rootActor)
-    self.m_UnitMapActor:onEnter(rootActor)
-    
-    return self
-end
-
-function ModelWarField:onCleanup(rootActor)
-    self.m_TileMapActor:onCleanup(rootActor)
-    self.m_UnitMapActor:onCleanup(rootActor)
-    
     return self
 end
 

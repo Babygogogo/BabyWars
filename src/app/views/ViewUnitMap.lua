@@ -1,14 +1,13 @@
 
 local ViewUnitMap = class("ViewUnitMap", cc.Node)
 
-local GridSize    = require("res.data.GameConstant").GridSize
-local toGridIndex = require("app.utilities.ToGridIndex")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 function ViewUnitMap:ctor(param)
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -19,12 +18,8 @@ end
 function ViewUnitMap.createInstance(param)
 	local view = ViewUnitMap.new():load(param)
 	assert(view, "ViewUnitMap.createInstance() failed.")
-	
-	return view
-end
 
-function ViewUnitMap:worldPosToGridIndex(pos)
-    return toGridIndex(self:convertToNodeSpace(pos), GridSize)
+	return view
 end
 
 function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
@@ -45,7 +40,7 @@ function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
                 local gridIndex = self:worldPosToGridIndex(touch:getLocation())
                 model:handleAndSwallowTouchOnGrid(gridIndex)
             end
-            
+
             return false
         end
     end
