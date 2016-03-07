@@ -6,18 +6,25 @@ local GameConstant = require("res.data.GameConstant")
 
 local ORIGIN = {x = 0, y = 0}
 local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.height - 10, lowerLeftX = 10, lowerLeftY = 10}
+BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
+BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
 
-local function isViewSmallerThanScreen(scale, contentSize)
+local function isViewSmallerThanBoundaryRect(scale, contentSize)
     local width = contentSize.width * scale
     local height = contentSize.height * scale
 
-    return (width < display.width) and (height < display.height)
+    return (width <= BOUNDARY_RECT.width) and (height <= BOUNDARY_RECT.height)
 end
 
-local function shouldZoomWithScrollValue(view, value)
+local function shouldZoomWithScroll(view, focusPosInNode, value)
+    if (focusPosInNode.x < 0) or (focusPosInNode.x > view.m_ContentSize.width) or
+       (focusPosInNode.y < 0) or (focusPosInNode.y > view.m_ContentSize.height) then
+       return false
+    end
+
     local currentScale = view:getScale()
-    if ((value > 0) and (isViewSmallerThanScreen(currentScale, view:getContentSize()))) or
-       ((value < 0) and (currentScale > 2)) or
+    if ((value > 0) and (isViewSmallerThanBoundaryRect(currentScale, view.m_ContentSize))) or
+       ((value < 0) and (currentScale >= view.m_MaxScale)) or
        (value == 0) then
         return false
     else
@@ -25,33 +32,15 @@ local function shouldZoomWithScrollValue(view, value)
     end
 end
 
-local function setSafeAnchor(view, anchorX, anchorY)
-    local scale = view:getScale()
-    local diffX = anchorX * view:getContentSize().width  * (scale - 1)
-    local diffY = anchorY * view:getContentSize().height * (scale - 1)
+local function getScaleWithScrollValue(view, value)
+    local scale = view:getScale() * (1 - value / 10)
+    if (scale > view.m_MaxScale) then
+        scale = view.m_MaxScale
+    elseif (scale < view.m_MinScale) then
+        scale = view.m_MinScale
+    end
 
-    view:setAnchorPoint(anchorX, anchorY)
-        :setPositionX(view:getPositionX() - diffX)
-        :setPositionY(view:getPositionY() - diffY)
-end
-
-local function setAnchorPointWithCursorPos(view, pos)
-    --pos.y = display.height - pos.y
---    print("cursor", pos.x, pos.y)
---    local glPos = cc.Director:getInstance():convertToGL(pos)
---    print("gl", glPos.x, glPos.y)
-    
-    local posInView = view:convertToNodeSpace(cc.Director:getInstance():convertToGL(pos))
-    local contentSize = view:getContentSize()
-    local anchorX = posInView.x / contentSize.width
-    local anchorY = posInView.y / contentSize.height
-    
-    print("====\nsetAnchorPointWithCursorPos posInView", posInView.x, posInView.y)
-    print("setAnchorPointWithCursorPos anchor", anchorX, anchorY)
-    
---    setSafeAnchor(view, posInView.x / contentSize.width, posInView.y / contentSize.height)
---    view:setAnchorPoint(0.5, 0.5)
-    view:setAnchorPoint(anchorX, anchorY)
+    return scale
 end
 
 local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundaryUpperRightComp, boundaryLowerLeftComp)
@@ -71,16 +60,16 @@ function ViewWarField:setPositionOnDrag(previousDragPos, currentDragPos)
     local boundingBox = self:getBoundingBox()
     local dragDeltaX, dragDeltaY = currentDragPos.x - previousDragPos.x, currentDragPos.y - previousDragPos.y
 
-    self:setPosition(dragDeltaX + self:getPositionX(), dragDeltaY + self:getPositionY())
-
---    self:setPosition(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BOUNDARY_RECT.upperRightX, BOUNDARY_RECT.lowerLeftX),
-  --                   getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BOUNDARY_RECT.upperRightY, BOUNDARY_RECT.lowerLeftY))
+    self:setPosition(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BOUNDARY_RECT.upperRightX, BOUNDARY_RECT.lowerLeftX),
+                     getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BOUNDARY_RECT.upperRightY, BOUNDARY_RECT.lowerLeftY))
 
     return self
 end
 
 function ViewWarField:ctor(param)
     self:ignoreAnchorPointForPosition(true)
+        :setAnchorPoint(0, 0)
+    self.m_ContentSize = {}
 
     if (param) then
         self:load(param)
@@ -101,38 +90,34 @@ function ViewWarField.createInstance(param)
 end
 
 function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
---[[
     local isTouchSwallowed = require("app.utilities.DispatchAndSwallowTouch")(self.m_TouchableChildrenViews, touch, touchType, event)
 
-    if (isTouchSwallowed) then
-        return true
-    else
-        if (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-            self:setPositionOnDrag(touch:getPreviousLocation(), touch:getLocation())
-            return true
-        else
-            return false
-        end
-    end
-]]
+    return isTouchSwallowed
 end
 
 function ViewWarField:setContentSizeWithMapSize(mapSize)
     local gridSize = GameConstant.GridSize
-    self:setContentSize(mapSize.width * gridSize.width, mapSize.height * gridSize.height)
- --       :placeInDragBoundary()
+    self.m_ContentSize.width = mapSize.width * gridSize.width
+    self.m_ContentSize.height = mapSize.height * gridSize.height
+    self.m_MaxScale = 2
+    self.m_MinScale = math.min((BOUNDARY_RECT.width)  / self.m_ContentSize.width,
+                               (BOUNDARY_RECT.height) / self.m_ContentSize.height)
+
+    self:setContentSize(self.m_ContentSize.width, self.m_ContentSize.height)
+        :placeInDragBoundary()
 
 	return self
 end
 
-function ViewWarField:setZoomWithScroll(cursorPos, scrollValue)
-    if (shouldZoomWithScrollValue(self, scrollValue)) then
-        setAnchorPointWithCursorPos(self, cursorPos)
-        self:setScale(self:getScale() - scrollValue / 20)
---        setSafeAnchor(self, 0, 0)
- --           :setAnchorPoint(0, 0)
+function ViewWarField:setZoomWithScroll(focusPosInWorld, scrollValue)
+    local focusPosInNode = self:convertToNodeSpace(focusPosInWorld)
+    if (shouldZoomWithScroll(self, focusPosInNode, scrollValue)) then
+        self:setScale(getScaleWithScrollValue(self, scrollValue))
+        local scaledFocusPosInWorld = self:convertToWorldSpace(focusPosInNode)
 
---        self    :placeInDragBoundary()
+        self:setPosition(- scaledFocusPosInWorld.x + focusPosInWorld.x + self:getPositionX(),
+                         - scaledFocusPosInWorld.y + focusPosInWorld.y + self:getPositionY())
+            :placeInDragBoundary()
     end
 
     return self

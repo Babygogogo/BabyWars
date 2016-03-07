@@ -92,7 +92,7 @@ function ModelWarField:onEvent(event)
         self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
     elseif (event.name == "EvtPlayerZoomField") and (self.m_View) then
         local scrollEvent = event.scrollEvent
-        self.m_View:setZoomWithScroll(scrollEvent:getLocation(), scrollEvent:getScrollY())
+        self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
     end
     
     return self

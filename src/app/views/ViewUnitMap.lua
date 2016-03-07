@@ -37,7 +37,7 @@ function ViewUnitMap:handleAndSwallowTouch(touch, touchType, event)
         else
             local model = self.m_Model
             if (model) then
-                local gridIndex = self:worldPosToGridIndex(touch:getLocation())
+                local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), self)
                 model:handleAndSwallowTouchOnGrid(gridIndex)
             end
 
