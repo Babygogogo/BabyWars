@@ -1,6 +1,8 @@
 
 local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
+local AnimationLoader = require("app.utilities.AnimationLoader")
+
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
 local LEFT_POSITION_X = 10
 local LEFT_POSITION_Y = 10
@@ -20,13 +22,13 @@ local CAPTURE_INFO_POSITION_Y = 10
 local function createButton(view)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-    
+
         :ignoreAnchorPointForPosition(true)
-    
+
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
-    
+
         :setZoomScale(-0.05)
 
         :addTouchEventListener(function(sender, eventType)
@@ -36,7 +38,7 @@ local function createButton(view)
                 end
             end
         end)
-        
+
     return button
 end
 
@@ -52,9 +54,9 @@ local function createIcon()
         :setPosition(ICON_POSITION_X, ICON_POSITION_Y)
 
         :setScale(ICON_SCALE)
-        
+
         :playAnimationForever(require("app.utilities.AnimationLoader").getAnimationWithTiledID(1))
-        
+
     return icon
 end
 
@@ -66,10 +68,10 @@ end
 local function createLabel()
     local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
-        
+
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
-    
+
     return label
 end
 
@@ -77,21 +79,21 @@ local function createDefenseInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        
+
         :setScale(ICON_SCALE)
-    
+
     local label = createLabel()
     label:setPosition(30, -5)
-    
+
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
         :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-        
+
         :addChild(icon)
         :addChild(label)
-        
+
     info.m_Label = label
-    
+
     return info
 end
 
@@ -104,21 +106,21 @@ local function createCaptureInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        
+
         :setScale(ICON_SCALE)
-        
+
     local label = createLabel()
     label:setPosition(30, -4)
-    
+
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
         :setPosition(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y)
-        
+
         :addChild(icon)
         :addChild(label)
-        
+
     info.m_Label = label
-    
+
     return info
 end
 
@@ -133,16 +135,16 @@ function ViewTileInfo:ctor(param)
     initWithDefenseInfo(self, createDefenseInfo())
     initWithCaptureInfo(self, createCaptureInfo())
 
-    self:setCascadeOpacityEnabled(true)
-        :setOpacity(180)
-    
-        :ignoreAnchorPointForPosition(true)
+    self:ignoreAnchorPointForPosition(true)
         :moveToRightSide()
-    
+
+        :setOpacity(220)
+        :setCascadeOpacityEnabled(true)
+
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -153,7 +155,7 @@ end
 function ViewTileInfo.createInstance(param)
     local view = ViewTileInfo.new():load(param)
     assert(view, "ViewTileInfo.createInstance() failed.")
-    
+
     return view
 end
 
@@ -177,20 +179,28 @@ function ViewTileInfo:handleAndSwallowTouch(touch, touchType, event)
                 end
             end
         end
-        
+
         return false
     end
 end
 
 function ViewTileInfo:moveToLeftSide()
     self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
-    
+
     return self
 end
 
 function ViewTileInfo:moveToRightSide()
     self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
-    
+
+    return self
+end
+
+function ViewTileInfo:updateWithModelTile(model)
+    local tiledID = model:getTiledID()
+    self.m_Icon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
+
     return self
 end
 

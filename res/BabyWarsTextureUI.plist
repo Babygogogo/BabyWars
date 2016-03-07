@@ -111,7 +111,7 @@
             <key>c03_t02_s08_f01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{612,840},{60,60}}</string>
+                <string>{{666,772},{60,60}}</string>
                 <key>offset</key>
                 <string>{10,-10}</string>
                 <key>rotated</key>
@@ -215,11 +215,11 @@
             <key>c03_t07_s02_f01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{624,902},{35,40}}</string>
+                <string>{{624,907},{35,40}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{35,40}}</string>
                 <key>sourceSize</key>
@@ -241,7 +241,7 @@
             <key>c03_t07_s04_f01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{674,834},{45,45}}</string>
+                <string>{{703,896},{45,45}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -254,7 +254,7 @@
             <key>c03_t07_s05_f01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{666,772},{45,60}}</string>
+                <string>{{679,834},{45,60}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -263,6 +263,32 @@
                 <string>{{0,0},{45,60}}</string>
                 <key>sourceSize</key>
                 <string>{45,60}</string>
+            </dict>
+            <key>c03_t07_s06_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{666,907},{35,35}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{35,35}}</string>
+                <key>sourceSize</key>
+                <string>{35,35}</string>
+            </dict>
+            <key>c03_t07_s07_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{612,840},{65,65}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{65,65}}</string>
+                <key>sourceSize</key>
+                <string>{65,65}</string>
             </dict>
         </dict>
         <key>metadata</key>
@@ -274,7 +300,7 @@
             <key>size</key>
             <string>{964,944}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:134d71742c24a201bd79187f69a89cbc:b3efe2db5048d0a2583c9132c2589ecb:215d1941b12516cc0f89fcfb847e1dd5$</string>
+            <string>$TexturePacker:SmartUpdate:c8f3837174fbaac674fc06ad82d61e41:5093c363723fb0fb0048bc7209d45d68:215d1941b12516cc0f89fcfb847e1dd5$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureUI.png</string>
         </dict>

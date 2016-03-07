@@ -59,4 +59,8 @@ function ModelTile:initView()
     view:updateWithTiledID(self.m_TiledID)
 end
 
+function ModelTile:getTiledID()
+    return self.m_TiledID
+end
+
 return ModelTile
