@@ -32,14 +32,15 @@ local function createTouchListener(model)
 
         if (isTouchingCursor) then
             local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), model.m_View)
-            if (GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)
-               and not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
+            if (GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)) and
+               (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
                 model:setGridIndex(gridIndex)
+                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
                 isTouchMoved = true
             end
         else
             if (isTouchMoved) then
-                model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerDragField",
+                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerDragField",
                                                              previousPosition = touch:getPreviousLocation(),
                                                              currentPosition = touch:getLocation()})
             end
@@ -58,6 +59,8 @@ local function createTouchListener(model)
         if (not isTouchMoved) or
            ((isTouchingCursor) and (GridIndexFunctions.isEqual(gridIndex, initialTouchGridIndex))) then
             model:setGridIndex(gridIndex)
+            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
+
             print("Player activate a grid:", gridIndex.x, gridIndex.y)
         end
     end
@@ -72,7 +75,7 @@ end
 
 local function createMouseListener(model)
     local function onMouseScroll(event)
-        model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerZoomField", scrollEvent = event})
+        model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerZoomField", scrollEvent = event})
     end
 
     local mouseListener = cc.EventListenerMouse:create()
@@ -117,7 +120,8 @@ function ModelMapCursor.createInstance(param)
 end
 
 function ModelMapCursor:onEnter(rootActor)
-    self.m_ScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = self:getGridIndex()})
 
     return self
 end

@@ -24,15 +24,15 @@ local AMMO_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - 25
 local function createButton(view)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-    
+
         :ignoreAnchorPointForPosition(true)
-    
+
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 5, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
-    
+
         :setZoomScale(-0.05)
-        
+
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
                 if (view.m_Model) then
@@ -40,7 +40,7 @@ local function createButton(view)
                 end
             end
         end)
-        
+
     return button
 end
 
@@ -56,9 +56,9 @@ local function createIcon()
         :setPosition(ICON_POSITION_X, ICON_POSITION_Y)
 
         :setScale(ICON_SCALE)
-        
+
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(117))
-        
+
     return icon
 end
 
@@ -70,10 +70,10 @@ end
 local function createLabel()
     local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
-        
+
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
-    
+
     return label
 end
 
@@ -82,21 +82,21 @@ local function createHPInfo()
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(2, 2)
-        
+
         :setScale(ICON_SCALE)
-    
+
     local label = createLabel()
     label:setPosition(28, -5)
-    
+
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
         :setPosition(HP_INFO_POSITION_X, HP_INFO_POSITION_Y)
-        
+
         :addChild(icon)
         :addChild(label)
-        
+
     info.m_Label = label
-    
+
     return info
 end
 
@@ -110,21 +110,21 @@ local function createFuelInfo()
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(2, 0)
-        
+
         :setScale(ICON_SCALE)
-    
+
     local label = createLabel()
     label:setPosition(28, -5)
-    
+
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
         :setPosition(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y)
-        
+
         :addChild(icon)
         :addChild(label)
-        
+
     info.m_Label = label
-    
+
     return info
 end
 
@@ -138,21 +138,21 @@ local function createAmmoInfo()
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(2, 5)
-        
+
         :setScale(ICON_SCALE)
-    
+
     local label = createLabel()
     label:setPosition(28, -5)
-    
+
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
         :setPosition(AMMO_INFO_POSITION_X, AMMO_INFO_POSITION_Y)
-        
+
         :addChild(icon)
         :addChild(label)
-        
+
     info.m_Label = label
-    
+
     return info
 end
 
@@ -186,19 +186,20 @@ function ViewUnitInfo:ctor(param)
     initWithHPInfo(self, createHPInfo())
     initWithFuelInfo(self, createFuelInfo())
     initWithAmmoInfo(self, createAmmoInfo())
-    
+
     self:ignoreAnchorPointForPosition(true)
-    
-        :setCascadeOpacityEnabled(true)
-        :setOpacity(180)
+
         :setVisible(false)
 
+        :setOpacity(220)
+        :setCascadeOpacityEnabled(true)
+
     moveToRightSide(self)
-        
+
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -209,7 +210,7 @@ end
 function ViewUnitInfo.createInstance(param)
     local view = ViewUnitInfo.new():load(param)
     assert(view, "ViewUnitInfo.createInstance() failed.")
-    
+
     return view
 end
 
@@ -235,7 +236,7 @@ function ViewUnitInfo:updateWithModelUnit(model)
     local tiledID = model:getTiledID()
     self.m_Icon:stopAllActions()
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
-    
+
     return self
 end
 

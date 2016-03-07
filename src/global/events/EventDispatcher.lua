@@ -1,6 +1,8 @@
 
 local EventDispatcher = class("EventDispatcher")
 
+local DISPATCH_NEST_INFORMING_LEVEL = 3
+
 local function hasListener(listenersForName, listener)
     if (listenersForName) then
         for i, l in ipairs(listenersForName) do
@@ -9,7 +11,7 @@ local function hasListener(listenersForName, listener)
             end
         end
     end
-    
+
     return false
 end
 
@@ -17,7 +19,7 @@ local function forceAddEventListener(listenerCollection, eventName, listener)
     if (not listenerCollection[eventName]) then
         listenerCollection[eventName] = {}
     end
-    
+
     local listenersForName = listenerCollection[eventName]
     if (hasListener(listenersForName, listener)) then
         error("EventDispatcher-forceAddEventListener() the listener already exists.")
@@ -36,7 +38,7 @@ end
 local function doCachedOperations(operations)
     for _, op in ipairs(operations) do
         op()
-    end    
+    end
 end
 
 function EventDispatcher:ctor(param)
@@ -45,7 +47,7 @@ function EventDispatcher:ctor(param)
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -56,17 +58,17 @@ end
 function EventDispatcher.createInstance(param)
     local dispatcher = EventDispatcher:create():load(param)
     assert(dispatcher, "EventDispatcher.createInstance() failed.")
-    
+
     return dispatcher
 end
 
 function EventDispatcher:reset()
     assert(self.m_NestLevelOfDispatch == 0 or self.m_NestLevelOfDispatch == nil, "EventDispatcher:reset() an dispatch is currently running.")
-    
+
     self.m_Listeners = {}
     self.m_NestLevelOfDispatch = 0
     self.m_OperationCache = {}
-    
+
     return self
 end
 
@@ -84,7 +86,7 @@ function EventDispatcher:addEventListener(eventName, listener)
             self:addEventListener(eventName, listener)
         end
     end
-    
+
     return self
 end
 
@@ -100,7 +102,7 @@ function EventDispatcher:removeEventListener(eventName, listener)
             self:removeEventListener(eventName, listener)
         end
     end
-    
+
     return self
 end
 
@@ -112,12 +114,12 @@ end
 -- If you try to add/remove listeners during dispatch, the add/remove operations will be cached and be done when the dispatch ends.
 function EventDispatcher:dispatchEvent(eventObj)
     assert(self.m_NestLevelOfDispatch >= 0, "EventDispatcher:dispatchEvent() the nesting level of dispatch is less than 0, which is illegal.")
-    
+
     self.m_NestLevelOfDispatch = self.m_NestLevelOfDispatch + 1
-    if (self.m_NestLevelOfDispatch >= 2) then
+    if (self.m_NestLevelOfDispatch >= DISPATCH_NEST_INFORMING_LEVEL) then
         print("EventDispatcher:dispatcher() the nesting level of dispatch is growing to: " .. self.m_NestLevelOfDispatch)
     end
-    
+
     local name = eventObj.name
     assert(type(name) == "string", "EventDispatcher:dispatchEvent() the param eventObj.name is not a string.")
 
@@ -127,9 +129,9 @@ function EventDispatcher:dispatchEvent(eventObj)
             listener:onEvent(eventObj)
         end
     end
-    
+
     self.m_NestLevelOfDispatch = self.m_NestLevelOfDispatch - 1
-    
+
     if (self.m_NestLevelOfDispatch == 0) then
         doCachedOperations(self.m_OperationCache)
         self.m_OperationCache = {}
