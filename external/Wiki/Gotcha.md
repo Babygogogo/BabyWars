@@ -67,8 +67,8 @@
 我们实际上是在引擎的c++侧新建了一个Sprite对象，同时使lua侧的变量s“绑定”到它。  
 
 需要注意的是，就如同在c++中调用Sprite:create()那样，上面的代码所生成的c++侧的Sprite对象是会在下一帧开始之前被自动回收的。
-如果不阻止自动回收，那么在c++侧的Sprite对象被回收之后，lua侧的s就变成了空壳，试图调用c++侧的方法（如s:setVisible()）都会以失败告终。  
-c++侧的Sprite对象被回收，并不会使得lua侧的s变成nil（另一方面，手动把s置为nil，也不会使得c++侧的Sprite对象被马上回收）。  
+如果不加以阻止，那么在c++侧的Sprite对象被回收之后，lua侧的s就变成了空壳，试图调用c++侧的方法（如s:setVisible()）都会以失败告终。  
+c++侧的Sprite对象被回收，并不会使得lua侧的s变成nil；另一方面，手动把s置为nil，也不会使得c++侧的Sprite对象被马上回收。  
 
 顺带一提，阻止自动回收主要有两种方法：
 - 调用s:retain()（后续需要在合适时机调用s:release()，否则对应的c++侧的Sprite对象将无法被回收）
@@ -77,6 +77,80 @@ c++侧的Sprite对象被回收，并不会使得lua侧的s变成nil（另一方�
 ### lua对象的析构函数？
 从lua 5.2起，如果一个对象存在名为\_\_gc的元方法，那么这个对象被回收时，该元方法将被调用，参数就是该对象。由此，我们可以在这个元方法里实现类似于析构函数的操作。  
 非常遗憾的是，在lua 5.1（也就是cocos2d-lua所使用的版本）中，仅当该对象是userdata时，\_\_gc才会被调用。因此我们无法为纯lua对象实现类似析构函数的功能了。
+
+## cc.Node
+### 以某一位置为中心进行缩放
+#### 问题描述
+普通情况下，要缩放cc.Node只需直接调用node:setScale()即可；引擎会以该node的锚点为中心对node进行缩放。简单吧？
+但如果需要以某一特定位置为中心进行缩放，那解决方案可就不是这么直观了（事实上，我整整消耗了一天在这问题上）。  
+为了方便叙述，以下以“鼠标位置”作为缩放中心（在触摸操作下，一般以两个触摸点的中点为缩放中心；这并非核心问题，这里从略），以滚轮滚动触发缩放。这样，本问题可以举例描述为：假设缩放前，鼠标正指向地图上的某片树叶，那么不论如何缩如何放，只要鼠标没移动过，那么鼠标应该始终指向该片树叶（换言之，该片树叶也必须一直处在屏幕的某个相同位置）。  
+
+上面已经提过，node:setScale()会以node的锚点进行缩放。因此首先能想到的解决办法就是：
+
+1. 在需要进行缩放的时候，先获取鼠标的位置，并转换为节点空间下的坐标
+- 把node的锚点设置为上述坐标对应的点（需要设置ignoreAnchorPointForPosition，否则node马上就会移动）
+- 愉快地进行缩放
+
+示例代码如下：
+```lua
+local ViewZoomTest = class("ViewZoomTest", cc.Scene)
+
+function ViewZoomTest:ctor()
+    -- 创建一个背景sprite；预先设置了ignoreAnchorPointForPosition
+    self.m_Background = cc.Sprite:createWithSpriteFrameName("bg.png")
+    self.m_Background:ignoreAnchorPointForPosition(true)
+    self:addChild(self.m_Background)
+
+    --创建鼠标事件侦听器，侦听鼠标滚动事件
+    self.m_Listener = cc.EventListenerMouse:create()
+    self.m_Listener:registerScriptHandler(function(event)
+        -- 获取鼠标位置，转换为节点空间下的坐标
+        local cursorPosInNode = self.m_Background:convertToNodeSpace(cc.Director:getInstance():convertToGL(event:getLocation()))
+
+        -- 归一化上述坐标并设置锚点
+        local width = self.m_Background:getContentSize().width
+        local height = self.m_Background:getContentSize().height
+        local ax, ay = cursorPosInNode.x / width, cursorPosInNode.y / height
+        self.m_Background:setAnchorPoint(ax, ay)
+ 
+        -- 愉快地进行缩放
+        local scale = self.m_Background:getScale() + event:getScrollY() / 100
+        self.m_Background:setScale(scale)
+
+    end, cc.Handler.EVENT_MOUSE_SCROLL)
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_Listener, self)
+    
+    return self
+end
+
+return ViewZoomTest
+
+-- 在别的什么地方创建ViewZoomTest的实例并运行
+display.runScene(ViewZoomTest:create())
+```
+代码很好写，过程很愉快，但运行结果是令人内心崩溃的。简单地说，就是背景图片在缩放时不停地进行着幅度或大或小的抖动，最终要么缩放中心“收敛”到了鼠标位置，要么整个图直接从屏幕上消失。显然，这是不可接受的。  
+至于悲剧的起因，则是和引擎内部的绘图方式有关。回想上面的代码，我们已经设置了ignoreAnchorPointForPosition，而且全程没有改动过背景的position，因此引擎在绘图时，总是试图让背景图能够回到最初的位置，而这正导致了背景图的抖动。  
+由于cc.Node是所有显示节点的父类，所以不可能贸贸然去修改它（事实上，我是尽力避免写任何一行c++代码，虽然c++才是我最熟悉的语言），因此我便开始寻找各种办法解决这个问题。这一找就是一整天……
+
+最后，我终于确信，通过改变锚点来改变缩放中心的做法是行不通的。那么，不改变锚点的话，节点的缩放就会无视鼠标位置，仅以一个固定的点为中心进行缩放。
+这样，要让节点看上去像是在以鼠标位置为中心在进行缩放，唯一的办法就是缩放完了以后，恰当地改变节点的位置。  
+至于怎样才叫恰当？请看解决方案：
+
+#### 解决方案
+1. 把缩放中心点zoomCenterInWorld从世界坐标转换为节点空间坐标zoomCenterInNode
+- 调用setScale进行缩放
+- 把zoomCenterInNode重新转换为世界坐标scaledZoomCenterInWorld
+- 以两个世界坐标的差值为位移，设置节点位置
+
+示例代码：
+```lua
+local zoomCenterInNode = self:convertToNodeSpace(zoomCenterInWorld)
+self:setScale(scaleValue))
+local scaledZoomCenterInWorld = self:convertToWorldSpace(zoomCenterInNode)
+self:setPosition(self:getPositionX() - scaledZoomCenterInWorld.x + zoomCenterInWorld.x,
+                 self:getPositionY() - scaledZoomCenterInWorld.y + zoomCenterInWorld.y)
+```
+就是这么简单。至于为什么奏效？其实有了代码就很好懂了，这里就不废话了;)
 
 ## cc.EventDispatcher
 ### 调用xxx:setEventDispatcher()后，listener无法触发？
