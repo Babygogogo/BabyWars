@@ -158,6 +158,15 @@ function ViewMapCursor:initWithTouchListener(listener)
     return self
 end
 
+function ViewMapCursor:initWithMouseListener(listener)
+    assert(not self.m_MouseListener, "ViewMapCursor:initWithMouseListener() there's areadty a mouse listener.")
+
+    self.m_MouseListener = listener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+
+    return self
+end
+
 function ViewMapCursor:setPosition(x, y)
     self.m_Cursor:setPosition(x, y)
 

@@ -70,6 +70,7 @@ function ModelWarField:onEnter(rootActor)
 
     self.m_ScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_ScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
+                                :addEventListener("EvtPlayerZoomField", self)
 
     return self
 end
@@ -79,7 +80,8 @@ function ModelWarField:onCleanup(rootActor)
     self.m_UnitMapActor:onCleanup(rootActor)
     self.m_CursorActor:onCleanup(rootActor)
 
-    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerDragField", self)
+    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerZoomField", self)
+                                :removeEventListener("EvtPlayerDragField", self)
     self.m_ScriptEventDispatcher = nil
 
     return self
@@ -88,6 +90,9 @@ end
 function ModelWarField:onEvent(event)
     if (event.name == "EvtPlayerDragField") and (self.m_View) then    
         self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
+    elseif (event.name == "EvtPlayerZoomField") and (self.m_View) then
+        local scrollEvent = event.scrollEvent
+        self.m_View:setZoomWithScroll(scrollEvent:getLocation(), scrollEvent:getScrollY())
     end
     
     return self

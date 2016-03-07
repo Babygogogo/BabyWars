@@ -70,6 +70,17 @@ local function createTouchListener(model)
     return touchListener
 end
 
+local function createMouseListener(model)
+    local function onMouseScroll(event)
+        model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerZoomField", scrollEvent = event})
+    end
+
+    local mouseListener = cc.EventListenerMouse:create()
+    mouseListener:registerScriptHandler(onMouseScroll, cc.Handler.EVENT_MOUSE_SCROLL)
+
+    return mouseListener
+end
+
 function ModelMapCursor:ctor(param)
     require("global.components.ComponentManager").bindComponent(self, "GridIndexable")
     self:setGridIndex({x = 1, y = 1})
@@ -121,6 +132,7 @@ function ModelMapCursor:initView()
 
     self:setViewPositionWithGridIndex()
     view:initWithTouchListener(createTouchListener(self))
+        :initWithMouseListener(createMouseListener(self))
 
     return self
 end
