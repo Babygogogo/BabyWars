@@ -1,45 +1,77 @@
 
 local ModelTile = class("ModelTile")
 
-local TileTemplates    = require("res.data.GameConstant").TileModelTemplates
-local TiledIdMapping   = require("res.data.GameConstant").TiledIdMapping
+local MODEL_TILE_IDS       = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
+local MODEL_TILE_TEMPLATES = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
+
 local ComponentManager = require("global.components.ComponentManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
-local function toModelTileTemplate(tiledID)
-	return TiledIdMapping[tiledID]
+local function isOfSameModelTileID(tiledID1, tiledID2)
+    if (not tiledID1) or (not tiledID2) then
+        return false
+    end
+
+    return MODEL_TILE_IDS[tiledID1] == MODEL_TILE_IDS[tiledID2]
 end
 
-local function createModel(tileData)
-	assert(type(tileData) == "table", "ModelTile-createModel() the param tileData is not a table, therefore not a valid TileData.")
+local function toModelTileTemplate(tiledID)
+	return MODEL_TILE_TEMPLATES[MODEL_TILE_IDS[tiledID]]
+end
 
-    local tiledID = tileData.tiledID
-    assert(TypeChecker.isTiledID(tiledID), "ModelTile-createModel() the param tileData hasn't a valid TiledID.")
+local function initWithTiledID(model, tiledID)
+    local template = toModelTileTemplate(tiledID)
+    assert(template, "ModelTile-initWithTiledID() failed to get the model tile template with param tiledID.")
 
-    local gridIndex = tileData.gridIndex
-    assert(TypeChecker.isGridIndex(gridIndex), "ModelTile-createModel() the param tileData hasn't a valid GridIndex.")
+    ComponentManager.unbindAllComponents(model)
 
-	-- TODO: load data from param and handle errors
+    ComponentManager.bindComponent(model, "GridIndexable")
+    model.m_DefenseBonus = template.defenseBonus
 
-    return {tiledID = tiledID, gridIndex = gridIndex}
+    if (template.specialProperties) then
+        for _, specialProperty in ipairs(template.specialProperties) do
+            ComponentManager.bindComponent(model, specialProperty.name)
+            ComponentManager.getComponent(model, specialProperty.name):load(specialProperty)
+        end
+    end
+end
+
+local function loadOverwrites(model, overwrites)
+    if (overwrites.gridIndex) then
+        model:setGridIndex(overwrites.gridIndex)
+    end
+
+    if (overwrites.specialProperties) then
+        for _, specialProperty in ipairs(overwrites.specialProperties) do
+            local component = ComponentManager.getComponent(model, specialProperty.name)
+            assert(component, "ModelTile-loadOverwrites() attempting to overwrite a component that the model hasn't bound with.")
+            component:load(specialProperty)
+        end
+    end
 end
 
 function ModelTile:ctor(param)
-    ComponentManager.bindComponent(self, "GridIndexable")
+    if (param) then
+        self:load(param)
+    end
 
-	if (param) then self:load(param) end
-
-	return self
+    return self
 end
 
 function ModelTile:load(param)
-    local model = createModel(param)
-    assert(model, "ModelTile:load() failed to create the model with param.")
+    if (param.tiledID) then
+        if (not isOfSameModelTileID(param.tiledID, self.m_TiledID)) then
+            initWithTiledID(self, param.tiledID)
+        end
 
-    self.m_TiledID = model.tiledID
-    self:setGridIndex(model.gridIndex)
+        self.m_TiledID = param.tiledID
+    end
 
-    if (self.m_View) then self:initView() end
+    loadOverwrites(self, param)
+
+    if (self.m_View) then
+        self:initView()
+    end
 
 	return self
 end
@@ -57,6 +89,8 @@ function ModelTile:initView()
 
     self:setViewPositionWithGridIndex()
     view:updateWithTiledID(self.m_TiledID)
+
+    return self
 end
 
 function ModelTile:getTiledID()

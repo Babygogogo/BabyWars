@@ -1,42 +1,42 @@
 
 local GameConstant = {
 	GridSize = {width = 80, height = 80},
-  
+
     Mapping_TiledIdToTemplateModelIdTileOrUnit = {
         -- TiledID 0 + 1; TemplateModelIdTile starts from '1'
         1,        1,        1,        1,        2,        2,        2,        2,        2,        3,
-  
+
         -- TiledID 10 + 1
         3,        3,        3,        3,        4,        4,        4,        4,        4,        5,
-  
+
         -- TiledID 20 + 1
         5,        5,        5,        5,        6,        6,        6,        6,        7,        7,
 
         -- TiledID 30 + 1
         7,        7,        7,        7,        7,        7,        7,        7,        7,        8,
-  
+
         -- TiledID 40 + 1
         9,        9,        9,        9,        9,        9,        9,        9,        9,        9,
 
         -- TiledID 50 + 1
         10,      10,       10,       10,       10,       10,       10,       10,       10,       10,
-  
+
         -- TiledID 60 + 1
         10,      10,       10,       10,       10,       10,       10,       10,       10,       10,
-  
+
         -- TiledID 70 + 1
         10,      10,       10,       10,       10,       10,       10,       10,       10,       10,
-  
+
         -- TiledID 80 + 1
         11,      11,       11,       11,       11,       11,       11,       11,       11,       11,
-        
+
         -- TiledID 90 + 1
         11,      11,       11,       11,       11,       11,       11,       11,       11,       11,
-  
+
         -- TiledID 100 + 1
         12,      12,       13,       13,       14,       14,       14,       14,       14,       14,
 
-        -- TiledID 110 + 1; TemplateModelIdUnit starts from '1'                                         
+        -- TiledID 110 + 1; TemplateModelIdUnit starts from '1'
         14,      14,       14,       14,       15,       15,        1,        1,        1,        1,
 
         -- TiledID 120 + 1
@@ -63,7 +63,7 @@ local GameConstant = {
         -- TiledID 190 + 1
         19,      19,
     },
-    
+
     Mapping_TiledIdToTemplateViewTileOrUnit = {
         -- TiledID 0 + 1
         {
@@ -96,7 +96,7 @@ local GameConstant = {
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t03_s01_f%02d.png", 1, 4), 0.25),
         },
-  
+
         -- TiledID 10 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t03_s02_f%02d.png", 1, 4), 0.25),
@@ -129,7 +129,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t05_s01_f%02d.png", 1, 2), 0.5),
         },
 
-        -- TiledID 20 + 1  
+        -- TiledID 20 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t05_s02_f%02d.png", 1, 2), 0.5),
         },
@@ -161,7 +161,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t07_s02_f%02d.png", 1, 1), 99999),
         },
 
-        -- TiledID 30 + 1  
+        -- TiledID 30 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t07_s03_f%02d.png", 1, 1), 99999),
         },
@@ -193,7 +193,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t08_s01_f%02d.png", 1, 1), 99999),
         },
 
-        -- TiledID 40 + 1  
+        -- TiledID 40 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t09_s01_f%02d.png", 1, 8), 0.2),
         },
@@ -225,7 +225,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t09_s10_f%02d.png", 1, 8), 0.2),
         },
 
-        -- TiledID 50 + 1  
+        -- TiledID 50 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s01_f%02d.png", 1, 6), 0.2),
         },
@@ -257,7 +257,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s10_f%02d.png", 1, 6), 0.2),
         },
 
-        -- TiledID 60 + 1  
+        -- TiledID 60 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s11_f%02d.png", 1, 6), 0.2),
         },
@@ -289,7 +289,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s20_f%02d.png", 1, 6), 0.2),
         },
 
-        -- TiledID 70 + 1  
+        -- TiledID 70 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s21_f%02d.png", 1, 6), 0.2),
         },
@@ -320,8 +320,8 @@ local GameConstant = {
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t10_s30_f%02d.png", 1, 6), 0.2),
         },
- 
-        -- TiledID 80 + 1 
+
+        -- TiledID 80 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t11_s01_f%02d.png", 1, 6), 0.2),
         },
@@ -385,7 +385,7 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c01_t11_s20_f%02d.png", 1, 6), 0.2),
         },
 
-        -- TiledID 100 + 1  
+        -- TiledID 100 + 1
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t12_s01_f%02d.png", 1, 1), 99999),
         },
@@ -416,7 +416,7 @@ local GameConstant = {
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t14_s06_f%02d.png", 1, 1), 99999),
         },
-  
+
         -- TiledID 110 + 1; Units start from "c02..."
         {
 --            Animation = display.newAnimation(display.newFrames("c01_t14_s07_f%02d.png", 1, 1), 99999),
@@ -675,55 +675,75 @@ local GameConstant = {
 --            Animation = display.newAnimation(display.newFrames("c02_t19_s04_f%02d.png", 1, 4), 0.3),
         },
     },
-    
+
     Mapping_IdToTemplateModelTile = {
-        { -- TemplateModelTileID 1, HQ
-            DefenseBonus = 40,
+        -- TemplateModelTileID 1, HQ
+        {
+            defenseBonus = 40,
+            specialProperties = {
+                --[[
+                {
+                    name = "CaptureTaker",
+                    onCapture = "Defeat"
+                },
+                {
+                    name = "FundProvider"
+                },
+                {
+                    name = "SupplyProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                },
+                {
+                    name = "RepairProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                }
+                --]]
+            }
         },
         { -- TemplateModelTileID 2, city
-            DefenseBonus = 30,
+            defenseBonus = 30,
         },
         { -- TemplateModelTileID 3, factory
-            DefenseBonus = 30,
+            defenseBonus = 30,
         },
         { -- TemplateModelTileID 4, airport
-            DefenseBonus = 30,
+            defenseBonus = 30,
         },
         { -- TemplateModelTileID 5, seaport
-            DefenseBonus = 30,
+            defenseBonus = 30,
         },
         { -- TemplateModelTileID 6, plain
-            DefenseBonus = 10,
+            defenseBonus = 10,
         },
         { -- TemplateModelTileID 7, road
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 8, forest
-            DefenseBonus = 20,
+            defenseBonus = 20,
         },
         { -- TemplateModelTileID 9, river
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 10, sea
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 11, shoal
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 12, mountain
-            DefenseBonus = 30,
+            defenseBonus = 30,
         },
         { -- TemplateModelTileID 13, bridge
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 14, pipe
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
         { -- TemplateModelTileID 15, joint
-            DefenseBonus = 0,
+            defenseBonus = 0,
         },
     },
-    
+
     Mapping_IdToTemplateModelUnit = {
         -- TemplateModelUnitID 1, infantry
         {},
@@ -764,7 +784,7 @@ local GameConstant = {
         -- TemplateModelUnitID 19, submarine
         {},
     },
-    
+
 	TiledIdMapping = {
 		-- Tile
 		{Template = "Sea",		View = 1},	--1
@@ -775,26 +795,26 @@ local GameConstant = {
 		{Template = "Tank",		View = 1},	--5
 		{Template = "Tank",		View = 2},	--6
 	},
-	
+
 	TileModelTemplates = {
 		Forest = {
-			DefenseBonus	= 0.2,
+			defenseBonus	= 0.2,
 			Animation		= "Tile_Forest_01.png",
 		},
 		Plain = {
-			DefenseBonus	= 0.1,
+			defenseBonus	= 0.1,
 			Animation		= "Tile_Plain_01.png",
 		},
 		Road = {
-			DefenseBonus	= 0,
+			defenseBonus	= 0,
 			Animation		= "Tile_Road_01.png",
 		},
 		Sea = {
-			DefenseBonus	= 0,
+			defenseBonus	= 0,
 			Animation		= "Tile_Sea_01.png",
 		},
 	},
-	
+
 	TileViewTemplates = {
 		Forest = {
 			{Animation		= "Tile_Forest_01.png"},	-- Forest 1

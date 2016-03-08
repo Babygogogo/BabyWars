@@ -78,6 +78,10 @@ function ComponentManager.unbindComponent(target, ...)
 end
 
 function ComponentManager.unbindAllComponents(target)
+    if (not target.components_) then
+        return ComponentManager
+    end
+
 	for name, component in pairs(target.components_) do
 		component:unbind(target)
 		target.components_[name] = nil
@@ -96,7 +100,7 @@ function ComponentManager.hasBound(target, componentName)
 	if (target.components_ == nil) then
 		return false
 	end
-	
+
 	return target.components_[componentName] ~= nil
 end
 
