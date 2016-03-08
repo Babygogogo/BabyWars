@@ -8,7 +8,7 @@ end
 local function loadTiledAnimation(tiledID, pattern, frameCount, frameDuration)
     local animation = display.newAnimation(display.newFrames(pattern, 1, frameCount), frameDuration)
     display.setAnimationCache(toAnimationName(tiledID), animation)
-    
+
     return tiledID
 end
 
@@ -38,7 +38,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t04_s05_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t05_s01_f%02d.png", 2, 0.5)
 
-    -- TiledID 20 + 1  
+    -- TiledID 20 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t05_s02_f%02d.png", 2, 0.5)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t05_s03_f%02d.png", 2, 0.5)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t05_s04_f%02d.png", 2, 0.5)
@@ -50,7 +50,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s01_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s02_f%02d.png", 1, 99999)
 
-    -- TiledID 30 + 1  
+    -- TiledID 30 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s03_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s04_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s05_f%02d.png", 1, 99999)
@@ -62,7 +62,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t07_s11_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t08_s01_f%02d.png", 1, 99999)
 
-    -- TiledID 40 + 1  
+    -- TiledID 40 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t09_s01_f%02d.png", 8, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t09_s02_f%02d.png", 8, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t09_s03_f%02d.png", 8, 0.2)
@@ -74,7 +74,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t09_s09_f%02d.png", 8, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t09_s10_f%02d.png", 8, 0.2)
 
-    -- TiledID 50 + 1  
+    -- TiledID 50 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s01_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s02_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s03_f%02d.png", 6, 0.2)
@@ -86,7 +86,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s09_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s10_f%02d.png", 6, 0.2)
 
-    -- TiledID 60 + 1  
+    -- TiledID 60 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s11_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s12_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s13_f%02d.png", 6, 0.2)
@@ -98,7 +98,7 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s19_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s20_f%02d.png", 6, 0.2)
 
-    -- TiledID 70 + 1  
+    -- TiledID 70 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s21_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s22_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s23_f%02d.png", 6, 0.2)
@@ -108,51 +108,51 @@ function AnimationLoader.load()
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s27_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s28_f%02d.png", 6, 0.2)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s29_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t10_s30_f%02d.png", 6, 0.2)
-
-    -- TiledID 80 + 1 
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s01_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s02_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s03_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s04_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s05_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s06_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s07_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s08_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s09_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s10_f%02d.png", 6, 0.2)
+
+    -- TiledID 80 + 1
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s01_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s02_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s03_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s04_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s05_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s06_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s07_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s08_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s09_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s10_f%02d.png", 6, 0.2)
 
     -- TiledID 90 + 1
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s11_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s12_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s13_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s14_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s15_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s16_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s17_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s18_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s19_f%02d.png", 6, 0.2)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t11_s20_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s11_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s12_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s13_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s14_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s15_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s16_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s17_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s18_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s19_f%02d.png", 6, 0.2)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s20_f%02d.png", 6, 0.2)
 
-    -- TiledID 100 + 1  
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s01_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t12_s02_f%02d.png", 1, 99999)
+    -- TiledID 100 + 1
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t13_s01_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t13_s02_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s01_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s02_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s03_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s04_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s05_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s06_f%02d.png", 1, 99999)
-
-    -- TiledID 110 + 1; Units start from "c02..."
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s07_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s08_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s09_f%02d.png", 1, 99999)
-    tiledID = loadTiledAnimation(tiledID + 1, "c01_t14_s10_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s01_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s02_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s03_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s04_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s05_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s06_f%02d.png", 1, 99999)
+
+    -- TiledID 110 + 1; Units start from "c02..."
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s07_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s08_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s09_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t15_s10_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t16_s01_f%02d.png", 1, 99999)
+    tiledID = loadTiledAnimation(tiledID + 1, "c01_t16_s02_f%02d.png", 1, 99999)
     tiledID = loadTiledAnimation(tiledID + 1, "c02_t01_s01_f%02d.png", 4, 0.3)
     tiledID = loadTiledAnimation(tiledID + 1, "c02_t01_s02_f%02d.png", 4, 0.3)
     tiledID = loadTiledAnimation(tiledID + 1, "c02_t01_s03_f%02d.png", 4, 0.3)

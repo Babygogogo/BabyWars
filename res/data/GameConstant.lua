@@ -25,19 +25,19 @@ local GameConstant = {
         10,      10,       10,       10,       10,       10,       10,       10,       10,       10,
 
         -- TiledID 70 + 1
-        10,      10,       10,       10,       10,       10,       10,       10,       10,       10,
+        10,      10,       10,       10,       10,       10,       10,       10,       10,       11,
 
         -- TiledID 80 + 1
-        11,      11,       11,       11,       11,       11,       11,       11,       11,       11,
+        12,      12,       12,       12,       12,       12,       12,       12,       12,       12,
 
         -- TiledID 90 + 1
-        11,      11,       11,       11,       11,       11,       11,       11,       11,       11,
+        12,      12,       12,       12,       12,       12,       12,       12,       12,       12,
 
         -- TiledID 100 + 1
-        12,      12,       13,       13,       14,       14,       14,       14,       14,       14,
+        13,      13,       14,       14,       15,       15,       15,       15,       15,       15,
 
         -- TiledID 110 + 1; TemplateModelIdUnit starts from '1'
-        14,      14,       14,       14,       15,       15,        1,        1,        1,        1,
+        15,      15,       15,       15,       16,       16,        1,        1,        1,        1,
 
         -- TiledID 120 + 1
         2,        2,        2,        2,        3,        3,        3,        3,        4,        4,
@@ -767,7 +767,7 @@ local GameConstant = {
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
             description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
-            
+
             specialProperties = {
                 {
                     name = "CaptureTaker",
@@ -857,7 +857,15 @@ local GameConstant = {
             description = "A body of water. Only naval and air units can traverse seas.",
         },
 
-        -- TemplateModelTileID 11, shoal
+        -- TemplateModelTileID 11, reef
+        {
+            defenseBonus = 10,
+            defenseTarget = {16, 17, 18, 19},
+
+            description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+        },
+
+        -- TemplateModelTileID 12, shoal
         {
             defenseBonus = 0,
             defenseTarget = {},
@@ -865,7 +873,7 @@ local GameConstant = {
             description = "A sandy shoal. Lander units load and unload units here.",
         },
 
-        -- TemplateModelTileID 12, mountain
+        -- TemplateModelTileID 13, mountain
         {
             defenseBonus = 30,
             defenseTarget = {1, 2},
@@ -873,7 +881,7 @@ local GameConstant = {
             description = "A steep mountain. Infantry units add 3 to their vision range from here.",
         },
 
-        -- TemplateModelTileID 13, bridge
+        -- TemplateModelTileID 14, bridge
         {
             defenseBonus = 0,
             defenseTarget = {},
@@ -881,7 +889,7 @@ local GameConstant = {
             description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
         },
 
-        -- TemplateModelTileID 14, pipeline
+        -- TemplateModelTileID 15, pipeline
         {
             defenseBonus = 0,
             defenseTarget = {},
@@ -889,20 +897,12 @@ local GameConstant = {
             description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
         },
 
-        -- TemplateModelTileID 15, joint
+        -- TemplateModelTileID 16, joint
         {
             defenseBonus = 0,
             defenseTarget = {},
 
             description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
-        },
-
-        -- TemplateModelTileID 16, reef
-        {
-            defenseBonus = 10,
-            defenseTarget = {16, 17, 18, 19},
-
-            description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
 
         -- TemplateModelTileID 17, Silo
