@@ -10,7 +10,7 @@ local function createScreenBackground()
     local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
     background:setContentSize(display.width, display.height)
         :ignoreAnchorPointForPosition(true)
-        
+
     return background
 end
 
@@ -24,7 +24,7 @@ local function createDetailBackground()
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
-        :setContentSize(BACKGROUND_SIZE_WIDTH, BACKGROUND_SIZE_HEIGHT)        
+        :setContentSize(BACKGROUND_SIZE_WIDTH, BACKGROUND_SIZE_HEIGHT)
 
     background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
@@ -38,15 +38,15 @@ local function initWithDetailBackground(view, background)
 end
 
 local function createLabel()
-    local label = cc.Label:createWithTTF("A rich, green plain. Easy to traverse, but offers little defense cover.", "res/fonts/msyhbd.ttc", 25)
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6)
-        
+
         :setDimensions(BACKGROUND_SIZE_WIDTH - 10, BACKGROUND_SIZE_HEIGHT - 14)
-        
+
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
-        
+
     return label
 end
 
@@ -58,15 +58,15 @@ end
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
-    
+
 	touchListener:registerScriptHandler(function()
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
-    
+
     touchListener:registerScriptHandler(function()
         view:setEnabled(false)
     end, cc.Handler.EVENT_TOUCH_ENDED)
-    
+
     return touchListener
 end
 
@@ -87,7 +87,7 @@ function ViewTileDetail:ctor(param)
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -98,8 +98,14 @@ end
 function ViewTileDetail.createInstance(param)
     local view = ViewTileDetail:create():load(param)
     assert(view, "ViewTileDetail.createInstance() failed.")
-    
+
     return view
+end
+
+function ViewTileDetail:updateWithModelTile(tile)
+    self.m_Label:setString(tile:getDescription())
+
+    return self
 end
 
 function ViewTileDetail:setEnabled(enabled)
@@ -110,7 +116,7 @@ function ViewTileDetail:setEnabled(enabled)
         self:setVisible(false)
         self:getEventDispatcher():pauseEventListenersForTarget(self, true)
     end
-    
+
     return self
 end
 

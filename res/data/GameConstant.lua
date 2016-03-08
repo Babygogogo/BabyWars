@@ -680,12 +680,16 @@ local GameConstant = {
         -- TemplateModelTileID 1, HQ
         {
             defenseBonus = 40,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
+
             specialProperties = {
-                --[[
                 {
                     name = "CaptureTaker",
                     onCapture = "Defeat"
                 },
+                --[[
                 {
                     name = "FundProvider"
                 },
@@ -700,47 +704,213 @@ local GameConstant = {
                 --]]
             }
         },
-        { -- TemplateModelTileID 2, city
+
+        -- TemplateModelTileID 2, city
+        {
             defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "A normal city. Ground units gain supplies and HP in allied cities.",
+
+            specialProperties = {
+                {
+                    name = "CaptureTaker",
+                    onCapture = "ChangeCapturer"
+                },
+                --[[
+                {
+                    name = "FundProvider"
+                },
+                {
+                    name = "SupplyProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                },
+                {
+                    name = "RepairProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                }
+                --]]
+            }
         },
-        { -- TemplateModelTileID 3, factory
+
+        -- TemplateModelTileID 3, base
+        {
             defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "A base. Allied bases deploy, supply, and restore HP to ground units.",
+
+            specialProperties = {
+                {
+                    name = "CaptureTaker",
+                    onCapture = "ChangeCapturer"
+                },
+                --[[
+                {
+                    name = "FundProvider"
+                },
+                {
+                    name = "SupplyProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                },
+                {
+                    name = "RepairProvider",
+                    target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+                }
+                --]]
+            }
         },
-        { -- TemplateModelTileID 4, airport
+
+        -- TemplateModelTileID 4, airport
+        {
             defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
+            
+            specialProperties = {
+                {
+                    name = "CaptureTaker",
+                    onCapture = "ChangeCapturer"
+                },
+                --[[
+                {
+                    name = "FundProvider"
+                },
+                {
+                    name = "SupplyProvider",
+                    target = {12, 13, 14, 15}
+                },
+                {
+                    name = "RepairProvider",
+                    target = {12, 13, 14, 15}
+                }
+                --]]
+            }
         },
-        { -- TemplateModelTileID 5, seaport
+
+        -- TemplateModelTileID 5, seaport
+        {
             defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19},
+
+            description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
+
+            specialProperties = {
+                {
+                    name = "CaptureTaker",
+                    onCapture = "ChangeCapturer"
+                },
+                --[[
+                {
+                    name = "FundProvider"
+                },
+                {
+                    name = "SupplyProvider",
+                    target = {16, 17, 18, 19}
+                },
+                {
+                    name = "RepairProvider",
+                    target = {16, 17, 18, 19}
+                }
+                --]]
+            }
         },
-        { -- TemplateModelTileID 6, plain
+
+        -- TemplateModelTileID 6, plain
+        {
             defenseBonus = 10,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
         },
-        { -- TemplateModelTileID 7, road
+
+        -- TemplateModelTileID 7, road
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A paved road. Easy to traverse, but offers little defensive cover.",
         },
-        { -- TemplateModelTileID 8, forest
+
+        -- TemplateModelTileID 8, forest
+        {
             defenseBonus = 20,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
-        { -- TemplateModelTileID 9, river
+
+        -- TemplateModelTileID 9, river
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A gentle, flowing river. Only infantry units can ford rivers.",
         },
-        { -- TemplateModelTileID 10, sea
+
+        -- TemplateModelTileID 10, sea
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A body of water. Only naval and air units can traverse seas.",
         },
-        { -- TemplateModelTileID 11, shoal
+
+        -- TemplateModelTileID 11, shoal
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A sandy shoal. Lander units load and unload units here.",
         },
-        { -- TemplateModelTileID 12, mountain
+
+        -- TemplateModelTileID 12, mountain
+        {
             defenseBonus = 30,
+            defenseTarget = {1, 2},
+
+            description = "A steep mountain. Infantry units add 3 to their vision range from here.",
         },
-        { -- TemplateModelTileID 13, bridge
+
+        -- TemplateModelTileID 13, bridge
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
         },
-        { -- TemplateModelTileID 14, pipe
+
+        -- TemplateModelTileID 14, pipeline
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
         },
-        { -- TemplateModelTileID 15, joint
+
+        -- TemplateModelTileID 15, joint
+        {
             defenseBonus = 0,
+            defenseTarget = {},
+
+            description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+        },
+
+        -- TemplateModelTileID 16, reef
+        {
+            defenseBonus = 10,
+            defenseTarget = {16, 17, 18, 19},
+
+            description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+        },
+
+        -- TemplateModelTileID 17, Silo
+        {
+            defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
         },
     },
 

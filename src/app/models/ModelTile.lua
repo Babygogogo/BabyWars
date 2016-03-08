@@ -27,6 +27,7 @@ local function initWithTiledID(model, tiledID)
 
     ComponentManager.bindComponent(model, "GridIndexable")
     model.m_DefenseBonus = template.defenseBonus
+    model.m_Description  = template.description
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -40,6 +41,8 @@ local function loadOverwrites(model, overwrites)
     if (overwrites.gridIndex) then
         model:setGridIndex(overwrites.gridIndex)
     end
+    model.m_DefenseBonus = overwrites.defenseBonus or model.m_DefenseBonus
+    model.m_Description  = overwrites.description  or model.m_Description
 
     if (overwrites.specialProperties) then
         for _, specialProperty in ipairs(overwrites.specialProperties) do
@@ -95,6 +98,14 @@ end
 
 function ModelTile:getTiledID()
     return self.m_TiledID
+end
+
+function ModelTile:getDefenseBonus()
+    return self.m_DefenseBonus
+end
+
+function ModelTile:getDescription()
+    return self.m_Description
 end
 
 return ModelTile

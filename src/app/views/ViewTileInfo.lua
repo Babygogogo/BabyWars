@@ -1,7 +1,8 @@
 
 local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
-local AnimationLoader = require("app.utilities.AnimationLoader")
+local AnimationLoader  = require("app.utilities.AnimationLoader")
+local ComponentManager = require("global.components.ComponentManager")
 
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
 local LEFT_POSITION_X = 10
@@ -65,8 +66,13 @@ local function initWithIcon(view, icon)
     view:addChild(icon)
 end
 
+local function updateIconWithModelTile(icon, tile)
+    icon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tile:getTiledID()))
+end
+
 local function createLabel()
-    local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
+    local label = cc.Label:createWithTTF("0", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
 
         :setTextColor({r = 255, g = 255, b = 255})
@@ -94,12 +100,24 @@ local function createDefenseInfo()
 
     info.m_Label = label
 
+    info.setDefenseBonus = function(self, bonus)
+        if (bonus < 10) then
+            self.m_Label:setString("  " .. bonus)
+        else
+            self.m_Label:setString(""  .. bonus)
+        end
+    end
+
     return info
 end
 
 local function initWithDefenseInfo(view, info)
     view.m_DefenseInfo = info
     view:addChild(info)
+end
+
+local function updateDefenseInfoWithModelTile(info, tile)
+    info:setDefenseBonus(tile:getDefenseBonus() / 10)
 end
 
 local function createCaptureInfo()
@@ -121,12 +139,30 @@ local function createCaptureInfo()
 
     info.m_Label = label
 
+    info.setCapturePoint = function(self, point)
+        if (point < 10) then
+            self.m_Label:setString("  " .. point)
+        else
+            self.m_Label:setString(""  .. point)
+        end
+    end
+
     return info
 end
 
 local function initWithCaptureInfo(view, info)
     view.m_CaptureInfo = info
     view:addChild(info)
+end
+
+local function updateCaptureInfoWithModelTile(info, tile)
+    local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
+    if (captureTaker) then
+        info:setCapturePoint(captureTaker:getCapturePoint())
+        info:setVisible(true)
+    else
+        info:setVisible(false)
+    end
 end
 
 function ViewTileInfo:ctor(param)
@@ -197,9 +233,9 @@ function ViewTileInfo:moveToRightSide()
 end
 
 function ViewTileInfo:updateWithModelTile(model)
-    local tiledID = model:getTiledID()
-    self.m_Icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
+    updateIconWithModelTile(self.m_Icon, model)
+    updateCaptureInfoWithModelTile(self.m_CaptureInfo, model)
+    updateDefenseInfoWithModelTile(self.m_DefenseInfo, model)
 
     return self
 end

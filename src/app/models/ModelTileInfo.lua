@@ -6,6 +6,8 @@ local function createDetailActor()
 end
 
 local function onEvtPlayerTouchTile(model, event)
+    model.m_ModelTile = event.tileModel
+
     if (model.m_View) then
         model.m_View:updateWithModelTile(event.tileModel)
         model.m_View:setVisible(true)
@@ -54,12 +56,14 @@ function ModelTileInfo:onEvent(event)
 end
 
 function ModelTileInfo:onPlayerTouch()
-    if (self.m_DetailActor) then
-        self.m_DetailActor:getModel():setEnabled(true)
-    else
-        self.m_DetailActor = createDetailActor()
+    if (not self.m_DetailActor) then
+        self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelTileDetail", nil, "ViewTileDetail")
         self.m_View:getScene():addChild(self.m_DetailActor:getView())
     end
+
+    local modelDetail = self.m_DetailActor:getModel()
+    modelDetail:updateWithModelTile(self.m_ModelTile)
+        :setEnabled(true)
 
     return self
 end

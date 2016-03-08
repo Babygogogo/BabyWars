@@ -1,9 +1,9 @@
 
 local GridIndexable = class("GridIndexable")
 
-local TypeChecker		= require("app.utilities.TypeChecker")
-local GridSize			= require("res.data.GameConstant").GridSize
-local ComponentManager	= require("global.components.ComponentManager")
+local TypeChecker        = require("app.utilities.TypeChecker")
+local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
 	"getGridIndex",
@@ -11,19 +11,9 @@ local EXPORTED_METHODS = {
     "setViewPositionWithGridIndex"
 }
 
-local function gridIndexToPosition(gridIndex)
-	return	(gridIndex.x - 1) * GridSize.width,
-			(gridIndex.y - 1) * GridSize.height
-end
-
 local function init_(component)
     component.m_Target = nil
     component.m_GridIndex = {}
-end
-
-function GridIndexable:init_()
-	self.m_Target = nil
-	self.m_GridIndex = {}
 end
 
 function GridIndexable:bind(target)
@@ -59,7 +49,7 @@ end
 function GridIndexable:setViewPositionWithGridIndex(gridIndex)
     local view = self.m_Target.m_View
     if (view) then
-        view:move(gridIndexToPosition(gridIndex or self.m_GridIndex))
+        view:move(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
     end
 
     return self

@@ -9,7 +9,9 @@ local AnimationLoader   = require("app.utilities.AnimationLoader")
 function ViewTile:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
-	if (param) then self:load(param) end
+	if (param) then
+        self:load(param)
+    end
 
 	return self
 end
@@ -39,9 +41,7 @@ function ViewTile:updateWithTiledID(tiledID)
 
     self.m_TiledID_ = tiledID
     self:stopAllActions()
---      :playAnimationForever(template.Animation)
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
-
 
     return self
 end

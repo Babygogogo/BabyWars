@@ -9,6 +9,11 @@ function GridIndexFunctions.toGridIndex(pos)
     }
 end
 
+function GridIndexFunctions.toPosition(gridIndex)
+    return	(gridIndex.x - 1) * GRID_SIZE.width,
+            (gridIndex.y - 1) * GRID_SIZE.height
+end
+
 function GridIndexFunctions.worldPosToGridIndexInNode(worldPos, node)
     return GridIndexFunctions.toGridIndex(node:convertToNodeSpace(worldPos))
 end
