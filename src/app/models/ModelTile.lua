@@ -7,7 +7,7 @@ local MODEL_TILE_TEMPLATES = require("res.data.GameConstant").Mapping_IdToTempla
 local ComponentManager = require("global.components.ComponentManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
-local function isOfSameModelTileID(tiledID1, tiledID2)
+local function isOfSameTemplateModelTileID(tiledID1, tiledID2)
     if (not tiledID1) or (not tiledID2) then
         return false
     end
@@ -63,7 +63,7 @@ end
 
 function ModelTile:load(param)
     if (param.tiledID) then
-        if (not isOfSameModelTileID(param.tiledID, self.m_TiledID)) then
+        if (not isOfSameTemplateModelTileID(param.tiledID, self.m_TiledID)) then
             initWithTiledID(self, param.tiledID)
         end
 

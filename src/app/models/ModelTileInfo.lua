@@ -1,10 +1,6 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
-local function createDetailActor()
-    return require("global.actors.Actor").createWithModelAndViewName("ModelTileDetail", nil, "ViewTileDetail")
-end
-
 local function onEvtPlayerTouchTile(model, event)
     model.m_ModelTile = event.tileModel
 
