@@ -1,25 +1,28 @@
 
 local MapFunctions = {}
 
-local TypeChecker	= require("app.utilities.TypeChecker")
-local Actor			= require("global.actors.Actor")
+local TypeChecker = require("app.utilities.TypeChecker")
+local Actor       = require("global.actors.Actor")
 
-local function updateViewForGridActor(actor, viewClass, gridData)
-    if (not actor:getView()) then
-        actor:setView(viewClass.createInstance(gridData))
+local function updateViewForGridActor(actor, viewName, gridData)
+    local existingView = actor:getView()
+    if (existingView) then
+        existingView:load(gridData)
+    else
+        actor:setView(Actor.createView(viewName, gridData))
     end
-    
+
     return actor
 end
 
-local function updateModelForGridActor(actor, modelClass, gridData)
+local function updateModelForGridActor(actor, modelName, gridData)
     local existingModel = actor:getModel()
     if (existingModel) then
         existingModel:load(gridData)
     elseif (modelClass) then
-        actor:setModel(modelClass.createInstance(gridData))
+        actor:setModel(Actor.createModel(modelName, gridData))
     end
-    
+
     return actor
 end
 
@@ -30,9 +33,7 @@ local function createGridActor(modelClass, viewClass, gridData)
 end
 
 function MapFunctions.loadMapSize(mapData)
-	assert(TypeChecker.isMapData(mapData))
-	
-	local mapSize = mapData.MapSize or {width = mapData.width, height = mapData.height}
+	local mapSize = mapData.mapSize or {width = mapData.width, height = mapData.height}
 	assert(TypeChecker.isMapSize(mapSize))
 
 	return mapSize
@@ -43,7 +44,7 @@ function MapFunctions.createEmptyMap(mapSize)
 	for i = 1, mapSize.width do
 		map[i] = {}
 	end
-	
+
 	return map
 end
 
@@ -54,57 +55,58 @@ function MapFunctions.hasNilGrid(map)
 			if (map[x][y] == nil) then return true end
 		end
 	end
-	
+
 	return false
 end
 
 function MapFunctions.createGridActorsMapWithMapData(mapData, gridModelClass, gridViewClass)
 	assert(TypeChecker.isMapData(mapData))
-	
+
 	local mapSize = MapFunctions.loadMapSize(mapData)
 	local map = MapFunctions.createEmptyMap(mapSize)
-	
+
 	return MapFunctions.updateGridActorsMapWithGridsData(map, mapData.Grids, gridModelClass, gridViewClass)
 end
 
-function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, gridModelClass, gridViewClass)
-	assert(TypeChecker.isTiledLayer(tiledLayer))
-	
-	local mapSize = MapFunctions.loadMapSize(tiledLayer)
-	local map = MapFunctions.createEmptyMap(mapSize)
+function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, modelName, viewName)
+    local mapSize = MapFunctions.loadMapSize(tiledLayer)
+    assert(TypeChecker.isMapSize(mapSize))
+    local map = MapFunctions.createEmptyMap(mapSize)
 
-	local width, height = mapSize.width, mapSize.height
-	for x = 1, width do
-		for y = 1, height do
-			local tiledID = tiledLayer.data[x + (mapSize.height - y) * mapSize.width]
-			assert(TypeChecker.isTiledID(tiledID))
-         
+    local width, height = mapSize.width, mapSize.height
+    for x = 1, width do
+        for y = 1, height do
+            local tiledID = tiledLayer.data[x + (height - y) * width]
             if (tiledID ~= 0) then
-                map[x][y] = createGridActor(gridModelClass, gridViewClass, {TiledID = tiledID, GridIndex = {x = x, y = y}})
+                local actorData = {tiledID = tiledID, gridIndex = {x = x, y = y}}
+                local actor = Actor.createWithModelAndViewName(modelName, actorData, viewName, actorData)
+                assert(actor, "MapFunctions.createGridActorsMapWithTiledLayer() failed to create a grid actor.")
+
+                map[x][y] = actor
             end
-		end
-	end
-	
-	return map
+        end
+    end
+
+    return map
 end
 
-function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, gridModelClass, gridViewClass)
+function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, modelName, viewName)
 	local mapSize = map.size
 	assert(TypeChecker.isMapSize(mapSize))
-	
+
 	for _, gridData in ipairs(gridsData) do
-		local gridIndex = gridData.GridIndex
+		local gridIndex = gridData.gridIndex
 		assert(TypeChecker.isGridIndex(gridIndex))
 		assert(TypeChecker.isGridInMap(gridIndex, mapSize))
-		
+
 		local x, y = gridIndex.x, gridIndex.y
 		if (map[x][y] == nil) then
-            map[x][y] = createGridActor(gridModelClass, gridViewClass, gridData)
+            map[x][y] = Actor.createWithModelAndViewName(modelName, gridData, viewName, gridData)
 		else
 			print(string.format("MapFunctions.updateGridActorsMapWithGridsData() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
 
-            updateModelForGridActor(map[x][y], gridModelClass, gridData)
-            updateViewForGridActor( map[x][y], gridViewClass,  gridData)
+            updateModelForGridActor(map[x][y], modelName, gridData)
+            updateViewForGridActor( map[x][y], viewName,  gridData)
 		end
 	end
 

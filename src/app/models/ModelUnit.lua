@@ -8,10 +8,10 @@ local TypeChecker       = require("app.utilities.TypeChecker")
 local function createModel(unitData)
     assert(type(unitData) == "table", "Unit--createModel() the param unitData is not a table.")
 
-    local tiledID = unitData.TiledID
+    local tiledID = unitData.tiledID
     assert(TypeChecker.isTiledID(tiledID), "Unit--createModel() the param unitData hasn't a valid TiledID.")
 	
-    local gridIndex = unitData.GridIndex
+    local gridIndex = unitData.gridIndex
     assert(TypeChecker.isGridIndex(gridIndex), "Unit--createModel() the param unitData hasn't a valid GridIndex.")
     
 	-- TODO: load data from unitData and handle errors
