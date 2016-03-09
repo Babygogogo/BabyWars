@@ -117,8 +117,8 @@ local GameConstant = {
             }
         },
 
-        -- TiledID 10 + 1
         {
+            -- TiledID 11
             animations = {
                 normal = {pattern = "c01_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
             }
@@ -169,8 +169,8 @@ local GameConstant = {
             }
         },
 
-        -- TiledID 20 + 1
         {
+            -- TiledID 21
             animations = {
                 normal = {pattern = "c01_t05_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
             }
@@ -221,8 +221,8 @@ local GameConstant = {
             }
         },
 
-        -- TiledID 30 + 1
         {
+            -- TiledID 31
             animations = {
                 normal = {pattern = "c01_t07_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
             }
@@ -273,8 +273,8 @@ local GameConstant = {
             }
         },
 
-        -- TiledID 40 + 1
         {
+            -- TiledID 41
             animations = {
                 normal = {pattern = "c01_t09_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
             }
@@ -1145,8 +1145,8 @@ local GameConstant = {
             }
         },
 
-        -- TemplateModelTileID 4, airport
         {
+            -- TemplateModelTileID 4, airport
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1173,8 +1173,8 @@ local GameConstant = {
             }
         },
 
-        -- TemplateModelTileID 5, seaport
         {
+            -- TemplateModelTileID 5, seaport
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19},
 
@@ -1299,44 +1299,100 @@ local GameConstant = {
     },
 
     Mapping_IdToTemplateModelUnit = {
-        -- TemplateModelUnitID 1, infantry
-        {},
-        -- TemplateModelUnitID 2, mech
-        {},
-        -- TemplateModelUnitID 3, recon
-        {},
-        -- TemplateModelUnitID 4, tank
-        {},
-        -- TemplateModelUnitID 5, md-tank
-        {},
-        -- TemplateModelUnitID 6, neotank
-        {},
-        -- TemplateModelUnitID 7, apc
-        {},
-        -- TemplateModelUnitID 8, artillery
-        {},
-        -- TemplateModelUnitID 9, rockets
-        {},
-        -- TemplateModelUnitID 10, anti-air
-        {},
-        -- TemplateModelUnitID 11, missiles
-        {},
-        -- TemplateModelUnitID 12, fighter
-        {},
-        -- TemplateModelUnitID 13, bomber
-        {},
-        -- TemplateModelUnitID 14, b-copter
-        {},
-        -- TemplateModelUnitID 15, t-copter
-        {},
-        -- TemplateModelUnitID 16, battleship
-        {},
-        -- TemplateModelUnitID 17, cruiser
-        {},
-        -- TemplateModelUnitID 18, lander
-        {},
-        -- TemplateModelUnitID 19, submarine
-        {},
+        {
+            -- TemplateModelUnitID 1, infantry
+            description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
+        },
+
+        {
+            -- TemplateModelUnitID 2, mech
+            description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
+        },
+
+        {
+            -- TemplateModelUnitID 3, recon
+            description = "Recon units have high movement range and are strong against infantry units.",
+        },
+
+        {
+            -- TemplateModelUnitID 4, tank
+            description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
+        },
+
+        {
+            -- TemplateModelUnitID 5, md-tank
+            description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
+        },
+
+        {
+            -- TemplateModelUnitID 6, neotank
+            description = "These are new weapons developed recently. They are more powerful than Md tanks.",
+        },
+
+        {
+            -- TemplateModelUnitID 7, apc
+            description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
+        },
+
+        {
+            -- TemplateModelUnitID 8, artillery
+            description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
+        },
+
+        {
+            -- TemplateModelUnitID 9, rockets
+            description = "Rocket units are valuable, because they can fire on both land and naval units.",
+        },
+
+        {
+            -- TemplateModelUnitID 10, anti-air
+            description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
+        },
+
+        {
+            -- TemplateModelUnitID 11, missiles
+            description = "Missile units are essential in defending against air units. Their vision range is large.",
+        },
+
+        {
+            -- TemplateModelUnitID 12, fighter
+            description = "Fighter units are strong vs. other air units. They also have the highest movements.",
+        },
+
+        {
+            -- TemplateModelUnitID 13, bomber
+            description = "Bomber units can fire on ground and naval units with a high destructive force.",
+        },
+
+        {
+            -- TemplateModelUnitID 14, b-copter
+            description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
+        },
+
+        {
+            -- TemplateModelUnitID 15, t-copter
+            description = "T copters can transport both infantry and mech units.",
+        },
+
+        {
+            -- TemplateModelUnitID 16, battleship
+            description = "B(Battle) ships have a larger attack range than even rocket units.",
+        },
+
+        {
+            -- TemplateModelUnitID 17, cruiser
+            description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
+        },
+
+        {
+            -- TemplateModelUnitID 18, lander
+            description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+        },
+
+        {
+            -- TemplateModelUnitID 19, submarine
+            description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
+        },
     },
 
 	TiledIdMapping = {
