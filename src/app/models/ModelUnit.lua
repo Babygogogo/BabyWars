@@ -26,6 +26,8 @@ local function initWithTiledID(model, tiledID)
     ComponentManager.unbindAllComponents(model)
     ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
 
+    model.m_Description = template.description
+
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
             if (not ComponentManager.getComponent(model, specialProperty.name)) then
@@ -40,6 +42,8 @@ local function overwrite(model, param)
     if (param.gridIndex) then
         model:setGridIndex(param.gridIndex)
     end
+
+    model.m_Description = param.description or model.m_Description
 
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
@@ -95,6 +99,10 @@ end
 
 function ModelUnit:getTiledID()
     return self.m_TiledID
+end
+
+function ModelUnit:getDescription()
+    return self.m_Description
 end
 
 return ModelUnit

@@ -36,7 +36,7 @@ function HPOwner:bind(target)
 end
 
 function HPOwner:unbind(target)
-    assert(self.m_Target == target , "HPOwner:unbind() the component is not bind to the parameter target")
+    assert(self.m_Target == target , "HPOwner:unbind() the component is not bind to the param target.")
     assert(self.m_Target, "HPOwner:unbind() the component is not bind to any target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)

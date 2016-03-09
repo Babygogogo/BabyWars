@@ -67,8 +67,10 @@ function ModelUnitInfo:onPlayerTouch()
         self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
         self.m_View:getScene():addChild(self.m_DetailActor:getView())
     end
-        
-    self.m_DetailActor:getModel():setEnabled(true)
+
+    local modelDetail = self.m_DetailActor:getModel()
+    modelDetail:updateWithModelUnit(self.m_ModelUnit)
+        :setEnabled(true)
 
     return self
 end
