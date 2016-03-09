@@ -24,7 +24,7 @@ local function initWithTiledID(model, tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID.")
 
     ComponentManager.unbindAllComponents(model)
-    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
+    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner", "FuelOwner")
 
     model.m_Description = template.description
 

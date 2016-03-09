@@ -141,6 +141,14 @@ local function createFuelInfo()
         :addChild(label)
 
     info.m_Label = label
+    
+    info.setFuel = function(self, fuel)
+        if (fuel < 10) then
+            self.m_Label:setString("  " .. fuel)
+        else
+            self.m_Label:setString("" .. fuel)
+        end
+    end
 
     return info
 end
@@ -148,6 +156,10 @@ end
 local function initWithFuelInfo(view, info)
     view.m_FuelInfo = info
     view:addChild(info)
+end
+
+local function updateFuelInfoWithModelUnit(info, unit)
+    info:setFuel(unit:getCurrentFuel())
 end
 
 local function createAmmoInfo()
@@ -252,6 +264,7 @@ end
 function ViewUnitInfo:updateWithModelUnit(model)
     updateIconWithModelUnit(self.m_Icon, model)
     updateHPInfoWithModelUnit(self.m_HPInfo, model)
+    updateFuelInfoWithModelUnit(self.m_FuelInfo, model)
 
     return self
 end

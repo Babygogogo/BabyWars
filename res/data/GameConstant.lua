@@ -1302,143 +1302,269 @@ local GameConstant = {
         {
             -- TemplateModelUnitID 1, infantry
             description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 2, mech
             description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 70,
+                    currentFuel        = 70,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 3, recon
             description = "Recon units have high movement range and are strong against infantry units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 80,
+                    currentFuel        = 80,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 4, tank
             description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 70,
+                    currentFuel        = 70,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 5, md-tank
             description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 50,
+                    currentFuel        = 50,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 6, neotank
             description = "These are new weapons developed recently. They are more powerful than Md tanks.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 7, apc
             description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 70,
+                    currentFuel        = 70,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 8, artillery
             description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 50,
+                    currentFuel        = 50,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 9, rockets
             description = "Rocket units are valuable, because they can fire on both land and naval units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 50,
+                    currentFuel        = 50,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 10, anti-air
             description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 60,
+                    currentFuel        = 60,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 11, missiles
             description = "Missile units are essential in defending against air units. Their vision range is large.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 50,
+                    currentFuel        = 50,
+                    consumptionPerTurn = 0,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 12, fighter
             description = "Fighter units are strong vs. other air units. They also have the highest movements.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 5,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 13, bomber
             description = "Bomber units can fire on ground and naval units with a high destructive force.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 5,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 14, b-copter
             description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 2,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 15, t-copter
             description = "T copters can transport both infantry and mech units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 2,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 16, battleship
             description = "B(Battle) ships have a larger attack range than even rocket units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 1,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 17, cruiser
             description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 1,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 18, lander
             description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 99,
+                    currentFuel        = 99,
+                    consumptionPerTurn = 1,
+                },
+            },
         },
 
         {
             -- TemplateModelUnitID 19, submarine
             description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
+
+            specialProperties = {
+                {
+                    name               = "FuelOwner",
+                    maxFuel            = 60,
+                    currentFuel        = 60,
+                    consumptionPerTurn = 1,
+                },
+            },
         },
     },
-
-	TiledIdMapping = {
-		-- Tile
-		{Template = "Sea",		View = 1},	--1
-		{Template = "Plain",	View = 1},	--2
-		{Template = "Road",		View = 1},	--3
-		{Template = "Forest",	View = 1},	--4
-		-- Unit
-		{Template = "Tank",		View = 1},	--5
-		{Template = "Tank",		View = 2},	--6
-	},
-
-	TileModelTemplates = {
-		Forest = {
-			defenseBonus	= 0.2,
-			Animation		= "Tile_Forest_01.png",
-		},
-		Plain = {
-			defenseBonus	= 0.1,
-			Animation		= "Tile_Plain_01.png",
-		},
-		Road = {
-			defenseBonus	= 0,
-			Animation		= "Tile_Road_01.png",
-		},
-		Sea = {
-			defenseBonus	= 0,
-			Animation		= "Tile_Sea_01.png",
-		},
-	},
-
-	TileViewTemplates = {
-		Forest = {
-			{Animation		= "Tile_Forest_01.png"},	-- Forest 1
-		},
-		Plain = {
-			{Animation		= "Tile_Plain_01.png"},		-- Plain 1
-		},
-		Road = {
-			{Animation		= "Tile_Road_01.png"},		-- Road 1
-		},
-		Sea = {
-			{Animation		= "Tile_Sea_01.png"},		-- Sea 1
-		},
-	},
 
 	MoveType = {
 		Infantry = {
@@ -1472,29 +1598,6 @@ local GameConstant = {
 				Road = nil,
 				Sea = 1,
 			},
-		},
-	},
-
-	Unit = {
-		Infantry = {
-			MoveType = "Infantry",
-			MoveRange = 3,
-			Animation = "Unit_Infantry_Idle_Orange_01.png"
-		},
-		Tank = {
-			MoveType = "Track",
-			MoveRange = 6,
-			Animation = "Unit_Tank_Idle_Orange_01.png"
-		},
-		Bomber = {
-			MoveType = "Flying",
-			MoveRange = 7,
-			Animation = "Unit_Bomber_Idle_Orange_01.png"
-		},
-		Battleship = {
-			MoveType = "Sailing",
-			MoveRange = 5,
-			Animation = "Unit_Battleship_Idle_Orange_01.png"
 		},
 	},
 }
