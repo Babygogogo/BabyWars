@@ -1,40 +1,80 @@
 
 local ModelUnit = class("ModelUnit")
 
-local UnitTemplates		= require("res.data.GameConstant").Unit
 local ComponentManager	= require("global.components.ComponentManager")
 local TypeChecker       = require("app.utilities.TypeChecker")
 
-local function createModel(unitData)
-    assert(type(unitData) == "table", "Unit--createModel() the param unitData is not a table.")
+local TEMPLATE_MODEL_UNIT_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
+local TEMPLATE_MODEL_UNITS    = require("res.data.GameConstant").Mapping_IdToTemplateModelUnit
 
-    local tiledID = unitData.tiledID
-    assert(TypeChecker.isTiledID(tiledID), "Unit--createModel() the param unitData hasn't a valid TiledID.")
-	
-    local gridIndex = unitData.gridIndex
-    assert(TypeChecker.isGridIndex(gridIndex), "Unit--createModel() the param unitData hasn't a valid GridIndex.")
-    
-	-- TODO: load data from unitData and handle errors
-	return {tiledID = tiledID, gridIndex = gridIndex}
+local function isOfSameTemplateModelUnitID(tiledID1, tiledID2)
+    if (not tiledID1) or (not tiledID2) then
+        return false
+    end
+
+    return TEMPLATE_MODEL_UNIT_IDS[tiledID1] == TEMPLATE_MODEL_UNIT_IDS[tiledID2]
+end
+
+local function toTemplateModelUnit(tiledID)
+    return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID]]
+end
+
+local function initWithTiledID(model, tiledID)
+    local template = toTemplateModelUnit(tiledID)
+    assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID.")
+
+    ComponentManager.unbindAllComponents(model)
+    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
+
+    if (template.specialProperties) then
+        for _, specialProperty in ipairs(template.specialProperties) do
+            if (not ComponentManager.getComponent(model, specialProperty.name)) then
+                ComponentManager.bindComponent(model, specialProperty.name)
+            end
+            ComponentManager.getComponent(model, specialProperty.name):load(specialProperty)
+        end
+    end
+end
+
+local function overwrite(model, param)
+    if (param.gridIndex) then
+        model:setGridIndex(param.gridIndex)
+    end
+
+    if (param.specialProperties) then
+        for _, specialProperty in ipairs(param.specialProperties) do
+            local component = ComponentManager.getComponent(model, specialProperty.name)
+            assert(component, "ModelUnit-overwrite() attempting to overwrite a component that the model hasn't bound with.")
+            component:load(specialProperty)
+        end
+    end
 end
 
 function ModelUnit:ctor(param)
     ComponentManager.bindComponent(self, "GridIndexable")
 
-    if (param) then self:load(param) end
+    if (param) then
+        self:load(param)
+    end
 
 	return self
 end
 
 function ModelUnit:load(param)
-	local model = createModel(param)
-    assert(model, "ModelUnit:load() failed.")
-	
-    self.m_TiledID = model.tiledID
-    self:setGridIndex(model.gridIndex)
-    
-    if (self.m_View) then self:initView() end
-		
+    if (param.tiledID) then
+        if (not isOfSameTemplateModelUnitID(param.tiledID, self.m_TiledID)) then
+            initWithTiledID(self, param.tiledID)
+        end
+
+        self.m_TiledID = param.tiledID
+    end
+
+    overwrite(self, param)
+
+    if (self.m_View) then
+        self:initView()
+    end
+
 	return self
 end
 

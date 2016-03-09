@@ -67,6 +67,11 @@ local function initWithIcon(view, icon)
     view:addChild(icon)
 end
 
+local function updateIconWithModelUnit(icon, unit)
+    icon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(unit:getTiledID()))
+end
+
 local function createLabel()
     local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
@@ -97,12 +102,24 @@ local function createHPInfo()
 
     info.m_Label = label
 
+    info.setHP = function(self, hp)
+        if (hp < 10) then
+            self.m_Label:setString("  " .. hp)
+        else
+            self.m_Label:setString(""   .. hp)
+        end
+    end
+
     return info
 end
 
 local function initWithHPInfo(view, info)
     view.m_HPInfo = info
     view:addChild(info)
+end
+
+local function updateHPInfoWithModelUnit(info, unit)
+    info:setHP(unit:getNormalizedCurrentHP())
 end
 
 local function createFuelInfo()
@@ -233,9 +250,8 @@ function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
 end
 
 function ViewUnitInfo:updateWithModelUnit(model)
-    local tiledID = model:getTiledID()
-    self.m_Icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
+    updateIconWithModelUnit(self.m_Icon, model)
+    updateHPInfoWithModelUnit(self.m_HPInfo, model)
 
     return self
 end

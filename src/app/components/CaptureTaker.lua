@@ -5,7 +5,6 @@ local MAX_CAPTURE_POINT = 20
 
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
 	"getCapturePoint",
@@ -52,7 +51,7 @@ end
 
 function CaptureTaker:setCapturePoint(point)
     self.m_CapturePoint = point
-    
+
     return self
 end
 
@@ -62,7 +61,7 @@ end
 
 function CaptureTaker:setCapturerID(id)
     self.m_CapturerID = id
-    
+
     return self
 end
 

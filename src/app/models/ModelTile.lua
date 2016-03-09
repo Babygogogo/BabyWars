@@ -1,8 +1,8 @@
 
 local ModelTile = class("ModelTile")
 
-local MODEL_TILE_IDS       = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
-local MODEL_TILE_TEMPLATES = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
+local TEMPLATE_MODEL_TILE_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
+local TEMPLATE_MODEL_TILES = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
 
 local ComponentManager = require("global.components.ComponentManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
@@ -12,15 +12,15 @@ local function isOfSameTemplateModelTileID(tiledID1, tiledID2)
         return false
     end
 
-    return MODEL_TILE_IDS[tiledID1] == MODEL_TILE_IDS[tiledID2]
+    return TEMPLATE_MODEL_TILE_IDS[tiledID1] == TEMPLATE_MODEL_TILE_IDS[tiledID2]
 end
 
-local function toModelTileTemplate(tiledID)
-	return MODEL_TILE_TEMPLATES[MODEL_TILE_IDS[tiledID]]
+local function toTemplateModelTile(tiledID)
+	return TEMPLATE_MODEL_TILES[TEMPLATE_MODEL_TILE_IDS[tiledID]]
 end
 
 local function initWithTiledID(model, tiledID)
-    local template = toModelTileTemplate(tiledID)
+    local template = toTemplateModelTile(tiledID)
     assert(template, "ModelTile-initWithTiledID() failed to get the model tile template with param tiledID.")
 
     ComponentManager.unbindAllComponents(model)
@@ -31,23 +31,25 @@ local function initWithTiledID(model, tiledID)
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
-            ComponentManager.bindComponent(model, specialProperty.name)
+            if (not ComponentManager.getComponent(model, specialProperty.name)) then
+                ComponentManager.bindComponent(model, specialProperty.name)
+            end
             ComponentManager.getComponent(model, specialProperty.name):load(specialProperty)
         end
     end
 end
 
-local function loadOverwrites(model, overwrites)
-    if (overwrites.gridIndex) then
-        model:setGridIndex(overwrites.gridIndex)
+local function overwrite(model, param)
+    if (param.gridIndex) then
+        model:setGridIndex(param.gridIndex)
     end
-    model.m_DefenseBonus = overwrites.defenseBonus or model.m_DefenseBonus
-    model.m_Description  = overwrites.description  or model.m_Description
+    model.m_DefenseBonus = param.defenseBonus or model.m_DefenseBonus
+    model.m_Description  = param.description  or model.m_Description
 
-    if (overwrites.specialProperties) then
-        for _, specialProperty in ipairs(overwrites.specialProperties) do
+    if (param.specialProperties) then
+        for _, specialProperty in ipairs(param.specialProperties) do
             local component = ComponentManager.getComponent(model, specialProperty.name)
-            assert(component, "ModelTile-loadOverwrites() attempting to overwrite a component that the model hasn't bound with.")
+            assert(component, "ModelTile-overwrite() attempting to overwrite a component that the model hasn't bound with.")
             component:load(specialProperty)
         end
     end
@@ -70,7 +72,7 @@ function ModelTile:load(param)
         self.m_TiledID = param.tiledID
     end
 
-    loadOverwrites(self, param)
+    overwrite(self, param)
 
     if (self.m_View) then
         self:initView()
