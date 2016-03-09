@@ -1310,6 +1310,14 @@ local GameConstant = {
                     currentFuel        = 99,
                     consumptionPerTurn = 0,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = nil,
+                    sideWeapon = {
+                        target     = {},
+                        baseDamage = {},
+                    },
+                },
             },
         },
 
@@ -1323,6 +1331,19 @@ local GameConstant = {
                     maxFuel            = 70,
                     currentFuel        = 70,
                     consumptionPerTurn = 0,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 3,
+                        currentAmmo = 3,
+                    },
+                    sideWeapon = {
+                        target     = {},
+                        baseDamage = {},
+                    },
                 },
             },
         },
@@ -1338,6 +1359,14 @@ local GameConstant = {
                     currentFuel        = 80,
                     consumptionPerTurn = 0,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = nil,
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
+                },
             },
         },
 
@@ -1352,7 +1381,20 @@ local GameConstant = {
                     currentFuel        = 70,
                     consumptionPerTurn = 0,
                 },
-            },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
+                },
+           },
         },
 
         {
@@ -1365,6 +1407,19 @@ local GameConstant = {
                     maxFuel            = 50,
                     currentFuel        = 50,
                     consumptionPerTurn = 0,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 8,
+                        currentAmmo = 8,
+                    },
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
                 },
             },
         },
@@ -1379,6 +1434,19 @@ local GameConstant = {
                     maxFuel            = 99,
                     currentFuel        = 99,
                     consumptionPerTurn = 0,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
                 },
             },
         },
@@ -1408,6 +1476,16 @@ local GameConstant = {
                     currentFuel        = 50,
                     consumptionPerTurn = 0,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = nil,
+                },
             },
         },
 
@@ -1421,6 +1499,16 @@ local GameConstant = {
                     maxFuel            = 50,
                     currentFuel        = 50,
                     consumptionPerTurn = 0,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 6,
+                        currentAmmo = 6,
+                    },
+                    sideWeapon = nil,
                 },
             },
         },
@@ -1436,6 +1524,16 @@ local GameConstant = {
                     currentFuel        = 60,
                     consumptionPerTurn = 0,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = nil,
+                },
             },
         },
 
@@ -1449,6 +1547,16 @@ local GameConstant = {
                     maxFuel            = 50,
                     currentFuel        = 50,
                     consumptionPerTurn = 0,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 6,
+                        currentAmmo = 6,
+                    },
+                    sideWeapon = nil,
                 },
             },
         },
@@ -1464,6 +1572,16 @@ local GameConstant = {
                     currentFuel        = 99,
                     consumptionPerTurn = 5,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = nil,
+                },
             },
         },
 
@@ -1478,6 +1596,16 @@ local GameConstant = {
                     currentFuel        = 99,
                     consumptionPerTurn = 5,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = nil,
+                },
             },
         },
 
@@ -1491,6 +1619,19 @@ local GameConstant = {
                     maxFuel            = 99,
                     currentFuel        = 99,
                     consumptionPerTurn = 2,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 6,
+                        currentAmmo = 6,
+                    },
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
                 },
             },
         },
@@ -1520,6 +1661,16 @@ local GameConstant = {
                     currentFuel        = 99,
                     consumptionPerTurn = 1,
                 },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = nil,
+                },
             },
         },
 
@@ -1533,6 +1684,19 @@ local GameConstant = {
                     maxFuel            = 99,
                     currentFuel        = 99,
                     consumptionPerTurn = 1,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 9,
+                        currentAmmo = 9,
+                    },
+                    sideWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                    },
                 },
             },
         },
@@ -1561,6 +1725,16 @@ local GameConstant = {
                     maxFuel            = 60,
                     currentFuel        = 60,
                     consumptionPerTurn = 1,
+                },
+                {
+                    name         = "AttackDoer",
+                    mainWeapon = {
+                        target      = {},
+                        baseDamage  = {},
+                        maxAmmo     = 6,
+                        currentAmmo = 6,
+                    },
+                    sideWeapon = nil,
                 },
             },
         },
