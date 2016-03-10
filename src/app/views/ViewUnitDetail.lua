@@ -16,6 +16,14 @@ local MOVEMENT_INFO_HEIGHT     = 40
 local MOVEMENT_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local MOVEMENT_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
 
+local FUEL_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local FUEL_INFO_HEIGHT     = 80
+local FUEL_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local FUEL_INFO_POSITION_Y = MOVEMENT_INFO_POSITION_Y - FUEL_INFO_HEIGHT
+
+--------------------------------------------------------------------------------
+-- Things about the screen background (the grey transparent mask).
+--------------------------------------------------------------------------------
 local function createScreenBackground()
     local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
     background:setContentSize(display.width, display.height)
@@ -29,6 +37,9 @@ local function initWithScreenBackground(view, background)
     view:addChild(background)
 end
 
+--------------------------------------------------------------------------------
+-- Things about the detail panel background.
+--------------------------------------------------------------------------------
 local function createDetailBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
@@ -47,6 +58,9 @@ local function initWithDetailBackground(view, background)
     view:addChild(background)
 end
 
+--------------------------------------------------------------------------------
+-- Things about the brief description for the unit.
+--------------------------------------------------------------------------------
 local function createDescription()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
     bottomLine:ignoreAnchorPointForPosition(true)
@@ -85,6 +99,9 @@ local function updateDescriptionWithModelUnit(description, unit)
     description:setDescription(unit:getDescription())
 end
 
+--------------------------------------------------------------------------------
+-- Things about the movement information for the unit.
+--------------------------------------------------------------------------------
 local function createMovementInfo()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
     bottomLine:ignoreAnchorPointForPosition(true)
@@ -123,6 +140,54 @@ local function updateMovementInfoWithModelUnit(info, unit)
     info:setMovement(unit:getMovementRange(), unit:getMovementType())
 end
 
+--------------------------------------------------------------------------------
+-- Things about the fuel information for the unit.
+--------------------------------------------------------------------------------
+local function createFuelInfo()
+    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    bottomLine:ignoreAnchorPointForPosition(true)
+        :setPosition(FUEL_INFO_POSITION_X + 5, FUEL_INFO_POSITION_Y)
+        :setContentSize(FUEL_INFO_WIDTH - 10, FUEL_INFO_HEIGHT)
+
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y)
+
+        :setDimensions(FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(bottomLine)
+        :addChild(label)
+
+    info.m_BottomLine = bottomLine
+    info.m_Label      = label
+    info.setFuel  = function(self, currentFuel, maxFuel, consumption, description)
+        self.m_Label:setString("Fuel:    Amount:   " .. currentFuel .. " / " .. maxFuel .. "   ConsumptionPerTurn:   " .. consumption
+                               .. "\n            " .. description)
+    end
+
+    return info
+end
+
+local function initWithFuelInfo(view, info)
+    view.m_FuelInfo = info
+    view:addChild(info)
+end
+
+local function updateFuelInfoWithModelUnit(info, unit)
+    info:setFuel(unit:getCurrentFuel(),
+                 unit:getMaxFuel(),
+                 unit:getFuelConsumptionPerTurn(),
+                 unit:getDescriptionOnOutOfFuel())
+end
+
+--------------------------------------------------------------------------------
+-- Things about the touch listener.
+--------------------------------------------------------------------------------
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
@@ -148,6 +213,7 @@ function ViewUnitDetail:ctor(param)
     initWithDetailBackground(self, createDetailBackground())
     initWithDescription(self, createDescription())
     initWithMovementInfo(self, createMovementInfo())
+    initWithFuelInfo(self, createFuelInfo())
     initWithTouchListener(self, createTouchListener(self))
 
     self:setCascadeOpacityEnabled(true)
@@ -174,6 +240,7 @@ end
 function ViewUnitDetail:updateWithModelUnit(unit)
     updateDescriptionWithModelUnit(self.m_Description, unit)
     updateMovementInfoWithModelUnit(self.m_MovementInfo, unit)
+    updateFuelInfoWithModelUnit(self.m_FuelInfo, unit)
 
     return self
 end

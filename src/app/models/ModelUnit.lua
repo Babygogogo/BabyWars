@@ -19,6 +19,9 @@ local function toTemplateModelUnit(tiledID)
     return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID]]
 end
 
+--------------------------------------------------------------------------------
+-- Things about fuel data.
+--------------------------------------------------------------------------------
 local function initWithFuelData(model, data)
     local fuelData = {}
 
@@ -29,6 +32,16 @@ local function initWithFuelData(model, data)
     fuelData.m_DestroyOnOutOfFuel     = data.destroyOnOutOfFuel
 
     model.m_FuelData = fuelData
+end
+
+local function overwriteWithFuelData(model, data)
+    assert(type(model.m_FuelData) == "table", "ModelUnit-overwriteWithFuelData() the model has no fuel data.")
+
+    if (not data) then
+        return
+    end
+
+    model.m_FuelData.m_CurrentFuel = data.currentFuel
 end
 
 local function initWithTiledID(model, tiledID)
@@ -59,6 +72,8 @@ local function overwrite(model, param)
     if (param.gridIndex) then
         model:setGridIndex(param.gridIndex)
     end
+
+    overwriteWithFuelData(model, param.fuel)
 
 --[[ These codes are commented out because the properties should not be overwrited.
     model.m_Description = param.description or model.m_Description
@@ -133,6 +148,18 @@ end
 
 function ModelUnit:getCurrentFuel()
     return self.m_FuelData.m_CurrentFuel
+end
+
+function ModelUnit:getMaxFuel()
+    return self.m_FuelData.m_MaxFuel
+end
+
+function ModelUnit:getFuelConsumptionPerTurn()
+    return self.m_FuelData.m_ConsumptionPerTurn
+end
+
+function ModelUnit:getDescriptionOnOutOfFuel()
+    return self.m_FuelData.m_DescriptionOnOutOfFuel
 end
 
 return ModelUnit
