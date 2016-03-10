@@ -26,6 +26,9 @@ local function initWithTiledID(model, tiledID)
     ComponentManager.unbindAllComponents(model)
     ComponentManager.bindComponent(model, "GridIndexable", "HPOwner", "FuelOwner")
 
+    model.m_MovementRange = template.movementRange
+    model.m_MovementType  = template.movementType
+
     model.m_Description = template.description
 
     if (template.specialProperties) then
@@ -43,8 +46,9 @@ local function overwrite(model, param)
         model:setGridIndex(param.gridIndex)
     end
 
+--[[ These codes are commented out because the properties should not be overwrited.
     model.m_Description = param.description or model.m_Description
-
+]]
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
             local component = ComponentManager.getComponent(model, specialProperty.name)
@@ -103,6 +107,14 @@ end
 
 function ModelUnit:getDescription()
     return self.m_Description
+end
+
+function ModelUnit:getMovementRange()
+    return self.m_MovementRange
+end
+
+function ModelUnit:getMovementType()
+    return self.m_MovementType
 end
 
 return ModelUnit

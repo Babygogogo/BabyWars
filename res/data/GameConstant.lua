@@ -1301,6 +1301,9 @@ local GameConstant = {
     Mapping_IdToTemplateModelUnit = {
         {
             -- TemplateModelUnitID 1, infantry
+            movementRange = 3,
+            movementType  = "Infantry",
+            
             description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
 
             specialProperties = {
@@ -1323,6 +1326,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 2, mech
+            movementRange = 2,
+            movementType  = "Mech",
+
             description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
 
             specialProperties = {
@@ -1350,6 +1356,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 3, recon
+            movementRange = 8,
+            movementType  = "Tires",
+
             description = "Recon units have high movement range and are strong against infantry units.",
 
             specialProperties = {
@@ -1372,6 +1381,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 4, tank
+            movementRange = 6,
+            movementType  = "Treads",
+
             description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
 
             specialProperties = {
@@ -1399,6 +1411,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 5, md-tank
+            movementRange = 5,
+            movementType  = "Treads",
+
             description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
 
             specialProperties = {
@@ -1426,7 +1441,10 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 6, neotank
-            description = "These are new weapons developed recently. They are more powerful than Md tanks.",
+            movementRange = 6,
+            movementType  = "Treads",
+
+            description = "Neotank units are new weapons developed recently. They are more powerful than Md tanks.",
 
             specialProperties = {
                 {
@@ -1453,6 +1471,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 7, apc
+            movementRange = 6,
+            movementType  = "Treads",
+
             description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
 
             specialProperties = {
@@ -1467,6 +1488,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 8, artillery
+            movementRange = 5,
+            movementType  = "Treads",
+
             description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
 
             specialProperties = {
@@ -1491,6 +1515,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 9, rockets
+            movementRange = 5,
+            movementType  = "Tires",
+
             description = "Rocket units are valuable, because they can fire on both land and naval units.",
 
             specialProperties = {
@@ -1515,6 +1542,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 10, anti-air
+            movementRange = 6,
+            movementType  = "Treads",
+
             description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
 
             specialProperties = {
@@ -1539,6 +1569,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 11, missiles
+            movementRange = 5,
+            movementType  = "Tires",
+
             description = "Missile units are essential in defending against air units. Their vision range is large.",
 
             specialProperties = {
@@ -1563,6 +1596,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 12, fighter
+            movementRange = 9,
+            movementType  = "Air",
+
             description = "Fighter units are strong vs. other air units. They also have the highest movements.",
 
             specialProperties = {
@@ -1587,6 +1623,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 13, bomber
+            movementRange = 7,
+            movementType  = "Air",
+
             description = "Bomber units can fire on ground and naval units with a high destructive force.",
 
             specialProperties = {
@@ -1611,6 +1650,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 14, b-copter
+            movementRange = 6,
+            movementType  = "Air",
+
             description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
 
             specialProperties = {
@@ -1638,6 +1680,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 15, t-copter
+            movementRange = 6,
+            movementType  = "Air",
+
             description = "T copters can transport both infantry and mech units.",
 
             specialProperties = {
@@ -1652,6 +1697,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 16, battleship
+            movementRange = 5,
+            movementType  = "Ship",
+
             description = "B(Battle) ships have a larger attack range than even rocket units.",
 
             specialProperties = {
@@ -1676,6 +1724,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 17, cruiser
+            movementRange = 6,
+            movementType  = "Ship",
+
             description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
 
             specialProperties = {
@@ -1703,6 +1754,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 18, lander
+            movementRange = 6,
+            movementType  = "Lander",
+
             description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
 
             specialProperties = {
@@ -1717,6 +1771,9 @@ local GameConstant = {
 
         {
             -- TemplateModelUnitID 19, submarine
+            movementRange = 5,
+            movementType  = "Ship",
+
             description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
 
             specialProperties = {

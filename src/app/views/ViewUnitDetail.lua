@@ -1,10 +1,20 @@
 
 local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 
-local BACKGROUND_SIZE_WIDTH  = display.width * 0.7
-local BACKGROUND_SIZE_HEIGHT = display.height * 0.7
-local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_SIZE_WIDTH) / 2
-local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_SIZE_HEIGHT) / 2
+local BACKGROUND_WIDTH  = display.width * 0.7
+local BACKGROUND_HEIGHT = display.height * 0.7
+local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
+local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
+
+local DESCRIPTION_WIDTH      = BACKGROUND_WIDTH - 10
+local DESCRIPTION_HEIGHT     = 80
+local DESCRIPTION_POSITION_X = BACKGROUND_POSITION_X + 5
+local DESCRIPTION_POSITION_Y = BACKGROUND_POSITION_Y + BACKGROUND_HEIGHT - DESCRIPTION_HEIGHT - 8
+
+local MOVEMENT_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local MOVEMENT_INFO_HEIGHT     = 40
+local MOVEMENT_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local MOVEMENT_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
 
 local function createScreenBackground()
     local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
@@ -24,7 +34,7 @@ local function createDetailBackground()
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
-        :setContentSize(BACKGROUND_SIZE_WIDTH, BACKGROUND_SIZE_HEIGHT)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
     background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
     background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
@@ -37,22 +47,80 @@ local function initWithDetailBackground(view, background)
     view:addChild(background)
 end
 
-local function createLabel()
+local function createDescription()
+    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    bottomLine:ignoreAnchorPointForPosition(true)
+        :setPosition(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y)
+        :setContentSize(DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
+
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     label:ignoreAnchorPointForPosition(true)
-        :setPosition(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6)
+        :setPosition(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y)
 
-        :setDimensions(BACKGROUND_SIZE_WIDTH - 10, BACKGROUND_SIZE_HEIGHT - 14)
+        :setDimensions(DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
 
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
 
-    return label
+    local description = cc.Node:create()
+    description:ignoreAnchorPointForPosition(true)
+        :addChild(bottomLine)
+        :addChild(label)
+
+    description.m_BottomLine   = bottomLine
+    description.m_Label        = label
+    description.setDescription = function(self, description)
+        self.m_Label:setString(description)
+    end
+
+    return description
 end
 
-local function initWithLabel(view, label)
-    view.m_Label = label
-    view:addChild(label)
+local function initWithDescription(view, description)
+    view.m_Description = description
+    view:addChild(description)
+end
+
+local function updateDescriptionWithModelUnit(description, unit)
+    description:setDescription(unit:getDescription())
+end
+
+local function createMovementInfo()
+    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    bottomLine:ignoreAnchorPointForPosition(true)
+        :setPosition(MOVEMENT_INFO_POSITION_X + 5, MOVEMENT_INFO_POSITION_Y)
+        :setContentSize(MOVEMENT_INFO_WIDTH - 10, MOVEMENT_INFO_HEIGHT)
+
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(MOVEMENT_INFO_POSITION_X, MOVEMENT_INFO_POSITION_Y)
+
+        :setDimensions(MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(bottomLine)
+        :addChild(label)
+
+    info.m_BottomLine = bottomLine
+    info.m_Label      = label
+    info.setMovement  = function(self, range, moveType)
+        self.m_Label:setString("Movement:    " .. "Range: " .. range .. "    Type: " .. moveType)
+    end
+
+    return info
+end
+
+local function initWithMovementInfo(view, info)
+    view.m_MovementInfo = info
+    view:addChild(info)
+end
+
+local function updateMovementInfoWithModelUnit(info, unit)
+    info:setMovement(unit:getMovementRange(), unit:getMovementType())
 end
 
 local function createTouchListener(view)
@@ -78,7 +146,8 @@ end
 function ViewUnitDetail:ctor(param)
     initWithScreenBackground(self, createScreenBackground())
     initWithDetailBackground(self, createDetailBackground())
-    initWithLabel(self, createLabel())
+    initWithDescription(self, createDescription())
+    initWithMovementInfo(self, createMovementInfo())
     initWithTouchListener(self, createTouchListener(self))
 
     self:setCascadeOpacityEnabled(true)
@@ -103,7 +172,8 @@ function ViewUnitDetail.createInstance(param)
 end
 
 function ViewUnitDetail:updateWithModelUnit(unit)
-    self.m_Label:setString(unit:getDescription())
+    updateDescriptionWithModelUnit(self.m_Description, unit)
+    updateMovementInfoWithModelUnit(self.m_MovementInfo, unit)
 
     return self
 end
