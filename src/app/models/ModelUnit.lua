@@ -19,15 +19,29 @@ local function toTemplateModelUnit(tiledID)
     return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID]]
 end
 
+local function initWithFuelData(model, data)
+    local fuelData = {}
+
+    fuelData.m_MaxFuel                = data.maxFuel
+    fuelData.m_CurrentFuel            = data.maxFuel
+    fuelData.m_ConsumptionPerTurn     = data.consumptionPerTurn
+    fuelData.m_DescriptionOnOutOfFuel = data.descriptionOnOutOfFuel
+    fuelData.m_DestroyOnOutOfFuel     = data.destroyOnOutOfFuel
+
+    model.m_FuelData = fuelData
+end
+
 local function initWithTiledID(model, tiledID)
     local template = toTemplateModelUnit(tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID.")
 
     ComponentManager.unbindAllComponents(model)
-    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner", "FuelOwner")
+    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
 
     model.m_MovementRange = template.movementRange
     model.m_MovementType  = template.movementType
+
+    initWithFuelData(model, template.fuel)
 
     model.m_Description = template.description
 
@@ -115,6 +129,10 @@ end
 
 function ModelUnit:getMovementType()
     return self.m_MovementType
+end
+
+function ModelUnit:getCurrentFuel()
+    return self.m_FuelData.m_CurrentFuel
 end
 
 return ModelUnit

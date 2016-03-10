@@ -1303,16 +1303,17 @@ local GameConstant = {
             -- TemplateModelUnitID 1, infantry
             movementRange = 3,
             movementType  = "Infantry",
-            
+
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = nil,
@@ -1329,15 +1330,16 @@ local GameConstant = {
             movementRange = 2,
             movementType  = "Mech",
 
+            fuel = {
+                maxFuel                = 70,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 70,
-                    currentFuel        = 70,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1359,15 +1361,16 @@ local GameConstant = {
             movementRange = 8,
             movementType  = "Tires",
 
+            fuel = {
+                maxFuel                = 80,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Recon units have high movement range and are strong against infantry units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 80,
-                    currentFuel        = 80,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = nil,
@@ -1384,15 +1387,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 70,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 70,
-                    currentFuel        = 70,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1414,15 +1418,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 50,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 50,
-                    currentFuel        = 50,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1444,15 +1449,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Neotank units are new weapons developed recently. They are more powerful than Md tanks.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1474,15 +1480,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 70,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 70,
-                    currentFuel        = 70,
-                    consumptionPerTurn = 0,
-                },
             },
         },
 
@@ -1491,15 +1498,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 50,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 50,
-                    currentFuel        = 50,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1518,15 +1526,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Tires",
 
+            fuel = {
+                maxFuel                = 50,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Rocket units are valuable, because they can fire on both land and naval units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 50,
-                    currentFuel        = 50,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1545,15 +1554,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Treads",
 
+            fuel = {
+                maxFuel                = 60,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 60,
-                    currentFuel        = 60,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1572,15 +1582,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Tires",
 
+            fuel = {
+                maxFuel                = 50,
+                consumptionPerTurn     = 0,
+                descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+                destroyOnOutOfFuel     = false,
+            },
+
             description = "Missile units are essential in defending against air units. Their vision range is large.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 50,
-                    currentFuel        = 50,
-                    consumptionPerTurn = 0,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1599,15 +1610,16 @@ local GameConstant = {
             movementRange = 9,
             movementType  = "Air",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 5,
+                descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "Fighter units are strong vs. other air units. They also have the highest movements.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 5,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1626,15 +1638,16 @@ local GameConstant = {
             movementRange = 7,
             movementType  = "Air",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 5,
+                descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "Bomber units can fire on ground and naval units with a high destructive force.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 5,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1653,15 +1666,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Air",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 2,
+                descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 2,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1683,15 +1697,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Air",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 2,
+                descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "T copters can transport both infantry and mech units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 2,
-                },
             },
         },
 
@@ -1700,15 +1715,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Ship",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 1,
+                descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "B(Battle) ships have a larger attack range than even rocket units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 1,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1727,15 +1743,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Ship",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 1,
+                descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 1,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1757,15 +1774,16 @@ local GameConstant = {
             movementRange = 6,
             movementType  = "Lander",
 
+            fuel = {
+                maxFuel                = 99,
+                consumptionPerTurn     = 1,
+                descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 99,
-                    currentFuel        = 99,
-                    consumptionPerTurn = 1,
-                },
             },
         },
 
@@ -1774,15 +1792,16 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Ship",
 
+            fuel = {
+                maxFuel                = 60,
+                consumptionPerTurn     = 1,
+                descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+                destroyOnOutOfFuel     = true,
+            },
+
             description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
 
             specialProperties = {
-                {
-                    name               = "FuelOwner",
-                    maxFuel            = 60,
-                    currentFuel        = 60,
-                    consumptionPerTurn = 1,
-                },
                 {
                     name         = "AttackDoer",
                     mainWeapon = {
@@ -1796,41 +1815,6 @@ local GameConstant = {
             },
         },
     },
-
-	MoveType = {
-		Infantry = {
-			Cost = {
-				Forest = 1,
-				Plain = 1,
-				Road = 1,
-				Sea = nil,
-			},
-		},
-		Track = {
-			Cost = {
-				Forest = 2,
-				Plain = 1,
-				Road = 1,
-				Sea = nil,
-			},
-		},
-		Flying = {
-			Cost = {
-				Forest = 1,
-				Plain = 1,
-				Road = 1,
-				Sea = 1,
-			},
-		},
-		Sailing = {
-			Cost = {
-				Forest = nil,
-				Plain = nil,
-				Road = nil,
-				Sea = 1,
-			},
-		},
-	},
 }
 
 return GameConstant
