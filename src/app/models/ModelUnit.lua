@@ -53,6 +53,7 @@ local function initWithTiledID(model, tiledID)
 
     model.m_MovementRange = template.movementRange
     model.m_MovementType  = template.movementType
+    model.m_Vision        = template.vision
 
     initWithFuelData(model, template.fuel)
 
@@ -144,6 +145,10 @@ end
 
 function ModelUnit:getMovementType()
     return self.m_MovementType
+end
+
+function ModelUnit:getVision()
+    return self.m_Vision
 end
 
 function ModelUnit:getCurrentFuel()

@@ -201,8 +201,8 @@ local function initWithAmmoInfo(view, info)
 end
 
 local function updateAmmoInfoWithModelUnit(info, unit)
-    if (unit.getMainWeaponCurrentAmmo) then
-        local ammo = unit:getMainWeaponCurrentAmmo()
+    if (unit.getPrimaryWeaponCurrentAmmo) then
+        local ammo = unit:getPrimaryWeaponCurrentAmmo()
         if (ammo) then
             info:setAmmo(ammo)
                 :setVisible(true)

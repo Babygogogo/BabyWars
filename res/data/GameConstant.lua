@@ -1304,6 +1304,8 @@ local GameConstant = {
             movementRange = 3,
             movementType  = "Infantry",
 
+            vision        = 2,
+
             fuel = {
                 maxFuel                = 99,
                 consumptionPerTurn     = 0,
@@ -1315,11 +1317,11 @@ local GameConstant = {
 
             specialProperties = {
                 {
-                    name         = "AttackDoer",
-                    mainWeapon = nil,
-                    sideWeapon = {
-                        target     = {},
-                        baseDamage = {},
+                    name            = "AttackDoer",
+                    primaryWeapon   = nil,
+                    secondaryWeapon = {
+                        target      = {},
+                        baseDamage  = {},
                     },
                 },
             },
@@ -1329,6 +1331,8 @@ local GameConstant = {
             -- TemplateModelUnitID 2, mech
             movementRange = 2,
             movementType  = "Mech",
+
+            vision        = 2,
 
             fuel = {
                 maxFuel                = 70,
@@ -1342,13 +1346,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 3,
                         currentAmmo = 3,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target     = {},
                         baseDamage = {},
                     },
@@ -1360,6 +1364,8 @@ local GameConstant = {
             -- TemplateModelUnitID 3, recon
             movementRange = 8,
             movementType  = "Tires",
+
+            vision        = 5,
 
             fuel = {
                 maxFuel                = 80,
@@ -1373,8 +1379,8 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = nil,
-                    sideWeapon = {
+                    primaryWeapon = nil,
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1386,6 +1392,8 @@ local GameConstant = {
             -- TemplateModelUnitID 4, tank
             movementRange = 6,
             movementType  = "Treads",
+
+            vision        = 3,
 
             fuel = {
                 maxFuel                = 70,
@@ -1399,13 +1407,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1417,6 +1425,8 @@ local GameConstant = {
             -- TemplateModelUnitID 5, md-tank
             movementRange = 5,
             movementType  = "Treads",
+
+            vision        = 1,
 
             fuel = {
                 maxFuel                = 50,
@@ -1430,13 +1440,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 8,
                         currentAmmo = 8,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1448,6 +1458,8 @@ local GameConstant = {
             -- TemplateModelUnitID 6, neotank
             movementRange = 6,
             movementType  = "Treads",
+
+            vision        = 1,
 
             fuel = {
                 maxFuel                = 99,
@@ -1461,13 +1473,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1479,6 +1491,8 @@ local GameConstant = {
             -- TemplateModelUnitID 7, apc
             movementRange = 6,
             movementType  = "Treads",
+
+            vision        = 1,
 
             fuel = {
                 maxFuel                = 70,
@@ -1498,6 +1512,8 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Treads",
 
+            vision        = 1,
+
             fuel = {
                 maxFuel                = 50,
                 consumptionPerTurn     = 0,
@@ -1510,13 +1526,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1525,6 +1541,8 @@ local GameConstant = {
             -- TemplateModelUnitID 9, rockets
             movementRange = 5,
             movementType  = "Tires",
+
+            vision        = 1,
 
             fuel = {
                 maxFuel                = 50,
@@ -1538,13 +1556,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 6,
                         currentAmmo = 6,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1553,6 +1571,8 @@ local GameConstant = {
             -- TemplateModelUnitID 10, anti-air
             movementRange = 6,
             movementType  = "Treads",
+
+            vision        = 2,
 
             fuel = {
                 maxFuel                = 60,
@@ -1566,13 +1586,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1581,6 +1601,8 @@ local GameConstant = {
             -- TemplateModelUnitID 11, missiles
             movementRange = 5,
             movementType  = "Tires",
+
+            vision        = 5,
 
             fuel = {
                 maxFuel                = 50,
@@ -1594,13 +1616,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 6,
                         currentAmmo = 6,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1609,6 +1631,8 @@ local GameConstant = {
             -- TemplateModelUnitID 12, fighter
             movementRange = 9,
             movementType  = "Air",
+
+            vision        = 2,
 
             fuel = {
                 maxFuel                = 99,
@@ -1622,13 +1646,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1637,6 +1661,8 @@ local GameConstant = {
             -- TemplateModelUnitID 13, bomber
             movementRange = 7,
             movementType  = "Air",
+
+            vision        = 2,
 
             fuel = {
                 maxFuel                = 99,
@@ -1650,13 +1676,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1665,6 +1691,8 @@ local GameConstant = {
             -- TemplateModelUnitID 14, b-copter
             movementRange = 6,
             movementType  = "Air",
+
+            vision        = 3,
 
             fuel = {
                 maxFuel                = 99,
@@ -1678,13 +1706,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 6,
                         currentAmmo = 6,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1696,6 +1724,8 @@ local GameConstant = {
             -- TemplateModelUnitID 15, t-copter
             movementRange = 6,
             movementType  = "Air",
+
+            vision        = 2,
 
             fuel = {
                 maxFuel                = 99,
@@ -1715,6 +1745,8 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Ship",
 
+            vision        = 2,
+
             fuel = {
                 maxFuel                = 99,
                 consumptionPerTurn     = 1,
@@ -1727,13 +1759,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },
@@ -1742,6 +1774,8 @@ local GameConstant = {
             -- TemplateModelUnitID 17, cruiser
             movementRange = 6,
             movementType  = "Ship",
+
+            vision        = 3,
 
             fuel = {
                 maxFuel                = 99,
@@ -1755,13 +1789,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 9,
                         currentAmmo = 9,
                     },
-                    sideWeapon = {
+                    secondaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                     },
@@ -1773,6 +1807,8 @@ local GameConstant = {
             -- TemplateModelUnitID 18, lander
             movementRange = 6,
             movementType  = "Lander",
+
+            vision        = 1,
 
             fuel = {
                 maxFuel                = 99,
@@ -1792,6 +1828,8 @@ local GameConstant = {
             movementRange = 5,
             movementType  = "Ship",
 
+            vision        = 5,
+
             fuel = {
                 maxFuel                = 60,
                 consumptionPerTurn     = 1,
@@ -1804,13 +1842,13 @@ local GameConstant = {
             specialProperties = {
                 {
                     name         = "AttackDoer",
-                    mainWeapon = {
+                    primaryWeapon = {
                         target      = {},
                         baseDamage  = {},
                         maxAmmo     = 6,
                         currentAmmo = 6,
                     },
-                    sideWeapon = nil,
+                    secondaryWeapon = nil,
                 },
             },
         },

@@ -5,16 +5,16 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
-    "getMainWeaponCurrentAmmo",
+    "getPrimaryWeaponCurrentAmmo",
 }
 
-local function initMainWeapon(doer, param)
-    if (doer.m_MainWeapon) then
-        doer.m_MainWeapon.m_CurrentAmmo = param.currentAmmo
+local function initPrimaryWeapon(doer, param)
+    if (doer.m_PrimaryWeapon) then
+        doer.m_PrimaryWeapon.m_CurrentAmmo = param.currentAmmo
     else
-        doer.m_MainWeapon = {}
+        doer.m_PrimaryWeapon = {}
 
-        local weapon = doer.m_MainWeapon
+        local weapon = doer.m_PrimaryWeapon
         weapon.m_MaxAmmo     = param.maxAmmo
         weapon.m_CurrentAmmo = param.currentAmmo
         weapon.m_Target      = param.target
@@ -22,11 +22,11 @@ local function initMainWeapon(doer, param)
     end
 end
 
-local function initSideWeapon(doer, param)
-    if (not doer.m_SideWeapon) then
-        doer.m_SideWeapon = {}
+local function initSecondaryWeapon(doer, param)
+    if (not doer.m_SecondaryWeapon) then
+        doer.m_SecondaryWeapon = {}
 
-        local weapon = doer.m_SideWeapon
+        local weapon = doer.m_SecondaryWeapon
         weapon.m_Target     = param.target
         weapon.m_BaseDamage = param.baseDamage
     end
@@ -41,11 +41,11 @@ function AttackDoer:ctor(param)
 end
 
 function AttackDoer:load(param)
-    if (param.mainWeapon) then
-        initMainWeapon(self, param.mainWeapon)
+    if (param.primaryWeapon) then
+        initPrimaryWeapon(self, param.primaryWeapon)
     end
-    if (param.sideWeapon) then
-        initSideWeapon(self, param.sideWeapon)
+    if (param.secondaryWeapon) then
+        initSecondaryWeapon(self, param.secondaryWeapon)
     end
 
     return self
@@ -65,9 +65,9 @@ function AttackDoer:unbind(target)
     self.m_Target = nil
 end
 
-function AttackDoer:getMainWeaponCurrentAmmo()
-    if (self.m_MainWeapon) then
-        return self.m_MainWeapon.m_CurrentAmmo
+function AttackDoer:getPrimaryWeaponCurrentAmmo()
+    if (self.m_PrimaryWeapon) then
+        return self.m_PrimaryWeapon.m_CurrentAmmo
     else
         return nil
     end

@@ -1,8 +1,8 @@
 
 local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 
-local BACKGROUND_WIDTH  = display.width * 0.7
-local BACKGROUND_HEIGHT = display.height * 0.7
+local BACKGROUND_WIDTH  = display.width * 0.8
+local BACKGROUND_HEIGHT = display.height * 0.8
 local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
 
@@ -15,6 +15,11 @@ local MOVEMENT_INFO_WIDTH      = BACKGROUND_WIDTH - 10
 local MOVEMENT_INFO_HEIGHT     = 40
 local MOVEMENT_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local MOVEMENT_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
+
+local VISION_INFO_WIDTH      = 300
+local VISION_INFO_HEIGHT     = 40
+local VISION_INFO_POSITION_X = BACKGROUND_POSITION_X + BACKGROUND_WIDTH - VISION_INFO_WIDTH
+local VISION_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
 
 local FUEL_INFO_WIDTH      = BACKGROUND_WIDTH - 10
 local FUEL_INFO_HEIGHT     = 80
@@ -125,7 +130,7 @@ local function createMovementInfo()
     info.m_BottomLine = bottomLine
     info.m_Label      = label
     info.setMovement  = function(self, range, moveType)
-        self.m_Label:setString("Movement:    " .. "Range: " .. range .. "    Type: " .. moveType)
+        self.m_Label:setString("Movement Range:  " .. range .. "(" .. moveType .. ")")
     end
 
     return info
@@ -138,6 +143,40 @@ end
 
 local function updateMovementInfoWithModelUnit(info, unit)
     info:setMovement(unit:getMovementRange(), unit:getMovementType())
+end
+
+--------------------------------------------------------------------------------
+-- Things about the vision information for the unit.
+--------------------------------------------------------------------------------
+local function createVisionInfo()
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(VISION_INFO_POSITION_X, VISION_INFO_POSITION_Y)
+
+        :setDimensions(VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(label)
+
+    info.m_Label = label
+    info.setVision = function(self, vision)
+        self.m_Label:setString("Vision:  " .. vision)
+    end
+
+    return info
+end
+
+local function initWithVisionInfo(view, info)
+    view.m_VisionInfo = info
+    view:addChild(info)
+end
+
+local function updateVisionInfoWithModelUnit(info, unit)
+    info:setVision(unit:getVision())
 end
 
 --------------------------------------------------------------------------------
@@ -166,7 +205,7 @@ local function createFuelInfo()
     info.m_BottomLine = bottomLine
     info.m_Label      = label
     info.setFuel  = function(self, currentFuel, maxFuel, consumption, description)
-        self.m_Label:setString("Fuel:    Amount:   " .. currentFuel .. " / " .. maxFuel .. "   ConsumptionPerTurn:   " .. consumption
+        self.m_Label:setString("Fuel:    Amount:  " .. currentFuel .. " / " .. maxFuel .. "    ConsumptionPerTurn:  " .. consumption
                                .. "\n            " .. description)
     end
 
@@ -208,11 +247,15 @@ local function initWithTouchListener(view, touchListener)
     view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
 end
 
+--------------------------------------------------------------------------------
+-- Things about construction.
+--------------------------------------------------------------------------------
 function ViewUnitDetail:ctor(param)
     initWithScreenBackground(self, createScreenBackground())
     initWithDetailBackground(self, createDetailBackground())
     initWithDescription(self, createDescription())
     initWithMovementInfo(self, createMovementInfo())
+    initWithVisionInfo(self, createVisionInfo())
     initWithFuelInfo(self, createFuelInfo())
     initWithTouchListener(self, createTouchListener(self))
 
@@ -240,6 +283,7 @@ end
 function ViewUnitDetail:updateWithModelUnit(unit)
     updateDescriptionWithModelUnit(self.m_Description, unit)
     updateMovementInfoWithModelUnit(self.m_MovementInfo, unit)
+    updateVisionInfoWithModelUnit(self.m_VisionInfo, unit)
     updateFuelInfoWithModelUnit(self.m_FuelInfo, unit)
 
     return self
