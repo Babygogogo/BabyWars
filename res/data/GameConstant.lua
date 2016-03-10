@@ -1320,8 +1320,7 @@ local GameConstant = {
                     name            = "AttackDoer",
                     primaryWeapon   = nil,
                     secondaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {55, 45, 12, 5, 1, 1, 14, 15, 25, 5, 26, false, false, 7, 30, false, false, false, false},
                     },
                 },
             },
@@ -1348,12 +1347,10 @@ local GameConstant = {
                     name         = "AttackDoer",
                     primaryWeapon = {
                         target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {65, 55, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, 9, 35, false, false, false, false},
                         maxAmmo     = 3,
-                        currentAmmo = 3,
                     },
                     secondaryWeapon = {
-                        target     = {},
                         baseDamage = {},
                     },
                 },
@@ -1381,8 +1378,7 @@ local GameConstant = {
                     name         = "AttackDoer",
                     primaryWeapon = nil,
                     secondaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {70, 65, 35, 6, 1, 1, 45, 45, 55, 4, 28, false, false, 12, 35, false, false, false, false},
                     },
                 },
             },
@@ -1408,13 +1404,10 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {75, 70, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, 10, 40, 1, 5, 10, 1},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = {
-                        target      = {},
                         baseDamage  = {},
                     },
                 },
@@ -1441,13 +1434,10 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {105, 95, 105, 85, 55, 45, 105, 105, 105, 105, 105, false, false, 12, 45, 10, 45, 35, 10},
                         maxAmmo     = 8,
-                        currentAmmo = 8,
                     },
                     secondaryWeapon = {
-                        target      = {},
                         baseDamage  = {},
                     },
                 },
@@ -1474,13 +1464,10 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {125, 115, 125, 105, 75, 55, 125, 115, 125, 115, 125, false, false, 22, 55, 15, 50, 50, 15},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = {
-                        target      = {},
                         baseDamage  = {},
                     },
                 },
@@ -1527,10 +1514,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {90, 85, 80, 70, 45, 40, 70, 75, 80, 75, 80, false, false, false, false, 40, 65, 55, 60},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1557,10 +1542,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {95, 90, 90, 80, 55, 50, 80, 80, 85, 85, 90, false, false, false, false, 55, 85, 60, 85},
                         maxAmmo     = 6,
-                        currentAmmo = 6,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1587,10 +1570,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {105, 105, 60, 25, 10, 5, 50, 50, 55, 45, 55, 65, 75, 120, 120, false, false, false, false},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1617,10 +1598,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, 100, 100, 120, 120, false, false, false, false},
                         maxAmmo     = 6,
-                        currentAmmo = 6,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1647,10 +1626,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, 55, 100, 100, 100, false, false, false, false},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1677,10 +1654,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {110, 110, 105, 105, 95, 90, 105, 105, 105, 95, 105, false, false, false, false, 75, 85, 95, 95},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1707,10 +1682,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {75, 75, 55, 55, 25, 20, 60, 65, 65, 25, 65, false, false, 65, 95, 25, 55, 25, 25},
                         maxAmmo     = 6,
-                        currentAmmo = 6,
                     },
                     secondaryWeapon = {
                         target      = {},
@@ -1760,10 +1733,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {95, 90, 90, 80, 55, 50, 80, 80, 85, 85, 90, false, false, false, false, 50, 95, 95, 95},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = nil,
                 },
@@ -1790,10 +1761,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, 55, 65, 115, 115, false, false, false, 90},
                         maxAmmo     = 9,
-                        currentAmmo = 9,
                     },
                     secondaryWeapon = {
                         target      = {},
@@ -1843,10 +1812,8 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 55, 25, 95, 55},
                         maxAmmo     = 6,
-                        currentAmmo = 6,
                     },
                     secondaryWeapon = nil,
                 },

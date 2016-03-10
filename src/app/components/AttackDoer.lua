@@ -16,8 +16,7 @@ local function initPrimaryWeapon(doer, param)
 
         local weapon = doer.m_PrimaryWeapon
         weapon.m_MaxAmmo     = param.maxAmmo
-        weapon.m_CurrentAmmo = param.currentAmmo
-        weapon.m_Target      = param.target
+        weapon.m_CurrentAmmo = param.maxAmmo
         weapon.m_BaseDamage  = param.baseDamage
     end
 end
@@ -27,7 +26,6 @@ local function initSecondaryWeapon(doer, param)
         doer.m_SecondaryWeapon = {}
 
         local weapon = doer.m_SecondaryWeapon
-        weapon.m_Target     = param.target
         weapon.m_BaseDamage = param.baseDamage
     end
 end
