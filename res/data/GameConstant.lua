@@ -3,65 +3,29 @@ local GameConstant = {
 	GridSize = {width = 80, height = 80},
 
     Mapping_TiledIdToTemplateModelIdTileOrUnit = {
-        -- TiledID 0 + 1; TemplateModelIdTile starts from '1'
-        1,   1,   1,   1,   2,   2,   2,   2,   2,   3,
-
-        -- TiledID 10 + 1
-        3,   3,   3,   3,   4,   4,   4,   4,   4,   5,
-
-        -- TiledID 20 + 1
-        5,   5,   5,   5,   6,   6,   6,   6,   7,   7,
-
-        -- TiledID 30 + 1
-        7,   7,   7,   7,   7,   7,   7,   7,   7,   8,
-
-        -- TiledID 40 + 1
-        9,   9,   9,   9,   9,   9,   9,   9,   9,   9,
-
-        -- TiledID 50 + 1
-        10,  10,  10,  10,  10,  10,  10,  10,  10,  10,
-
-        -- TiledID 60 + 1
-        10,  10,  10,  10,  10,  10,  10,  10,  10,  10,
-
-        -- TiledID 70 + 1
-        10,  10,  10,  10,  10,  10,  10,  10,  10,  11,
-
-        -- TiledID 80 + 1
-        12,  12,  12,  12,  12,  12,  12,  12,  12,  12,
-
-        -- TiledID 90 + 1
-        12,  12,  12,  12,  12,  12,  12,  12,  12,  12,
+        -- TiledID 0 + 1
+        "hq",          "hq",          "hq",          "hq",          "city",        "city",        "city",        "city",        "city",        "base",
+        "base",        "base",        "base",        "base",        "airport",     "airport",     "airport",     "airport",     "airport",     "seaport",
+        "seaport",     "seaport",     "seaport",     "seaport",     "plain",       "plain",       "plain",       "plain",       "road",        "road",
+        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "forest",
+        "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",
+        "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
+        "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
+        "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "reef",
+        "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
+        "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
 
         -- TiledID 100 + 1
-        13,  13,  14,  14,  15,  15,  15,  15,  15,  15,
-
-        -- TiledID 110 + 1; TemplateModelIdUnit starts from '1'
-        15,  15,  15,  15,  16,  16,  1,   1,   1,   1,
-
-        -- TiledID 120 + 1
-        2,   2,   2,   2,   3,   3,   3,   3,   4,   4,
-
-        -- TiledID 130 + 1
-        4,   4,   5,   5,   5,   5,   6,   6,   6,   6,
-
-        -- TiledID 140 + 1
-        7,   7,   7,   7,   8,   8,   8,   8,   9,   9,
-
-        -- TiledID 150 + 1
-        9,   9,   10,  10,  10,  10,  11,  11,  11,  11,
-
-        -- TiledID 160 + 1
-        12,  12,  12,  12,  13,  13,  13,  13,  14,  14,
-
-        -- TiledID 170 + 1
-        14,  14,  15,  15,  15,  15,  16,  16,  16,  16,
-
-        -- TiledID 180 + 1
-        17,  17,  17,  17,  18,  18,  18,  18,  19,  19,
-
-        -- TiledID 190 + 1
-        19,  19,
+        "mountain",    "mountain",    "bridge",      "bridge",      "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",
+        "pipeline",    "pipeline",    "pipeline",    "pipeline",    "joint",       "joint",       "infantry",    "infantry",    "infantry",    "infantry",
+        "mech",        "mech",        "mech",        "mech",        "recon",       "recon",       "recon",       "recon",       "tank",        "tank",
+        "tank",        "tank",        "mdtank",      "mdtank",      "mdtank",      "mdtank",      "neotank",     "neotank",     "neotank",     "neotank",
+        "apc",         "apc",         "apc",         "apc",         "artillery",   "artillery",   "artillery",   "artillery",   "rockets",     "rockets",
+        "rockets",     "rockets",     "antiair",     "antiair",     "antiair",     "antiair",     "missiles",    "missiles",    "missiles",    "missiles",
+        "fighter",     "fighter",     "fighter",     "fighter",     "bomber",      "bomber",      "bomber",      "bomber",      "bcopter",     "bcopter",
+        "bcopter",     "bcopter",     "tcopter",     "tcopter",     "tcopter",     "tcopter",     "battleship",  "battleship",  "battleship",  "battleship",
+        "cruiser",     "cruiser",     "cruiser",     "cruiser",     "lander",      "lander",      "lander",      "lander",      "submarine",   "submarine",
+        "submarine",   "submarine",
     },
 
     Mapping_TiledIdToTemplateViewTileOrUnit = {
@@ -1061,8 +1025,7 @@ local GameConstant = {
     },
 
     Mapping_IdToTemplateModelTile = {
-        -- TemplateModelTileID 1, HQ
-        {
+        hq = {
             defenseBonus = 40,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1122,8 +1085,7 @@ local GameConstant = {
             },
         },
 
-        -- TemplateModelTileID 2, city
-        {
+        city = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1183,8 +1145,7 @@ local GameConstant = {
             }
         },
 
-        {
-            -- TemplateModelTileID 3, base
+        base = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1244,8 +1205,7 @@ local GameConstant = {
             }
         },
 
-        {
-            -- TemplateModelTileID 4, airport
+        airport = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1305,8 +1265,7 @@ local GameConstant = {
             }
         },
 
-        {
-            -- TemplateModelTileID 5, seaport
+        seaport = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19},
 
@@ -1366,8 +1325,7 @@ local GameConstant = {
             }
         },
 
-        {
-            -- TemplateModelTileID 6, plain
+        plain = {
             defenseBonus = 10,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1407,8 +1365,7 @@ local GameConstant = {
             description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
         },
 
-        -- TemplateModelTileID 7, road
-        {
+        road = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1448,8 +1405,7 @@ local GameConstant = {
             description = "A paved road. Easy to traverse, but offers little defensive cover.",
         },
 
-        -- TemplateModelTileID 8, forest
-        {
+        forest = {
             defenseBonus = 20,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1489,8 +1445,7 @@ local GameConstant = {
             description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
 
-        -- TemplateModelTileID 9, river
-        {
+        river = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1530,8 +1485,7 @@ local GameConstant = {
             description = "A gentle, flowing river. Only infantry units can ford rivers.",
         },
 
-        -- TemplateModelTileID 10, sea
-        {
+        sea = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1571,8 +1525,7 @@ local GameConstant = {
             description = "A body of water. Only naval and air units can traverse seas.",
         },
 
-        -- TemplateModelTileID 11, reef
-        {
+        reef = {
             defenseBonus = 10,
             defenseTarget = {16, 17, 18, 19},
 
@@ -1612,8 +1565,7 @@ local GameConstant = {
             description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
 
-        -- TemplateModelTileID 12, shoal
-        {
+        shoal = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1653,8 +1605,7 @@ local GameConstant = {
             description = "A sandy shoal. Lander units load and unload units here.",
         },
 
-        -- TemplateModelTileID 13, mountain
-        {
+        mountain = {
             defenseBonus = 40,
             defenseTarget = {1, 2},
 
@@ -1694,8 +1645,7 @@ local GameConstant = {
             description = "A steep mountain. Infantry units add 3 to their vision range from here.",
         },
 
-        -- TemplateModelTileID 14, bridge
-        {
+        bridge = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1735,8 +1685,7 @@ local GameConstant = {
             description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
         },
 
-        -- TemplateModelTileID 15, pipeline
-        {
+        pipeline = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1776,8 +1725,7 @@ local GameConstant = {
             description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
         },
 
-        -- TemplateModelTileID 16, joint
-        {
+        joint = {
             defenseBonus = 0,
             defenseTarget = {},
 
@@ -1817,8 +1765,7 @@ local GameConstant = {
             description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
         },
 
-        {
-            -- TemplateModelTileID 17, Silo
+        silo = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1858,8 +1805,7 @@ local GameConstant = {
             description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
         },
 
-        {
-            -- TemplateModelTileID 18, Command Tower
+        cmdtower = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
@@ -1901,8 +1847,7 @@ local GameConstant = {
     },
 
     Mapping_IdToTemplateModelUnit = {
-        {
-            -- TemplateModelUnitID 1, infantry
+        infantry = {
             movementRange = 3,
             movementType  = "Infantry",
 
@@ -1928,8 +1873,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 2, mech
+        mech = {
             movementRange = 2,
             movementType  = "Mech",
 
@@ -1959,8 +1903,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 3, recon
+        recon = {
             movementRange = 8,
             movementType  = "Tires",
 
@@ -1986,8 +1929,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 4, tank
+        tank = {
             movementRange = 6,
             movementType  = "Treads",
 
@@ -2016,8 +1958,7 @@ local GameConstant = {
            },
         },
 
-        {
-            -- TemplateModelUnitID 5, md-tank
+        mdtank = {
             movementRange = 5,
             movementType  = "Treads",
 
@@ -2046,8 +1987,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 6, neotank
+        neotank = {
             movementRange = 6,
             movementType  = "Treads",
 
@@ -2076,8 +2016,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 7, apc
+        apc = {
             movementRange = 6,
             movementType  = "Treads",
 
@@ -2096,8 +2035,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 8, artillery
+        artillery = {
             movementRange = 5,
             movementType  = "Treads",
 
@@ -2124,8 +2062,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 9, rockets
+        rockets = {
             movementRange = 5,
             movementType  = "Tires",
 
@@ -2152,8 +2089,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 10, anti-air
+        antiair = {
             movementRange = 6,
             movementType  = "Treads",
 
@@ -2180,8 +2116,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 11, missiles
+        missiles = {
             movementRange = 5,
             movementType  = "Tires",
 
@@ -2208,8 +2143,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 12, fighter
+        fighter = {
             movementRange = 9,
             movementType  = "Air",
 
@@ -2236,8 +2170,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 13, bomber
+        bomber = {
             movementRange = 7,
             movementType  = "Air",
 
@@ -2264,8 +2197,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 14, b-copter
+        bcopter = {
             movementRange = 6,
             movementType  = "Air",
 
@@ -2294,8 +2226,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 15, t-copter
+        tcopter = {
             movementRange = 6,
             movementType  = "Air",
 
@@ -2314,8 +2245,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 16, battleship
+        battleship = {
             movementRange = 5,
             movementType  = "Ship",
 
@@ -2342,8 +2272,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 17, cruiser
+        cruiser = {
             movementRange = 6,
             movementType  = "Ship",
 
@@ -2372,8 +2301,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 18, lander
+        lander = {
             movementRange = 6,
             movementType  = "Lander",
 
@@ -2392,8 +2320,7 @@ local GameConstant = {
             },
         },
 
-        {
-            -- TemplateModelUnitID 19, submarine
+        submarine = {
             movementRange = 5,
             movementType  = "Ship",
 
