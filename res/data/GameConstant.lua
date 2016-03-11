@@ -1066,6 +1066,39 @@ local GameConstant = {
             defenseBonus = 40,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
 
             specialProperties = {
@@ -1086,13 +1119,46 @@ local GameConstant = {
                     target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
                 }
                 --]]
-            }
+            },
         },
 
         -- TemplateModelTileID 2, city
         {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
 
             description = "A normal city. Ground units gain supplies and HP in allied cities.",
 
@@ -1117,10 +1183,43 @@ local GameConstant = {
             }
         },
 
-        -- TemplateModelTileID 3, base
         {
+            -- TemplateModelTileID 3, base
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+            },
 
             description = "A base. Allied bases deploy, supply, and restore HP to ground units.",
 
@@ -1150,6 +1249,39 @@ local GameConstant = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
 
             specialProperties = {
@@ -1178,6 +1310,39 @@ local GameConstant = {
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = 1,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = 1,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = 2,
+                    Lander     = 2,
+                    Piperunner = false,
+                },
+            },
+
             description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
 
             specialProperties = {
@@ -1201,10 +1366,43 @@ local GameConstant = {
             }
         },
 
-        -- TemplateModelTileID 6, plain
         {
+            -- TemplateModelTileID 6, plain
             defenseBonus = 10,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 2,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 2,
+                    Tires      = 3,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = 2,
+                    Tires      = 3,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
 
             description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
         },
@@ -1214,6 +1412,39 @@ local GameConstant = {
             defenseBonus = 0,
             defenseTarget = {},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "A paved road. Easy to traverse, but offers little defensive cover.",
         },
 
@@ -1221,6 +1452,39 @@ local GameConstant = {
         {
             defenseBonus = 20,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 2,
+                    Tires      = 3,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 3,
+                    Tires      = 4,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = 3,
+                    Tires      = 4,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
 
             description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
@@ -1230,6 +1494,39 @@ local GameConstant = {
             defenseBonus = 0,
             defenseTarget = {},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "A gentle, flowing river. Only infantry units can ford rivers.",
         },
 
@@ -1237,6 +1534,39 @@ local GameConstant = {
         {
             defenseBonus = 0,
             defenseTarget = {},
+
+            moveCost = {
+                clear = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = 1,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = 1,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 2,
+                    Ship       = 2,
+                    Lander     = 2,
+                    Piperunner = false,
+                },
+            },
 
             description = "A body of water. Only naval and air units can traverse seas.",
         },
@@ -1246,6 +1576,39 @@ local GameConstant = {
             defenseBonus = 10,
             defenseTarget = {16, 17, 18, 19},
 
+            moveCost = {
+                clear = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = 2,
+                    Lander     = 2,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = 2,
+                    Lander     = 2,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 2,
+                    Ship       = 2,
+                    Lander     = 2,
+                    Piperunner = false,
+                },
+            },
+
             description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
         },
 
@@ -1254,13 +1617,79 @@ local GameConstant = {
             defenseBonus = 0,
             defenseTarget = {},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = 1,
+                    Piperunner = false,
+                },
+            },
+
             description = "A sandy shoal. Lander units load and unload units here.",
         },
 
         -- TemplateModelTileID 13, mountain
         {
-            defenseBonus = 30,
+            defenseBonus = 40,
             defenseTarget = {1, 2},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 2,
+                    Mech       = 1,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 4,
+                    Mech       = 2,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
 
             description = "A steep mountain. Infantry units add 3 to their vision range from here.",
         },
@@ -1270,6 +1699,39 @@ local GameConstant = {
             defenseBonus = 0,
             defenseTarget = {},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
         },
 
@@ -1277,6 +1739,39 @@ local GameConstant = {
         {
             defenseBonus = 0,
             defenseTarget = {},
+
+            moveCost = {
+                clear = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                rain  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                snow  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+            },
 
             description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
         },
@@ -1286,15 +1781,122 @@ local GameConstant = {
             defenseBonus = 0,
             defenseTarget = {},
 
+            moveCost = {
+                clear = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                rain  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+                snow  = {
+                    Infantry   = false,
+                    Mech       = false,
+                    Treads     = false,
+                    Tires      = false,
+                    Air        = false,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = 1,
+                },
+            },
+
             description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
         },
 
-        -- TemplateModelTileID 17, Silo
         {
+            -- TemplateModelTileID 17, Silo
             defenseBonus = 30,
             defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
             description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
+        },
+
+        {
+            -- TemplateModelTileID 18, Command Tower
+            defenseBonus = 30,
+            defenseTarget = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+
+            moveCost = {
+                clear = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                rain  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 1,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+                snow  = {
+                    Infantry   = 1,
+                    Mech       = 1,
+                    Treads     = 1,
+                    Tires      = 1,
+                    Air        = 2,
+                    Ship       = false,
+                    Lander     = false,
+                    Piperunner = false,
+                },
+            },
+
+            description = "A command tower.",
         },
     },
 
@@ -1347,11 +1949,11 @@ local GameConstant = {
                     name         = "AttackDoer",
                     primaryWeapon = {
                         target      = {},
-                        baseDamage  = {65, 55, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, 9, 35, false, false, false, false},
+                        baseDamage  = {false, false, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, false, false, false, false, false, false},
                         maxAmmo     = 3,
                     },
                     secondaryWeapon = {
-                        baseDamage = {},
+                        baseDamage  = {65, 55, 18, 6, 1, 1, 20, 32, 35, 6, 35, false, false, 9, 35, false, false, false, false},
                     },
                 },
             },
@@ -1404,11 +2006,11 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        baseDamage  = {75, 70, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, 10, 40, 1, 5, 10, 1},
+                        baseDamage  = {false, false, 85, 55, 15, 15, 75, 70, 85, 65, 85, false, false, false, false, 1, 5, 10, 1},
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = {
-                        baseDamage  = {},
+                        baseDamage  = {75, 70, 40, 6, 1, 1, 45, 45, 55, 5, 30, false, false, 10, 40, false, false, false, false},
                     },
                 },
            },
@@ -1434,11 +2036,11 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        baseDamage  = {105, 95, 105, 85, 55, 45, 105, 105, 105, 105, 105, false, false, 12, 45, 10, 45, 35, 10},
+                        baseDamage  = {false, false, 105, 85, 55, 45, 105, 105, 105, 105, 105, false, false, false, false, 10, 45, 35, 10},
                         maxAmmo     = 8,
                     },
                     secondaryWeapon = {
-                        baseDamage  = {},
+                        baseDamage  = {105, 95, 45, 8, 1, 1, 45, 45, 55, 7, 35, false, false, 12, 45, false, false, false, false},
                     },
                 },
             },
@@ -1464,11 +2066,11 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        baseDamage  = {125, 115, 125, 105, 75, 55, 125, 115, 125, 115, 125, false, false, 22, 55, 15, 50, 50, 15},
+                        baseDamage  = {false, false, 125, 105, 75, 55, 125, 115, 125, 115, 125, false, false, false, false, 15, 50, 50, 15},
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = {
-                        baseDamage  = {},
+                        baseDamage  = {125, 115, 65, 10, 1, 1, 65, 65, 75, 17, 55, false, false, 22, 55, false, false, false, false},
                     },
                 },
             },
@@ -1682,12 +2284,11 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        baseDamage  = {75, 75, 55, 55, 25, 20, 60, 65, 65, 25, 65, false, false, 65, 95, 25, 55, 25, 25},
+                        baseDamage  = {false, false, 55, 55, 25, 20, 60, 65, 65, 25, 65, false, false, false, false, 25, 55, 25, 25},
                         maxAmmo     = 6,
                     },
                     secondaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {75, 75, 30, 6, 1, 1, 20, 25, 35, 6, 35, false, false, 65, 95, false, false, false, false},
                     },
                 },
             },
@@ -1761,12 +2362,11 @@ local GameConstant = {
                 {
                     name         = "AttackDoer",
                     primaryWeapon = {
-                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, 55, 65, 115, 115, false, false, false, 90},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 90},
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = {
-                        target      = {},
-                        baseDamage  = {},
+                        baseDamage  = {false, false, false, false, false, false, false, false, false, false, false, 55, 65, 115, 115, false, false, false, false},
                     },
                 },
             },
