@@ -31,7 +31,7 @@ function AnimationLoader.getAnimationWithTiledID(tiledID)
 end
 
 function AnimationLoader.getAnimationWithTypeName(name)
-    local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelTileOrUnit
+    local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelIdTileOrUnit
     for id, typeName in ipairs(mapping) do
         if (typeName == name) then
             return AnimationLoader.getAnimationWithTiledID(id)

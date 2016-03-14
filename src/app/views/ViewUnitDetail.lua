@@ -31,8 +31,33 @@ local PRIMARY_WEAPON_INFO_HEIGHT     = 80
 local PRIMARY_WEAPON_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local PRIMARY_WEAPON_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - PRIMARY_WEAPON_INFO_HEIGHT
 
+local ICON_SCALE = 0.4
+local ICON_WIDTH = require("res.data.GameConstant").GridSize.width * ICON_SCALE
+
+local AnimationLoader = require("app.utilities.AnimationLoader")
+
 --------------------------------------------------------------------------------
--- Things about the screen background (the grey transparent mask).
+-- Util functions.
+--------------------------------------------------------------------------------
+local function resetIconsWithTypeNames(icons, typeNames)
+    icons:removeAllChildren()
+        :setVisible(true)
+
+    for i, name in ipairs(typeNames) do
+        local icon = cc.Sprite:create()
+        icon:setScale(ICON_SCALE)
+            :ignoreAnchorPointForPosition(true)
+            :setPosition(ICON_WIDTH * (i - 1), 0)
+            :playAnimationForever(AnimationLoader.getAnimationWithTypeName(name))
+
+        icons:addChild(icon)
+    end
+
+    icons.m_Width = #typeNames * ICON_WIDTH
+end
+
+--------------------------------------------------------------------------------
+-- The screen background (the grey transparent mask).
 --------------------------------------------------------------------------------
 local function createScreenBackground()
     local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
@@ -48,7 +73,7 @@ local function initWithScreenBackground(view, background)
 end
 
 --------------------------------------------------------------------------------
--- Things about the detail panel background.
+-- The detail panel background.
 --------------------------------------------------------------------------------
 local function createDetailBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
@@ -69,7 +94,7 @@ local function initWithDetailBackground(view, background)
 end
 
 --------------------------------------------------------------------------------
--- Things about the brief description for the unit.
+-- The brief description for the unit.
 --------------------------------------------------------------------------------
 local function createDescription()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
@@ -110,7 +135,7 @@ local function updateDescriptionWithModelUnit(description, unit)
 end
 
 --------------------------------------------------------------------------------
--- Things about the movement information for the unit.
+-- The movement information for the unit.
 --------------------------------------------------------------------------------
 local function createMovementInfo()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
@@ -151,7 +176,7 @@ local function updateMovementInfoWithModelUnit(info, unit)
 end
 
 --------------------------------------------------------------------------------
--- Things about the vision information for the unit.
+-- The vision information for the unit.
 --------------------------------------------------------------------------------
 local function createVisionInfo()
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
@@ -185,7 +210,7 @@ local function updateVisionInfoWithModelUnit(info, unit)
 end
 
 --------------------------------------------------------------------------------
--- Things about the fuel information for the unit.
+-- The fuel information for the unit.
 --------------------------------------------------------------------------------
 local function createFuelInfo()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
@@ -232,12 +257,16 @@ end
 --------------------------------------------------------------------------------
 -- The primary weapon information for the unit.
 --------------------------------------------------------------------------------
-local function createPrimaryWeaponInfo()
+local function createPrimaryWeaponInfoBottomLine()
     local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
     bottomLine:ignoreAnchorPointForPosition(true)
         :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 5, PRIMARY_WEAPON_INFO_POSITION_Y)
         :setContentSize(PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
 
+    return bottomLine
+end
+
+local function createPrimaryWeaponInfoBriefLabel()
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
@@ -247,13 +276,74 @@ local function createPrimaryWeaponInfo()
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
 
+    return label
+end
+
+local function createPrimaryWeaponInfoFatalLabel()
+    local fatalLabel = cc.Label:createWithTTF("Fatal:", "res/fonts/msyhbd.ttc", 25)
+    fatalLabel:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
+
+        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    return fatalLabel
+end
+
+local function createPrimaryWeaponInfoFatalIcons()
+    local icons = cc.Node:create()
+    icons:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 46, PRIMARY_WEAPON_INFO_POSITION_Y - 46)
+
+    return icons
+end
+
+local function createPrimaryWeaponInfoStrongLabel()
+    local strongLabel = cc.Label:createWithTTF("Strong:", "res/fonts/msyhbd.ttc", 25)
+    strongLabel:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y)
+
+        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    return strongLabel
+end
+
+local function createPrimaryWeaponInfoStrongIcons()
+    local icons = cc.Node:create()
+    icons:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y - 46)
+
+    return icons
+end
+
+local function createPrimaryWeaponInfo()
+    local bottomLine  = createPrimaryWeaponInfoBottomLine()
+    local briefLabel  = createPrimaryWeaponInfoBriefLabel()
+    local fatalLabel  = createPrimaryWeaponInfoFatalLabel()
+    local fatalIcons  = createPrimaryWeaponInfoFatalIcons()
+    local strongLabel = createPrimaryWeaponInfoStrongLabel()
+    local strongIcons = createPrimaryWeaponInfoStrongIcons()
+
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
         :addChild(bottomLine)
-        :addChild(label)
+        :addChild(briefLabel)
+        :addChild(fatalLabel)
+        :addChild(fatalIcons)
+        :addChild(strongLabel)
+        :addChild(strongIcons)
 
-    info.m_BottomLine        = bottomLine
-    info.m_Label             = label
+    info.m_BottomLine   = bottomLine
+    info.m_BriefLabel   = briefLabel
+    info.m_FatalLabel   = fatalLabel
+    info.m_FatalIcons   = fatalIcons
+    info.m_StrongLabel  = strongLabel
+    info.m_StrongIcons  = strongIcons
 
     return info
 end
@@ -263,16 +353,57 @@ local function initWithPrimaryWeaponInfo(view, info)
     view:addChild(info)
 end
 
-local function updatePrimaryWeaponInfoWithModelUnit(info, unit)
-    if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
-        info.m_Label:setString("Primary Weapon: " .. unit:getPrimaryWeaponName())
+local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
+    if (hasPrimaryWeapon) then
+        label:setString("Primary Weapon: " .. unit:getPrimaryWeaponName() .. "    Ammo:  " .. unit:getPrimaryWeaponCurrentAmmo() .. " / " .. unit:getPrimaryWeaponMaxAmmo())
     else
-        info.m_Label:setString("Primary Weapon: Not equipped.")
+        label:setString("Primary Weapon: Not equipped.")
     end
 end
 
+local function updatePrimaryWeaponInfoFatalLabel(label, unit, hasPrimaryWeapon)
+    label:setVisible(hasPrimaryWeapon)
+end
+
+local function updatePrimaryWeaponInfoFatalIcons(icons, unit, hasPrimaryWeapon)
+    icons:setVisible(hasPrimaryWeapon)
+    if (hasPrimaryWeapon) then
+        resetIconsWithTypeNames(icons, unit:getPrimaryWeaponFatalList())
+    end
+end
+
+local function updatePrimaryWeaponInfoStrongLabel(label, unit, hasPrimaryWeapon, fatalIcons)
+    label:setVisible(hasPrimaryWeapon)
+
+    if (hasPrimaryWeapon) then
+        local fatalInfoWidth = 85 + fatalIcons.m_Width
+        if (fatalInfoWidth < 300) then
+            fatalInfoWidth = 300
+        end
+
+        label:setPosition(PRIMARY_WEAPON_INFO_POSITION_X + fatalInfoWidth, PRIMARY_WEAPON_INFO_POSITION_Y)
+    end
+end
+
+local function updatePrimaryWeaponInfoStrongIcons(icons, unit, hasPrimaryWeapon, strongLabel)
+    icons:setVisible(hasPrimaryWeapon)
+    if (hasPrimaryWeapon) then
+        resetIconsWithTypeNames(icons, unit:getPrimaryWeaponStrongList())
+        icons:setPosition(strongLabel:getPositionX() + 72, icons:getPositionY())
+    end
+end
+
+local function updatePrimaryWeaponInfoWithModelUnit(info, unit)
+    local hasPrimaryWeapon = unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()
+    updatePrimaryWeaponInfoBriefLabel(info.m_BriefLabel, unit, hasPrimaryWeapon)
+    updatePrimaryWeaponInfoFatalLabel(info.m_FatalLabel, unit, hasPrimaryWeapon)
+    updatePrimaryWeaponInfoFatalIcons(info.m_FatalIcons, unit, hasPrimaryWeapon)
+    updatePrimaryWeaponInfoStrongLabel(info.m_StrongLabel, unit, hasPrimaryWeapon, info.m_FatalIcons)
+    updatePrimaryWeaponInfoStrongIcons(info.m_StrongIcons, unit, hasPrimaryWeapon, info.m_StrongLabel)
+end
+
 --------------------------------------------------------------------------------
--- Things about the touch listener.
+-- The touch listener.
 --------------------------------------------------------------------------------
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()

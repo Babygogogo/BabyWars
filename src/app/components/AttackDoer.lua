@@ -7,7 +7,10 @@ local ComponentManager   = require("global.components.ComponentManager")
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",
     "getPrimaryWeaponName",
+    "getPrimaryWeaponMaxAmmo",
     "getPrimaryWeaponCurrentAmmo",
+    "getPrimaryWeaponFatalList",
+    "getPrimaryWeaponStrongList"
 }
 
 local function initPrimaryWeapon(doer, param)
@@ -64,8 +67,16 @@ function AttackDoer:unbind(target)
     self.m_Target = nil
 end
 
+--------------------------------------------------------------------------------
+-- Exported methods.
+--------------------------------------------------------------------------------
 function AttackDoer:hasPrimaryWeapon()
     return self.m_PrimaryWeapon ~= nil
+end
+
+function AttackDoer:getPrimaryWeaponMaxAmmo()
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponMaxAmmo() the attack doer has no primary weapon.")
+    return self.m_PrimaryWeapon.m_Template.maxAmmo
 end
 
 function AttackDoer:getPrimaryWeaponCurrentAmmo()
@@ -76,6 +87,16 @@ end
 function AttackDoer:getPrimaryWeaponName()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
     return self.m_PrimaryWeapon.m_Template.name
+end
+
+function AttackDoer:getPrimaryWeaponFatalList()
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponFatalList() the attack doer has no primary weapon.")
+    return self.m_PrimaryWeapon.m_Template.fatal
+end
+
+function AttackDoer:getPrimaryWeaponStrongList()
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponStrongList() the attack doer has no primary weapon.")
+    return self.m_PrimaryWeapon.m_Template.strong
 end
 
 return AttackDoer
