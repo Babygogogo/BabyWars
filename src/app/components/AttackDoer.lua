@@ -10,7 +10,12 @@ local EXPORTED_METHODS = {
     "getPrimaryWeaponMaxAmmo",
     "getPrimaryWeaponCurrentAmmo",
     "getPrimaryWeaponFatalList",
-    "getPrimaryWeaponStrongList"
+    "getPrimaryWeaponStrongList",
+
+    "hasSecondaryWeapon",
+    "getSecondaryWeaponName",
+    "getSecondaryWeaponFatalList",
+    "getSecondaryWeaponStrongList",
 }
 
 local function initPrimaryWeapon(doer, param)
@@ -97,6 +102,25 @@ end
 function AttackDoer:getPrimaryWeaponStrongList()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponStrongList() the attack doer has no primary weapon.")
     return self.m_PrimaryWeapon.m_Template.strong
+end
+
+function AttackDoer:hasSecondaryWeapon()
+    return self.m_SecondaryWeapon ~= nil
+end
+
+function AttackDoer:getSecondaryWeaponName()
+    assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponName() the attack doer has no secondary weapon.")
+    return self.m_SecondaryWeapon.m_Template.name
+end
+
+function AttackDoer:getSecondaryWeaponFatalList()
+    assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponFatalList() the attack doer has no secondary weapon.")
+    return self.m_SecondaryWeapon.m_Template.fatal
+end
+
+function AttackDoer:getSecondaryWeaponStrongList()
+    assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponStrongList() the attack doer has no secondary weapon.")
+    return self.m_SecondaryWeapon.m_Template.strong
 end
 
 return AttackDoer

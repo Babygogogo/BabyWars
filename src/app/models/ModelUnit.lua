@@ -51,6 +51,7 @@ local function initWithTiledID(model, tiledID)
     ComponentManager.unbindAllComponents(model)
     ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
 
+    model.m_Template      = template
     model.m_MovementRange = template.movementRange
     model.m_MovementType  = template.movementType
     model.m_Vision        = template.vision
@@ -165,6 +166,14 @@ end
 
 function ModelUnit:getDescriptionOnOutOfFuel()
     return self.m_FuelData.m_DescriptionOnOutOfFuel
+end
+
+function ModelUnit:getDefenseFatalList()
+    return self.m_Template.defense.fatal
+end
+
+function ModelUnit:getDefenseWeakList()
+    return self.m_Template.defense.weak
 end
 
 return ModelUnit

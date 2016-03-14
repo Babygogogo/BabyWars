@@ -2345,7 +2345,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "mdtank", "neotank", "rockets", "bomber", "battleship"
                 },
@@ -2373,7 +2373,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "mdtank", "neotank", "rockets", "bomber", "battleship"
                 },
@@ -2436,7 +2436,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
                 },
@@ -2499,7 +2499,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "mdtank", "neotank", "rockets", "bomber", "battleship"
                 },
@@ -2562,7 +2562,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
                 },
@@ -2624,7 +2624,7 @@ local GameConstant = {
                 destroyOnOutOfFuel     = true,
             },
 
-            defendse = {
+            defense = {
                 fatal = {
                     "missiles"
                 },
