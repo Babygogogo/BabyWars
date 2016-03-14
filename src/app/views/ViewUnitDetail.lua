@@ -26,6 +26,11 @@ local FUEL_INFO_HEIGHT     = 80
 local FUEL_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local FUEL_INFO_POSITION_Y = MOVEMENT_INFO_POSITION_Y - FUEL_INFO_HEIGHT
 
+local PRIMARY_WEAPON_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local PRIMARY_WEAPON_INFO_HEIGHT     = 80
+local PRIMARY_WEAPON_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local PRIMARY_WEAPON_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - PRIMARY_WEAPON_INFO_HEIGHT
+
 --------------------------------------------------------------------------------
 -- Things about the screen background (the grey transparent mask).
 --------------------------------------------------------------------------------
@@ -204,7 +209,7 @@ local function createFuelInfo()
 
     info.m_BottomLine = bottomLine
     info.m_Label      = label
-    info.setFuel  = function(self, currentFuel, maxFuel, consumption, description)
+    info.setFuel      = function(self, currentFuel, maxFuel, consumption, description)
         self.m_Label:setString("Fuel:    Amount:  " .. currentFuel .. " / " .. maxFuel .. "    ConsumptionPerTurn:  " .. consumption
                                .. "\n            " .. description)
     end
@@ -222,6 +227,48 @@ local function updateFuelInfoWithModelUnit(info, unit)
                  unit:getMaxFuel(),
                  unit:getFuelConsumptionPerTurn(),
                  unit:getDescriptionOnOutOfFuel())
+end
+
+--------------------------------------------------------------------------------
+-- The primary weapon information for the unit.
+--------------------------------------------------------------------------------
+local function createPrimaryWeaponInfo()
+    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    bottomLine:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 5, PRIMARY_WEAPON_INFO_POSITION_Y)
+        :setContentSize(PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
+
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
+
+        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(bottomLine)
+        :addChild(label)
+
+    info.m_BottomLine        = bottomLine
+    info.m_Label             = label
+
+    return info
+end
+
+local function initWithPrimaryWeaponInfo(view, info)
+    view.m_PrimaryWeaponInfo = info
+    view:addChild(info)
+end
+
+local function updatePrimaryWeaponInfoWithModelUnit(info, unit)
+    if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
+        info.m_Label:setString("Primary Weapon: " .. unit:getPrimaryWeaponName())
+    else
+        info.m_Label:setString("Primary Weapon: Not equipped.")
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -257,6 +304,7 @@ function ViewUnitDetail:ctor(param)
     initWithMovementInfo(self, createMovementInfo())
     initWithVisionInfo(self, createVisionInfo())
     initWithFuelInfo(self, createFuelInfo())
+    initWithPrimaryWeaponInfo(self, createPrimaryWeaponInfo())
     initWithTouchListener(self, createTouchListener(self))
 
     self:setCascadeOpacityEnabled(true)
@@ -285,6 +333,7 @@ function ViewUnitDetail:updateWithModelUnit(unit)
     updateMovementInfoWithModelUnit(self.m_MovementInfo, unit)
     updateVisionInfoWithModelUnit(self.m_VisionInfo, unit)
     updateFuelInfoWithModelUnit(self.m_FuelInfo, unit)
+    updatePrimaryWeaponInfoWithModelUnit(self.m_PrimaryWeaponInfo, unit)
 
     return self
 end

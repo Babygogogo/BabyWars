@@ -5,6 +5,8 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
+    "hasPrimaryWeapon",
+    "getPrimaryWeaponName",
     "getPrimaryWeaponCurrentAmmo",
 }
 
@@ -15,9 +17,8 @@ local function initPrimaryWeapon(doer, param)
         doer.m_PrimaryWeapon = {}
 
         local weapon = doer.m_PrimaryWeapon
-        weapon.m_MaxAmmo     = param.maxAmmo
+        weapon.m_Template    = param
         weapon.m_CurrentAmmo = param.maxAmmo
-        weapon.m_BaseDamage  = param.baseDamage
     end
 end
 
@@ -26,7 +27,7 @@ local function initSecondaryWeapon(doer, param)
         doer.m_SecondaryWeapon = {}
 
         local weapon = doer.m_SecondaryWeapon
-        weapon.m_BaseDamage = param.baseDamage
+        weapon.m_Template = param
     end
 end
 
@@ -63,12 +64,18 @@ function AttackDoer:unbind(target)
     self.m_Target = nil
 end
 
+function AttackDoer:hasPrimaryWeapon()
+    return self.m_PrimaryWeapon ~= nil
+end
+
 function AttackDoer:getPrimaryWeaponCurrentAmmo()
-    if (self.m_PrimaryWeapon) then
-        return self.m_PrimaryWeapon.m_CurrentAmmo
-    else
-        return nil
-    end
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
+    return self.m_PrimaryWeapon.m_CurrentAmmo
+end
+
+function AttackDoer:getPrimaryWeaponName()
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
+    return self.m_PrimaryWeapon.m_Template.name
 end
 
 return AttackDoer

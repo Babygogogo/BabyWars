@@ -21,6 +21,9 @@ local FUEL_INFO_POSITION_Y = HP_INFO_POSITION_Y - 25
 local AMMO_INFO_POSITION_X = HP_INFO_POSITION_X
 local AMMO_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - 25
 
+--------------------------------------------------------------------------------
+-- The button background.
+--------------------------------------------------------------------------------
 local function createButton(view)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
@@ -49,6 +52,9 @@ local function initWithButton(view, button)
     view:addChild(button)
 end
 
+--------------------------------------------------------------------------------
+-- The unit icon.
+--------------------------------------------------------------------------------
 local function createIcon()
     local icon = cc.Sprite:create()
     icon:setAnchorPoint(0, 0)
@@ -72,6 +78,9 @@ local function updateIconWithModelUnit(icon, unit)
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(unit:getTiledID()))
 end
 
+--------------------------------------------------------------------------------
+-- The general label.
+--------------------------------------------------------------------------------
 local function createLabel()
     local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
@@ -82,6 +91,9 @@ local function createLabel()
     return label
 end
 
+--------------------------------------------------------------------------------
+-- The HP infomation for the unit.
+--------------------------------------------------------------------------------
 local function createHPInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -122,6 +134,9 @@ local function updateHPInfoWithModelUnit(info, unit)
     info:setHP(unit:getNormalizedCurrentHP())
 end
 
+--------------------------------------------------------------------------------
+-- The fuel infomation for the unit.
+--------------------------------------------------------------------------------
 local function createFuelInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -162,6 +177,9 @@ local function updateFuelInfoWithModelUnit(info, unit)
     info:setFuel(unit:getCurrentFuel())
 end
 
+--------------------------------------------------------------------------------
+-- The primary weapon ammo infomation for the unit.
+--------------------------------------------------------------------------------
 local function createAmmoInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -188,7 +206,7 @@ local function createAmmoInfo()
         else
             self.m_Label:setString(""   .. ammo)
         end
-        
+
         return self
     end
 
@@ -201,14 +219,9 @@ local function initWithAmmoInfo(view, info)
 end
 
 local function updateAmmoInfoWithModelUnit(info, unit)
-    if (unit.getPrimaryWeaponCurrentAmmo) then
-        local ammo = unit:getPrimaryWeaponCurrentAmmo()
-        if (ammo) then
-            info:setAmmo(ammo)
-                :setVisible(true)
-        else
-            info:setVisible(false)
-        end
+    if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
+        info:setAmmo(unit:getPrimaryWeaponCurrentAmmo())
+            :setVisible(true)
     else
         info:setVisible(false)
     end

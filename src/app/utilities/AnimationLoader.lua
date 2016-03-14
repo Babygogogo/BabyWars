@@ -30,4 +30,15 @@ function AnimationLoader.getAnimationWithTiledID(tiledID)
     return display.getAnimationCache(toAnimationName(tiledID))
 end
 
+function AnimationLoader.getAnimationWithTypeName(name)
+    local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelTileOrUnit
+    for id, typeName in ipairs(mapping) do
+        if (typeName == name) then
+            return AnimationLoader.getAnimationWithTiledID(id)
+        end
+    end
+
+    error("AnimationLoader.getAnimationWithTypeName() failed to find an animation with param name.")
+end
+
 return AnimationLoader
