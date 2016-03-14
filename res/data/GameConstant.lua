@@ -1861,6 +1861,15 @@ local GameConstant = {
                 destroyOnOutOfFuel     = false,
             },
 
+            defense = {
+                fatal = {
+                    "mdtank", "neotank", "artillery", "rockets", "antiair", "bomber", "battleship"
+                },
+                weak   = {
+                    "infantry", "mech", "recon", "tank", "bcopter"
+                },
+            },
+
             description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
 
             specialProperties = {
@@ -1889,6 +1898,10 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {},
+                        strong = {
+                            "infantry", "mech"
+                        }
                     },
                 },
             },
@@ -1905,6 +1918,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defense = {
+                fatal = {
+                    "mdtank", "neotank", "artillery", "rockets", "antiair", "bomber", "battleship"
+                },
+                weak   = {
+                    "infantry", "mech", "recon", "tank", "bcopter"
+                },
             },
 
             description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
@@ -1934,6 +1956,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {
+                            "recon", "rockets", "missiles"
+                        },
+                        strong = {
+                            "tank", "apc", "artillery", "antiair"
+                        },
                         maxAmmo     = 3,
                     },
                     secondaryWeapon = {
@@ -1958,6 +1986,10 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {},
+                        strong = {
+                            "infantry", "mech"
+                        }
                     },
                 },
             },
@@ -1974,6 +2006,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defense = {
+                fatal = {
+                    "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
+                },
+                weak   = {
+                    "antiair", "bcopter"
+                },
             },
 
             description = "Recon units have high movement range and are strong against infantry units.",
@@ -2004,6 +2045,10 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {},
+                        strong = {
+                            "infantry", "mech", "apc", "artillery", "rockets"
+                        },
                     },
                 },
             },
@@ -2020,6 +2065,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defense = {
+                fatal = {
+                    "mdtank", "neotank", "rockets", "bomber", "battleship"
+                },
+                weak   = {
+                    "mech", "tank", "artillery", "bcopter"
+                },
             },
 
             description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
@@ -2050,6 +2104,12 @@ local GameConstant = {
                             submarine = 1,
                         },
                         maxAmmo     = 9,
+                        fatal  = {
+                            "recon", "rockets", "missiles"
+                        },
+                        strong = {
+                            "tank", "apc", "artillery", "antiair"
+                        },
                     },
                     secondaryWeapon = {
                         baseDamage  = {
@@ -2073,6 +2133,10 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {},
+                        strong = {
+                            "infantry", "mech", "recon", "apc", "artillery", "rockets", "tcopter"
+                        }
                     },
                 },
            },
@@ -2089,6 +2153,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defense = {
+                fatal = {
+                    "bomber"
+                },
+                weak   = {
+                    "mdtank", "neotank", "artillery", "rockets", "battleship"
+                },
             },
 
             description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
@@ -2118,6 +2191,12 @@ local GameConstant = {
                             lander = 35,
                             submarine = 10,
                         },
+                        fatal  = {
+                            "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
+                        },
+                        strong = {
+                            "mdtank", "neotank", "cruiser"
+                        },
                         maxAmmo     = 8,
                     },
                     secondaryWeapon = {
@@ -2142,6 +2221,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {
+                            "infantry", "mech"
+                        },
+                        strong = {
+                            "recon", "apc", "artillery", "rockets", "tcopter"
+                        }
                     },
                 },
             },
@@ -2158,6 +2243,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defense = {
+                fatal = {
+                    "bomber"
+                },
+                weak   = {
+                    "mdtank", "neotank", "artillery", "rockets", "battleship"
+                },
             },
 
             description = "Neotank units are new weapons developed recently. They are more powerful than Md tanks.",
@@ -2187,6 +2281,12 @@ local GameConstant = {
                             lander = 50,
                             submarine = 15,
                         },
+                        fatal  = {
+                            "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
+                        },
+                        strong = {
+                            "mdtank", "neotank", "cruiser", "lander"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = {
@@ -2211,6 +2311,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal  = {
+                            "infantry", "mech"
+                        },
+                        strong = {
+                            "recon", "apc", "artillery", "rockets", "missiles", "tcopter"
+                        },
                     },
                 },
             },
@@ -2227,6 +2333,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defendse = {
+                fatal = {
+                    "mdtank", "neotank", "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "mech", "recon", "tank", "artillery", "antiair", "bcopter"
+                },
             },
 
             description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
@@ -2246,6 +2361,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defendse = {
+                fatal = {
+                    "mdtank", "neotank", "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "mech", "recon", "tank", "artillery", "antiair", "bcopter"
+                },
             },
 
             description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
@@ -2275,6 +2399,12 @@ local GameConstant = {
                             lander = 55,
                             submarine = 60,
                         },
+                        fatal  = {
+                            "infantry", "mech", "recon", "rockets", "missiles"
+                        },
+                        strong = {
+                            "tank", "mdtank", "neotank", "apc", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = nil,
@@ -2293,6 +2423,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defendse = {
+                fatal = {
+                    "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "recon", "antiair", "bcopter"
+                },
             },
 
             description = "Rocket units are valuable, because they can fire on both land and naval units.",
@@ -2322,6 +2461,12 @@ local GameConstant = {
                             lander = 60,
                             submarine = 85,
                         },
+                        fatal  = {
+                            "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "submarine"
+                        },
+                        strong = {
+                            "mdtank", "neotank", "battleship", "lander",
+                        },
                         maxAmmo     = 6,
                     },
                     secondaryWeapon = nil,
@@ -2340,6 +2485,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defendse = {
+                fatal = {
+                    "mdtank", "neotank", "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "mech", "tank", "artillery", "antiair"
+                },
             },
 
             description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
@@ -2369,6 +2523,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal = {
+                            "infantry", "mech", "bcopter", "tcopter"
+                        },
+                        strong = {
+                            "recon", "apc", "artillery", "rockets", "antiair", "missiles", "fighter", "bomber"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = nil,
@@ -2387,6 +2547,15 @@ local GameConstant = {
                 consumptionPerTurn     = 0,
                 descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
                 destroyOnOutOfFuel     = false,
+            },
+
+            defendse = {
+                fatal = {
+                    "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "antiair", "bcopter"
+                },
             },
 
             description = "Missile units are essential in defending against air units. Their vision range is large.",
@@ -2416,6 +2585,11 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal = {
+                            "fighter", "bomber", "bcopter", "tcopter"
+                        },
+                        strong = {
+                        },
                         maxAmmo     = 6,
                     },
                     secondaryWeapon = nil,
@@ -2434,6 +2608,15 @@ local GameConstant = {
                 consumptionPerTurn     = 5,
                 descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defendse = {
+                fatal = {
+                    "missiles"
+                },
+                weak = {
+                    "antiair", "fighter", "cruiser"
+                },
             },
 
             description = "Fighter units are strong vs. other air units. They also have the highest movements.",
@@ -2463,6 +2646,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal = {
+                            "bomber", "bcopter", "tcopter"
+                        },
+                        strong = {
+                            "fighter"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = nil,
@@ -2481,6 +2670,15 @@ local GameConstant = {
                 consumptionPerTurn     = 5,
                 descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "missiles", "fighter"
+                },
+                weak = {
+                    "antiair", "cruiser"
+                },
             },
 
             description = "Bomber units can fire on ground and naval units with a high destructive force.",
@@ -2510,6 +2708,12 @@ local GameConstant = {
                             lander = 95,
                             submarine = 95,
                         },
+                        fatal = {
+                            "infantry", "mech", "recon", "tank", "mdtank", "neotank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
+                        },
+                        strong = {
+                            "battleship"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = nil,
@@ -2528,6 +2732,15 @@ local GameConstant = {
                 consumptionPerTurn     = 2,
                 descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "antiair", "missiles", "fighter", "cruiser"
+                },
+                weak = {
+                    "bcopter"
+                },
             },
 
             description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
@@ -2557,6 +2770,11 @@ local GameConstant = {
                             lander = 25,
                             submarine = 25,
                         },
+                        fatal = {
+                        },
+                        strong = {
+                            "recon", "tank", "apc", "artillery", "rockets", "missiles", "cruiser"
+                        },
                         maxAmmo     = 6,
                     },
                     secondaryWeapon = {
@@ -2581,6 +2799,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal = {
+                            "tcopter"
+                        },
+                        strong = {
+                            "infantry", "mech", "bcopter"
+                        },
                     },
                 },
             },
@@ -2597,6 +2821,15 @@ local GameConstant = {
                 consumptionPerTurn     = 2,
                 descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "antiair", "missiles", "fighter", "bcopter", "cruiser"
+                },
+                weak = {
+                    "tank", "mdtank", "neotank"
+                },
             },
 
             description = "T copters can transport both infantry and mech units.",
@@ -2616,6 +2849,14 @@ local GameConstant = {
                 consumptionPerTurn     = 1,
                 descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                },
+                weak = {
+                    "artillery", "rockets", "bomber", "battleship", "submarine"
+                },
             },
 
             description = "B(Battle) ships have a larger attack range than even rocket units.",
@@ -2645,6 +2886,12 @@ local GameConstant = {
                             lander = 95,
                             submarine = 95,
                         },
+                        fatal = {
+                            "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
+                        },
+                        strong = {
+                            "mdtank", "neotank", "battleship"
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = nil,
@@ -2663,6 +2910,15 @@ local GameConstant = {
                 consumptionPerTurn     = 1,
                 descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "rockets", "bomber", "battleship"
+                },
+                weak = {
+                    "mdtank", "neotank", "artillery", "bcopter"
+                },
             },
 
             description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
@@ -2692,6 +2948,11 @@ local GameConstant = {
                             lander = false,
                             submarine = 90,
                         },
+                        fatal = {
+                            "submarine"
+                        },
+                        strong = {
+                        },
                         maxAmmo     = 9,
                     },
                     secondaryWeapon = {
@@ -2716,6 +2977,12 @@ local GameConstant = {
                             lander = false,
                             submarine = false,
                         },
+                        fatal = {
+                            "bcopter", "tcopter"
+                        },
+                        strong = {
+                            "fighter", "bomber"
+                        },
                     },
                 },
             },
@@ -2732,6 +2999,15 @@ local GameConstant = {
                 consumptionPerTurn     = 1,
                 descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "bomber", "battleship", "submarine"
+                },
+                weak = {
+                    "neotank", "artillery", "rockets"
+                },
             },
 
             description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
@@ -2751,6 +3027,15 @@ local GameConstant = {
                 consumptionPerTurn     = 1,
                 descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
                 destroyOnOutOfFuel     = true,
+            },
+
+            defense = {
+                fatal = {
+                    "rockets", "bomber", "battleship", "cruiser"
+                },
+                weak = {
+                    "artillery", "submarine"
+                },
             },
 
             description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
@@ -2779,6 +3064,12 @@ local GameConstant = {
                             cruiser = 25,
                             lander = 95,
                             submarine = 55,
+                        },
+                        fatal = {
+                            "lander"
+                        },
+                        strong = {
+                            "battleship", "submarine"
                         },
                         maxAmmo     = 6,
                     },
