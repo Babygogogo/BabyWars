@@ -1091,6 +1091,9 @@ GameConstant.unitCatagory = {
     },
 }
 
+GameConstant.maxCapturePoint = 20
+GameConstant.incomePerTurn   = 1000
+
 GameConstant.Mapping_IdToTemplateModelTile = {
     hq = {
         defenseBonus = {
@@ -1136,8 +1139,9 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
         specialProperties = {
             {
-                name = "CaptureTaker",
-                onCapture = "Defeat"
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "Defeat"
             },
             {
                 name           = "RepairDoer",
@@ -1145,10 +1149,11 @@ GameConstant.Mapping_IdToTemplateModelTile = {
                 targetList     = GameConstant.unitCatagory.groundUnits,
                 amount         = 2,
             },
-            --[[
             {
-                name = "FundProvider"
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
             },
+            --[[
             {
                 name = "SupplyProvider",
                 target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -1201,8 +1206,9 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
         specialProperties = {
             {
-                name = "CaptureTaker",
-                onCapture = "ChangeCapturer"
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
             },
             {
                 name           = "RepairDoer",
@@ -1210,18 +1216,15 @@ GameConstant.Mapping_IdToTemplateModelTile = {
                 targetList     = GameConstant.unitCatagory.groundUnits,
                 amount         = 2,
             },
-            --[[
             {
-                name = "FundProvider"
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
             },
+            --[[
             {
                 name = "SupplyProvider",
                 target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
             },
-            {
-                name = "RepairDoer",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            }
             --]]
         }
     },
@@ -1270,8 +1273,9 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
         specialProperties = {
             {
-                name = "CaptureTaker",
-                onCapture = "ChangeCapturer"
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
             },
             {
                 name           = "RepairDoer",
@@ -1279,10 +1283,11 @@ GameConstant.Mapping_IdToTemplateModelTile = {
                 targetList     = GameConstant.unitCatagory.groundUnits,
                 amount         = 2,
             },
-            --[[
             {
-                name = "FundProvider"
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
             },
+            --[[
             {
                 name = "SupplyProvider",
                 target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -1339,8 +1344,9 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
         specialProperties = {
             {
-                name = "CaptureTaker",
-                onCapture = "ChangeCapturer"
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
             },
             {
                 name           = "RepairDoer",
@@ -1348,10 +1354,11 @@ GameConstant.Mapping_IdToTemplateModelTile = {
                 targetList     = GameConstant.unitCatagory.airUnits,
                 amount         = 2,
             },
-            --[[
             {
-                name = "FundProvider"
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
             },
+            --[[
             {
                 name = "SupplyProvider",
                 target = {12, 13, 14, 15}
@@ -1408,18 +1415,21 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
         specialProperties = {
             {
-                name = "CaptureTaker",
-                onCapture = "ChangeCapturer"
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
             },
             {
                 name           = "RepairDoer",
                 targetCatagory = "Naval units",
                 targetList     = GameConstant.unitCatagory.navalUnits,
                 amount         = 2,
-            },                --[[
-            {
-                name = "FundProvider"
             },
+            {
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
+            },
+            --[[
             {
                 name = "SupplyProvider",
                 target = {16, 17, 18, 19}
@@ -1989,6 +1999,14 @@ GameConstant.Mapping_IdToTemplateModelTile = {
         },
 
         description = "A command tower.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
+            },
+        },
     },
 }
 

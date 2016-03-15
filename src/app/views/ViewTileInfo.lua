@@ -20,6 +20,22 @@ local DEFENSE_INFO_POSITION_Y = 40
 local CAPTURE_INFO_POSITION_X = DEFENSE_INFO_POSITION_X
 local CAPTURE_INFO_POSITION_Y = 10
 
+--------------------------------------------------------------------------------
+-- Util functions.
+--------------------------------------------------------------------------------
+local function createLabel()
+    local label = cc.Label:createWithTTF("0", "res/fonts/msyhbd.ttc", 22)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    return label
+end
+
+--------------------------------------------------------------------------------
+-- The button.
+--------------------------------------------------------------------------------
 local function createButton(view)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
@@ -48,6 +64,9 @@ local function initWithButton(view, button)
     view:addChild(button)
 end
 
+--------------------------------------------------------------------------------
+-- The tile icon.
+--------------------------------------------------------------------------------
 local function createIcon()
     local icon = cc.Sprite:create()
     icon:setAnchorPoint(0, 0)
@@ -71,16 +90,9 @@ local function updateIconWithModelTile(icon, tile)
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tile:getTiledID()))
 end
 
-local function createLabel()
-    local label = cc.Label:createWithTTF("0", "res/fonts/msyhbd.ttc", 22)
-    label:ignoreAnchorPointForPosition(true)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
-end
-
+--------------------------------------------------------------------------------
+-- The defense bonus info.
+--------------------------------------------------------------------------------
 local function createDefenseInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -120,6 +132,9 @@ local function updateDefenseInfoWithModelTile(info, tile)
     info:setDefenseBonus(tile:getNormalizedDefenseBonusAmount())
 end
 
+--------------------------------------------------------------------------------
+-- The capture info.
+--------------------------------------------------------------------------------
 local function createCaptureInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -145,6 +160,8 @@ local function createCaptureInfo()
         else
             self.m_Label:setString(""  .. point)
         end
+        
+        return self
     end
 
     return info
@@ -158,13 +175,16 @@ end
 local function updateCaptureInfoWithModelTile(info, tile)
     local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
     if (captureTaker) then
-        info:setCapturePoint(captureTaker:getCapturePoint())
-        info:setVisible(true)
+        info:setCapturePoint(captureTaker:getCurrentCapturePoint())
+            :setVisible(true)
     else
         info:setVisible(false)
     end
 end
 
+--------------------------------------------------------------------------------
+-- The contructor and public functions.
+--------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
     initWithButton(self, createButton(self))
     initWithIcon(self, createIcon())

@@ -19,6 +19,16 @@ local DEFENSE_INFO_HEIGHT     = LINE_HEIGHT
 local DEFENSE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local DEFENSE_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - DEFENSE_INFO_HEIGHT
 
+local REPAIR_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local REPAIR_INFO_HEIGHT     = LINE_HEIGHT
+local REPAIR_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local REPAIR_INFO_POSITION_Y = DEFENSE_INFO_POSITION_Y - REPAIR_INFO_HEIGHT
+
+local CAPTURE_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local CAPTURE_INFO_HEIGHT     = LINE_HEIGHT
+local CAPTURE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local CAPTURE_INFO_POSITION_Y = REPAIR_INFO_POSITION_Y - CAPTURE_INFO_HEIGHT
+
 --------------------------------------------------------------------------------
 -- The screen background (the grey transparent mask).
 --------------------------------------------------------------------------------
@@ -117,7 +127,7 @@ local function createDefenseInfoButtomLine()
     return line
 end
 
-local function createDefenseInfoDefenseLabel()
+local function createDefenseInfoLabel()
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
@@ -132,7 +142,7 @@ end
 
 local function createDefenseInfo()
     local buttomLine   = createDefenseInfoButtomLine()
-    local defenseLabel = createDefenseInfoDefenseLabel()
+    local defenseLabel = createDefenseInfoLabel()
 
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
@@ -157,12 +167,21 @@ end
 --------------------------------------------------------------------------------
 -- The repair info.
 --------------------------------------------------------------------------------
-local function createDefenseInfoRepairLabel()
+local function createRepairInfoButtomLine()
+    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    line:ignoreAnchorPointForPosition(true)
+        :setPosition(REPAIR_INFO_POSITION_X + 5, REPAIR_INFO_POSITION_Y)
+        :setContentSize(REPAIR_INFO_WIDTH - 10, REPAIR_INFO_HEIGHT)
+
+    return line
+end
+
+local function createRepairInfoLabel()
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y)
+        :setPosition(REPAIR_INFO_POSITION_X, REPAIR_INFO_POSITION_Y)
 
-        :setDimensions(DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
+        :setDimensions(REPAIR_INFO_WIDTH, REPAIR_INFO_HEIGHT)
 
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
@@ -170,15 +189,118 @@ local function createDefenseInfoRepairLabel()
     return label
 end
 
-local function updateDefenseInfoRepairLabel(label, tile)
+local function createRepairInfo()
+    local buttomLine  = createRepairInfoButtomLine()
+    local repairLabel = createRepairInfoLabel()
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(buttomLine)
+        :addChild(repairLabel)
+
+    info.m_ButtomLine = buttomLine
+    info.m_Label      = repairLabel
+
+    return info
+end
+
+local function initWithRepairInfo(view, info)
+    view.m_RepairInfo = info
+    view:addChild(info)
+end
+
+local function updateRepairInfoWithModelTile(info, tile)
     if (tile.getRepairTargetCatagory) then
         local catagory = tile:getRepairTargetCatagory()
         local amount   = tile:getRepairAmount()
-        label:setString("Repair: " .. catagory .. "(+" .. amount .. ")")
-            :setVisible(true)
+        info.m_Label:setString("Repair:  +" .. amount .. "HP (" .. catagory .. ")")
     else
-        label:setVisible(false)
+        info.m_Label:setString("Repair: None")
     end
+end
+
+--------------------------------------------------------------------------------
+-- The capture and income info.
+--------------------------------------------------------------------------------
+local function createCaptureAndIncomeInfoButtomLine()
+    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
+    line:ignoreAnchorPointForPosition(true)
+        :setPosition(CAPTURE_INFO_POSITION_X + 5, CAPTURE_INFO_POSITION_Y)
+        :setContentSize(CAPTURE_INFO_WIDTH - 10, CAPTURE_INFO_HEIGHT)
+
+    return line
+end
+
+local function createCaptureAndIncomeInfoCaptureLabel()
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y)
+
+        :setDimensions(CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    return label
+end
+
+local function createCaptureAndIncomeInfIncomeLabel()
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(CAPTURE_INFO_POSITION_X + 350, CAPTURE_INFO_POSITION_Y)
+
+        :setDimensions(CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
+
+        :setTextColor({r = 255, g = 255, b = 255})
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    return label
+end
+
+local function createCaptureAndIncomeInfo()
+    local buttomLine   = createCaptureAndIncomeInfoButtomLine()
+    local captureLabel = createCaptureAndIncomeInfoCaptureLabel()
+    local incomeLabel  = createCaptureAndIncomeInfIncomeLabel()
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(buttomLine)
+        :addChild(captureLabel)
+        :addChild(incomeLabel)
+
+    info.m_ButtomLine   = buttomLine
+    info.m_CaptureLabel = captureLabel
+    info.m_IncomeLabel  = incomeLabel
+
+    return info
+end
+
+local function initWithCaptureAndIncomeInfo(view, info)
+    view.m_CaptureAndIncomeInfo = info
+    view:addChild(info)
+end
+
+local function updateCaptureAndIncomeInfoCaptureLabel(label, tile)
+    if (tile.getCurrentCapturePoint) then
+        local currentPoint = tile:getCurrentCapturePoint()
+        local maxPoint     = tile:getMaxCapturePoint()
+        label:setString("CapturePoint:  " .. currentPoint .. " / " .. maxPoint)
+    else
+        label:setString("CapturePoint: None")
+    end
+end
+
+local function updateCaptureAndIncomeInfoIncomeLabel(label, tile)
+    if (tile.getIncomeAmount) then
+        label:setString("Income:  " .. tile:getIncomeAmount())
+    else
+        label:setString("Income: None")
+    end
+end
+
+local function updateCaptureAndIncomeInfoWithModelTile(info, tile)
+    updateCaptureAndIncomeInfoCaptureLabel(info.m_CaptureLabel, tile)
+    updateCaptureAndIncomeInfoIncomeLabel( info.m_IncomeLabel,  tile)
 end
 
 --------------------------------------------------------------------------------
@@ -208,11 +330,13 @@ end
 -- The constructor and public methods.
 --------------------------------------------------------------------------------
 function ViewTileDetail:ctor(param)
-    initWithScreenBackground( self, createScreenBackground())
-    initWithDetailBackground( self, createDetailBackground())
-    initWithDescription(      self, createDescription())
-    initWithDefenseInfo(      self, createDefenseInfo())
-    initWithTouchListener(    self, createTouchListener(self))
+    initWithScreenBackground(    self, createScreenBackground())
+    initWithDetailBackground(    self, createDetailBackground())
+    initWithDescription(         self, createDescription())
+    initWithDefenseInfo(         self, createDefenseInfo())
+    initWithRepairInfo(          self, createRepairInfo())
+    initWithCaptureAndIncomeInfo(self, createCaptureAndIncomeInfo())
+    initWithTouchListener(       self, createTouchListener(self))
 
     self:setCascadeOpacityEnabled(true)
         :setOpacity(180)
@@ -238,6 +362,8 @@ end
 function ViewTileDetail:updateWithModelTile(tile)
     updateDescriptionWithModelTile(self.m_Description, tile)
     updateDefenseInfoWithModelTile(self.m_DefenseInfo, tile)
+    updateRepairInfoWithModelTile( self.m_RepairInfo,  tile)
+    updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, tile)
 
     return self
 end

@@ -1,20 +1,18 @@
 
 local CaptureTaker = class("CaptureTaker")
 
-local MAX_CAPTURE_POINT = 20
-
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
-	"getCapturePoint",
-	"setCapturePoint",
+	"getCurrentCapturePoint",
+	"setCurrentCapturePoint",
+    "getMaxCapturePoint",
     "getCapturerID",
     "setCapturerID",
 }
 
 function CaptureTaker:ctor(param)
-    self.m_CapturePoint = MAX_CAPTURE_POINT
     self.m_CapturerID = 0
 
     if (param) then
@@ -39,20 +37,28 @@ function CaptureTaker:unbind(target)
 end
 
 function CaptureTaker:load(param)
-    self.m_CapturePoint = param.capturePoint or self.m_CapturePoint
-    self.m_CapturerID   = param.capturerID   or self.m_CapturerID
+    self.m_MaxCapturePoint     = param.maxCapturePoint or self.m_MaxCapturePoint
+    self.m_CurrentCapturePoint = param.capturePoint    or self.m_MaxCapturePoint
+    self.m_CapturerID          = param.capturerID      or self.m_CapturerID
 
     return self
 end
 
-function CaptureTaker:getCapturePoint()
-    return self.m_CapturePoint
+--------------------------------------------------------------------------------
+-- Exported methods.
+--------------------------------------------------------------------------------
+function CaptureTaker:getCurrentCapturePoint()
+    return self.m_CurrentCapturePoint
 end
 
-function CaptureTaker:setCapturePoint(point)
-    self.m_CapturePoint = point
+function CaptureTaker:setCurrentCapturePoint(point)
+    self.m_CurrentCapturePoint = point
 
     return self
+end
+
+function CaptureTaker:getMaxCapturePoint()
+    return self.m_MaxCapturePoint
 end
 
 function CaptureTaker:getCapturerID()
