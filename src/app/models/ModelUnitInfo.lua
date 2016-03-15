@@ -1,6 +1,8 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
+local UNIT_DETAIL_Z_ORDER = 2
+
 local function onEvtPlayerTouchUnit(model, event)
     model.m_ModelUnit = event.unitModel
 
@@ -65,7 +67,7 @@ end
 function ModelUnitInfo:onPlayerTouch()
     if (not self.m_DetailActor) then
         self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
-        self.m_View:getScene():addChild(self.m_DetailActor:getView())
+        self.m_View:getScene():addChild(self.m_DetailActor:getView(), UNIT_DETAIL_Z_ORDER)
     end
 
     local modelDetail = self.m_DetailActor:getModel()

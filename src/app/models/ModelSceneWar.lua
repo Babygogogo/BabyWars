@@ -29,20 +29,16 @@ local function createChildrenActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
-    local backgroundActor = Actor.createWithModelAndViewName(nil, nil, "ViewSceneWarBackground")
-    assert(backgroundActor, "SceneWar-createChildrenActors() failed to create a background actor.")
-
     local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.WarField, "ViewWarField", sceneData.WarField)
 	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create a WarField actor.")
 
     local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
     assert(hudActor, "SceneWar--createChildrenActors() failed to create a HUD actor.")
 
-	return {backgroundActor = backgroundActor, warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
+	return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
 end
 
 local function initWithChildrenActors(model, actors)
-    model.m_BackgroundActor  = actors.backgroundActor
     model.m_WarFieldActor    = actors.warFieldActor
     model.m_SceneWarHUDActor = actors.sceneWarHUDActor
 end
@@ -58,6 +54,9 @@ local function getTouchableChildrenViews(model)
     return views
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelSceneWar:ctor(param)
     self.m_ScriptEventDispatcher = require("global.events.EventDispatcher"):create()
 
@@ -86,14 +85,15 @@ function ModelSceneWar.createInstance(param)
     return model
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:removeAllChildren()
-        :addChild(self.m_BackgroundActor:getView())
-        :addChild(self.m_WarFieldActor:getView())
-        :addChild(self.m_SceneWarHUDActor:getView())
+    view:setWarFieldView(self.m_WarFieldActor:getView())
+        :setSceneHudView(self.m_SceneWarHUDActor:getView())
 
         :initTouchListener(getTouchableChildrenViews(self))
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))

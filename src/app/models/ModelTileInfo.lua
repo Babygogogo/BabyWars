@@ -1,6 +1,8 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
+local TILE_DETAIL_Z_ORDER = 2
+
 local function onEvtPlayerTouchTile(model, event)
     model.m_ModelTile = event.tileModel
 
@@ -54,7 +56,7 @@ end
 function ModelTileInfo:onPlayerTouch()
     if (not self.m_DetailActor) then
         self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelTileDetail", nil, "ViewTileDetail")
-        self.m_View:getScene():addChild(self.m_DetailActor:getView())
+        self.m_View:getScene():addChild(self.m_DetailActor:getView(), TILE_DETAIL_Z_ORDER)
     end
 
     local modelDetail = self.m_DetailActor:getModel()
