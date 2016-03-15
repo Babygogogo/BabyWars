@@ -1,11 +1,9 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
-local function createDetailActor()
-    return require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
-end
-
 local function onEvtPlayerTouchUnit(model, event)
+    model.m_ModelUnit = event.unitModel
+
     if (model.m_View) then
         model.m_View:updateWithModelUnit(event.unitModel)
         model.m_View:setVisible(true)
@@ -22,7 +20,7 @@ function ModelUnitInfo:ctor(param)
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -33,7 +31,7 @@ end
 function ModelUnitInfo.createInstance(param)
     local model = ModelUnitInfo.new():load(param)
     assert(model, "ModelUnitInfo.createInstance() failed.")
-    
+
     return model
 end
 
@@ -41,18 +39,16 @@ function ModelUnitInfo:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchUnit",   self)
                                     :addEventListener("EvtPlayerTouchNoUnit", self)
-    
+
     return self
 end
 
 function ModelUnitInfo:onCleanup(rootActor)
---[[
-    -- removeEventListener can be commented out because the dispatch itself is being destroyed.
+    -- removeEventListener can be commented out because the dispatcher itself is being destroyed.
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerTouchUnit",   self)
                                     :removeEventListener("EvtPlayerTouchNoUnit", self)
---]]
     self.m_RootScriptEventDispatcher = nil
-    
+
     return self
 end
 
@@ -62,18 +58,20 @@ function ModelUnitInfo:onEvent(event)
     elseif (event.name == "EvtPlayerTouchUnit") then
         onEvtPlayerTouchUnit(self, event)
     end
-    
+
     return self
 end
 
 function ModelUnitInfo:onPlayerTouch()
-    if (self.m_DetailActor) then
-        self.m_DetailActor:getModel():setEnabled(true)
-    else
-        self.m_DetailActor = createDetailActor()
+    if (not self.m_DetailActor) then
+        self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
         self.m_View:getScene():addChild(self.m_DetailActor:getView())
     end
-    
+
+    local modelDetail = self.m_DetailActor:getModel()
+    modelDetail:updateWithModelUnit(self.m_ModelUnit)
+        :setEnabled(true)
+
     return self
 end
 

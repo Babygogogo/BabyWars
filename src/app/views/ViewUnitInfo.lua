@@ -21,6 +21,9 @@ local FUEL_INFO_POSITION_Y = HP_INFO_POSITION_Y - 25
 local AMMO_INFO_POSITION_X = HP_INFO_POSITION_X
 local AMMO_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - 25
 
+--------------------------------------------------------------------------------
+-- The button background.
+--------------------------------------------------------------------------------
 local function createButton(view)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
@@ -49,6 +52,9 @@ local function initWithButton(view, button)
     view:addChild(button)
 end
 
+--------------------------------------------------------------------------------
+-- The unit icon.
+--------------------------------------------------------------------------------
 local function createIcon()
     local icon = cc.Sprite:create()
     icon:setAnchorPoint(0, 0)
@@ -67,6 +73,14 @@ local function initWithIcon(view, icon)
     view:addChild(icon)
 end
 
+local function updateIconWithModelUnit(icon, unit)
+    icon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(unit:getTiledID()))
+end
+
+--------------------------------------------------------------------------------
+-- The general label.
+--------------------------------------------------------------------------------
 local function createLabel()
     local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
@@ -77,6 +91,9 @@ local function createLabel()
     return label
 end
 
+--------------------------------------------------------------------------------
+-- The HP infomation for the unit.
+--------------------------------------------------------------------------------
 local function createHPInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -97,6 +114,14 @@ local function createHPInfo()
 
     info.m_Label = label
 
+    info.setHP = function(self, hp)
+        if (hp < 10) then
+            self.m_Label:setString("  " .. hp)
+        else
+            self.m_Label:setString(""   .. hp)
+        end
+    end
+
     return info
 end
 
@@ -105,6 +130,13 @@ local function initWithHPInfo(view, info)
     view:addChild(info)
 end
 
+local function updateHPInfoWithModelUnit(info, unit)
+    info:setHP(unit:getNormalizedCurrentHP())
+end
+
+--------------------------------------------------------------------------------
+-- The fuel infomation for the unit.
+--------------------------------------------------------------------------------
 local function createFuelInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -125,6 +157,14 @@ local function createFuelInfo()
 
     info.m_Label = label
 
+    info.setFuel = function(self, fuel)
+        if (fuel < 10) then
+            self.m_Label:setString("  " .. fuel)
+        else
+            self.m_Label:setString("" .. fuel)
+        end
+    end
+
     return info
 end
 
@@ -133,6 +173,13 @@ local function initWithFuelInfo(view, info)
     view:addChild(info)
 end
 
+local function updateFuelInfoWithModelUnit(info, unit)
+    info:setFuel(unit:getCurrentFuel())
+end
+
+--------------------------------------------------------------------------------
+-- The primary weapon ammo infomation for the unit.
+--------------------------------------------------------------------------------
 local function createAmmoInfo()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
     icon:setAnchorPoint(0, 0)
@@ -153,12 +200,31 @@ local function createAmmoInfo()
 
     info.m_Label = label
 
+    info.setAmmo = function(self, ammo)
+        if (ammo < 10) then
+            self.m_Label:setString("  " .. ammo)
+        else
+            self.m_Label:setString(""   .. ammo)
+        end
+
+        return self
+    end
+
     return info
 end
 
 local function initWithAmmoInfo(view, info)
     view.m_AmmoInfo = info
     view:addChild(info)
+end
+
+local function updateAmmoInfoWithModelUnit(info, unit)
+    if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
+        info:setAmmo(unit:getPrimaryWeaponCurrentAmmo())
+            :setVisible(true)
+    else
+        info:setVisible(false)
+    end
 end
 
 local function moveToLeftSide(view)
@@ -233,9 +299,10 @@ function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
 end
 
 function ViewUnitInfo:updateWithModelUnit(model)
-    local tiledID = model:getTiledID()
-    self.m_Icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(model:getTiledID()))
+    updateIconWithModelUnit(self.m_Icon, model)
+    updateHPInfoWithModelUnit(self.m_HPInfo, model)
+    updateFuelInfoWithModelUnit(self.m_FuelInfo, model)
+    updateAmmoInfoWithModelUnit(self.m_AmmoInfo, model)
 
     return self
 end

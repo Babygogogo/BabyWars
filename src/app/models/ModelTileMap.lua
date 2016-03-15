@@ -23,23 +23,19 @@ local function getTiledTileLayer(tiledData)
 end
 
 local function createTileActorsMapWithTemplateAndOverwriting(mapData)
-	local templateTiledData = requireMapData(mapData.Template)
-	assert(TypeChecker.isTiledData(templateTiledData))
+	local templateTiledData = requireMapData(mapData.template)
+	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), "ModelTile", "ViewTile")
+	assert(templateMap, "ModelTileMap-createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
 
-	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), ModelTile, ViewTile)
-	assert(templateMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
-
-	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.Grids, ModelTile, ViewTile)
-	assert(overwroteMap, "ModelTileMap--createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
+	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.grids, "ModelTile", "ViewTile")
+	assert(overwroteMap, "ModelTileMap-createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
 
 	return overwroteMap
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
-	assert(TypeChecker.isTiledData(mapData))
-
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), ModelTile, ViewTile)
-	assert(map, "ModelTileMap--createTileActorsMapWithoutTemplate() failed to create the map.")
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), "ModelTile", "ViewTile")
+	assert(map, "ModelTileMap-createTileActorsMapWithoutTemplate() failed to create the map.")
 
 	return map
 end
@@ -48,7 +44,7 @@ local function createChildrenActors(param)
 	local mapData = requireMapData(param)
 	assert(TypeChecker.isMapData(mapData))
 
-	local tileActorsMap = (mapData.Template == nil
+	local tileActorsMap = (mapData.template == nil
 		and createTileActorsMapWithoutTemplate(mapData)
 		or  createTileActorsMapWithTemplateAndOverwriting(mapData))
 	assert(tileActorsMap, "ModelTileMap--createChildrenActors() failed to create tile actors map.")
@@ -86,14 +82,14 @@ end
 function ModelTileMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
-    
+
     return self
 end
 
 function ModelTileMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtCursorPositionChanged", self)
     self.m_RootScriptEventDispatcher = nil
-    
+
     return self
 end
 
@@ -103,7 +99,7 @@ function ModelTileMap:onEvent(event)
         assert(tileActor, "ModelTileMap:onEvent() failed to get the tile actor with event.gridIndex.")
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = tileActor:getModel()})
     end
-    
+
     return self
 end
 

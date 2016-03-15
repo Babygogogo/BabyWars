@@ -60,8 +60,8 @@ local function createChildrenActors(param)
 	assert(TypeChecker.isMapData(mapData))
 
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
-		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), ModelUnit, ViewUnit)
-		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    ModelUnit, ViewUnit)
+		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), "ModelUnit", "ViewUnit")
+		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    "ModelUnit", "ViewUnit")
 	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
 
 	return {UnitActorsMap = unitActorsMap}

@@ -29,17 +29,21 @@ local function createChildrenActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
+    local backgroundActor = Actor.createWithModelAndViewName(nil, nil, "ViewSceneWarBackground")
+    assert(backgroundActor, "SceneWar-createChildrenActors() failed to create a background actor.")
+
     local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.WarField, "ViewWarField", sceneData.WarField)
 	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create a WarField actor.")
 
     local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
     assert(hudActor, "SceneWar--createChildrenActors() failed to create a HUD actor.")
 
-	return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
+	return {backgroundActor = backgroundActor, warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
 end
 
 local function initWithChildrenActors(model, actors)
-    model.m_WarFieldActor = actors.warFieldActor
+    model.m_BackgroundActor  = actors.backgroundActor
+    model.m_WarFieldActor    = actors.warFieldActor
     model.m_SceneWarHUDActor = actors.sceneWarHUDActor
 end
 
@@ -50,49 +54,50 @@ local function getTouchableChildrenViews(model)
     -- TODO: Add more children views. Be careful of the order of the views!
     views[#views + 1] = getTouchableViewFromActor(model.m_SceneWarHUDActor)
     views[#views + 1] = getTouchableViewFromActor(model.m_WarFieldActor)
-    
+
     return views
 end
 
 function ModelSceneWar:ctor(param)
     self.m_ScriptEventDispatcher = require("global.events.EventDispatcher"):create()
-    
+
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
 function ModelSceneWar:load(param)
     self.m_ScriptEventDispatcher:reset()
     initWithChildrenActors(self, createChildrenActors(param))
-    
+
     if (self.m_View) then
         self:initView()
     end
-    
+
     return self
 end
 
 function ModelSceneWar.createInstance(param)
     local model = ModelSceneWar:create():load(param)
     assert(model, "ModelSceneWar.createInstance() failed.")
-    
+
     return model
 end
 
 function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
-    
+
     view:removeAllChildren()
+        :addChild(self.m_BackgroundActor:getView())
         :addChild(self.m_WarFieldActor:getView())
         :addChild(self.m_SceneWarHUDActor:getView())
-        
+
         :initTouchListener(getTouchableChildrenViews(self))
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
-    
+
     return self
 end
 
@@ -102,19 +107,19 @@ end
 
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
-    
+
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
-    
+
     return self
 end
 
 function ModelSceneWar:onCleanup(rootActor)
     print("ModelSceneWar:onCleanup()")
-    
+
     self.m_SceneWarHUDActor:onCleanup(rootActor)
     self.m_WarFieldActor:onCleanup(rootActor)
-    
+
     return self
 end
 

@@ -3,7 +3,7 @@ local Actor = class("Actor")
 
 local ComponentManager = require("global.components.ComponentManager")
 
-local function createModel(name, param)
+function Actor.createModel(name, param)
     if (not name) then
         return nil
     else
@@ -16,7 +16,7 @@ local function createModel(name, param)
     end
 end
 
-local function createView(name, param)
+function Actor.createView(name, param)
     if (not name) then
         return nil
     else
@@ -33,13 +33,13 @@ function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
 	local actor = Actor.new()
 	if (modelInstance) then actor:setModel(modelInstance) end
 	if (viewInstance)  then actor:setView( viewInstance)  end
-	
+
 	return actor
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
-    local model = createModel(modelName, modelParam)
-    local view  = createView( viewName,  viewParam)
+    local model = Actor.createModel(modelName, modelParam)
+    local view  = Actor.createView( viewName,  viewParam)
 
 	return Actor.createWithModelAndViewInstance(model, view)
 end
@@ -50,7 +50,7 @@ function Actor:destroy()
         :destroyModel()
 --        :unbindAllComponents()
 
-    return self    
+    return self
 end
 --]]
 
@@ -61,7 +61,7 @@ function Actor:onEnter(rootActor)
     if (self.m_View and self.m_View.onEnter) then
         self.m_View:onEnter(rootActor)
     end
-    
+
     return self
 end
 
@@ -72,7 +72,7 @@ function Actor:onCleanup(rootActor)
     if (self.m_View and self.m_View.onCleanup) then
         self.m_View:onCleanup(rootActor)
     end
-    
+
     return self
 end
 
@@ -87,10 +87,10 @@ function Actor:setView(view)
 		model.m_View = view
 		if (model.initView) then model:initView() end
 	end
-	
+
 	self.m_View = view
 	view.m_Actor = self
-	
+
 	return self
 end
 
@@ -103,11 +103,11 @@ function Actor:removeView()
 	if (view) then
 		local model = self.m_Model
 		if (model) then model.m_View = nil end
-		
+
 		view.m_Model, view.m_Actor = nil, nil
 		self.m_View = nil
 	end
-	
+
 	return self
 end
 
@@ -120,7 +120,7 @@ function Actor:destroyView()
             view:onCleanup()
         end
     end
-    
+
     return self
 end
 --]]
@@ -129,17 +129,17 @@ function Actor:setModel(model)
 	assert(type(model) == "table", "Actor:setModel() the param model is not a table.")
 	assert(model.m_Actor == nil, "Actor:setModel() the param model already has an owner actor.")
 	assert(self.m_Model == nil, "Actor:setModel() the actor already has a model.")
-	
+
 	local view = self.m_View
 	model.m_View = view
 	if (view) then
 		view.m_Model = model
 		if (model.initView) then model:initView() end
 	end
-	
+
 	self.m_Model = model
 	model.m_Actor = self
-	
+
 	return self
 end
 
@@ -156,7 +156,7 @@ function Actor:removeModel()
 		model.m_View, model.m_Actor = nil, nil
 		self.m_Model = nil
 	end
-	
+
 	return self
 end
 
@@ -169,7 +169,7 @@ function Actor:destroyModel()
             model:onCleanup()
         end
     end
-    
+
     return self
 end
 --]]
@@ -177,19 +177,19 @@ end
 --[[
 function Actor:bindComponent(...)
 	ComponentManager.bindComponent(self, ...)
-	
+
 	return self
 end
 
 function Actor:unbindComponent(...)
 	ComponentManager.unbindComponent(self, ...)
-    
+
 	return self
 end
 
 function Actor:unbindAllComponents()
 	ComponentManager.unbindAllComponents(self)
-	
+
 	return self
 end
 

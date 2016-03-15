@@ -15,7 +15,7 @@ function ViewUnit:ctor(param)
 end
 
 function ViewUnit:load(param)
-    local tiledID = param.TiledID
+    local tiledID = param.tiledID
     assert(TypeChecker.isTiledID(tiledID), "ViewUnit:load() the param hasn't a valid TiledID.")
 
     self:updateWithTiledID(tiledID)
@@ -41,7 +41,7 @@ function ViewUnit:updateWithTiledID(tiledID)
     self:stopAllActions()
 --        :playAnimationForever(template.Animation)
         :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
-    
+
     return self
 end
 
