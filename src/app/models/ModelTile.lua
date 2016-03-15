@@ -56,6 +56,9 @@ local function overwrite(model, param)
     end
 end
 
+--------------------------------------------------------------------------------
+-- The constructor and public functions.
+--------------------------------------------------------------------------------
 function ModelTile:ctor(param)
     if (param) then
         self:load(param)
@@ -113,6 +116,10 @@ end
 
 function ModelTile:getDefenseBonusTargetCatagory()
     return self.m_Template.defenseBonus.targetCatagory
+end
+
+function ModelTile:getMoveCostWithMoveType(moveType)
+    return self.m_Template.moveCost.clear[moveType]
 end
 
 function ModelTile:getDescription()

@@ -4,8 +4,8 @@ local ViewTileDetail = class("ViewTileDetail", cc.Node)
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH  = display.width * 0.7
-local BACKGROUND_HEIGHT = display.height * 0.7
+local BACKGROUND_WIDTH  = display.width * 0.8
+local BACKGROUND_HEIGHT = math.min(LINE_HEIGHT * 8 + 10, display.height * 0.9)
 local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
 
@@ -28,6 +28,43 @@ local CAPTURE_INFO_WIDTH      = BACKGROUND_WIDTH - 10
 local CAPTURE_INFO_HEIGHT     = LINE_HEIGHT
 local CAPTURE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local CAPTURE_INFO_POSITION_Y = REPAIR_INFO_POSITION_Y - CAPTURE_INFO_HEIGHT
+
+local MOVE_COST_INFO_WIDTH      = BACKGROUND_WIDTH - 10
+local MOVE_COST_INFO_HEIGHT     = LINE_HEIGHT * 4
+local MOVE_COST_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
+local MOVE_COST_INFO_POSITION_Y = CAPTURE_INFO_POSITION_Y - MOVE_COST_INFO_HEIGHT
+
+--------------------------------------------------------------------------------
+-- Util functions.
+--------------------------------------------------------------------------------
+local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
+local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
+
+local function createButtomLine(posX, poxY, width, height)
+    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
+    line:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, poxY)
+        :setContentSize(width, height)
+
+    return line
+end
+
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local FONT_OUTLINE_WIDTH = 2
+
+local function createLabel(posX, posY, width, height, text)
+    local label = cc.Label:createWithTTF(text or "", FONT_NAME, FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
+        :setDimensions(width, height)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+
+    return label
+end
 
 --------------------------------------------------------------------------------
 -- The screen background (the grey transparent mask).
@@ -70,25 +107,13 @@ end
 -- The description.
 --------------------------------------------------------------------------------
 local function createDescriptionButtomLine()
-    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    line:ignoreAnchorPointForPosition(true)
-        :setPosition(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y)
-        :setContentSize(DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
-
-    return line
+    return createButtomLine(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y,
+                            DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
 end
 
 local function createDescriptionLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6)
-
-        :setDimensions(BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6,
+                       BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
 end
 
 local function createDescription()
@@ -119,25 +144,13 @@ end
 -- The defense bonus info.
 --------------------------------------------------------------------------------
 local function createDefenseInfoButtomLine()
-    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    line:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X + 5, DEFENSE_INFO_POSITION_Y)
-        :setContentSize(DEFENSE_INFO_WIDTH - 10, DEFENSE_INFO_HEIGHT)
-
-    return line
+    return createButtomLine(DEFENSE_INFO_POSITION_X + 5, DEFENSE_INFO_POSITION_Y,
+                            DEFENSE_INFO_WIDTH - 10, DEFENSE_INFO_HEIGHT)
 end
 
 local function createDefenseInfoLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-
-        :setDimensions(DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
+                       DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
 end
 
 local function createDefenseInfo()
@@ -168,25 +181,13 @@ end
 -- The repair info.
 --------------------------------------------------------------------------------
 local function createRepairInfoButtomLine()
-    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    line:ignoreAnchorPointForPosition(true)
-        :setPosition(REPAIR_INFO_POSITION_X + 5, REPAIR_INFO_POSITION_Y)
-        :setContentSize(REPAIR_INFO_WIDTH - 10, REPAIR_INFO_HEIGHT)
-
-    return line
+    return createButtomLine(REPAIR_INFO_POSITION_X + 5, REPAIR_INFO_POSITION_Y,
+                            REPAIR_INFO_WIDTH - 10, REPAIR_INFO_HEIGHT)
 end
 
 local function createRepairInfoLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(REPAIR_INFO_POSITION_X, REPAIR_INFO_POSITION_Y)
-
-        :setDimensions(REPAIR_INFO_WIDTH, REPAIR_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(REPAIR_INFO_POSITION_X, REPAIR_INFO_POSITION_Y,
+                       REPAIR_INFO_WIDTH, REPAIR_INFO_HEIGHT)
 end
 
 local function createRepairInfo()
@@ -223,44 +224,24 @@ end
 -- The capture and income info.
 --------------------------------------------------------------------------------
 local function createCaptureAndIncomeInfoButtomLine()
-    local line = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    line:ignoreAnchorPointForPosition(true)
-        :setPosition(CAPTURE_INFO_POSITION_X + 5, CAPTURE_INFO_POSITION_Y)
-        :setContentSize(CAPTURE_INFO_WIDTH - 10, CAPTURE_INFO_HEIGHT)
-
-    return line
+    return createButtomLine(CAPTURE_INFO_POSITION_X + 5, CAPTURE_INFO_POSITION_Y,
+                            CAPTURE_INFO_WIDTH - 10, CAPTURE_INFO_HEIGHT)
 end
 
 local function createCaptureAndIncomeInfoCaptureLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y)
-
-        :setDimensions(CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y,
+                       CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
 end
 
-local function createCaptureAndIncomeInfIncomeLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(CAPTURE_INFO_POSITION_X + 350, CAPTURE_INFO_POSITION_Y)
-
-        :setDimensions(CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+local function createCaptureAndIncomeInfoIncomeLabel()
+    return createLabel(CAPTURE_INFO_POSITION_X + 350, CAPTURE_INFO_POSITION_Y,
+                       CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
 end
 
 local function createCaptureAndIncomeInfo()
     local buttomLine   = createCaptureAndIncomeInfoButtomLine()
     local captureLabel = createCaptureAndIncomeInfoCaptureLabel()
-    local incomeLabel  = createCaptureAndIncomeInfIncomeLabel()
+    local incomeLabel  = createCaptureAndIncomeInfoIncomeLabel()
 
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
@@ -304,6 +285,62 @@ local function updateCaptureAndIncomeInfoWithModelTile(info, tile)
 end
 
 --------------------------------------------------------------------------------
+-- The move cost info.
+--------------------------------------------------------------------------------
+local function createMoveCostInfoMoveCostLabel()
+    return createLabel(MOVE_COST_INFO_POSITION_X, MOVE_COST_INFO_POSITION_Y + LINE_HEIGHT * 3,
+                       MOVE_COST_INFO_WIDTH, LINE_HEIGHT,
+                       "Move Cost:")
+end
+
+local function createMoveCostInfoDetailLabels()
+    local originX, originY = MOVE_COST_INFO_POSITION_X, MOVE_COST_INFO_POSITION_Y
+    local width,   height =  MOVE_COST_INFO_WIDTH / 4,  LINE_HEIGHT
+    return {
+        infantry = createLabel(originX,             originY + height * 2, width, height),
+        mech     = createLabel(originX + width,     originY + height * 2, width, height),
+        treads   = createLabel(originX + width * 2, originY + height * 2, width, height),
+        tires    = createLabel(originX + width * 3, originY + height * 2, width, height),
+        air      = createLabel(originX,             originY + height,     width, height),
+        ship     = createLabel(originX + width * 1, originY + height,     width, height),
+        lander   = createLabel(originX + width * 2, originY + height,     width, height)
+    }
+end
+
+local function createMoveCostInfo()
+    local moveCostLabel = createMoveCostInfoMoveCostLabel()
+    local detailLabels = createMoveCostInfoDetailLabels()
+
+    local info = cc.Node:create()
+    info:ignoreAnchorPointForPosition(true)
+        :addChild(moveCostLabel)
+
+    for _, label in pairs(detailLabels) do
+        info:addChild(label)
+    end
+
+    info.m_MoveCostLabel = captureLabel
+    info.m_DetailLabels  = detailLabels
+
+    return info
+end
+
+local function initWithMoveCostInfo(view, info)
+    view.m_MoveCostInfo = info
+    view:addChild(info)
+end
+
+local function updateMoveCostInfoDetailLabels(labels, tile)
+    for key, label in pairs(labels) do
+        label:setString(key .. ": " .. (tile:getMoveCostWithMoveType(key) or "-"))
+    end
+end
+
+local function updateMoveCostInfoWithModelTile(info, tile)
+    updateMoveCostInfoDetailLabels(info.m_DetailLabels, tile)
+end
+
+--------------------------------------------------------------------------------
 -- The touch listener.
 --------------------------------------------------------------------------------
 local function createTouchListener(view)
@@ -336,6 +373,7 @@ function ViewTileDetail:ctor(param)
     initWithDefenseInfo(         self, createDefenseInfo())
     initWithRepairInfo(          self, createRepairInfo())
     initWithCaptureAndIncomeInfo(self, createCaptureAndIncomeInfo())
+    initWithMoveCostInfo(        self, createMoveCostInfo())
     initWithTouchListener(       self, createTouchListener(self))
 
     self:setCascadeOpacityEnabled(true)
@@ -360,10 +398,11 @@ function ViewTileDetail.createInstance(param)
 end
 
 function ViewTileDetail:updateWithModelTile(tile)
-    updateDescriptionWithModelTile(self.m_Description, tile)
-    updateDefenseInfoWithModelTile(self.m_DefenseInfo, tile)
-    updateRepairInfoWithModelTile( self.m_RepairInfo,  tile)
+    updateDescriptionWithModelTile(         self.m_Description,          tile)
+    updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          tile)
+    updateRepairInfoWithModelTile(          self.m_RepairInfo,           tile)
     updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, tile)
+    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         tile)
 
     return self
 end
