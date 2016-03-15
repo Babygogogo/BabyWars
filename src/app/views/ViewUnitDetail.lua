@@ -45,7 +45,7 @@ local DEFENSE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local DEFENSE_INFO_POSITION_Y = SECONDARY_WEAPON_INFO_POSITION_Y - DEFENSE_INFO_HEIGHT
 
 local ICON_SCALE = FONT_SIZE * 0.016
-local ICON_WIDTH = require("res.data.GameConstant").GridSize.width * ICON_SCALE
+local GRID_WIDTH = require("res.data.GameConstant").GridSize.width
 
 local AnimationLoader = require("app.utilities.AnimationLoader")
 
@@ -58,15 +58,14 @@ local function resetIconsWithTypeNames(icons, typeNames)
 
     for i, name in ipairs(typeNames) do
         local icon = cc.Sprite:create()
-        icon:setScale(ICON_SCALE)
-            :ignoreAnchorPointForPosition(true)
-            :setPosition(ICON_WIDTH * (i - 1), 0)
+        icon:ignoreAnchorPointForPosition(true)
+            :setPosition(GRID_WIDTH * (i - 1), 0)
             :playAnimationForever(AnimationLoader.getAnimationWithTypeName(name))
 
         icons:addChild(icon)
     end
 
-    icons.m_Width = #typeNames * ICON_WIDTH
+    icons.m_Width = #typeNames * GRID_WIDTH * ICON_SCALE
 end
 
 --------------------------------------------------------------------------------
@@ -308,7 +307,8 @@ end
 local function createPrimaryWeaponInfoFatalIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 46, PRIMARY_WEAPON_INFO_POSITION_Y - 46)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -329,7 +329,8 @@ end
 local function createPrimaryWeaponInfoStrongIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y - 46)
+        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -402,7 +403,7 @@ local function updatePrimaryWeaponInfoStrongIcons(icons, unit, hasPrimaryWeapon,
     icons:setVisible(hasPrimaryWeapon)
     if (hasPrimaryWeapon) then
         resetIconsWithTypeNames(icons, unit:getPrimaryWeaponStrongList())
-        icons:setPosition(strongLabel:getPositionX() + 72, icons:getPositionY())
+        icons:setPosition(strongLabel:getPositionX() + 98, icons:getPositionY())
     end
 end
 
@@ -456,7 +457,8 @@ end
 local function createSecondaryWeaponInfoFatalIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X + 46, SECONDARY_WEAPON_INFO_POSITION_Y - 46)
+        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -477,7 +479,8 @@ end
 local function createSecondaryWeaponInfoStrongIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y - 46)
+        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -550,7 +553,7 @@ local function updateSecondaryWeaponInfoStrongIcons(icons, unit, hasSecondaryWea
     icons:setVisible(hasSecondaryWeapon)
     if (hasSecondaryWeapon) then
         resetIconsWithTypeNames(icons, unit:getSecondaryWeaponStrongList())
-        icons:setPosition(strongLabel:getPositionX() + 72, icons:getPositionY())
+        icons:setPosition(strongLabel:getPositionX() + 98, icons:getPositionY())
     end
 end
 
@@ -595,7 +598,8 @@ end
 local function createDefenseInfoFatalIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X + 46, DEFENSE_INFO_POSITION_Y - 46)
+        :setPosition(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -616,7 +620,8 @@ end
 local function createDefenseInfoWeakIcons()
     local icons = cc.Node:create()
     icons:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y - 46)
+        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
+        :setScale(ICON_SCALE)
 
     return icons
 end
@@ -665,7 +670,7 @@ end
 
 local function updateDefenseInfoWeakIcons(icons, unit, weakLabel)
     resetIconsWithTypeNames(icons, unit:getDefenseWeakList())
-    icons:setPosition(weakLabel:getPositionX() + 60, icons:getPositionY())
+    icons:setPosition(weakLabel:getPositionX() + 86, icons:getPositionY())
 end
 
 local function updateDefenseInfoWithModelUnit(info, unit)
@@ -698,7 +703,7 @@ local function initWithTouchListener(view, touchListener)
 end
 
 --------------------------------------------------------------------------------
--- Things about construction.
+-- The constructor and public functions.
 --------------------------------------------------------------------------------
 function ViewUnitDetail:ctor(param)
     initWithScreenBackground(   self, createScreenBackground())

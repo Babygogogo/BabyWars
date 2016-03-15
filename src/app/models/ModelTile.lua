@@ -2,7 +2,7 @@
 local ModelTile = class("ModelTile")
 
 local TEMPLATE_MODEL_TILE_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
-local TEMPLATE_MODEL_TILES = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
+local TEMPLATE_MODEL_TILES    = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
 
 local ComponentManager = require("global.components.ComponentManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
@@ -24,10 +24,9 @@ local function initWithTiledID(model, tiledID)
     assert(template, "ModelTile-initWithTiledID() failed to get the model tile template with param tiledID.")
 
     ComponentManager.unbindAllComponents(model)
-
     ComponentManager.bindComponent(model, "GridIndexable")
-    model.m_DefenseBonus = template.defenseBonus
-    model.m_Description  = template.description
+
+    model.m_Template     = template
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -43,9 +42,11 @@ local function overwrite(model, param)
     if (param.gridIndex) then
         model:setGridIndex(param.gridIndex)
     end
+
+--[[ These code are commented out because the properties should not be overwritten.
     model.m_DefenseBonus = param.defenseBonus or model.m_DefenseBonus
     model.m_Description  = param.description  or model.m_Description
-
+]]
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
             local component = ComponentManager.getComponent(model, specialProperty.name)
@@ -102,12 +103,20 @@ function ModelTile:getTiledID()
     return self.m_TiledID
 end
 
-function ModelTile:getDefenseBonus()
-    return self.m_DefenseBonus
+function ModelTile:getDefenseBonusAmount()
+    return self.m_Template.defenseBonus.amount
+end
+
+function ModelTile:getNormalizedDefenseBonusAmount()
+    return math.floor(self:getDefenseBonusAmount() / 10)
+end
+
+function ModelTile:getDefenseBonusTargetCatagory()
+    return self.m_Template.defenseBonus.targetCatagory
 end
 
 function ModelTile:getDescription()
-    return self.m_Description
+    return self.m_Template.description
 end
 
 return ModelTile

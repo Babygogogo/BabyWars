@@ -117,7 +117,7 @@ local function initWithDefenseInfo(view, info)
 end
 
 local function updateDefenseInfoWithModelTile(info, tile)
-    info:setDefenseBonus(tile:getDefenseBonus() / 10)
+    info:setDefenseBonus(tile:getNormalizedDefenseBonusAmount())
 end
 
 local function createCaptureInfo()
