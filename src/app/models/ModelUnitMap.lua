@@ -23,58 +23,31 @@ local function getTiledUnitLayer(tiledData)
 	return tiledData.layers[2]
 end
 
-local function createModel(param)
-	local mapData = requireMapData(param)
-	if (mapData == nil) then
-		return nil, "ModelUnitMap--createModel() failed to require MapData from param."
-	end
-
-	local baseMap, mapSize
-	if (mapData.Template ~= nil) then
-		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
-		if (createTemplateMapResult == nil) then
-			return nil, string.format("ModelUnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
-		end
-
-		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
-	else
-		local loadSizeMsg
-		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
-		if (mapSize == nil) then
-			return nil, "ModelUnitMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
-		end
-
-		baseMap = MapFunctions.createEmptyMap(mapSize)
-	end
-
-	local map, loadUnitsIntoMapMsg = MapFunctions.loadGridsIntoMap(Unit, mapData.Units, baseMap, mapSize)
-	if (map == nil) then
-		return nil, "ModelUnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
-	end
-
-	return {map = map, mapSize = mapSize}
-end
-
-local function createChildrenActors(param)
+local function createCompositionActors(param)
 	local mapData = requireMapData(param)
 	assert(TypeChecker.isMapData(mapData))
 
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
 		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), "ModelUnit", "ViewUnit")
 		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    "ModelUnit", "ViewUnit")
-	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
+	assert(unitActorsMap, "ModelUnitMap--createCompositionActors() failed to create the unit actors map.")
 
 	return {UnitActorsMap = unitActorsMap}
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
-	if (param) then self:load(param) end
+    if (param) then
+        self:load(param)
+    end
 
-	return self
+    return self
 end
 
 function ModelUnitMap:load(param)
-	local childrenActors = createChildrenActors(param)
+	local childrenActors = createCompositionActors(param)
 	assert(childrenActors, "ModelUnitMap:load() failed to create children actors.")
 
 	self.m_UnitActorsMap = childrenActors.UnitActorsMap
@@ -93,6 +66,27 @@ function ModelUnitMap.createInstance(param)
 	return model
 end
 
+function ModelUnitMap:initView()
+	local view = self.m_View
+	assert(TypeChecker.isView(view))
+
+	view:removeAllChildren()
+
+    local unitActors = self.m_UnitActorsMap
+	local mapSize = unitActors.size
+    for y = mapSize.height, 1, -1 do
+        for x = mapSize.width, 1, -1 do
+            local unitActor = unitActors[x][y]
+            if (unitActor) then view:addChild(unitActor:getView()) end
+        end
+	end
+
+	return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on node/script events.
+--------------------------------------------------------------------------------
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
@@ -120,24 +114,9 @@ function ModelUnitMap:onEvent(event)
     return self
 end
 
-function ModelUnitMap:initView()
-	local view = self.m_View
-	assert(TypeChecker.isView(view))
-
-	view:removeAllChildren()
-
-    local unitActors = self.m_UnitActorsMap
-	local mapSize = unitActors.size
-    for y = mapSize.height, 1, -1 do
-        for x = mapSize.width, 1, -1 do
-            local unitActor = unitActors[x][y]
-            if (unitActor) then view:addChild(unitActor:getView()) end
-        end
-	end
-
-	return self
-end
-
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()
 	return self.m_UnitActorsMap.size
 end
@@ -148,20 +127,6 @@ function ModelUnitMap:getUnitActor(gridIndex)
     else
         return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
     end
-end
-
-function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
---[[
-    local unitActor = self:getUnitActor(gridIndex)
-    if (unitActor) then
-        local event = {name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()}
-        self.m_RootScriptEventDispatcher:dispatchEvent(event)
-    else
-        local event = {name = "EvtPlayerTouchNoUnit"}
-        self.m_RootScriptEventDispatcher:dispatchEvent(event)
-    end
---]]
-    return false
 end
 
 return ModelUnitMap

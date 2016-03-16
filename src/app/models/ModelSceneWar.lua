@@ -25,32 +25,25 @@ local function requireSceneData(param)
 	end
 end
 
-local function createChildrenActors(param)
+--------------------------------------------------------------------------------
+-- The comsition actors.
+--------------------------------------------------------------------------------
+local function createCompositionActors(param)
 	local sceneData = requireSceneData(param)
 	assert(TypeChecker.isWarSceneData(sceneData))
 
     local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.WarField, "ViewWarField", sceneData.WarField)
-	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create a WarField actor.")
+	assert(warFieldActor, "SceneWar--createCompositionActors() failed to create a WarField actor.")
 
     local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
-    assert(hudActor, "SceneWar--createChildrenActors() failed to create a HUD actor.")
+    assert(hudActor, "SceneWar--createCompositionActors() failed to create a HUD actor.")
 
 	return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
 end
 
-local function initWithChildrenActors(model, actors)
+local function initWithCompositionActors(model, actors)
     model.m_WarFieldActor    = actors.warFieldActor
     model.m_SceneWarHUDActor = actors.sceneWarHUDActor
-end
-
-local function getTouchableChildrenViews(model)
-    local views = {}
-    local getTouchableViewFromActor = require("app.utilities.GetTouchableViewFromActor")
-
-    -- TODO: Add more children views. Be careful of the order of the views!
-    views[#views + 1] = getTouchableViewFromActor(model.m_WarFieldActor)
-
-    return views
 end
 
 --------------------------------------------------------------------------------
@@ -68,7 +61,7 @@ end
 
 function ModelSceneWar:load(param)
     self.m_ScriptEventDispatcher:reset()
-    initWithChildrenActors(self, createChildrenActors(param))
+    initWithCompositionActors(self, createCompositionActors(param))
 
     if (self.m_View) then
         self:initView()
@@ -91,7 +84,6 @@ function ModelSceneWar:initView()
     view:setWarFieldView(self.m_WarFieldActor:getView())
         :setSceneHudView(self.m_SceneWarHUDActor:getView())
 
-        :initTouchListener(getTouchableChildrenViews(self))
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
 
     return self

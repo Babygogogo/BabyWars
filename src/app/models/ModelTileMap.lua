@@ -22,6 +22,9 @@ local function getTiledTileLayer(tiledData)
 	return tiledData.layers[1]
 end
 
+--------------------------------------------------------------------------------
+-- The composition actors.
+--------------------------------------------------------------------------------
 local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateTiledData = requireMapData(mapData.template)
 	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), "ModelTile", "ViewTile")
@@ -53,10 +56,15 @@ local function createChildrenActors(param)
 	return {TileActorsMap = tileActorsMap}
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelTileMap:ctor(param)
-	if (param) then self:load(param) end
+    if (param) then
+        self:load(param)
+    end
 
-	return self
+    return self
 end
 
 function ModelTileMap:load(param)
@@ -79,6 +87,26 @@ function ModelTileMap.createInstance(param)
 	return model
 end
 
+function ModelTileMap:initView()
+    local view = self.m_View
+    assert(view, "ModelTileMap:initView() no view is attached to the owner actor of the model.")
+
+    view:removeAllChildren()
+
+    local tileActors = self.m_TileActorsMap
+    local mapSize = tileActors.size
+    for y = mapSize.height, 1, -1 do
+        for x = mapSize.width, 1, -1 do
+            view:addChild(tileActors[x][y]:getView())
+        end
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on node/script events.
+--------------------------------------------------------------------------------
 function ModelTileMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
@@ -103,23 +131,9 @@ function ModelTileMap:onEvent(event)
     return self
 end
 
-function ModelTileMap:initView()
-    local view = self.m_View
-    assert(view, "ModelTileMap:initView() no view is attached to the owner actor of the model.")
-
-    view:removeAllChildren()
-
-    local tileActors = self.m_TileActorsMap
-    local mapSize = tileActors.size
-    for y = mapSize.height, 1, -1 do
-        for x = mapSize.width, 1, -1 do
-            view:addChild(tileActors[x][y]:getView())
-        end
-    end
-
-    return self
-end
-
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelTileMap:getMapSize()
 	return self.m_TileActorsMap.size
 end

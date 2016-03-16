@@ -6,11 +6,14 @@ local GameConstant = require("res.data.GameConstant")
 
 local ORIGIN = {x = 0, y = 0}
 local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.height - 10, lowerLeftX = 10, lowerLeftY = 10}
-BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
-BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
+      BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
+      BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
 
+--------------------------------------------------------------------------------
+-- The functions that deals with zooming/dragging.
+--------------------------------------------------------------------------------
 local function isViewSmallerThanBoundaryRect(scale, contentSize)
-    local width = contentSize.width * scale
+    local width  = contentSize.width * scale
     local height = contentSize.height * scale
 
     return (width <= BOUNDARY_RECT.width) and (height <= BOUNDARY_RECT.height)
@@ -56,16 +59,9 @@ local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSiz
     end
 end
 
-function ViewWarField:setPositionOnDrag(previousDragPos, currentDragPos)
-    local boundingBox = self:getBoundingBox()
-    local dragDeltaX, dragDeltaY = currentDragPos.x - previousDragPos.x, currentDragPos.y - previousDragPos.y
-
-    self:setPosition(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BOUNDARY_RECT.upperRightX, BOUNDARY_RECT.lowerLeftX),
-                     getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BOUNDARY_RECT.upperRightY, BOUNDARY_RECT.lowerLeftY))
-
-    return self
-end
-
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ViewWarField:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
@@ -89,12 +85,9 @@ function ViewWarField.createInstance(param)
 	return view
 end
 
-function ViewWarField:handleAndSwallowTouch(touch, touchType, event)
-    local isTouchSwallowed = require("app.utilities.DispatchAndSwallowTouch")(self.m_TouchableChildrenViews, touch, touchType, event)
-
-    return isTouchSwallowed
-end
-
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ViewWarField:setContentSizeWithMapSize(mapSize)
     local gridSize = GameConstant.GridSize
     self.m_ContentSize.width = mapSize.width * gridSize.width
@@ -123,14 +116,18 @@ function ViewWarField:setZoomWithScroll(focusPosInWorld, scrollValue)
     return self
 end
 
-function ViewWarField:placeInDragBoundary()
-    self:setPositionOnDrag(ORIGIN, ORIGIN)
+function ViewWarField:setPositionOnDrag(previousDragPos, currentDragPos)
+    local boundingBox = self:getBoundingBox()
+    local dragDeltaX, dragDeltaY = currentDragPos.x - previousDragPos.x, currentDragPos.y - previousDragPos.y
+
+    self:setPosition(getNewPosComponentOnDrag(self:getPositionX(), dragDeltaX, boundingBox.width,  boundingBox.x, BOUNDARY_RECT.upperRightX, BOUNDARY_RECT.lowerLeftX),
+                     getNewPosComponentOnDrag(self:getPositionY(), dragDeltaY, boundingBox.height, boundingBox.y, BOUNDARY_RECT.upperRightY, BOUNDARY_RECT.lowerLeftY))
 
     return self
 end
 
-function ViewWarField:setTouchableChildrenViews(views)
-    self.m_TouchableChildrenViews = views
+function ViewWarField:placeInDragBoundary()
+    self:setPositionOnDrag(ORIGIN, ORIGIN)
 
     return self
 end

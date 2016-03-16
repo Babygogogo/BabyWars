@@ -1,6 +1,9 @@
 
 local ViewTileMap = class("ViewTileMap", cc.Node)
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ViewTileMap:ctor(param)
     if (param) then
         self:load(param)
