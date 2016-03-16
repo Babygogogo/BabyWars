@@ -48,7 +48,6 @@ local function getTouchableChildrenViews(model)
     local getTouchableViewFromActor = require("app.utilities.GetTouchableViewFromActor")
 
     -- TODO: Add more children views. Be careful of the order of the views!
-    views[#views + 1] = getTouchableViewFromActor(model.m_SceneWarHUDActor)
     views[#views + 1] = getTouchableViewFromActor(model.m_WarFieldActor)
 
     return views
@@ -85,9 +84,6 @@ function ModelSceneWar.createInstance(param)
     return model
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
 function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
@@ -101,10 +97,9 @@ function ModelSceneWar:initView()
     return self
 end
 
-function ModelSceneWar:getScriptEventDispatcher()
-    return self.m_ScriptEventDispatcher
-end
-
+--------------------------------------------------------------------------------
+-- The callback functions on node events.
+--------------------------------------------------------------------------------
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
 
@@ -121,6 +116,13 @@ function ModelSceneWar:onCleanup(rootActor)
     self.m_WarFieldActor:onCleanup(rootActor)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneWar:getScriptEventDispatcher()
+    return self.m_ScriptEventDispatcher
 end
 
 return ModelSceneWar

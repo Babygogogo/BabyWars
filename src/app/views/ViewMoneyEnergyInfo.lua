@@ -145,27 +145,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewMoneyEnergyInfo:handleAndSwallowTouch(touch, touchType, event)
---[[
-    if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
-        self.m_IsTouchMoved = false
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        self.m_IsTouchMoved = true
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_CANCELLED) then
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
-        if (not self.m_IsTouchMoved) then
-            adjustPositionOnTouch(self, touch)
-        end
-
-        return false
-    end
-]]
-    return false
-end
-
 function ViewMoneyEnergyInfo:setTouchListener(listener)
     local eventDispatcher = self:getEventDispatcher()
     if (self.m_TouchListener) then

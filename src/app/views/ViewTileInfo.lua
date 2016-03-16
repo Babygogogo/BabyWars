@@ -34,6 +34,17 @@ local function createLabel()
 end
 
 --------------------------------------------------------------------------------
+-- The functions that adjust the position of the view.
+--------------------------------------------------------------------------------
+local function moveToLeftSide(view)
+    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+end
+
+local function moveToRightSide(view)
+    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+end
+
+--------------------------------------------------------------------------------
 -- The button.
 --------------------------------------------------------------------------------
 local function createButton(view)
@@ -160,7 +171,7 @@ local function createCaptureInfo()
         else
             self.m_Label:setString(""  .. point)
         end
-        
+
         return self
     end
 
@@ -183,7 +194,7 @@ local function updateCaptureInfoWithModelTile(info, tile)
 end
 
 --------------------------------------------------------------------------------
--- The contructor and public functions.
+-- The contructor.
 --------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
     initWithButton(self, createButton(self))
@@ -192,10 +203,11 @@ function ViewTileInfo:ctor(param)
     initWithCaptureInfo(self, createCaptureInfo())
 
     self:ignoreAnchorPointForPosition(true)
-        :moveToRightSide()
 
         :setOpacity(220)
         :setCascadeOpacityEnabled(true)
+
+    moveToRightSide(self)
 
     if (param) then
         self:load(param)
@@ -215,39 +227,30 @@ function ViewTileInfo.createInstance(param)
     return view
 end
 
-function ViewTileInfo:handleAndSwallowTouch(touch, touchType, event)
-    if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
-        self.m_IsTouchMoved = false
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        self.m_IsTouchMoved = true
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_CANCELLED) then
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
-        if (not self.m_IsTouchMoved) then
-            local touchLocation = touch:getLocation()
-            if (touchLocation.y <= display.height / 2) then
-                if (touchLocation.x <= display.width / 2) then
-                    self:moveToRightSide()
-                else
-                    self:moveToLeftSide()
-                end
-            end
-        end
-
-        return false
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewTileInfo:setTouchListener(listener)
+    local eventDispatcher = self:getEventDispatcher()
+    if (self.m_TouchListener) then
+        eventDispatcher:removeEventListener(self.m_TouchListener)
     end
-end
 
-function ViewTileInfo:moveToLeftSide()
-    self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
+    self.m_TouchListener = listener
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
 
     return self
 end
 
-function ViewTileInfo:moveToRightSide()
-    self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+function ViewTileInfo:adjustPositionOnTouch(touch)
+    local touchLocation = touch:getLocation()
+    if (touchLocation.y < display.height / 2) then
+        if (touchLocation.x <= display.width / 2) then
+            moveToRightSide(self)
+        else
+            moveToLeftSide(self)
+        end
+    end
 
     return self
 end

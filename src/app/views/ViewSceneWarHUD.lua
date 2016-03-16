@@ -1,11 +1,14 @@
 
 local ViewSceneWarHUD = class("ViewSceneWarHUD", cc.Node)
 
+--------------------------------------------------------------------------------
+-- The contructor.
+--------------------------------------------------------------------------------
 function ViewSceneWarHUD:ctor(param)
     if (param) then
         self:load(param)
     end
-    
+
     return self
 end
 
@@ -16,20 +19,44 @@ end
 function ViewSceneWarHUD.createInstance(param)
     local view = ViewSceneWarHUD.new():load(param)
     assert(view, "ViewSceneWarHUD.createInstance() failed.")
-    
+
     return view
 end
 
-function ViewSceneWarHUD:setTouchableChildrenViews(views)
-    self.m_TouchableChildrenViews = views
-    assert(type(self.m_TouchableChildrenViews) == "table", "ViewSceneWarHUD:setTouchableChildrenViews() the views is not a table, therefore invalid.")
-    
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewSceneWarHUD:setViewMoneyEnergyInfo(view)
+    if (self.m_ViewMoneyEnergyInfo) then
+        self:removeChild(self.m_ViewMoneyEnergyInfo)
+    end
+
+    self.m_ViewMoneyEnergyInfo = view
+    self:addChild(view)
+
     return self
 end
 
-function ViewSceneWarHUD:handleAndSwallowTouch(touch, touchType, event)
-    local dispatchAndSwallowTouch = require("app.utilities.DispatchAndSwallowTouch")
-    return dispatchAndSwallowTouch(self.m_TouchableChildrenViews, touch, touchType, event)
+function ViewSceneWarHUD:setViewTileInfo(view)
+    if (self.m_ViewTileInfo) then
+        self:removeChild(self.m_ViewTileInfo)
+    end
+
+    self.m_ViewTileInfo = view
+    self:addChild(view)
+
+    return self
+end
+
+function ViewSceneWarHUD:setViewUnitInfo(view)
+    if (self.m_ViewUnitInfo) then
+        self:removeChild(self.m_ViewUnitInfo)
+    end
+
+    self.m_ViewUnitInfo = view
+    self:addChild(view)
+
+    return self
 end
 
 return ViewSceneWarHUD

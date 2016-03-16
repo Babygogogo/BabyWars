@@ -227,6 +227,9 @@ local function updateAmmoInfoWithModelUnit(info, unit)
     end
 end
 
+--------------------------------------------------------------------------------
+-- The functions that adjust the position of the view.
+--------------------------------------------------------------------------------
 local function moveToLeftSide(view)
     view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
 end
@@ -235,17 +238,9 @@ local function moveToRightSide(view)
     view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 end
 
-local function adjustPositionOnTouch(view, touch)
-    local touchLocation = touch:getLocation()
-    if (touchLocation.y <= display.height / 2) then
-        if (touchLocation.x <= display.width / 2) then
-            moveToRightSide(view)
-        else
-            moveToLeftSide(view)
-        end
-    end
-end
-
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ViewUnitInfo:ctor(param)
     initWithButton(self, createButton(self))
     initWithIcon(self, createIcon())
@@ -280,22 +275,32 @@ function ViewUnitInfo.createInstance(param)
     return view
 end
 
-function ViewUnitInfo:handleAndSwallowTouch(touch, touchType, event)
-    if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
-        self.m_IsTouchMoved = false
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        self.m_IsTouchMoved = true
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_CANCELLED) then
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
-        if (not self.m_IsTouchMoved) then
-            adjustPositionOnTouch(self, touch)
-        end
-
-        return false
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewUnitInfo:setTouchListener(listener)
+    local eventDispatcher = self:getEventDispatcher()
+    if (self.m_TouchListener) then
+        eventDispatcher:removeEventListener(self.m_TouchListener)
     end
+
+    self.m_TouchListener = listener
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+
+    return self
+end
+
+function ViewUnitInfo:adjustPositionOnTouch(touch)
+    local touchLocation = touch:getLocation()
+    if (touchLocation.y < display.height / 2) then
+        if (touchLocation.x <= display.width / 2) then
+            moveToRightSide(self)
+        else
+            moveToLeftSide(self)
+        end
+    end
+
+    return self
 end
 
 function ViewUnitInfo:updateWithModelUnit(model)
