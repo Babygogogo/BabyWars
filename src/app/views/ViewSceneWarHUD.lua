@@ -59,4 +59,16 @@ function ViewSceneWarHUD:setViewUnitInfo(view)
     return self
 end
 
+function ViewSceneWarHUD:setTouchListener(listener)
+    local eventDispatcher = self:getEventDispatcher()
+    if (self.m_TouchListener) then
+        eventDispatcher:removeEventListener(self.m_TouchListener)
+    end
+
+    self.m_TouchListener = listener
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+
+    return self
+end
+
 return ViewSceneWarHUD

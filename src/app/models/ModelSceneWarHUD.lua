@@ -1,32 +1,67 @@
 
 local ModelSceneWarHUD = class("ModelSceneWarHUD")
 
-local function createChildrenActors(param)
+--------------------------------------------------------------------------------
+-- The composition actors.
+--------------------------------------------------------------------------------
+local function createCompositionActors(param)
     local Actor = require("global.actors.Actor")
 
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
-    assert(moneyEnergyInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a MoneyEnergyInfo actor.")
+    assert(moneyEnergyInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a MoneyEnergyInfo actor.")
 
     local unitInfoActor = Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
-    assert(unitInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a UnitInfo actor.")
+    assert(unitInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a UnitInfo actor.")
 
     local tileInfoActor = Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
-    assert(tileInfoActor, "ModelSceneWarHUD-createChildrenActors() failed to create a TileInfo actor.")
+    assert(tileInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a TileInfo actor.")
 
     return {moneyEnergyInfoActor = moneyEnergyInfoActor,
             unitInfoActor        = unitInfoActor,
             tileInfoActor        = tileInfoActor}
 end
 
-local function initWithChildrenActors(model, actors)
+local function initWithCompositionActors(model, actors)
     model.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
-    assert(model.m_MoneyEnergyInfoActor, "ModelSceneWarHUD-initWithChildrenActors() failed to retrieve a MoneyEnergyInfo actor.")
-
     model.m_UnitInfoActor = actors.unitInfoActor
-    assert(model.m_UnitInfoActor, "ModelSceneWarHUD-initWithChildrenActors() failed to retrieve a UnitInfo actor.")
-
     model.m_TileInfoActor = actors.tileInfoActor
-    assert(model.m_TileInfoActor, "ModelSceneWarHUD-initWithChildrenActors() failed to retrieve a TileInfo actor.")
+end
+
+--------------------------------------------------------------------------------
+-- The touch listener for view.
+--------------------------------------------------------------------------------
+local function createTouchListener(model)
+    local touchListener = cc.EventListenerTouchOneByOne:create()
+
+    local function onTouchBegan(touch, event)
+        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
+
+        return true
+    end
+
+    local function onTouchMoved(touch, event)
+        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
+    end
+
+    local function onTouchCancelled(touch, event)
+    end
+
+    local function onTouchEnded(touch, event)
+        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
+        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
+    end
+
+    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
+    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
+    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
+    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
+
+    return touchListener
 end
 
 --------------------------------------------------------------------------------
@@ -41,7 +76,7 @@ function ModelSceneWarHUD:ctor(param)
 end
 
 function ModelSceneWarHUD:load(param)
-    initWithChildrenActors(self, createChildrenActors(param))
+    initWithCompositionActors(self, createCompositionActors(param))
 
     return self
 end
@@ -60,6 +95,8 @@ function ModelSceneWarHUD:initView()
     view:setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
         :setViewTileInfo(       self.m_TileInfoActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
+
+        :setTouchListener(createTouchListener(self))
 
     return self
 end

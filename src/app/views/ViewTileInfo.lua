@@ -230,18 +230,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewTileInfo:setTouchListener(listener)
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then
-        eventDispatcher:removeEventListener(self.m_TouchListener)
-    end
-
-    self.m_TouchListener = listener
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
-
-    return self
-end
-
 function ViewTileInfo:adjustPositionOnTouch(touch)
     local touchLocation = touch:getLocation()
     if (touchLocation.y < display.height / 2) then

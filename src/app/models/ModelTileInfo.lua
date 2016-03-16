@@ -13,43 +13,6 @@ local function onEvtPlayerTouchTile(model, event)
 end
 
 --------------------------------------------------------------------------------
--- The touch listener for view.
---------------------------------------------------------------------------------
-local function createTouchListener(model)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
-
-    local function onTouchBegan(touch, event)
-        if (model.m_View) then
-            model.m_View:adjustPositionOnTouch(touch)
-        end
-
-        return true
-    end
-
-    local function onTouchMoved(touch, event)
-        if (model.m_View) then
-            model.m_View:adjustPositionOnTouch(touch)
-        end
-    end
-
-    local function onTouchCancelled(touch, event)
-    end
-
-    local function onTouchEnded(touch, event)
-        if (model.m_View) then
-            model.m_View:adjustPositionOnTouch(touch)
-        end
-    end
-
-    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
-    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
-    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
-    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
-
-    return touchListener
-end
-
---------------------------------------------------------------------------------
 -- The contructor.
 --------------------------------------------------------------------------------
 function ModelTileInfo:ctor(param)
@@ -74,8 +37,6 @@ end
 function ModelTileInfo:initView()
     local view = self.m_View
     assert(view, "ModelTileInfo:initView() no view is attached to the owner actor of the model.")
-
-    view:setTouchListener(createTouchListener(self))
 
     return self
 end
@@ -114,6 +75,17 @@ function ModelTileInfo:onPlayerTouch()
     local modelDetail = self.m_DetailActor:getModel()
     modelDetail:updateWithModelTile(self.m_ModelTile)
         :setEnabled(true)
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelTileInfo:adjustPositionOnTouch(touch)
+    if (self.m_View) then
+        self.m_View:adjustPositionOnTouch(touch)
+    end
 
     return self
 end
