@@ -379,22 +379,7 @@ function ViewTileDetail:ctor(param)
     self:setCascadeOpacityEnabled(true)
         :setOpacity(180)
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewTileDetail:load(param)
-    return self
-end
-
-function ViewTileDetail.createInstance(param)
-    local view = ViewTileDetail:create():load(param)
-    assert(view, "ViewTileDetail.createInstance() failed.")
-
-    return view
 end
 
 function ViewTileDetail:updateWithModelTile(tile)

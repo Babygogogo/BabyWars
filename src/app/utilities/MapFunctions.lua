@@ -7,7 +7,7 @@ local Actor       = require("global.actors.Actor")
 local function updateViewForGridActor(actor, viewName, gridData)
     local existingView = actor:getView()
     if (existingView) then
-        existingView:load(gridData)
+        existingView:ctor(gridData)
     else
         actor:setView(Actor.createView(viewName, gridData))
     end
@@ -18,7 +18,7 @@ end
 local function updateModelForGridActor(actor, modelName, gridData)
     local existingModel = actor:getModel()
     if (existingModel) then
-        existingModel:load(gridData)
+        existingModel:ctor(gridData)
     elseif (modelClass) then
         actor:setModel(Actor.createModel(modelName, gridData))
     end
