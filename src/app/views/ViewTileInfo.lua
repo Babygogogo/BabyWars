@@ -104,15 +104,26 @@ end
 --------------------------------------------------------------------------------
 -- The defense bonus info.
 --------------------------------------------------------------------------------
-local function createDefenseInfo()
+local function createDefenseInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
 
         :setScale(ICON_SCALE)
 
+    return icon
+end
+
+local function createDefenseInfoLabel()
     local label = createLabel()
     label:setPosition(30, -5)
+
+    return label
+end
+
+local function createDefenseInfo()
+    local icon  = createDefenseInfoIcon()
+    local label = createDefenseInfoLabel()
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -121,15 +132,8 @@ local function createDefenseInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setDefenseBonus = function(self, bonus)
-        if (bonus < 10) then
-            self.m_Label:setString("  " .. bonus)
-        else
-            self.m_Label:setString(""  .. bonus)
-        end
-    end
 
     return info
 end
@@ -139,22 +143,41 @@ local function initWithDefenseInfo(view, info)
     view:addChild(info)
 end
 
+local function updateDefenseInfoLabel(label, defenseBonus)
+    if (defenseBonus < 10) then
+        label:setString("  " .. defenseBonus)
+    else
+        label:setString(""   .. defenseBonus)
+    end
+end
+
 local function updateDefenseInfoWithModelTile(info, tile)
-    info:setDefenseBonus(tile:getNormalizedDefenseBonusAmount())
+    updateDefenseInfoLabel(info.m_Label, tile:getNormalizedDefenseBonusAmount())
 end
 
 --------------------------------------------------------------------------------
 -- The capture info.
 --------------------------------------------------------------------------------
-local function createCaptureInfo()
+local function createCaptureInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
 
         :setScale(ICON_SCALE)
 
+    return icon
+end
+
+local function createCaptureInfoLabel()
     local label = createLabel()
     label:setPosition(30, -4)
+
+    return label
+end
+
+local function createCaptureInfo()
+    local icon  = createCaptureInfoIcon()
+    local label = createCaptureInfoLabel()
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -163,17 +186,8 @@ local function createCaptureInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setCapturePoint = function(self, point)
-        if (point < 10) then
-            self.m_Label:setString("  " .. point)
-        else
-            self.m_Label:setString(""  .. point)
-        end
-
-        return self
-    end
 
     return info
 end
@@ -183,11 +197,19 @@ local function initWithCaptureInfo(view, info)
     view:addChild(info)
 end
 
+local function updateCaptureInfoLabel(label, capturePoint)
+    if (capturePoint < 10) then
+        label:setString("  " .. capturePoint)
+    else
+        label:setString(""  .. capturePoint)
+    end
+end
+
 local function updateCaptureInfoWithModelTile(info, tile)
     local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
     if (captureTaker) then
-        info:setCapturePoint(captureTaker:getCurrentCapturePoint())
-            :setVisible(true)
+        updateCaptureInfoLabel(info.m_Label, captureTaker:getCurrentCapturePoint())
+        info:setVisible(true)
     else
         info:setVisible(false)
     end
@@ -197,8 +219,8 @@ end
 -- The contructor.
 --------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
-    initWithButton(self, createButton(self))
-    initWithIcon(self, createIcon())
+    initWithButton(     self, createButton(self))
+    initWithIcon(       self, createIcon())
     initWithDefenseInfo(self, createDefenseInfo())
     initWithCaptureInfo(self, createCaptureInfo())
 
@@ -209,22 +231,7 @@ function ViewTileInfo:ctor(param)
 
     moveToRightSide(self)
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewTileInfo:load(param)
-    return self
-end
-
-function ViewTileInfo.createInstance(param)
-    local view = ViewTileInfo.new():load(param)
-    assert(view, "ViewTileInfo.createInstance() failed.")
-
-    return view
 end
 
 --------------------------------------------------------------------------------

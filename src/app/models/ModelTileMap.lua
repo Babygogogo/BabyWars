@@ -14,7 +14,7 @@ local function requireMapData(param)
 	elseif (t == "table") then
 		return param
 	else
-		return nil
+		return error("ModelTileMap-requireMapData() the param is invalid.")
 	end
 end
 
@@ -23,7 +23,7 @@ local function getTiledTileLayer(tiledData)
 end
 
 --------------------------------------------------------------------------------
--- The composition actors.
+-- The composition tile actors.
 --------------------------------------------------------------------------------
 local function createTileActorsMapWithTemplateAndOverwriting(mapData)
 	local templateTiledData = requireMapData(mapData.template)
@@ -43,48 +43,35 @@ local function createTileActorsMapWithoutTemplate(mapData)
 	return map
 end
 
-local function createChildrenActors(param)
-	local mapData = requireMapData(param)
-	assert(TypeChecker.isMapData(mapData))
+local function createTileActorsMap(param)
+    local mapData = requireMapData(param)
+    assert(TypeChecker.isMapData(mapData))
 
-	local tileActorsMap = (mapData.template == nil
-		and createTileActorsMapWithoutTemplate(mapData)
-		or  createTileActorsMapWithTemplateAndOverwriting(mapData))
-	assert(tileActorsMap, "ModelTileMap--createChildrenActors() failed to create tile actors map.")
-	assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createChildrenActors() some tiles are missing in the created map.")
+    local tileActorsMap = (mapData.template == nil) and
+        createTileActorsMapWithoutTemplate(mapData) or
+        createTileActorsMapWithTemplateAndOverwriting(mapData)
 
-	return {TileActorsMap = tileActorsMap}
+    assert(tileActorsMap, "ModelTileMap--createTileActorsMap() failed to create tile actors map.")
+    assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createTileActorsMap() some tiles are missing in the created map.")
+
+    return tileActorsMap
+end
+
+local function initWithTileActorsMap(model, map)
+    model.m_TileActorsMap = map
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelTileMap:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelTileMap:load(param)
-	local childrenActors = createChildrenActors(param)
-	assert(childrenActors, "ModelTileMap:load() failed to create children actors with param.")
-
-	self.m_TileActorsMap = childrenActors.TileActorsMap
+    initWithTileActorsMap(self, createTileActorsMap(param))
 
 	if (self.m_View) then
         self:initView()
     end
 
-	return self
-end
-
-function ModelTileMap.createInstance(param)
-	local model = ModelTileMap.new():load(param)
-	assert(model, "ModelTileMap.createInstance() failed to create the model with param.")
-
-	return model
+    return self
 end
 
 function ModelTileMap:initView()

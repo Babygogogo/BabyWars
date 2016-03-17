@@ -19,17 +19,11 @@ local function updateModelForGridActor(actor, modelName, gridData)
     local existingModel = actor:getModel()
     if (existingModel) then
         existingModel:ctor(gridData)
-    elseif (modelClass) then
+    else
         actor:setModel(Actor.createModel(modelName, gridData))
     end
 
     return actor
-end
-
-local function createGridActor(modelClass, viewClass, gridData)
-    local model = modelClass and modelClass.createInstance(gridData) or nil
-    local view  = viewClass  and viewClass.createInstance( gridData) or nil
-    return Actor.createWithModelAndViewInstance(model, view)
 end
 
 function MapFunctions.loadMapSize(mapData)
@@ -59,15 +53,6 @@ function MapFunctions.hasNilGrid(map)
 	return false
 end
 
-function MapFunctions.createGridActorsMapWithMapData(mapData, gridModelClass, gridViewClass)
-	assert(TypeChecker.isMapData(mapData))
-
-	local mapSize = MapFunctions.loadMapSize(mapData)
-	local map = MapFunctions.createEmptyMap(mapSize)
-
-	return MapFunctions.updateGridActorsMapWithGridsData(map, mapData.Grids, gridModelClass, gridViewClass)
-end
-
 function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, modelName, viewName)
     local mapSize = MapFunctions.loadMapSize(tiledLayer)
     assert(TypeChecker.isMapSize(mapSize))
@@ -88,6 +73,15 @@ function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, modelName, v
     end
 
     return map
+end
+
+function MapFunctions.createGridActorsMapWithMapData(mapData, modelName, viewName)
+	assert(TypeChecker.isMapData(mapData))
+
+	local mapSize = MapFunctions.loadMapSize(mapData)
+	local map = MapFunctions.createEmptyMap(mapSize)
+
+	return MapFunctions.updateGridActorsMapWithGridsData(map, mapData.Grids, modelName, viewName)
 end
 
 function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, modelName, viewName)
