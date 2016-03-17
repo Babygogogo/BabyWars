@@ -1,6 +1,9 @@
 
 local ViewSceneMain = class("ViewSceneMain", cc.Scene)
 
+local BACKGROUND_Z_ORDER    = 0
+local WAR_LIST_VIEW_Z_ORDER = 1
+
 --------------------------------------------------------------------------------
 -- The composition background.
 --------------------------------------------------------------------------------
@@ -13,7 +16,7 @@ end
 
 local function initWithBackground(view, background)
     view.m_Background = background
-    view:addChild(background)
+    view:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -30,11 +33,15 @@ end
 --------------------------------------------------------------------------------
 function ViewSceneMain:setWarListView(view)
     if (self.m_WarListView) then
-        self:removeChildren(self.m_WarListView)
+        if (self.m_WarListView == view) then
+            return
+        else
+            self:removeChild(self.m_WarListView)
+        end
     end
 
     self.m_WarListView = view
-    self:addChild(view)
+    self:addChild(view, WAR_LIST_VIEW_Z_ORDER)
 
     return self
 end

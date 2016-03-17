@@ -50,17 +50,9 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(param)
+    assert(param, "ModelSceneWar:ctor() tempting to initialize the instance with no param.")
+
     self.m_ScriptEventDispatcher = require("global.events.EventDispatcher"):create()
-
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelSceneWar:load(param)
-    self.m_ScriptEventDispatcher:reset()
     initWithCompositionActors(self, createCompositionActors(param))
 
     if (self.m_View) then
@@ -68,13 +60,6 @@ function ModelSceneWar:load(param)
     end
 
     return self
-end
-
-function ModelSceneWar.createInstance(param)
-    local model = ModelSceneWar:create():load(param)
-    assert(model, "ModelSceneWar.createInstance() failed.")
-
-    return model
 end
 
 function ModelSceneWar:initView()

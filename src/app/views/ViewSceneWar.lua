@@ -28,22 +28,7 @@ end
 function ViewSceneWar:ctor(param)
     initWithBackground(self, createBackground())
 
-	if (param) then
-        self:load(param)
-    end
-
-	return self
-end
-
-function ViewSceneWar:load(param)
-	return self
-end
-
-function ViewSceneWar.createInstance(param)
-	local scene = ViewSceneWar.new():load(param)
-	assert(scene, "ViewSceneWar.createInstance() failed.")
-
-	return scene
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -51,7 +36,11 @@ end
 --------------------------------------------------------------------------------
 function ViewSceneWar:setWarFieldView(view)
     if (self.m_WarFieldView) then
-        self:removeChild(self.m_WarFieldView)
+        if (self.m_WarFieldView == view) then
+            return
+        else
+            self:removeChild(self.m_WarFieldView)
+        end
     end
 
     self.m_WarFieldView = view
@@ -62,7 +51,11 @@ end
 
 function ViewSceneWar:setSceneHudView(view)
     if (self.m_SceneHudView) then
-        self:removeChild(self.m_SceneHudView)
+        if (self.m_SceneHudView == view) then
+            return
+        else
+            self:removeChild(self.m_SceneHudView)
+        end
     end
 
     self.m_SceneHudView = view

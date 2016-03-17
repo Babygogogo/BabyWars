@@ -5,22 +5,7 @@ local ViewSceneWarHUD = class("ViewSceneWarHUD", cc.Node)
 -- The contructor.
 --------------------------------------------------------------------------------
 function ViewSceneWarHUD:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewSceneWarHUD:load(param)
-    return self
-end
-
-function ViewSceneWarHUD.createInstance(param)
-    local view = ViewSceneWarHUD.new():load(param)
-    assert(view, "ViewSceneWarHUD.createInstance() failed.")
-
-    return view
 end
 
 --------------------------------------------------------------------------------
@@ -28,7 +13,11 @@ end
 --------------------------------------------------------------------------------
 function ViewSceneWarHUD:setViewMoneyEnergyInfo(view)
     if (self.m_ViewMoneyEnergyInfo) then
-        self:removeChild(self.m_ViewMoneyEnergyInfo)
+        if (self.m_ViewMoneyEnergyInfo == view) then
+            return
+        else
+            self:removeChild(self.m_ViewMoneyEnergyInfo)
+        end
     end
 
     self.m_ViewMoneyEnergyInfo = view
@@ -39,7 +28,11 @@ end
 
 function ViewSceneWarHUD:setViewTileInfo(view)
     if (self.m_ViewTileInfo) then
-        self:removeChild(self.m_ViewTileInfo)
+        if (self.m_ViewTileInfo == view) then
+            return
+        else
+            self:removeChild(self.m_ViewTileInfo)
+        end
     end
 
     self.m_ViewTileInfo = view
@@ -50,7 +43,11 @@ end
 
 function ViewSceneWarHUD:setViewUnitInfo(view)
     if (self.m_ViewUnitInfo) then
-        self:removeChild(self.m_ViewUnitInfo)
+        if (self.m_ViewUnitInfo == view) then
+            return
+        else
+            self:removeChild(self.m_ViewUnitInfo)
+        end
     end
 
     self.m_ViewUnitInfo = view
@@ -62,7 +59,11 @@ end
 function ViewSceneWarHUD:setTouchListener(listener)
     local eventDispatcher = self:getEventDispatcher()
     if (self.m_TouchListener) then
-        eventDispatcher:removeEventListener(self.m_TouchListener)
+        if (self.m_TouchListener == listener) then
+            return
+        else
+            eventDispatcher:removeEventListener(self.m_TouchListener)
+        end
     end
 
     self.m_TouchListener = listener

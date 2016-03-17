@@ -1,20 +1,15 @@
 
 local ModelSceneWarHUD = class("ModelSceneWarHUD")
 
+local Actor = require("global.actors.Actor")
+
 --------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createCompositionActors(param)
-    local Actor = require("global.actors.Actor")
-
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
-    assert(moneyEnergyInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a MoneyEnergyInfo actor.")
-
-    local unitInfoActor = Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
-    assert(unitInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a UnitInfo actor.")
-
-    local tileInfoActor = Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
-    assert(tileInfoActor, "ModelSceneWarHUD-createCompositionActors() failed to create a TileInfo actor.")
+    local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
+    local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
 
     return {moneyEnergyInfoActor = moneyEnergyInfoActor,
             unitInfoActor        = unitInfoActor,
@@ -23,8 +18,8 @@ end
 
 local function initWithCompositionActors(model, actors)
     model.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
-    model.m_UnitInfoActor = actors.unitInfoActor
-    model.m_TileInfoActor = actors.tileInfoActor
+    model.m_UnitInfoActor        = actors.unitInfoActor
+    model.m_TileInfoActor        = actors.tileInfoActor
 end
 
 --------------------------------------------------------------------------------
@@ -68,24 +63,13 @@ end
 -- The contructor.
 --------------------------------------------------------------------------------
 function ModelSceneWarHUD:ctor(param)
-    if (param) then
-        self:load(param)
+    initWithCompositionActors(self, createCompositionActors())
+
+    if (self.m_View) then
+        self:initView()
     end
 
     return self
-end
-
-function ModelSceneWarHUD:load(param)
-    initWithCompositionActors(self, createCompositionActors(param))
-
-    return self
-end
-
-function ModelSceneWarHUD.createInstance(param)
-    local model = ModelSceneWarHUD.new():load(param)
-    assert(model, "ModelSceneWarHUD.createInstance() failed.")
-
-    return model
 end
 
 function ModelSceneWarHUD:initView()
