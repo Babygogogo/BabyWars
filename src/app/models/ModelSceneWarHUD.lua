@@ -8,8 +8,8 @@ local Actor = require("global.actors.Actor")
 --------------------------------------------------------------------------------
 local function createCompositionActors(param)
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
-    local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
-    local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
+    local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo",        nil, "ViewUnitInfo")
+    local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
 
     return {moneyEnergyInfoActor = moneyEnergyInfoActor,
             unitInfoActor        = unitInfoActor,

@@ -9,12 +9,15 @@ local TypeChecker = require("app.utilities.TypeChecker")
 local function createActorConfirmBox(modelItem, warName)
     local modelBox = require("app.models.ModelConfirmBox"):create()
     modelBox:setConfirmText("You are entering a war:\n" .. warName .. ".\nAre you sure?")
+
         :setOnConfirmYes(function()
             modelItem:onPlayerConfirmEnterWar()
         end)
+
         :setOnConfirmNo(function()
             modelBox:setEnabled(false)
         end)
+
         :setOnConfirmCancel(function()
             modelBox:setEnabled(false)
         end)

@@ -34,7 +34,7 @@ end
 function ViewSceneMain:setWarListView(view)
     if (self.m_WarListView) then
         if (self.m_WarListView == view) then
-            return
+            return self
         else
             self:removeChild(self.m_WarListView)
         end

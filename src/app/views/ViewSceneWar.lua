@@ -37,7 +37,7 @@ end
 function ViewSceneWar:setWarFieldView(view)
     if (self.m_WarFieldView) then
         if (self.m_WarFieldView == view) then
-            return
+            return self
         else
             self:removeChild(self.m_WarFieldView)
         end
@@ -52,7 +52,7 @@ end
 function ViewSceneWar:setSceneHudView(view)
     if (self.m_SceneHudView) then
         if (self.m_SceneHudView == view) then
-            return
+            return self
         else
             self:removeChild(self.m_SceneHudView)
         end

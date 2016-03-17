@@ -124,22 +124,7 @@ function ViewMoneyEnergyInfo:ctor(param)
     self:ignoreAnchorPointForPosition(true)
     moveToRightSide(self)
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewMoneyEnergyInfo:load(param)
-    return self
-end
-
-function ViewMoneyEnergyInfo.createInstance(param)
-    local view = ViewMoneyEnergyInfo.new():load(param)
-    assert(view, "ViewMoneyEnergyInfo.createInstance() failed.")
-
-    return view
 end
 
 --------------------------------------------------------------------------------

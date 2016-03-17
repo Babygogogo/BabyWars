@@ -6,27 +6,28 @@ local ActorManager = require("global.actors.ActorManager")
 local TypeChecker  = require("app.utilities.TypeChecker")
 
 local TITLE_TEXT          = "Quit"
-local CONFIRM_TEXT        = "You are quitting the war.\nAre you sure?"
+local CONFIRM_TEXT        = "You are quitting the war (you may reenter it later).\nAre you sure?"
 local CONFIRM_BOX_Z_ORDER = 99
 
 local function onConfirmYes()
     local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
     assert(mainSceneActor, "ModelMenuItemQuitWar-onConfirmYes() failed to create a main scene actor.")
     ActorManager.setAndRunRootActor(mainSceneActor, "FADE", 1)
-
-    return self
 end
 
+--------------------------------------------------------------------------------
+-- The composition confirm box actor.
+--------------------------------------------------------------------------------
 local function createConfirmBoxActor(itemModel, warName)
     local boxModel = require("app.models.ModelConfirmBox"):create()
     boxModel:setConfirmText(CONFIRM_TEXT)
 
-        :setOnConfirmYes(function()
-            onConfirmYes()
-        end)
+        :setOnConfirmYes(onConfirmYes)
+
         :setOnConfirmNo(function()
             boxModel:setEnabled(false)
         end)
+
         :setOnConfirmCancel(function()
             boxModel:setEnabled(false)
         end)
@@ -34,23 +35,15 @@ local function createConfirmBoxActor(itemModel, warName)
     return Actor.createWithModelAndViewInstance(boxModel, require("app.views.ViewConfirmBox"):create())
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelMenuItemQuitWar:ctor(param)
-    if (param) then
-        self:load(param)
+    if (self.m_View) then
+        self:initView()
     end
 
 	return self
-end
-
-function ModelMenuItemQuitWar:load(param)
-	return self
-end
-
-function ModelMenuItemQuitWar.createInstance(param)
-	local list = ModelMenuItemQuitWar.new():load(param)
-    assert(list, "ModelMenuItemQuitWar.createInstance() failed.")
-
-	return list
 end
 
 function ModelMenuItemQuitWar:initView()
@@ -62,6 +55,9 @@ function ModelMenuItemQuitWar:initView()
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on player touch the menu item.
+--------------------------------------------------------------------------------
 function ModelMenuItemQuitWar:onPlayerTouch()
     if (self.m_ConfirmBoxActor) then
         self.m_ConfirmBoxActor:getModel():setEnabled(true)
