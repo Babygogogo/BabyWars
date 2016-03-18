@@ -23,47 +23,36 @@ local function getTiledUnitLayer(tiledData)
 	return tiledData.layers[2]
 end
 
-local function createCompositionActors(param)
+--------------------------------------------------------------------------------
+-- The unit actors map.
+--------------------------------------------------------------------------------
+local function createUnitActorsMap(param)
 	local mapData = requireMapData(param)
 	assert(TypeChecker.isMapData(mapData))
 
 	local unitActorsMap = TypeChecker.isTiledData(mapData)
 		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), "ModelUnit", "ViewUnit")
 		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    "ModelUnit", "ViewUnit")
-	assert(unitActorsMap, "ModelUnitMap--createCompositionActors() failed to create the unit actors map.")
+	assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
 
-	return {UnitActorsMap = unitActorsMap}
+	return unitActorsMap
+end
+
+local function initWithUnitActorsMap(model, map)
+    model.m_UnitActorsMap = map
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelUnitMap:load(param)
-	local childrenActors = createCompositionActors(param)
-	assert(childrenActors, "ModelUnitMap:load() failed to create children actors.")
-
-	self.m_UnitActorsMap = childrenActors.UnitActorsMap
+    initWithUnitActorsMap(self, createUnitActorsMap(param))
 
 	if (self.m_View) then
         self:initView()
     end
 
-	return self
-end
-
-function ModelUnitMap.createInstance(param)
-	local model = ModelUnitMap.new():load(param)
-	assert(model, "ModelUnitMap.createInstance() failed.")
-
-	return model
+    return self
 end
 
 function ModelUnitMap:initView()
@@ -77,7 +66,9 @@ function ModelUnitMap:initView()
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local unitActor = unitActors[x][y]
-            if (unitActor) then view:addChild(unitActor:getView()) end
+            if (unitActor) then
+                view:addChild(unitActor:getView())
+            end
         end
 	end
 

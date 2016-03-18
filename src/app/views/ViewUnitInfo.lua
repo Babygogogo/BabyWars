@@ -3,6 +3,12 @@ local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
 local AnimationLoader = require("app.utilities.AnimationLoader")
 
+local FONT_SIZE          = 22
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local FONT_OUTLINE_WIDTH = 2
+
 local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
 local LEFT_POSITION_X = 10 + CONTENT_SIZE_WIDTH
 local LEFT_POSITION_Y = 10
@@ -20,6 +26,20 @@ local FUEL_INFO_POSITION_X = HP_INFO_POSITION_X
 local FUEL_INFO_POSITION_Y = HP_INFO_POSITION_Y - 25
 local AMMO_INFO_POSITION_X = HP_INFO_POSITION_X
 local AMMO_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - 25
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function createLabel(posX, posY)
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+
+    return label
+end
 
 --------------------------------------------------------------------------------
 -- The button background.
@@ -63,8 +83,6 @@ local function createIcon()
 
         :setScale(ICON_SCALE)
 
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(117))
-
     return icon
 end
 
@@ -79,22 +97,9 @@ local function updateIconWithModelUnit(icon, unit)
 end
 
 --------------------------------------------------------------------------------
--- The general label.
---------------------------------------------------------------------------------
-local function createLabel()
-    local label = cc.Label:createWithTTF("99", "res/fonts/msyhbd.ttc", 22)
-    label:ignoreAnchorPointForPosition(true)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
-end
-
---------------------------------------------------------------------------------
 -- The HP infomation for the unit.
 --------------------------------------------------------------------------------
-local function createHPInfo()
+local function createHPInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
@@ -102,8 +107,12 @@ local function createHPInfo()
 
         :setScale(ICON_SCALE)
 
-    local label = createLabel()
-    label:setPosition(28, -5)
+    return icon
+end
+
+local function createHPInfo()
+    local icon  = createHPInfoIcon()
+    local label = createLabel(28, -5)
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -112,15 +121,8 @@ local function createHPInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Inco  = icon
     info.m_Label = label
-
-    info.setHP = function(self, hp)
-        if (hp < 10) then
-            self.m_Label:setString("  " .. hp)
-        else
-            self.m_Label:setString(""   .. hp)
-        end
-    end
 
     return info
 end
@@ -131,13 +133,18 @@ local function initWithHPInfo(view, info)
 end
 
 local function updateHPInfoWithModelUnit(info, unit)
-    info:setHP(unit:getNormalizedCurrentHP())
+    local hp = unit:getNormalizedCurrentHP()
+    if (hp < 10) then
+        info.m_Label:setString("  " .. hp)
+    else
+        info.m_Label:setString(""   .. hp)
+    end
 end
 
 --------------------------------------------------------------------------------
 -- The fuel infomation for the unit.
 --------------------------------------------------------------------------------
-local function createFuelInfo()
+local function createFuelInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
@@ -145,8 +152,12 @@ local function createFuelInfo()
 
         :setScale(ICON_SCALE)
 
-    local label = createLabel()
-    label:setPosition(28, -5)
+    return icon
+end
+
+local function createFuelInfo()
+    local icon  = createFuelInfoIcon()
+    local label = createLabel(28, -5)
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -155,15 +166,8 @@ local function createFuelInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setFuel = function(self, fuel)
-        if (fuel < 10) then
-            self.m_Label:setString("  " .. fuel)
-        else
-            self.m_Label:setString("" .. fuel)
-        end
-    end
 
     return info
 end
@@ -174,13 +178,18 @@ local function initWithFuelInfo(view, info)
 end
 
 local function updateFuelInfoWithModelUnit(info, unit)
-    info:setFuel(unit:getCurrentFuel())
+    local fuel = unit:getCurrentFuel()
+    if (fuel < 10) then
+        info.m_Label:setString("  " .. fuel)
+    else
+        info.m_Label:setString(""   .. fuel)
+    end
 end
 
 --------------------------------------------------------------------------------
 -- The primary weapon ammo infomation for the unit.
 --------------------------------------------------------------------------------
-local function createAmmoInfo()
+local function createAmmoInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
@@ -188,8 +197,12 @@ local function createAmmoInfo()
 
         :setScale(ICON_SCALE)
 
-    local label = createLabel()
-    label:setPosition(28, -5)
+    return icon
+end
+
+local function createAmmoInfo()
+    local icon  = createAmmoInfoIcon()
+    local label = createLabel(28, -5)
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -198,17 +211,8 @@ local function createAmmoInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setAmmo = function(self, ammo)
-        if (ammo < 10) then
-            self.m_Label:setString("  " .. ammo)
-        else
-            self.m_Label:setString(""   .. ammo)
-        end
-
-        return self
-    end
 
     return info
 end
@@ -220,8 +224,14 @@ end
 
 local function updateAmmoInfoWithModelUnit(info, unit)
     if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
-        info:setAmmo(unit:getPrimaryWeaponCurrentAmmo())
-            :setVisible(true)
+        local ammo = unit:getPrimaryWeaponCurrentAmmo()
+        if (ammo < 10) then
+            info.m_Label:setString("  " .. ammo)
+        else
+            info.m_Label:setString(""   .. ammo)
+        end
+
+        info:setVisible(true)
     else
         info:setVisible(false)
     end
@@ -257,22 +267,7 @@ function ViewUnitInfo:ctor(param)
 
     moveToRightSide(self)
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewUnitInfo:load(param)
-    return self
-end
-
-function ViewUnitInfo.createInstance(param)
-    local view = ViewUnitInfo.new():load(param)
-    assert(view, "ViewUnitInfo.createInstance() failed.")
-
-    return view
 end
 
 --------------------------------------------------------------------------------

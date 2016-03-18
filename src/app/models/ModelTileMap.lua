@@ -25,19 +25,30 @@ end
 --------------------------------------------------------------------------------
 -- The composition tile actors.
 --------------------------------------------------------------------------------
-local function createTileActorsMapWithTemplateAndOverwriting(mapData)
-	local templateTiledData = requireMapData(mapData.template)
-	local templateMap = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(templateTiledData), "ModelTile", "ViewTile")
-	assert(templateMap, "ModelTileMap-createTileActorsMapWithTemplateAndOverwriting() failed to create the template tile actors map.")
+local function createTileActorsMapWithTemplate(mapData)
+    assert(type(mapData.template) == "string", "ModelTileMap-createTileActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
+	local templateTiledLayer = getTiledTileLayer(requireMapData(mapData.template))
+    assert(templateTiledLayer, "ModelTileMap-createTileActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
 
-	local overwroteMap = MapFunctions.updateGridActorsMapWithGridsData(templateMap, mapData.grids, "ModelTile", "ViewTile")
-	assert(overwroteMap, "ModelTileMap-createTileActorsMapWithTemplateAndOverwriting() failed to overwrite the template tile actors map.")
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelTile", "ViewTile")
+	assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to create the template tile actors map.")
 
-	return overwroteMap
+    if (mapData.grids) then
+        map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelTile", "ViewTile")
+    	assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to update the tile actors map with the param mapData.grids.")
+    end
+
+    map.m_TemplateName = mapData.template
+    map.m_Name         = mapData.name
+
+	return map
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(getTiledTileLayer(mapData), "ModelTile", "ViewTile")
+    local tiledLayer = getTiledTileLayer(mapData)
+    assert(tiledLayer, "ModelTileMap-createTileActorsMapWithoutTemplate() the param mapData is expected to have a tiled layer.")
+
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelTile", "ViewTile")
 	assert(map, "ModelTileMap-createTileActorsMapWithoutTemplate() failed to create the map.")
 
 	return map
@@ -45,11 +56,9 @@ end
 
 local function createTileActorsMap(param)
     local mapData = requireMapData(param)
-    assert(TypeChecker.isMapData(mapData))
-
     local tileActorsMap = (mapData.template == nil) and
         createTileActorsMapWithoutTemplate(mapData) or
-        createTileActorsMapWithTemplateAndOverwriting(mapData)
+        createTileActorsMapWithTemplate(mapData)
 
     assert(tileActorsMap, "ModelTileMap--createTileActorsMap() failed to create tile actors map.")
     assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createTileActorsMap() some tiles are missing in the created map.")
