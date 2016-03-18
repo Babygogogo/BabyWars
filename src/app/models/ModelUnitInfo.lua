@@ -22,28 +22,6 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelUnitInfo:load(param)
-    return self
-end
-
-function ModelUnitInfo.createInstance(param)
-    local model = ModelUnitInfo.new():load(param)
-    assert(model, "ModelUnitInfo.createInstance() failed.")
-
-    return model
-end
-
-function ModelUnitInfo:initView()
-    local view = self.m_View
-    assert(view, "ModelUnitInfo:initView() no view is attached to the owner actor of the model.")
-
     return self
 end
 
