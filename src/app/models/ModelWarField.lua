@@ -45,14 +45,6 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWarField:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelWarField:load(param)
     initWithCompositionActors(self, createCompositionActors(param))
 
     if (self.m_View) then
@@ -60,13 +52,6 @@ function ModelWarField:load(param)
     end
 
     return self
-end
-
-function ModelWarField.createInstance(param)
-	local model = ModelWarField.new():load(param)
-	assert(model, "ModelWarField.createInstance() failed.")
-
-	return model
 end
 
 function ModelWarField:initView()

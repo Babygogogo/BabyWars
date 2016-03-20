@@ -15,7 +15,7 @@ local function requireMapData(param)
 	elseif (t == "table") then
 		return param
 	else
-		return nil
+		return error("ModelUnitMap-requireMapData() the param is invalid.")
 	end
 end
 
@@ -26,16 +26,54 @@ end
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
+local function createUnitActorsMapWithTemplate(mapData)
+    assert(type(mapData.template) == "string", "ModelUnitMap-createUnitActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
+    local templateTiledLayer = getTiledUnitLayer(requireMapData(mapData.template))
+    assert(templateTiledLayer, "ModelUnitMap-createUnitActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
+
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelUnit", "ViewUnit")
+	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to create the template unit actors map.")
+
+    if (mapData.grids) then
+        map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
+    	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
+    end
+
+    map.m_TemplateName = mapData.template
+    map.m_Name         = mapData.name
+
+	return map
+end
+
+local function createUnitActorsMapWithoutTemplate(mapData)
+    local tiledLayer = getTiledUnitLayer(mapData)
+    local map
+    if (not tiledLayer) then
+        map = MapFunctions.createGridActorsMapWithMapData(mapData.grids, "ModelUnit", "ViewUnit")
+        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the param mapData.grids")
+    else
+        map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelUnit", "ViewUnit")
+        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the tiled layer within the param.")
+
+        if (mapData.grids) then
+            map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
+            assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
+        end
+    end
+
+    map.m_Name = mapData.name
+
+	return map
+end
+
 local function createUnitActorsMap(param)
-	local mapData = requireMapData(param)
-	assert(TypeChecker.isMapData(mapData))
+    local mapData = requireMapData(param)
+    local unitActorsMap =(mapData.template == nil) and
+        createUnitActorsMapWithoutTemplate(mapData) or
+        createUnitActorsMapWithTemplate(mapData)
+    assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
 
-	local unitActorsMap = TypeChecker.isTiledData(mapData)
-		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), "ModelUnit", "ViewUnit")
-		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    "ModelUnit", "ViewUnit")
-	assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
-
-	return unitActorsMap
+    return unitActorsMap
 end
 
 local function initWithUnitActorsMap(model, map)

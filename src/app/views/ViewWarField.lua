@@ -67,22 +67,7 @@ function ViewWarField:ctor(param)
         :setAnchorPoint(0, 0)
     self.m_ContentSize = {}
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
-end
-
-function ViewWarField:load(param)
-	return self
-end
-
-function ViewWarField.createInstance(param)
-	local view = ViewWarField.new():load(param)
-	assert(view, "ViewWarField.createInstance() failed.")
-
-	return view
 end
 
 --------------------------------------------------------------------------------
@@ -93,8 +78,8 @@ function ViewWarField:setContentSizeWithMapSize(mapSize)
     self.m_ContentSize.width = mapSize.width * gridSize.width
     self.m_ContentSize.height = mapSize.height * gridSize.height
     self.m_MaxScale = 2
-    self.m_MinScale = math.min((BOUNDARY_RECT.width)  / self.m_ContentSize.width,
-                               (BOUNDARY_RECT.height) / self.m_ContentSize.height)
+    self.m_MinScale = math.min(BOUNDARY_RECT.width  / self.m_ContentSize.width,
+                               BOUNDARY_RECT.height / self.m_ContentSize.height)
 
     self:setContentSize(self.m_ContentSize.width, self.m_ContentSize.height)
         :placeInDragBoundary()

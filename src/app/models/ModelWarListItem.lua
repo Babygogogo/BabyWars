@@ -6,6 +6,9 @@ local COMFIRM_BOX_Z_ORDER = 99
 local Actor       = require("global.actors.Actor")
 local TypeChecker = require("app.utilities.TypeChecker")
 
+--------------------------------------------------------------------------------
+-- The confirm box actor.
+--------------------------------------------------------------------------------
 local function createActorConfirmBox(modelItem, warName)
     local modelBox = require("app.models.ModelConfirmBox"):create()
     modelBox:setConfirmText("You are entering a war:\n" .. warName .. ".\nAre you sure?")
@@ -25,28 +28,18 @@ local function createActorConfirmBox(modelItem, warName)
     return Actor.createWithModelAndViewInstance(modelBox, require("app.views.ViewConfirmBox"):create())
 end
 
+--------------------------------------------------------------------------------
+-- The contructor.
+--------------------------------------------------------------------------------
 function ModelWarListItem:ctor(param)
-    if (param) then self:load(param) end
-
-	return self
-end
-
-function ModelWarListItem:load(param)
-    assert(type(param) == "table", "ModelWarListItem:load() the param is not a table.")
-
     self.m_Title = param.name
     self.m_Data = param.data
 
-    if (self.m_View) then self:initView() end
+    if (self.m_View) then
+        self:initView()
+    end
 
 	return self
-end
-
-function ModelWarListItem.createInstance(param)
-	local list = ModelWarListItem.new():load(param)
-    assert(list, "ModelWarListItem.createInstance() failed.")
-
-	return list
 end
 
 function ModelWarListItem:initView()
@@ -58,6 +51,9 @@ function ModelWarListItem:initView()
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback function on player touch/confirm.
+--------------------------------------------------------------------------------
 function ModelWarListItem:onPlayerTouch()
     if (self.m_ActorConfirmBox) then
         self.m_ActorConfirmBox:getModel():setEnabled(true)
