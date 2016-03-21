@@ -28,19 +28,19 @@ end
 --------------------------------------------------------------------------------
 -- The quit war menu item.
 --------------------------------------------------------------------------------
-local function onQuitWarItemConfirmYes()
-    local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
-    assert(mainSceneActor, "ModelWarCommandMenu-onQuitWarItemConfirmYes() failed to create a main scene actor.")
-    require("global.actors.ActorManager").setAndRunRootActor(mainSceneActor, "FADE", 1)
-end
-
 local function createQuitWarItem(model)
     local item = {}
 
     item.onPlayerTouch = function(self)
         local confirmBoxModel = model.m_ConfirmBoxActor:getModel()
         confirmBoxModel:setConfirmText("You are quitting the war (you may reenter it later).\nAre you sure?")
-            :setOnConfirmYes(onQuitWarItemConfirmYes)
+
+            :setOnConfirmYes(function()
+                local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
+                assert(mainSceneActor, "ModelWarCommandMenu-onQuitWarItemConfirmYes() failed to create a main scene actor.")
+                require("global.actors.ActorManager").setAndRunRootActor(mainSceneActor, "FADE", 1)
+            end)
+
             :setEnabled(true)
     end
 
@@ -56,12 +56,43 @@ local function initWithQuitWarItem(model, item)
 end
 
 --------------------------------------------------------------------------------
+-- The end turn menu item.
+--------------------------------------------------------------------------------
+local function createEndTurnItem(model)
+    local item = {}
+
+    item.onPlayerTouch = function(self)
+        local confirmBoxModel = model.m_ConfirmBoxActor:getModel()
+        confirmBoxModel:setConfirmText("You are ending your turn, with some units unactioned.\nAre you sure?")
+
+            :setOnConfirmYes(function()
+                confirmBoxModel:setEnabled(false)
+                model:setEnabled(false)
+                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerRequestEndTurn"})
+            end)
+
+            :setEnabled(true)
+    end
+
+    item.getTitleText = function(self)
+        return "End Turn"
+    end
+
+    return item
+end
+
+local function initWithEndTurnItem(model, item)
+    model.m_EndTurnItem = item
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
     initWithConfirmBoxActor(self, createConfirmBoxActor())
 
     initWithQuitWarItem(self, createQuitWarItem(self))
+    initWithEndTurnItem(self, createEndTurnItem(self))
 
     if (self.m_View) then
         self:initView()
@@ -77,9 +108,21 @@ function ModelWarCommandMenu:initView()
     view:setConfirmBoxView(self.m_ConfirmBoxActor:getView())
 
         :removeAllItems()
-        :pushBackItemView(view:createItemView(self.m_QuitWarItem))
+        :createAndPushBackItemView(self.m_QuitWarItem)
+        :createAndPushBackItemView(self.m_EndTurnItem)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on node/script events.
+--------------------------------------------------------------------------------
+function ModelWarCommandMenu:onEnter(rootActor)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+end
+
+function ModelWarCommandMenu:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher = nil
 end
 
 --------------------------------------------------------------------------------

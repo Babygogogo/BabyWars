@@ -149,13 +149,15 @@ end
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
+    local isTouchWithinBackground = false
 
     touchListener:registerScriptHandler(function(touch, event)
-        return not isTouchWithinNode(touch, view.m_Background)
+        isTouchWithinBackground = isTouchWithinNode(touch, view.m_Background)
+        return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function(touch, event)
-        if (view.m_Model) then
+        if (not isTouchWithinBackground) and (view.m_Model) then
             view.m_Model:onConfirmCancel()
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)

@@ -56,8 +56,26 @@ local function initWithCompositionActors(model, actors)
 end
 
 --------------------------------------------------------------------------------
--- The turn and player.
+-- The turn and players.
 --------------------------------------------------------------------------------
+local function getNextTurnAndPlayerIndex(turn, players)
+    local nextTurnIndex   = turn.m_TurnIndex
+    local nextPlayerIndex = turn.m_PlayerIndex + 1
+
+    while (true) do
+        if (nextPlayerIndex > #players) then
+            nextPlayerIndex = 1
+            nextTurnIndex   = nextTurnIndex + 1
+        end
+
+        assert(nextPlayerIndex ~= turn.m_PlayerIndex, "ModelSceneWar-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
+
+        if (players[nextPlayerIndex].m_IsAlive) then
+            return nextTurnIndex, nextPlayerIndex
+        end
+    end
+end
+
 local function initTurn(model, turn)
     model.m_Turn = {
         m_TurnIndex   = turn.turnIndex,
@@ -71,7 +89,27 @@ local function runTurn(model)
     local player = model.m_Players[turn.m_PlayerIndex]
 
     model.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
+        if (turn.m_TurnPhase == "standby") then
+            -- TODO: Add fund, repair units, destroy units that run out of fuel.
+            turn.m_TurnPhase = "main"
+        elseif (turn.m_TurnPhase == "main") then
+            -- Do nothing.
+        elseif (turn.m_TurnPhase == "end") then
+            error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
+        end
     end)
+end
+
+local function endTurn(model)
+    local turn = model.m_Turn
+    assert(turn.m_TurnPhase == "main", "ModelSceneWar-endTurn() the turn phase is expected to be 'main'.")
+
+    turn.m_TurnPhase = "end"
+    -- TODO: Change state for units, weather, vision and so on.
+
+    turn.m_TurnPhase = "standby"
+    turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
+    runTurn(model)
 end
 
 local function initPlayers(model, players)
@@ -124,6 +162,8 @@ end
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
 
+    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestEndTurn", self)
+
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
 
@@ -139,8 +179,18 @@ end
 function ModelSceneWar:onCleanup(rootActor)
     print("ModelSceneWar:onCleanup()")
 
+    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerRequestEndTurn", self)
+
     self.m_SceneWarHUDActor:onCleanup(rootActor)
     self.m_WarFieldActor:onCleanup(rootActor)
+
+    return self
+end
+
+function ModelSceneWar:onEvent(event)
+    if (event.name == "EvtPlayerRequestEndTurn") then
+        endTurn(self)
+    end
 
     return self
 end

@@ -14,6 +14,35 @@ local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
 local CONFIRM_BOX_Z_ORDER = 99
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function createItemView(itemModel)
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
+        :setContentSize(230, 45)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName("res/fonts/msyhbd.ttc")
+        :setTitleFontSize(28)
+        :setTitleColor({r = 255, g = 255, b = 255})
+        :setTitleText(itemModel:getTitleText())
+
+    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    view:addTouchEventListener(function(sender, eventType)
+        if eventType == ccui.TouchEventType.ended then
+            itemModel:onPlayerTouch()
+        end
+    end)
+
+    return view
+end
+
+--------------------------------------------------------------------------------
 -- The screen background (the transparent grey mask).
 --------------------------------------------------------------------------------
 local function createScreenBackground()
@@ -38,9 +67,6 @@ local function createMenuBackground()
         :setPosition(MENU_BACKGROUND_POSITION_X, MENU_BACKGROUND_POSITION_Y)
 
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
-
-    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
-    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
 
     return background
 end
@@ -115,34 +141,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarCommandMenu:createItemView(item)
-    local view = ccui.Button:create()
-    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+function ViewWarCommandMenu:createAndPushBackItemView(itemModel)
+    self.m_ListView:pushBackCustomItem(createItemView(itemModel))
 
-        :setScale9Enabled(true)
-        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
-        :setContentSize(230, 45)
-
-        :setZoomScale(-0.05)
-
-        :setTitleFontName("res/fonts/msyhbd.ttc")
-        :setTitleFontSize(28)
-        :setTitleColor({r = 255, g = 255, b = 255})
-        :setTitleText(item:getTitleText())
-
-    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    view:addTouchEventListener(function(sender, eventType)
-        if eventType == ccui.TouchEventType.ended then
-            item:onPlayerTouch()
-        end
-    end)
-
-    return view
+    return self
 end
 
-function ViewWarCommandMenu:pushBackItemView(item)
-    self.m_ListView:pushBackCustomItem(item)
+function ViewWarCommandMenu:pushBackItemView(itemView)
+    self.m_ListView:pushBackCustomItem(itemView)
 
     return self
 end
@@ -156,10 +162,10 @@ end
 function ViewWarCommandMenu:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self:getEventDispatcher():resumeEventListenersForTarget(self)
+        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
-        self:getEventDispatcher():pauseEventListenersForTarget(self)
+        self.m_TouchListener:setEnabled(false)
     end
 
     return self
@@ -176,7 +182,6 @@ function ViewWarCommandMenu:setConfirmBoxView(view)
 
     self.m_ConfirmBoxView = view
     self:addChild(view, CONFIRM_BOX_Z_ORDER)
-    view:setEnabled(false)
 
     return self
 end
