@@ -129,7 +129,7 @@ local function setBeginTurnEffectLabel(effect, turnIndex, playerName)
 end
 
 --------------------------------------------------------------------------------
--- The contructor.
+-- The constructor.
 --------------------------------------------------------------------------------
 function ViewSceneWarHUD:ctor(param)
     initWithBeginTurnEffect(self, createBeginTurnEffect())

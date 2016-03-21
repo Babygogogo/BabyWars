@@ -11,6 +11,8 @@ local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
 local LIST_POSITION_X = MENU_BACKGROUND_POSITION_X + 5
 local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
 
+local CONFIRM_BOX_Z_ORDER = 99
+
 --------------------------------------------------------------------------------
 -- The screen background (the transparent grey mask).
 --------------------------------------------------------------------------------
@@ -77,7 +79,7 @@ local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
 
-	touchListener:registerScriptHandler(function()
+    touchListener:registerScriptHandler(function()
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
@@ -107,13 +109,39 @@ function ViewWarCommandMenu:ctor(param)
         :setCascadeOpacityEnabled(true)
         :setOpacity(200)
 
-	return self
+    return self
 end
 
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarCommandMenu:pushBackItem(item)
+function ViewWarCommandMenu:createItemView(item)
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
+        :setContentSize(230, 45)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName("res/fonts/msyhbd.ttc")
+        :setTitleFontSize(28)
+        :setTitleColor({r = 255, g = 255, b = 255})
+        :setTitleText(item:getTitleText())
+
+    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    view:addTouchEventListener(function(sender, eventType)
+        if eventType == ccui.TouchEventType.ended then
+            item:onPlayerTouch()
+        end
+    end)
+
+    return view
+end
+
+function ViewWarCommandMenu:pushBackItemView(item)
     self.m_ListView:pushBackCustomItem(item)
 
     return self
@@ -133,6 +161,26 @@ function ViewWarCommandMenu:setEnabled(enabled)
         self:setVisible(false)
         self:getEventDispatcher():pauseEventListenersForTarget(self, true)
     end
+
+    if (self.m_ConfirmBoxView) then
+        self.m_ConfirmBoxView:setEnabled(false)
+    end
+
+    return self
+end
+
+function ViewWarCommandMenu:setConfirmBoxView(view)
+    if (self.m_ConfirmBoxView) then
+        if (self.m_ConfirmBoxView == view) then
+            return self
+        else
+            self:removeChild(self.m_ConfirmBoxView)
+        end
+    end
+
+    view:setEnabled(false)
+    self.m_ConfirmBoxView = view
+    self:addChild(view, CONFIRM_BOX_Z_ORDER)
 
     return self
 end
