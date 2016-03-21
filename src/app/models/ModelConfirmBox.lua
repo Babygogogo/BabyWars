@@ -5,24 +5,6 @@ local Actor           = require("global.actors.Actor")
 local TypeChecker     = require("app.utilities.TypeChecker")
 
 --------------------------------------------------------------------------------
--- The touch listener for view.
---------------------------------------------------------------------------------
-local function createTouchListener(model)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
-    touchListener:setSwallowTouches(true)
-
-	touchListener:registerScriptHandler(function()
-        return true
-    end, cc.Handler.EVENT_TOUCH_BEGAN)
-
-    touchListener:registerScriptHandler(function()
-        model:onConfirmCancel()
-    end, cc.Handler.EVENT_TOUCH_ENDED)
-
-    return touchListener
-end
-
---------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelConfirmBox:ctor(param)
@@ -45,7 +27,6 @@ function ModelConfirmBox:initView()
 	assert(view, "ModelConfirmBox:initView() no view is attached to the actor of the model.")
 
     view:setConfirmText(self.m_ConfirmText or "")
-        :setTouchListener(createTouchListener(self))
 
     return self
 end

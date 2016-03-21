@@ -55,6 +55,16 @@ local function createConfirmButton(posX, posY, color, text, callback)
     return button
 end
 
+local function isTouchWithinNode(touch, node)
+    local location = node:convertToNodeSpace(touch:getLocation())
+    local x, y = location.x, location.y
+
+    local contentSize = node:getContentSize()
+    local width, height = contentSize.width, contentSize.height
+
+    return (x >= 0) and (y >= 0) and (x <= width) and (y <= height)
+end
+
 --------------------------------------------------------------------------------
 -- The composition background.
 --------------------------------------------------------------------------------
@@ -67,9 +77,6 @@ local function createBackground()
 
         :setOpacity(220)
 
-    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
-    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
-
     return background
 end
 
@@ -81,7 +88,7 @@ end
 --------------------------------------------------------------------------------
 -- The composition comfirm text label.
 --------------------------------------------------------------------------------
-local function createLabel()
+local function createConfirmTextLabel()
     local text = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     text:ignoreAnchorPointForPosition(true)
         :setPosition(TEXT_POSITION_X, TEXT_POSITION_Y)
@@ -96,8 +103,8 @@ local function createLabel()
     return text
 end
 
-local function initWithLabel(view, label)
-    view.m_Label = label
+local function initWithConfirmTextLabel(view, label)
+    view.m_ConfirmTextLabel = label
     view:addChild(label)
 end
 
@@ -137,16 +144,45 @@ local function initWithButtonNo(view, button)
 end
 
 --------------------------------------------------------------------------------
+-- The touch listener.
+--------------------------------------------------------------------------------
+local function createTouchListener(view)
+    local touchListener = cc.EventListenerTouchOneByOne:create()
+    touchListener:setSwallowTouches(true)
+
+	touchListener:registerScriptHandler(function(touch, event)
+        return not isTouchWithinNode(touch, view.m_Background)
+    end, cc.Handler.EVENT_TOUCH_BEGAN)
+
+    touchListener:registerScriptHandler(function(touch, event)
+        if (view.m_Model) then
+            view.m_Model:onConfirmCancel()
+        end
+    end, cc.Handler.EVENT_TOUCH_ENDED)
+
+    return touchListener
+end
+
+local function initWithTouchListener(view, listener)
+    view.m_TouchListener = listener
+    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, view)
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewConfirmBox:ctor(param)
-    initWithBackground(self, createBackground())
-    initWithLabel(     self, createLabel())
-    initWithButtonYes( self, createButtonYes(self))
-    initWithButtonNo(  self, createButtonNo(self))
+    assert(not self.m_IsInitialized, "ViewConfirmBox:ctor() the view is already initialized.")
+    self.m_IsInitialized = true
 
     self:setCascadeOpacityEnabled(true)
         :setOpacity(220)
+
+    initWithBackground(   self, createBackground())
+    initWithConfirmTextLabel(        self, createConfirmTextLabel())
+    initWithButtonYes(    self, createButtonYes(self))
+    initWithButtonNo(     self, createButtonNo(self))
+    initWithTouchListener(self, createTouchListener(self))
 
     return self
 end
@@ -155,23 +191,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewConfirmBox:setConfirmText(text)
-    self.m_Label:setString(text)
-
-    return self
-end
-
-function ViewConfirmBox:setTouchListener(listener)
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then
-        if (self.m_TouchListener == listener) then
-            return self
-        else
-            eventDispatcher:removeEventListener(self.m_TouchListener)
-        end
-    end
-
-    self.m_TouchListener = listener
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    self.m_ConfirmTextLabel:setString(text)
 
     return self
 end
@@ -179,10 +199,10 @@ end
 function ViewConfirmBox:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+            :getEventDispatcher():resumeEventListenersForTarget(self)
     else
         self:setVisible(false)
-        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+            :getEventDispatcher():pauseEventListenersForTarget(self)
     end
 
     return self
