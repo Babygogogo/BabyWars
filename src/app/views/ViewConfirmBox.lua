@@ -119,7 +119,7 @@ local function createButtonYes(view)
     end
 
     return createConfirmButton(BUTTON_YES_POSITION_X, BUTTON_YES_POSITION_Y,
-                               {r = 104, g = 248, b = 200}, "Yes", callback)
+                            {r = 104, g = 248, b = 200}, "Yes", callback)
 end
 
 local function initWithButtonYes(view, button)
@@ -135,7 +135,7 @@ local function createButtonNo(view)
     end
 
     return createConfirmButton(BUTTON_NO_POSITION_X, BUTTON_NO_POSITION_Y,
-                               {r = 240, g = 80, b = 56}, "No", callback)
+                            {r = 240, g = 80, b = 56}, "No", callback)
 end
 
 local function initWithButtonNo(view, button)
@@ -150,7 +150,7 @@ local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
 
-	touchListener:registerScriptHandler(function(touch, event)
+    touchListener:registerScriptHandler(function(touch, event)
         return not isTouchWithinNode(touch, view.m_Background)
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
@@ -178,11 +178,11 @@ function ViewConfirmBox:ctor(param)
     self:setCascadeOpacityEnabled(true)
         :setOpacity(220)
 
-    initWithBackground(   self, createBackground())
-    initWithConfirmTextLabel(        self, createConfirmTextLabel())
-    initWithButtonYes(    self, createButtonYes(self))
-    initWithButtonNo(     self, createButtonNo(self))
-    initWithTouchListener(self, createTouchListener(self))
+    initWithBackground(      self, createBackground())
+    initWithConfirmTextLabel(self, createConfirmTextLabel())
+    initWithButtonYes(       self, createButtonYes(self))
+    initWithButtonNo(        self, createButtonNo(self))
+    initWithTouchListener(   self, createTouchListener(self))
 
     return self
 end
@@ -199,10 +199,10 @@ end
 function ViewConfirmBox:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-            :getEventDispatcher():resumeEventListenersForTarget(self)
+        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
-            :getEventDispatcher():pauseEventListenersForTarget(self)
+        self.m_TouchListener:setEnabled(false)
     end
 
     return self

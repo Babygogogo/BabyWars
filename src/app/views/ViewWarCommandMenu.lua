@@ -156,14 +156,10 @@ end
 function ViewWarCommandMenu:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+        self:getEventDispatcher():resumeEventListenersForTarget(self)
     else
         self:setVisible(false)
-        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
-    end
-
-    if (self.m_ConfirmBoxView) then
-        self.m_ConfirmBoxView:setEnabled(false)
+        self:getEventDispatcher():pauseEventListenersForTarget(self)
     end
 
     return self
@@ -178,9 +174,9 @@ function ViewWarCommandMenu:setConfirmBoxView(view)
         end
     end
 
-    view:setEnabled(false)
     self.m_ConfirmBoxView = view
     self:addChild(view, CONFIRM_BOX_Z_ORDER)
+    view:setEnabled(false)
 
     return self
 end

@@ -21,7 +21,7 @@ local BEGIN_TURN_EFFECT_MOVEOUT_DURATION = 0.5
 local BEGIN_TURN_EFFECT_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local BEGIN_TURN_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
-local BEGIN_TURN_EFFECT_FONT_OUTLINE_WIDTH = 2
+local BEGIN_TURN_EFFECT_FONT_OUTLINE_WIDTH = math.ceil(BEGIN_TURN_EFFECT_FONT_SIZE / 15)
 
 --------------------------------------------------------------------------------
 -- The begin turn effect.

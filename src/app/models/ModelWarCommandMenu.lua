@@ -26,22 +26,11 @@ local function initWithConfirmBoxActor(model, actor)
 end
 
 --------------------------------------------------------------------------------
--- The quit war menu item actor.
+-- The quit war menu item.
 --------------------------------------------------------------------------------
-local function createQuitWarActor()
-    local quitWarActor = Actor.createWithModelAndViewName("ModelMenuItemQuitWar", nil, "ViewWarCommandMenuItem")
-    assert(quitWarActor, "ModelWarCommandMenu-createChildrenActors() failed to create a QuitWar actor.")
-
-    return quitWarActor
-end
-
-local function initWithQuitWarActor(model, actor)
-    model.m_QuitWarActor = actor
-end
-
 local function onQuitWarItemConfirmYes()
     local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
-    assert(mainSceneActor, "ModelMenuItemQuitWar-onConfirmYes() failed to create a main scene actor.")
+    assert(mainSceneActor, "ModelWarCommandMenu-onQuitWarItemConfirmYes() failed to create a main scene actor.")
     require("global.actors.ActorManager").setAndRunRootActor(mainSceneActor, "FADE", 1)
 end
 
@@ -70,8 +59,6 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
-    initWithQuitWarActor(self, createQuitWarActor())
---[[
     initWithConfirmBoxActor(self, createConfirmBoxActor())
 
     initWithQuitWarItem(self, createQuitWarItem(self))
@@ -79,7 +66,7 @@ function ModelWarCommandMenu:ctor(param)
     if (self.m_View) then
         self:initView()
     end
-]]
+
     return self
 end
 
@@ -87,14 +74,11 @@ function ModelWarCommandMenu:initView()
     local view = self.m_View
     assert(view, "ModelWarCommandMenu:initView() no view is attached to the actor of the model.")
 
-    view:removeAllItems()
-        :pushBackItemView(self.m_QuitWarActor:getView())
---[[
     view:setConfirmBoxView(self.m_ConfirmBoxActor:getView())
 
         :removeAllItems()
         :pushBackItemView(view:createItemView(self.m_QuitWarItem))
-]]
+
     return self
 end
 
