@@ -104,4 +104,17 @@ function ModelSceneWarHUD:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneWarHUD:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
+    if (self.m_View) then
+        self.m_View:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
+    else
+        callbackOnDisappear()
+    end
+
+    return self
+end
+
 return ModelSceneWarHUD

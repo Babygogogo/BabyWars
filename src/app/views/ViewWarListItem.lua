@@ -27,6 +27,9 @@ local function initTouchListener(view)
         end)
 end
 
+--------------------------------------------------------------------------------
+-- The contructor.
+--------------------------------------------------------------------------------
 function ViewWarListItem:ctor(param)
     initAppearance(self)
     initTouchListener(self)
