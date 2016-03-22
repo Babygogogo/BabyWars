@@ -91,7 +91,7 @@ end
 local function createFundLabel()
     return createLabel(FUND_INFO_POSITION_X, FUND_INFO_POSITION_Y,
                        FUND_INFO_WIDTH, FUND_INFO_HEIGHT,
-                       "F:     123000")
+                       "F:")
 end
 
 local function initWithFundLabel(view, label)
@@ -105,7 +105,7 @@ end
 local function createEnergyLabel()
     return createLabel(ENERGY_INFO_POSITION_X, ENERGY_INFO_POSITION_Y,
                        ENERGY_INFO_WIDTH, ENERGY_INFO_HEIGHT,
-                       "EN:  10/0/10")
+                       "EN:")
 end
 
 local function initWithEnergyLabel(view, label)
@@ -139,6 +139,18 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
             moveToLeftSide(self)
         end
     end
+
+    return self
+end
+
+function ViewMoneyEnergyInfo:setFund(fund)
+    self.m_FundLabel:setString("F:     " .. fund)
+
+    return self
+end
+
+function ViewMoneyEnergyInfo:setEnergy(current, coPower, superPower)
+    self.m_EnergyLabel:setString("EN:  " .. current .. "/" .. coPower .. "/" .. superPower)
 
     return self
 end

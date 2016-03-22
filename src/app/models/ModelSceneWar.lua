@@ -56,7 +56,7 @@ local function initWithCompositionActors(model, actors)
 end
 
 --------------------------------------------------------------------------------
--- The turn and players.
+-- The turn.
 --------------------------------------------------------------------------------
 local function getNextTurnAndPlayerIndex(turn, players)
     local nextTurnIndex   = turn.m_TurnIndex
@@ -86,7 +86,16 @@ end
 
 local function runTurn(model)
     local turn = model.m_Turn
+
+    if (turn.m_TurnPhase == "end") then
+        -- TODO: Change state for units, weather, vision and so on.
+
+        turn.m_TurnPhase = "standby"
+        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
+    end
+
     local player = model.m_Players[turn.m_PlayerIndex]
+    model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
 
     model.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
         if (turn.m_TurnPhase == "standby") then
@@ -94,7 +103,7 @@ local function runTurn(model)
             turn.m_TurnPhase = "main"
         elseif (turn.m_TurnPhase == "main") then
             -- Do nothing.
-        elseif (turn.m_TurnPhase == "end") then
+        else
             error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
         end
     end)
@@ -105,13 +114,12 @@ local function endTurn(model)
     assert(turn.m_TurnPhase == "main", "ModelSceneWar-endTurn() the turn phase is expected to be 'main'.")
 
     turn.m_TurnPhase = "end"
-    -- TODO: Change state for units, weather, vision and so on.
-
-    turn.m_TurnPhase = "standby"
-    turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
     runTurn(model)
 end
 
+--------------------------------------------------------------------------------
+-- The players.
+--------------------------------------------------------------------------------
 local function initPlayers(model, players)
     model.m_Players = {}
     for i, p in ipairs(players) do
@@ -119,8 +127,20 @@ local function initPlayers(model, players)
             m_ID      = p.id,
             m_Name    = p.name,
             m_Fund    = p.fund,
-            m_Energy  = p.energy,
             m_IsAlive = p.isAlive,
+            m_CO      = {
+                m_CurrentEnergy    = p.co.currentEnergy,
+                m_COPowerEnergy    = p.co.coPowerEnergy,
+                m_SuperPowerEnergy = p.co.superPowerEnergy,
+            },
+
+            getFund = function(self)
+                return self.m_Fund
+            end,
+
+            getCOEnergy = function(self)
+                return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
+            end,
         }
     end
 end
