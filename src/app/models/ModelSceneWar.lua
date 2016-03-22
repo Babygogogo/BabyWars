@@ -146,6 +146,15 @@ local function initPlayers(model, players)
 end
 
 --------------------------------------------------------------------------------
+-- The weather.
+--------------------------------------------------------------------------------
+local function initWeather(model, weather)
+    model.m_Weather = {
+        m_CurrentWeather = weather.current
+    }
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(param)
@@ -156,6 +165,7 @@ function ModelSceneWar:ctor(param)
     initWithCompositionActors(    self, createCompositionActors(sceneData))
     initTurn(   self, sceneData.turn)
     initPlayers(self, sceneData.players)
+    initWeather(self, sceneData.weather)
 
     if (self.m_View) then
         self:initView()
@@ -186,6 +196,8 @@ function ModelSceneWar:onEnter(rootActor)
 
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
+
+    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self.m_Weather.m_CurrentWeather})
 
     return self
 end

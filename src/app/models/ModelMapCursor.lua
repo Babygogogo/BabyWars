@@ -31,7 +31,7 @@ local function createTouchListener(model)
         if (isTouchingCursor) then
             local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), model.m_View)
             if (GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)) and
-               (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
+            (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
                 model:setGridIndex(gridIndex)
                 model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
                 isTouchMoved = true
@@ -39,8 +39,8 @@ local function createTouchListener(model)
         else
             if (isTouchMoved) then
                 model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerDragField",
-                                                             previousPosition = touch:getPreviousLocation(),
-                                                             currentPosition = touch:getLocation()})
+                                                            previousPosition = touch:getPreviousLocation(),
+                                                            currentPosition = touch:getLocation()})
             end
         end
     end
@@ -55,11 +55,10 @@ local function createTouchListener(model)
         end
 
         if (not isTouchMoved) or
-           ((isTouchingCursor) and (GridIndexFunctions.isEqual(gridIndex, initialTouchGridIndex))) then
+        ((isTouchingCursor) and (GridIndexFunctions.isEqual(gridIndex, initialTouchGridIndex))) then
             model:setGridIndex(gridIndex)
             model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
-
-            print("Player activate a grid:", gridIndex.x, gridIndex.y)
+                :dispatchEvent({name = "EvtGridSelected", gridIndex = gridIndex})
         end
     end
 

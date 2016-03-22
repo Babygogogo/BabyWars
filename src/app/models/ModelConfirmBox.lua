@@ -19,12 +19,12 @@ function ModelConfirmBox:ctor(param)
         self:initView()
     end
 
-	return self
+    return self
 end
 
 function ModelConfirmBox:initView()
     local view = self.m_View
-	assert(view, "ModelConfirmBox:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelConfirmBox:initView() no view is attached to the actor of the model.")
 
     view:setConfirmText(self.m_ConfirmText or "")
 

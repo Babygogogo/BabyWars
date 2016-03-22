@@ -9,6 +9,11 @@ local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.
       BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
       BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
 
+local MAP_CURSOR_Z_ORDER     = 3
+local UNIT_MAP_Z_ORDER       = 2
+local ACTION_PLANNER_Z_ORDER = 1
+local TILE_MAP_Z_ORDER       = 0
+
 --------------------------------------------------------------------------------
 -- The functions that deals with zooming/dragging.
 --------------------------------------------------------------------------------
@@ -21,14 +26,14 @@ end
 
 local function shouldZoomWithScroll(view, focusPosInNode, value)
     if (focusPosInNode.x < 0) or (focusPosInNode.x > view.m_ContentSize.width) or
-       (focusPosInNode.y < 0) or (focusPosInNode.y > view.m_ContentSize.height) then
-       return false
+    (focusPosInNode.y < 0) or (focusPosInNode.y > view.m_ContentSize.height) then
+    return false
     end
 
     local currentScale = view:getScale()
     if ((value > 0) and (isViewSmallerThanBoundaryRect(currentScale, view.m_ContentSize))) or
-       ((value < 0) and (currentScale >= view.m_MaxScale)) or
-       (value == 0) then
+    ((value < 0) and (currentScale >= view.m_MaxScale)) or
+    (value == 0) then
         return false
     else
         return true
@@ -60,7 +65,7 @@ local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSiz
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewWarField:ctor(param)
     self:ignoreAnchorPointForPosition(true)
@@ -70,12 +75,69 @@ function ViewWarField:ctor(param)
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
+function ViewWarField:setTileMapView(view)
+    if (self.m_TileMapView) then
+        if (self.m_TileMapView == view) then
+            return self
+        else
+            self:removeChild(self.m_TileMapView)
+        end
+    end
+
+    self.m_TileMapView = view
+    self:addChild(view, TILE_MAP_Z_ORDER)
+
+    return self
+end
+
+function ViewWarField:setUnitMapView(view)
+    if (self.m_UnitMapView) then
+        if (self.m_UnitMapView == view) then
+            return self
+        else
+            self:removeChild(self.m_UnitMapView)
+        end
+    end
+
+    self.m_UnitMapView = view
+    self:addChild(view, UNIT_MAP_Z_ORDER)
+
+    return self
+end
+
+function ViewWarField:setActionPlannerView(view)
+    if (self.m_ActionPlannerView) then
+        if (self.m_ActionPlannerView == view) then
+            return self
+        else
+            self:removeChild(self.m_ActionPlannerView)
+        end
+    end
+
+    self.m_ActionPlannerView = view
+    self:addChild(view, ACTION_PLANNER_Z_ORDER)
+
+    return self
+end
+
+function ViewWarField:setMapCursorView(view)
+    if (self.m_MapCursorView) then
+        if (self.m_MapCursorView == view) then
+            return self
+        else
+            self:removeChild(self.m_MapCursorView)
+        end
+    end
+
+    self.m_MapCursorView = view
+    self:addChild(view, MAP_CURSOR_Z_ORDER)
+
+    return self
+end
+
 function ViewWarField:setContentSizeWithMapSize(mapSize)
     local gridSize = GameConstant.GridSize
-    self.m_ContentSize.width = mapSize.width * gridSize.width
+    self.m_ContentSize.width  = mapSize.width  * gridSize.width
     self.m_ContentSize.height = mapSize.height * gridSize.height
     self.m_MaxScale = 2
     self.m_MinScale = math.min(BOUNDARY_RECT.width  / self.m_ContentSize.width,
@@ -84,9 +146,12 @@ function ViewWarField:setContentSizeWithMapSize(mapSize)
     self:setContentSize(self.m_ContentSize.width, self.m_ContentSize.height)
         :placeInDragBoundary()
 
-	return self
+    return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ViewWarField:setZoomWithScroll(focusPosInWorld, scrollValue)
     local focusPosInNode = self:convertToNodeSpace(focusPosInWorld)
     if (shouldZoomWithScroll(self, focusPosInNode, scrollValue)) then

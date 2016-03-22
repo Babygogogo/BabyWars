@@ -54,6 +54,10 @@ local WarScene_Test2 = {
             },
         },
     },
+
+    weather = {
+        current = "clear"
+    },
 }
 
 return WarScene_Test2

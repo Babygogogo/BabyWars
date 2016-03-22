@@ -9,18 +9,18 @@ local GridSize           = require("res.data.GameConstant").GridSize
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireMapData(param)
-	local t = type(param)
-	if (t == "string") then
-		return require("data.unitMap." .. param)
-	elseif (t == "table") then
-		return param
-	else
-		return error("ModelUnitMap-requireMapData() the param is invalid.")
-	end
+    local t = type(param)
+    if (t == "string") then
+        return require("data.unitMap." .. param)
+    elseif (t == "table") then
+        return param
+    else
+        return error("ModelUnitMap-requireMapData() the param is invalid.")
+    end
 end
 
 local function getTiledUnitLayer(tiledData)
-	return tiledData.layers[2]
+    return tiledData.layers[2]
 end
 
 --------------------------------------------------------------------------------
@@ -31,18 +31,18 @@ local function createUnitActorsMapWithTemplate(mapData)
     local templateTiledLayer = getTiledUnitLayer(requireMapData(mapData.template))
     assert(templateTiledLayer, "ModelUnitMap-createUnitActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
 
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelUnit", "ViewUnit")
-	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to create the template unit actors map.")
+    local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelUnit", "ViewUnit")
+    assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to create the template unit actors map.")
 
     if (mapData.grids) then
         map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
-    	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
+        assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
     end
 
     map.m_TemplateName = mapData.template
     map.m_Name         = mapData.name
 
-	return map
+    return map
 end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
@@ -63,7 +63,7 @@ local function createUnitActorsMapWithoutTemplate(mapData)
 
     map.m_Name = mapData.name
 
-	return map
+    return map
 end
 
 local function createUnitActorsMap(param)
@@ -86,7 +86,7 @@ end
 function ModelUnitMap:ctor(param)
     initWithUnitActorsMap(self, createUnitActorsMap(param))
 
-	if (self.m_View) then
+    if (self.m_View) then
         self:initView()
     end
 
@@ -94,13 +94,13 @@ function ModelUnitMap:ctor(param)
 end
 
 function ModelUnitMap:initView()
-	local view = self.m_View
-	assert(TypeChecker.isView(view))
+    local view = self.m_View
+    assert(TypeChecker.isView(view))
 
-	view:removeAllChildren()
+    view:removeAllChildren()
 
     local unitActors = self.m_UnitActorsMap
-	local mapSize = unitActors.size
+    local mapSize = unitActors.size
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local unitActor = unitActors[x][y]
@@ -108,9 +108,9 @@ function ModelUnitMap:initView()
                 view:addChild(unitActor:getView())
             end
         end
-	end
+    end
 
-	return self
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()
-	return self.m_UnitActorsMap.size
+    return self.m_UnitActorsMap.size
 end
 
 function ModelUnitMap:getUnitActor(gridIndex)

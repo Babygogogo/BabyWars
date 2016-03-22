@@ -25,20 +25,32 @@ local function createCompositionActors(param)
 
     local tileMapActor = Actor.createWithModelAndViewName("ModelTileMap", warFieldData.TileMap, "ViewTileMap")
     assert(tileMapActor, "ModelWarField-createCompositionActors() failed to create the TileMap actor.")
+
     local unitMapActor = Actor.createWithModelAndViewName("ModelUnitMap", warFieldData.UnitMap, "ViewUnitMap")
     assert(unitMapActor, "ModelWarField-createCompositionActors() failed to create the UnitMap actor.")
+
+    local actionPlannerActor = Actor.createWithModelAndViewName("ModelActionPlanner", nil, "ViewActionPlanner")
+    assert(actionPlannerActor, "ModelWarField-createCompositionActors() failed to create the action planner actor.")
+
     local cursorActor = Actor.createWithModelAndViewName("ModelMapCursor", {mapSize = tileMapActor:getModel():getMapSize()}, "ViewMapCursor")
     assert(cursorActor, "ModelWarField-createCompositionActors() failed to create the cursor actor.")
 
     assert(TypeChecker.isSizeEqual(tileMapActor:getModel():getMapSize(), unitMapActor:getModel():getMapSize()))
 
-    return {tileMapActor = tileMapActor, unitMapActor = unitMapActor, cursorActor = cursorActor}
+    return {tileMapActor       = tileMapActor,
+            unitMapActor       = unitMapActor,
+            actionPlannerActor = actionPlannerActor,
+            cursorActor        = cursorActor}
 end
 
 local function initWithCompositionActors(model, actors)
-    model.m_TileMapActor = actors.tileMapActor
-    model.m_UnitMapActor = actors.unitMapActor
-    model.m_CursorActor  = actors.cursorActor
+    model.m_TileMapActor       = actors.tileMapActor
+    model.m_UnitMapActor       = actors.unitMapActor
+    model.m_CursorActor        = actors.cursorActor
+
+    model.m_ActionPlannerActor = actors.actionPlannerActor
+    model.m_ActionPlannerActor:getModel():setTileMapModel(model.m_TileMapActor:getModel())
+        :setUnitMapModel(model.m_UnitMapActor:getModel())
 end
 
 --------------------------------------------------------------------------------
@@ -58,10 +70,9 @@ function ModelWarField:initView()
     local view = self.m_View
     assert(TypeChecker.isView(view))
 
-    view:removeAllChildren()
-        :addChild(self.m_TileMapActor:getView())
-        :addChild(self.m_UnitMapActor:getView())
-        :addChild(self.m_CursorActor:getView())
+    view:setTileMapView(  self.m_TileMapActor:getView())
+        :setUnitMapView(  self.m_UnitMapActor:getView())
+        :setMapCursorView(self.m_CursorActor:getView())
 
         :setContentSizeWithMapSize(self.m_TileMapActor:getModel():getMapSize())
 
@@ -72,25 +83,29 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onEnter(rootActor)
-    self.m_TileMapActor:onEnter(rootActor)
-    self.m_UnitMapActor:onEnter(rootActor)
-    self.m_CursorActor:onEnter(rootActor)
+    self.m_TileMapActor:onEnter(      rootActor)
+    self.m_UnitMapActor:onEnter(      rootActor)
+    self.m_CursorActor:onEnter(       rootActor)
+    self.m_ActionPlannerActor:onEnter(rootActor)
 
-    self.m_ScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
-                                :addEventListener("EvtPlayerZoomField", self)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
+        :addEventListener("EvtPlayerZoomField", self)
+        :addEventListener("EvtGridSelected",   self)
 
     return self
 end
 
 function ModelWarField:onCleanup(rootActor)
-    self.m_TileMapActor:onCleanup(rootActor)
-    self.m_UnitMapActor:onCleanup(rootActor)
-    self.m_CursorActor:onCleanup(rootActor)
+    self.m_TileMapActor:onCleanup(      rootActor)
+    self.m_UnitMapActor:onCleanup(      rootActor)
+    self.m_CursorActor:onCleanup(       rootActor)
+    self.m_ActionPlannerActor:onCleanup(rootActor)
 
-    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerZoomField", self)
-                                :removeEventListener("EvtPlayerDragField", self)
-    self.m_ScriptEventDispatcher = nil
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtGridSelected",   self)
+        :removeEventListener("EvtPlayerZoomField", self)
+        :removeEventListener("EvtPlayerDragField", self)
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end
@@ -101,6 +116,8 @@ function ModelWarField:onEvent(event)
     elseif (event.name == "EvtPlayerZoomField") and (self.m_View) then
         local scrollEvent = event.scrollEvent
         self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
+    elseif (event.name == "EvtGridSelected") then
+
     end
 
     return self

@@ -8,18 +8,18 @@ local ModelTile          = require("app.models.ModelTile")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireMapData(param)
-	local t = type(param)
-	if (t == "string") then
-		return require("data.tileMap." .. param)
-	elseif (t == "table") then
-		return param
-	else
-		return error("ModelTileMap-requireMapData() the param is invalid.")
-	end
+    local t = type(param)
+    if (t == "string") then
+        return require("data.tileMap." .. param)
+    elseif (t == "table") then
+        return param
+    else
+        return error("ModelTileMap-requireMapData() the param is invalid.")
+    end
 end
 
 local function getTiledTileLayer(tiledData)
-	return tiledData.layers[1]
+    return tiledData.layers[1]
 end
 
 --------------------------------------------------------------------------------
@@ -27,31 +27,31 @@ end
 --------------------------------------------------------------------------------
 local function createTileActorsMapWithTemplate(mapData)
     assert(type(mapData.template) == "string", "ModelTileMap-createTileActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
-	local templateTiledLayer = getTiledTileLayer(requireMapData(mapData.template))
+    local templateTiledLayer = getTiledTileLayer(requireMapData(mapData.template))
     assert(templateTiledLayer, "ModelTileMap-createTileActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
 
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelTile", "ViewTile")
-	assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to create the template tile actors map.")
+    local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelTile", "ViewTile")
+    assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to create the template tile actors map.")
 
     if (mapData.grids) then
         map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelTile", "ViewTile")
-    	assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to update the tile actors map with the param mapData.grids.")
+        assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to update the tile actors map with the param mapData.grids.")
     end
 
     map.m_TemplateName = mapData.template
     map.m_Name         = mapData.name
 
-	return map
+    return map
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
     local tiledLayer = getTiledTileLayer(mapData)
     assert(tiledLayer, "ModelTileMap-createTileActorsMapWithoutTemplate() the param mapData is expected to have a tiled layer.")
 
-	local map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelTile", "ViewTile")
-	assert(map, "ModelTileMap-createTileActorsMapWithoutTemplate() failed to create the map.")
+    local map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelTile", "ViewTile")
+    assert(map, "ModelTileMap-createTileActorsMapWithoutTemplate() failed to create the map.")
 
-	return map
+    return map
 end
 
 local function createTileActorsMap(param)
@@ -76,7 +76,7 @@ end
 function ModelTileMap:ctor(param)
     initWithTileActorsMap(self, createTileActorsMap(param))
 
-	if (self.m_View) then
+    if (self.m_View) then
         self:initView()
     end
 
@@ -133,7 +133,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTileMap:getMapSize()
-	return self.m_TileActorsMap.size
+    return self.m_TileActorsMap.size
 end
 
 function ModelTileMap:getTileActor(gridIndex)
