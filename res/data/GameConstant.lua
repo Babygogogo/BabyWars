@@ -7,28 +7,66 @@ GameConstant.GridSize = {
 
 GameConstant.Mapping_TiledIdToTemplateModelIdTileOrUnit = {
     -- TiledID 0 + 1
-    "hq",          "hq",          "hq",          "hq",          "city",        "city",        "city",        "city",        "city",        "base",
-    "base",        "base",        "base",        "base",        "airport",     "airport",     "airport",     "airport",     "airport",     "seaport",
-    "seaport",     "seaport",     "seaport",     "seaport",     "plain",       "plain",       "plain",       "plain",       "road",        "road",
-    "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "forest",
-    "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "reef",
-    "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
-    "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
+    {n = "hq",       p = 1},    {n = "hq",       p = 2},    {n = "hq",       p = 3},    {n = "hq",       p = 4},
+    {n = "city",     p = 1},    {n = "city",     p = 2},    {n = "city",     p = 3},    {n = "city",     p = 4},    {n = "city",     p = 5},
+    {n = "base",     p = 1},    {n = "base",     p = 2},    {n = "base",     p = 3},    {n = "base",     p = 4},    {n = "base",     p = 5},
+    {n = "airport",  p = 1},    {n = "airport",  p = 2},    {n = "airport",  p = 3},    {n = "airport",  p = 4},    {n = "airport",  p = 5},
+    {n = "seaport",  p = 1},    {n = "seaport",  p = 2},    {n = "seaport",  p = 3},    {n = "seaport",  p = 4},    {n = "seaport",  p = 5},
+
+    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},
+
+    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
+    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
+    {n = "road",     p = 0},
+
+    {n = "forest",   p = 0},
+
+    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
+    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
+
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+
+    {n = "reef",     p = 0},
+
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
 
     -- TiledID 100 + 1
-    "mountain",    "mountain",    "bridge",      "bridge",      "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",
-    "pipeline",    "pipeline",    "pipeline",    "pipeline",    "joint",       "joint",       "infantry",    "infantry",    "infantry",    "infantry",
-    "mech",        "mech",        "mech",        "mech",        "recon",       "recon",       "recon",       "recon",       "tank",        "tank",
-    "tank",        "tank",        "mdtank",      "mdtank",      "mdtank",      "mdtank",      "neotank",     "neotank",     "neotank",     "neotank",
-    "apc",         "apc",         "apc",         "apc",         "artillery",   "artillery",   "artillery",   "artillery",   "rockets",     "rockets",
-    "rockets",     "rockets",     "antiair",     "antiair",     "antiair",     "antiair",     "missiles",    "missiles",    "missiles",    "missiles",
-    "fighter",     "fighter",     "fighter",     "fighter",     "bomber",      "bomber",      "bomber",      "bomber",      "bcopter",     "bcopter",
-    "bcopter",     "bcopter",     "tcopter",     "tcopter",     "tcopter",     "tcopter",     "battleship",  "battleship",  "battleship",  "battleship",
-    "cruiser",     "cruiser",     "cruiser",     "cruiser",     "lander",      "lander",      "lander",      "lander",      "submarine",   "submarine",
-    "submarine",   "submarine",
+    {n = "mountain", p = 0},    {n = "mountain", p = 0},
+
+    {n = "bridge",   p = 0},    {n = "bridge",   p = 0},
+
+    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
+    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
+
+    {n = "joint",    p = 0},    {n = "joint",    p = 0},
+
+    {n = "infantry",   p = 1},  {n = "infantry",   p = 2},  {n = "infantry",   p = 3},  {n = "infantry",   p = 4},
+    {n = "mech",       p = 1},  {n = "mech",       p = 2},  {n = "mech",       p = 3},  {n = "mech",       p = 4},
+    {n = "recon",      p = 1},  {n = "recon",      p = 2},  {n = "recon",      p = 3},  {n = "recon",      p = 4},
+    {n = "tank",       p = 1},  {n = "tank",       p = 2},  {n = "tank",       p = 3},  {n = "tank",       p = 4},
+    {n = "mdtank",     p = 1},  {n = "mdtank",     p = 2},  {n = "mdtank",     p = 3},  {n = "mdtank",     p = 4},
+    {n = "neotank",    p = 1},  {n = "neotank",    p = 2},  {n = "neotank",    p = 3},  {n = "neotank",    p = 4},
+    {n = "apc",        p = 1},  {n = "apc",        p = 2},  {n = "apc",        p = 3},  {n = "apc",        p = 4},
+    {n = "artillery",  p = 1},  {n = "artillery",  p = 2},  {n = "artillery",  p = 3},  {n = "artillery",  p = 4},
+    {n = "rockets",    p = 1},  {n = "rockets",    p = 2},  {n = "rockets",    p = 3},  {n = "rockets",    p = 4},
+    {n = "antiair",    p = 1},  {n = "antiair",    p = 2},  {n = "antiair",    p = 3},  {n = "antiair",    p = 4},
+    {n = "missiles",   p = 1},  {n = "missiles",   p = 2},  {n = "missiles",   p = 3},  {n = "missiles",   p = 4},
+    {n = "fighter",    p = 1},  {n = "fighter",    p = 2},  {n = "fighter",    p = 3},  {n = "fighter",    p = 4},
+    {n = "bomber",     p = 1},  {n = "bomber",     p = 2},  {n = "bomber",     p = 3},  {n = "bomber",     p = 4},
+    {n = "bcopter",    p = 1},  {n = "bcopter",    p = 2},  {n = "bcopter",    p = 3},  {n = "bcopter",    p = 4},
+    {n = "tcopter",    p = 1},  {n = "tcopter",    p = 2},  {n = "tcopter",    p = 3},  {n = "tcopter",    p = 4},
+    {n = "battleship", p = 1},  {n = "battleship", p = 2},  {n = "battleship", p = 3},  {n = "battleship", p = 4},
+    {n = "cruiser",    p = 1},  {n = "cruiser",    p = 2},  {n = "cruiser",    p = 3},  {n = "cruiser",    p = 4},
+    {n = "lander",     p = 1},  {n = "lander",     p = 2},  {n = "lander",     p = 3},  {n = "lander",     p = 4},
+    {n = "submarine",  p = 1},  {n = "submarine",  p = 2},  {n = "submarine",  p = 3},  {n = "submarine",  p = 4},
 }
 
 GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {

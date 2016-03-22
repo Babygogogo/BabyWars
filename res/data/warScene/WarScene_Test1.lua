@@ -11,7 +11,7 @@ local WarScene_Test1 = {
     players = {
         {
             id      = 1,
-            name    = "Alice",
+            name    = "Red Alice",
             fund    = 111111,
             isAlive = true,
             co      = {
@@ -22,7 +22,7 @@ local WarScene_Test1 = {
         },
         {
             id      = 2,
-            name    = "Bob",
+            name    = "Blue Bob",
             fund    = 222222,
             isAlive = true,
             co      = {
@@ -33,7 +33,7 @@ local WarScene_Test1 = {
         },
         {
             id      = 3,
-            name    = "Cat",
+            name    = "Yellow Cat",
             fund    = 333333,
             isAlive = true,
             co      = {
@@ -44,7 +44,7 @@ local WarScene_Test1 = {
         },
         {
             id      = 4,
-            name    = "Dog",
+            name    = "Green Dog",
             fund    = 444444,
             isAlive = true,
             co      = {

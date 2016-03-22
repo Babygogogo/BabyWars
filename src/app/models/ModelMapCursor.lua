@@ -58,7 +58,7 @@ local function createTouchListener(model)
         ((isTouchingCursor) and (GridIndexFunctions.isEqual(gridIndex, initialTouchGridIndex))) then
             model:setGridIndex(gridIndex)
             model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
-                :dispatchEvent({name = "EvtGridSelected", gridIndex = gridIndex})
+                :dispatchEvent({name = "EvtPlayerSelectedGrid", gridIndex = gridIndex})
         end
     end
 

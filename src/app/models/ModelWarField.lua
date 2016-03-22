@@ -70,9 +70,10 @@ function ModelWarField:initView()
     local view = self.m_View
     assert(TypeChecker.isView(view))
 
-    view:setTileMapView(  self.m_TileMapActor:getView())
-        :setUnitMapView(  self.m_UnitMapActor:getView())
-        :setMapCursorView(self.m_CursorActor:getView())
+    view:setTileMapView(      self.m_TileMapActor:getView())
+        :setUnitMapView(      self.m_UnitMapActor:getView())
+        :setActionPlannerView(self.m_ActionPlannerActor:getView())
+        :setMapCursorView(    self.m_CursorActor:getView())
 
         :setContentSizeWithMapSize(self.m_TileMapActor:getModel():getMapSize())
 
@@ -91,7 +92,7 @@ function ModelWarField:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
         :addEventListener("EvtPlayerZoomField", self)
-        :addEventListener("EvtGridSelected",   self)
+        :addEventListener("EvtPlayerSelectedGrid",   self)
 
     return self
 end
@@ -102,7 +103,7 @@ function ModelWarField:onCleanup(rootActor)
     self.m_CursorActor:onCleanup(       rootActor)
     self.m_ActionPlannerActor:onCleanup(rootActor)
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtGridSelected",   self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid",   self)
         :removeEventListener("EvtPlayerZoomField", self)
         :removeEventListener("EvtPlayerDragField", self)
     self.m_RootScriptEventDispatcher = nil
@@ -116,7 +117,7 @@ function ModelWarField:onEvent(event)
     elseif (event.name == "EvtPlayerZoomField") and (self.m_View) then
         local scrollEvent = event.scrollEvent
         self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
-    elseif (event.name == "EvtGridSelected") then
+    elseif (event.name == "EvtPlayerSelectedGrid") then
 
     end
 

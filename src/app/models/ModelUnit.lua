@@ -7,16 +7,23 @@ local TypeChecker       = require("app.utilities.TypeChecker")
 local TEMPLATE_MODEL_UNIT_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
 local TEMPLATE_MODEL_UNITS    = require("res.data.GameConstant").Mapping_IdToTemplateModelUnit
 
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function isOfSameTemplateModelUnitID(tiledID1, tiledID2)
     if (not tiledID1) or (not tiledID2) then
         return false
     end
 
-    return TEMPLATE_MODEL_UNIT_IDS[tiledID1] == TEMPLATE_MODEL_UNIT_IDS[tiledID2]
+    return TEMPLATE_MODEL_UNIT_IDS[tiledID1].n == TEMPLATE_MODEL_UNIT_IDS[tiledID2].n
 end
 
 local function toTemplateModelUnit(tiledID)
-    return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID]]
+    return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID].n]
+end
+
+local function toPlayerIndex(tiledID)
+    return TEMPLATE_MODEL_UNIT_IDS[tiledID].p
 end
 
 --------------------------------------------------------------------------------
@@ -51,7 +58,8 @@ local function initWithTiledID(model, tiledID)
         return
     end
 
-    model.m_Template  = template
+    model.m_Template = template
+    model.m_State    = "idle"
     initWithFuelData(model, template.fuel)
 
     ComponentManager.unbindAllComponents(model)
@@ -72,6 +80,7 @@ local function loadInstanceProperties(model, param)
         model:setGridIndex(param.gridIndex)
     end
 
+    model.m_State = param.state or model.m_State
     loadFuelData(model, param.fuel)
 
     if (param.specialProperties) then
@@ -97,12 +106,12 @@ function ModelUnit:ctor(param)
         self:initView()
     end
 
-	return self
+    return self
 end
 
 function ModelUnit:initView()
     local view = self.m_View
-	assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
     view:updateWithTiledID(self.m_TiledID)
@@ -113,6 +122,14 @@ end
 --------------------------------------------------------------------------------
 function ModelUnit:getTiledID()
     return self.m_TiledID
+end
+
+function ModelUnit:getPlayerIndex()
+    return toPlayerIndex(self.m_TiledID)
+end
+
+function ModelUnit:getState()
+    return self.m_State
 end
 
 function ModelUnit:getDescription()

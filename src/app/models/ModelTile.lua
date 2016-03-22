@@ -7,16 +7,23 @@ local TEMPLATE_MODEL_TILES    = require("res.data.GameConstant").Mapping_IdToTem
 local ComponentManager = require("global.components.ComponentManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function isOfSameTemplateModelTileID(tiledID1, tiledID2)
     if (not tiledID1) or (not tiledID2) then
         return false
     end
 
-    return TEMPLATE_MODEL_TILE_IDS[tiledID1] == TEMPLATE_MODEL_TILE_IDS[tiledID2]
+    return TEMPLATE_MODEL_TILE_IDS[tiledID1].n == TEMPLATE_MODEL_TILE_IDS[tiledID2].n
 end
 
 local function toTemplateModelTile(tiledID)
-	return TEMPLATE_MODEL_TILES[TEMPLATE_MODEL_TILE_IDS[tiledID]]
+    return TEMPLATE_MODEL_TILES[TEMPLATE_MODEL_TILE_IDS[tiledID].n]
+end
+
+local function toPlayerIndex(tiledID)
+    return TEMPLATE_MODEL_TILE_IDS[tiledID].p
 end
 
 local function initWithTiledID(model, tiledID)
@@ -76,7 +83,7 @@ end
 
 function ModelTile:initView()
     local view = self.m_View
-	assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
     view:updateWithTiledID(self.m_TiledID)
@@ -89,6 +96,10 @@ end
 --------------------------------------------------------------------------------
 function ModelTile:getTiledID()
     return self.m_TiledID
+end
+
+function ModelTile:getPlayerIndex()
+    return toPlayerIndex(self.m_TiledID)
 end
 
 function ModelTile:getDefenseBonusAmount()
