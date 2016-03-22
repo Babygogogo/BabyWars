@@ -21,12 +21,17 @@ end
 
 local function initWithTiledID(model, tiledID)
     local template = toTemplateModelTile(tiledID)
-    assert(template, "ModelTile-initWithTiledID() failed to get the model tile template with param tiledID.")
+    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param tiledID.")
+
+    model.m_TiledID = tiledID
+    if (model.m_Template == template) then
+        return
+    end
+
+    model.m_Template = template
 
     ComponentManager.unbindAllComponents(model)
     ComponentManager.bindComponent(model, "GridIndexable")
-
-    model.m_Template     = template
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -38,58 +43,35 @@ local function initWithTiledID(model, tiledID)
     end
 end
 
-local function overwrite(model, param)
+local function loadInstanceProperties(model, param)
     if (param.gridIndex) then
         model:setGridIndex(param.gridIndex)
     end
 
---[[ These code are commented out because the properties should not be overwritten.
-    model.m_DefenseBonus = param.defenseBonus or model.m_DefenseBonus
-    model.m_Description  = param.description  or model.m_Description
-]]
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
             local component = ComponentManager.getComponent(model, specialProperty.name)
-            assert(component, "ModelTile-overwrite() attempting to overwrite a component that the model hasn't bound with.")
+            assert(component, "ModelTile-loadInstanceProperties() attempting to overwrite a component that the model hasn't bound with.")
             component:load(specialProperty)
         end
     end
 end
 
 --------------------------------------------------------------------------------
--- The constructor and public functions.
+-- The constructor.
 --------------------------------------------------------------------------------
 function ModelTile:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
-    return self
-end
-
-function ModelTile:load(param)
     if (param.tiledID) then
-        if (not isOfSameTemplateModelTileID(param.tiledID, self.m_TiledID)) then
-            initWithTiledID(self, param.tiledID)
-        end
-
-        self.m_TiledID = param.tiledID
+        initWithTiledID(self, param.tiledID)
     end
 
-    overwrite(self, param)
+    loadInstanceProperties(self, param)
 
     if (self.m_View) then
         self:initView()
     end
 
-	return self
-end
-
-function ModelTile.createInstance(param)
-	local model = ModelTile.new():load(param)
-	assert(model, "ModelTile.createInstance() failed.")
-
-	return model
+    return self
 end
 
 function ModelTile:initView()
@@ -102,6 +84,9 @@ function ModelTile:initView()
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelTile:getTiledID()
     return self.m_TiledID
 end

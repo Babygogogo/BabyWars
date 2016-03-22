@@ -8,6 +8,8 @@ local function createNodeEventHandler(model, rootActor)
     return function(event)
         if (event == "enter") then
             model:onEnter(rootActor)
+        elseif (event == "enterTransitionFinish") then
+            model:onEnterTransitionFinish(rootActor)
         elseif (event == "cleanup") then
             model:onCleanup(rootActor)
         end
@@ -22,55 +24,138 @@ local function requireSceneData(param)
         return require("res.data.warScene." .. param)
     else
         error("ModelSceneWar-requireSceneData() the param is invalid.")
-	end
+    end
+end
+--------------------------------------------------------------------------------
+-- The script event dispatcher.
+--------------------------------------------------------------------------------
+local function createScriptEventDispatcher()
+    return require("global.events.EventDispatcher"):create()
 end
 
-local function createChildrenActors(param)
-	local sceneData = requireSceneData(param)
-	assert(TypeChecker.isWarSceneData(sceneData))
+local function initWithScriptEventDispatcher(model, dispatcher)
+    model.m_ScriptEventDispatcher = dispatcher
+end
 
-    local backgroundActor = Actor.createWithModelAndViewName(nil, nil, "ViewSceneWarBackground")
-    assert(backgroundActor, "SceneWar-createChildrenActors() failed to create a background actor.")
-
-    local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.WarField, "ViewWarField", sceneData.WarField)
-	assert(warFieldActor, "SceneWar--createChildrenActors() failed to create a WarField actor.")
+--------------------------------------------------------------------------------
+-- The comsition actors.
+--------------------------------------------------------------------------------
+local function createCompositionActors(sceneData)
+    local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.warField, "ViewWarField", sceneData.warField)
+    assert(warFieldActor, "SceneWar--createCompositionActors() failed to create a war field actor.")
 
     local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
-    assert(hudActor, "SceneWar--createChildrenActors() failed to create a HUD actor.")
+    assert(hudActor, "SceneWar--createCompositionActors() failed to create a HUD actor.")
 
-	return {backgroundActor = backgroundActor, warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
+    return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
 end
 
-local function initWithChildrenActors(model, actors)
-    model.m_BackgroundActor  = actors.backgroundActor
+local function initWithCompositionActors(model, actors)
     model.m_WarFieldActor    = actors.warFieldActor
     model.m_SceneWarHUDActor = actors.sceneWarHUDActor
 end
 
-local function getTouchableChildrenViews(model)
-    local views = {}
-    local getTouchableViewFromActor = require("app.utilities.GetTouchableViewFromActor")
+--------------------------------------------------------------------------------
+-- The turn.
+--------------------------------------------------------------------------------
+local function getNextTurnAndPlayerIndex(turn, players)
+    local nextTurnIndex   = turn.m_TurnIndex
+    local nextPlayerIndex = turn.m_PlayerIndex + 1
 
-    -- TODO: Add more children views. Be careful of the order of the views!
-    views[#views + 1] = getTouchableViewFromActor(model.m_SceneWarHUDActor)
-    views[#views + 1] = getTouchableViewFromActor(model.m_WarFieldActor)
+    while (true) do
+        if (nextPlayerIndex > #players) then
+            nextPlayerIndex = 1
+            nextTurnIndex   = nextTurnIndex + 1
+        end
 
-    return views
+        assert(nextPlayerIndex ~= turn.m_PlayerIndex, "ModelSceneWar-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
+
+        if (players[nextPlayerIndex].m_IsAlive) then
+            return nextTurnIndex, nextPlayerIndex
+        end
+    end
 end
 
-function ModelSceneWar:ctor(param)
-    self.m_ScriptEventDispatcher = require("global.events.EventDispatcher"):create()
+local function initTurn(model, turn)
+    model.m_Turn = {
+        m_TurnIndex   = turn.turnIndex,
+        m_PlayerIndex = turn.playerIndex,
+        m_TurnPhase   = turn.phase,
+    }
+end
 
-    if (param) then
-        self:load(param)
+local function runTurn(model)
+    local turn = model.m_Turn
+
+    if (turn.m_TurnPhase == "end") then
+        -- TODO: Change state for units, weather, vision and so on.
+
+        turn.m_TurnPhase = "standby"
+        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
     end
 
-    return self
+    local player = model.m_Players[turn.m_PlayerIndex]
+    model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
+
+    model.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
+        if (turn.m_TurnPhase == "standby") then
+            -- TODO: Add fund, repair units, destroy units that run out of fuel.
+            turn.m_TurnPhase = "main"
+        elseif (turn.m_TurnPhase == "main") then
+            -- Do nothing.
+        else
+            error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
+        end
+    end)
 end
 
-function ModelSceneWar:load(param)
-    self.m_ScriptEventDispatcher:reset()
-    initWithChildrenActors(self, createChildrenActors(param))
+local function endTurn(model)
+    local turn = model.m_Turn
+    assert(turn.m_TurnPhase == "main", "ModelSceneWar-endTurn() the turn phase is expected to be 'main'.")
+
+    turn.m_TurnPhase = "end"
+    runTurn(model)
+end
+
+--------------------------------------------------------------------------------
+-- The players.
+--------------------------------------------------------------------------------
+local function initPlayers(model, players)
+    model.m_Players = {}
+    for i, p in ipairs(players) do
+        model.m_Players[i] = {
+            m_ID      = p.id,
+            m_Name    = p.name,
+            m_Fund    = p.fund,
+            m_IsAlive = p.isAlive,
+            m_CO      = {
+                m_CurrentEnergy    = p.co.currentEnergy,
+                m_COPowerEnergy    = p.co.coPowerEnergy,
+                m_SuperPowerEnergy = p.co.superPowerEnergy,
+            },
+
+            getFund = function(self)
+                return self.m_Fund
+            end,
+
+            getCOEnergy = function(self)
+                return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
+            end,
+        }
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
+function ModelSceneWar:ctor(param)
+    assert(param, "ModelSceneWar:ctor() tempting to initialize the instance with no param.")
+    local sceneData = requireSceneData(param)
+
+    initWithScriptEventDispatcher(self, createScriptEventDispatcher())
+    initWithCompositionActors(    self, createCompositionActors(sceneData))
+    initTurn(   self, sceneData.turn)
+    initPlayers(self, sceneData.players)
 
     if (self.m_View) then
         self:initView()
@@ -79,34 +164,25 @@ function ModelSceneWar:load(param)
     return self
 end
 
-function ModelSceneWar.createInstance(param)
-    local model = ModelSceneWar:create():load(param)
-    assert(model, "ModelSceneWar.createInstance() failed.")
-
-    return model
-end
-
 function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:removeAllChildren()
-        :addChild(self.m_BackgroundActor:getView())
-        :addChild(self.m_WarFieldActor:getView())
-        :addChild(self.m_SceneWarHUDActor:getView())
+    view:setWarFieldView(self.m_WarFieldActor:getView())
+        :setSceneHudView(self.m_SceneWarHUDActor:getView())
 
-        :initTouchListener(getTouchableChildrenViews(self))
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
 
     return self
 end
 
-function ModelSceneWar:getScriptEventDispatcher()
-    return self.m_ScriptEventDispatcher
-end
-
+--------------------------------------------------------------------------------
+-- The callback functions on node events.
+--------------------------------------------------------------------------------
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
+
+    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestEndTurn", self)
 
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
@@ -114,13 +190,36 @@ function ModelSceneWar:onEnter(rootActor)
     return self
 end
 
+function ModelSceneWar:onEnterTransitionFinish(rootActor)
+    runTurn(self)
+
+    return self
+end
+
 function ModelSceneWar:onCleanup(rootActor)
     print("ModelSceneWar:onCleanup()")
+
+    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerRequestEndTurn", self)
 
     self.m_SceneWarHUDActor:onCleanup(rootActor)
     self.m_WarFieldActor:onCleanup(rootActor)
 
     return self
+end
+
+function ModelSceneWar:onEvent(event)
+    if (event.name == "EvtPlayerRequestEndTurn") then
+        endTurn(self)
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneWar:getScriptEventDispatcher()
+    return self.m_ScriptEventDispatcher
 end
 
 return ModelSceneWar

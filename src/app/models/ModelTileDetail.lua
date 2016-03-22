@@ -1,23 +1,11 @@
 
 local ModelTileDetail = class("ModelTileDetail")
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelTileDetail:ctor(param)
-    if (param) then
-        self:laod(param)
-    end
-
     return self
-end
-
-function ModelTileDetail:load(param)
-    return self
-end
-
-function ModelTileDetail.createInstance(param)
-    local model = ModelTileDetail:create():load(param)
-    assert(model, "ModelTileDetail.createInstance() failed.")
-
-    return model
 end
 
 function ModelTileDetail:updateWithModelTile(tile)

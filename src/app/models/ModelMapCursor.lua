@@ -2,15 +2,13 @@
 local ModelMapCursor = class("ModelMapCursor")
 
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local ComponentManager   = require("global.components.ComponentManager")
+
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 
-local function isWorldPosOnCursor(model, pos)
-    local posIndex = GridIndexFunctions.worldPosToGridIndexInNode(pos, model.m_View)
-    local modelIndex = model:getGridIndex()
-
-    return GridIndexFunctions.isEqual(posIndex, modelIndex)
-end
-
+--------------------------------------------------------------------------------
+-- The touch/scroll event listeners.
+--------------------------------------------------------------------------------
 local function createTouchListener(model)
     local isTouchMoved, isTouchingCursor
     local initialTouchPosition, initialTouchGridIndex
@@ -84,26 +82,18 @@ local function createMouseListener(model)
     return mouseListener
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelMapCursor:ctor(param)
-    require("global.components.ComponentManager").bindComponent(self, "GridIndexable")
-    self:setGridIndex({x = 1, y = 1})
-    self.m_MapSize = {}
-
-    if (param) then
-        self:load(param)
+    if (not ComponentManager:getComponent(self, "GridIndexable")) then
+        ComponentManager.bindComponent(self, "GridIndexable")
     end
 
-    return self
-end
+    assert(param.mapSize, "ModelMapCursor:ctor() param.mapSize expected.")
+    self:setMapSize(param.mapSize)
 
-function ModelMapCursor:load(param)
-    if (param.mapSize) then
-        self:setMapSize(param.mapSize)
-    end
-
-    if (param.gridIndex) then
-        self:setGridIndex(param.gridIndex)
-    end
+    self:setGridIndex(param.gridIndex or {x = 1, y = 1})
 
     if (self.m_View) then
         self:initView()
@@ -112,13 +102,20 @@ function ModelMapCursor:load(param)
     return self
 end
 
-function ModelMapCursor.createInstance(param)
-    local model = ModelMapCursor:create():load(param)
-    assert(model, "ModelMapCursor.createInstance() failed.")
+function ModelMapCursor:initView()
+    local view = self.m_View
+    assert(view, "ModelMapCursor:initView() no view is attached to the owner actor of the model.")
 
-    return model
+    self:setViewPositionWithGridIndex()
+    view:setTouchListener(createTouchListener(self))
+        :setMouseListener(createMouseListener(self))
+
+    return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on node events.
+--------------------------------------------------------------------------------
 function ModelMapCursor:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = self:getGridIndex()})
@@ -130,19 +127,12 @@ function ModelMapCursor:onCleanup(rootActor)
     return self
 end
 
-function ModelMapCursor:initView()
-    local view = self.m_View
-    assert(view, "ModelMapCursor:initView() no view is attached to the owner actor of the model.")
-
-    self:setViewPositionWithGridIndex()
-    view:initWithTouchListener(createTouchListener(self))
-        :initWithMouseListener(createMouseListener(self))
-
-    return self
-end
-
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelMapCursor:setMapSize(size)
-    self.m_MapSize.width = size.width
+    self.m_MapSize = self.m_MapSize or {}
+    self.m_MapSize.width  = size.width
     self.m_MapSize.height = size.height
 
     return self

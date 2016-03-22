@@ -34,6 +34,17 @@ local function createLabel()
 end
 
 --------------------------------------------------------------------------------
+-- The functions that adjust the position of the view.
+--------------------------------------------------------------------------------
+local function moveToLeftSide(view)
+    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+end
+
+local function moveToRightSide(view)
+    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+end
+
+--------------------------------------------------------------------------------
 -- The button.
 --------------------------------------------------------------------------------
 local function createButton(view)
@@ -93,15 +104,26 @@ end
 --------------------------------------------------------------------------------
 -- The defense bonus info.
 --------------------------------------------------------------------------------
-local function createDefenseInfo()
+local function createDefenseInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
 
         :setScale(ICON_SCALE)
 
+    return icon
+end
+
+local function createDefenseInfoLabel()
     local label = createLabel()
     label:setPosition(30, -5)
+
+    return label
+end
+
+local function createDefenseInfo()
+    local icon  = createDefenseInfoIcon()
+    local label = createDefenseInfoLabel()
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -110,15 +132,8 @@ local function createDefenseInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setDefenseBonus = function(self, bonus)
-        if (bonus < 10) then
-            self.m_Label:setString("  " .. bonus)
-        else
-            self.m_Label:setString(""  .. bonus)
-        end
-    end
 
     return info
 end
@@ -128,22 +143,41 @@ local function initWithDefenseInfo(view, info)
     view:addChild(info)
 end
 
+local function updateDefenseInfoLabel(label, defenseBonus)
+    if (defenseBonus < 10) then
+        label:setString("  " .. defenseBonus)
+    else
+        label:setString(""   .. defenseBonus)
+    end
+end
+
 local function updateDefenseInfoWithModelTile(info, tile)
-    info:setDefenseBonus(tile:getNormalizedDefenseBonusAmount())
+    updateDefenseInfoLabel(info.m_Label, tile:getNormalizedDefenseBonusAmount())
 end
 
 --------------------------------------------------------------------------------
 -- The capture info.
 --------------------------------------------------------------------------------
-local function createCaptureInfo()
+local function createCaptureInfoIcon()
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
 
         :setScale(ICON_SCALE)
 
+    return icon
+end
+
+local function createCaptureInfoLabel()
     local label = createLabel()
     label:setPosition(30, -4)
+
+    return label
+end
+
+local function createCaptureInfo()
+    local icon  = createCaptureInfoIcon()
+    local label = createCaptureInfoLabel()
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -152,17 +186,8 @@ local function createCaptureInfo()
         :addChild(icon)
         :addChild(label)
 
+    info.m_Icon  = icon
     info.m_Label = label
-
-    info.setCapturePoint = function(self, point)
-        if (point < 10) then
-            self.m_Label:setString("  " .. point)
-        else
-            self.m_Label:setString(""  .. point)
-        end
-        
-        return self
-    end
 
     return info
 end
@@ -172,82 +197,55 @@ local function initWithCaptureInfo(view, info)
     view:addChild(info)
 end
 
+local function updateCaptureInfoLabel(label, capturePoint)
+    if (capturePoint < 10) then
+        label:setString("  " .. capturePoint)
+    else
+        label:setString(""  .. capturePoint)
+    end
+end
+
 local function updateCaptureInfoWithModelTile(info, tile)
     local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
     if (captureTaker) then
-        info:setCapturePoint(captureTaker:getCurrentCapturePoint())
-            :setVisible(true)
+        updateCaptureInfoLabel(info.m_Label, captureTaker:getCurrentCapturePoint())
+        info:setVisible(true)
     else
         info:setVisible(false)
     end
 end
 
 --------------------------------------------------------------------------------
--- The contructor and public functions.
+-- The contructor.
 --------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
-    initWithButton(self, createButton(self))
-    initWithIcon(self, createIcon())
+    initWithButton(     self, createButton(self))
+    initWithIcon(       self, createIcon())
     initWithDefenseInfo(self, createDefenseInfo())
     initWithCaptureInfo(self, createCaptureInfo())
 
     self:ignoreAnchorPointForPosition(true)
-        :moveToRightSide()
 
         :setOpacity(220)
         :setCascadeOpacityEnabled(true)
 
-    if (param) then
-        self:load(param)
-    end
+    moveToRightSide(self)
 
     return self
 end
 
-function ViewTileInfo:load(param)
-    return self
-end
-
-function ViewTileInfo.createInstance(param)
-    local view = ViewTileInfo.new():load(param)
-    assert(view, "ViewTileInfo.createInstance() failed.")
-
-    return view
-end
-
-function ViewTileInfo:handleAndSwallowTouch(touch, touchType, event)
-    if (touchType == cc.Handler.EVENT_TOUCH_BEGAN) then
-        self.m_IsTouchMoved = false
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_MOVED) then
-        self.m_IsTouchMoved = true
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_CANCELLED) then
-        return false
-    elseif (touchType == cc.Handler.EVENT_TOUCH_ENDED) then
-        if (not self.m_IsTouchMoved) then
-            local touchLocation = touch:getLocation()
-            if (touchLocation.y <= display.height / 2) then
-                if (touchLocation.x <= display.width / 2) then
-                    self:moveToRightSide()
-                else
-                    self:moveToLeftSide()
-                end
-            end
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewTileInfo:adjustPositionOnTouch(touch)
+    local touchLocation = touch:getLocation()
+    if (touchLocation.y < display.height / 2) then
+        if (touchLocation.x <= display.width / 2) then
+            moveToRightSide(self)
+        else
+            moveToLeftSide(self)
         end
-
-        return false
     end
-end
-
-function ViewTileInfo:moveToLeftSide()
-    self:move(LEFT_POSITION_X, LEFT_POSITION_Y)
-
-    return self
-end
-
-function ViewTileInfo:moveToRightSide()
-    self:move(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 
     return self
 end

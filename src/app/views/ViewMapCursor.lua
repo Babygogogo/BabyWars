@@ -37,6 +37,9 @@ local function createCornerPulseAction(outerX, outerY, innerX, innerY)
     return cc.RepeatForever:create(cc.Sequence:create(pulseIn, pulseOut, interval))
 end
 
+--------------------------------------------------------------------------------
+-- The composition cursor.
+--------------------------------------------------------------------------------
 local function createUpperLeftCorner()
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
@@ -111,7 +114,6 @@ local function createCursor()
     local cursor = cc.Node:create()
     cursor:setAnchorPoint(0.5, 0.5)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(0, 0)
 
     initWithUpperLeftCorner( cursor, createUpperLeftCorner())
     initWithUpperRightCorner(cursor, createUpperRightCorner())
@@ -126,43 +128,48 @@ local function initWithCursor(view, cursor)
     view:addChild(cursor)
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ViewMapCursor:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
     initWithCursor(self, createCursor())
 
-    if (param) then
-        self:load(param)
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewMapCursor:setTouchListener(listener)
+    local eventDispatcher = self:getEventDispatcher()
+    if (self.m_TouchListener) then
+        if (self.m_TouchListener == listener) then
+            return self
+        else
+            eventDispatcher:removeEventListener(self.m_TouchListener)
+        end
     end
 
-    return self
-end
-
-function ViewMapCursor:load(param)
-    return self
-end
-
-function ViewMapCursor.createInstance(param)
-    local view = ViewMapCursor:create():load(param)
-    assert(view, "ViewMapCursor.createInstance() failed.")
-
-    return view
-end
-
-function ViewMapCursor:initWithTouchListener(listener)
-    assert(not self.m_TouchListener, "ViewMapCursor:initWithTouchListener() there's already a listener.")
-
     self.m_TouchListener = listener
-    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
 
     return self
 end
 
-function ViewMapCursor:initWithMouseListener(listener)
-    assert(not self.m_MouseListener, "ViewMapCursor:initWithMouseListener() there's areadty a mouse listener.")
+function ViewMapCursor:setMouseListener(listener)
+    local eventDispatcher = self:getEventDispatcher()
+    if (self.m_MouseListener) then
+        if (self.m_MouseListener == listener) then
+            return self
+        else
+            eventDispatcher:removeEventListener(self.m_MouseListener)
+        end
+    end
 
     self.m_MouseListener = listener
-    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
 
     return self
 end

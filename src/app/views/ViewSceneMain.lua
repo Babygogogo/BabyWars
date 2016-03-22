@@ -1,23 +1,49 @@
 
 local ViewSceneMain = class("ViewSceneMain", cc.Scene)
 
+local BACKGROUND_Z_ORDER    = 0
+local WAR_LIST_VIEW_Z_ORDER = 1
+
+--------------------------------------------------------------------------------
+-- The composition background.
+--------------------------------------------------------------------------------
+local function createBackground()
+    local background = cc.Sprite:createWithSpriteFrameName("c03_t05_s01_f01.png")
+    background:move(display.center)
+
+    return background
+end
+
+local function initWithBackground(view, background)
+    view.m_Background = background
+    view:addChild(background, BACKGROUND_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ViewSceneMain:ctor(param)
-    if (param) then
-        self:load(param)
+    initWithBackground(self, createBackground())
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewSceneMain:setWarListView(view)
+    if (self.m_WarListView) then
+        if (self.m_WarListView == view) then
+            return self
+        else
+            self:removeChild(self.m_WarListView)
+        end
     end
-    
-    return self
-end
 
-function ViewSceneMain:load(param)
-    return self
-end
+    self.m_WarListView = view
+    self:addChild(view, WAR_LIST_VIEW_Z_ORDER)
 
-function ViewSceneMain.createInstance(param)
-    local view = ViewSceneMain:create():load(param)
-    assert(view, "ViewSceneMain.createInstance() failed.")
-    
-    return view
+    return self
 end
 
 return ViewSceneMain

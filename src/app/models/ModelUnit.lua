@@ -20,45 +20,42 @@ local function toTemplateModelUnit(tiledID)
 end
 
 --------------------------------------------------------------------------------
--- Things about fuel data.
+-- The fuel data.
 --------------------------------------------------------------------------------
 local function initWithFuelData(model, data)
-    local fuelData = {}
+    local fuel = {}
+    fuel.m_CurrentFuel = data.maxFuel
 
-    fuelData.m_MaxFuel                = data.maxFuel
-    fuelData.m_CurrentFuel            = data.maxFuel
-    fuelData.m_ConsumptionPerTurn     = data.consumptionPerTurn
-    fuelData.m_DescriptionOnOutOfFuel = data.descriptionOnOutOfFuel
-    fuelData.m_DestroyOnOutOfFuel     = data.destroyOnOutOfFuel
-
-    model.m_FuelData = fuelData
+    model.m_Fuel = fuel
 end
 
-local function overwriteWithFuelData(model, data)
-    assert(type(model.m_FuelData) == "table", "ModelUnit-overwriteWithFuelData() the model has no fuel data.")
+local function loadFuelData(model, data)
+    assert(type(model.m_Fuel) == "table", "ModelUnit-loadFuelData() the model has no fuel data.")
 
     if (not data) then
         return
     end
 
-    model.m_FuelData.m_CurrentFuel = data.currentFuel
+    model.m_Fuel.m_CurrentFuel = data.currentFuel
 end
 
+--------------------------------------------------------------------------------
+-- The functions that loads the data for the model from a TiledID/lua table.
+--------------------------------------------------------------------------------
 local function initWithTiledID(model, tiledID)
     local template = toTemplateModelUnit(tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID.")
 
-    ComponentManager.unbindAllComponents(model)
-    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
+    model.m_TiledID = tiledID
+    if (template == model.m_Template) then
+        return
+    end
 
-    model.m_Template      = template
-    model.m_MovementRange = template.movementRange
-    model.m_MovementType  = template.movementType
-    model.m_Vision        = template.vision
-
+    model.m_Template  = template
     initWithFuelData(model, template.fuel)
 
-    model.m_Description = template.description
+    ComponentManager.unbindAllComponents(model)
+    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -70,58 +67,37 @@ local function initWithTiledID(model, tiledID)
     end
 end
 
-local function overwrite(model, param)
+local function loadInstanceProperties(model, param)
     if (param.gridIndex) then
         model:setGridIndex(param.gridIndex)
     end
 
-    overwriteWithFuelData(model, param.fuel)
+    loadFuelData(model, param.fuel)
 
---[[ These codes are commented out because the properties should not be overwrited.
-    model.m_Description = param.description or model.m_Description
-]]
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
             local component = ComponentManager.getComponent(model, specialProperty.name)
-            assert(component, "ModelUnit-overwrite() attempting to overwrite a component that the model hasn't bound with.")
+            assert(component, "ModelUnit-loadInstanceProperties() attempting to loadInstanceProperties a component that the model hasn't bound with.")
             component:load(specialProperty)
         end
     end
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
-    ComponentManager.bindComponent(self, "GridIndexable")
-
-    if (param) then
-        self:load(param)
-    end
-
-	return self
-end
-
-function ModelUnit:load(param)
     if (param.tiledID) then
-        if (not isOfSameTemplateModelUnitID(param.tiledID, self.m_TiledID)) then
-            initWithTiledID(self, param.tiledID)
-        end
-
-        self.m_TiledID = param.tiledID
+        initWithTiledID(self, param.tiledID)
     end
 
-    overwrite(self, param)
+    loadInstanceProperties(self, param)
 
     if (self.m_View) then
         self:initView()
     end
 
 	return self
-end
-
-function ModelUnit.createInstance(param)
-	local unit = ModelUnit.new():load(param)
-    assert(unit, "ModelUnit.createInstance() failed.")
-
-	return unit
 end
 
 function ModelUnit:initView()
@@ -132,40 +108,43 @@ function ModelUnit:initView()
     view:updateWithTiledID(self.m_TiledID)
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelUnit:getTiledID()
     return self.m_TiledID
 end
 
 function ModelUnit:getDescription()
-    return self.m_Description
+    return self.m_Template.description
 end
 
 function ModelUnit:getMovementRange()
-    return self.m_MovementRange
+    return self.m_Template.movementRange
 end
 
 function ModelUnit:getMovementType()
-    return self.m_MovementType
+    return self.m_Template.movementType
 end
 
 function ModelUnit:getVision()
-    return self.m_Vision
+    return self.m_Template.vision
 end
 
 function ModelUnit:getCurrentFuel()
-    return self.m_FuelData.m_CurrentFuel
+    return self.m_Fuel.m_CurrentFuel
 end
 
 function ModelUnit:getMaxFuel()
-    return self.m_FuelData.m_MaxFuel
+    return self.m_Template.fuel.maxFuel
 end
 
 function ModelUnit:getFuelConsumptionPerTurn()
-    return self.m_FuelData.m_ConsumptionPerTurn
+    return self.m_Template.fuel.consumptionPerTurn
 end
 
 function ModelUnit:getDescriptionOnOutOfFuel()
-    return self.m_FuelData.m_DescriptionOnOutOfFuel
+    return self.m_Template.fuel.descriptionOnOutOfFuel
 end
 
 function ModelUnit:getDefenseFatalList()

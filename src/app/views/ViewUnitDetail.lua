@@ -52,6 +52,44 @@ local AnimationLoader = require("app.utilities.AnimationLoader")
 --------------------------------------------------------------------------------
 -- Util functions.
 --------------------------------------------------------------------------------
+local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
+local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
+
+local function createBottomLine(posX, poxY, width, height)
+    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
+    line:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, poxY)
+        :setContentSize(width, height)
+
+    return line
+end
+
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local FONT_OUTLINE_WIDTH = 2
+
+local function createLabel(posX, posY, width, height, text)
+    local label = cc.Label:createWithTTF(text or "", FONT_NAME, FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
+        :setDimensions(width, height)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+
+    return label
+end
+
+local function createUnitIcons(posX, posY)
+    local icons = cc.Node:create()
+    icons:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
+        :setScale(ICON_SCALE)
+
+    return icons
+end
+
 local function resetIconsWithTypeNames(icons, typeNames)
     icons:removeAllChildren()
         :setVisible(true)
@@ -108,20 +146,19 @@ end
 --------------------------------------------------------------------------------
 -- The brief description for the unit.
 --------------------------------------------------------------------------------
+local function createDescriptionBottomLine()
+    return createBottomLine(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y,
+                            DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
+end
+
+local function createDescriptionLabel()
+    return createLabel(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y,
+                       DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
+end
+
 local function createDescription()
-    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    bottomLine:ignoreAnchorPointForPosition(true)
-        :setPosition(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y)
-        :setContentSize(DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
-
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y)
-
-        :setDimensions(DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+    local bottomLine = createDescriptionBottomLine()
+    local label = createDescriptionLabel()
 
     local description = cc.Node:create()
     description:ignoreAnchorPointForPosition(true)
@@ -130,9 +167,6 @@ local function createDescription()
 
     description.m_BottomLine   = bottomLine
     description.m_Label        = label
-    description.setDescription = function(self, description)
-        self.m_Label:setString(description)
-    end
 
     return description
 end
@@ -143,26 +177,25 @@ local function initWithDescription(view, description)
 end
 
 local function updateDescriptionWithModelUnit(description, unit)
-    description:setDescription(unit:getDescription())
+    description.m_Label:setString(unit:getDescription())
 end
 
 --------------------------------------------------------------------------------
 -- The movement information for the unit.
 --------------------------------------------------------------------------------
+local function createMovementInfoButtomLine()
+    return createBottomLine(MOVEMENT_INFO_POSITION_X + 5, MOVEMENT_INFO_POSITION_Y,
+                            MOVEMENT_INFO_WIDTH - 10, MOVEMENT_INFO_HEIGHT)
+end
+
+local function createMovementInfoLabel()
+    return createLabel(MOVEMENT_INFO_POSITION_X, MOVEMENT_INFO_POSITION_Y,
+                       MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
+end
+
 local function createMovementInfo()
-    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    bottomLine:ignoreAnchorPointForPosition(true)
-        :setPosition(MOVEMENT_INFO_POSITION_X + 5, MOVEMENT_INFO_POSITION_Y)
-        :setContentSize(MOVEMENT_INFO_WIDTH - 10, MOVEMENT_INFO_HEIGHT)
-
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(MOVEMENT_INFO_POSITION_X, MOVEMENT_INFO_POSITION_Y)
-
-        :setDimensions(MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+    local bottomLine = createMovementInfoButtomLine()
+    local label = createMovementInfoLabel()
 
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
@@ -171,9 +204,6 @@ local function createMovementInfo()
 
     info.m_BottomLine = bottomLine
     info.m_Label      = label
-    info.setMovement  = function(self, range, moveType)
-        self.m_Label:setString("Movement Range:  " .. range .. "(" .. moveType .. ")")
-    end
 
     return info
 end
@@ -184,30 +214,25 @@ local function initWithMovementInfo(view, info)
 end
 
 local function updateMovementInfoWithModelUnit(info, unit)
-    info:setMovement(unit:getMovementRange(), unit:getMovementType())
+    info.m_Label:setString("Movement Range:  " .. unit:getMovementRange() .. "(" .. unit:getMovementType() .. ")")
 end
 
 --------------------------------------------------------------------------------
 -- The vision information for the unit.
 --------------------------------------------------------------------------------
+local function createVisionInfoLabel()
+    return createLabel(VISION_INFO_POSITION_X, VISION_INFO_POSITION_Y,
+                       VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
+end
+
 local function createVisionInfo()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(VISION_INFO_POSITION_X, VISION_INFO_POSITION_Y)
-
-        :setDimensions(VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+    local label = createVisionInfoLabel()
 
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
         :addChild(label)
 
     info.m_Label = label
-    info.setVision = function(self, vision)
-        self.m_Label:setString("Vision:  " .. vision)
-    end
 
     return info
 end
@@ -218,26 +243,25 @@ local function initWithVisionInfo(view, info)
 end
 
 local function updateVisionInfoWithModelUnit(info, unit)
-    info:setVision(unit:getVision())
+    info.m_Label:setString("Vision:  " .. unit:getVision())
 end
 
 --------------------------------------------------------------------------------
 -- The fuel information for the unit.
 --------------------------------------------------------------------------------
+local function createFuelInfoBottomLine()
+    return createBottomLine(FUEL_INFO_POSITION_X + 5, FUEL_INFO_POSITION_Y,
+                            FUEL_INFO_WIDTH - 10, FUEL_INFO_HEIGHT)
+end
+
+local function createFuelInfoLabel()
+    return createLabel(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y,
+                       FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
+end
+
 local function createFuelInfo()
-    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    bottomLine:ignoreAnchorPointForPosition(true)
-        :setPosition(FUEL_INFO_POSITION_X + 5, FUEL_INFO_POSITION_Y)
-        :setContentSize(FUEL_INFO_WIDTH - 10, FUEL_INFO_HEIGHT)
-
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y)
-
-        :setDimensions(FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+    local bottomLine = createFuelInfoBottomLine()
+    local label      = createFuelInfoLabel()
 
     local info = cc.Node:create()
     info:ignoreAnchorPointForPosition(true)
@@ -246,10 +270,6 @@ local function createFuelInfo()
 
     info.m_BottomLine = bottomLine
     info.m_Label      = label
-    info.setFuel      = function(self, currentFuel, maxFuel, consumption, description)
-        self.m_Label:setString("Fuel:    Amount:  " .. currentFuel .. " / " .. maxFuel .. "    ConsumptionPerTurn:  " .. consumption
-                               .. "\n            " .. description)
-    end
 
     return info
 end
@@ -260,79 +280,40 @@ local function initWithFuelInfo(view, info)
 end
 
 local function updateFuelInfoWithModelUnit(info, unit)
-    info:setFuel(unit:getCurrentFuel(),
-                 unit:getMaxFuel(),
-                 unit:getFuelConsumptionPerTurn(),
-                 unit:getDescriptionOnOutOfFuel())
+    info.m_Label:setString("Fuel:    Amount:  " .. unit:getCurrentFuel() .. " / " .. unit:getMaxFuel() ..
+                           "    ConsumptionPerTurn:  " .. unit:getFuelConsumptionPerTurn() ..
+                           "\n            " .. unit:getDescriptionOnOutOfFuel())
 end
 
 --------------------------------------------------------------------------------
 -- The primary weapon information for the unit.
 --------------------------------------------------------------------------------
 local function createPrimaryWeaponInfoBottomLine()
-    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    bottomLine:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 5, PRIMARY_WEAPON_INFO_POSITION_Y)
-        :setContentSize(PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
-
-    return bottomLine
+    return createBottomLine(PRIMARY_WEAPON_INFO_POSITION_X + 5, PRIMARY_WEAPON_INFO_POSITION_Y,
+                            PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createPrimaryWeaponInfoBriefLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
+                       PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createPrimaryWeaponInfoFatalLabel()
-    local fatalLabel = cc.Label:createWithTTF("Fatal:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    fatalLabel:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return fatalLabel
+    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
+                        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
 end
 
 local function createPrimaryWeaponInfoFatalIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y)
 end
 
 local function createPrimaryWeaponInfoStrongLabel()
-    local strongLabel = cc.Label:createWithTTF("Strong:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    strongLabel:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return strongLabel
+    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y,
+                       PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
 end
 
 local function createPrimaryWeaponInfoStrongIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
 end
 
 local function createPrimaryWeaponInfo()
@@ -420,69 +401,31 @@ end
 -- The secondary weapon information for the unit.
 --------------------------------------------------------------------------------
 local function createSecondaryWeaponInfoBottomLine()
-    local bottomLine = cc.Scale9Sprite:createWithSpriteFrameName("c03_t06_s01_f01.png", {x = 2, y = 0, width = 1, height = 1})
-    bottomLine:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X + 5, SECONDARY_WEAPON_INFO_POSITION_Y)
-        :setContentSize(SECONDARY_WEAPON_INFO_WIDTH - 10, SECONDARY_WEAPON_INFO_HEIGHT)
-
-    return bottomLine
+    return createBottomLine(SECONDARY_WEAPON_INFO_POSITION_X + 5, SECONDARY_WEAPON_INFO_POSITION_Y,
+                            SECONDARY_WEAPON_INFO_WIDTH - 10, SECONDARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createSecondaryWeaponInfoBriefLabel()
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(SECONDARY_WEAPON_INFO_WIDTH, SECONDARY_WEAPON_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
+                       SECONDARY_WEAPON_INFO_WIDTH, SECONDARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createSecondaryWeaponInfoFatalLabel()
-    local fatalLabel = cc.Label:createWithTTF("Fatal:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    fatalLabel:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return fatalLabel
+    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
+                       SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
 end
 
 local function createSecondaryWeaponInfoFatalIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y)
 end
 
 local function createSecondaryWeaponInfoStrongLabel()
-    local strongLabel = cc.Label:createWithTTF("Strong:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    strongLabel:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X + 300, SECONDARY_WEAPON_INFO_POSITION_Y)
-
-        :setDimensions(SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return strongLabel
+    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X + 300, SECONDARY_WEAPON_INFO_POSITION_Y,
+                       SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
 end
 
 local function createSecondaryWeaponInfoStrongIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
 end
 
 local function createSecondaryWeaponInfo()
@@ -570,60 +513,26 @@ end
 -- The defense information for the unit.
 --------------------------------------------------------------------------------
 local function createDefenseInfoBriefLabel()
-    local label = cc.Label:createWithTTF("Defense:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-
-        :setDimensions(DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
+                       DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, "Defense:")
 end
 
 local function createDefenseInfoFatalLabel()
-    local fatalLabel = cc.Label:createWithTTF("Fatal:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    fatalLabel:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-
-        :setDimensions(DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return fatalLabel
+    return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
+                       DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Fatal:")
 end
 
 local function createDefenseInfoFatalIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y)
 end
 
 local function createDefenseInfoWeakLabel()
-    local label = cc.Label:createWithTTF("Weak:", "res/fonts/msyhbd.ttc", FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y)
-
-        :setDimensions(DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2)
-
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
-
-    return label
+    return createLabel(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y,
+                       DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Weak:")
 end
 
 local function createDefenseInfoWeakIcons()
-    local icons = cc.Node:create()
-    icons:ignoreAnchorPointForPosition(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-        :setScale(ICON_SCALE)
-
-    return icons
+    return createUnitIcons(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
 end
 
 local function createDefenseInfo()
@@ -641,9 +550,9 @@ local function createDefenseInfo()
         :addChild(weakLabel)
         :addChild(weakIcons)
 
-    info.m_BriefLabel   = briefLabel
-    info.m_FatalLabel   = fatalLabel
-    info.m_FatalIcons   = fatalIcons
+    info.m_BriefLabel = briefLabel
+    info.m_FatalLabel = fatalLabel
+    info.m_FatalIcons = fatalIcons
     info.m_WeakLabel  = weakLabel
     info.m_WeakIcons  = weakIcons
 
@@ -720,24 +629,12 @@ function ViewUnitDetail:ctor(param)
     self:setCascadeOpacityEnabled(true)
         :setOpacity(180)
 
-    if (param) then
-        self:load(param)
-    end
-
     return self
 end
 
-function ViewUnitDetail:load(param)
-    return self
-end
-
-function ViewUnitDetail.createInstance(param)
-    local view = ViewUnitDetail:create():load(param)
-    assert(view, "ViewUnitDetail.createInstance() failed.")
-
-    return view
-end
-
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ViewUnitDetail:updateWithModelUnit(unit)
     updateDescriptionWithModelUnit(        self.m_Description, unit)
     updateMovementInfoWithModelUnit(       self.m_MovementInfo, unit)

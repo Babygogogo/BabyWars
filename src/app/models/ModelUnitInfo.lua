@@ -1,6 +1,8 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
+local UNIT_DETAIL_Z_ORDER = 2
+
 local function onEvtPlayerTouchUnit(model, event)
     model.m_ModelUnit = event.unitModel
 
@@ -16,25 +18,16 @@ local function onEvtPlayerTouchNoUnit(model, event)
     end
 end
 
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
-    if (param) then
-        self:load(param)
-    end
-
     return self
 end
 
-function ModelUnitInfo:load(param)
-    return self
-end
-
-function ModelUnitInfo.createInstance(param)
-    local model = ModelUnitInfo.new():load(param)
-    assert(model, "ModelUnitInfo.createInstance() failed.")
-
-    return model
-end
-
+--------------------------------------------------------------------------------
+-- The callback functions on node/script events.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchUnit",   self)
@@ -65,12 +58,23 @@ end
 function ModelUnitInfo:onPlayerTouch()
     if (not self.m_DetailActor) then
         self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
-        self.m_View:getScene():addChild(self.m_DetailActor:getView())
+        self.m_View:getScene():addChild(self.m_DetailActor:getView(), UNIT_DETAIL_Z_ORDER)
     end
 
     local modelDetail = self.m_DetailActor:getModel()
     modelDetail:updateWithModelUnit(self.m_ModelUnit)
         :setEnabled(true)
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelUnitInfo:adjustPositionOnTouch(touch)
+    if (self.m_View) then
+        self.m_View:adjustPositionOnTouch(touch)
+    end
 
     return self
 end

@@ -1,41 +1,40 @@
 
 local ViewWarListItem = class("ViewWarListItem", ccui.Button)
 
-function ViewWarListItem:ctor(param)
-    self:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
-    
+local function initAppearance(view)
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
         :setScale9Enabled(true)
         :setCapInsets({x = 2, y = 0, width = 1, height = 1})
         :setContentSize(230, 45)
-        
+
         :setZoomScale(-0.05)
-        
+
         :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(28)
         :setTitleColor({r = 255, g = 255, b = 255})
-        
-        :addTouchEventListener(function(sender, eventType)
+
+        :getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+end
+
+local function initTouchListener(view)
+    view:addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
-                if (self.m_Model) then self.m_Model:onPlayerTouch() end
+                if (view.m_Model) then
+                    view.m_Model:onPlayerTouch()
+                end
             end
         end)
-        
-    self:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+end
 
-	if (param) then self:load(param) end
+--------------------------------------------------------------------------------
+-- The contructor.
+--------------------------------------------------------------------------------
+function ViewWarListItem:ctor(param)
+    initAppearance(self)
+    initTouchListener(self)
 
 	return self
-end
-
-function ViewWarListItem:load(param)
-    return self
-end
-
-function ViewWarListItem.createInstance(param)
-    local view = ViewWarListItem.new():load(param)
-    assert(view, "ViewWarListItem.createInstance() failed.")
-
-    return view
 end
 
 return ViewWarListItem

@@ -15,7 +15,7 @@ local function requireMapData(param)
 	elseif (t == "table") then
 		return param
 	else
-		return nil
+		return error("ModelUnitMap-requireMapData() the param is invalid.")
 	end
 end
 
@@ -23,98 +23,71 @@ local function getTiledUnitLayer(tiledData)
 	return tiledData.layers[2]
 end
 
-local function createModel(param)
-	local mapData = requireMapData(param)
-	if (mapData == nil) then
-		return nil, "ModelUnitMap--createModel() failed to require MapData from param."
-	end
+--------------------------------------------------------------------------------
+-- The unit actors map.
+--------------------------------------------------------------------------------
+local function createUnitActorsMapWithTemplate(mapData)
+    assert(type(mapData.template) == "string", "ModelUnitMap-createUnitActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
+    local templateTiledLayer = getTiledUnitLayer(requireMapData(mapData.template))
+    assert(templateTiledLayer, "ModelUnitMap-createUnitActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
 
-	local baseMap, mapSize
-	if (mapData.Template ~= nil) then
-		local createTemplateMapResult, createTemplateMapMsg = createModel(mapData.Template)
-		if (createTemplateMapResult == nil) then
-			return nil, string.format("ModelUnitMap--createModel() failed to create the template map [%s]:\n%s", mapData.Template, createTemplateMapMsg)
-		end
+	local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelUnit", "ViewUnit")
+	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to create the template unit actors map.")
 
-		baseMap, mapSize = createTemplateMapResult.map, createTemplateMapResult.mapSize
-	else
-		local loadSizeMsg
-		mapSize, loadSizeMsg = MapFunctions.loadMapSize(mapData)
-		if (mapSize == nil) then
-			return nil, "ModelUnitMap--createModel() failed to load MapSize from param:\n" .. loadSizeMsg
-		end
+    if (mapData.grids) then
+        map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
+    	assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
+    end
 
-		baseMap = MapFunctions.createEmptyMap(mapSize)
-	end
+    map.m_TemplateName = mapData.template
+    map.m_Name         = mapData.name
 
-	local map, loadUnitsIntoMapMsg = MapFunctions.loadGridsIntoMap(Unit, mapData.Units, baseMap, mapSize)
-	if (map == nil) then
-		return nil, "ModelUnitMap--createModel() failed to load units:\n" .. loadUnitsIntoMapMsg
-	end
-
-	return {map = map, mapSize = mapSize}
+	return map
 end
 
-local function createChildrenActors(param)
-	local mapData = requireMapData(param)
-	assert(TypeChecker.isMapData(mapData))
+local function createUnitActorsMapWithoutTemplate(mapData)
+    local tiledLayer = getTiledUnitLayer(mapData)
+    local map
+    if (not tiledLayer) then
+        map = MapFunctions.createGridActorsMapWithMapData(mapData.grids, "ModelUnit", "ViewUnit")
+        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the param mapData.grids")
+    else
+        map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelUnit", "ViewUnit")
+        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the tiled layer within the param.")
 
-	local unitActorsMap = TypeChecker.isTiledData(mapData)
-		and MapFunctions.createGridActorsMapWithTiledLayer(getTiledUnitLayer(mapData), "ModelUnit", "ViewUnit")
-		or  MapFunctions.createGridActorsMapWithMapData(   mapData,                    "ModelUnit", "ViewUnit")
-	assert(unitActorsMap, "ModelUnitMap--createChildrenActors() failed to create the unit actors map.")
+        if (mapData.grids) then
+            map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
+            assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
+        end
+    end
 
-	return {UnitActorsMap = unitActorsMap}
+    map.m_Name = mapData.name
+
+	return map
 end
 
+local function createUnitActorsMap(param)
+    local mapData = requireMapData(param)
+    local unitActorsMap =(mapData.template == nil) and
+        createUnitActorsMapWithoutTemplate(mapData) or
+        createUnitActorsMapWithTemplate(mapData)
+    assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
+
+    return unitActorsMap
+end
+
+local function initWithUnitActorsMap(model, map)
+    model.m_UnitActorsMap = map
+end
+
+--------------------------------------------------------------------------------
+-- The constructor.
+--------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
-	if (param) then self:load(param) end
-
-	return self
-end
-
-function ModelUnitMap:load(param)
-	local childrenActors = createChildrenActors(param)
-	assert(childrenActors, "ModelUnitMap:load() failed to create children actors.")
-
-	self.m_UnitActorsMap = childrenActors.UnitActorsMap
+    initWithUnitActorsMap(self, createUnitActorsMap(param))
 
 	if (self.m_View) then
         self:initView()
-    end
-
-	return self
-end
-
-function ModelUnitMap.createInstance(param)
-	local model = ModelUnitMap.new():load(param)
-	assert(model, "ModelUnitMap.createInstance() failed.")
-
-	return model
-end
-
-function ModelUnitMap:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
-
-    return self
-end
-
-function ModelUnitMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtCursorPositionChanged", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
-function ModelUnitMap:onEvent(event)
-    if (event.name == "EvtCursorPositionChanged") then
-        local unitActor = self:getUnitActor(event.gridIndex)
-        if (unitActor) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()})
-        else
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
-        end
     end
 
     return self
@@ -131,13 +104,52 @@ function ModelUnitMap:initView()
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local unitActor = unitActors[x][y]
-            if (unitActor) then view:addChild(unitActor:getView()) end
+            if (unitActor) then
+                view:addChild(unitActor:getView())
+            end
         end
 	end
 
 	return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on node/script events.
+--------------------------------------------------------------------------------
+function ModelUnitMap:onEnter(rootActor)
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
+        :addEventListener("EvtPlayerSwitched", self)
+
+    return self
+end
+
+function ModelUnitMap:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
+        :removeEventListener("EvtCursorPositionChanged", self)
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
+function ModelUnitMap:onEvent(event)
+    if (event.name == "EvtCursorPositionChanged") then
+        local unitActor = self:getUnitActor(event.gridIndex)
+        if (unitActor) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()})
+        else
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
+        end
+    elseif (event.name == "EvtPlayerSwitched") then
+        self.m_PlayerIndex = event.playerIndex
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()
 	return self.m_UnitActorsMap.size
 end
@@ -148,20 +160,6 @@ function ModelUnitMap:getUnitActor(gridIndex)
     else
         return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
     end
-end
-
-function ModelUnitMap:handleAndSwallowTouchOnGrid(gridIndex)
---[[
-    local unitActor = self:getUnitActor(gridIndex)
-    if (unitActor) then
-        local event = {name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()}
-        self.m_RootScriptEventDispatcher:dispatchEvent(event)
-    else
-        local event = {name = "EvtPlayerTouchNoUnit"}
-        self.m_RootScriptEventDispatcher:dispatchEvent(event)
-    end
---]]
-    return false
 end
 
 return ModelUnitMap

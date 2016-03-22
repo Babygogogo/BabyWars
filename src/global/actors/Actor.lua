@@ -7,12 +7,7 @@ function Actor.createModel(name, param)
     if (not name) then
         return nil
     else
-        local model, createModelMsg = require("app.models." .. name).createInstance(param)
-        if (not model) then
-            error("Actor--createModel() failed: " .. createModelMsg)
-        else
-            return model
-        end
+        return require("app.models." .. name):create(param)
     end
 end
 
@@ -20,21 +15,16 @@ function Actor.createView(name, param)
     if (not name) then
         return nil
     else
-        local view, createViewMsg = require("app.views." .. name).createInstance(param)
-        if (not view) then
-            error("Actor--createView() failed: ".. createViewMsg)
-        else
-            return view
-        end
+        return require("app.views." .. name):create(param)
     end
 end
 
 function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
-	local actor = Actor.new()
-	if (modelInstance) then actor:setModel(modelInstance) end
-	if (viewInstance)  then actor:setView( viewInstance)  end
+    local actor = Actor.new()
+    if (modelInstance) then actor:setModel(modelInstance) end
+    if (viewInstance)  then actor:setView( viewInstance)  end
 
-	return actor
+    return actor
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
