@@ -97,8 +97,6 @@ function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, modelName
         if (map[x][y] == nil) then
             map[x][y] = Actor.createWithModelAndViewName(modelName, gridData, viewName, gridData)
         else
-            print(string.format("MapFunctions.updateGridActorsMapWithGridsData() the grid on [%d, %d] is already loaded; overwriting it.", x, y))
-
             updateModelForGridActor(map[x][y], modelName, gridData)
             updateViewForGridActor( map[x][y], viewName,  gridData)
         end

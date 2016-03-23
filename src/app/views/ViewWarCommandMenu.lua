@@ -122,18 +122,33 @@ local function initWithTouchListener(view, touchListener)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewWarCommandMenu:ctor(param)
     initWithScreenBackground(self, createScreenBackground())
-    initWithMenuBackground(self, createMenuBackground())
-    initWithListView(self, createListView())
-    initWithTouchListener(self, createTouchListener(self))
+    initWithMenuBackground(  self, createMenuBackground())
+    initWithListView(        self, createListView())
+    initWithTouchListener(   self, createTouchListener(self))
 
     self:ignoreAnchorPointForPosition(true)
 
         :setCascadeOpacityEnabled(true)
         :setOpacity(200)
+
+    return self
+end
+
+function ViewWarCommandMenu:setConfirmBoxView(view)
+    if (self.m_ConfirmBoxView) then
+        if (self.m_ConfirmBoxView == view) then
+            return self
+        else
+            self:removeChild(self.m_ConfirmBoxView)
+        end
+    end
+
+    self.m_ConfirmBoxView = view
+    self:addChild(view, CONFIRM_BOX_Z_ORDER)
 
     return self
 end
@@ -167,21 +182,6 @@ function ViewWarCommandMenu:setEnabled(enabled)
         self:setVisible(false)
         self.m_TouchListener:setEnabled(false)
     end
-
-    return self
-end
-
-function ViewWarCommandMenu:setConfirmBoxView(view)
-    if (self.m_ConfirmBoxView) then
-        if (self.m_ConfirmBoxView == view) then
-            return self
-        else
-            self:removeChild(self.m_ConfirmBoxView)
-        end
-    end
-
-    self.m_ConfirmBoxView = view
-    self:addChild(view, CONFIRM_BOX_Z_ORDER)
 
     return self
 end

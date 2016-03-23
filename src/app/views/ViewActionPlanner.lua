@@ -53,35 +53,40 @@ local function getSpriteFrameName(prevDirection, nextDirection)
         elseif (nextDirection == "down"   ) then return SPRITE_FRAME_NAME_LINE_VERTICAL
         elseif (nextDirection == "left"   ) then return SPRITE_FRAME_NAME_LINE_HORIZONTAL
         elseif (nextDirection == "right"  ) then return SPRITE_FRAME_NAME_LINE_HORIZONTAL
-        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.") end
+        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.")
+        end
     elseif (prevDirection == "up") then
         if     (nextDirection == "invalid") then return SPRITE_FRAME_NAME_ARROW_DOWN
         elseif (nextDirection == "up"     ) then return SPRITE_FRAME_NAME_EMPTY
         elseif (nextDirection == "down"   ) then return SPRITE_FRAME_NAME_LINE_VERTICAL
         elseif (nextDirection == "left"   ) then return SPRITE_FRAME_NAME_CORNER_UP_LEFT
         elseif (nextDirection == "right"  ) then return SPRITE_FRAME_NAME_CORNER_UP_RIGHT
-        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.") end
+        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.")
+        end
     elseif (prevDirection == "down") then
         if     (nextDirection == "invalid") then return SPRITE_FRAME_NAME_ARROW_UP
         elseif (nextDirection == "up"     ) then return SPRITE_FRAME_NAME_LINE_VERTICAL
         elseif (nextDirection == "down"   ) then return SPRITE_FRAME_NAME_EMPTY
         elseif (nextDirection == "left"   ) then return SPRITE_FRAME_NAME_CORNER_DOWN_LEFT
         elseif (nextDirection == "right"  ) then return SPRITE_FRAME_NAME_CORNER_DOWN_RIGHT
-        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.") end
+        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.")
+        end
     elseif (prevDirection == "left") then
         if     (nextDirection == "invalid") then return SPRITE_FRAME_NAME_ARROW_RIGHT
         elseif (nextDirection == "up"     ) then return SPRITE_FRAME_NAME_CORNER_UP_LEFT
         elseif (nextDirection == "down"   ) then return SPRITE_FRAME_NAME_CORNER_DOWN_LEFT
         elseif (nextDirection == "left"   ) then return SPRITE_FRAME_NAME_EMPTY
         elseif (nextDirection == "right"  ) then return SPRITE_FRAME_NAME_LINE_HORIZONTAL
-        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.") end
+        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.")
+        end
     elseif (prevDirection == "right") then
         if     (nextDirection == "invalid") then return SPRITE_FRAME_NAME_ARROW_LEFT
         elseif (nextDirection == "up"     ) then return SPRITE_FRAME_NAME_CORNER_UP_RIGHT
         elseif (nextDirection == "down"   ) then return SPRITE_FRAME_NAME_CORNER_DOWN_RIGHT
         elseif (nextDirection == "left"   ) then return SPRITE_FRAME_NAME_LINE_HORIZONTAL
         elseif (nextDirection == "right"  ) then return SPRITE_FRAME_NAME_EMPTY
-        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.") end
+        else   error("ViewActionPlanner-getSpriteFrameName() the param nextDirection is invalid.")
+        end
     else
         error("ViewActionPlanner-getSpriteFrameName() the param prevDirection is invalid.")
     end

@@ -10,7 +10,7 @@ local function getMaxRange(unitModel)
     return math.min(unitModel:getMovementRange(), unitModel:getCurrentFuel())
 end
 
-local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapModel)
+local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapModel, weather)
     local tileActor = tileMapModel:getTileActor(gridIndex)
     if (not tileActor) then
         return nil
@@ -22,7 +22,7 @@ local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapMo
         return nil
     end
 
-    return tileActor:getModel():getMoveCostWithMoveType(unitModel:getMovementType())
+    return tileActor:getModel():getMoveCost(unitModel:getMovementType(), weather)
 end
 
 local function getReachableGrid(grids, gridIndex)
@@ -35,6 +35,16 @@ end
 
 local function canUnitTakeAction(model, unitModel)
     return (unitModel) and (unitModel:getPlayerIndex() == model.m_PlayerIndex) and (unitModel:getState() == "idle")
+end
+
+local function setState(self, state)
+    if (state == "idle") then
+        self.m_State = state
+        if (self.m_View) then
+            self.m_View:hideMovePath()
+                :hideReachableGrids()
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -112,7 +122,7 @@ end
 local function updateMovePathWithDestinationGrid(gridIndex, model)
     local focusUnitModel       = model.m_FocusUnitActor:getModel()
     local maxRange             = getMaxRange(focusUnitModel)
-    local nextRangeConsumption = getRangeConsumption(gridIndex, focusUnitModel, model.m_UnitMapModel, model.m_TileMapModel)
+    local nextRangeConsumption = getRangeConsumption(gridIndex, focusUnitModel, model.m_UnitMapModel, model.m_TileMapModel, model.m_CurrentWeather)
 
     if (not truncateMovePathToGrid(model.m_MovePath, gridIndex)) and
        (not extendMovePathToGrid(model.m_MovePath, gridIndex, nextRangeConsumption, maxRange)) then
@@ -147,7 +157,7 @@ local function pushBackToAvailableGridList(list, gridIndex, prevGridIndex, range
     }
 end
 
-local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel)
+local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel, weather)
     local maxRange = getMaxRange(unitModel)
     local reachableGrids, availableGridList = {}, {}
     pushBackToAvailableGridList(availableGridList, unitModel:getGridIndex(), nil, 0)
@@ -160,7 +170,7 @@ local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel)
 
         if (updateReachableGrids(reachableGrids, currentGridIndex, listItem.prevGridIndex, rangeConsumption, maxRange)) then
             for _, nextGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(currentGridIndex)) do
-                local nextRangeConsumption = getRangeConsumption(nextGridIndex, unitModel, unitMapModel, tileMapModel)
+                local nextRangeConsumption = getRangeConsumption(nextGridIndex, unitModel, unitMapModel, tileMapModel, weather)
                 if (nextRangeConsumption) and (rangeConsumption + nextRangeConsumption <= maxRange) then
                     pushBackToAvailableGridList(availableGridList, nextGridIndex, currentGridIndex, rangeConsumption + nextRangeConsumption)
                 end
@@ -173,31 +183,51 @@ local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel)
     return reachableGrids
 end
 
-local function onEvtPlayerSelectedGrid(model, gridIndex)
-    if (model.m_State == "idle") then
-        local unit = model.m_UnitMapModel:getUnitActor(gridIndex)
-        if (unit) and (canUnitTakeAction(model, unit:getModel())) then
-            model.m_State          = "makingMovePath"
-            model.m_FocusUnitActor = unit
-            model.m_ReachableGrids = getReachableGridsForUnit(unit:getModel(), model.m_UnitMapModel, model.m_TileMapModel)
-            model.m_MovePath       = {{
+local function onEvtPlayerSelectedGrid(self, gridIndex)
+    if (self.m_State == "idle") then
+        local unit = self.m_UnitMapModel:getUnitActor(gridIndex)
+        if (unit) and (canUnitTakeAction(self, unit:getModel())) then
+            self.m_State          = "makingMovePath"
+            self.m_FocusUnitActor = unit
+            self.m_ReachableGrids = getReachableGridsForUnit(unit:getModel(), self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
+            self.m_MovePath       = {{
                 gridIndex        = unit:getModel():getGridIndex(),
                 rangeConsumption = 0
             }}
 
-            if (model.m_View) then
-                model.m_View:showReachableGrids(model.m_ReachableGrids)
+            if (self.m_View) then
+                self.m_View:showReachableGrids(self.m_ReachableGrids)
             end
         end
-    elseif (model.m_State == "makingMovePath") then
-        local selectedReachableGrid = getReachableGrid(model.m_ReachableGrids, gridIndex)
+    elseif (self.m_State == "makingMovePath") then
+        local selectedReachableGrid = getReachableGrid(self.m_ReachableGrids, gridIndex)
         if (not selectedReachableGrid) then
-            model.m_State = "idle"
-            if (model.m_View) then
-                model.m_View:hideReachableGrids()
-                model.m_View:hideMovePath()
-            end
+            setState(self, "idle")
         else
+            updateMovePathWithDestinationGrid(gridIndex, self)
+            if (self.m_View) then
+                self.m_View:showMovePath(self.m_MovePath)
+            end
+        end
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on EvtPlayerSwitched.
+--------------------------------------------------------------------------------
+local function onEvtPlayerSwitched(self, playerIndex)
+    self.m_PlayerIndex = playerIndex
+    setState(self, "idle")
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on EvtPlayerMovedCursor.
+--------------------------------------------------------------------------------
+local function onEvtPlayerMovedCursor(model, gridIndex)
+    if (model.m_State == "idle") then
+        return
+    elseif (model.m_State == "makingMovePath") then
+        if (getReachableGrid(model.m_ReachableGrids, gridIndex)) then
             updateMovePathWithDestinationGrid(gridIndex, model)
             if (model.m_View) then
                 model.m_View:showMovePath(model.m_MovePath)
@@ -207,21 +237,10 @@ local function onEvtPlayerSelectedGrid(model, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor.
---------------------------------------------------------------------------------
-local function onEvtPlayerMovedCursor(model, gridIndex)
-    if (model.m_State == "idle") then
-        return
-    end
-
-    -- TODO: make the path.
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    self.m_State = "idle"
+    setState(self, "idle")
 
     return self
 end
@@ -252,12 +271,14 @@ function ModelActionPlanner:onEnter(rootActor)
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSwitched", self)
+        :addEventListener("EvtWeatherChanged", self)
 
     return self
 end
 
 function ModelActionPlanner:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWeatherChanged", self)
+        :removeEventListener("EvtPlayerSwitched", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
     self.m_RootScriptEventDispatcher = nil
@@ -269,11 +290,11 @@ function ModelActionPlanner:onEvent(event)
     if (event.name == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event.gridIndex)
     elseif (event.name == "EvtPlayerSwitched") then
-        self.m_PlayerIndex = event.playerIndex
+        onEvtPlayerSwitched(self, event.playerIndex)
     elseif (event.name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
     elseif (event.name == "EvtPlayerMovedCursor") then
-
+        onEvtPlayerMovedCursor(self, event.gridIndex)
     end
 
     return self
