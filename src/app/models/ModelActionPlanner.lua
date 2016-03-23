@@ -195,11 +195,13 @@ local function onEvtPlayerSelectedGrid(model, gridIndex)
             model.m_State = "idle"
             if (model.m_View) then
                 model.m_View:hideReachableGrids()
+                model.m_View:hideMovePath()
             end
         else
             updateMovePathWithDestinationGrid(gridIndex, model)
-
-            print("touched a reachable grid.")
+            if (model.m_View) then
+                model.m_View:showMovePath(model.m_MovePath)
+            end
         end
     end
 end
