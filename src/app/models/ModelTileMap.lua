@@ -105,7 +105,7 @@ end
 --------------------------------------------------------------------------------
 function ModelTileMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
+    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSwitched", self)
 
     return self
@@ -113,14 +113,14 @@ end
 
 function ModelTileMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
-        :removeEventListener("EvtCursorPositionChanged", self)
+        :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
 function ModelTileMap:onEvent(event)
-    if (event.name == "EvtCursorPositionChanged") then
+    if (event.name == "EvtPlayerMovedCursor") then
         local tileActor = self:getTileActor(event.gridIndex)
         assert(tileActor, "ModelTileMap:onEvent() failed to get the tile actor with event.gridIndex.")
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = tileActor:getModel()})

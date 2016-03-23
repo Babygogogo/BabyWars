@@ -23,6 +23,17 @@ function GridIndexFunctions.isEqual(index1, index2)
     return (index1.x == index2.x) and (index1.y == index2.y)
 end
 
+function GridIndexFunctions.isAdjacent(index1, index2)
+    local offset = GridIndexFunctions.sub(index1, index2)
+    for _, o in ipairs(ADJACENT_GRIDS_OFFSET) do
+        if (GridIndexFunctions.isEqual(offset, o)) then
+            return true
+        end
+    end
+
+    return false
+end
+
 function GridIndexFunctions.isWithinMap(index, mapSize)
     return (index.x >= 1) and (index.y >= 1)
         and (index.x <= mapSize.width) and (index.y <= mapSize.height)
@@ -30,6 +41,10 @@ end
 
 function GridIndexFunctions.add(index1, index2)
     return {x = index1.x + index2.x, y = index1.y + index2.y}
+end
+
+function GridIndexFunctions.sub(index1, index2)
+    return {x = index1.x - index2.x, y = index1.y - index2.y}
 end
 
 function GridIndexFunctions.getAdjacentGrids(index)

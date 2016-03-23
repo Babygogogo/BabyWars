@@ -31,16 +31,18 @@ local function createTouchListener(model)
         if (isTouchingCursor) then
             local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), model.m_View)
             if (GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)) and
-            (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
+               (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
                 model:setGridIndex(gridIndex)
-                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
+                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = gridIndex})
                 isTouchMoved = true
             end
         else
             if (isTouchMoved) then
-                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerDragField",
-                                                            previousPosition = touch:getPreviousLocation(),
-                                                            currentPosition = touch:getLocation()})
+                model.m_RootScriptEventDispatcher:dispatchEvent({
+                    name             = "EvtPlayerDragField",
+                    previousPosition = touch:getPreviousLocation(),
+                    currentPosition  = touch:getLocation()
+                })
             end
         end
     end
@@ -54,11 +56,14 @@ local function createTouchListener(model)
             return
         end
 
-        if (not isTouchMoved) or
-        ((isTouchingCursor) and (GridIndexFunctions.isEqual(gridIndex, initialTouchGridIndex))) then
+        if ((not isTouchMoved) or (isTouchingCursor)) and
+           (not GridIndexFunctions.isEqual(model:getGridIndex(), gridIndex)) then
             model:setGridIndex(gridIndex)
-            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = gridIndex})
-                :dispatchEvent({name = "EvtPlayerSelectedGrid", gridIndex = gridIndex})
+            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = gridIndex})
+        end
+
+        if (not isTouchMoved) then
+            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSelectedGrid", gridIndex = gridIndex})
         end
     end
 
@@ -117,7 +122,7 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtCursorPositionChanged", gridIndex = self:getGridIndex()})
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = self:getGridIndex()})
 
     return self
 end

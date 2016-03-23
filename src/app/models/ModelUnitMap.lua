@@ -118,7 +118,7 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtCursorPositionChanged", self)
+    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSwitched", self)
 
     return self
@@ -126,14 +126,14 @@ end
 
 function ModelUnitMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
-        :removeEventListener("EvtCursorPositionChanged", self)
+        :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
 function ModelUnitMap:onEvent(event)
-    if (event.name == "EvtCursorPositionChanged") then
+    if (event.name == "EvtPlayerMovedCursor") then
         local unitActor = self:getUnitActor(event.gridIndex)
         if (unitActor) then
             self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()})

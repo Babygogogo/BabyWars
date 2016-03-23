@@ -4,6 +4,23 @@ local ModelActionPlanner = class("ModelActionPlanner")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
+-- The functions for MovePath.
+--------------------------------------------------------------------------------
+local function hasGridInMovePath(path, gridIndex)
+    for i, pathItem in ipairs(path) do
+        if (GridIndexFunctions.isEqual(gridIndex, pathItem.gridIndex)) then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function canMovePathExtendToGrid(path, gridIndex)
+    return (not hasGridInMovePath(path, gridIndex)) and (GridIndexFunctions.isAdjacent(path[#path].gridIndex, gridIndex))
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
 local function canUnitTakeAction(model, unitModel)
@@ -18,55 +35,61 @@ local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapMo
 
     local existingUnitActor = unitMapModel:getUnitActor(gridIndex)
     -- TODO: add the unite feature.
-    if (existingUnitActor) then
+    if (existingUnitActor) and (existingUnitActor:getModel():getPlayerIndex() ~= unitModel:getPlayerIndex())then
         return nil
     end
 
     return tileActor:getModel():getMoveCostWithMoveType(unitModel:getMovementType())
 end
 
-local function createEmptyReachableGrids()
-    local grids = {}
-    grids.updateGrid = function(self, gridIndex, prevGridIndex, remainingRange)
-        local x, y = gridIndex.x, gridIndex.y
-        self[x] = self[x] or {}
-        self[x][y] = self[x][y] or {}
+local function updateReachableGrids(grids, gridIndex, prevGridIndex, rangeConsumption)
+    local x, y = gridIndex.x, gridIndex.y
+    grids[x] = grids[x] or {}
+    grids[x][y] = grids[x][y] or {}
 
-        local grid = self[x][y]
-        if (not grid.remainingRange) or (grid.remainingRange < remainingRange) then
-            grid.prevGridIndex = prevGridIndex
-            grid.remainingRange = remainingRange
+    local grid = grids[x][y]
+    if (not grid.rangeConsumption) or (grid.rangeConsumption > rangeConsumption) then
+        grid.prevGridIndex    = prevGridIndex
+        grid.rangeConsumption = rangeConsumption
 
-            return true
-        else
-            return false
-        end
+        return true
+    else
+        return false
     end
+end
 
-    return grids
+local function getReachableGrid(grids, gridIndex)
+    if (grids and grids[gridIndex.x]) then
+        return grids[gridIndex.x][gridIndex.y]
+    else
+        return nil
+    end
+end
+
+local function pushBackToAvailableGridList(list, gridIndex, prevGridIndex, rangeConsumption)
+    list[#list + 1] = {
+        gridIndex        = gridIndex,
+        prevGridIndex    = prevGridIndex,
+        rangeConsumption = rangeConsumption
+    }
 end
 
 local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel)
-    local range = math.min(unitModel:getMovementRange(), unitModel:getCurrentFuel())
-    local origin = unitModel:getGridIndex()
+    local maxRange = math.min(unitModel:getMovementRange(), unitModel:getCurrentFuel())
+    local reachableGrids, availableGridList = {}, {}
+    pushBackToAvailableGridList(availableGridList, unitModel:getGridIndex(), nil, 0)
 
-    local reachableGrids = createEmptyReachableGrids()
-    local availableGridList = {
-        {gridIndex = origin, remainingRange = range}
-    }
     local listIndex = 1
     while (listIndex <= #availableGridList) do
         local listItem         = availableGridList[listIndex]
         local currentGridIndex = listItem.gridIndex
-        local remainingRange   = listItem.remainingRange
+        local rangeConsumption = listItem.rangeConsumption
 
-        if (reachableGrids:updateGrid(currentGridIndex, listItem.prevGridIndex, remainingRange)) then
+        if (updateReachableGrids(reachableGrids, currentGridIndex, listItem.prevGridIndex, rangeConsumption, maxRange)) then
             for _, nextGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(currentGridIndex)) do
-                local rangeConsumption = getRangeConsumption(nextGridIndex, unitModel, unitMapModel, tileMapModel)
-                if (rangeConsumption) and (remainingRange >= rangeConsumption) then
-                    availableGridList[#availableGridList + 1] = {
-                        gridIndex = nextGridIndex, prevGridIndex = currentGridIndex, remainingRange = remainingRange - rangeConsumption
-                    }
+                local nextRangeConsumption = getRangeConsumption(nextGridIndex, unitModel, unitMapModel, tileMapModel)
+                if (nextRangeConsumption) and (rangeConsumption + nextRangeConsumption <= maxRange) then
+                    pushBackToAvailableGridList(availableGridList, nextGridIndex, currentGridIndex, rangeConsumption + nextRangeConsumption)
                 end
             end
         end
@@ -81,19 +104,36 @@ local function onEvtPlayerSelectedGrid(model, gridIndex)
     if (model.m_State == "idle") then
         local unit = model.m_UnitMapModel:getUnitActor(gridIndex)
         if (unit) and (canUnitTakeAction(model, unit:getModel())) then
-            model.m_State = "moving"
-            local reachableGrids = getReachableGridsForUnit(unit:getModel(), model.m_UnitMapModel, model.m_TileMapModel)
+            model.m_State          = "makingMovePath"
+            model.m_FocusUnitActor = unit
+            model.m_ReachableGrids = getReachableGridsForUnit(unit:getModel(), model.m_UnitMapModel, model.m_TileMapModel)
+
             if (model.m_View) then
-                model.m_View:showReachableGrids(reachableGrids)
+                model.m_View:showReachableGrids(model.m_ReachableGrids)
             end
         end
-    elseif (model.m_State == "moving") then
-        -- TODO: remove codes below and add correct ones.
-        model.m_State = "idle"
-        if (model.m_View) then
-            model.m_View:hideReachableGrids()
+    elseif (model.m_State == "makingMovePath") then
+        local selectedReachableGrid = getReachableGrid(model.m_ReachableGrids, gridIndex)
+        if (not selectedReachableGrid) then
+            model.m_State = "idle"
+            if (model.m_View) then
+                model.m_View:hideReachableGrids()
+            end
+        else
+            print("touched a reachable grid.")
         end
     end
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on EvtPlayerMovedCursor.
+--------------------------------------------------------------------------------
+local function onEvtPlayerMovedCursor(model, gridIndex)
+    if (model.m_State == "idle") then
+        return
+    end
+
+    -- TODO: make the path.
 end
 
 --------------------------------------------------------------------------------
@@ -129,6 +169,7 @@ end
 function ModelActionPlanner:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSwitched", self)
 
     return self
@@ -136,6 +177,7 @@ end
 
 function ModelActionPlanner:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
+        :removeEventListener("EvtPlayerMovedCursor", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -149,6 +191,8 @@ function ModelActionPlanner:onEvent(event)
         self.m_PlayerIndex = event.playerIndex
     elseif (event.name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
+    elseif (event.name == "EvtPlayerMovedCursor") then
+
     end
 
     return self
