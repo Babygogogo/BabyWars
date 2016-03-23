@@ -1,8 +1,6 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
-local TILE_DETAIL_Z_ORDER = 2
-
 local function onEvtPlayerTouchTile(model, event)
     model.m_ModelTile = event.tileModel
 
@@ -13,16 +11,14 @@ local function onEvtPlayerTouchTile(model, event)
 end
 
 --------------------------------------------------------------------------------
--- The contructor.
+-- The contructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileInfo:ctor(param)
-
     return self
 end
 
-function ModelTileInfo:initView()
-    local view = self.m_View
-    assert(view, "ModelTileInfo:initView() no view is attached to the owner actor of the model.")
+function ModelTileInfo:setModelTileDetail(model)
+    self.m_TileDetailModel = model
 
     return self
 end
@@ -33,12 +29,14 @@ end
 function ModelTileInfo:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchTile", self)
+        :addEventListener("EvtWeatherChanged", self)
 
     return self
 end
 
 function ModelTileInfo:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerTouchTile", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWeatherChanged", self)
+        :removeEventListener("EvtPlayerTouchTile", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -47,20 +45,18 @@ end
 function ModelTileInfo:onEvent(event)
     if (event.name == "EvtPlayerTouchTile") then
         onEvtPlayerTouchTile(self, event)
+    elseif (event.name == "EvtWeatherChanged") then
+        self.m_Weather = event.weather
     end
 
     return self
 end
 
 function ModelTileInfo:onPlayerTouch()
-    if (not self.m_DetailActor) then
-        self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelTileDetail", nil, "ViewTileDetail")
-        self.m_View:getScene():addChild(self.m_DetailActor:getView(), TILE_DETAIL_Z_ORDER)
+    if (self.m_TileDetailModel) then
+        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_Weather)
+            :setEnabled(true)
     end
-
-    local modelDetail = self.m_DetailActor:getModel()
-    modelDetail:updateWithModelTile(self.m_ModelTile)
-        :setEnabled(true)
 
     return self
 end

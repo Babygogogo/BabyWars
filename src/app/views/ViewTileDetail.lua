@@ -92,9 +92,6 @@ local function createDetailBackground()
 
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
-    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
-    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
-
     return background
 end
 
@@ -113,7 +110,7 @@ end
 
 local function createDescriptionLabel()
     return createLabel(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6,
-                       BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
+                    BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
 end
 
 local function createDescription()
@@ -150,7 +147,7 @@ end
 
 local function createDefenseInfoLabel()
     return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-                       DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
+                    DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT)
 end
 
 local function createDefenseInfo()
@@ -187,7 +184,7 @@ end
 
 local function createRepairInfoLabel()
     return createLabel(REPAIR_INFO_POSITION_X, REPAIR_INFO_POSITION_Y,
-                       REPAIR_INFO_WIDTH, REPAIR_INFO_HEIGHT)
+                    REPAIR_INFO_WIDTH, REPAIR_INFO_HEIGHT)
 end
 
 local function createRepairInfo()
@@ -230,12 +227,12 @@ end
 
 local function createCaptureAndIncomeInfoCaptureLabel()
     return createLabel(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y,
-                       CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
+                    CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
 end
 
 local function createCaptureAndIncomeInfoIncomeLabel()
     return createLabel(CAPTURE_INFO_POSITION_X + 350, CAPTURE_INFO_POSITION_Y,
-                       CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
+                    CAPTURE_INFO_WIDTH, CAPTURE_INFO_HEIGHT)
 end
 
 local function createCaptureAndIncomeInfo()
@@ -289,8 +286,8 @@ end
 --------------------------------------------------------------------------------
 local function createMoveCostInfoMoveCostLabel()
     return createLabel(MOVE_COST_INFO_POSITION_X, MOVE_COST_INFO_POSITION_Y + LINE_HEIGHT * 3,
-                       MOVE_COST_INFO_WIDTH, LINE_HEIGHT,
-                       "Move Cost:")
+                    MOVE_COST_INFO_WIDTH, LINE_HEIGHT,
+                    "Move Cost:")
 end
 
 local function createMoveCostInfoDetailLabels()
@@ -330,14 +327,14 @@ local function initWithMoveCostInfo(view, info)
     view:addChild(info)
 end
 
-local function updateMoveCostInfoDetailLabels(labels, tile)
+local function updateMoveCostInfoDetailLabels(labels, tile, weather)
     for key, label in pairs(labels) do
-        label:setString(key .. ": " .. (tile:getMoveCostWithMoveType(key) or "-"))
+        label:setString(key .. ": " .. (tile:getMoveCost(key, weather) or "-"))
     end
 end
 
-local function updateMoveCostInfoWithModelTile(info, tile)
-    updateMoveCostInfoDetailLabels(info.m_DetailLabels, tile)
+local function updateMoveCostInfoWithModelTile(info, tile, weather)
+    updateMoveCostInfoDetailLabels(info.m_DetailLabels, tile, weather)
 end
 
 --------------------------------------------------------------------------------
@@ -346,13 +343,17 @@ end
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
+    local isTouchWithinBackground
 
-	touchListener:registerScriptHandler(function()
+    touchListener:registerScriptHandler(function(touch, event)
+        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_DetailBackground)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
-    touchListener:registerScriptHandler(function()
-        view:setEnabled(false)
+    touchListener:registerScriptHandler(function(touch, event)
+        if (not isTouchWithinBackground) then
+            view:setEnabled(false)
+        end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
@@ -364,7 +365,7 @@ local function initWithTouchListener(view, touchListener)
 end
 
 --------------------------------------------------------------------------------
--- The constructor and public methods.
+-- The constructor.
 --------------------------------------------------------------------------------
 function ViewTileDetail:ctor(param)
     initWithScreenBackground(    self, createScreenBackground())
@@ -382,12 +383,15 @@ function ViewTileDetail:ctor(param)
     return self
 end
 
-function ViewTileDetail:updateWithModelTile(tile)
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ViewTileDetail:updateWithModelTile(tile, weather)
     updateDescriptionWithModelTile(         self.m_Description,          tile)
     updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          tile)
     updateRepairInfoWithModelTile(          self.m_RepairInfo,           tile)
     updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, tile)
-    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         tile)
+    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         tile, weather)
 
     return self
 end
@@ -395,10 +399,10 @@ end
 function ViewTileDetail:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
-        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+        self.m_TouchListener:setEnabled(false)
     end
 
     return self

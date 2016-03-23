@@ -1,7 +1,7 @@
 
 local ViewSceneWarHUD = class("ViewSceneWarHUD", cc.Node)
 
-local BEGIN_TURN_EFFECT_Z_ORDER     = 1
+local BEGIN_TURN_EFFECT_Z_ORDER     = 2
 local BEGIN_TURN_EFFECT_FONT_SIZE   = 40
 local BEGIN_TURN_EFFECT_LINE_HEIGHT = BEGIN_TURN_EFFECT_FONT_SIZE / 5 * 8
 
@@ -22,6 +22,9 @@ local BEGIN_TURN_EFFECT_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local BEGIN_TURN_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_WIDTH = math.ceil(BEGIN_TURN_EFFECT_FONT_SIZE / 15)
+
+local TILE_DETAIL_Z_ORDER = 1
+local UNIT_DETAIL_Z_ORDER = 1
 
 --------------------------------------------------------------------------------
 -- The begin turn effect.
@@ -129,17 +132,57 @@ local function setBeginTurnEffectLabel(effect, turnIndex, playerName)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The touch listener.
+--------------------------------------------------------------------------------
+local function createTouchListener(self)
+    local touchListener = cc.EventListenerTouchOneByOne:create()
+
+    local function onTouchBegan(touch, event)
+        self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+
+        return true
+    end
+
+    local function onTouchMoved(touch, event)
+        self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+    end
+
+    local function onTouchCancelled(touch, event)
+    end
+
+    local function onTouchEnded(touch, event)
+        self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+    end
+
+    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
+    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
+    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
+    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
+
+    return touchListener
+end
+
+local function initWithTouchListener(self, listener)
+    self.m_TouchListener = listener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+end
+
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewSceneWarHUD:ctor(param)
     initWithBeginTurnEffect(self, createBeginTurnEffect())
+    initWithTouchListener(  self, createTouchListener(self))
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
 function ViewSceneWarHUD:setViewMoneyEnergyInfo(view)
     if (self.m_ViewMoneyEnergyInfo) then
         if (self.m_ViewMoneyEnergyInfo == view) then
@@ -170,6 +213,22 @@ function ViewSceneWarHUD:setViewTileInfo(view)
     return self
 end
 
+function ViewSceneWarHUD:setViewTileDetail(view)
+    if (self.m_ViewTileDetail) then
+        if (self.m_ViewTileDetail == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewTileDetail)
+        end
+    end
+
+    view:setEnabled(false)
+    self.m_ViewTileDetail = view
+    self:addChild(view, TILE_DETAIL_Z_ORDER)
+
+    return self
+end
+
 function ViewSceneWarHUD:setViewUnitInfo(view)
     if (self.m_ViewUnitInfo) then
         if (self.m_ViewUnitInfo == view) then
@@ -185,22 +244,25 @@ function ViewSceneWarHUD:setViewUnitInfo(view)
     return self
 end
 
-function ViewSceneWarHUD:setTouchListener(listener)
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then
-        if (self.m_TouchListener == listener) then
+function ViewSceneWarHUD:setViewUnitDetail(view)
+    if (self.m_ViewUnitDetail) then
+        if (self.m_ViewUnitDetail == view) then
             return self
         else
-            eventDispatcher:removeEventListener(self.m_TouchListener)
+            self:removeChild(self.m_ViewUnitDetail)
         end
     end
 
-    self.m_TouchListener = listener
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    view:setEnabled(false)
+    self.m_ViewUnitDetail = view
+    self:addChild(view, UNIT_DETAIL_Z_ORDER)
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ViewSceneWarHUD:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
     local effect = self.m_BeginTurnEffect
     effect.m_CallbackOnDisappear = callbackOnDisappear

@@ -132,9 +132,6 @@ local function createDetailBackground()
 
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
-    background.m_TouchSwallower = require("app.utilities.CreateTouchSwallowerForNode")(background)
-    background:getEventDispatcher():addEventListenerWithSceneGraphPriority(background.m_TouchSwallower, background)
-
     return background
 end
 
@@ -153,7 +150,7 @@ end
 
 local function createDescriptionLabel()
     return createLabel(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y,
-                       DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
+                    DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
 end
 
 local function createDescription()
@@ -190,7 +187,7 @@ end
 
 local function createMovementInfoLabel()
     return createLabel(MOVEMENT_INFO_POSITION_X, MOVEMENT_INFO_POSITION_Y,
-                       MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
+                    MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
 end
 
 local function createMovementInfo()
@@ -222,7 +219,7 @@ end
 --------------------------------------------------------------------------------
 local function createVisionInfoLabel()
     return createLabel(VISION_INFO_POSITION_X, VISION_INFO_POSITION_Y,
-                       VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
+                    VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
 end
 
 local function createVisionInfo()
@@ -256,7 +253,7 @@ end
 
 local function createFuelInfoLabel()
     return createLabel(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y,
-                       FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
+                    FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
 end
 
 local function createFuelInfo()
@@ -281,8 +278,8 @@ end
 
 local function updateFuelInfoWithModelUnit(info, unit)
     info.m_Label:setString("Fuel:    Amount:  " .. unit:getCurrentFuel() .. " / " .. unit:getMaxFuel() ..
-                           "    ConsumptionPerTurn:  " .. unit:getFuelConsumptionPerTurn() ..
-                           "\n            " .. unit:getDescriptionOnOutOfFuel())
+                        "    ConsumptionPerTurn:  " .. unit:getFuelConsumptionPerTurn() ..
+                        "\n            " .. unit:getDescriptionOnOutOfFuel())
 end
 
 --------------------------------------------------------------------------------
@@ -295,7 +292,7 @@ end
 
 local function createPrimaryWeaponInfoBriefLabel()
     return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
-                       PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
+                    PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createPrimaryWeaponInfoFatalLabel()
@@ -309,7 +306,7 @@ end
 
 local function createPrimaryWeaponInfoStrongLabel()
     return createLabel(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y,
-                       PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
+                    PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
 end
 
 local function createPrimaryWeaponInfoStrongIcons()
@@ -407,12 +404,12 @@ end
 
 local function createSecondaryWeaponInfoBriefLabel()
     return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
-                       SECONDARY_WEAPON_INFO_WIDTH, SECONDARY_WEAPON_INFO_HEIGHT)
+                    SECONDARY_WEAPON_INFO_WIDTH, SECONDARY_WEAPON_INFO_HEIGHT)
 end
 
 local function createSecondaryWeaponInfoFatalLabel()
     return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
-                       SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
+                    SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
 end
 
 local function createSecondaryWeaponInfoFatalIcons()
@@ -421,7 +418,7 @@ end
 
 local function createSecondaryWeaponInfoStrongLabel()
     return createLabel(SECONDARY_WEAPON_INFO_POSITION_X + 300, SECONDARY_WEAPON_INFO_POSITION_Y,
-                       SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
+                    SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
 end
 
 local function createSecondaryWeaponInfoStrongIcons()
@@ -514,12 +511,12 @@ end
 --------------------------------------------------------------------------------
 local function createDefenseInfoBriefLabel()
     return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-                       DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, "Defense:")
+                    DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, "Defense:")
 end
 
 local function createDefenseInfoFatalLabel()
     return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-                       DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Fatal:")
+                    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Fatal:")
 end
 
 local function createDefenseInfoFatalIcons()
@@ -528,7 +525,7 @@ end
 
 local function createDefenseInfoWeakLabel()
     return createLabel(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y,
-                       DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Weak:")
+                    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Weak:")
 end
 
 local function createDefenseInfoWeakIcons()
@@ -594,13 +591,17 @@ end
 local function createTouchListener(view)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
+    local isTouchWithinBackground
 
-	touchListener:registerScriptHandler(function()
+    touchListener:registerScriptHandler(function(touch, event)
+        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_DetailBackground)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
-    touchListener:registerScriptHandler(function()
-        view:setEnabled(false)
+    touchListener:registerScriptHandler(function(touch, event)
+        if (not isTouchWithinBackground) then
+            view:setEnabled(false)
+        end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
@@ -650,10 +651,10 @@ end
 function ViewUnitDetail:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self:getEventDispatcher():resumeEventListenersForTarget(self, true)
+        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
-        self:getEventDispatcher():pauseEventListenersForTarget(self, true)
+        self.m_TouchListener:setEnabled(false)
     end
 
     return self

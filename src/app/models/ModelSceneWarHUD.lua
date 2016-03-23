@@ -9,54 +9,29 @@ local Actor = require("global.actors.Actor")
 local function createCompositionActors(param)
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
     local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo",        nil, "ViewUnitInfo")
+    local unitDetailActor      = Actor.createWithModelAndViewName("ModelUnitDetail",      nil, "ViewUnitDetail")
     local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
+    local tileDetailActor      = Actor.createWithModelAndViewName("ModelTileDetail",      nil, "ViewTileDetail")
 
-    return {moneyEnergyInfoActor = moneyEnergyInfoActor,
-            unitInfoActor        = unitInfoActor,
-            tileInfoActor        = tileInfoActor}
+    return {
+        moneyEnergyInfoActor = moneyEnergyInfoActor,
+        unitInfoActor        = unitInfoActor,
+        unitDetailActor      = unitDetailActor,
+        tileInfoActor        = tileInfoActor,
+        tileDetailActor      = tileDetailActor
+    }
 end
 
 local function initWithCompositionActors(model, actors)
     model.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
-    model.m_UnitInfoActor        = actors.unitInfoActor
-    model.m_TileInfoActor        = actors.tileInfoActor
-end
 
---------------------------------------------------------------------------------
--- The touch listener for view.
---------------------------------------------------------------------------------
-local function createTouchListener(model)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
+    model.m_UnitDetailActor = actors.unitDetailActor
+    model.m_UnitInfoActor   = actors.unitInfoActor
+    model.m_UnitInfoActor:getModel():setModelUnitDetail(model.m_UnitDetailActor:getModel())
 
-    local function onTouchBegan(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
-
-        return true
-    end
-
-    local function onTouchMoved(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
-    end
-
-    local function onTouchCancelled(touch, event)
-    end
-
-    local function onTouchEnded(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
-    end
-
-    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
-    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
-    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
-    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
-
-    return touchListener
+    model.m_TileDetailActor = actors.tileDetailActor
+    model.m_TileInfoActor   = actors.tileInfoActor
+    model.m_TileInfoActor:getModel():setModelTileDetail(model.m_TileDetailActor:getModel())
 end
 
 --------------------------------------------------------------------------------
@@ -78,9 +53,9 @@ function ModelSceneWarHUD:initView()
 
     view:setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
         :setViewTileInfo(       self.m_TileInfoActor:getView())
+        :setViewTileDetail(     self.m_TileDetailActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
-
-        :setTouchListener(createTouchListener(self))
+        :setViewUnitDetail(     self.m_UnitDetailActor:getView())
 
     return self
 end

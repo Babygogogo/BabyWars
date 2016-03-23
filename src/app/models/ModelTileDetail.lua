@@ -8,9 +8,9 @@ function ModelTileDetail:ctor(param)
     return self
 end
 
-function ModelTileDetail:updateWithModelTile(tile)
+function ModelTileDetail:updateWithModelTile(tile, weather)
     if (self.m_View) then
-        self.m_View:updateWithModelTile(tile)
+        self.m_View:updateWithModelTile(tile, weather)
     end
 
     return self
