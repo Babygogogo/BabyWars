@@ -125,14 +125,15 @@ end
 -- The move path destination view.
 --------------------------------------------------------------------------------
 local function createMovePathDestinationView()
-    local view = cc.Node:create()
-    view:setOpacity(160)
-        :setCascadeOpacityEnabled(true)
+    local view = cc.Sprite:createWithSpriteFrameName("c03_t03_s01_f01.png")
+    view:ignoreAnchorPointForPosition(true)
+        :setOpacity(160)
 
     return view
 end
 
 local function initWithMovePathDestinationView(self, view)
+    view:setVisible(false)
     self.m_MovePathDestinationView = view
     self:addChild(view, MOVE_PATH_DESTINATION_Z_ORDER)
 end
@@ -194,8 +195,7 @@ function ViewActionPlanner:setMovePathVisible(visible)
 end
 
 function ViewActionPlanner:setMovePathDestination(gridIndex)
-    self.m_MovePathDestinationView:removeAllChildren()
-        :addChild(createSingleReachableGridView(gridIndex))
+    self.m_MovePathDestinationView:setPosition(GridIndexFunctions.toPosition(gridIndex))
 
     return self
 end

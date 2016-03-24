@@ -172,4 +172,8 @@ function ModelUnit:getDefenseWeakList()
     return self.m_Template.defense.weak
 end
 
+function ModelUnit:canJoin(rhsUnitModel)
+    return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
+end
+
 return ModelUnit

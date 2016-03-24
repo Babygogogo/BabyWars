@@ -131,6 +131,7 @@ function ViewActionMenu:ctor(param)
         :setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 
         :setOpacity(200)
+        :setVisible(false)
 
     return self
 end

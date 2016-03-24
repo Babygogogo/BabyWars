@@ -16,9 +16,8 @@ local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapMo
         return nil
     end
 
-    local existingUnitActor = unitMapModel:getUnitActor(gridIndex)
-    -- TODO: add the unite feature.
-    if (existingUnitActor) and (existingUnitActor:getModel():getPlayerIndex() ~= unitModel:getPlayerIndex())then
+    local existingUnit = unitMapModel:getUnitActor(gridIndex)
+    if (existingUnit) and (existingUnit:getModel():getPlayerIndex() ~= unitModel:getPlayerIndex())then
         return nil
     end
 
@@ -35,6 +34,19 @@ end
 
 local function canUnitTakeAction(model, unitModel)
     return (unitModel) and (unitModel:getPlayerIndex() == model.m_PlayerIndex) and (unitModel:getState() == "idle")
+end
+
+local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
+    if (GridIndexFunctions.isEqual(unitModel:getGridIndex(), gridIndex)) then
+        return true
+    else
+        local existingUnit = unitMapModel:getUnitActor(gridIndex)
+        local existingUnitModel = existingUnit and existingUnit:getModel() or nil
+
+        return (not existingUnitModel) or
+               (existingUnitModel:canJoin(unitModel)) or
+               (existingUnitModel.canLoad and existingUnitModel:canLoad(unitModel))
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -175,28 +187,66 @@ end
 --------------------------------------------------------------------------------
 -- The set state functions.
 --------------------------------------------------------------------------------
-local function setStateIdle(self)
-    self.m_State = "idle"
-    if (self.m_View) then
-        self.m_View:setMovePathVisible(false)
-            :setReachableGridsVisible(false)
-            :setMovePathDestinationVisible(false)
+local function resetReachableGrids(self, focusUnitModel)
+    if (self.m_FocusUnitModel ~= focusUnitModel) then
+        self.m_ReachableGrids = getReachableGridsForUnit(focusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
+        if (self.m_View) then
+            self.m_View:setReachableGrids(self.m_ReachableGrids)
+        end
     end
 end
 
+local function resetMovePath(self, focusUnitModel)
+    if (self.m_FocusUnitModel ~= focusUnitModel) or (self.m_State == "idle") then
+        self.m_MovePath       = {{
+            gridIndex        = focusUnitModel:getGridIndex(),
+            rangeConsumption = 0
+        }}
+        if (self.m_View) then
+            self.m_View:setMovePath(self.m_MovePath)
+        end
+    end
+end
+
+local function setStateIdle(self)
+    self.m_State = "idle"
+    if (self.m_View) then
+        self.m_View:setReachableGridsVisible(false)
+            :setMovePathVisible(false)
+            :setMovePathDestinationVisible(false)
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
+end
+
 local function setStateMakingMovePath(self, focusUnitModel)
+    resetReachableGrids(self, focusUnitModel)
+    resetMovePath(      self, focusUnitModel)
     self.m_State          = "makingMovePath"
     self.m_FocusUnitModel = focusUnitModel
-    self.m_ReachableGrids = getReachableGridsForUnit(focusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
-    self.m_MovePath       = {{
-        gridIndex        = focusUnitModel:getGridIndex(),
-        rangeConsumption = 0
-    }}
 
     if (self.m_View) then
-        self.m_View:setReachableGrids(self.m_ReachableGrids)
-            :setReachableGridsVisible(true)
+        self.m_View:setReachableGridsVisible(true)
+            :setMovePathVisible(true)
+            :setMovePathDestinationVisible(false)
     end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerMakingMovePath"})
+end
+
+local function setStateChoosingAction(self, destination)
+    updateMovePathWithDestinationGrid(self, destination)
+    self.m_State = "choosingAction"
+
+    if (self.m_View) then
+        self.m_View:setReachableGridsVisible(false)
+            :setMovePath(self.m_MovePath)
+            :setMovePathVisible(true)
+            :setMovePathDestination(destination)
+            :setMovePathDestinationVisible(true)
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAction"})
 end
 
 --------------------------------------------------------------------------------
@@ -209,16 +259,13 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
             setStateMakingMovePath(self, unit:getModel())
         end
     elseif (self.m_State == "makingMovePath") then
-        local selectedReachableGrid = getReachableGrid(self.m_ReachableGrids, gridIndex)
-        if (not selectedReachableGrid) then
+        if (not getReachableGrid(self.m_ReachableGrids, gridIndex)) then
             setStateIdle(self)
-        else
-            updateMovePathWithDestinationGrid(self, gridIndex)
-            if (self.m_View) then
-                self.m_View:setMovePath(self.m_MovePath)
-                    :setMovePathVisible(true)
-            end
+        elseif (canUnitStayInGrid(self.m_FocusUnitModel, gridIndex, self.m_UnitMapModel)) then
+            setStateChoosingAction(self, gridIndex)
         end
+    elseif (self.m_State == "choosingAction") then
+        setStateMakingMovePath(self, self.m_FocusUnitModel)
     else
         error("ModelActionPlanner-onEvtPlayerSelectedGrid() the state of the planner is invalid.")
     end
@@ -253,7 +300,7 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    setStateIdle(self)
+    self.m_State = "idle"
 
     return self
 end

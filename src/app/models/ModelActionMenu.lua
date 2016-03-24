@@ -2,6 +2,14 @@
 local ModelActionMenu = class("ModelActionMenu")
 
 --------------------------------------------------------------------------------
+-- The callback functions on EvtActionPlannerChoosingAction.
+--------------------------------------------------------------------------------
+local function onEvtActionPlannerChoosingAction(self, event)
+    self:setEnabled(true)
+    print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAction")
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelActionMenu:ctor(param)
@@ -14,12 +22,16 @@ end
 function ModelActionMenu:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtActionPlannerIdle", self)
+        :addEventListener("EvtActionPlannerMakingMovePath", self)
+        :addEventListener("EvtActionPlannerChoosingAction", self)
 
     return self
 end
 
 function ModelActionMenu:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerIdle", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+        :removeEventListener("EvtActionPlannerMakingMovePath", self)
+        :removeEventListener("EvtActionPlannerIdle", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -27,7 +39,13 @@ end
 
 function ModelActionMenu:onEvent(event)
     if (event.name == "EvtActionPlannerIdle") then
-        print("EvtActionPlannerIdle")
+        self:setEnabled(false)
+        print("ModelActionMenu-onEvent() EvtActionPlannerIdle")
+    elseif(event.name == "EvtActionPlannerMakingMovePath") then
+        self:setEnabled(false)
+        print("ModelActionMenu-onEvent() EvtActionPlannerMakingMovePath")
+    elseif(event.name == "EvtActionPlannerChoosingAction") then
+        onEvtActionPlannerChoosingAction(self, event)
     end
 
     return self
