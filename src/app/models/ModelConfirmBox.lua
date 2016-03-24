@@ -4,6 +4,12 @@ local ModelConfirmBox = class("ModelConfirmBox")
 local Actor           = require("global.actors.Actor")
 local TypeChecker     = require("app.utilities.TypeChecker")
 
+local function createDefaultCallbackOnConfirm(self)
+    return function()
+        self:setEnabled(false)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -14,6 +20,10 @@ function ModelConfirmBox:ctor(param)
         if (param.onConfirmNo)     then self:setOnConfirmNo(param.onConfirmNo)         end
         if (param.onConfirmCancel) then self:setOnConfirmCancel(param.onConfirmCancel) end
     end
+    self.m_ConfirmText     = self.m_ConfirmText     or "Are you sure?"
+    self.m_OnConfirmYes    = self.m_OnConfirmYes    or createDefaultCallbackOnConfirm(self)
+    self.m_OnConfirmNo     = self.m_OnConfirmNo     or createDefaultCallbackOnConfirm(self)
+    self.m_OnConfirmCancel = self.m_OnConfirmCancel or createDefaultCallbackOnConfirm(self)
 
     if (self.m_View) then
         self:initView()

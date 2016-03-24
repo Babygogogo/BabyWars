@@ -251,13 +251,13 @@ function ModelActionPlanner:initView()
     return self
 end
 
-function ModelActionPlanner:setUnitMapModel(model)
+function ModelActionPlanner:setModelUnitMap(model)
     self.m_UnitMapModel = model
 
     return self
 end
 
-function ModelActionPlanner:setTileMapModel(model)
+function ModelActionPlanner:setModelTileMap(model)
     self.m_TileMapModel = model
 
     return self

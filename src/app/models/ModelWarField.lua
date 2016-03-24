@@ -49,8 +49,8 @@ local function initWithCompositionActors(model, actors)
     model.m_CursorActor        = actors.cursorActor
 
     model.m_ActionPlannerActor = actors.actionPlannerActor
-    model.m_ActionPlannerActor:getModel():setTileMapModel(model.m_TileMapActor:getModel())
-        :setUnitMapModel(model.m_UnitMapActor:getModel())
+    model.m_ActionPlannerActor:getModel():setModelTileMap(model.m_TileMapActor:getModel())
+        :setModelUnitMap(model.m_UnitMapActor:getModel())
 end
 
 --------------------------------------------------------------------------------

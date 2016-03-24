@@ -1,7 +1,12 @@
 
 local ViewSceneWarHUD = class("ViewSceneWarHUD", cc.Node)
 
-local BEGIN_TURN_EFFECT_Z_ORDER     = 2
+local CONFIRM_BOX_Z_ORDER       = 99
+local BEGIN_TURN_EFFECT_Z_ORDER = 3
+local WAR_COMMAND_MENU_Z_ORDER  = 2
+local TILE_DETAIL_Z_ORDER       = 1
+local UNIT_DETAIL_Z_ORDER       = 1
+
 local BEGIN_TURN_EFFECT_FONT_SIZE   = 40
 local BEGIN_TURN_EFFECT_LINE_HEIGHT = BEGIN_TURN_EFFECT_FONT_SIZE / 5 * 8
 
@@ -23,8 +28,6 @@ local BEGIN_TURN_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_WIDTH = math.ceil(BEGIN_TURN_EFFECT_FONT_SIZE / 15)
 
-local TILE_DETAIL_Z_ORDER = 1
-local UNIT_DETAIL_Z_ORDER = 1
 
 --------------------------------------------------------------------------------
 -- The begin turn effect.
@@ -183,6 +186,21 @@ function ViewSceneWarHUD:ctor(param)
     return self
 end
 
+function ViewSceneWarHUD:setViewConfirmBox(view)
+    if (self.m_ViewConfirmBox) then
+        if (self.m_ViewConfirmBox == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewConfirmBox)
+        end
+    end
+
+    self.m_ViewConfirmBox = view
+    self:addChild(view, CONFIRM_BOX_Z_ORDER)
+
+    return self
+end
+
 function ViewSceneWarHUD:setViewMoneyEnergyInfo(view)
     if (self.m_ViewMoneyEnergyInfo) then
         if (self.m_ViewMoneyEnergyInfo == view) then
@@ -194,6 +212,21 @@ function ViewSceneWarHUD:setViewMoneyEnergyInfo(view)
 
     self.m_ViewMoneyEnergyInfo = view
     self:addChild(view)
+
+    return self
+end
+
+function ViewSceneWarHUD:setViewWarCommandMenu(view)
+    if (self.m_ViewWarCommandMenu) then
+        if (self.m_ViewWarCommandMenu == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewWarCommandMenu)
+        end
+    end
+
+    self.m_ViewWarCommandMenu = view
+    self:addChild(view, WAR_COMMAND_MENU_Z_ORDER)
 
     return self
 end
