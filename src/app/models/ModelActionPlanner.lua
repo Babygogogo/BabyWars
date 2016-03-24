@@ -37,16 +37,6 @@ local function canUnitTakeAction(model, unitModel)
     return (unitModel) and (unitModel:getPlayerIndex() == model.m_PlayerIndex) and (unitModel:getState() == "idle")
 end
 
-local function setState(self, state)
-    if (state == "idle") then
-        self.m_State = state
-        if (self.m_View) then
-            self.m_View:hideMovePath()
-                :hideReachableGrids()
-        end
-    end
-end
-
 --------------------------------------------------------------------------------
 -- The functions for MovePath.
 --------------------------------------------------------------------------------
@@ -119,19 +109,18 @@ local function createShortestMovePathToGrid(gridIndex, reachableGrids)
     return path
 end
 
-local function updateMovePathWithDestinationGrid(gridIndex, model)
-    local focusUnitModel       = model.m_FocusUnitActor:getModel()
-    local maxRange             = getMaxRange(focusUnitModel)
-    local nextRangeConsumption = getRangeConsumption(gridIndex, focusUnitModel, model.m_UnitMapModel, model.m_TileMapModel, model.m_CurrentWeather)
+local function updateMovePathWithDestinationGrid(self, gridIndex)
+    local maxRange             = getMaxRange(self.m_FocusUnitModel)
+    local nextRangeConsumption = getRangeConsumption(gridIndex, self.m_FocusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
 
-    if (not truncateMovePathToGrid(model.m_MovePath, gridIndex)) and
-       (not extendMovePathToGrid(model.m_MovePath, gridIndex, nextRangeConsumption, maxRange)) then
-        model.m_MovePath = createShortestMovePathToGrid(gridIndex, model.m_ReachableGrids)
+    if (not truncateMovePathToGrid(self.m_MovePath, gridIndex)) and
+       (not extendMovePathToGrid(self.m_MovePath, gridIndex, nextRangeConsumption, maxRange)) then
+        self.m_MovePath = createShortestMovePathToGrid(gridIndex, self.m_ReachableGrids)
     end
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerSelectedGrid.
+-- The funcitons for ReachableGrids.
 --------------------------------------------------------------------------------
 local function updateReachableGrids(grids, gridIndex, prevGridIndex, rangeConsumption)
     local x, y = gridIndex.x, gridIndex.y
@@ -183,32 +172,55 @@ local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel, w
     return reachableGrids
 end
 
+--------------------------------------------------------------------------------
+-- The set state functions.
+--------------------------------------------------------------------------------
+local function setStateIdle(self)
+    self.m_State = "idle"
+    if (self.m_View) then
+        self.m_View:setMovePathVisible(false)
+            :setReachableGridsVisible(false)
+            :setMovePathDestinationVisible(false)
+    end
+end
+
+local function setStateMakingMovePath(self, focusUnitModel)
+    self.m_State          = "makingMovePath"
+    self.m_FocusUnitModel = focusUnitModel
+    self.m_ReachableGrids = getReachableGridsForUnit(focusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
+    self.m_MovePath       = {{
+        gridIndex        = focusUnitModel:getGridIndex(),
+        rangeConsumption = 0
+    }}
+
+    if (self.m_View) then
+        self.m_View:setReachableGrids(self.m_ReachableGrids)
+            :setReachableGridsVisible(true)
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on EvtPlayerSelectedGrid.
+--------------------------------------------------------------------------------
 local function onEvtPlayerSelectedGrid(self, gridIndex)
     if (self.m_State == "idle") then
         local unit = self.m_UnitMapModel:getUnitActor(gridIndex)
         if (unit) and (canUnitTakeAction(self, unit:getModel())) then
-            self.m_State          = "makingMovePath"
-            self.m_FocusUnitActor = unit
-            self.m_ReachableGrids = getReachableGridsForUnit(unit:getModel(), self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
-            self.m_MovePath       = {{
-                gridIndex        = unit:getModel():getGridIndex(),
-                rangeConsumption = 0
-            }}
-
-            if (self.m_View) then
-                self.m_View:showReachableGrids(self.m_ReachableGrids)
-            end
+            setStateMakingMovePath(self, unit:getModel())
         end
     elseif (self.m_State == "makingMovePath") then
         local selectedReachableGrid = getReachableGrid(self.m_ReachableGrids, gridIndex)
         if (not selectedReachableGrid) then
-            setState(self, "idle")
+            setStateIdle(self)
         else
-            updateMovePathWithDestinationGrid(gridIndex, self)
+            updateMovePathWithDestinationGrid(self, gridIndex)
             if (self.m_View) then
-                self.m_View:showMovePath(self.m_MovePath)
+                self.m_View:setMovePath(self.m_MovePath)
+                    :setMovePathVisible(true)
             end
         end
+    else
+        error("ModelActionPlanner-onEvtPlayerSelectedGrid() the state of the planner is invalid.")
     end
 end
 
@@ -217,7 +229,7 @@ end
 --------------------------------------------------------------------------------
 local function onEvtPlayerSwitched(self, playerIndex)
     self.m_PlayerIndex = playerIndex
-    setState(self, "idle")
+    setStateIdle(self)
 end
 
 --------------------------------------------------------------------------------
@@ -228,9 +240,10 @@ local function onEvtPlayerMovedCursor(model, gridIndex)
         return
     elseif (model.m_State == "makingMovePath") then
         if (getReachableGrid(model.m_ReachableGrids, gridIndex)) then
-            updateMovePathWithDestinationGrid(gridIndex, model)
+            updateMovePathWithDestinationGrid(model, gridIndex)
             if (model.m_View) then
-                model.m_View:showMovePath(model.m_MovePath)
+                model.m_View:setMovePath(model.m_MovePath)
+                    :setMovePathVisible(true)
             end
         end
     end
@@ -240,7 +253,7 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    setState(self, "idle")
+    setStateIdle(self)
 
     return self
 end

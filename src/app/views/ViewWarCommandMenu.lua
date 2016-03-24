@@ -138,21 +138,6 @@ function ViewWarCommandMenu:ctor(param)
     return self
 end
 
-function ViewWarCommandMenu:setConfirmBoxView(view)
-    if (self.m_ConfirmBoxView) then
-        if (self.m_ConfirmBoxView == view) then
-            return self
-        else
-            self:removeChild(self.m_ConfirmBoxView)
-        end
-    end
-
-    self.m_ConfirmBoxView = view
-    self:addChild(view, CONFIRM_BOX_Z_ORDER)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

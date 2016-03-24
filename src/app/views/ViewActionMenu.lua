@@ -64,6 +64,8 @@ local function createMenuBackground()
     background:ignoreAnchorPointForPosition(true)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
 
+        :setOpacity(180)
+
     return background
 end
 
@@ -123,27 +125,12 @@ end
 function ViewActionMenu:ctor(param)
     initWithMenuBackground(  self, createMenuBackground())
     initWithListView(        self, createListView())
-    initWithTouchListener(   self, createTouchListener(self))
+--    initWithTouchListener(   self, createTouchListener(self))
 
     self:ignoreAnchorPointForPosition(true)
         :setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 
         :setOpacity(200)
-
-    return self
-end
-
-function ViewActionMenu:setConfirmBoxView(view)
-    if (self.m_ConfirmBoxView) then
-        if (self.m_ConfirmBoxView == view) then
-            return self
-        else
-            self:removeChild(self.m_ConfirmBoxView)
-        end
-    end
-
-    self.m_ConfirmBoxView = view
-    self:addChild(view, CONFIRM_BOX_Z_ORDER)
 
     return self
 end
@@ -172,10 +159,10 @@ end
 function ViewActionMenu:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
-        self.m_TouchListener:setEnabled(true)
+--        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
-        self.m_TouchListener:setEnabled(false)
+--        self.m_TouchListener:setEnabled(false)
     end
 
     return self

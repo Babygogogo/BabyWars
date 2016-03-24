@@ -10,6 +10,7 @@ local function createCompositionActors(param)
     local confirmBoxActor      = Actor.createWithModelAndViewName("ModelConfirmBox",      nil, "ViewConfirmBox")
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
     local warCommandMenuActor  = Actor.createWithModelAndViewName("ModelWarCommandMenu",  nil, "ViewWarCommandMenu")
+    local actionMenuActor      = Actor.createWithModelAndViewName("ModelActionMenu",      nil, "ViewActionMenu")
     local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo",        nil, "ViewUnitInfo")
     local unitDetailActor      = Actor.createWithModelAndViewName("ModelUnitDetail",      nil, "ViewUnitDetail")
     local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
@@ -19,6 +20,7 @@ local function createCompositionActors(param)
         confirmBoxActor      = confirmBoxActor,
         moneyEnergyInfoActor = moneyEnergyInfoActor,
         warCommandMenuActor  = warCommandMenuActor,
+        actionMenuActor      = actionMenuActor,
         unitInfoActor        = unitInfoActor,
         unitDetailActor      = unitDetailActor,
         tileInfoActor        = tileInfoActor,
@@ -30,6 +32,8 @@ local function initWithCompositionActors(self, actors)
     self.m_ConfirmBoxActor     = actors.confirmBoxActor
     self.m_WarCommandMenuActor = actors.warCommandMenuActor
     self.m_WarCommandMenuActor:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
+
+    self.m_ActionMenuActor = actors.actionMenuActor
 
     self.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
     self.m_MoneyEnergyInfoActor:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
@@ -63,6 +67,7 @@ function ModelSceneWarHUD:initView()
     view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
         :setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
         :setViewWarCommandMenu( self.m_WarCommandMenuActor:getView())
+        :setViewActionMenu(     self.m_ActionMenuActor:getView())
         :setViewTileInfo(       self.m_TileInfoActor:getView())
         :setViewTileDetail(     self.m_TileDetailActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
@@ -75,6 +80,7 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelSceneWarHUD:onEnter(rootActor)
+    self.m_ActionMenuActor:onEnter(rootActor)
     self.m_WarCommandMenuActor:onEnter(rootActor)
     self.m_MoneyEnergyInfoActor:onEnter(rootActor)
     self.m_TileInfoActor:onEnter(rootActor)
@@ -84,6 +90,7 @@ function ModelSceneWarHUD:onEnter(rootActor)
 end
 
 function ModelSceneWarHUD:onCleanup(rootActor)
+    self.m_ActionMenuActor:onCleanup(rootActor)
     self.m_WarCommandMenuActor:onCleanup(rootActor)
     self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
     self.m_TileInfoActor:onCleanup(rootActor)

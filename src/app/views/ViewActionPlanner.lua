@@ -1,6 +1,10 @@
 
 local ViewActionPlanner = class("ViewActionPlanner", cc.Node)
 
+local MOVE_PATH_Z_ORDER             = 1
+local REACHABLE_GRIDS_Z_ORDER       = 0
+local MOVE_PATH_DESTINATION_Z_ORDER = 0
+
 local SPRITE_FRAME_NAME_EMPTY             = nil
 local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c03_t02_s01_f01.png"
 local SPRITE_FRAME_NAME_LINE_HORIZONTAL   = "c03_t02_s02_f01.png"
@@ -36,7 +40,7 @@ end
 
 local function initWithReachableGridsView(view, gridsView)
     view.m_ReachableGridsView = gridsView
-    view:addChild(gridsView)
+    view:addChild(gridsView, REACHABLE_GRIDS_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -114,15 +118,32 @@ end
 
 local function initWithMovePathView(view, pathView)
     view.m_MovePathView = pathView
-    view:addChild(pathView)
+    view:addChild(pathView, MOVE_PATH_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
+-- The move path destination view.
+--------------------------------------------------------------------------------
+local function createMovePathDestinationView()
+    local view = cc.Node:create()
+    view:setOpacity(160)
+        :setCascadeOpacityEnabled(true)
+
+    return view
+end
+
+local function initWithMovePathDestinationView(self, view)
+    self.m_MovePathDestinationView = view
+    self:addChild(view, MOVE_PATH_DESTINATION_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewActionPlanner:ctor(param)
-    initWithReachableGridsView(self, createReachableGridsView())
-    initWithMovePathView(      self, createMovePathView())
+    initWithReachableGridsView(     self, createReachableGridsView())
+    initWithMovePathDestinationView(self, createMovePathDestinationView())
+    initWithMovePathView(           self, createMovePathView())
 
     return self
 end
@@ -130,7 +151,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewActionPlanner:showReachableGrids(grids)
+function ViewActionPlanner:setReachableGrids(grids)
     self.m_ReachableGridsView:removeAllChildren()
 
     for x, column in pairs(grids) do
@@ -144,13 +165,13 @@ function ViewActionPlanner:showReachableGrids(grids)
     return self
 end
 
-function ViewActionPlanner:hideReachableGrids()
-    self.m_ReachableGridsView:removeAllChildren()
+function ViewActionPlanner:setReachableGridsVisible(visible)
+    self.m_ReachableGridsView:setVisible(visible)
 
     return self
 end
 
-function ViewActionPlanner:showMovePath(path)
+function ViewActionPlanner:setMovePath(path)
     self.m_MovePathView:removeAllChildren()
 
     for i = 1, #path do
@@ -166,8 +187,21 @@ function ViewActionPlanner:showMovePath(path)
     return self
 end
 
-function ViewActionPlanner:hideMovePath()
-    self.m_MovePathView:removeAllChildren()
+function ViewActionPlanner:setMovePathVisible(visible)
+    self.m_MovePathView:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setMovePathDestination(gridIndex)
+    self.m_MovePathDestinationView:removeAllChildren()
+        :addChild(createSingleReachableGridView(gridIndex))
+
+    return self
+end
+
+function ViewActionPlanner:setMovePathDestinationVisible(visible)
+    self.m_MovePathDestinationView:setVisible(visible)
 
     return self
 end

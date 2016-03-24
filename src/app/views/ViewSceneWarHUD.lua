@@ -6,6 +6,7 @@ local BEGIN_TURN_EFFECT_Z_ORDER = 3
 local WAR_COMMAND_MENU_Z_ORDER  = 2
 local TILE_DETAIL_Z_ORDER       = 1
 local UNIT_DETAIL_Z_ORDER       = 1
+local ACTION_MENU_Z_ORDER       = 0
 
 local BEGIN_TURN_EFFECT_FONT_SIZE   = 40
 local BEGIN_TURN_EFFECT_LINE_HEIGHT = BEGIN_TURN_EFFECT_FONT_SIZE / 5 * 8
@@ -142,6 +143,7 @@ local function createTouchListener(self)
 
     local function onTouchBegan(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
 
@@ -150,6 +152,7 @@ local function createTouchListener(self)
 
     local function onTouchMoved(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
     end
@@ -159,6 +162,7 @@ local function createTouchListener(self)
 
     local function onTouchEnded(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
     end
@@ -227,6 +231,21 @@ function ViewSceneWarHUD:setViewWarCommandMenu(view)
 
     self.m_ViewWarCommandMenu = view
     self:addChild(view, WAR_COMMAND_MENU_Z_ORDER)
+
+    return self
+end
+
+function ViewSceneWarHUD:setViewActionMenu(view)
+    if (self.m_ViewActionMenu) then
+        if (self.m_ViewActionMenu == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewActionMenu)
+        end
+    end
+
+    self.m_ViewActionMenu = view
+    self:addChild(view, ACTION_MENU_Z_ORDER)
 
     return self
 end
