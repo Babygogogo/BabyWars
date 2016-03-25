@@ -2086,7 +2086,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name            = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon   = nil,
                 secondaryWeapon = {
                     name        = "Machine gun",
@@ -2152,7 +2156,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name = "Barzooka",
                     baseDamage  = {
@@ -2249,7 +2257,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name            = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon   = nil,
                 secondaryWeapon = {
                     name        = "Machine gun",
@@ -2316,7 +2328,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2413,7 +2429,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2512,7 +2532,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2644,7 +2668,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 2,
+                maxAttackRange     = 3,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name       = "Cannon",
                     baseDamage = {
@@ -2713,7 +2741,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 5,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Rockets",
                     baseDamage  = {
@@ -2782,7 +2814,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Vulcan",
                     baseDamage  = {
@@ -2851,7 +2887,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 6,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -2919,7 +2959,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -2988,7 +3032,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Bombs",
                     baseDamage  = {
@@ -3057,7 +3105,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -3187,7 +3239,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 6,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -3256,7 +3312,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -3387,7 +3447,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Torpedoes",
                     baseDamage  = {

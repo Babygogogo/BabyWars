@@ -19,13 +19,16 @@ local DEFENSE_INFO_POSITION_X = 10
 local DEFENSE_INFO_POSITION_Y = 40
 local CAPTURE_INFO_POSITION_X = DEFENSE_INFO_POSITION_X
 local CAPTURE_INFO_POSITION_Y = 10
+local HP_INFO_POSITION_X      = DEFENSE_INFO_POSITION_X
+local HP_INFO_POSITION_Y      = 10
 
 --------------------------------------------------------------------------------
 -- Util functions.
 --------------------------------------------------------------------------------
-local function createLabel()
+local function createLabel(posX, posY)
     local label = cc.Label:createWithTTF("0", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
 
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0, g = 0, b = 0}, 2)
@@ -114,16 +117,9 @@ local function createDefenseInfoIcon()
     return icon
 end
 
-local function createDefenseInfoLabel()
-    local label = createLabel()
-    label:setPosition(30, -5)
-
-    return label
-end
-
 local function createDefenseInfo()
     local icon  = createDefenseInfoIcon()
-    local label = createDefenseInfoLabel()
+    local label = createLabel(30, -5)
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -168,16 +164,9 @@ local function createCaptureInfoIcon()
     return icon
 end
 
-local function createCaptureInfoLabel()
-    local label = createLabel()
-    label:setPosition(30, -4)
-
-    return label
-end
-
 local function createCaptureInfo()
     local icon  = createCaptureInfoIcon()
-    local label = createCaptureInfoLabel()
+    local label = createLabel(30, -4)
 
     local info = cc.Node:create()
     info:setCascadeOpacityEnabled(true)
@@ -216,6 +205,57 @@ local function updateCaptureInfoWithModelTile(info, tile)
 end
 
 --------------------------------------------------------------------------------
+-- The HP infomation.
+--------------------------------------------------------------------------------
+local function createHPInfoIcon()
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(2, 2)
+
+        :setScale(ICON_SCALE)
+
+    return icon
+end
+
+local function createHPInfo()
+    local icon  = createHPInfoIcon()
+    local label = createLabel(31, -4)
+
+    local info = cc.Node:create()
+    info:setCascadeOpacityEnabled(true)
+        :setPosition(HP_INFO_POSITION_X, HP_INFO_POSITION_Y)
+
+        :addChild(icon)
+        :addChild(label)
+
+    info.m_Inco  = icon
+    info.m_Label = label
+
+    return info
+end
+
+local function initWithHPInfo(view, info)
+    view.m_HPInfo = info
+    view:addChild(info)
+end
+
+local function updateHPInfoWithModelTile(info, tile)
+    if (not tile.getCurrentHP) then
+        info:setVisible(false)
+    else
+        local hp = tile:getCurrentHP()
+        if (hp < 10) then
+            info.m_Label:setString("  " .. hp)
+        else
+            info.m_Label:setString(""   .. hp)
+        end
+
+        info:setVisible(true)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The contructor.
 --------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
@@ -223,6 +263,7 @@ function ViewTileInfo:ctor(param)
     initWithIcon(       self, createIcon())
     initWithDefenseInfo(self, createDefenseInfo())
     initWithCaptureInfo(self, createCaptureInfo())
+    initWithHPInfo(     self, createHPInfo())
 
     self:ignoreAnchorPointForPosition(true)
 
@@ -251,9 +292,10 @@ function ViewTileInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewTileInfo:updateWithModelTile(model)
-    updateIconWithModelTile(self.m_Icon, model)
+    updateIconWithModelTile(       self.m_Icon,        model)
     updateCaptureInfoWithModelTile(self.m_CaptureInfo, model)
     updateDefenseInfoWithModelTile(self.m_DefenseInfo, model)
+    updateHPInfoWithModelTile(     self.m_HPInfo,      model)
 
     return self
 end

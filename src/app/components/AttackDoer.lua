@@ -3,6 +3,7 @@ local AttackDoer = class("AttackDoer")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",
@@ -18,6 +19,8 @@ local EXPORTED_METHODS = {
     "getSecondaryWeaponStrongList",
 
     "canAttackTarget",
+    "getAttackRangeMinMax",
+    "canAttackAfterMove",
 }
 
 local function initPrimaryWeapon(self, param)
@@ -50,6 +53,17 @@ function AttackDoer:ctor(param)
 end
 
 function AttackDoer:load(param)
+    self.m_MinAttackRange = param.minAttackRange or self.m_MinAttackRange
+    assert(self.m_MinAttackRange, "AttackDoer:load() failed to load the min attack range.")
+
+    self.m_MaxAttackRange = param.maxAttackRange or self.m_MaxAttackRange
+    assert(self.m_MaxAttackRange, "AttackDoer:load() failed to load the max attack range.")
+
+    if (param.canAttackAfterMove ~= nil) then
+        self.m_CanAttackAfterMove = param.canAttackAfterMove
+    end
+    assert(self.m_CanAttackAfterMove ~= nil, "AttackDoer:load() failed to load the attribute 'canAttackAfterMove'.")
+
     if (param.primaryWeapon) then
         initPrimaryWeapon(self, param.primaryWeapon)
     end
@@ -126,7 +140,43 @@ function AttackDoer:getSecondaryWeaponStrongList()
 end
 
 function AttackDoer:canAttackTarget(targetModel)
+    if (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex()) then
+        return false
+    end
 
+    if (not targetModel.getDefenseType) then
+        return false
+    end
+
+    local distance = GridIndexFunctions.getDistance(self.m_Target:getGridIndex(), targetModel:getGridIndex())
+    if (distance < self.m_MinAttackRange) or (distance > self.m_MaxAttackRange) then
+        return false
+    end
+
+    local defenseType = targetModel:getDefenseType()
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        local baseDamage = self.m_PrimaryWeapon.m_Template.baseDamage[defenseType]
+        if (baseDamage) then
+            return true, baseDamage
+        end
+    end
+
+    if (self:hasSecondaryWeapon()) then
+        local baseDamage = self.m_SecondaryWeapon.m_Template.baseDamage[defenseType]
+        if (baseDamage) then
+            return true, baseDamage
+        end
+    end
+
+    return false
+end
+
+function AttackDoer:getAttackRangeMinMax()
+    return self.m_MinAttackRange, self.m_MaxAttackRange
+end
+
+function AttackDoer:canAttackAfterMove()
+    return self.m_CanAttackAfterMove
 end
 
 return AttackDoer

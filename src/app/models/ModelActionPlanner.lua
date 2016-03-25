@@ -72,7 +72,14 @@ local function getActionJoin(self, destination)
 end
 
 local function getActionAttack(self, destination)
-
+    local focusUnitModel  = self.m_FocusUnitModel
+    local canAttackTarget = focusUnitModel.canAttackTarget
+    if (not canAttackTarget) or
+       ((not focusUnitModel:canAttackAfterMove()) and (#self.m_MovePath ~= 1)) then
+        return nil
+    else
+        -- TODO: Collect the target in range and check if the focus unit can attack them.
+    end
 end
 
 local function getActionWait(self, destination)

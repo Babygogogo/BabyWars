@@ -77,4 +77,9 @@ function GridIndexFunctions.getAdjacentDirection(index1, index2)
     return "invalid"
 end
 
+function GridIndexFunctions.getDistance(index1, index2)
+    local offset = GridIndexFunctions.sub(index1, index2)
+    return math.abs(offset.x) + math.abs(offset.y)
+end
+
 return GridIndexFunctions
