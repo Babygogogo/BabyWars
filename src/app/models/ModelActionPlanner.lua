@@ -32,6 +32,11 @@ local function getReachableGrid(grids, gridIndex)
     end
 end
 
+local function getUnitModel(unitMapModel, gridIndex)
+    local unitActor = unitMapModel:getUnitActor(gridIndex)
+    return unitActor and unitActor:getModel() or nil
+end
+
 local function canUnitTakeAction(model, unitModel)
     return (unitModel) and (unitModel:getPlayerIndex() == model.m_PlayerIndex) and (unitModel:getState() == "idle")
 end
@@ -40,13 +45,61 @@ local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
     if (GridIndexFunctions.isEqual(unitModel:getGridIndex(), gridIndex)) then
         return true
     else
-        local existingUnit = unitMapModel:getUnitActor(gridIndex)
-        local existingUnitModel = existingUnit and existingUnit:getModel() or nil
-
+        local existingUnitModel = getUnitModel(unitMapModel, gridIndex)
         return (not existingUnitModel) or
                (existingUnitModel:canJoin(unitModel)) or
                (existingUnitModel.canLoad and existingUnitModel:canLoad(unitModel))
     end
+end
+
+--------------------------------------------------------------------------------
+-- The functions for avaliable action list.
+--------------------------------------------------------------------------------
+local function getActionJoin(self, destination)
+    if (not GridIndexFunctions.isEqual(self.m_FocusUnitModel:getGridIndex(), destination)) then
+        local existingUnitModel = getUnitModel(self.m_UnitMapModel, destination)
+        if (existingUnitModel and existingUnitModel:canJoin(self.m_FocusUnitModel)) then
+            return {
+                name     = "Join",
+                callback = function()
+                    print("The Join action is selected, but not implemented.")
+                end
+            }
+        end
+    else
+        return nil
+    end
+end
+
+local function getActionAttack(self, destination)
+
+end
+
+local function getActionWait(self, destination)
+    local existingUnitModel = getUnitModel(self.m_UnitMapModel, destination)
+    if (not existingUnitModel) or (self.m_FocusUnitModel == existingUnitModel) then
+        return {
+            name = "Wait",
+            callback = function()
+                print("The Wait action is selected, but not implemented.")
+            end
+        }
+    else
+        return nil
+    end
+end
+
+local function getAvaliableActionList(self, destination)
+    local actionJoin = getActionJoin(self, destination)
+    if (actionJoin) then
+        return {actionJoin}
+    end
+
+    local list = {}
+    list[#list + 1] = getActionWait(self, destination)
+
+    assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
+    return list
 end
 
 --------------------------------------------------------------------------------
@@ -131,6 +184,18 @@ local function updateMovePathWithDestinationGrid(self, gridIndex)
     end
 end
 
+local function resetMovePath(self, focusUnitModel)
+    if (self.m_FocusUnitModel ~= focusUnitModel) or (self.m_State == "idle") then
+        self.m_MovePath       = {{
+            gridIndex        = focusUnitModel:getGridIndex(),
+            rangeConsumption = 0
+        }}
+        if (self.m_View) then
+            self.m_View:setMovePath(self.m_MovePath)
+        end
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The funcitons for ReachableGrids.
 --------------------------------------------------------------------------------
@@ -184,9 +249,6 @@ local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel, w
     return reachableGrids
 end
 
---------------------------------------------------------------------------------
--- The set state functions.
---------------------------------------------------------------------------------
 local function resetReachableGrids(self, focusUnitModel)
     if (self.m_FocusUnitModel ~= focusUnitModel) then
         self.m_ReachableGrids = getReachableGridsForUnit(focusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
@@ -196,18 +258,9 @@ local function resetReachableGrids(self, focusUnitModel)
     end
 end
 
-local function resetMovePath(self, focusUnitModel)
-    if (self.m_FocusUnitModel ~= focusUnitModel) or (self.m_State == "idle") then
-        self.m_MovePath       = {{
-            gridIndex        = focusUnitModel:getGridIndex(),
-            rangeConsumption = 0
-        }}
-        if (self.m_View) then
-            self.m_View:setMovePath(self.m_MovePath)
-        end
-    end
-end
-
+--------------------------------------------------------------------------------
+-- The set state functions.
+--------------------------------------------------------------------------------
 local function setStateIdle(self)
     self.m_State = "idle"
     if (self.m_View) then
@@ -246,7 +299,7 @@ local function setStateChoosingAction(self, destination)
             :setMovePathDestinationVisible(true)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAction"})
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAction", list = getAvaliableActionList(self, destination)})
 end
 
 --------------------------------------------------------------------------------

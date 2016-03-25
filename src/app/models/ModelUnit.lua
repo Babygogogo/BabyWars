@@ -63,7 +63,7 @@ local function initWithTiledID(model, tiledID)
     initWithFuelData(model, template.fuel)
 
     ComponentManager.unbindAllComponents(model)
-    ComponentManager.bindComponent(model, "GridIndexable", "HPOwner")
+    ComponentManager.bindComponent(model, "GridIndexable", "AttackTaker")
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do

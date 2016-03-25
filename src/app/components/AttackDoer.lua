@@ -16,15 +16,17 @@ local EXPORTED_METHODS = {
     "getSecondaryWeaponName",
     "getSecondaryWeaponFatalList",
     "getSecondaryWeaponStrongList",
+
+    "canAttackTarget",
 }
 
-local function initPrimaryWeapon(doer, param)
-    if (doer.m_PrimaryWeapon) then
-        doer.m_PrimaryWeapon.m_CurrentAmmo = param.currentAmmo
+local function initPrimaryWeapon(self, param)
+    if (self.m_PrimaryWeapon) then
+        self.m_PrimaryWeapon.m_CurrentAmmo = param.currentAmmo
     else
-        doer.m_PrimaryWeapon = {}
+        self.m_PrimaryWeapon = {}
 
-        local weapon = doer.m_PrimaryWeapon
+        local weapon = self.m_PrimaryWeapon
         weapon.m_Template    = param
         weapon.m_CurrentAmmo = param.maxAmmo
     end
@@ -59,9 +61,9 @@ function AttackDoer:load(param)
 end
 
 function AttackDoer:bind(target)
-	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
 
-	self.m_Target = target
+    self.m_Target = target
 end
 
 function AttackDoer:unbind(target)
@@ -121,6 +123,10 @@ end
 function AttackDoer:getSecondaryWeaponStrongList()
     assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponStrongList() the attack doer has no secondary weapon.")
     return self.m_SecondaryWeapon.m_Template.strong
+end
+
+function AttackDoer:canAttackTarget(targetModel)
+
 end
 
 return AttackDoer

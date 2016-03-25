@@ -5,8 +5,16 @@ local ModelActionMenu = class("ModelActionMenu")
 -- The callback functions on EvtActionPlannerChoosingAction.
 --------------------------------------------------------------------------------
 local function onEvtActionPlannerChoosingAction(self, event)
-    self:setEnabled(true)
     print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAction")
+    self:setEnabled(true)
+
+    local view = self.m_View
+    if (view) then
+        view:removeAllItems()
+        for _, item in ipairs(event.list) do
+            view:createAndPushBackItemView(item)
+        end
+    end
 end
 
 --------------------------------------------------------------------------------

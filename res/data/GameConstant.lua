@@ -1130,6 +1130,8 @@ GameConstant.unitCatagory = {
 }
 
 GameConstant.maxCapturePoint = 20
+GameConstant.unitMaxHP       = 100
+GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
 
 GameConstant.Mapping_IdToTemplateModelTile = {
@@ -1951,6 +1953,15 @@ GameConstant.Mapping_IdToTemplateModelTile = {
         },
 
         description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+
+        specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.tileMaxHP,
+                defenseType      = "mdtank",
+                isAffectedByLuck = false,
+            },
+        },
     },
 
     silo = {
@@ -2106,6 +2117,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "infantry",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2196,6 +2213,13 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "mech",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
@@ -2256,6 +2280,13 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "recon",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
@@ -2346,6 +2377,13 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "tank",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
@@ -2438,6 +2476,13 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "mdtank",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
@@ -2530,6 +2575,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "neotank",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2558,6 +2609,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "apc",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2620,6 +2677,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 9,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "artillery",
+                isAffectedByLuck = true,
             },
         },
     },
@@ -2684,6 +2747,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "rockets",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2747,6 +2816,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "antiair",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2808,6 +2883,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 6,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "missiles",
+                isAffectedByLuck = true,
             },
         },
     },
@@ -2872,6 +2953,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "fighter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -2934,6 +3021,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 9,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "bomber",
+                isAffectedByLuck = true,
             },
         },
     },
@@ -3026,6 +3119,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "bcopter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -3054,6 +3153,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "T copters can transport both infantry and mech units.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "tcopter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -3115,6 +3220,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 9,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "battleship",
+                isAffectedByLuck = true,
             },
         },
     },
@@ -3207,6 +3318,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "cruiser",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -3235,6 +3352,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "lander",
+                isAffectedByLuck = true,
+            },
         },
     },
 
@@ -3297,6 +3420,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 6,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "submarine",
+                isAffectedByLuck = true,
             },
         },
     },

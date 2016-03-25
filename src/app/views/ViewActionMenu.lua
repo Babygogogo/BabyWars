@@ -14,10 +14,9 @@ local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
 local LIST_POSITION_X = 5
 local LIST_POSITION_Y = 6
 
-local BUTTON_WIDTH  = MENU_BACKGROUND_WIDTH - 10
-local BUTTON_HEIGHT = 45
-
-local CONFIRM_BOX_Z_ORDER = 99
+local FONT_SIZE     = 25
+local BUTTON_WIDTH  = MENU_BACKGROUND_WIDTH - 15
+local BUTTON_HEIGHT = FONT_SIZE / 5 * 8
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -35,13 +34,13 @@ local function createItemView(itemModel)
         :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(25)
         :setTitleColor({r = 255, g = 255, b = 255})
-        :setTitleText(itemModel:getTitleText())
+        :setTitleText(itemModel.name)
 
     view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
 
     view:addTouchEventListener(function(sender, eventType)
         if eventType == ccui.TouchEventType.ended then
-            itemModel:onPlayerTouch()
+            itemModel.callback()
         end
     end)
 
@@ -64,7 +63,7 @@ local function createMenuBackground()
     background:ignoreAnchorPointForPosition(true)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
 
-        :setOpacity(180)
+        :setOpacity(200)
 
     return background
 end
