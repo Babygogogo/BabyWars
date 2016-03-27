@@ -23,9 +23,10 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 -- The reachable grids view.
 --------------------------------------------------------------------------------
 local function createSingleReachableGridView(gridIndex)
-    local view = cc.Sprite:createWithSpriteFrameName("c03_t03_s01_f01.png")
+    local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
         :setPosition(GridIndexFunctions.toPosition(gridIndex))
+        :playAnimationForever(display.getAnimationCache("ReachableGrid"))
 
     return view
 end
