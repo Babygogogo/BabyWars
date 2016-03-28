@@ -45,7 +45,7 @@ local function createEndTurnItem(model)
             :setOnConfirmYes(function()
                 model.m_ConfirmBoxModel:setEnabled(false)
                 model:setEnabled(false)
-                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerRequestEndTurn"})
+                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerRequestDoAction", actionName = "EndTurn"})
             end)
 
             :setEnabled(true)

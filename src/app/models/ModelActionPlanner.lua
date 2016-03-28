@@ -268,7 +268,11 @@ local function getActionWait(self, destination)
         return {
             name = "Wait",
             callback = function()
-                print("The Wait action is selected, but not implemented.")
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name       = "EvtPlayerRequestDoAction",
+                    actionName = "Wait",
+                    path       = self.m_MovePath,
+                })
             end
         }
     else

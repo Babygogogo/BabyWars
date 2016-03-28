@@ -1,9 +1,16 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local Actor       = require("global.actors.Actor")
-local TypeChecker = require("app.utilities.TypeChecker")
+local isServer = true
 
+local Actor            = require("global.actors.Actor")
+local TypeChecker      = require("app.utilities.TypeChecker")
+local ActionTranslator = require("app.utilities.ActionTranslator")
+local ActionExecutor   = require("app.utilities.ActionExecutor")
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function createNodeEventHandler(model, rootActor)
     return function(event)
         if (event == "enter") then
@@ -26,6 +33,31 @@ local function requireSceneData(param)
         error("ModelSceneWar-requireSceneData() the param is invalid.")
     end
 end
+
+--------------------------------------------------------------------------------
+-- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
+--------------------------------------------------------------------------------
+local function onEvtSystemRequestDoAction(self, event)
+    ActionExecutor.execute(event, self)
+end
+
+local function onEvtPlayerRequestDoAction(self, event)
+    local requestedAction = event
+    requestedAction.playerID = self:getCurrentPlayerID() -- This should be replaced by the ID of the logged in player.
+
+    if (isServer) then
+        local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)
+        if (not translatedAction) then
+            print("ModelSceneWar-onEvtPlayerRequestDoAction() action translation failed: " .. (translateMsg or ""))
+        else
+            onEvtSystemRequestDoAction(self, translatedAction)
+            -- TODO: send the translatedAction to clients.
+        end
+    else
+        -- TODO: send the requestedAction to the server.
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The script event dispatcher.
 --------------------------------------------------------------------------------
@@ -47,12 +79,15 @@ local function createCompositionActors(sceneData)
     local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
     assert(hudActor, "SceneWar--createCompositionActors() failed to create a HUD actor.")
 
-    return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
+    return {
+        warFieldActor    = warFieldActor,
+        sceneWarHUDActor = hudActor,
+    }
 end
 
-local function initWithCompositionActors(model, actors)
-    model.m_WarFieldActor    = actors.warFieldActor
-    model.m_SceneWarHUDActor = actors.sceneWarHUDActor
+local function initWithCompositionActors(self, actors)
+    self.m_WarFieldActor    = actors.warFieldActor
+    self.m_SceneWarHUDActor = actors.sceneWarHUDActor
 end
 
 --------------------------------------------------------------------------------
@@ -84,20 +119,23 @@ local function initTurn(model, turn)
     }
 end
 
-local function runTurn(model)
-    local turn = model.m_Turn
-
+local function runTurn(self, nextWeather)
+    local turn = self.m_Turn
     if (turn.m_TurnPhase == "end") then
-        -- TODO: Change state for units, weather, vision and so on.
+        if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
+            self.m_Weather.m_CurrentWeather = nextWeather
+            self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = nextWeather})
+        end
 
+        -- TODO: Change state for units, vision and so on.
         turn.m_TurnPhase = "standby"
-        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
+        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, self.m_Players)
     end
 
-    local player = model.m_Players[turn.m_PlayerIndex]
-    model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
+    local player = self.m_Players[turn.m_PlayerIndex]
+    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
 
-    model.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
+    self.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
         if (turn.m_TurnPhase == "standby") then
             -- TODO: Add fund, repair units, destroy units that run out of fuel.
             turn.m_TurnPhase = "main"
@@ -107,14 +145,6 @@ local function runTurn(model)
             error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
         end
     end)
-end
-
-local function endTurn(model)
-    local turn = model.m_Turn
-    assert(turn.m_TurnPhase == "main", "ModelSceneWar-endTurn() the turn phase is expected to be 'main'.")
-
-    turn.m_TurnPhase = "end"
-    runTurn(model)
 end
 
 --------------------------------------------------------------------------------
@@ -192,7 +222,8 @@ end
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
 
-    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestEndTurn", self)
+    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtSystemRequestDoAction", self)
 
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
@@ -211,7 +242,8 @@ end
 function ModelSceneWar:onCleanup(rootActor)
     print("ModelSceneWar:onCleanup()")
 
-    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerRequestEndTurn", self)
+    self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
+        :removeEventListener("EvtPlayerRequestDoAction", self)
 
     self.m_SceneWarHUDActor:onCleanup(rootActor)
     self.m_WarFieldActor:onCleanup(rootActor)
@@ -220,11 +252,36 @@ function ModelSceneWar:onCleanup(rootActor)
 end
 
 function ModelSceneWar:onEvent(event)
-    if (event.name == "EvtPlayerRequestEndTurn") then
-        endTurn(self)
+    if (event.name == "EvtPlayerRequestDoAction") then
+        onEvtPlayerRequestDoAction(self, event)
+    elseif (event.name == "EvtSystemRequestDoAction") then
+        onEvtSystemRequestDoAction(self, event)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions that should only be called by ActionTranslator.
+--------------------------------------------------------------------------------
+function ModelSceneWar:getNextWeather()
+    -- TODO: add code to do the real work.
+    return "clear"
+end
+
+function ModelSceneWar:getCurrentTurnPhase()
+    return self.m_Turn.m_TurnPhase
+end
+
+--------------------------------------------------------------------------------
+-- The functions that should only be called by ActionExecutor.
+--------------------------------------------------------------------------------
+function ModelSceneWar:endTurn(nextWeather)
+    local turn = self.m_Turn
+    assert(turn.m_TurnPhase == "main", "ModelSceneWar:endTurn() the turn phase is expected to be 'main'.")
+
+    turn.m_TurnPhase = "end"
+    runTurn(self, nextWeather)
 end
 
 --------------------------------------------------------------------------------
@@ -232,6 +289,10 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
+end
+
+function ModelSceneWar:getCurrentPlayerID()
+    return self.m_Players[self.m_Turn.m_PlayerIndex].m_ID
 end
 
 return ModelSceneWar
