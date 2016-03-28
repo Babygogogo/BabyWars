@@ -32,12 +32,14 @@ function ModelActionMenu:onEnter(rootActor)
     self.m_RootScriptEventDispatcher:addEventListener("EvtActionPlannerIdle", self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
+        :addEventListener("EvtActionPlannerChoosingAttackTarget", self)
 
     return self
 end
 
 function ModelActionMenu:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAttackTarget", self)
+        :removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle", self)
     self.m_RootScriptEventDispatcher = nil
@@ -49,11 +51,14 @@ function ModelActionMenu:onEvent(event)
     if (event.name == "EvtActionPlannerIdle") then
         self:setEnabled(false)
         print("ModelActionMenu-onEvent() EvtActionPlannerIdle")
-    elseif(event.name == "EvtActionPlannerMakingMovePath") then
+    elseif (event.name == "EvtActionPlannerMakingMovePath") then
         self:setEnabled(false)
         print("ModelActionMenu-onEvent() EvtActionPlannerMakingMovePath")
-    elseif(event.name == "EvtActionPlannerChoosingAction") then
+    elseif (event.name == "EvtActionPlannerChoosingAction") then
         onEvtActionPlannerChoosingAction(self, event)
+    elseif (event.name == "EvtActionPlannerChoosingAttackTarget") then
+        print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAttackTarget")
+        self:setEnabled(false)
     end
 
     return self

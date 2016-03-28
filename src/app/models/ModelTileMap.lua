@@ -144,4 +144,9 @@ function ModelTileMap:getTileActor(gridIndex)
     end
 end
 
+function ModelTileMap:getTileModel(gridIndex)
+    local tileActor = self:getTileActor(gridIndex)
+    return tileActor and tileActor:getModel() or nil
+end
+
 return ModelTileMap

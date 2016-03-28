@@ -162,4 +162,9 @@ function ModelUnitMap:getUnitActor(gridIndex)
     end
 end
 
+function ModelUnitMap:getUnitModel(gridIndex)
+    local unitActor = self:getUnitActor(gridIndex)
+    return unitActor and unitActor:getModel() or nil
+end
+
 return ModelUnitMap

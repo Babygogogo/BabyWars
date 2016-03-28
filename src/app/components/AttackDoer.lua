@@ -139,16 +139,14 @@ function AttackDoer:getSecondaryWeaponStrongList()
     return self.m_SecondaryWeapon.m_Template.strong
 end
 
-function AttackDoer:canAttackTarget(targetModel)
-    if (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex()) then
+function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
+    if (not targetModel) or
+       (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex()) or
+       (not targetModel.getDefenseType) then
         return false
     end
 
-    if (not targetModel.getDefenseType) then
-        return false
-    end
-
-    local distance = GridIndexFunctions.getDistance(self.m_Target:getGridIndex(), targetModel:getGridIndex())
+    local distance = GridIndexFunctions.getDistance(selfGridIndex or self.m_Target:getGridIndex(), targetModel:getGridIndex())
     if (distance < self.m_MinAttackRange) or (distance > self.m_MaxAttackRange) then
         return false
     end

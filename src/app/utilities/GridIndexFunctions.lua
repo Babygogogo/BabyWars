@@ -3,10 +3,10 @@ local GridIndexFunctions = {}
 
 local GRID_SIZE = require("res.data.GameConstant").GridSize
 local ADJACENT_GRIDS_OFFSET = {
-    {x = -1, y =  0, direction = "left"},
-    {x =  1, y =  0, direction = "right"},
-    {x =  0, y = -1, direction = "down"},
-    {x =  0, y =  1, direction = "up"}
+    {x = -1, y =  0, direction = "left",  clockwiseOffset = {x =  1, y =  1},},
+    {x =  1, y =  0, direction = "right", clockwiseOffset = {x = -1, y = -1},},
+    {x =  0, y = -1, direction = "down",  clockwiseOffset = {x = -1, y =  1},},
+    {x =  0, y =  1, direction = "up",    clockwiseOffset = {x =  1, y = -1},},
 }
 
 function GridIndexFunctions.toGridIndex(pos)
@@ -52,6 +52,10 @@ function GridIndexFunctions.sub(index1, index2)
     return {x = index1.x - index2.x, y = index1.y - index2.y}
 end
 
+function GridIndexFunctions.scale(index, scale)
+    return {x = index.x * scale, y = index.y * scale}
+end
+
 function GridIndexFunctions.getAdjacentGrids(index)
     local grids = {}
     for _, offset in ipairs(ADJACENT_GRIDS_OFFSET) do
@@ -80,6 +84,23 @@ end
 function GridIndexFunctions.getDistance(index1, index2)
     local offset = GridIndexFunctions.sub(index1, index2)
     return math.abs(offset.x) + math.abs(offset.y)
+end
+
+function GridIndexFunctions.getGridsWithinDistance(origin, minDistance, maxDistance, predicate)
+    local grids = {}
+    for distance = minDistance, maxDistance do
+        for _, offsetItem in ipairs(ADJACENT_GRIDS_OFFSET) do
+            local gridIndex = GridIndexFunctions.add(origin, GridIndexFunctions.sub(GridIndexFunctions.scale(offsetItem, distance), offsetItem.clockwiseOffset))
+            for i = 1, distance do
+                gridIndex = GridIndexFunctions.add(gridIndex, offsetItem.clockwiseOffset)
+                if (not predicate) or (predicate(gridIndex)) then
+                    grids[#grids + 1] = gridIndex
+                end
+            end
+        end
+    end
+
+    return grids
 end
 
 return GridIndexFunctions
