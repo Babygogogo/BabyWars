@@ -6,33 +6,55 @@ local ComponentManager   = require("global.components.ComponentManager")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
-	"getGridIndex",
-	"setGridIndex",
+    "getGridIndex",
+    "setGridIndex",
     "setViewPositionWithGridIndex"
 }
 
-local function init_(component)
-    component.m_Target = nil
-    component.m_GridIndex = {}
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
+--------------------------------------------------------------------------------
+function GridIndexable:ctor(param)
+    self.m_GridIndex = {x = 1, y = 1}
+    if (param) then
+        self:load(param)
+    end
+
+    return self
 end
 
-function GridIndexable:bind(target)
-	init_(self)
-	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+function GridIndexable:load(param)
+    self:setGridIndex(param)
 
-	self.m_Target = target
+    return self
 end
 
-function GridIndexable:unbind(target)
-    assert(self.m_Target == target , "GridIndexable:unbind() the component is not bind to the parameter target")
-    assert(self.m_Target, "GridIndexable:unbind() the component is not bind to any target.")
+--------------------------------------------------------------------------------
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function GridIndexable:onBind(target)
+    assert(self.m_Target == nil, "GridIndexable:onBind() the GridIndexable has already bound a target.")
+
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+    self.m_Target = target
+
+    return self
+end
+
+function GridIndexable:onUnbind()
+    assert(self.m_Target, "GridIndexable:unbind() the component has not bound a target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    init_(self)
+    self.m_Target = nil
+
+    return self
 end
 
+--------------------------------------------------------------------------------
+-- The exported functions.
+--------------------------------------------------------------------------------
 function GridIndexable:getGridIndex()
-	return self.m_GridIndex
+    return self.m_GridIndex
 end
 
 -- This function also sets the position of the view.

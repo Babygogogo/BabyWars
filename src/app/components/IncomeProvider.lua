@@ -8,6 +8,9 @@ local EXPORTED_METHODS = {
     "getIncomeAmount"
 }
 
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
+--------------------------------------------------------------------------------
 function IncomeProvider:ctor(param)
     if (param) then
         self:load(param)
@@ -21,22 +24,29 @@ function IncomeProvider:load(param)
     return self
 end
 
-function IncomeProvider:bind(target)
-	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+--------------------------------------------------------------------------------
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function IncomeProvider:onBind(target)
+    assert(self.m_Target == nil, "IncomeProvider:onBind() the component has already bound a target.")
 
-	self.m_Target = target
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+    self.m_Target = target
+
+    return self
 end
 
-function IncomeProvider:unbind(target)
-    assert(self.m_Target == target , "IncomeProvider:unbind() the component is not bind to the parameter target")
-    assert(self.m_Target, "IncomeProvider:unbind() the component is not bind to any target.")
+function IncomeProvider:onUnbind()
+    assert(self.m_Target ~= nil, "IncomeProvider:onUnbind() the component has not bound to a target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
 end
 
 --------------------------------------------------------------------------------
--- Exported methods.
+-- The exported functions.
 --------------------------------------------------------------------------------
 function IncomeProvider:getIncomeAmount()
     return self.m_IncomeAmount

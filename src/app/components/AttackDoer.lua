@@ -44,6 +44,9 @@ local function initSecondaryWeapon(doer, param)
     end
 end
 
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
+--------------------------------------------------------------------------------
 function AttackDoer:ctor(param)
     if (param) then
         self:load(param)
@@ -74,18 +77,25 @@ function AttackDoer:load(param)
     return self
 end
 
-function AttackDoer:bind(target)
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+--------------------------------------------------------------------------------
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function AttackDoer:onBind(target)
+    assert(self.m_Target == nil, "AttackDoer:onBind() the component has already bound a target.")
 
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
     self.m_Target = target
+
+    return self
 end
 
-function AttackDoer:unbind(target)
-    assert(self.m_Target == target , "AttackDoer:unbind() the component is not bind to the param target.")
-    assert(self.m_Target, "AttackDoer:unbind() the component is not bind to any target.")
+function AttackDoer:onUnbind()
+    assert(self.m_Target ~= nil, "AttackDoer:onUnbind() the component has not bound a target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
 end
 
 --------------------------------------------------------------------------------

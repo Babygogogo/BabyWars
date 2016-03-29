@@ -42,22 +42,29 @@ function AttackTaker:load(param)
     return self
 end
 
-function AttackTaker:bind(target)
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+--------------------------------------------------------------------------------
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function AttackTaker:onBind(target)
+    assert(self.m_Target == nil, "AttackTaker:onBind() the component has already bound a target.")
 
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
     self.m_Target = target
+
+    return self
 end
 
-function AttackTaker:unbind(target)
-    assert(self.m_Target == target , "AttackTaker:unbind() the component is not bind to the param target.")
-    assert(self.m_Target, "AttackTaker:unbind() the component is not bind to any target.")
+function AttackTaker:onUnbind()
+    assert(self.m_Target ~= nil, "AttackTaker:onUnbind() the component has not bound a target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
 end
 
 --------------------------------------------------------------------------------
--- Exported methods.
+-- The exported functions.
 --------------------------------------------------------------------------------
 function AttackTaker:getCurrentHP()
     return self.m_CurrentHP
