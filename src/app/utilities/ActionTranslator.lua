@@ -2,11 +2,14 @@
 local ActionTranslator = {}
 
 local function translateEndTurn(action, sceneModel)
-    if (action.playerID ~= sceneModel:getCurrentPlayerID()) then
+    local playerManager = sceneModel:getPlayerManager()
+    local turnManager   = sceneModel:getTurnManager()
+
+    if (action.playerID ~= playerManager:getPlayer(turnManager:getPlayerIndex()):getID()) then
         return nil, "ActionTranslator-translateEndTurn() the playerID is not the same as the one of the logged in player."
     end
 
-    if (sceneModel:getCurrentTurnPhase() ~= "main") then
+    if (turnManager:getTurnPhase() ~= "main") then
         return nil, "ActionTranslator-translateEndTurn() the current turn phase is expected to be 'main'."
     end
 

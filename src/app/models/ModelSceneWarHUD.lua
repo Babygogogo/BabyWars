@@ -4,6 +4,19 @@ local ModelSceneWarHUD = class("ModelSceneWarHUD")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The callback function on EvtTurnStarted.
+--------------------------------------------------------------------------------
+local function onEvtTurnStarted(self, event)
+    if (self.m_View) then
+        self.m_View:showBeginTurnEffect(event.turnIndex, event.player:getName(), event.callbackOnBeginTurnEffectDisappear)
+    else
+        event.callbackOnBeginTurnEffect()
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createCompositionActors(param)
@@ -86,10 +99,16 @@ function ModelSceneWarHUD:onEnter(rootActor)
     self.m_TileInfoActor:onEnter(rootActor)
     self.m_UnitInfoActor:onEnter(rootActor)
 
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnStarted", self)
+
     return self
 end
 
 function ModelSceneWarHUD:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
+    self.m_RootScriptEventDispatcher = nil
+
     self.m_ActionMenuActor:onCleanup(rootActor)
     self.m_WarCommandMenuActor:onCleanup(rootActor)
     self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
@@ -99,14 +118,9 @@ function ModelSceneWarHUD:onCleanup(rootActor)
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelSceneWarHUD:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
-    if (self.m_View) then
-        self.m_View:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
-    else
-        callbackOnDisappear()
+function ModelSceneWarHUD:onEvent(event)
+    if (event.name == "EvtTurnStarted") then
+        onEvtTurnStarted(self, event)
     end
 
     return self

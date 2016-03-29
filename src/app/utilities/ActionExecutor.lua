@@ -2,7 +2,7 @@
 local ActionExecutor = {}
 
 local function executeEndTurn(action, sceneModel)
-    sceneModel:endTurn(action.nextWeather)
+    sceneModel:getTurnManager():endTurn(action.nextWeather)
 end
 
 function ActionExecutor.execute(action, sceneModel)

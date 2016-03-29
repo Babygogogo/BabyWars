@@ -43,7 +43,7 @@ end
 
 local function onEvtPlayerRequestDoAction(self, event)
     local requestedAction = event
-    requestedAction.playerID = self:getCurrentPlayerID() -- This should be replaced by the ID of the logged in player.
+    requestedAction.playerID = self.m_PlayerManager:getPlayer(self.m_TurnManager:getPlayerIndex()):getID() -- This should be replaced by the ID of the logged in player.
 
     if (isServer) then
         local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)
@@ -91,88 +91,27 @@ local function initWithCompositionActors(self, actors)
 end
 
 --------------------------------------------------------------------------------
--- The turn.
+-- The player manager.
 --------------------------------------------------------------------------------
-local function getNextTurnAndPlayerIndex(turn, players)
-    local nextTurnIndex   = turn.m_TurnIndex
-    local nextPlayerIndex = turn.m_PlayerIndex + 1
-
-    while (true) do
-        if (nextPlayerIndex > #players) then
-            nextPlayerIndex = 1
-            nextTurnIndex   = nextTurnIndex + 1
-        end
-
-        assert(nextPlayerIndex ~= turn.m_PlayerIndex, "ModelSceneWar-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
-
-        if (players[nextPlayerIndex].m_IsAlive) then
-            return nextTurnIndex, nextPlayerIndex
-        end
-    end
+local function createPlayerManager(playersData)
+    return require("app.utilities.PlayerManager"):create(playersData)
 end
 
-local function initTurn(model, turn)
-    model.m_Turn = {
-        m_TurnIndex   = turn.turnIndex,
-        m_PlayerIndex = turn.playerIndex,
-        m_TurnPhase   = turn.phase,
-    }
-end
-
-local function runTurn(self, nextWeather)
-    local turn = self.m_Turn
-    if (turn.m_TurnPhase == "end") then
-        if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
-            self.m_Weather.m_CurrentWeather = nextWeather
-            self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = nextWeather})
-        end
-
-        -- TODO: Change state for units, vision and so on.
-        turn.m_TurnPhase = "standby"
-        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, self.m_Players)
-    end
-
-    local player = self.m_Players[turn.m_PlayerIndex]
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
-
-    self.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
-        if (turn.m_TurnPhase == "standby") then
-            -- TODO: Add fund, repair units, destroy units that run out of fuel.
-            turn.m_TurnPhase = "main"
-        elseif (turn.m_TurnPhase == "main") then
-            -- Do nothing.
-        else
-            error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
-        end
-    end)
+local function initWithPlayerManager(self, playerManager)
+    self.m_PlayerManager = playerManager
 end
 
 --------------------------------------------------------------------------------
--- The players.
+-- The turn manager.
 --------------------------------------------------------------------------------
-local function initPlayers(model, players)
-    model.m_Players = {}
-    for i, p in ipairs(players) do
-        model.m_Players[i] = {
-            m_ID      = p.id,
-            m_Name    = p.name,
-            m_Fund    = p.fund,
-            m_IsAlive = p.isAlive,
-            m_CO      = {
-                m_CurrentEnergy    = p.co.currentEnergy,
-                m_COPowerEnergy    = p.co.coPowerEnergy,
-                m_SuperPowerEnergy = p.co.superPowerEnergy,
-            },
+local function createTurnManager(turnData)
+    return require("app.utilities.TurnManager"):create(turnData)
+end
 
-            getFund = function(self)
-                return self.m_Fund
-            end,
-
-            getCOEnergy = function(self)
-                return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
-            end,
-        }
-    end
+local function initWithTurnManager(self, turnManager)
+    turnManager:setPlayerManager(self.m_PlayerManager)
+        :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    self.m_TurnManager = turnManager
 end
 
 --------------------------------------------------------------------------------
@@ -193,8 +132,8 @@ function ModelSceneWar:ctor(param)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithCompositionActors(    self, createCompositionActors(sceneData))
-    initTurn(   self, sceneData.turn)
-    initPlayers(self, sceneData.players)
+    initWithPlayerManager(        self, createPlayerManager(sceneData.players))
+    initWithTurnManager(          self, createTurnManager(sceneData.turn))
     initWeather(self, sceneData.weather)
 
     if (self.m_View) then
@@ -234,7 +173,7 @@ function ModelSceneWar:onEnter(rootActor)
 end
 
 function ModelSceneWar:onEnterTransitionFinish(rootActor)
-    runTurn(self)
+    self.m_TurnManager:runTurn()
 
     return self
 end
@@ -269,21 +208,6 @@ function ModelSceneWar:getNextWeather()
     return "clear"
 end
 
-function ModelSceneWar:getCurrentTurnPhase()
-    return self.m_Turn.m_TurnPhase
-end
-
---------------------------------------------------------------------------------
--- The functions that should only be called by ActionExecutor.
---------------------------------------------------------------------------------
-function ModelSceneWar:endTurn(nextWeather)
-    local turn = self.m_Turn
-    assert(turn.m_TurnPhase == "main", "ModelSceneWar:endTurn() the turn phase is expected to be 'main'.")
-
-    turn.m_TurnPhase = "end"
-    runTurn(self, nextWeather)
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -291,8 +215,12 @@ function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
 end
 
-function ModelSceneWar:getCurrentPlayerID()
-    return self.m_Players[self.m_Turn.m_PlayerIndex].m_ID
+function ModelSceneWar:getTurnManager()
+    return self.m_TurnManager
+end
+
+function ModelSceneWar:getPlayerManager()
+    return self.m_PlayerManager
 end
 
 return ModelSceneWar

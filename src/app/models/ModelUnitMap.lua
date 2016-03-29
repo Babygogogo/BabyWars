@@ -119,13 +119,13 @@ end
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtPlayerSwitched", self)
+        :addEventListener("EvtTurnStarted", self)
 
     return self
 end
 
 function ModelUnitMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSwitched", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -140,7 +140,7 @@ function ModelUnitMap:onEvent(event)
         else
             self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
         end
-    elseif (event.name == "EvtPlayerSwitched") then
+    elseif (event.name == "EvtTurnStarted") then
         self.m_PlayerIndex = event.playerIndex
     end
 

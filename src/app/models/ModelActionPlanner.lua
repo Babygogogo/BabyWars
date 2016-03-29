@@ -380,10 +380,10 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerSwitched.
+-- The callback functions on EvtTurnStarted.
 --------------------------------------------------------------------------------
-local function onEvtPlayerSwitched(self, playerIndex)
-    self.m_PlayerIndex = playerIndex
+local function onEvtTurnStarted(self, event)
+    self.m_PlayerIndex = event.playerIndex
     setStateIdle(self)
 end
 
@@ -438,7 +438,7 @@ function ModelActionPlanner:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtPlayerSwitched", self)
+        :addEventListener("EvtTurnStarted", self)
         :addEventListener("EvtWeatherChanged", self)
 
     return self
@@ -446,7 +446,7 @@ end
 
 function ModelActionPlanner:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtWeatherChanged", self)
-        :removeEventListener("EvtPlayerSwitched", self)
+        :removeEventListener("EvtTurnStarted", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
     self.m_RootScriptEventDispatcher = nil
@@ -457,8 +457,8 @@ end
 function ModelActionPlanner:onEvent(event)
     if (event.name == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event.gridIndex)
-    elseif (event.name == "EvtPlayerSwitched") then
-        onEvtPlayerSwitched(self, event.playerIndex)
+    elseif (event.name == "EvtTurnStarted") then
+        onEvtTurnStarted(self, event)
     elseif (event.name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
     elseif (event.name == "EvtPlayerMovedCursor") then
