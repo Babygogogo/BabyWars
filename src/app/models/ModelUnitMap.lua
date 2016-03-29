@@ -134,9 +134,9 @@ end
 
 function ModelUnitMap:onEvent(event)
     if (event.name == "EvtPlayerMovedCursor") then
-        local unitActor = self:getUnitActor(event.gridIndex)
-        if (unitActor) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitActor:getModel()})
+        local unitModel = self:getModelUnit(event.gridIndex)
+        if (unitModel) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitModel})
         else
             self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
         end
@@ -154,7 +154,7 @@ function ModelUnitMap:getMapSize()
     return self.m_UnitActorsMap.size
 end
 
-function ModelUnitMap:getUnitActor(gridIndex)
+function ModelUnitMap:getActorUnit(gridIndex)
     if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
         return nil
     else
@@ -162,8 +162,8 @@ function ModelUnitMap:getUnitActor(gridIndex)
     end
 end
 
-function ModelUnitMap:getUnitModel(gridIndex)
-    local unitActor = self:getUnitActor(gridIndex)
+function ModelUnitMap:getModelUnit(gridIndex)
+    local unitActor = self:getActorUnit(gridIndex)
     return unitActor and unitActor:getModel() or nil
 end
 

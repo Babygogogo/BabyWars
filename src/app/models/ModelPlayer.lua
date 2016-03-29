@@ -1,10 +1,10 @@
 
-local Player = class("Player")
+local ModelPlayer = class("ModelPlayer")
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function Player:ctor(param)
+function ModelPlayer:ctor(param)
     self.m_ID      = param.id
     self.m_Name    = param.name
     self.m_Fund    = param.fund
@@ -21,24 +21,24 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function Player:getID()
+function ModelPlayer:getID()
     return self.m_ID
 end
 
-function Player:getName()
+function ModelPlayer:getName()
     return self.m_Name
 end
 
-function Player:isAlive()
+function ModelPlayer:isAlive()
     return self.m_IsAlive
 end
 
-function Player:getFund()
+function ModelPlayer:getFund()
     return self.m_Fund
 end
 
-function Player:getCOEnergy()
+function ModelPlayer:getCOEnergy()
     return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
 end
 
-return Player
+return ModelPlayer

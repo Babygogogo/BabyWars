@@ -43,7 +43,7 @@ end
 
 local function onEvtPlayerRequestDoAction(self, event)
     local requestedAction = event
-    requestedAction.playerID = self.m_PlayerManager:getPlayer(self.m_TurnManager:getPlayerIndex()):getID() -- This should be replaced by the ID of the logged in player.
+    requestedAction.playerID = self:getModelPlayerManager():getModelPlayer(self:getModelTurnManager():getPlayerIndex()):getID() -- This should be replaced by the ID of the logged in player.
 
     if (isServer) then
         local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)
@@ -70,57 +70,60 @@ local function initWithScriptEventDispatcher(model, dispatcher)
 end
 
 --------------------------------------------------------------------------------
--- The comsition actors.
+-- The composition war field actor.
 --------------------------------------------------------------------------------
-local function createCompositionActors(sceneData)
-    local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.warField, "ViewWarField", sceneData.warField)
-    assert(warFieldActor, "SceneWar--createCompositionActors() failed to create a war field actor.")
-
-    local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
-    assert(hudActor, "SceneWar--createCompositionActors() failed to create a HUD actor.")
-
-    return {
-        warFieldActor    = warFieldActor,
-        sceneWarHUDActor = hudActor,
-    }
+local function createActorWarField(warFieldData)
+    return Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField", warFieldData)
 end
 
-local function initWithCompositionActors(self, actors)
-    self.m_WarFieldActor    = actors.warFieldActor
-    self.m_SceneWarHUDActor = actors.sceneWarHUDActor
+local function initWithActorWarField(self, actor)
+    self.m_WarFieldActor = actor
+end
+
+--------------------------------------------------------------------------------
+-- The composition HUD actor.
+--------------------------------------------------------------------------------
+local function createActorSceneWarHUD()
+    return Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
+end
+
+local function initWithActorSceneWarHUD(self, actor)
+    self.m_SceneWarHUDActor = actor
 end
 
 --------------------------------------------------------------------------------
 -- The player manager.
 --------------------------------------------------------------------------------
-local function createPlayerManager(playersData)
-    return require("app.utilities.PlayerManager"):create(playersData)
+local function createActorPlayerManager(playersData)
+    return Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
 end
 
-local function initWithPlayerManager(self, playerManager)
-    self.m_PlayerManager = playerManager
+local function initWithActorPlayerManager(self, actor)
+    self.m_ActorPlayerManager = actor
 end
 
 --------------------------------------------------------------------------------
 -- The turn manager.
 --------------------------------------------------------------------------------
-local function createTurnManager(turnData)
-    return require("app.utilities.TurnManager"):create(turnData)
+local function createActorTurnManager(turnData)
+    return Actor.createWithModelAndViewName("ModelTurnManager", turnData)
 end
 
-local function initWithTurnManager(self, turnManager)
-    turnManager:setPlayerManager(self.m_PlayerManager)
+local function initWithActorTurnManager(self, actor)
+    actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
-    self.m_TurnManager = turnManager
+    self.m_ActorTurnManager = actor
 end
 
 --------------------------------------------------------------------------------
--- The weather.
+-- The composition weather manager actor.
 --------------------------------------------------------------------------------
-local function initWeather(model, weather)
-    model.m_Weather = {
-        m_CurrentWeather = weather.current
-    }
+local function createActorWeatherManager(weatherData)
+    return Actor.createWithModelAndViewName("ModelWeatherManager", weatherData)
+end
+
+local function initWithActorWeatherManager(self, actor)
+    self.m_ActorWeatherManager = actor
 end
 
 --------------------------------------------------------------------------------
@@ -131,10 +134,11 @@ function ModelSceneWar:ctor(param)
     local sceneData = requireSceneData(param)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
-    initWithCompositionActors(    self, createCompositionActors(sceneData))
-    initWithPlayerManager(        self, createPlayerManager(sceneData.players))
-    initWithTurnManager(          self, createTurnManager(sceneData.turn))
-    initWeather(self, sceneData.weather)
+    initWithActorWarField(        self, createActorWarField(sceneData.warField))
+    initWithActorSceneWarHUD(     self, createActorSceneWarHUD())
+    initWithActorPlayerManager(   self, createActorPlayerManager(sceneData.players))
+    initWithActorTurnManager(     self, createActorTurnManager(sceneData.turn))
+    initWithActorWeatherManager(  self, createActorWeatherManager(sceneData.weather))
 
     if (self.m_View) then
         self:initView()
@@ -167,13 +171,13 @@ function ModelSceneWar:onEnter(rootActor)
     self.m_SceneWarHUDActor:onEnter(rootActor)
     self.m_WarFieldActor:onEnter(rootActor)
 
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self.m_Weather.m_CurrentWeather})
+    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
 
     return self
 end
 
 function ModelSceneWar:onEnterTransitionFinish(rootActor)
-    self.m_TurnManager:runTurn()
+    self:getModelTurnManager():runTurn()
 
     return self
 end
@@ -201,26 +205,26 @@ function ModelSceneWar:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The functions that should only be called by ActionTranslator.
---------------------------------------------------------------------------------
-function ModelSceneWar:getNextWeather()
-    -- TODO: add code to do the real work.
-    return "clear"
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
 end
 
-function ModelSceneWar:getTurnManager()
-    return self.m_TurnManager
+function ModelSceneWar:getModelTurnManager()
+    return self.m_ActorTurnManager:getModel()
 end
 
-function ModelSceneWar:getPlayerManager()
-    return self.m_PlayerManager
+function ModelSceneWar:getModelPlayerManager()
+    return self.m_ActorPlayerManager:getModel()
+end
+
+function ModelSceneWar:getModelWeatherManager()
+    return self.m_ActorWeatherManager:getModel()
+end
+
+function ModelSceneWar:getModelWarField()
+    return self.m_WarFieldActor:getModel()
 end
 
 return ModelSceneWar

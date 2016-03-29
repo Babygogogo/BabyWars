@@ -16,8 +16,8 @@ local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapMo
         return nil
     end
 
-    local existingUnit = unitMapModel:getUnitActor(gridIndex)
-    if (existingUnit) and (existingUnit:getModel():getPlayerIndex() ~= unitModel:getPlayerIndex())then
+    local existingUnit = unitMapModel:getModelUnit(gridIndex)
+    if (existingUnit) and (existingUnit:getPlayerIndex() ~= unitModel:getPlayerIndex()) then
         return nil
     end
 
@@ -40,7 +40,7 @@ local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
     if (GridIndexFunctions.isEqual(unitModel:getGridIndex(), gridIndex)) then
         return true
     else
-        local existingUnitModel = unitMapModel:getUnitModel(gridIndex)
+        local existingUnitModel = unitMapModel:getModelUnit(gridIndex)
         return (not existingUnitModel) or
                (existingUnitModel:canJoin(unitModel)) or
                (existingUnitModel.canLoad and existingUnitModel:canLoad(unitModel))
@@ -55,7 +55,7 @@ local function canAttackTargetOnGridIndex(attacker, destination, gridIndex, tile
     if (attacker:canAttackTarget(tileMapModel:getTileModel(gridIndex), destination)) then
         return true
     else
-        return attacker:canAttackTarget(unitMapModel:getUnitModel(gridIndex), destination)
+        return attacker:canAttackTarget(unitMapModel:getModelUnit(gridIndex), destination)
     end
 end
 
@@ -237,7 +237,7 @@ local setStateIdle, setStateMakingMovePath, setStateChoosingAction, setStateChoo
 
 local function getActionJoin(self, destination)
     if (not GridIndexFunctions.isEqual(self.m_FocusUnitModel:getGridIndex(), destination)) then
-        local existingUnitModel = self.m_UnitMapModel:getUnitModel(destination)
+        local existingUnitModel = self.m_UnitMapModel:getModelUnit(destination)
         if (existingUnitModel and existingUnitModel:canJoin(self.m_FocusUnitModel)) then
             return {
                 name     = "Join",
@@ -263,7 +263,7 @@ local function getActionAttack(self, destination)
 end
 
 local function getActionWait(self, destination)
-    local existingUnitModel = self.m_UnitMapModel:getUnitModel(destination)
+    local existingUnitModel = self.m_UnitMapModel:getModelUnit(destination)
     if (not existingUnitModel) or (self.m_FocusUnitModel == existingUnitModel) then
         return {
             name = "Wait",
@@ -359,9 +359,9 @@ end
 --------------------------------------------------------------------------------
 local function onEvtPlayerSelectedGrid(self, gridIndex)
     if (self.m_State == "idle") then
-        local unit = self.m_UnitMapModel:getUnitActor(gridIndex)
-        if (unit) and (canUnitTakeAction(self, unit:getModel())) then
-            setStateMakingMovePath(self, unit:getModel())
+        local unitModel = self.m_UnitMapModel:getModelUnit(gridIndex)
+        if (unitModel) and (canUnitTakeAction(self, unitModel)) then
+            setStateMakingMovePath(self, unitModel)
         end
     elseif (self.m_State == "makingMovePath") then
         if (not getReachableGrid(self.m_ReachableGrids, gridIndex)) then

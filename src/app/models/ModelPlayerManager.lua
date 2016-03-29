@@ -1,13 +1,12 @@
 
-local PlayerManager = class("PlayerManager")
+local ModelPlayerManager = class("ModelPlayerManager")
 
-local Player      = require("app.utilities.Player")
-local TypeChecker = require("app.utilities.TypeChecker")
+local Player      = require("app.models.ModelPlayer")
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function PlayerManager:ctor(param)
+function ModelPlayerManager:ctor(param)
     self.m_Players = {}
     for i, player in ipairs(param) do
         self.m_Players[i] = Player:create(player)
@@ -19,12 +18,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function PlayerManager:getPlayer(playerIndex)
+function ModelPlayerManager:getModelPlayer(playerIndex)
     return self.m_Players[playerIndex]
 end
 
-function PlayerManager:getPlayersCount()
+function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
 end
 
-return PlayerManager
+return ModelPlayerManager

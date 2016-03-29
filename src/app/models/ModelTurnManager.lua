@@ -1,5 +1,5 @@
 
-local TurnManager = class("TurnManager")
+local ModelTurnManager = class("ModelTurnManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -14,9 +14,9 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
             nextTurnIndex   = nextTurnIndex + 1
         end
 
-        assert(nextPlayerIndex ~= self.m_PlayerIndex, "TurnManager-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
+        assert(nextPlayerIndex ~= self.m_PlayerIndex, "ModelTurnManager-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
 
-        if (playerManager:getPlayer(nextPlayerIndex):isAlive()) then
+        if (playerManager:getModelPlayer(nextPlayerIndex):isAlive()) then
             return nextTurnIndex, nextPlayerIndex
         end
     end
@@ -36,7 +36,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function TurnManager:ctor(param)
+function ModelTurnManager:ctor(param)
     self.m_TurnIndex   = param.turnIndex
     self.m_PlayerIndex = param.playerIndex
     self.m_TurnPhase   = param.phase
@@ -44,13 +44,13 @@ function TurnManager:ctor(param)
     return self
 end
 
-function TurnManager:setPlayerManager(playerManager)
-    self.m_PlayerManager = playerManager
+function ModelTurnManager:setModelPlayerManager(playerManager)
+    self.m_ModelPlayerManager = playerManager
 
     return self
 end
 
-function TurnManager:setScriptEventDispatcher(dispatcher)
+function ModelTurnManager:setScriptEventDispatcher(dispatcher)
     self.m_ScriptEventDispatcher = dispatcher
 
     return self
@@ -59,19 +59,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function TurnManager:getTurnIndex()
+function ModelTurnManager:getTurnIndex()
     return self.m_TurnIndex
 end
 
-function TurnManager:getTurnPhase()
+function ModelTurnManager:getTurnPhase()
     return self.m_TurnPhase
 end
 
-function TurnManager:getPlayerIndex()
+function ModelTurnManager:getPlayerIndex()
     return self.m_PlayerIndex
 end
 
-function TurnManager:runTurn(nextWeather)
+function ModelTurnManager:runTurn(nextWeather)
     if (self.m_TurnPhase == "end") then
     --[[
         if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
@@ -82,10 +82,10 @@ function TurnManager:runTurn(nextWeather)
 
         -- TODO: Change state for units, vision and so on.
         self.m_TurnPhase = "standby"
-        self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_PlayerManager)
+        self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
     end
 
-    local player = self.m_PlayerManager:getPlayer(self.m_PlayerIndex)
+    local player = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
     self.m_ScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnStarted",
         player      = player,
@@ -99,8 +99,8 @@ function TurnManager:runTurn(nextWeather)
     return self
 end
 
-function TurnManager:endTurn(nextWeather)
-    assert(self.m_TurnPhase == "main", "TurnManager:endTurn() the turn phase is expected to be 'main'.")
+function ModelTurnManager:endTurn(nextWeather)
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurn() the turn phase is expected to be 'main'.")
 
     self.m_TurnPhase = "end"
     self:runTurn(nextWeather)
@@ -108,4 +108,4 @@ function TurnManager:endTurn(nextWeather)
     return self
 end
 
-return TurnManager
+return ModelTurnManager

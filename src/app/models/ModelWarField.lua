@@ -124,4 +124,15 @@ function ModelWarField:onEvent(event)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelWarField:getModelUnitMap()
+    return self.m_UnitMapActor:getModel()
+end
+
+function ModelWarField:getModelTileMap()
+    return self.m_TileMapActor:getModel()
+end
+
 return ModelWarField
