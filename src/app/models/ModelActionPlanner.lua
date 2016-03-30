@@ -440,12 +440,14 @@ function ModelActionPlanner:onEnter(rootActor)
         :addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnStarted", self)
         :addEventListener("EvtWeatherChanged", self)
+        :addEventListener("EvtPlayerRequestDoAction", self)
 
     return self
 end
 
 function ModelActionPlanner:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWeatherChanged", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
+        :removeEventListener("EvtWeatherChanged", self)
         :removeEventListener("EvtTurnStarted", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
@@ -455,14 +457,17 @@ function ModelActionPlanner:onCleanup(rootActor)
 end
 
 function ModelActionPlanner:onEvent(event)
-    if (event.name == "EvtPlayerSelectedGrid") then
+    local name = event.name
+    if (name == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event.gridIndex)
-    elseif (event.name == "EvtTurnStarted") then
+    elseif (name == "EvtTurnStarted") then
         onEvtTurnStarted(self, event)
-    elseif (event.name == "EvtWeatherChanged") then
+    elseif (name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
-    elseif (event.name == "EvtPlayerMovedCursor") then
+    elseif (name == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event.gridIndex)
+    elseif (name == "EvtPlayerRequestDoAction") then
+        setStateIdle(self)
     end
 
     return self

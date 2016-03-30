@@ -32,10 +32,10 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
     local moveType             = modelFocusUnit:getMovementType()
     local weather              = modelWeatherManager:getCurrentWeather()
     local totalFuelConsumption = 0
-    local translatedPath       = {path[1].gridIndex}
+    local translatedPath       = {GridIndexFunctions.clone(path[1].gridIndex)}
 
     for i = 2, #path do
-        local gridIndex = path[i].gridIndex
+        local gridIndex = GridIndexFunctions.clone(path[i].gridIndex)
         if (not GridIndexFunctions.isAdjacent(path[i - 1].gridIndex, gridIndex)) then
             return nil, "ActionTranslator-translatePath() the path is invalid because some grids are not adjacent to previous ones."
         end

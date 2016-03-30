@@ -35,10 +35,27 @@ local function requireSceneData(param)
 end
 
 --------------------------------------------------------------------------------
+-- The functions that do the actions the system requested.
+--------------------------------------------------------------------------------
+local function doActionEndTurn(self, action)
+    self:getModelTurnManager():endTurn()
+end
+
+local function doActionWait(self, action)
+    self:getModelWarField():doActionWait(action)
+end
+
+--------------------------------------------------------------------------------
 -- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
-    ActionExecutor.execute(event, self)
+    if (event.actionName == "EndTurn") then
+        doActionEndTurn(self, event)
+    elseif (event.actionName == "Wait") then
+        doActionWait(self, event)
+    else
+        print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
+    end
 end
 
 local function onEvtPlayerRequestDoAction(self, event)

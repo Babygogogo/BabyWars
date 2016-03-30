@@ -44,13 +44,13 @@ local function createCompositionActors(param)
 end
 
 local function initWithCompositionActors(model, actors)
-    model.m_TileMapActor       = actors.tileMapActor
-    model.m_UnitMapActor       = actors.unitMapActor
-    model.m_CursorActor        = actors.cursorActor
+    model.m_ActorTileMap       = actors.tileMapActor
+    model.m_ActorUnitMap       = actors.unitMapActor
+    model.m_ActorCursor        = actors.cursorActor
 
-    model.m_ActionPlannerActor = actors.actionPlannerActor
-    model.m_ActionPlannerActor:getModel():setModelTileMap(model.m_TileMapActor:getModel())
-        :setModelUnitMap(model.m_UnitMapActor:getModel())
+    model.m_ActorActionPlanner = actors.actionPlannerActor
+    model.m_ActorActionPlanner:getModel():setModelTileMap(model.m_ActorTileMap:getModel())
+        :setModelUnitMap(model.m_ActorUnitMap:getModel())
 end
 
 --------------------------------------------------------------------------------
@@ -70,12 +70,12 @@ function ModelWarField:initView()
     local view = self.m_View
     assert(TypeChecker.isView(view))
 
-    view:setTileMapView(      self.m_TileMapActor:getView())
-        :setUnitMapView(      self.m_UnitMapActor:getView())
-        :setActionPlannerView(self.m_ActionPlannerActor:getView())
-        :setMapCursorView(    self.m_CursorActor:getView())
+    view:setTileMapView(      self.m_ActorTileMap:getView())
+        :setUnitMapView(      self.m_ActorUnitMap:getView())
+        :setActionPlannerView(self.m_ActorActionPlanner:getView())
+        :setMapCursorView(    self.m_ActorCursor:getView())
 
-        :setContentSizeWithMapSize(self.m_TileMapActor:getModel():getMapSize())
+        :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
 
     return self
 end
@@ -84,10 +84,10 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onEnter(rootActor)
-    self.m_TileMapActor:onEnter(      rootActor)
-    self.m_UnitMapActor:onEnter(      rootActor)
-    self.m_CursorActor:onEnter(       rootActor)
-    self.m_ActionPlannerActor:onEnter(rootActor)
+    self.m_ActorTileMap:onEnter(      rootActor)
+    self.m_ActorUnitMap:onEnter(      rootActor)
+    self.m_ActorCursor:onEnter(       rootActor)
+    self.m_ActorActionPlanner:onEnter(rootActor)
 
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
@@ -98,10 +98,10 @@ function ModelWarField:onEnter(rootActor)
 end
 
 function ModelWarField:onCleanup(rootActor)
-    self.m_TileMapActor:onCleanup(      rootActor)
-    self.m_UnitMapActor:onCleanup(      rootActor)
-    self.m_CursorActor:onCleanup(       rootActor)
-    self.m_ActionPlannerActor:onCleanup(rootActor)
+    self.m_ActorTileMap:onCleanup(      rootActor)
+    self.m_ActorUnitMap:onCleanup(      rootActor)
+    self.m_ActorCursor:onCleanup(       rootActor)
+    self.m_ActorActionPlanner:onCleanup(rootActor)
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid",   self)
         :removeEventListener("EvtPlayerZoomField", self)
@@ -128,11 +128,17 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarField:getModelUnitMap()
-    return self.m_UnitMapActor:getModel()
+    return self.m_ActorUnitMap:getModel()
 end
 
 function ModelWarField:getModelTileMap()
-    return self.m_TileMapActor:getModel()
+    return self.m_ActorTileMap:getModel()
+end
+
+function ModelWarField:doActionWait(action)
+    self:getModelUnitMap():doActionWait(action)
+
+    return self
 end
 
 return ModelWarField

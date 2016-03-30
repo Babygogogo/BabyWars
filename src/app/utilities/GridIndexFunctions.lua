@@ -20,6 +20,11 @@ function GridIndexFunctions.toPosition(gridIndex)
             (gridIndex.y - 1) * GRID_SIZE.height
 end
 
+function GridIndexFunctions.toPositionTable(gridIndex)
+    local x, y = GridIndexFunctions.toPosition(gridIndex)
+    return {x = x, y = y}
+end
+
 function GridIndexFunctions.worldPosToGridIndexInNode(worldPos, node)
     return GridIndexFunctions.toGridIndex(node:convertToNodeSpace(worldPos))
 end
@@ -54,6 +59,10 @@ end
 
 function GridIndexFunctions.scale(index, scale)
     return {x = index.x * scale, y = index.y * scale}
+end
+
+function GridIndexFunctions.clone(index)
+    return {x = index.x, y = index.y}
 end
 
 function GridIndexFunctions.getAdjacentGrids(index)

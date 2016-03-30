@@ -121,6 +121,15 @@ function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnStarted", self)
 
+    for x = 1, self.m_UnitActorsMap.size.height do
+        for y = 1, self.m_UnitActorsMap.size.width do
+            local actorUnit = self.m_UnitActorsMap[x][y]
+            if (actorUnit) then
+                actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+            end
+        end
+    end
+
     return self
 end
 
@@ -128,6 +137,15 @@ function ModelUnitMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
+
+    for x = 1, self.m_UnitActorsMap.size.height do
+        for y = 1, self.m_UnitActorsMap.size.width do
+            local actorUnit = self.m_UnitActorsMap[x][y]
+            if (actorUnit) then
+                actorUnit:getModel():unsetRootScriptEventDispatcher()
+            end
+        end
+    end
 
     return self
 end
@@ -165,6 +183,20 @@ end
 function ModelUnitMap:getModelUnit(gridIndex)
     local unitActor = self:getActorUnit(gridIndex)
     return unitActor and unitActor:getModel() or nil
+end
+
+function ModelUnitMap:doActionWait(action)
+    local path               = action.path
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[#path]
+
+    local actorFocusUnit = self:getActorUnit(beginningGridIndex)
+    actorFocusUnit:getModel():doActionWait(action)
+
+    self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
+    self.m_UnitActorsMap[endingGridIndex.x   ][endingGridIndex.y   ] = actorFocusUnit
+
+    return self
 end
 
 return ModelUnitMap

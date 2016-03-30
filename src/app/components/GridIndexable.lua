@@ -71,7 +71,7 @@ end
 function GridIndexable:setViewPositionWithGridIndex(gridIndex)
     local view = self.m_Target.m_View
     if (view) then
-        view:move(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
+        view:setPosition(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
     end
 
     return self

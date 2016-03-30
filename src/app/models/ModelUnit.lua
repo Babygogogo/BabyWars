@@ -26,6 +26,35 @@ local function toPlayerIndex(tiledID)
     return TEMPLATE_MODEL_UNIT_IDS[tiledID].p
 end
 
+
+--------------------------------------------------------------------------------
+-- The set state functions.
+--------------------------------------------------------------------------------
+local function setStateIdle(self)
+    self.m_State = "idle"
+
+    if (self.m_View) then
+        self.m_View:setStateIdle()
+    end
+end
+
+local function setStateActioned(self)
+    self.m_State = "actioned"
+
+    if (self.m_View) then
+        self.m_View:setStateActioned()
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on EvtTurnPhaseEnd.
+--------------------------------------------------------------------------------
+local function onEvtTurnPhaseEnd(self, event)
+    if (self:getPlayerIndex() == event.playerIndex) then
+        setStateIdle(self)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The fuel data.
 --------------------------------------------------------------------------------
@@ -94,7 +123,7 @@ local function loadInstanceProperties(model, param)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
     if (param.tiledID) then
@@ -116,6 +145,35 @@ function ModelUnit:initView()
 
     self:setViewPositionWithGridIndex()
     view:updateWithTiledID(self.m_TiledID)
+end
+
+function ModelUnit:setRootScriptEventDispatcher(dispatcher)
+    self:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtTurnPhaseEnd", self)
+
+    return self
+end
+
+function ModelUnit:unsetRootScriptEventDispatcher()
+    if (self.m_RootScriptEventDispatcher) then
+        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseEnd", self)
+
+        self.m_RootScriptEventDispatcher = nil
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+function ModelUnit:onEvent(event)
+    if (event.name == "EvtTurnPhaseEnd") then
+        onEvtTurnPhaseEnd(self, event)
+    end
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -179,6 +237,21 @@ end
 
 function ModelUnit:canJoin(rhsUnitModel)
     return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
+end
+
+function ModelUnit:doActionWait(action)
+    local callbackOnMoveFinish = function()
+        self:setGridIndex(action.path[#action.path])
+        setStateActioned(self)
+    end
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, callbackOnMoveFinish)
+    else
+        callbackOnMoveFinish()
+    end
+
+    return self
 end
 
 return ModelUnit

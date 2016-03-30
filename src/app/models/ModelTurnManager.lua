@@ -73,6 +73,7 @@ end
 
 function ModelTurnManager:runTurn(nextWeather)
     if (self.m_TurnPhase == "end") then
+        self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseEnd", playerIndex = self.m_PlayerIndex})
     --[[
         if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
             self.m_Weather.m_CurrentWeather = nextWeather
