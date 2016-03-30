@@ -121,9 +121,9 @@ end
 
 function ModelTileMap:onEvent(event)
     if (event.name == "EvtPlayerMovedCursor") then
-        local tileActor = self:getTileActor(event.gridIndex)
-        assert(tileActor, "ModelTileMap:onEvent() failed to get the tile actor with event.gridIndex.")
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = tileActor:getModel()})
+        local modelTile = self:getModelTile(event.gridIndex)
+        assert(modelTile, "ModelTileMap:onEvent() failed to get the tile model with event.gridIndex.")
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = modelTile})
     end
 
     return self
@@ -136,7 +136,7 @@ function ModelTileMap:getMapSize()
     return self.m_TileActorsMap.size
 end
 
-function ModelTileMap:getTileActor(gridIndex)
+function ModelTileMap:getActorTile(gridIndex)
     if (GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
         return self.m_TileActorsMap[gridIndex.x][gridIndex.y]
     else
@@ -144,8 +144,8 @@ function ModelTileMap:getTileActor(gridIndex)
     end
 end
 
-function ModelTileMap:getTileModel(gridIndex)
-    local tileActor = self:getTileActor(gridIndex)
+function ModelTileMap:getModelTile(gridIndex)
+    local tileActor = self:getActorTile(gridIndex)
     return tileActor and tileActor:getModel() or nil
 end
 

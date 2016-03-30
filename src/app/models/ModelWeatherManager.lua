@@ -20,4 +20,9 @@ function ModelWeatherManager:getNextWeather()
     return self.m_CurrentWeather
 end
 
+function ModelWeatherManager:isInFog()
+    -- TODO: add code to do the real job.
+    return false
+end
+
 return ModelWeatherManager

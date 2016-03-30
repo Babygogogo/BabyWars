@@ -11,7 +11,7 @@ local function getMaxRange(unitModel)
 end
 
 local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapModel, weather)
-    local tileActor = tileMapModel:getTileActor(gridIndex)
+    local tileActor = tileMapModel:getActorTile(gridIndex)
     if (not tileActor) then
         return nil
     end
@@ -52,7 +52,7 @@ local function canAttackTargetOnGridIndex(attacker, destination, gridIndex, tile
         return false
     end
 
-    if (attacker:canAttackTarget(tileMapModel:getTileModel(gridIndex), destination)) then
+    if (attacker:canAttackTarget(tileMapModel:getModelTile(gridIndex), destination)) then
         return true
     else
         return attacker:canAttackTarget(unitMapModel:getModelUnit(gridIndex), destination)

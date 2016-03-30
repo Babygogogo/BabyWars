@@ -88,6 +88,10 @@ end
 
 function GridIndexFunctions.getGridsWithinDistance(origin, minDistance, maxDistance, predicate)
     local grids = {}
+    if (minDistance == 0) and (minDistance <= maxDistance) then
+        grids[1] = {x = origin.x, y = origin.y}
+    end
+
     for distance = minDistance, maxDistance do
         for _, offsetItem in ipairs(ADJACENT_GRIDS_OFFSET) do
             local gridIndex = GridIndexFunctions.add(origin, GridIndexFunctions.sub(GridIndexFunctions.scale(offsetItem, distance), offsetItem.clockwiseOffset))

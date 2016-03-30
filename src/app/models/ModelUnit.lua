@@ -133,6 +133,10 @@ function ModelUnit:getState()
     return self.m_State
 end
 
+function ModelUnit:isInStealthMode()
+    return false
+end
+
 function ModelUnit:getDescription()
     return self.m_Template.description
 end

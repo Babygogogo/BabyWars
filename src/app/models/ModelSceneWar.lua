@@ -77,7 +77,7 @@ local function createActorWarField(warFieldData)
 end
 
 local function initWithActorWarField(self, actor)
-    self.m_WarFieldActor = actor
+    self.m_ActorWarField = actor
 end
 
 --------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ local function createActorSceneWarHUD()
 end
 
 local function initWithActorSceneWarHUD(self, actor)
-    self.m_SceneWarHUDActor = actor
+    self.m_ActorSceneWarHUD = actor
 end
 
 --------------------------------------------------------------------------------
@@ -151,8 +151,8 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setWarFieldView(self.m_WarFieldActor:getView())
-        :setSceneHudView(self.m_SceneWarHUDActor:getView())
+    view:setWarFieldView(self.m_ActorWarField:getView())
+        :setSceneHudView(self.m_ActorSceneWarHUD:getView())
 
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
 
@@ -168,8 +168,8 @@ function ModelSceneWar:onEnter(rootActor)
     self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
 
-    self.m_SceneWarHUDActor:onEnter(rootActor)
-    self.m_WarFieldActor:onEnter(rootActor)
+    self.m_ActorSceneWarHUD:onEnter(rootActor)
+    self.m_ActorWarField:onEnter(rootActor)
 
     self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
 
@@ -188,8 +188,8 @@ function ModelSceneWar:onCleanup(rootActor)
     self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
         :removeEventListener("EvtPlayerRequestDoAction", self)
 
-    self.m_SceneWarHUDActor:onCleanup(rootActor)
-    self.m_WarFieldActor:onCleanup(rootActor)
+    self.m_ActorSceneWarHUD:onCleanup(rootActor)
+    self.m_ActorWarField:onCleanup(rootActor)
 
     return self
 end
@@ -224,7 +224,7 @@ function ModelSceneWar:getModelWeatherManager()
 end
 
 function ModelSceneWar:getModelWarField()
-    return self.m_WarFieldActor:getModel()
+    return self.m_ActorWarField:getModel()
 end
 
 return ModelSceneWar
