@@ -4,9 +4,9 @@ local ModelSceneWarHUD = class("ModelSceneWarHUD")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
--- The callback function on EvtTurnStarted.
+-- The callback function on EvtTurnPhaseBeginning.
 --------------------------------------------------------------------------------
-local function onEvtTurnStarted(self, event)
+local function onEvtTurnPhaseBeginning(self, event)
     if (self.m_View) then
         self.m_View:showBeginTurnEffect(event.turnIndex, event.player:getName(), event.callbackOnBeginTurnEffectDisappear)
     else
@@ -100,13 +100,13 @@ function ModelSceneWarHUD:onEnter(rootActor)
     self.m_UnitInfoActor:onEnter(rootActor)
 
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnStarted", self)
+    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
 
     return self
 end
 
 function ModelSceneWarHUD:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
 
     self.m_ActionMenuActor:onCleanup(rootActor)
@@ -119,8 +119,8 @@ function ModelSceneWarHUD:onCleanup(rootActor)
 end
 
 function ModelSceneWarHUD:onEvent(event)
-    if (event.name == "EvtTurnStarted") then
-        onEvtTurnStarted(self, event)
+    if (event.name == "EvtTurnPhaseBeginning") then
+        onEvtTurnPhaseBeginning(self, event)
     end
 
     return self

@@ -106,13 +106,13 @@ end
 function ModelTileMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtTurnStarted", self)
+        :addEventListener("EvtTurnPhaseBeginning", self)
 
     return self
 end
 
 function ModelTileMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 

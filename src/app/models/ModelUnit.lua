@@ -43,9 +43,9 @@ local function setStateActioned(self)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseStandby.
+-- The callback functions on EvtTurnPhaseConsumeUnitFuel.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseStandby(self, event)
+local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
         local fuel = self:getCurrentFuel() - self:getFuelConsumptionPerTurn()
         self:setCurrentFuel(fuel)
@@ -54,9 +54,9 @@ local function onEvtTurnPhaseStandby(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseEnd.
+-- The callback functions on EvtTurnPhaseResetUnitState.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseEnd(self, event)
+local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
         setStateIdle(self)
     end
@@ -140,16 +140,16 @@ end
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     self:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseStandby", self)
-        :addEventListener("EvtTurnPhaseEnd", self)
+    dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
+        :addEventListener("EvtTurnPhaseResetUnitState", self)
 
     return self
 end
 
 function ModelUnit:unsetRootScriptEventDispatcher()
     if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseEnd", self)
-            :removeEventListener("EvtTurnPhaseStandby", self)
+        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
+            :removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
 
         self.m_RootScriptEventDispatcher = nil
     end
@@ -162,10 +162,10 @@ end
 --------------------------------------------------------------------------------
 function ModelUnit:onEvent(event)
     local name = event.name
-    if (name == "EvtTurnPhaseStandby") then
-        onEvtTurnPhaseStandby(self, event)
-    elseif (name == "EvtTurnPhaseEnd") then
-        onEvtTurnPhaseEnd(self, event)
+    if (name == "EvtTurnPhaseConsumeUnitFuel") then
+        onEvtTurnPhaseConsumeUnitFuel(self, event)
+    elseif (name == "EvtTurnPhaseResetUnitState") then
+        onEvtTurnPhaseResetUnitState(self, event)
     end
 
     return self

@@ -5,7 +5,7 @@ local WarScene_Test2 = {
     turn = {
         turnIndex   = 1,
         playerIndex = 1,
-        phase       = "standby",
+        phase       = "beginning",
     },
 
     players = {

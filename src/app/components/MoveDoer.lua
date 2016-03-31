@@ -83,7 +83,7 @@ end
 
 function MoveDoer:moveAlongPath(path, callbackOnFinish)
     local target = self.m_Target
-    target:setGridIndex(path[#path], false)
+    target:setGridIndex(path[path.length], false)
         :setCurrentFuel(target:getCurrentFuel() - path.fuelConsumption)
 
     local view = target.m_View

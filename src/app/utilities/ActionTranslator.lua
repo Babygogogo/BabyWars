@@ -32,7 +32,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
     local moveType             = modelFocusUnit:getMoveType()
     local weather              = modelWeatherManager:getCurrentWeather()
     local totalFuelConsumption = 0
-    local translatedPath       = {GridIndexFunctions.clone(path[1].gridIndex)}
+    local translatedPath       = {GridIndexFunctions.clone(path[1].gridIndex), length = 1}
 
     for i = 2, #path do
         local gridIndex = GridIndexFunctions.clone(path[i].gridIndex)
@@ -56,7 +56,8 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
         end
 
         totalFuelConsumption = totalFuelConsumption + fuelConsumption
-        translatedPath[#translatedPath + 1] = gridIndex
+        translatedPath.length = translatedPath.length + 1
+        translatedPath[translatedPath.length] = gridIndex
     end
 
     if (totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or (totalFuelConsumption > modelFocusUnit:getMoveRange()) then
@@ -88,7 +89,7 @@ local function translateWait(action, modelScene, currentPlayerID)
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
     assert(translatedPath, "ActionTranslator-translateWait() failed to translate the move path:\n" .. (translateMsg or ""))
 
-    local existingModelUnit = modelUnitMap:getModelUnit(translatedPath[#translatedPath])
+    local existingModelUnit = modelUnitMap:getModelUnit(translatedPath[translatedPath.length])
     if (existingModelUnit) and (modelUnitMap:getModelUnit(translatedPath[1]) ~= existingModelUnit) then
         return nil, "ActionTranslator-translateWait() failed because there is another unit on the destination grid."
     else

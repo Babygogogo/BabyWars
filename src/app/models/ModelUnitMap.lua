@@ -133,7 +133,7 @@ end
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtTurnStarted", self)
+        :addEventListener("EvtTurnPhaseBeginning", self)
 
     iterateAllActorUnits(self, function(actor)
         actor:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
@@ -143,7 +143,7 @@ function ModelUnitMap:onEnter(rootActor)
 end
 
 function ModelUnitMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnStarted", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -162,7 +162,7 @@ function ModelUnitMap:onEvent(event)
         else
             self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
         end
-    elseif (event.name == "EvtTurnStarted") then
+    elseif (event.name == "EvtTurnPhaseBeginning") then
         self.m_PlayerIndex = event.playerIndex
     end
 
@@ -195,8 +195,8 @@ function ModelUnitMap:doActionWait(action)
     -- and the value of path[1] will become the same as path[#path].
     -- so I clone them for later use.
     local beginningGridIndex = GridIndexFunctions.clone(path[1])
-    local endingGridIndex    = GridIndexFunctions.clone(path[#path])
-    local actorFocusUnit = self:getActorUnit(beginningGridIndex)
+    local endingGridIndex    = GridIndexFunctions.clone(path[path.length])
+    local actorFocusUnit     = self:getActorUnit(beginningGridIndex)
 
     self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
     self.m_UnitActorsMap[endingGridIndex.x   ][endingGridIndex.y   ] = actorFocusUnit

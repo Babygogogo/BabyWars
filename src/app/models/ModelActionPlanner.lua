@@ -380,9 +380,9 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnStarted.
+-- The callback functions on EvtTurnPhaseBeginning.
 --------------------------------------------------------------------------------
-local function onEvtTurnStarted(self, event)
+local function onEvtTurnPhaseBeginning(self, event)
     self.m_PlayerIndex = event.playerIndex
     setStateIdle(self)
 end
@@ -438,7 +438,7 @@ function ModelActionPlanner:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtTurnStarted", self)
+        :addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtWeatherChanged", self)
         :addEventListener("EvtPlayerRequestDoAction", self)
 
@@ -448,7 +448,7 @@ end
 function ModelActionPlanner:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
         :removeEventListener("EvtWeatherChanged", self)
-        :removeEventListener("EvtTurnStarted", self)
+        :removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
     self.m_RootScriptEventDispatcher = nil
@@ -460,8 +460,8 @@ function ModelActionPlanner:onEvent(event)
     local name = event.name
     if (name == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event.gridIndex)
-    elseif (name == "EvtTurnStarted") then
-        onEvtTurnStarted(self, event)
+    elseif (name == "EvtTurnPhaseBeginning") then
+        onEvtTurnPhaseBeginning(self, event)
     elseif (name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
     elseif (name == "EvtPlayerMovedCursor") then
