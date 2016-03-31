@@ -93,6 +93,7 @@ local function initWithTiledID(model, tiledID)
 
     ComponentManager.unbindAllComponents(model)
         .bindComponent(model, "GridIndexable")
+        .bindComponent(model, "MoveDoer", template.movement)
         .bindComponent(model, "AttackTaker")
 
     if (template.specialProperties) then
@@ -197,14 +198,6 @@ end
 
 function ModelUnit:getDescription()
     return self.m_Template.description
-end
-
-function ModelUnit:getMovementRange()
-    return self.m_Template.movementRange
-end
-
-function ModelUnit:getMovementType()
-    return self.m_Template.movementType
 end
 
 function ModelUnit:getVision()

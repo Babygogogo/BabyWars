@@ -211,7 +211,7 @@ local function initWithMovementInfo(view, info)
 end
 
 local function updateMovementInfoWithModelUnit(info, unit)
-    info.m_Label:setString("Movement Range:  " .. unit:getMovementRange() .. "(" .. unit:getMovementType() .. ")")
+    info.m_Label:setString("Movement Range:  " .. unit:getMoveRange() .. "(" .. unit:getMoveType() .. ")")
 end
 
 --------------------------------------------------------------------------------
@@ -347,7 +347,12 @@ end
 
 local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
     if (hasPrimaryWeapon) then
-        label:setString("Primary Weapon: " .. unit:getPrimaryWeaponName() .. "    Ammo:  " .. unit:getPrimaryWeaponCurrentAmmo() .. " / " .. unit:getPrimaryWeaponMaxAmmo())
+        local minRange, maxRange = unit:getAttackRangeMinMax()
+        label:setString(
+            "Primary Weapon: " .. unit:getPrimaryWeaponName() ..
+            "    Ammo:  "      .. unit:getPrimaryWeaponCurrentAmmo() .. " / " .. unit:getPrimaryWeaponMaxAmmo() ..
+            "    Range:  "     .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
+        )
     else
         label:setString("Primary Weapon: Not equipped.")
     end

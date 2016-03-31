@@ -29,7 +29,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
         return nil, "ActionTranslator-translatePath() the moving unit is not in idle state."
     end
 
-    local moveType             = modelFocusUnit:getMovementType()
+    local moveType             = modelFocusUnit:getMoveType()
     local weather              = modelWeatherManager:getCurrentWeather()
     local totalFuelConsumption = 0
     local translatedPath       = {GridIndexFunctions.clone(path[1].gridIndex)}
@@ -59,7 +59,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
         translatedPath[#translatedPath + 1] = gridIndex
     end
 
-    if (totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or (totalFuelConsumption > modelFocusUnit:getMovementRange()) then
+    if (totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or (totalFuelConsumption > modelFocusUnit:getMoveRange()) then
         return nil, "ActionTranslator-translatedPath() the path is invalid because the fuel consumption is too high."
     else
         return translatedPath

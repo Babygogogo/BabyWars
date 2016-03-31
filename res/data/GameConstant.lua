@@ -1134,6 +1134,16 @@ GameConstant.unitMaxHP       = 100
 GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
 
+GameConstant.moveTypes = {
+    "infantry",
+    "mech",
+    "tires",
+    "treads",
+    "air",
+    "ship",
+    "lander",
+}
+
 GameConstant.Mapping_IdToTemplateModelTile = {
     hq = {
         defenseBonus = {
@@ -2061,8 +2071,10 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
 GameConstant.Mapping_IdToTemplateModelUnit = {
     infantry   = {
-        movementRange = 3,
-        movementType  = "infantry",
+        movement = {
+            range = 3,
+            type  = "infantry",
+        },
 
         vision        = 2,
 
@@ -2131,8 +2143,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     mech       = {
-        movementRange = 2,
-        movementType  = "mech",
+        movement = {
+            range = 2,
+            type  = "mech",
+        },
 
         vision        = 2,
 
@@ -2232,8 +2246,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     recon      = {
-        movementRange = 8,
-        movementType  = "tires",
+        movement = {
+            range = 8,
+            type  = "tires",
+        },
 
         vision        = 5,
 
@@ -2303,8 +2319,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     tank       = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 3,
 
@@ -2404,8 +2422,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     mdtank     = {
-        movementRange = 5,
-        movementType  = "treads",
+        movement = {
+            range = 5,
+            type  = "treads",
+        },
 
         vision        = 1,
 
@@ -2507,8 +2527,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     neotank    = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 1,
 
@@ -2609,8 +2631,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     apc        = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 1,
 
@@ -2643,8 +2667,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     artillery  = {
-        movementRange = 5,
-        movementType  = "treads",
+        movement = {
+            range = 5,
+            type  = "treads",
+        },
 
         vision        = 1,
 
@@ -2716,8 +2742,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     rockets    = {
-        movementRange = 5,
-        movementType  = "tires",
+        movement = {
+            range = 5,
+            type  = "tires",
+        },
 
         vision        = 1,
 
@@ -2789,8 +2817,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     antiair    = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 2,
 
@@ -2862,8 +2892,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     missiles   = {
-        movementRange = 5,
-        movementType  = "tires",
+        movement = {
+            range = 5,
+            type  = "tires",
+        },
 
         vision        = 5,
 
@@ -2934,8 +2966,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     fighter    = {
-        movementRange = 9,
-        movementType  = "air",
+        movement = {
+            range = 9,
+            type  = "air",
+        },
 
         vision        = 2,
 
@@ -3007,8 +3041,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     bomber     = {
-        movementRange = 7,
-        movementType  = "air",
+        movement = {
+            range = 7,
+            type  = "air",
+        },
 
         vision        = 2,
 
@@ -3080,8 +3116,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     bcopter    = {
-        movementRange = 6,
-        movementType  = "air",
+        movement = {
+            range = 6,
+            type  = "air",
+        },
 
         vision        = 3,
 
@@ -3181,8 +3219,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     tcopter    = {
-        movementRange = 6,
-        movementType  = "air",
+        movement = {
+            range = 6,
+            type  = "air",
+        },
 
         vision        = 2,
 
@@ -3215,8 +3255,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     battleship = {
-        movementRange = 5,
-        movementType  = "ship",
+        movement = {
+            range = 5,
+            type  = "ship",
+        },
 
         vision        = 2,
 
@@ -3287,8 +3329,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     cruiser    = {
-        movementRange = 6,
-        movementType  = "ship",
+        movement = {
+            range = 6,
+            type  = "ship",
+        },
 
         vision        = 3,
 
@@ -3388,8 +3432,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     lander     = {
-        movementRange = 6,
-        movementType  = "lander",
+        movement = {
+            range = 6,
+            type  = "lander",
+        },
 
         vision        = 1,
 
@@ -3422,8 +3468,10 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
     },
 
     submarine  = {
-        movementRange = 5,
-        movementType  = "ship",
+        movement = {
+            range = 5,
+            type  = "ship",
+        },
 
         vision        = 5,
 

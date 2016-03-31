@@ -8,6 +8,9 @@ local ModelUnit          = require("app.models.ModelUnit")
 local GridSize           = require("res.data.GameConstant").GridSize
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
@@ -21,6 +24,17 @@ end
 
 local function getTiledUnitLayer(tiledData)
     return tiledData.layers[2]
+end
+
+local function iterateAllActorUnits(self, func)
+    for x = 1, self.m_UnitActorsMap.size.width do
+        for y = 1, self.m_UnitActorsMap.size.height do
+            local actorUnit = self.m_UnitActorsMap[x][y]
+            if (actorUnit) then
+                func(actorUnit)
+            end
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -121,14 +135,9 @@ function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnStarted", self)
 
-    for x = 1, self.m_UnitActorsMap.size.height do
-        for y = 1, self.m_UnitActorsMap.size.width do
-            local actorUnit = self.m_UnitActorsMap[x][y]
-            if (actorUnit) then
-                actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
-            end
-        end
-    end
+    iterateAllActorUnits(self, function(actor)
+        actor:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+    end)
 
     return self
 end
@@ -138,14 +147,9 @@ function ModelUnitMap:onCleanup(rootActor)
         :removeEventListener("EvtPlayerMovedCursor", self)
     self.m_RootScriptEventDispatcher = nil
 
-    for x = 1, self.m_UnitActorsMap.size.height do
-        for y = 1, self.m_UnitActorsMap.size.width do
-            local actorUnit = self.m_UnitActorsMap[x][y]
-            if (actorUnit) then
-                actorUnit:getModel():unsetRootScriptEventDispatcher()
-            end
-        end
-    end
+    iterateAllActorUnits(self, function(actor)
+        actor:getModel():unsetRootScriptEventDispatcher()
+    end)
 
     return self
 end

@@ -7,7 +7,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getMaxRange(unitModel)
-    return math.min(unitModel:getMovementRange(), unitModel:getCurrentFuel())
+    return math.min(unitModel:getMoveRange(), unitModel:getCurrentFuel())
 end
 
 local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapModel, weather)
@@ -21,7 +21,7 @@ local function getRangeConsumption(gridIndex, unitModel, unitMapModel, tileMapMo
         return nil
     end
 
-    return tileActor:getModel():getMoveCost(unitModel:getMovementType(), weather)
+    return tileActor:getModel():getMoveCost(unitModel:getMoveType(), weather)
 end
 
 local function getReachableGrid(grids, gridIndex)
