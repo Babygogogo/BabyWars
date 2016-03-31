@@ -73,7 +73,7 @@ end
 
 function ModelTurnManager:runTurn(nextWeather)
     if (self.m_TurnPhase == "end") then
-        self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseEnd", playerIndex = self.m_PlayerIndex})
+        self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseEnd", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
     --[[
         if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
             self.m_Weather.m_CurrentWeather = nextWeather
@@ -84,6 +84,10 @@ function ModelTurnManager:runTurn(nextWeather)
         -- TODO: Change state for units, vision and so on.
         self.m_TurnPhase = "standby"
         self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
+    end
+
+    if (self.m_TurnPhase == "standby") then
+        self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseStandby", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
     end
 
     local player = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)

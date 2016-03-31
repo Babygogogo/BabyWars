@@ -2079,7 +2079,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2151,7 +2152,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2254,7 +2256,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 5,
 
         fuel = {
-            maxFuel                = 80,
+            max                    = 80,
+            current                = 80,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2327,7 +2330,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 3,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2430,7 +2434,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2535,7 +2540,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2639,7 +2645,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2675,7 +2682,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2750,7 +2758,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2825,7 +2834,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 60,
+            max                    = 60,
+            current                = 60,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2900,7 +2910,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 5,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2974,7 +2985,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3049,7 +3061,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3124,7 +3137,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 3,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3227,7 +3241,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3263,7 +3278,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3337,7 +3353,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 3,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3440,7 +3457,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 1,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3476,7 +3494,8 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         vision        = 5,
 
         fuel = {
-            maxFuel                = 60,
+            max                    = 60,
+            current                = 60,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,

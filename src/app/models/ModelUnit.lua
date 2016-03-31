@@ -40,9 +40,16 @@ end
 
 local function setStateActioned(self)
     self.m_State = "actioned"
+end
 
-    if (self.m_View) then
-        self.m_View:setStateActioned()
+--------------------------------------------------------------------------------
+-- The callback functions on EvtTurnPhaseStandby.
+--------------------------------------------------------------------------------
+local function onEvtTurnPhaseStandby(self, event)
+    if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
+        local fuel = self:getCurrentFuel() - self:getFuelConsumptionPerTurn()
+        self:setCurrentFuel(fuel)
+        -- TODO: destroy the unit if needed.
     end
 end
 
@@ -56,68 +63,50 @@ local function onEvtTurnPhaseEnd(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The fuel data.
---------------------------------------------------------------------------------
-local function initWithFuelData(model, data)
-    local fuel = {}
-    fuel.m_CurrentFuel = data.maxFuel
-
-    model.m_Fuel = fuel
-end
-
-local function loadFuelData(model, data)
-    assert(type(model.m_Fuel) == "table", "ModelUnit-loadFuelData() the model has no fuel data.")
-
-    if (not data) then
-        return
-    end
-
-    model.m_Fuel.m_CurrentFuel = data.currentFuel
-end
-
---------------------------------------------------------------------------------
 -- The functions that loads the data for the model from a TiledID/lua table.
 --------------------------------------------------------------------------------
-local function initWithTiledID(model, tiledID)
+local function initWithTiledID(self, tiledID)
     local template = toTemplateModelUnit(tiledID)
-    assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID.")
+    assert(template, "ModelUnit-initWithTiledID() failed to get the template self unit with param tiledID.")
 
-    model.m_TiledID = tiledID
-    if (template == model.m_Template) then
+    self.m_TiledID = tiledID
+    if (template == self.m_Template) then
         return
     end
 
-    model.m_Template = template
-    model.m_State    = "idle"
-    initWithFuelData(model, template.fuel)
+    self.m_Template = template
+    self.m_State    = "idle"
 
-    ComponentManager.unbindAllComponents(model)
-        .bindComponent(model, "GridIndexable")
-        .bindComponent(model, "MoveDoer", template.movement)
-        .bindComponent(model, "AttackTaker")
+    ComponentManager.unbindAllComponents(self)
+        .bindComponent(self, "GridIndexable")
+        .bindComponent(self, "FuelOwner", {template = template.fuel, instantialData = template.fuel})
+        .bindComponent(self, "MoveDoer",  {template = template.movement})
+        .bindComponent(self, "AttackTaker")
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
-            if (not ComponentManager.getComponent(model, specialProperty.name)) then
-                ComponentManager.bindComponent(model, specialProperty.name)
+            if (not ComponentManager.getComponent(self, specialProperty.name)) then
+                ComponentManager.bindComponent(self, specialProperty.name)
             end
-            ComponentManager.getComponent(model, specialProperty.name):load(specialProperty)
+            ComponentManager.getComponent(self, specialProperty.name):load(specialProperty)
         end
     end
 end
 
-local function loadInstanceProperties(model, param)
+local function loadInstantialData(self, param)
     if (param.gridIndex) then
-        model:setGridIndex(param.gridIndex)
+        self:setGridIndex(param.gridIndex)
     end
 
-    model.m_State = param.state or model.m_State
-    loadFuelData(model, param.fuel)
+    self.m_State = param.state or self.m_State
+    if (param.fuel) then
+        ComponentManager.getComponent("FuelOwner"):loadInstantialData(param.fuel)
+    end
 
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
-            local component = ComponentManager.getComponent(model, specialProperty.name)
-            assert(component, "ModelUnit-loadInstanceProperties() attempting to loadInstanceProperties a component that the model hasn't bound with.")
+            local component = ComponentManager.getComponent(self, specialProperty.name)
+            assert(component, "ModelUnit-loadInstantialData() attempting to load a component that the model hasn't bound with.")
             component:load(specialProperty)
         end
     end
@@ -131,7 +120,7 @@ function ModelUnit:ctor(param)
         initWithTiledID(self, param.tiledID)
     end
 
-    loadInstanceProperties(self, param)
+    loadInstantialData(self, param)
 
     if (self.m_View) then
         self:initView()
@@ -151,7 +140,8 @@ end
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     self:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseEnd", self)
+    dispatcher:addEventListener("EvtTurnPhaseStandby", self)
+        :addEventListener("EvtTurnPhaseEnd", self)
 
     return self
 end
@@ -159,6 +149,7 @@ end
 function ModelUnit:unsetRootScriptEventDispatcher()
     if (self.m_RootScriptEventDispatcher) then
         self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseEnd", self)
+            :removeEventListener("EvtTurnPhaseStandby", self)
 
         self.m_RootScriptEventDispatcher = nil
     end
@@ -170,7 +161,10 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelUnit:onEvent(event)
-    if (event.name == "EvtTurnPhaseEnd") then
+    local name = event.name
+    if (name == "EvtTurnPhaseStandby") then
+        onEvtTurnPhaseStandby(self, event)
+    elseif (name == "EvtTurnPhaseEnd") then
         onEvtTurnPhaseEnd(self, event)
     end
 
@@ -204,22 +198,6 @@ function ModelUnit:getVision()
     return self.m_Template.vision
 end
 
-function ModelUnit:getCurrentFuel()
-    return self.m_Fuel.m_CurrentFuel
-end
-
-function ModelUnit:getMaxFuel()
-    return self.m_Template.fuel.maxFuel
-end
-
-function ModelUnit:getFuelConsumptionPerTurn()
-    return self.m_Template.fuel.consumptionPerTurn
-end
-
-function ModelUnit:getDescriptionOnOutOfFuel()
-    return self.m_Template.fuel.descriptionOnOutOfFuel
-end
-
 function ModelUnit:getDefenseFatalList()
     return self.m_Template.defense.fatal
 end
@@ -233,16 +211,12 @@ function ModelUnit:canJoin(rhsUnitModel)
 end
 
 function ModelUnit:doActionWait(action)
-    local callbackOnMoveFinish = function()
-        self:setGridIndex(action.path[#action.path])
-        setStateActioned(self)
-    end
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, callbackOnMoveFinish)
-    else
-        callbackOnMoveFinish()
-    end
+    setStateActioned(self)
+    self:moveAlongPath(action.path, function()
+        if (self.m_View) then
+            self.m_View:setStateActioned()
+        end
+    end)
 
     return self
 end

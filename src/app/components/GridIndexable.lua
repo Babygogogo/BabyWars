@@ -57,14 +57,15 @@ function GridIndexable:getGridIndex()
     return self.m_GridIndex
 end
 
--- This function also sets the position of the view.
-function GridIndexable:setGridIndex(gridIndex)
+function GridIndexable:setGridIndex(gridIndex, shouldMoveView)
     assert(TypeChecker.isGridIndex(gridIndex))
-
     self.m_GridIndex.x, self.m_GridIndex.y = gridIndex.x, gridIndex.y
-    self:setViewPositionWithGridIndex(self.m_GridIndex)
 
-    return self
+    if (shouldMoveView ~= false) then
+        self:setViewPositionWithGridIndex(self.m_GridIndex)
+    end
+
+    return self.m_Target
 end
 
 -- The param gridIndex may be nil. If so, the function set the position of view with self.m_GridIndex .
@@ -74,7 +75,7 @@ function GridIndexable:setViewPositionWithGridIndex(gridIndex)
         view:setPosition(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
     end
 
-    return self
+    return self.m_Target
 end
 
 return GridIndexable

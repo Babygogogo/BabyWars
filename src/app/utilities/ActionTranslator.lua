@@ -62,6 +62,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
     if (totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or (totalFuelConsumption > modelFocusUnit:getMoveRange()) then
         return nil, "ActionTranslator-translatedPath() the path is invalid because the fuel consumption is too high."
     else
+        translatedPath.fuelConsumption = totalFuelConsumption
         return translatedPath
     end
 end

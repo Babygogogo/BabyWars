@@ -191,14 +191,17 @@ end
 
 function ModelUnitMap:doActionWait(action)
     local path               = action.path
-    local beginningGridIndex = path[1]
-    local endingGridIndex    = path[#path]
-
+    -- HACK: sometimes the path is modified mysteriously after calling actorFocusUnit:getModel():doActionWait(action)
+    -- and the value of path[1] will become the same as path[#path].
+    -- so I clone them for later use.
+    local beginningGridIndex = GridIndexFunctions.clone(path[1])
+    local endingGridIndex    = GridIndexFunctions.clone(path[#path])
     local actorFocusUnit = self:getActorUnit(beginningGridIndex)
-    actorFocusUnit:getModel():doActionWait(action)
 
     self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
     self.m_UnitActorsMap[endingGridIndex.x   ][endingGridIndex.y   ] = actorFocusUnit
+
+    actorFocusUnit:getModel():doActionWait(action)
 
     return self
 end
