@@ -28,6 +28,9 @@ local function loadGridAnimations()
 
     local attackableGridAnimation = display.newAnimation(display.newFrames("c03_t03_s02_f%02d.png", 1, 15), 0.07)
     display.setAnimationCache("AttackableGrid", attackableGridAnimation)
+
+    local explosionAnimation = display.newAnimation(display.newFrames("c03_t07_s09_f%02d.png", 1, 9), 0.06)
+    display.setAnimationCache("GridExplosion", explosionAnimation)
 end
 
 function AnimationLoader.load()

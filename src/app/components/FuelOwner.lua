@@ -12,6 +12,7 @@ local EXPORTED_METHODS = {
     "getMaxFuel",
     "getFuelConsumptionPerTurn",
     "getDescriptionOnOutOfFuel",
+    "shouldDestroyOnOutOfFuel",
 }
 
 --------------------------------------------------------------------------------
@@ -86,6 +87,10 @@ end
 
 function FuelOwner:getDescriptionOnOutOfFuel()
     return self.m_Template.descriptionOnOutOfFuel
+end
+
+function FuelOwner:shouldDestroyOnOutOfFuel()
+    return self.m_Template.destroyOnOutOfFuel
 end
 
 function FuelOwner:setCurrentFuel(fuelAmount)

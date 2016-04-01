@@ -9,7 +9,8 @@ local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.
       BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
       BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
 
-local MAP_CURSOR_Z_ORDER     = 3
+local MAP_CURSOR_Z_ORDER     = 4
+local GRID_EXPLOSION_Z_ORDER = 3
 local UNIT_MAP_Z_ORDER       = 2
 local ACTION_PLANNER_Z_ORDER = 1
 local TILE_MAP_Z_ORDER       = 0
@@ -75,52 +76,52 @@ function ViewWarField:ctor(param)
     return self
 end
 
-function ViewWarField:setTileMapView(view)
-    if (self.m_TileMapView) then
-        if (self.m_TileMapView == view) then
+function ViewWarField:setViewTileMap(view)
+    if (self.m_ViewTileMap) then
+        if (self.m_ViewTileMap == view) then
             return self
         else
-            self:removeChild(self.m_TileMapView)
+            self:removeChild(self.m_ViewTileMap)
         end
     end
 
-    self.m_TileMapView = view
+    self.m_ViewTileMap = view
     self:addChild(view, TILE_MAP_Z_ORDER)
 
     return self
 end
 
-function ViewWarField:setUnitMapView(view)
-    if (self.m_UnitMapView) then
-        if (self.m_UnitMapView == view) then
+function ViewWarField:setViewUnitMap(view)
+    if (self.m_ViewUnitMap) then
+        if (self.m_ViewUnitMap == view) then
             return self
         else
-            self:removeChild(self.m_UnitMapView)
+            self:removeChild(self.m_ViewUnitMap)
         end
     end
 
-    self.m_UnitMapView = view
+    self.m_ViewUnitMap = view
     self:addChild(view, UNIT_MAP_Z_ORDER)
 
     return self
 end
 
-function ViewWarField:setActionPlannerView(view)
-    if (self.m_ActionPlannerView) then
-        if (self.m_ActionPlannerView == view) then
+function ViewWarField:setViewActionPlanner(view)
+    if (self.m_ViewActionPlanner) then
+        if (self.m_ViewActionPlanner == view) then
             return self
         else
-            self:removeChild(self.m_ActionPlannerView)
+            self:removeChild(self.m_ViewActionPlanner)
         end
     end
 
-    self.m_ActionPlannerView = view
+    self.m_ViewActionPlanner = view
     self:addChild(view, ACTION_PLANNER_Z_ORDER)
 
     return self
 end
 
-function ViewWarField:setMapCursorView(view)
+function ViewWarField:setViewMapCursor(view)
     if (self.m_MapCursorView) then
         if (self.m_MapCursorView == view) then
             return self
@@ -131,6 +132,21 @@ function ViewWarField:setMapCursorView(view)
 
     self.m_MapCursorView = view
     self:addChild(view, MAP_CURSOR_Z_ORDER)
+
+    return self
+end
+
+function ViewWarField:setViewGridExplosion(view)
+    if (self.m_ViewGridExplosion) then
+        if (self.m_ViewGridExplosion == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewGridExplosion)
+        end
+    end
+
+    self.m_ViewGridExplosion = view
+    self:addChild(view, GRID_EXPLOSION_Z_ORDER)
 
     return self
 end

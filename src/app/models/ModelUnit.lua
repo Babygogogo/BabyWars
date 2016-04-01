@@ -47,9 +47,11 @@ end
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
-        local fuel = self:getCurrentFuel() - self:getFuelConsumptionPerTurn()
-        self:setCurrentFuel(fuel)
-        -- TODO: destroy the unit if needed.
+        local fuel = math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0)
+        self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
+        if (self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel()) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyUnit", gridIndex = self:getGridIndex()})
+        end
     end
 end
 

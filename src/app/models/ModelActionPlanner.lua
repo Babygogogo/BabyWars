@@ -207,7 +207,7 @@ local function getReachableGridsForUnit(unitModel, unitMapModel, tileMapModel, w
 end
 
 local function resetReachableGrids(self, focusUnitModel)
-    if (self.m_FocusUnitModel ~= focusUnitModel) then
+    if (self.m_FocusUnitModel ~= focusUnitModel) or (self.m_State == "idle") then
         self.m_ReachableGrids = getReachableGridsForUnit(focusUnitModel, self.m_UnitMapModel, self.m_TileMapModel, self.m_CurrentWeather)
         if (self.m_View) then
             self.m_View:setReachableGrids(self.m_ReachableGrids)
