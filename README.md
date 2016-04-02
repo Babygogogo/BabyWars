@@ -1,5 +1,5 @@
 # BabyWars
-Baby Wars is a 2D turn-based strategy game, whose gameplay is based on *Advanced Wars* series. 
+Baby Wars is a 2D turn-based strategy game, whose gameplay is based on the ones of *Advanced Wars* series. 
 
 ![Screenshot](https://github.com/Babygogogo/BabyWars/raw/master/external/Screenshots/screenshot.PNG)
 
@@ -33,6 +33,7 @@ If you want to have a try, feel free to email to 101599838@qq.com, and I will se
 The game uses cocos2d-lua v3.9 as its engine, which is cross-platform, so you can develop the game on most destop platforms.
 
 A typical way to setup the development environment:
+
 1. Download the engine and unzip it
 - Create an empty lua project using the tools in the engine and compile it (for details, reach for the documents of the engine)
 - Download the files of this project, then copy them to the project above, overwriting the existing files
