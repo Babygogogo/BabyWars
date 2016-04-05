@@ -1,8 +1,6 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
-local UNIT_DETAIL_Z_ORDER = 2
-
 local function onEvtPlayerTouchUnit(model, event)
     model.m_ModelUnit = event.unitModel
 
@@ -19,9 +17,15 @@ local function onEvtPlayerTouchNoUnit(model, event)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
+    return self
+end
+
+function ModelUnitInfo:setModelUnitDetail(model)
+    self.m_UnitDetailModel = model
+
     return self
 end
 
@@ -56,14 +60,10 @@ function ModelUnitInfo:onEvent(event)
 end
 
 function ModelUnitInfo:onPlayerTouch()
-    if (not self.m_DetailActor) then
-        self.m_DetailActor = require("global.actors.Actor").createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
-        self.m_View:getScene():addChild(self.m_DetailActor:getView(), UNIT_DETAIL_Z_ORDER)
+    if (self.m_UnitDetailModel) then
+        self.m_UnitDetailModel:updateWithModelUnit(self.m_ModelUnit)
+            :setEnabled(true)
     end
-
-    local modelDetail = self.m_DetailActor:getModel()
-    modelDetail:updateWithModelUnit(self.m_ModelUnit)
-        :setEnabled(true)
 
     return self
 end

@@ -22,8 +22,20 @@ local function loadTiledAnimations()
     end
 end
 
+local function loadGridAnimations()
+    local reachableGridAnimation = display.newAnimation(display.newFrames("c03_t03_s01_f%02d.png", 1, 15), 0.07)
+    display.setAnimationCache("ReachableGrid", reachableGridAnimation)
+
+    local attackableGridAnimation = display.newAnimation(display.newFrames("c03_t03_s02_f%02d.png", 1, 15), 0.07)
+    display.setAnimationCache("AttackableGrid", attackableGridAnimation)
+
+    local explosionAnimation = display.newAnimation(display.newFrames("c03_t07_s09_f%02d.png", 1, 9), 0.06)
+    display.setAnimationCache("GridExplosion", explosionAnimation)
+end
+
 function AnimationLoader.load()
     loadTiledAnimations()
+    loadGridAnimations()
 end
 
 function AnimationLoader.getAnimationWithTiledID(tiledID)
@@ -32,8 +44,8 @@ end
 
 function AnimationLoader.getAnimationWithTypeName(name)
     local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelIdTileOrUnit
-    for id, typeName in ipairs(mapping) do
-        if (typeName == name) then
+    for id, templateID in ipairs(mapping) do
+        if (templateID.n == name) then
             return AnimationLoader.getAnimationWithTiledID(id)
         end
     end

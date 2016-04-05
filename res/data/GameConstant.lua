@@ -7,28 +7,66 @@ GameConstant.GridSize = {
 
 GameConstant.Mapping_TiledIdToTemplateModelIdTileOrUnit = {
     -- TiledID 0 + 1
-    "hq",          "hq",          "hq",          "hq",          "city",        "city",        "city",        "city",        "city",        "base",
-    "base",        "base",        "base",        "base",        "airport",     "airport",     "airport",     "airport",     "airport",     "seaport",
-    "seaport",     "seaport",     "seaport",     "seaport",     "plain",       "plain",       "plain",       "plain",       "road",        "road",
-    "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "road",        "forest",
-    "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",       "river",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",
-    "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "sea",         "reef",
-    "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
-    "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",       "shoal",
+    {n = "hq",       p = 1},    {n = "hq",       p = 2},    {n = "hq",       p = 3},    {n = "hq",       p = 4},
+    {n = "city",     p = 1},    {n = "city",     p = 2},    {n = "city",     p = 3},    {n = "city",     p = 4},    {n = "city",     p = 5},
+    {n = "base",     p = 1},    {n = "base",     p = 2},    {n = "base",     p = 3},    {n = "base",     p = 4},    {n = "base",     p = 5},
+    {n = "airport",  p = 1},    {n = "airport",  p = 2},    {n = "airport",  p = 3},    {n = "airport",  p = 4},    {n = "airport",  p = 5},
+    {n = "seaport",  p = 1},    {n = "seaport",  p = 2},    {n = "seaport",  p = 3},    {n = "seaport",  p = 4},    {n = "seaport",  p = 5},
+
+    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},
+
+    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
+    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
+    {n = "road",     p = 0},
+
+    {n = "forest",   p = 0},
+
+    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
+    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
+
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+
+    {n = "reef",     p = 0},
+
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
 
     -- TiledID 100 + 1
-    "mountain",    "mountain",    "bridge",      "bridge",      "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",    "pipeline",
-    "pipeline",    "pipeline",    "pipeline",    "pipeline",    "joint",       "joint",       "infantry",    "infantry",    "infantry",    "infantry",
-    "mech",        "mech",        "mech",        "mech",        "recon",       "recon",       "recon",       "recon",       "tank",        "tank",
-    "tank",        "tank",        "mdtank",      "mdtank",      "mdtank",      "mdtank",      "neotank",     "neotank",     "neotank",     "neotank",
-    "apc",         "apc",         "apc",         "apc",         "artillery",   "artillery",   "artillery",   "artillery",   "rockets",     "rockets",
-    "rockets",     "rockets",     "antiair",     "antiair",     "antiair",     "antiair",     "missiles",    "missiles",    "missiles",    "missiles",
-    "fighter",     "fighter",     "fighter",     "fighter",     "bomber",      "bomber",      "bomber",      "bomber",      "bcopter",     "bcopter",
-    "bcopter",     "bcopter",     "tcopter",     "tcopter",     "tcopter",     "tcopter",     "battleship",  "battleship",  "battleship",  "battleship",
-    "cruiser",     "cruiser",     "cruiser",     "cruiser",     "lander",      "lander",      "lander",      "lander",      "submarine",   "submarine",
-    "submarine",   "submarine",
+    {n = "mountain", p = 0},    {n = "mountain", p = 0},
+
+    {n = "bridge",   p = 0},    {n = "bridge",   p = 0},
+
+    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
+    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
+
+    {n = "joint",    p = 0},    {n = "joint",    p = 0},
+
+    {n = "infantry",   p = 1},  {n = "infantry",   p = 2},  {n = "infantry",   p = 3},  {n = "infantry",   p = 4},
+    {n = "mech",       p = 1},  {n = "mech",       p = 2},  {n = "mech",       p = 3},  {n = "mech",       p = 4},
+    {n = "recon",      p = 1},  {n = "recon",      p = 2},  {n = "recon",      p = 3},  {n = "recon",      p = 4},
+    {n = "tank",       p = 1},  {n = "tank",       p = 2},  {n = "tank",       p = 3},  {n = "tank",       p = 4},
+    {n = "mdtank",     p = 1},  {n = "mdtank",     p = 2},  {n = "mdtank",     p = 3},  {n = "mdtank",     p = 4},
+    {n = "neotank",    p = 1},  {n = "neotank",    p = 2},  {n = "neotank",    p = 3},  {n = "neotank",    p = 4},
+    {n = "apc",        p = 1},  {n = "apc",        p = 2},  {n = "apc",        p = 3},  {n = "apc",        p = 4},
+    {n = "artillery",  p = 1},  {n = "artillery",  p = 2},  {n = "artillery",  p = 3},  {n = "artillery",  p = 4},
+    {n = "rockets",    p = 1},  {n = "rockets",    p = 2},  {n = "rockets",    p = 3},  {n = "rockets",    p = 4},
+    {n = "antiair",    p = 1},  {n = "antiair",    p = 2},  {n = "antiair",    p = 3},  {n = "antiair",    p = 4},
+    {n = "missiles",   p = 1},  {n = "missiles",   p = 2},  {n = "missiles",   p = 3},  {n = "missiles",   p = 4},
+    {n = "fighter",    p = 1},  {n = "fighter",    p = 2},  {n = "fighter",    p = 3},  {n = "fighter",    p = 4},
+    {n = "bomber",     p = 1},  {n = "bomber",     p = 2},  {n = "bomber",     p = 3},  {n = "bomber",     p = 4},
+    {n = "bcopter",    p = 1},  {n = "bcopter",    p = 2},  {n = "bcopter",    p = 3},  {n = "bcopter",    p = 4},
+    {n = "tcopter",    p = 1},  {n = "tcopter",    p = 2},  {n = "tcopter",    p = 3},  {n = "tcopter",    p = 4},
+    {n = "battleship", p = 1},  {n = "battleship", p = 2},  {n = "battleship", p = 3},  {n = "battleship", p = 4},
+    {n = "cruiser",    p = 1},  {n = "cruiser",    p = 2},  {n = "cruiser",    p = 3},  {n = "cruiser",    p = 4},
+    {n = "lander",     p = 1},  {n = "lander",     p = 2},  {n = "lander",     p = 3},  {n = "lander",     p = 4},
+    {n = "submarine",  p = 1},  {n = "submarine",  p = 2},  {n = "submarine",  p = 3},  {n = "submarine",  p = 4},
 }
 
 GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
@@ -1092,7 +1130,19 @@ GameConstant.unitCatagory = {
 }
 
 GameConstant.maxCapturePoint = 20
+GameConstant.unitMaxHP       = 100
+GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
+
+GameConstant.moveTypes = {
+    "infantry",
+    "mech",
+    "tires",
+    "treads",
+    "air",
+    "ship",
+    "lander",
+}
 
 GameConstant.Mapping_IdToTemplateModelTile = {
     hq = {
@@ -1913,6 +1963,15 @@ GameConstant.Mapping_IdToTemplateModelTile = {
         },
 
         description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+
+        specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.tileMaxHP,
+                defenseType      = "mdtank",
+                isAffectedByLuck = false,
+            },
+        },
     },
 
     silo = {
@@ -2012,13 +2071,16 @@ GameConstant.Mapping_IdToTemplateModelTile = {
 
 GameConstant.Mapping_IdToTemplateModelUnit = {
     infantry   = {
-        movementRange = 3,
-        movementType  = "infantry",
+        movement = {
+            range = 3,
+            type  = "infantry",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2037,7 +2099,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name            = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon   = nil,
                 secondaryWeapon = {
                     name        = "Machine gun",
@@ -2068,17 +2134,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "infantry",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     mech       = {
-        movementRange = 2,
-        movementType  = "mech",
+        movement = {
+            range = 2,
+            type  = "mech",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2097,7 +2172,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name = "Barzooka",
                     baseDamage  = {
@@ -2158,17 +2237,27 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "mech",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
     recon      = {
-        movementRange = 8,
-        movementType  = "tires",
+        movement = {
+            range = 8,
+            type  = "tires",
+        },
 
         vision        = 5,
 
         fuel = {
-            maxFuel                = 80,
+            max                    = 80,
+            current                = 80,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2187,7 +2276,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name            = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon   = nil,
                 secondaryWeapon = {
                     name        = "Machine gun",
@@ -2218,17 +2311,27 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "recon",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
     tank       = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 3,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2247,7 +2350,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2308,17 +2415,27 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "tank",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
     mdtank     = {
-        movementRange = 5,
-        movementType  = "treads",
+        movement = {
+            range = 5,
+            type  = "treads",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2337,7 +2454,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2400,17 +2521,27 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     }
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "mdtank",
+                isAffectedByLuck = true,
+            },
+
         },
     },
 
     neotank    = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2429,7 +2560,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -2492,17 +2627,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "neotank",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     apc        = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 70,
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2520,17 +2664,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "apc",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     artillery  = {
-        movementRange = 5,
-        movementType  = "treads",
+        movement = {
+            range = 5,
+            type  = "treads",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2549,7 +2702,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 2,
+                maxAttackRange     = 3,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name       = "Cannon",
                     baseDamage = {
@@ -2583,17 +2740,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "artillery",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     rockets    = {
-        movementRange = 5,
-        movementType  = "tires",
+        movement = {
+            range = 5,
+            type  = "tires",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2612,7 +2778,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 5,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Rockets",
                     baseDamage  = {
@@ -2646,17 +2816,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "rockets",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     antiair    = {
-        movementRange = 6,
-        movementType  = "treads",
+        movement = {
+            range = 6,
+            type  = "treads",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 60,
+            max                    = 60,
+            current                = 60,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2675,7 +2854,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name          = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Vulcan",
                     baseDamage  = {
@@ -2709,17 +2892,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "antiair",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     missiles   = {
-        movementRange = 5,
-        movementType  = "tires",
+        movement = {
+            range = 5,
+            type  = "tires",
+        },
 
         vision        = 5,
 
         fuel = {
-            maxFuel                = 50,
+            max                    = 50,
+            current                = 50,
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
@@ -2738,7 +2930,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 6,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -2771,17 +2967,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "missiles",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     fighter    = {
-        movementRange = 9,
-        movementType  = "air",
+        movement = {
+            range = 9,
+            type  = "air",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -2800,7 +3005,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -2834,17 +3043,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "fighter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     bomber     = {
-        movementRange = 7,
-        movementType  = "air",
+        movement = {
+            range = 7,
+            type  = "air",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -2863,7 +3081,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Bombs",
                     baseDamage  = {
@@ -2897,17 +3119,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "bomber",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     bcopter    = {
-        movementRange = 6,
-        movementType  = "air",
+        movement = {
+            range = 6,
+            type  = "air",
+        },
 
         vision        = 3,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -2926,7 +3157,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -2988,17 +3223,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "bcopter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     tcopter    = {
-        movementRange = 6,
-        movementType  = "air",
+        movement = {
+            range = 6,
+            type  = "air",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3016,17 +3260,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "T copters can transport both infantry and mech units.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "tcopter",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     battleship = {
-        movementRange = 5,
-        movementType  = "ship",
+        movement = {
+            range = 5,
+            type  = "ship",
+        },
 
         vision        = 2,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3044,7 +3297,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 3,
+                maxAttackRange     = 6,
+                canAttackAfterMove = false,
+
                 primaryWeapon = {
                     name        = "Cannon",
                     baseDamage  = {
@@ -3078,17 +3335,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                 },
                 secondaryWeapon = nil,
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "battleship",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     cruiser    = {
-        movementRange = 6,
-        movementType  = "ship",
+        movement = {
+            range = 6,
+            type  = "ship",
+        },
 
         vision        = 3,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3107,7 +3373,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Missiles",
                     baseDamage  = {
@@ -3169,17 +3439,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     },
                 },
             },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "cruiser",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     lander     = {
-        movementRange = 6,
-        movementType  = "lander",
+        movement = {
+            range = 6,
+            type  = "lander",
+        },
 
         vision        = 1,
 
         fuel = {
-            maxFuel                = 99,
+            max                    = 99,
+            current                = 99,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3197,17 +3476,26 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
         description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
 
         specialProperties = {
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "lander",
+                isAffectedByLuck = true,
+            },
         },
     },
 
     submarine  = {
-        movementRange = 5,
-        movementType  = "ship",
+        movement = {
+            range = 5,
+            type  = "ship",
+        },
 
         vision        = 5,
 
         fuel = {
-            maxFuel                = 60,
+            max                    = 60,
+            current                = 60,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
@@ -3226,7 +3514,11 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
 
         specialProperties = {
             {
-                name         = "AttackDoer",
+                name               = "AttackDoer",
+                minAttackRange     = 1,
+                maxAttackRange     = 1,
+                canAttackAfterMove = true,
+
                 primaryWeapon = {
                     name        = "Torpedoes",
                     baseDamage  = {
@@ -3259,6 +3551,12 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
                     maxAmmo     = 6,
                 },
                 secondaryWeapon = nil,
+            },
+            {
+                name             = "AttackTaker",
+                maxHP            = GameConstant.unitMaxHP,
+                defenseType      = "submarine",
+                isAffectedByLuck = true,
             },
         },
     },

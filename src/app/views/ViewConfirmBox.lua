@@ -55,16 +55,6 @@ local function createConfirmButton(posX, posY, color, text, callback)
     return button
 end
 
-local function isTouchWithinNode(touch, node)
-    local location = node:convertToNodeSpace(touch:getLocation())
-    local x, y = location.x, location.y
-
-    local contentSize = node:getContentSize()
-    local width, height = contentSize.width, contentSize.height
-
-    return (x >= 0) and (y >= 0) and (x <= width) and (y <= height)
-end
-
 --------------------------------------------------------------------------------
 -- The composition background.
 --------------------------------------------------------------------------------
@@ -152,7 +142,7 @@ local function createTouchListener(view)
     local isTouchWithinBackground = false
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = isTouchWithinNode(touch, view.m_Background)
+        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_Background)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 

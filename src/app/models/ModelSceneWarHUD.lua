@@ -4,59 +4,60 @@ local ModelSceneWarHUD = class("ModelSceneWarHUD")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The callback function on EvtTurnPhaseBeginning.
+--------------------------------------------------------------------------------
+local function onEvtTurnPhaseBeginning(self, event)
+    if (self.m_View) then
+        self.m_View:showBeginTurnEffect(event.turnIndex, event.player:getName(), event.callbackOnBeginTurnEffectDisappear)
+    else
+        event.callbackOnBeginTurnEffect()
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createCompositionActors(param)
+    local confirmBoxActor      = Actor.createWithModelAndViewName("ModelConfirmBox",      nil, "ViewConfirmBox")
     local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
+    local warCommandMenuActor  = Actor.createWithModelAndViewName("ModelWarCommandMenu",  nil, "ViewWarCommandMenu")
+    local actionMenuActor      = Actor.createWithModelAndViewName("ModelActionMenu",      nil, "ViewActionMenu")
     local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo",        nil, "ViewUnitInfo")
+    local unitDetailActor      = Actor.createWithModelAndViewName("ModelUnitDetail",      nil, "ViewUnitDetail")
     local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
+    local tileDetailActor      = Actor.createWithModelAndViewName("ModelTileDetail",      nil, "ViewTileDetail")
 
-    return {moneyEnergyInfoActor = moneyEnergyInfoActor,
-            unitInfoActor        = unitInfoActor,
-            tileInfoActor        = tileInfoActor}
+    return {
+        confirmBoxActor      = confirmBoxActor,
+        moneyEnergyInfoActor = moneyEnergyInfoActor,
+        warCommandMenuActor  = warCommandMenuActor,
+        actionMenuActor      = actionMenuActor,
+        unitInfoActor        = unitInfoActor,
+        unitDetailActor      = unitDetailActor,
+        tileInfoActor        = tileInfoActor,
+        tileDetailActor      = tileDetailActor
+    }
 end
 
-local function initWithCompositionActors(model, actors)
-    model.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
-    model.m_UnitInfoActor        = actors.unitInfoActor
-    model.m_TileInfoActor        = actors.tileInfoActor
-end
+local function initWithCompositionActors(self, actors)
+    self.m_ConfirmBoxActor     = actors.confirmBoxActor
+    self.m_WarCommandMenuActor = actors.warCommandMenuActor
+    self.m_WarCommandMenuActor:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
 
---------------------------------------------------------------------------------
--- The touch listener for view.
---------------------------------------------------------------------------------
-local function createTouchListener(model)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
+    self.m_ActionMenuActor = actors.actionMenuActor
 
-    local function onTouchBegan(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
+    self.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
+    self.m_MoneyEnergyInfoActor:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
 
-        return true
-    end
+    self.m_UnitDetailActor = actors.unitDetailActor
+    self.m_UnitInfoActor   = actors.unitInfoActor
+    self.m_UnitInfoActor:getModel():setModelUnitDetail(self.m_UnitDetailActor:getModel())
 
-    local function onTouchMoved(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
-    end
-
-    local function onTouchCancelled(touch, event)
-    end
-
-    local function onTouchEnded(touch, event)
-        model.m_MoneyEnergyInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_TileInfoActor:getModel():adjustPositionOnTouch(touch)
-        model.m_UnitInfoActor:getModel():adjustPositionOnTouch(touch)
-    end
-
-    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
-    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
-    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
-    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
-
-    return touchListener
+    self.m_TileDetailActor = actors.tileDetailActor
+    self.m_TileInfoActor   = actors.tileInfoActor
+    self.m_TileInfoActor:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
 end
 
 --------------------------------------------------------------------------------
@@ -76,11 +77,14 @@ function ModelSceneWarHUD:initView()
     local view = self.m_View
     assert(view, "ModelSceneWarHUD:initView() no view is attached to the actor of the model.")
 
-    view:setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
+    view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
+        :setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
+        :setViewWarCommandMenu( self.m_WarCommandMenuActor:getView())
+        :setViewActionMenu(     self.m_ActionMenuActor:getView())
         :setViewTileInfo(       self.m_TileInfoActor:getView())
+        :setViewTileDetail(     self.m_TileDetailActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
-
-        :setTouchListener(createTouchListener(self))
+        :setViewUnitDetail(     self.m_UnitDetailActor:getView())
 
     return self
 end
@@ -89,14 +93,24 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelSceneWarHUD:onEnter(rootActor)
+    self.m_ActionMenuActor:onEnter(rootActor)
+    self.m_WarCommandMenuActor:onEnter(rootActor)
     self.m_MoneyEnergyInfoActor:onEnter(rootActor)
     self.m_TileInfoActor:onEnter(rootActor)
     self.m_UnitInfoActor:onEnter(rootActor)
+
+    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
 
     return self
 end
 
 function ModelSceneWarHUD:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
+    self.m_RootScriptEventDispatcher = nil
+
+    self.m_ActionMenuActor:onCleanup(rootActor)
+    self.m_WarCommandMenuActor:onCleanup(rootActor)
     self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
     self.m_TileInfoActor:onCleanup(rootActor)
     self.m_UnitInfoActor:onCleanup(rootActor)
@@ -104,14 +118,9 @@ function ModelSceneWarHUD:onCleanup(rootActor)
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelSceneWarHUD:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
-    if (self.m_View) then
-        self.m_View:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
-    else
-        callbackOnDisappear()
+function ModelSceneWarHUD:onEvent(event)
+    if (event.name == "EvtTurnPhaseBeginning") then
+        onEvtTurnPhaseBeginning(self, event)
     end
 
     return self

@@ -9,6 +9,9 @@ local EXPORTED_METHODS = {
     "getRepairAmount",
 }
 
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
+--------------------------------------------------------------------------------
 function RepairDoer:ctor(param)
     if (param) then
         self:load(param)
@@ -23,18 +26,25 @@ function RepairDoer:load(param)
     return self
 end
 
-function RepairDoer:bind(target)
-	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+--------------------------------------------------------------------------------
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function RepairDoer:onBind(target)
+    assert(self.m_Target == nil, "RepairDoer:onBind() the component has already bound a target.")
 
-	self.m_Target = target
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+    self.m_Target = target
+
+    return self
 end
 
-function RepairDoer:unbind(target)
-    assert(self.m_Target == target , "RepairDoer:unbind() the component is not bind to the parameter target")
-    assert(self.m_Target, "RepairDoer:unbind() the component is not bind to any target.")
+function RepairDoer:onUnbind()
+    assert(self.m_Target, "RepairDoer:onUnbind() the component has not bound a target.")
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
 end
 
 --------------------------------------------------------------------------------

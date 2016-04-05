@@ -5,13 +5,16 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
-	"getCurrentCapturePoint",
-	"setCurrentCapturePoint",
+    "getCurrentCapturePoint",
+    "setCurrentCapturePoint",
     "getMaxCapturePoint",
     "getCapturerID",
     "setCapturerID",
 }
 
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
+--------------------------------------------------------------------------------
 function CaptureTaker:ctor(param)
     self.m_CapturerID = 0
 
@@ -20,20 +23,6 @@ function CaptureTaker:ctor(param)
     end
 
     return self
-end
-
-function CaptureTaker:bind(target)
-	ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-
-	self.m_Target = target
-end
-
-function CaptureTaker:unbind(target)
-    assert(self.m_Target == target , "CaptureTaker:unbind() the component is not bind to the parameter target")
-    assert(self.m_Target, "CaptureTaker:unbind() the component is not bind to any target.")
-
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
 end
 
 function CaptureTaker:load(param)
@@ -45,7 +34,28 @@ function CaptureTaker:load(param)
 end
 
 --------------------------------------------------------------------------------
--- Exported methods.
+-- The callback functions on ComponentManager.bindComponent()/unbindComponent().
+--------------------------------------------------------------------------------
+function CaptureTaker:onBind(target)
+    assert(self.m_Target == nil, "CaptureTaker:onBind() the component has already bound a target.")
+
+    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
+    self.m_Target = target
+
+    return self
+end
+
+function CaptureTaker:onUnbind()
+    assert(self.m_Target ~= nil, "CaptureTaker:onUnbind() the component has not bound a target.")
+
+    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
+    self.m_Target = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The exported functions.
 --------------------------------------------------------------------------------
 function CaptureTaker:getCurrentCapturePoint()
     return self.m_CurrentCapturePoint

@@ -1,9 +1,16 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local Actor       = require("global.actors.Actor")
-local TypeChecker = require("app.utilities.TypeChecker")
+local isServer = true
 
+local Actor            = require("global.actors.Actor")
+local TypeChecker      = require("app.utilities.TypeChecker")
+local ActionTranslator = require("app.utilities.ActionTranslator")
+local ActionExecutor   = require("app.utilities.ActionExecutor")
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function createNodeEventHandler(model, rootActor)
     return function(event)
         if (event == "enter") then
@@ -26,6 +33,48 @@ local function requireSceneData(param)
         error("ModelSceneWar-requireSceneData() the param is invalid.")
     end
 end
+
+--------------------------------------------------------------------------------
+-- The functions that do the actions the system requested.
+--------------------------------------------------------------------------------
+local function doActionEndTurn(self, action)
+    self:getModelTurnManager():endTurn()
+end
+
+local function doActionWait(self, action)
+    self:getModelWarField():doActionWait(action)
+end
+
+--------------------------------------------------------------------------------
+-- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
+--------------------------------------------------------------------------------
+local function onEvtSystemRequestDoAction(self, event)
+    if (event.actionName == "EndTurn") then
+        doActionEndTurn(self, event)
+    elseif (event.actionName == "Wait") then
+        doActionWait(self, event)
+    else
+        print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
+    end
+end
+
+local function onEvtPlayerRequestDoAction(self, event)
+    local requestedAction = event
+    requestedAction.playerID = self:getModelPlayerManager():getModelPlayer(self:getModelTurnManager():getPlayerIndex()):getID() -- This should be replaced by the ID of the logged in player.
+
+    if (isServer) then
+        local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)
+        if (not translatedAction) then
+            print("ModelSceneWar-onEvtPlayerRequestDoAction() action translation failed: " .. (translateMsg or ""))
+        else
+            onEvtSystemRequestDoAction(self, translatedAction)
+            -- TODO: send the translatedAction to clients.
+        end
+    else
+        -- TODO: send the requestedAction to the server.
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The script event dispatcher.
 --------------------------------------------------------------------------------
@@ -38,111 +87,60 @@ local function initWithScriptEventDispatcher(model, dispatcher)
 end
 
 --------------------------------------------------------------------------------
--- The comsition actors.
+-- The composition war field actor.
 --------------------------------------------------------------------------------
-local function createCompositionActors(sceneData)
-    local warFieldActor = Actor.createWithModelAndViewName("ModelWarField", sceneData.warField, "ViewWarField", sceneData.warField)
-    assert(warFieldActor, "SceneWar--createCompositionActors() failed to create a war field actor.")
-
-    local hudActor = Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
-    assert(hudActor, "SceneWar--createCompositionActors() failed to create a HUD actor.")
-
-    return {warFieldActor = warFieldActor, sceneWarHUDActor = hudActor}
+local function createActorWarField(warFieldData)
+    return Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField", warFieldData)
 end
 
-local function initWithCompositionActors(model, actors)
-    model.m_WarFieldActor    = actors.warFieldActor
-    model.m_SceneWarHUDActor = actors.sceneWarHUDActor
+local function initWithActorWarField(self, actor)
+    self.m_ActorWarField = actor
 end
 
 --------------------------------------------------------------------------------
--- The turn.
+-- The composition HUD actor.
 --------------------------------------------------------------------------------
-local function getNextTurnAndPlayerIndex(turn, players)
-    local nextTurnIndex   = turn.m_TurnIndex
-    local nextPlayerIndex = turn.m_PlayerIndex + 1
-
-    while (true) do
-        if (nextPlayerIndex > #players) then
-            nextPlayerIndex = 1
-            nextTurnIndex   = nextTurnIndex + 1
-        end
-
-        assert(nextPlayerIndex ~= turn.m_PlayerIndex, "ModelSceneWar-getNextTurnAndPlayerIndex() the number of alive players is less than 2.")
-
-        if (players[nextPlayerIndex].m_IsAlive) then
-            return nextTurnIndex, nextPlayerIndex
-        end
-    end
+local function createActorSceneWarHUD()
+    return Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
 end
 
-local function initTurn(model, turn)
-    model.m_Turn = {
-        m_TurnIndex   = turn.turnIndex,
-        m_PlayerIndex = turn.playerIndex,
-        m_TurnPhase   = turn.phase,
-    }
-end
-
-local function runTurn(model)
-    local turn = model.m_Turn
-
-    if (turn.m_TurnPhase == "end") then
-        -- TODO: Change state for units, weather, vision and so on.
-
-        turn.m_TurnPhase = "standby"
-        turn.m_TurnIndex, turn.m_PlayerIndex = getNextTurnAndPlayerIndex(turn, model.m_Players)
-    end
-
-    local player = model.m_Players[turn.m_PlayerIndex]
-    model.m_ScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSwitched", player = player, playerIndex = turn.m_PlayerIndex})
-
-    model.m_SceneWarHUDActor:getModel():showBeginTurnEffect(turn.m_TurnIndex, player.m_Name, function()
-        if (turn.m_TurnPhase == "standby") then
-            -- TODO: Add fund, repair units, destroy units that run out of fuel.
-            turn.m_TurnPhase = "main"
-        elseif (turn.m_TurnPhase == "main") then
-            -- Do nothing.
-        else
-            error("ModelSceneWar-runTurn() the turn phase is expected to be 'standby' or 'main'")
-        end
-    end)
-end
-
-local function endTurn(model)
-    local turn = model.m_Turn
-    assert(turn.m_TurnPhase == "main", "ModelSceneWar-endTurn() the turn phase is expected to be 'main'.")
-
-    turn.m_TurnPhase = "end"
-    runTurn(model)
+local function initWithActorSceneWarHUD(self, actor)
+    self.m_ActorSceneWarHUD = actor
 end
 
 --------------------------------------------------------------------------------
--- The players.
+-- The player manager.
 --------------------------------------------------------------------------------
-local function initPlayers(model, players)
-    model.m_Players = {}
-    for i, p in ipairs(players) do
-        model.m_Players[i] = {
-            m_ID      = p.id,
-            m_Name    = p.name,
-            m_Fund    = p.fund,
-            m_IsAlive = p.isAlive,
-            m_CO      = {
-                m_CurrentEnergy    = p.co.currentEnergy,
-                m_COPowerEnergy    = p.co.coPowerEnergy,
-                m_SuperPowerEnergy = p.co.superPowerEnergy,
-            },
+local function createActorPlayerManager(playersData)
+    return Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
+end
 
-            getFund = function(self)
-                return self.m_Fund
-            end,
+local function initWithActorPlayerManager(self, actor)
+    self.m_ActorPlayerManager = actor
+end
 
-            getCOEnergy = function(self)
-                return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
-            end,
-        }
-    end
+--------------------------------------------------------------------------------
+-- The turn manager.
+--------------------------------------------------------------------------------
+local function createActorTurnManager(turnData)
+    return Actor.createWithModelAndViewName("ModelTurnManager", turnData)
+end
+
+local function initWithActorTurnManager(self, actor)
+    actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
+        :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    self.m_ActorTurnManager = actor
+end
+
+--------------------------------------------------------------------------------
+-- The composition weather manager actor.
+--------------------------------------------------------------------------------
+local function createActorWeatherManager(weatherData)
+    return Actor.createWithModelAndViewName("ModelWeatherManager", weatherData)
+end
+
+local function initWithActorWeatherManager(self, actor)
+    self.m_ActorWeatherManager = actor
 end
 
 --------------------------------------------------------------------------------
@@ -153,9 +151,11 @@ function ModelSceneWar:ctor(param)
     local sceneData = requireSceneData(param)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
-    initWithCompositionActors(    self, createCompositionActors(sceneData))
-    initTurn(   self, sceneData.turn)
-    initPlayers(self, sceneData.players)
+    initWithActorWarField(        self, createActorWarField(sceneData.warField))
+    initWithActorSceneWarHUD(     self, createActorSceneWarHUD())
+    initWithActorPlayerManager(   self, createActorPlayerManager(sceneData.players))
+    initWithActorTurnManager(     self, createActorTurnManager(sceneData.turn))
+    initWithActorWeatherManager(  self, createActorWeatherManager(sceneData.weather))
 
     if (self.m_View) then
         self:initView()
@@ -168,8 +168,8 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setWarFieldView(self.m_WarFieldActor:getView())
-        :setSceneHudView(self.m_SceneWarHUDActor:getView())
+    view:setWarFieldView(self.m_ActorWarField:getView())
+        :setSceneHudView(self.m_ActorSceneWarHUD:getView())
 
         :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
 
@@ -182,16 +182,19 @@ end
 function ModelSceneWar:onEnter(rootActor)
     print("ModelSceneWar:onEnter()")
 
-    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestEndTurn", self)
+    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtSystemRequestDoAction", self)
 
-    self.m_SceneWarHUDActor:onEnter(rootActor)
-    self.m_WarFieldActor:onEnter(rootActor)
+    self.m_ActorSceneWarHUD:onEnter(rootActor)
+    self.m_ActorWarField:onEnter(rootActor)
+
+    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
 
     return self
 end
 
 function ModelSceneWar:onEnterTransitionFinish(rootActor)
-    runTurn(self)
+    self:getModelTurnManager():runTurn()
 
     return self
 end
@@ -199,17 +202,20 @@ end
 function ModelSceneWar:onCleanup(rootActor)
     print("ModelSceneWar:onCleanup()")
 
-    self.m_ScriptEventDispatcher:removeEventListener("EvtPlayerRequestEndTurn", self)
+    self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
+        :removeEventListener("EvtPlayerRequestDoAction", self)
 
-    self.m_SceneWarHUDActor:onCleanup(rootActor)
-    self.m_WarFieldActor:onCleanup(rootActor)
+    self.m_ActorSceneWarHUD:onCleanup(rootActor)
+    self.m_ActorWarField:onCleanup(rootActor)
 
     return self
 end
 
 function ModelSceneWar:onEvent(event)
-    if (event.name == "EvtPlayerRequestEndTurn") then
-        endTurn(self)
+    if (event.name == "EvtPlayerRequestDoAction") then
+        onEvtPlayerRequestDoAction(self, event)
+    elseif (event.name == "EvtSystemRequestDoAction") then
+        onEvtSystemRequestDoAction(self, event)
     end
 
     return self
@@ -220,6 +226,22 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
+end
+
+function ModelSceneWar:getModelTurnManager()
+    return self.m_ActorTurnManager:getModel()
+end
+
+function ModelSceneWar:getModelPlayerManager()
+    return self.m_ActorPlayerManager:getModel()
+end
+
+function ModelSceneWar:getModelWeatherManager()
+    return self.m_ActorWeatherManager:getModel()
+end
+
+function ModelSceneWar:getModelWarField()
+    return self.m_ActorWarField:getModel()
 end
 
 return ModelSceneWar
