@@ -98,7 +98,7 @@ local function resetIconsWithTypeNames(icons, typeNames)
         local icon = cc.Sprite:create()
         icon:ignoreAnchorPointForPosition(true)
             :setPosition(GRID_WIDTH * (i - 1), 0)
-            :playAnimationForever(AnimationLoader.getAnimationWithTypeName(name))
+            :playAnimationForever(AnimationLoader.getUnitAnimation(name))
 
         icons:addChild(icon)
     end

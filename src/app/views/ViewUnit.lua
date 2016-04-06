@@ -5,10 +5,11 @@ local COLOR_IDLE             = {r = 255, g = 255, b = 255}
 local COLOR_ACTIONED         = {r = 170, g = 170, b = 170}
 local MOVE_DURATION_PER_GRID = 0.1
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local GridSize           = require("res.data.GameConstant").GridSize
-local AnimationLoader    = require("app.utilities.AnimationLoader")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local GridSize              = require("res.data.GameConstant").GridSize
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -57,10 +58,12 @@ function ViewUnit:updateWithTiledID(tiledID)
     if (self.m_TiledID == tiledID) then
         return
     end
-
     self.m_TiledID = tiledID
+
+    local unitName    = GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+    local playerIndex = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
     self.m_UnitSprite:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
+        :playAnimationForever(AnimationLoader.getUnitAnimation(unitName, playerIndex, "normal"))
 
     return self
 end

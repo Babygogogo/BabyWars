@@ -8,6 +8,10 @@ local function toAnimationName(tiledID)
     return "tiledID" .. tiledID
 end
 
+local function getUnitAnimationName(unitName, playerIndex, state)
+    return unitName .. playerIndex .. state
+end
+
 local function loadTiledAnimation(tiledID, pattern, frameCount, frameDuration)
     local animation = display.newAnimation(display.newFrames(pattern, 1, frameCount), frameDuration)
     display.setAnimationCache(toAnimationName(tiledID), animation)
@@ -20,6 +24,16 @@ local function loadTiledAnimations()
         local animation = animations.normal
 
         loadTiledAnimation(tiledID, animation.pattern, animation.framesCount, animation.durationPerFrame)
+    end
+end
+
+local function loadUnitAnimations()
+    for unitName, animationsForPlayers in pairs(GAME_CONSTANT.unitAnimations) do
+        for playerIndex, animations in ipairs(animationsForPlayers) do
+            local normal = animations.normal
+            local animation = display.newAnimation(display.newFrames(normal.pattern, 1, normal.framesCount), normal.durationPerFrame)
+            display.setAnimationCache(getUnitAnimationName(unitName, playerIndex, "normal"), animation)
+        end
     end
 end
 
@@ -36,6 +50,7 @@ end
 
 function AnimationLoader.load()
     loadTiledAnimations()
+    loadUnitAnimations()
     loadGridAnimations()
 end
 
@@ -45,6 +60,14 @@ end
 
 function AnimationLoader.getAnimationWithTypeName(name)
     return AnimationLoader.getAnimationWithTiledID(GameConstantFunctions.getTiledIdWithTileOrUnitName(name))
+end
+
+function AnimationLoader.getUnitAnimation(unitName, playerIndex, animationState)
+    return display.getAnimationCache(getUnitAnimationName(unitName, playerIndex or 1, animationState or "normal"))
+end
+
+function AnimationLoader.getUnitAnimationWithTiledId(tiledID)
+    return AnimationLoader.getUnitAnimation(GameConstantFunctions.getUnitNameWithTiledId(tiledID), GameConstantFunctions.getPlayerIndexWithTiledId(tiledID), "normal")
 end
 
 return AnimationLoader

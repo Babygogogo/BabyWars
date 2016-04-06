@@ -93,7 +93,7 @@ end
 
 local function updateIconWithModelUnit(icon, unit)
     icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(unit:getTiledID()))
+        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(unit:getTiledID()))
 end
 
 --------------------------------------------------------------------------------

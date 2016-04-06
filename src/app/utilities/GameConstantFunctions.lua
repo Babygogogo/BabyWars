@@ -21,6 +21,14 @@ function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
     error("GameConstantFunctions.getTiledIdWithTileOrUnitName() failed to find the Tiled ID.")
 end
 
+function GameConstantFunctions.getTileNameWithTiledId(tiledID)
+    return TILE_UNIT_INDEXES[tiledID].name
+end
+
+function GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+    return TILE_UNIT_INDEXES[tiledID].name
+end
+
 function GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].playerIndex
 end
