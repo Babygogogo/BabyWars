@@ -63,15 +63,6 @@ local function initWithTiledID(self, tiledID)
             ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
         end
     end
-
-    if (template.specialProperties) then
-        for _, specialProperty in ipairs(template.specialProperties) do
-            if (not ComponentManager.getComponent(self, specialProperty.name)) then
-                ComponentManager.bindComponent(self, specialProperty.name)
-            end
-            ComponentManager.getComponent(self, specialProperty.name):load(specialProperty)
-        end
-    end
 end
 
 local function loadInstantialData(self, param)
@@ -83,14 +74,6 @@ local function loadInstantialData(self, param)
             assert(component, "ModelUnit-loadInstantialData() attempting to update a component that the model hasn't bound with.")
 
             component:loadInstantialData(data)
-        end
-    end
-
-    if (param.specialProperties) then
-        for _, specialProperty in ipairs(param.specialProperties) do
-            local component = ComponentManager.getComponent(self, specialProperty.name)
-            assert(component, "ModelUnit-loadInstantialData() attempting to load a component that the model hasn't bound with.")
-            component:load(specialProperty)
         end
     end
 end

@@ -2277,6 +2277,42 @@ GameConstant.templateModelUnits = {
     infantry   = {
         GridIndexable = {},
 
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 55,
+                    mech       = 45,
+                    recon      = 12,
+                    tank       = 5,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 14,
+                    artillery  = 15,
+                    rockets    = 25,
+                    antiair    = 5,
+                    missiles   = 26,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 7,
+                    tcopter    = 30,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {},
+                strong = {
+                    "infantry", "mech"
+                },
+            },
+        },
+
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
@@ -2288,8 +2324,6 @@ GameConstant.templateModelUnits = {
             range = 3,
             type  = "infantry",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 99,
@@ -2308,50 +2342,80 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon   = nil,
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 55,
-                        mech       = 45,
-                        recon      = 12,
-                        tank       = 5,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 14,
-                        artillery  = 15,
-                        rockets    = 25,
-                        antiair    = 5,
-                        missiles   = 26,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 7,
-                        tcopter    = 30,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech"
-                    }
-                },
-            },
-        },
     },
 
     mech       = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name = "Barzooka",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = 85,
+                    tank       = 55,
+                    mdtank     = 15,
+                    neotank    = 15,
+                    apc        = 75,
+                    artillery  = 70,
+                    rockets    = 85,
+                    antiair    = 65,
+                    missiles   = 85,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {
+                    "recon", "rockets", "missiles"
+                },
+                strong = {
+                    "tank", "apc", "artillery", "antiair"
+                },
+                maxAmmo     = 3,
+                currentAmmo = 3,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 65,
+                    mech       = 55,
+                    recon      = 18,
+                    tank       = 6,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 20,
+                    artillery  = 32,
+                    rockets    = 35,
+                    antiair    = 6,
+                    missiles   = 35,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 9,
+                    tcopter    = 35,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {},
+                strong = {
+                    "infantry", "mech"
+                }
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2364,8 +2428,6 @@ GameConstant.templateModelUnits = {
             range = 2,
             type  = "mech",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 70,
@@ -2384,80 +2446,49 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name = "Barzooka",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 85,
-                        tank       = 55,
-                        mdtank     = 15,
-                        neotank    = 15,
-                        apc        = 75,
-                        artillery  = 70,
-                        rockets    = 85,
-                        antiair    = 65,
-                        missiles   = 85,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "apc", "artillery", "antiair"
-                    },
-                    maxAmmo     = 3,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 65,
-                        mech       = 55,
-                        recon      = 18,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 20,
-                        artillery  = 32,
-                        rockets    = 35,
-                        antiair    = 6,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 9,
-                        tcopter    = 35,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech"
-                    }
-                },
-            },
-        },
     },
 
     recon      = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 70,
+                    mech       = 65,
+                    recon      = 35,
+                    tank       = 6,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 45,
+                    artillery  = 45,
+                    rockets    = 55,
+                    antiair    = 4,
+                    missiles   = 28,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 12,
+                    tcopter    = 35,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {},
+                strong = {
+                    "infantry", "mech", "apc", "artillery", "rockets"
+                },
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2470,8 +2501,6 @@ GameConstant.templateModelUnits = {
             range = 8,
             type  = "tires",
         },
-
-        vision        = 5,
 
         FuelOwner = {
             max                    = 80,
@@ -2490,50 +2519,80 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 5,
+
         description = "Recon units have high movement range and are strong against infantry units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon   = nil,
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 70,
-                        mech       = 65,
-                        recon      = 35,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 4,
-                        missiles   = 28,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 12,
-                        tcopter    = 35,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech", "apc", "artillery", "rockets"
-                    },
-                },
-            },
-        },
     },
 
     tank       = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = 85,
+                    tank       = 55,
+                    mdtank     = 15,
+                    neotank    = 15,
+                    apc        = 75,
+                    artillery  = 70,
+                    rockets    = 85,
+                    antiair    = 65,
+                    missiles   = 85,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 1,
+                    cruiser    = 5,
+                    lander     = 10,
+                    submarine  = 1,
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+                fatal  = {
+                    "recon", "rockets", "missiles"
+                },
+                strong = {
+                    "tank", "apc", "artillery", "antiair"
+                },
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 70,
+                    recon      = 40,
+                    tank       = 6,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 45,
+                    artillery  = 45,
+                    rockets    = 55,
+                    antiair    = 5,
+                    missiles   = 30,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 10,
+                    tcopter    = 40,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {},
+                strong = {
+                    "infantry", "mech", "recon", "apc", "artillery", "rockets", "tcopter"
+                }
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2546,8 +2605,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "treads",
         },
-
-        vision        = 3,
 
         FuelOwner = {
             max                    = 70,
@@ -2566,80 +2623,82 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 3,
+
         description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 85,
-                        tank       = 55,
-                        mdtank     = 15,
-                        neotank    = 15,
-                        apc        = 75,
-                        artillery  = 70,
-                        rockets    = 85,
-                        antiair    = 65,
-                        missiles   = 85,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 1,
-                        cruiser    = 5,
-                        lander     = 10,
-                        submarine  = 1,
-                    },
-                    maxAmmo     = 9,
-                    fatal  = {
-                        "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "apc", "artillery", "antiair"
-                    },
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 75,
-                        mech       = 70,
-                        recon      = 40,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 5,
-                        missiles   = 30,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 10,
-                        tcopter    = 40,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech", "recon", "apc", "artillery", "rockets", "tcopter"
-                    }
-                },
-            },
-        },
     },
 
     mdtank     = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = 105,
+                    tank       = 85,
+                    mdtank     = 55,
+                    neotank    = 45,
+                    apc        = 105,
+                    artillery  = 105,
+                    rockets    = 105,
+                    antiair    = 105,
+                    missiles   = 105,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 10,
+                    cruiser    = 45,
+                    lander     = 35,
+                    submarine  = 10,
+                },
+                fatal  = {
+                    "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
+                },
+                strong = {
+                    "mdtank", "neotank", "cruiser"
+                },
+                maxAmmo     = 8,
+                currentAmmo = 8,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 105,
+                    mech       = 95,
+                    recon      = 45,
+                    tank       = 8,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 45,
+                    artillery  = 45,
+                    rockets    = 55,
+                    antiair    = 7,
+                    missiles   = 35,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 12,
+                    tcopter    = 45,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {
+                    "infantry", "mech"
+                },
+                strong = {
+                    "recon", "apc", "artillery", "rockets", "tcopter"
+                }
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2652,8 +2711,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "treads",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 50,
@@ -2672,82 +2729,82 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 1,
+
         description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 105,
-                        tank       = 85,
-                        mdtank     = 55,
-                        neotank    = 45,
-                        apc        = 105,
-                        artillery  = 105,
-                        rockets    = 105,
-                        antiair    = 105,
-                        missiles   = 105,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 10,
-                        cruiser    = 45,
-                        lander     = 35,
-                        submarine  = 10,
-                    },
-                    fatal  = {
-                        "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "cruiser"
-                    },
-                    maxAmmo     = 8,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 105,
-                        mech       = 95,
-                        recon      = 45,
-                        tank       = 8,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 7,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 12,
-                        tcopter    = 45,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "infantry", "mech"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "tcopter"
-                    }
-                },
-            },
-        },
     },
 
     neotank    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = 125,
+                    tank       = 105,
+                    mdtank     = 75,
+                    neotank    = 55,
+                    apc        = 125,
+                    artillery  = 115,
+                    rockets    = 125,
+                    antiair    = 115,
+                    missiles   = 125,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 15,
+                    cruiser    = 50,
+                    lander     = 50,
+                    submarine  = 15,
+                },
+                fatal  = {
+                    "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
+                },
+                strong = {
+                    "mdtank", "neotank", "cruiser", "lander"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 125,
+                    mech       = 115,
+                    recon      = 65,
+                    tank       = 10,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 65,
+                    artillery  = 65,
+                    rockets    = 75,
+                    antiair    = 17,
+                    missiles   = 55,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 22,
+                    tcopter    = 55,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal  = {
+                    "infantry", "mech"
+                },
+                strong = {
+                    "recon", "apc", "artillery", "rockets", "missiles", "tcopter"
+                },
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2760,8 +2817,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "treads",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 99,
@@ -2780,78 +2835,9 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 1,
+
         description = "Neotank units are new weapons developed recently. They are more powerful than Md tanks.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 125,
-                        tank       = 105,
-                        mdtank     = 75,
-                        neotank    = 55,
-                        apc        = 125,
-                        artillery  = 115,
-                        rockets    = 125,
-                        antiair    = 115,
-                        missiles   = 125,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 15,
-                        cruiser    = 50,
-                        lander     = 50,
-                        submarine  = 15,
-                    },
-                    fatal  = {
-                        "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "cruiser", "lander"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 125,
-                        mech       = 115,
-                        recon      = 65,
-                        tank       = 10,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 65,
-                        artillery  = 65,
-                        rockets    = 75,
-                        antiair    = 17,
-                        missiles   = 55,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 22,
-                        tcopter    = 55,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "infantry", "mech"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "missiles", "tcopter"
-                    },
-                },
-            },
-        },
     },
 
     apc        = {
@@ -2868,8 +2854,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "treads",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 70,
@@ -2888,14 +2872,53 @@ GameConstant.templateModelUnits = {
             },
         },
 
-        description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
+        vision        = 1,
 
-        specialProperties = {
-        },
+        description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
     },
 
     artillery  = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 2,
+            maxAttackRange     = 3,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name       = "Cannon",
+                baseDamage = {
+                    infantry   = 90,
+                    mech       = 85,
+                    recon      = 80,
+                    tank       = 70,
+                    mdtank     = 45,
+                    neotank    = 40,
+                    apc        = 70,
+                    artillery  = 75,
+                    rockets    = 80,
+                    antiair    = 75,
+                    missiles   = 80,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 40,
+                    cruiser    = 65,
+                    lander     = 55,
+                    submarine  = 60,
+                },
+                fatal  = {
+                    "infantry", "mech", "recon", "rockets", "missiles"
+                },
+                strong = {
+                    "tank", "mdtank", "neotank", "apc", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2908,8 +2931,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "treads",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 50,
@@ -2928,53 +2949,54 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 1,
+
         description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 2,
-                maxAttackRange     = 3,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name       = "Cannon",
-                    baseDamage = {
-                        infantry   = 90,
-                        mech       = 85,
-                        recon      = 80,
-                        tank       = 70,
-                        mdtank     = 45,
-                        neotank    = 40,
-                        apc        = 70,
-                        artillery  = 75,
-                        rockets    = 80,
-                        antiair    = 75,
-                        missiles   = 80,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 40,
-                        cruiser    = 65,
-                        lander     = 55,
-                        submarine  = 60,
-                    },
-                    fatal  = {
-                        "infantry", "mech", "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "mdtank", "neotank", "apc", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     rockets    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            name               = "AttackDoer",
+            minAttackRange     = 3,
+            maxAttackRange     = 5,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name        = "Rockets",
+                baseDamage  = {
+                    infantry   = 95,
+                    mech       = 90,
+                    recon      = 90,
+                    tank       = 80,
+                    mdtank     = 55,
+                    neotank    = 50,
+                    apc        = 80,
+                    artillery  = 80,
+                    rockets    = 85,
+                    antiair    = 85,
+                    missiles   = 90,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 55,
+                    cruiser    = 85,
+                    lander     = 60,
+                    submarine  = 85,
+                },
+                fatal  = {
+                    "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "submarine"
+                },
+                strong = {
+                    "mdtank", "neotank", "battleship", "lander",
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -2987,8 +3009,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "tires",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 50,
@@ -3007,53 +3027,54 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 1,
+
         description = "Rocket units are valuable, because they can fire on both land and naval units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 5,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name        = "Rockets",
-                    baseDamage  = {
-                        infantry   = 95,
-                        mech       = 90,
-                        recon      = 90,
-                        tank       = 80,
-                        mdtank     = 55,
-                        neotank    = 50,
-                        apc        = 80,
-                        artillery  = 80,
-                        rockets    = 85,
-                        antiair    = 85,
-                        missiles   = 90,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 55,
-                        cruiser    = 85,
-                        lander     = 60,
-                        submarine  = 85,
-                    },
-                    fatal  = {
-                        "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "submarine"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "battleship", "lander",
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     antiair    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            name               = "AttackDoer",
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Vulcan",
+                baseDamage  = {
+                    infantry   = 105,
+                    mech       = 105,
+                    recon      = 60,
+                    tank       = 25,
+                    mdtank     = 10,
+                    neotank    = 5,
+                    apc        = 50,
+                    artillery  = 50,
+                    rockets    = 55,
+                    antiair    = 45,
+                    missiles   = 55,
+                    fighter    = 65,
+                    bomber     = 75,
+                    bcopter    = 120,
+                    tcopter    = 120,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal = {
+                    "infantry", "mech", "bcopter", "tcopter"
+                },
+                strong = {
+                    "recon", "apc", "artillery", "rockets", "antiair", "missiles", "fighter", "bomber"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3066,8 +3087,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "treads",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 60,
@@ -3086,53 +3105,52 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Vulcan",
-                    baseDamage  = {
-                        infantry   = 105,
-                        mech       = 105,
-                        recon      = 60,
-                        tank       = 25,
-                        mdtank     = 10,
-                        neotank    = 5,
-                        apc        = 50,
-                        artillery  = 50,
-                        rockets    = 55,
-                        antiair    = 45,
-                        missiles   = 55,
-                        fighter    = 65,
-                        bomber     = 75,
-                        bcopter    = 120,
-                        tcopter    = 120,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "infantry", "mech", "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "antiair", "missiles", "fighter", "bomber"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     missiles   = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 3,
+            maxAttackRange     = 6,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = false,
+                    tank       = false,
+                    mdtank     = false,
+                    neotank    = false,
+                    apc        = false,
+                    artillery  = false,
+                    rockets    = false,
+                    antiair    = false,
+                    missiles   = false,
+                    fighter    = 100,
+                    bomber     = 100,
+                    bcopter    = 120,
+                    tcopter    = 120,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal = {
+                    "fighter", "bomber", "bcopter", "tcopter"
+                },
+                strong = {
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3145,8 +3163,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "tires",
         },
-
-        vision        = 5,
 
         FuelOwner = {
             max                    = 50,
@@ -3165,52 +3181,53 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 5,
+
         description = "Missile units are essential in defending against air units. Their vision range is large.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 6,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 100,
-                        bomber     = 100,
-                        bcopter    = 120,
-                        tcopter    = 120,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "fighter", "bomber", "bcopter", "tcopter"
-                    },
-                    strong = {
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     fighter    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = false,
+                    tank       = false,
+                    mdtank     = false,
+                    neotank    = false,
+                    apc        = false,
+                    artillery  = false,
+                    rockets    = false,
+                    antiair    = false,
+                    missiles   = false,
+                    fighter    = 55,
+                    bomber     = 100,
+                    bcopter    = 100,
+                    tcopter    = 100,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal = {
+                    "bomber", "bcopter", "tcopter"
+                },
+                strong = {
+                    "fighter"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3223,8 +3240,6 @@ GameConstant.templateModelUnits = {
             range = 9,
             type  = "air",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 99,
@@ -3243,53 +3258,53 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "Fighter units are strong vs. other air units. They also have the highest movements.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 55,
-                        bomber     = 100,
-                        bcopter    = 100,
-                        tcopter    = 100,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "bomber", "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "fighter"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     bomber     = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Bombs",
+                baseDamage  = {
+                    infantry   = 110,
+                    mech       = 110,
+                    recon      = 105,
+                    tank       = 105,
+                    mdtank     = 95,
+                    neotank    = 90,
+                    apc        = 105,
+                    artillery  = 105,
+                    rockets    = 105,
+                    antiair    = 95,
+                    missiles   = 105,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 75,
+                    cruiser    = 85,
+                    lander     = 95,
+                    submarine  = 95,
+                },
+                fatal = {
+                    "infantry", "mech", "recon", "tank", "mdtank", "neotank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
+                },
+                strong = {
+                    "battleship"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3302,8 +3317,6 @@ GameConstant.templateModelUnits = {
             range = 7,
             type  = "air",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 99,
@@ -3322,53 +3335,81 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "Bomber units can fire on ground and naval units with a high destructive force.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Bombs",
-                    baseDamage  = {
-                        infantry   = 110,
-                        mech       = 110,
-                        recon      = 105,
-                        tank       = 105,
-                        mdtank     = 95,
-                        neotank    = 90,
-                        apc        = 105,
-                        artillery  = 105,
-                        rockets    = 105,
-                        antiair    = 95,
-                        missiles   = 105,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 75,
-                        cruiser    = 85,
-                        lander     = 95,
-                        submarine  = 95,
-                    },
-                    fatal = {
-                        "infantry", "mech", "recon", "tank", "mdtank", "neotank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                    },
-                    strong = {
-                        "battleship"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     bcopter    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = 55,
+                    tank       = 55,
+                    mdtank     = 25,
+                    neotank    = 20,
+                    apc        = 60,
+                    artillery  = 65,
+                    rockets    = 65,
+                    antiair    = 25,
+                    missiles   = 65,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 25,
+                    cruiser    = 55,
+                    lander     = 25,
+                    submarine  = 25,
+                },
+                fatal = {
+                },
+                strong = {
+                    "recon", "tank", "apc", "artillery", "rockets", "missiles", "cruiser"
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 75,
+                    recon      = 30,
+                    tank       = 6,
+                    mdtank     = 1,
+                    neotank    = 1,
+                    apc        = 20,
+                    artillery  = 25,
+                    rockets    = 35,
+                    antiair    = 6,
+                    missiles   = 35,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = 65,
+                    tcopter    = 95,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal = {
+                    "tcopter"
+                },
+                strong = {
+                    "infantry", "mech", "bcopter"
+                },
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3381,8 +3422,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "air",
         },
-
-        vision        = 3,
 
         FuelOwner = {
             max                    = 99,
@@ -3401,77 +3440,9 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 3,
+
         description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 55,
-                        tank       = 55,
-                        mdtank     = 25,
-                        neotank    = 20,
-                        apc        = 60,
-                        artillery  = 65,
-                        rockets    = 65,
-                        antiair    = 25,
-                        missiles   = 65,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 25,
-                        cruiser    = 55,
-                        lander     = 25,
-                        submarine  = 25,
-                    },
-                    fatal = {
-                    },
-                    strong = {
-                        "recon", "tank", "apc", "artillery", "rockets", "missiles", "cruiser"
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 75,
-                        mech       = 75,
-                        recon      = 30,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 20,
-                        artillery  = 25,
-                        rockets    = 35,
-                        antiair    = 6,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 65,
-                        tcopter    = 95,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "tcopter"
-                    },
-                    strong = {
-                        "infantry", "mech", "bcopter"
-                    },
-                },
-            },
-        },
     },
 
     tcopter    = {
@@ -3488,8 +3459,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "air",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 99,
@@ -3508,14 +3477,53 @@ GameConstant.templateModelUnits = {
             },
         },
 
-        description = "T copters can transport both infantry and mech units.",
+        vision        = 2,
 
-        specialProperties = {
-        },
+        description = "T copters can transport both infantry and mech units.",
     },
 
     battleship = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 3,
+            maxAttackRange     = 6,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = 95,
+                    mech       = 90,
+                    recon      = 90,
+                    tank       = 80,
+                    mdtank     = 55,
+                    neotank    = 50,
+                    apc        = 80,
+                    artillery  = 80,
+                    rockets    = 85,
+                    antiair    = 85,
+                    missiles   = 90,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 50,
+                    cruiser    = 95,
+                    lander     = 95,
+                    submarine  = 95,
+                },
+                fatal = {
+                    "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
+                },
+                strong = {
+                    "mdtank", "neotank", "battleship"
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3528,8 +3536,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "ship",
         },
-
-        vision        = 2,
 
         FuelOwner = {
             max                    = 99,
@@ -3547,53 +3553,81 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 2,
+
         description = "B(Battle) ships have a larger attack range than even rocket units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 6,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = 95,
-                        mech       = 90,
-                        recon      = 90,
-                        tank       = 80,
-                        mdtank     = 55,
-                        neotank    = 50,
-                        apc        = 80,
-                        artillery  = 80,
-                        rockets    = 85,
-                        antiair    = 85,
-                        missiles   = 90,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 50,
-                        cruiser    = 95,
-                        lander     = 95,
-                        submarine  = 95,
-                    },
-                    fatal = {
-                        "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "battleship"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 
     cruiser    = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = false,
+                    tank       = false,
+                    mdtank     = false,
+                    neotank    = false,
+                    apc        = false,
+                    artillery  = false,
+                    rockets    = false,
+                    antiair    = false,
+                    missiles   = false,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = 90,
+                },
+                fatal = {
+                    "submarine"
+                },
+                strong = {
+                },
+                maxAmmo     = 9,
+                currentAmmo = 9,
+            },
+            secondaryWeapon = {
+                name        = "Anti-air gun",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = false,
+                    tank       = false,
+                    mdtank     = false,
+                    neotank    = false,
+                    apc        = false,
+                    artillery  = false,
+                    rockets    = false,
+                    antiair    = false,
+                    missiles   = false,
+                    fighter    = 55,
+                    bomber     = 65,
+                    bcopter    = 115,
+                    tcopter    = 115,
+                    battleship = false,
+                    cruiser    = false,
+                    lander     = false,
+                    submarine  = false,
+                },
+                fatal = {
+                    "bcopter", "tcopter"
+                },
+                strong = {
+                    "fighter", "bomber"
+                },
+            },
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3606,8 +3640,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "ship",
         },
-
-        vision        = 3,
 
         FuelOwner = {
             max                    = 99,
@@ -3626,77 +3658,9 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 3,
+
         description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = 90,
-                    },
-                    fatal = {
-                        "submarine"
-                    },
-                    strong = {
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = {
-                    name        = "Anti-air gun",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 55,
-                        bomber     = 65,
-                        bcopter    = 115,
-                        tcopter    = 115,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "fighter", "bomber"
-                    },
-                },
-            },
-        },
     },
 
     lander     = {
@@ -3713,8 +3677,6 @@ GameConstant.templateModelUnits = {
             range = 6,
             type  = "lander",
         },
-
-        vision        = 1,
 
         FuelOwner = {
             max                    = 99,
@@ -3733,14 +3695,53 @@ GameConstant.templateModelUnits = {
             },
         },
 
-        description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+        vision        = 1,
 
-        specialProperties = {
-        },
+        description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
     },
 
     submarine  = {
         GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Torpedoes",
+                baseDamage  = {
+                    infantry   = false,
+                    mech       = false,
+                    recon      = false,
+                    tank       = false,
+                    mdtank     = false,
+                    neotank    = false,
+                    apc        = false,
+                    artillery  = false,
+                    rockets    = false,
+                    antiair    = false,
+                    missiles   = false,
+                    fighter    = false,
+                    bomber     = false,
+                    bcopter    = false,
+                    tcopter    = false,
+                    battleship = 55,
+                    cruiser    = 25,
+                    lander     = 95,
+                    submarine  = 55,
+                },
+                fatal = {
+                    "lander"
+                },
+                strong = {
+                    "battleship", "submarine"
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
@@ -3753,8 +3754,6 @@ GameConstant.templateModelUnits = {
             range = 5,
             type  = "ship",
         },
-
-        vision        = 5,
 
         FuelOwner = {
             max                    = 60,
@@ -3773,49 +3772,9 @@ GameConstant.templateModelUnits = {
             },
         },
 
+        vision        = 5,
+
         description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Torpedoes",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 55,
-                        cruiser    = 25,
-                        lander     = 95,
-                        submarine  = 55,
-                    },
-                    fatal = {
-                        "lander"
-                    },
-                    strong = {
-                        "battleship", "submarine"
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = nil,
-            },
-        },
     },
 }
 
