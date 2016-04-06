@@ -294,13 +294,14 @@ local function createMoveCostInfoDetailLabels()
     local originX, originY = MOVE_COST_INFO_POSITION_X, MOVE_COST_INFO_POSITION_Y
     local width,   height =  MOVE_COST_INFO_WIDTH / 4,  LINE_HEIGHT
     return {
-        infantry = createLabel(originX,             originY + height * 2, width, height),
-        mech     = createLabel(originX + width,     originY + height * 2, width, height),
-        treads   = createLabel(originX + width * 2, originY + height * 2, width, height),
-        tires    = createLabel(originX + width * 3, originY + height * 2, width, height),
-        air      = createLabel(originX,             originY + height,     width, height),
-        ship     = createLabel(originX + width * 1, originY + height,     width, height),
-        lander   = createLabel(originX + width * 2, originY + height,     width, height)
+        infantry  = createLabel(originX,             originY + height * 2, width, height),
+        mech      = createLabel(originX + width,     originY + height * 2, width, height),
+        tireA     = createLabel(originX + width * 2, originY + height * 2, width, height),
+        tireB     = createLabel(originX + width * 3, originY + height * 2, width, height),
+        tank      = createLabel(originX,             originY + height,     width, height),
+        air       = createLabel(originX + width * 1, originY + height,     width, height),
+        ship      = createLabel(originX + width * 2, originY + height,     width, height),
+        transport = createLabel(originX + width * 3, originY + height,     width, height),
     }
 end
 

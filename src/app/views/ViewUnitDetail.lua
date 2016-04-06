@@ -4,7 +4,7 @@ local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH      = display.width * 0.8
+local BACKGROUND_WIDTH      = display.width * 0.85
 local BACKGROUND_HEIGHT     = math.min(LINE_HEIGHT * 11 + 10, display.height * 0.95)
 local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
