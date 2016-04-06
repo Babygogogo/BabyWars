@@ -3,7 +3,6 @@ local ViewTile = class("ViewTile", cc.Sprite)
 
 local ComponentManager  = require("global.components.ComponentManager")
 local TypeChecker       = require("app.utilities.TypeChecker")
-local TemplateViewTiles = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
 local AnimationLoader   = require("app.utilities.AnimationLoader")
 
 --------------------------------------------------------------------------------
@@ -12,7 +11,7 @@ local AnimationLoader   = require("app.utilities.AnimationLoader")
 function ViewTile:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
-	return self
+    return self
 end
 
 function ViewTile:updateWithTiledID(tiledID)
@@ -20,9 +19,6 @@ function ViewTile:updateWithTiledID(tiledID)
     if (self.m_TiledID == tiledID) then
         return
     end
-
-    local template = TemplateViewTiles[tiledID]
-    assert(template, "ViewTile:updateWithTiledID() failed to get the template view with param tiledID.")
 
     self.m_TiledID = tiledID
     self:stopAllActions()
