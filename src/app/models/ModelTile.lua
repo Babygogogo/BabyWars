@@ -20,7 +20,12 @@ local function initWithTiledID(self, tiledID)
     self.m_Template = template
 
     ComponentManager.unbindAllComponents(self)
-    ComponentManager.bindComponent(self, "GridIndexable")
+    for name, data in pairs(template) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+        end
+    end
+--    ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {gridIndex = {x = 1, y = 1}}})
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -33,8 +38,13 @@ local function initWithTiledID(self, tiledID)
 end
 
 local function loadInstantialData(self, param)
-    if (param.gridIndex) then
-        self:setGridIndex(param.gridIndex)
+    for name, data in pairs(param) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            local component = ComponentManager.getComponent(self, name)
+            assert(component, "ModelUnit-loadInstantialData() attempting to update a component that the model hasn't bound with.")
+
+            component:loadInstantialData(data)
+        end
     end
 
     if (param.specialProperties) then

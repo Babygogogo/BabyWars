@@ -4,23 +4,33 @@ local TileMap_Overwrite1 = {
 
     grids = {
         {
-            gridIndex = {x = 8, y = 1},
+            GridIndexable = {
+                gridIndex = {x = 8, y = 1},
+            },
             tiledID = 39,
         },
         {
-            gridIndex = {x = 8, y = 2},
+            GridIndexable = {
+                gridIndex = {x = 8, y = 2},
+            },
             tiledID = 39,
         },
         {
-            gridIndex = {x = 8, y = 3},
+            GridIndexable = {
+                gridIndex = {x = 8, y = 3},
+            },
             tiledID = 39,
         },
         {
-            gridIndex = {x = 8, y = 4},
+            GridIndexable = {
+                gridIndex = {x = 8, y = 4},
+            },
             tiledID = 39,
         },
         {
-            gridIndex = {x = 8, y = 5},
+            GridIndexable = {
+                gridIndex = {x = 8, y = 5},
+            },
             tiledID = 39,
         },
     }

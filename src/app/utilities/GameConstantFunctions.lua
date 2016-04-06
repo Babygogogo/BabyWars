@@ -13,7 +13,7 @@ end
 
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
-        if (index.n == name) then
+        if (index.name == name) then
             return id
         end
     end
@@ -22,15 +22,15 @@ function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
 end
 
 function GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
-    return TILE_UNIT_INDEXES[tiledID].p
+    return TILE_UNIT_INDEXES[tiledID].playerIndex
 end
 
 function GameConstantFunctions.getTemplateModelTileWithTiledId(tiledID)
-    return TEMPLATE_MODEL_TILES[TILE_UNIT_INDEXES[tiledID].n]
+    return TEMPLATE_MODEL_TILES[TILE_UNIT_INDEXES[tiledID].name]
 end
 
 function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
-    return TEMPLATE_MODEL_UNITS[TILE_UNIT_INDEXES[tiledID].n]
+    return TEMPLATE_MODEL_UNITS[TILE_UNIT_INDEXES[tiledID].name]
 end
 
 return GameConstantFunctions

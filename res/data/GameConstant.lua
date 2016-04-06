@@ -7,66 +7,233 @@ GameConstant.GridSize = {
 
 GameConstant.indexesForTileOrUnit = {
     -- TiledID 0 + 1
-    {n = "hq",       p = 1},    {n = "hq",       p = 2},    {n = "hq",       p = 3},    {n = "hq",       p = 4},
-    {n = "city",     p = 1},    {n = "city",     p = 2},    {n = "city",     p = 3},    {n = "city",     p = 4},    {n = "city",     p = 5},
-    {n = "base",     p = 1},    {n = "base",     p = 2},    {n = "base",     p = 3},    {n = "base",     p = 4},    {n = "base",     p = 5},
-    {n = "airport",  p = 1},    {n = "airport",  p = 2},    {n = "airport",  p = 3},    {n = "airport",  p = 4},    {n = "airport",  p = 5},
-    {n = "seaport",  p = 1},    {n = "seaport",  p = 2},    {n = "seaport",  p = 3},    {n = "seaport",  p = 4},    {n = "seaport",  p = 5},
+    {name = "hq",       playerIndex = 1},
+    {name = "hq",       playerIndex = 2},
+    {name = "hq",       playerIndex = 3},
+    {name = "hq",       playerIndex = 4},
 
-    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},
+    {name = "city",     playerIndex = 1},
+    {name = "city",     playerIndex = 2},
+    {name = "city",     playerIndex = 3},
+    {name = "city",     playerIndex = 4},
+    {name = "city",     playerIndex = 5},
 
-    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
-    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
-    {n = "road",     p = 0},
+    {name = "base",     playerIndex = 1},
+    {name = "base",     playerIndex = 2},
+    {name = "base",     playerIndex = 3},
+    {name = "base",     playerIndex = 4},
+    {name = "base",     playerIndex = 5},
 
-    {n = "forest",   p = 0},
+    {name = "airport",  playerIndex = 1},
+    {name = "airport",  playerIndex = 2},
+    {name = "airport",  playerIndex = 3},
+    {name = "airport",  playerIndex = 4},
+    {name = "airport",  playerIndex = 5},
 
-    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
-    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
+    {name = "seaport",  playerIndex = 1},
+    {name = "seaport",  playerIndex = 2},
+    {name = "seaport",  playerIndex = 3},
+    {name = "seaport",  playerIndex = 4},
+    {name = "seaport",  playerIndex = 5},
 
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
+    {name = "plain",    playerIndex = 0},
+    {name = "plain",    playerIndex = 0},
+    {name = "plain",    playerIndex = 0},
+    {name = "plain",    playerIndex = 0},
 
-    {n = "reef",     p = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
 
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
+    {name = "forest",   playerIndex = 0},
+
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+
+    {name = "reef",     playerIndex = 0},
+
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
 
     -- TiledID 100 + 1
-    {n = "mountain", p = 0},    {n = "mountain", p = 0},
+    {name = "mountain", playerIndex = 0},
+    {name = "mountain", playerIndex = 0},
 
-    {n = "bridge",   p = 0},    {n = "bridge",   p = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
 
-    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
-    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
+    {name = "pipeline", playerIndex = 0},
 
-    {n = "joint",    p = 0},    {n = "joint",    p = 0},
+    {name = "joint",    playerIndex = 0},
+    {name = "joint",    playerIndex = 0},
 
-    {n = "infantry",   p = 1},  {n = "infantry",   p = 2},  {n = "infantry",   p = 3},  {n = "infantry",   p = 4},
-    {n = "mech",       p = 1},  {n = "mech",       p = 2},  {n = "mech",       p = 3},  {n = "mech",       p = 4},
-    {n = "recon",      p = 1},  {n = "recon",      p = 2},  {n = "recon",      p = 3},  {n = "recon",      p = 4},
-    {n = "tank",       p = 1},  {n = "tank",       p = 2},  {n = "tank",       p = 3},  {n = "tank",       p = 4},
-    {n = "mdtank",     p = 1},  {n = "mdtank",     p = 2},  {n = "mdtank",     p = 3},  {n = "mdtank",     p = 4},
-    {n = "neotank",    p = 1},  {n = "neotank",    p = 2},  {n = "neotank",    p = 3},  {n = "neotank",    p = 4},
-    {n = "apc",        p = 1},  {n = "apc",        p = 2},  {n = "apc",        p = 3},  {n = "apc",        p = 4},
-    {n = "artillery",  p = 1},  {n = "artillery",  p = 2},  {n = "artillery",  p = 3},  {n = "artillery",  p = 4},
-    {n = "rockets",    p = 1},  {n = "rockets",    p = 2},  {n = "rockets",    p = 3},  {n = "rockets",    p = 4},
-    {n = "antiair",    p = 1},  {n = "antiair",    p = 2},  {n = "antiair",    p = 3},  {n = "antiair",    p = 4},
-    {n = "missiles",   p = 1},  {n = "missiles",   p = 2},  {n = "missiles",   p = 3},  {n = "missiles",   p = 4},
-    {n = "fighter",    p = 1},  {n = "fighter",    p = 2},  {n = "fighter",    p = 3},  {n = "fighter",    p = 4},
-    {n = "bomber",     p = 1},  {n = "bomber",     p = 2},  {n = "bomber",     p = 3},  {n = "bomber",     p = 4},
-    {n = "bcopter",    p = 1},  {n = "bcopter",    p = 2},  {n = "bcopter",    p = 3},  {n = "bcopter",    p = 4},
-    {n = "tcopter",    p = 1},  {n = "tcopter",    p = 2},  {n = "tcopter",    p = 3},  {n = "tcopter",    p = 4},
-    {n = "battleship", p = 1},  {n = "battleship", p = 2},  {n = "battleship", p = 3},  {n = "battleship", p = 4},
-    {n = "cruiser",    p = 1},  {n = "cruiser",    p = 2},  {n = "cruiser",    p = 3},  {n = "cruiser",    p = 4},
-    {n = "lander",     p = 1},  {n = "lander",     p = 2},  {n = "lander",     p = 3},  {n = "lander",     p = 4},
-    {n = "submarine",  p = 1},  {n = "submarine",  p = 2},  {n = "submarine",  p = 3},  {n = "submarine",  p = 4},
+    {name = "infantry",   playerIndex = 1},
+    {name = "infantry",   playerIndex = 2},
+    {name = "infantry",   playerIndex = 3},
+    {name = "infantry",   playerIndex = 4},
+
+    {name = "mech",       playerIndex = 1},
+    {name = "mech",       playerIndex = 2},
+    {name = "mech",       playerIndex = 3},
+    {name = "mech",       playerIndex = 4},
+
+    {name = "recon",      playerIndex = 1},
+    {name = "recon",      playerIndex = 2},
+    {name = "recon",      playerIndex = 3},
+    {name = "recon",      playerIndex = 4},
+
+    {name = "tank",       playerIndex = 1},
+    {name = "tank",       playerIndex = 2},
+    {name = "tank",       playerIndex = 3},
+    {name = "tank",       playerIndex = 4},
+
+    {name = "mdtank",     playerIndex = 1},
+    {name = "mdtank",     playerIndex = 2},
+    {name = "mdtank",     playerIndex = 3},
+    {name = "mdtank",     playerIndex = 4},
+
+    {name = "neotank",    playerIndex = 1},
+    {name = "neotank",    playerIndex = 2},
+    {name = "neotank",    playerIndex = 3},
+    {name = "neotank",    playerIndex = 4},
+
+    {name = "apc",        playerIndex = 1},
+    {name = "apc",        playerIndex = 2},
+    {name = "apc",        playerIndex = 3},
+    {name = "apc",        playerIndex = 4},
+
+    {name = "artillery",  playerIndex = 1},
+    {name = "artillery",  playerIndex = 2},
+    {name = "artillery",  playerIndex = 3},
+    {name = "artillery",  playerIndex = 4},
+
+    {name = "rockets",    playerIndex = 1},
+    {name = "rockets",    playerIndex = 2},
+    {name = "rockets",    playerIndex = 3},
+    {name = "rockets",    playerIndex = 4},
+
+    {name = "antiair",    playerIndex = 1},
+    {name = "antiair",    playerIndex = 2},
+    {name = "antiair",    playerIndex = 3},
+    {name = "antiair",    playerIndex = 4},
+
+    {name = "missiles",   playerIndex = 1},
+    {name = "missiles",   playerIndex = 2},
+    {name = "missiles",   playerIndex = 3},
+    {name = "missiles",   playerIndex = 4},
+
+    {name = "fighter",    playerIndex = 1},
+    {name = "fighter",    playerIndex = 2},
+    {name = "fighter",    playerIndex = 3},
+    {name = "fighter",    playerIndex = 4},
+
+    {name = "bomber",     playerIndex = 1},
+    {name = "bomber",     playerIndex = 2},
+    {name = "bomber",     playerIndex = 3},
+    {name = "bomber",     playerIndex = 4},
+
+    {name = "bcopter",    playerIndex = 1},
+    {name = "bcopter",    playerIndex = 2},
+    {name = "bcopter",    playerIndex = 3},
+    {name = "bcopter",    playerIndex = 4},
+
+    {name = "tcopter",    playerIndex = 1},
+    {name = "tcopter",    playerIndex = 2},
+    {name = "tcopter",    playerIndex = 3},
+    {name = "tcopter",    playerIndex = 4},
+
+    {name = "battleship", playerIndex = 1},
+    {name = "battleship", playerIndex = 2},
+    {name = "battleship", playerIndex = 3},
+    {name = "battleship", playerIndex = 4},
+
+    {name = "cruiser",    playerIndex = 1},
+    {name = "cruiser",    playerIndex = 2},
+    {name = "cruiser",    playerIndex = 3},
+    {name = "cruiser",    playerIndex = 4},
+
+    {name = "lander",     playerIndex = 1},
+    {name = "lander",     playerIndex = 2},
+    {name = "lander",     playerIndex = 3},
+    {name = "lander",     playerIndex = 4},
+
+    {name = "submarine",  playerIndex = 1},
+    {name = "submarine",  playerIndex = 2},
+    {name = "submarine",  playerIndex = 3},
+    {name = "submarine",  playerIndex = 4},
 }
 
 GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
@@ -1146,6 +1313,8 @@ GameConstant.moveTypes = {
 
 GameConstant.templateModelTiles = {
     hq = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 40,
             targetCatagory = "Ground units",
@@ -1213,6 +1382,8 @@ GameConstant.templateModelTiles = {
     },
 
     city = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground units",
@@ -1280,6 +1451,8 @@ GameConstant.templateModelTiles = {
     },
 
     base = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground units",
@@ -1351,6 +1524,8 @@ GameConstant.templateModelTiles = {
     },
 
     airport = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground units",
@@ -1422,6 +1597,8 @@ GameConstant.templateModelTiles = {
     },
 
     seaport = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground/naval units",
@@ -1493,6 +1670,8 @@ GameConstant.templateModelTiles = {
     },
 
     plain = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 10,
             targetCatagory = "Ground units",
@@ -1536,6 +1715,8 @@ GameConstant.templateModelTiles = {
     },
 
     road = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1579,6 +1760,8 @@ GameConstant.templateModelTiles = {
     },
 
     forest = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 20,
             targetCatagory = "Ground units",
@@ -1622,6 +1805,8 @@ GameConstant.templateModelTiles = {
     },
 
     river = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1665,6 +1850,8 @@ GameConstant.templateModelTiles = {
     },
 
     sea = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1708,6 +1895,8 @@ GameConstant.templateModelTiles = {
     },
 
     reef = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 10,
             targetCatagory = "Naval units",
@@ -1751,6 +1940,8 @@ GameConstant.templateModelTiles = {
     },
 
     shoal = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1794,6 +1985,8 @@ GameConstant.templateModelTiles = {
     },
 
     mountain = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 40,
             targetCatagory = "Foot units",
@@ -1837,6 +2030,8 @@ GameConstant.templateModelTiles = {
     },
 
     bridge = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1880,6 +2075,8 @@ GameConstant.templateModelTiles = {
     },
 
     pipeline = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1923,6 +2120,15 @@ GameConstant.templateModelTiles = {
     },
 
     joint = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.tileMaxHP,
+            currentHP        = GameConstant.tileMaxHP,
+            defenseType      = "mdtank",
+            isAffectedByLuck = false,
+        },
+
         defenseBonus = {
             amount         = 0,
             targetCatagory = "None",
@@ -1965,16 +2171,12 @@ GameConstant.templateModelTiles = {
         description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
 
         specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.tileMaxHP,
-                defenseType      = "mdtank",
-                isAffectedByLuck = false,
-            },
         },
     },
 
     silo = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground units",
@@ -2018,6 +2220,8 @@ GameConstant.templateModelTiles = {
     },
 
     cmdtower = {
+        GridIndexable = {},
+
         defenseBonus = {
             amount         = 30,
             targetCatagory = "Ground units",
@@ -2071,14 +2275,23 @@ GameConstant.templateModelTiles = {
 
 GameConstant.templateModelUnits = {
     infantry   = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "infantry",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 3,
             type  = "infantry",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 0,
@@ -2134,24 +2347,27 @@ GameConstant.templateModelUnits = {
                     }
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "infantry",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     mech       = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "mech",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 2,
             type  = "mech",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 70,
             current                = 70,
             consumptionPerTurn     = 0,
@@ -2237,25 +2453,27 @@ GameConstant.templateModelUnits = {
                     }
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "mech",
-                isAffectedByLuck = true,
-            },
-
         },
     },
 
     recon      = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "recon",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 8,
             type  = "tires",
         },
 
         vision        = 5,
 
-        fuel = {
+        FuelOwner = {
             max                    = 80,
             current                = 80,
             consumptionPerTurn     = 0,
@@ -2311,25 +2529,27 @@ GameConstant.templateModelUnits = {
                     },
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "recon",
-                isAffectedByLuck = true,
-            },
-
         },
     },
 
     tank       = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "tank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "treads",
         },
 
         vision        = 3,
 
-        fuel = {
+        FuelOwner = {
             max                    = 70,
             current                = 70,
             consumptionPerTurn     = 0,
@@ -2415,25 +2635,27 @@ GameConstant.templateModelUnits = {
                     }
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "tank",
-                isAffectedByLuck = true,
-            },
-
         },
     },
 
     mdtank     = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "mdtank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "treads",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 50,
             current                = 50,
             consumptionPerTurn     = 0,
@@ -2521,25 +2743,27 @@ GameConstant.templateModelUnits = {
                     }
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "mdtank",
-                isAffectedByLuck = true,
-            },
-
         },
     },
 
     neotank    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "neotank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "treads",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 0,
@@ -2627,24 +2851,27 @@ GameConstant.templateModelUnits = {
                     },
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "neotank",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     apc        = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "apc",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "treads",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 70,
             current                = 70,
             consumptionPerTurn     = 0,
@@ -2664,24 +2891,27 @@ GameConstant.templateModelUnits = {
         description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
 
         specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "apc",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     artillery  = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "artillery",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "treads",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 50,
             current                = 50,
             consumptionPerTurn     = 0,
@@ -2740,24 +2970,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "artillery",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     rockets    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "rockets",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "tires",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 50,
             current                = 50,
             consumptionPerTurn     = 0,
@@ -2816,24 +3049,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "rockets",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     antiair    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "antiair",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "treads",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 60,
             current                = 60,
             consumptionPerTurn     = 0,
@@ -2892,24 +3128,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "antiair",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     missiles   = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "missiles",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "tires",
         },
 
         vision        = 5,
 
-        fuel = {
+        FuelOwner = {
             max                    = 50,
             current                = 50,
             consumptionPerTurn     = 0,
@@ -2967,24 +3206,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "missiles",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     fighter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "fighter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 9,
             type  = "air",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 5,
@@ -3043,24 +3285,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "fighter",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     bomber     = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "bomber",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 7,
             type  = "air",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 5,
@@ -3119,24 +3364,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "bomber",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     bcopter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "bcopter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "air",
         },
 
         vision        = 3,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 2,
@@ -3223,24 +3471,27 @@ GameConstant.templateModelUnits = {
                     },
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "bcopter",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     tcopter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "tcopter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "air",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 2,
@@ -3260,24 +3511,27 @@ GameConstant.templateModelUnits = {
         description = "T copters can transport both infantry and mech units.",
 
         specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "tcopter",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     battleship = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "battleship",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "ship",
         },
 
         vision        = 2,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 1,
@@ -3335,24 +3589,27 @@ GameConstant.templateModelUnits = {
                 },
                 secondaryWeapon = nil,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "battleship",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     cruiser    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "cruiser",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "ship",
         },
 
         vision        = 3,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 1,
@@ -3439,24 +3696,27 @@ GameConstant.templateModelUnits = {
                     },
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "cruiser",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     lander     = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "lander",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "lander",
         },
 
         vision        = 1,
 
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 1,
@@ -3476,24 +3736,27 @@ GameConstant.templateModelUnits = {
         description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
 
         specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "lander",
-                isAffectedByLuck = true,
-            },
         },
     },
 
     submarine  = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "submarine",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "ship",
         },
 
         vision        = 5,
 
-        fuel = {
+        FuelOwner = {
             max                    = 60,
             current                = 60,
             consumptionPerTurn     = 1,
@@ -3551,12 +3814,6 @@ GameConstant.templateModelUnits = {
                     maxAmmo     = 6,
                 },
                 secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "submarine",
-                isAffectedByLuck = true,
             },
         },
     },

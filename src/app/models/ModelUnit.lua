@@ -58,10 +58,11 @@ local function initWithTiledID(self, tiledID)
     self.m_State    = "idle"
 
     ComponentManager.unbindAllComponents(self)
-        .bindComponent(self, "GridIndexable")
-        .bindComponent(self, "FuelOwner", {template = template.fuel, instantialData = template.fuel})
-        .bindComponent(self, "MoveDoer",  {template = template.movement})
-        .bindComponent(self, "AttackTaker")
+    for name, data in pairs(template) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+        end
+    end
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -74,13 +75,15 @@ local function initWithTiledID(self, tiledID)
 end
 
 local function loadInstantialData(self, param)
-    if (param.gridIndex) then
-        self:setGridIndex(param.gridIndex)
-    end
-
     self.m_State = param.state or self.m_State
-    if (param.fuel) then
-        ComponentManager.getComponent("FuelOwner"):loadInstantialData(param.fuel)
+
+    for name, data in pairs(param) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            local component = ComponentManager.getComponent(self, name)
+            assert(component, "ModelUnit-loadInstantialData() attempting to update a component that the model hasn't bound with.")
+
+            component:loadInstantialData(data)
+        end
     end
 
     if (param.specialProperties) then
