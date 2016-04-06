@@ -5,7 +5,7 @@ GameConstant.GridSize = {
     width = 80, height = 80
 }
 
-GameConstant.Mapping_TiledIdToTemplateModelIdTileOrUnit = {
+GameConstant.indexesForTileOrUnit = {
     -- TiledID 0 + 1
     {n = "hq",       p = 1},    {n = "hq",       p = 2},    {n = "hq",       p = 3},    {n = "hq",       p = 4},
     {n = "city",     p = 1},    {n = "city",     p = 2},    {n = "city",     p = 3},    {n = "city",     p = 4},    {n = "city",     p = 5},
@@ -1144,7 +1144,7 @@ GameConstant.moveTypes = {
     "lander",
 }
 
-GameConstant.Mapping_IdToTemplateModelTile = {
+GameConstant.templateModelTiles = {
     hq = {
         defenseBonus = {
             amount         = 40,
@@ -2069,7 +2069,7 @@ GameConstant.Mapping_IdToTemplateModelTile = {
     },
 }
 
-GameConstant.Mapping_IdToTemplateModelUnit = {
+GameConstant.templateModelUnits = {
     infantry   = {
         movement = {
             range = 3,

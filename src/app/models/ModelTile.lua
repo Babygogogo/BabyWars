@@ -1,64 +1,46 @@
 
 local ModelTile = class("ModelTile")
 
-local TEMPLATE_MODEL_TILE_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
-local TEMPLATE_MODEL_TILES    = require("res.data.GameConstant").Mapping_IdToTemplateModelTile
-
-local ComponentManager = require("global.components.ComponentManager")
-local TypeChecker      = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function isOfSameTemplateModelTileID(tiledID1, tiledID2)
-    if (not tiledID1) or (not tiledID2) then
-        return false
-    end
-
-    return TEMPLATE_MODEL_TILE_IDS[tiledID1].n == TEMPLATE_MODEL_TILE_IDS[tiledID2].n
-end
-
-local function toTemplateModelTile(tiledID)
-    return TEMPLATE_MODEL_TILES[TEMPLATE_MODEL_TILE_IDS[tiledID].n]
-end
-
-local function toPlayerIndex(tiledID)
-    return TEMPLATE_MODEL_TILE_IDS[tiledID].p
-end
-
-local function initWithTiledID(model, tiledID)
-    local template = toTemplateModelTile(tiledID)
+local function initWithTiledID(self, tiledID)
+    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(tiledID)
     assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param tiledID.")
 
-    model.m_TiledID = tiledID
-    if (model.m_Template == template) then
+    self.m_TiledID = tiledID
+    if (self.m_Template == template) then
         return
     end
 
-    model.m_Template = template
+    self.m_Template = template
 
-    ComponentManager.unbindAllComponents(model)
-    ComponentManager.bindComponent(model, "GridIndexable")
+    ComponentManager.unbindAllComponents(self)
+    ComponentManager.bindComponent(self, "GridIndexable")
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
-            if (not ComponentManager.getComponent(model, specialProperty.name)) then
-                ComponentManager.bindComponent(model, specialProperty.name)
+            if (not ComponentManager.getComponent(self, specialProperty.name)) then
+                ComponentManager.bindComponent(self, specialProperty.name)
             end
-            ComponentManager.getComponent(model, specialProperty.name):load(specialProperty)
+            ComponentManager.getComponent(self, specialProperty.name):load(specialProperty)
         end
     end
 end
 
-local function loadInstanceProperties(model, param)
+local function loadInstantialData(self, param)
     if (param.gridIndex) then
-        model:setGridIndex(param.gridIndex)
+        self:setGridIndex(param.gridIndex)
     end
 
     if (param.specialProperties) then
         for _, specialProperty in ipairs(param.specialProperties) do
-            local component = ComponentManager.getComponent(model, specialProperty.name)
-            assert(component, "ModelTile-loadInstanceProperties() attempting to overwrite a component that the model hasn't bound with.")
+            local component = ComponentManager.getComponent(self, specialProperty.name)
+            assert(component, "ModelTile-loadInstantialData() attempting to overwrite a component that the model hasn't bound with.")
             component:load(specialProperty)
         end
     end
@@ -72,7 +54,7 @@ function ModelTile:ctor(param)
         initWithTiledID(self, param.tiledID)
     end
 
-    loadInstanceProperties(self, param)
+    loadInstantialData(self, param)
 
     if (self.m_View) then
         self:initView()
@@ -99,7 +81,7 @@ function ModelTile:getTiledID()
 end
 
 function ModelTile:getPlayerIndex()
-    return toPlayerIndex(self.m_TiledID)
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
 end
 
 function ModelTile:getDefenseBonusAmount()

@@ -2,6 +2,7 @@
 local AnimationLoader = {}
 
 local GAME_CONSTANT = require("res.data.GameConstant")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 local function toAnimationName(tiledID)
     return "tiledID" .. tiledID
@@ -43,14 +44,7 @@ function AnimationLoader.getAnimationWithTiledID(tiledID)
 end
 
 function AnimationLoader.getAnimationWithTypeName(name)
-    local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelIdTileOrUnit
-    for id, templateID in ipairs(mapping) do
-        if (templateID.n == name) then
-            return AnimationLoader.getAnimationWithTiledID(id)
-        end
-    end
-
-    error("AnimationLoader.getAnimationWithTypeName() failed to find an animation with param name.")
+    return AnimationLoader.getAnimationWithTiledID(GameConstantFunctions.getTiledIdWithTileOrUnitName(name))
 end
 
 return AnimationLoader

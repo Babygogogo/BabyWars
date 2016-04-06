@@ -1,31 +1,9 @@
 
 local ModelUnit = class("ModelUnit")
 
-local ComponentManager	= require("global.components.ComponentManager")
-local TypeChecker       = require("app.utilities.TypeChecker")
-
-local TEMPLATE_MODEL_UNIT_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
-local TEMPLATE_MODEL_UNITS    = require("res.data.GameConstant").Mapping_IdToTemplateModelUnit
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function isOfSameTemplateModelUnitID(tiledID1, tiledID2)
-    if (not tiledID1) or (not tiledID2) then
-        return false
-    end
-
-    return TEMPLATE_MODEL_UNIT_IDS[tiledID1].n == TEMPLATE_MODEL_UNIT_IDS[tiledID2].n
-end
-
-local function toTemplateModelUnit(tiledID)
-    return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID].n]
-end
-
-local function toPlayerIndex(tiledID)
-    return TEMPLATE_MODEL_UNIT_IDS[tiledID].p
-end
-
+local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The set state functions.
@@ -68,7 +46,7 @@ end
 -- The functions that loads the data for the model from a TiledID/lua table.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, tiledID)
-    local template = toTemplateModelUnit(tiledID)
+    local template = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template self unit with param tiledID.")
 
     self.m_TiledID = tiledID
@@ -181,7 +159,7 @@ function ModelUnit:getTiledID()
 end
 
 function ModelUnit:getPlayerIndex()
-    return toPlayerIndex(self.m_TiledID)
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
 end
 
 function ModelUnit:getState()
