@@ -7,140 +7,199 @@ GameConstant.GridSize = {
 
 GameConstant.indexesForTileOrUnit = {
     -- TiledID 0 + 1
---    {name = "plain",    playerIndex = 0},
+    {name = "plain",    playerIndex = 0},
 
-    {name = "hq",       playerIndex = 1},
-    {name = "hq",       playerIndex = 2},
-    {name = "hq",       playerIndex = 3},
-    {name = "hq",       playerIndex = 4},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+
+  --    {name = "wood",     playerIndex = 0},
+    {name = "forest",   playerIndex = 0},
+
+    {name = "mountain", playerIndex = 0},
+
+  --    {name = "wasteland",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+
+  --    {name = "ruins",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+
+  --    {name = "fire",     playerIndex = 0},
+    {name = "road",     playerIndex = 0},
+
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0},
+
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0},
+
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0},
+
+  --12    {name = "beach",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+
+  --    {name = "rough",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+
+ --    {name = "mist",    playerIndex = 0},
+    {name = "shoal",    playerIndex = 0},
+
+    {name = "reef",    playerIndex = 0},
 
     {name = "city",     playerIndex = 1},
     {name = "city",     playerIndex = 2},
     {name = "city",     playerIndex = 3},
     {name = "city",     playerIndex = 4},
-    {name = "city",     playerIndex = 5},
+    {name = "city",     playerIndex = 0},
 
+  --5    {name = "comtower",     playerIndex = 1},
+    {name = "city",     playerIndex = 1},
+    {name = "city",     playerIndex = 2},
+    {name = "city",     playerIndex = 3},
+    {name = "city",     playerIndex = 4},
+    {name = "city",     playerIndex = 0},
+
+  --5    {name = "radar",     playerIndex = 1},
+    {name = "city",     playerIndex = 1},
+    {name = "city",     playerIndex = 2},
+    {name = "city",     playerIndex = 3},
+    {name = "city",     playerIndex = 4},
+    {name = "city",     playerIndex = 0},
+
+    {name = "silo",     playerIndex = 0},
+    {name = "silo",     playerIndex = 0},
+
+  --    {name = "plasma",     playerIndex = 0},
+    {name = "city",     playerIndex = 0},
+
+  --    {name = "meteor",     playerIndex = 0},
+    {name = "city",     playerIndex = 0},
+
+    {name = "hq",     playerIndex = 1},
+    {name = "hq",     playerIndex = 2},
+    {name = "hq",     playerIndex = 3},
+    {name = "hq",     playerIndex = 4},
+
+  --5    {name = "factory",     playerIndex = 1},
     {name = "base",     playerIndex = 1},
     {name = "base",     playerIndex = 2},
     {name = "base",     playerIndex = 3},
     {name = "base",     playerIndex = 4},
-    {name = "base",     playerIndex = 5},
+    {name = "base",     playerIndex = 0},
 
     {name = "airport",  playerIndex = 1},
     {name = "airport",  playerIndex = 2},
     {name = "airport",  playerIndex = 3},
     {name = "airport",  playerIndex = 4},
-    {name = "airport",  playerIndex = 5},
+    {name = "airport",  playerIndex = 0},
 
     {name = "seaport",  playerIndex = 1},
     {name = "seaport",  playerIndex = 2},
     {name = "seaport",  playerIndex = 3},
     {name = "seaport",  playerIndex = 4},
-    {name = "seaport",  playerIndex = 5},
+    {name = "seaport",  playerIndex = 0},
 
-    {name = "plain",    playerIndex = 0},
-    {name = "plain",    playerIndex = 0},
-    {name = "plain",    playerIndex = 0},
-    {name = "plain",    playerIndex = 0},
+  --    {name = "tempairport",  playerIndex = 1},
+    {name = "airport",  playerIndex = 1},
+    {name = "airport",  playerIndex = 2},
+    {name = "airport",  playerIndex = 3},
+    {name = "airport",  playerIndex = 4},
+    {name = "airport",  playerIndex = 0},
 
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-
-    {name = "forest",   playerIndex = 0},
-
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-
-    {name = "reef",     playerIndex = 0},
-
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-
-    -- TiledID 100 + 1
-    {name = "mountain", playerIndex = 0},
-    {name = "mountain", playerIndex = 0},
-
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-    {name = "pipeline", playerIndex = 0},
-
-    {name = "joint",    playerIndex = 0},
-    {name = "joint",    playerIndex = 0},
+  --    {name = "tempseaport",  playerIndex = 1},
+    {name = "seaport",  playerIndex = 1},
+    {name = "seaport",  playerIndex = 2},
+    {name = "seaport",  playerIndex = 3},
+    {name = "seaport",  playerIndex = 4},
+    {name = "seaport",  playerIndex = 0},
 
     -- Units
     {name = "infantry",   playerIndex = 1},
@@ -364,7 +423,7 @@ GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
 
     {
         animations = {
-            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 5, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 5, durationPerFrame = 0.1}
         }
     },
 
@@ -1040,6 +1099,11 @@ GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
             normal = {pattern = "c01_t25_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
+    {
+        animations = {
+            normal = {pattern = "c01_t25_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
 
     {
         animations = {
@@ -1059,6 +1123,11 @@ GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
     {
         animations = {
             normal = {pattern = "c01_t26_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t26_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 }
