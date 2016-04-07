@@ -89,8 +89,6 @@ local function createIcon()
 
         :setScale(ICON_SCALE)
 
-        :playAnimationForever(require("app.utilities.AnimationLoader").getAnimationWithTiledID(1))
-
     return icon
 end
 
@@ -101,7 +99,7 @@ end
 
 local function updateIconWithModelTile(icon, tile)
     icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tile:getTiledID()))
+        :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tile:getTiledID()))
 end
 
 --------------------------------------------------------------------------------

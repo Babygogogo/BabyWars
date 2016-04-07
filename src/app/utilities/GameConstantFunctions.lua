@@ -114,6 +114,10 @@ function GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].playerIndex
 end
 
+function GameConstantFunctions.getShapeIndexWithTiledId(tiledID)
+    return TILE_UNIT_INDEXES[tiledID].shapeIndex
+end
+
 function GameConstantFunctions.getTemplateModelTileWithTiledId(tiledID)
     return TEMPLATE_MODEL_TILES[TILE_UNIT_INDEXES[tiledID].name]
 end

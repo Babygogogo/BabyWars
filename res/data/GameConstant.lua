@@ -6,200 +6,185 @@ GameConstant.GridSize = {
 }
 
 GameConstant.indexesForTileOrUnit = {
-    -- TiledID 0 + 1
-    {name = "plain",    playerIndex = 0},
+    {name = "plain",    playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
+    {name = "road",     playerIndex = 0, shapeIndex = 1,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 2,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 3,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 4,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 5,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 6,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 7,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 8,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 9,  },
+    {name = "road",     playerIndex = 0, shapeIndex = 10, },
+    {name = "road",     playerIndex = 0, shapeIndex = 11, },
 
-  --    {name = "wood",     playerIndex = 0},
-    {name = "forest",   playerIndex = 0},
+    {name = "wood",     playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "mountain", playerIndex = 0},
+    {name = "mountain", playerIndex = 0, shapeIndex = 1,  },
 
-  --    {name = "wasteland",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
+    {name = "wasteland",playerIndex = 0, shapeIndex = 1,  },
 
-  --    {name = "ruins",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
+    {name = "ruins",    playerIndex = 0, shapeIndex = 1,  },
 
-  --    {name = "fire",     playerIndex = 0},
-    {name = "road",     playerIndex = 0},
+    {name = "fire",     playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
-    {name = "sea",      playerIndex = 0},
+    {name = "sea",      playerIndex = 0, shapeIndex = 1,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 2,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 3,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 4,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 5,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 6,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 7,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 8,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 9,  },
+    {name = "sea",      playerIndex = 0, shapeIndex = 10, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 11, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 12, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 13, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 14, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 15, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 16, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 17, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 18, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 19, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 20, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 21, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 22, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 23, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 24, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 25, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 26, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 27, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 28, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 29, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 30, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 31, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 32, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 33, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 34, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 35, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 36, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 37, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 38, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 39, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 40, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 41, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 42, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 43, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 44, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 45, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 46, },
+    {name = "sea",      playerIndex = 0, shapeIndex = 47, },
 
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
-    {name = "bridge",   playerIndex = 0},
+    {name = "bridge",   playerIndex = 0, shapeIndex = 1,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 2,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 3,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 4,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 5,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 6,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 7,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 8,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 9,  },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 10, },
+    {name = "bridge",   playerIndex = 0, shapeIndex = 11, },
 
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
-    {name = "river",    playerIndex = 0},
+    {name = "river",    playerIndex = 0, shapeIndex = 1,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 2,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 3,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 4,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 5,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 6,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 7,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 8,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 9,  },
+    {name = "river",    playerIndex = 0, shapeIndex = 10, },
+    {name = "river",    playerIndex = 0, shapeIndex = 11, },
+    {name = "river",    playerIndex = 0, shapeIndex = 12, },
+    {name = "river",    playerIndex = 0, shapeIndex = 13, },
+    {name = "river",    playerIndex = 0, shapeIndex = 14, },
+    {name = "river",    playerIndex = 0, shapeIndex = 15, },
+    {name = "river",    playerIndex = 0, shapeIndex = 16, },
 
-  --12    {name = "beach",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
+    {name = "beach",    playerIndex = 0, shapeIndex = 1,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 2,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 3,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 4,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 5,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 6,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 7,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 8,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 9,  },
+    {name = "beach",    playerIndex = 0, shapeIndex = 10, },
+    {name = "beach",    playerIndex = 0, shapeIndex = 11, },
+    {name = "beach",    playerIndex = 0, shapeIndex = 12, },
 
-  --    {name = "rough",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
+    {name = "rough",    playerIndex = 0, shapeIndex = 1,  },
 
- --    {name = "mist",    playerIndex = 0},
-    {name = "shoal",    playerIndex = 0},
+    {name = "mist",     playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "reef",    playerIndex = 0},
+    {name = "reef",     playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "city",     playerIndex = 1},
-    {name = "city",     playerIndex = 2},
-    {name = "city",     playerIndex = 3},
-    {name = "city",     playerIndex = 4},
-    {name = "city",     playerIndex = 0},
+    {name = "city",     playerIndex = 1, shapeIndex = 1,  },
+    {name = "city",     playerIndex = 2, shapeIndex = 2,  },
+    {name = "city",     playerIndex = 3, shapeIndex = 3,  },
+    {name = "city",     playerIndex = 4, shapeIndex = 4,  },
+    {name = "city",     playerIndex = 0, shapeIndex = 5,  },
 
-  --5    {name = "comtower",     playerIndex = 1},
-    {name = "city",     playerIndex = 1},
-    {name = "city",     playerIndex = 2},
-    {name = "city",     playerIndex = 3},
-    {name = "city",     playerIndex = 4},
-    {name = "city",     playerIndex = 0},
+    {name = "comtower", playerIndex = 1, shapeIndex = 1,  },
+    {name = "comtower", playerIndex = 2, shapeIndex = 2,  },
+    {name = "comtower", playerIndex = 3, shapeIndex = 3,  },
+    {name = "comtower", playerIndex = 4, shapeIndex = 4,  },
+    {name = "comtower", playerIndex = 0, shapeIndex = 5,  },
 
-  --5    {name = "radar",     playerIndex = 1},
-    {name = "city",     playerIndex = 1},
-    {name = "city",     playerIndex = 2},
-    {name = "city",     playerIndex = 3},
-    {name = "city",     playerIndex = 4},
-    {name = "city",     playerIndex = 0},
+    {name = "radar",    playerIndex = 1, shapeIndex = 1,  },
+    {name = "radar",    playerIndex = 2, shapeIndex = 2,  },
+    {name = "radar",    playerIndex = 3, shapeIndex = 3,  },
+    {name = "radar",    playerIndex = 4, shapeIndex = 4,  },
+    {name = "radar",    playerIndex = 0, shapeIndex = 5,  },
 
-    {name = "silo",     playerIndex = 0},
-    {name = "silo",     playerIndex = 0},
+    {name = "silo",     playerIndex = 0, shapeIndex = 1,  },
+    {name = "silo",     playerIndex = 0, shapeIndex = 2,  },
 
-  --    {name = "plasma",     playerIndex = 0},
-    {name = "city",     playerIndex = 0},
+    {name = "plasma",   playerIndex = 0, shapeIndex = 1,  },
 
-  --    {name = "meteor",     playerIndex = 0},
-    {name = "city",     playerIndex = 0},
+    {name = "meteor",   playerIndex = 0, shapeIndex = 1,  },
 
-    {name = "hq",     playerIndex = 1},
-    {name = "hq",     playerIndex = 2},
-    {name = "hq",     playerIndex = 3},
-    {name = "hq",     playerIndex = 4},
+    {name = "hq",       playerIndex = 1, shapeIndex = 1,  },
+    {name = "hq",       playerIndex = 2, shapeIndex = 2,  },
+    {name = "hq",       playerIndex = 3, shapeIndex = 3,  },
+    {name = "hq",       playerIndex = 4, shapeIndex = 4,  },
 
-  --5    {name = "factory",     playerIndex = 1},
-    {name = "base",     playerIndex = 1},
-    {name = "base",     playerIndex = 2},
-    {name = "base",     playerIndex = 3},
-    {name = "base",     playerIndex = 4},
-    {name = "base",     playerIndex = 0},
+    {name = "factory",  playerIndex = 1, shapeIndex = 1,  },
+    {name = "factory",  playerIndex = 2, shapeIndex = 2,  },
+    {name = "factory",  playerIndex = 3, shapeIndex = 3,  },
+    {name = "factory",  playerIndex = 4, shapeIndex = 4,  },
+    {name = "factory",  playerIndex = 0, shapeIndex = 5,  },
 
-    {name = "airport",  playerIndex = 1},
-    {name = "airport",  playerIndex = 2},
-    {name = "airport",  playerIndex = 3},
-    {name = "airport",  playerIndex = 4},
-    {name = "airport",  playerIndex = 0},
+    {name = "airport",  playerIndex = 1, shapeIndex = 1,  },
+    {name = "airport",  playerIndex = 2, shapeIndex = 2,  },
+    {name = "airport",  playerIndex = 3, shapeIndex = 3,  },
+    {name = "airport",  playerIndex = 4, shapeIndex = 4,  },
+    {name = "airport",  playerIndex = 0, shapeIndex = 5,  },
 
-    {name = "seaport",  playerIndex = 1},
-    {name = "seaport",  playerIndex = 2},
-    {name = "seaport",  playerIndex = 3},
-    {name = "seaport",  playerIndex = 4},
-    {name = "seaport",  playerIndex = 0},
+    {name = "seaport",  playerIndex = 1, shapeIndex = 1,  },
+    {name = "seaport",  playerIndex = 2, shapeIndex = 2,  },
+    {name = "seaport",  playerIndex = 3, shapeIndex = 3,  },
+    {name = "seaport",  playerIndex = 4, shapeIndex = 4,  },
+    {name = "seaport",  playerIndex = 0, shapeIndex = 5,  },
 
-  --    {name = "tempairport",  playerIndex = 1},
-    {name = "airport",  playerIndex = 1},
-    {name = "airport",  playerIndex = 2},
-    {name = "airport",  playerIndex = 3},
-    {name = "airport",  playerIndex = 4},
-    {name = "airport",  playerIndex = 0},
+    {name = "tempairport",  playerIndex = 1, shapeIndex = 1,  },
+    {name = "tempairport",  playerIndex = 2, shapeIndex = 2,  },
+    {name = "tempairport",  playerIndex = 3, shapeIndex = 3,  },
+    {name = "tempairport",  playerIndex = 4, shapeIndex = 4,  },
+    {name = "tempairport",  playerIndex = 0, shapeIndex = 5,  },
 
-  --    {name = "tempseaport",  playerIndex = 1},
-    {name = "seaport",  playerIndex = 1},
-    {name = "seaport",  playerIndex = 2},
-    {name = "seaport",  playerIndex = 3},
-    {name = "seaport",  playerIndex = 4},
-    {name = "seaport",  playerIndex = 0},
+    {name = "tempseaport",  playerIndex = 1, shapeIndex = 1,  },
+    {name = "tempseaport",  playerIndex = 2, shapeIndex = 2,  },
+    {name = "tempseaport",  playerIndex = 3, shapeIndex = 3,  },
+    {name = "tempseaport",  playerIndex = 4, shapeIndex = 4,  },
+    {name = "tempseaport",  playerIndex = 0, shapeIndex = 5,  },
 
     -- Units
     {name = "infantry",   playerIndex = 1},
@@ -333,803 +318,33 @@ GameConstant.indexesForTileOrUnit = {
     {name = "gunboat",    playerIndex = 4},
 }
 
-GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
-    {
-        -- TiledID 1
-        animations = {
-            normal = {pattern = "c01_t01_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 5, durationPerFrame = 0.1}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s11_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s12_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s13_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s14_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s15_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s16_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s17_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s18_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s19_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s20_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s21_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s22_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s23_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s24_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s25_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s26_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s27_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s28_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s29_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s30_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s31_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s32_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s33_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s34_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s35_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s36_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s37_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s38_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s39_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s40_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s41_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s42_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s43_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s44_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s45_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s46_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s47_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s12_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s13_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s14_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s15_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s16_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s11_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s12_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t13_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t14_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t17_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t17_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t17_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t17_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t17_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t18_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t18_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t19_s01_f%02d.png", framesCount = 3, durationPerFrame = 0.1}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t20_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t21_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t21_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t21_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t21_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t22_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t22_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t22_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t22_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t22_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t23_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t23_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t23_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t23_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t23_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t24_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t24_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t24_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t24_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t24_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t25_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t25_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t25_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t25_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t25_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c01_t26_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t26_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t26_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t26_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t26_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
-        }
-    },
+GameConstant.tileAnimations = {
+    plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    road        = {typeIndex = 2,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999,},
+    wood        = {typeIndex = 3,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    mountain    = {typeIndex = 4,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    wasteland   = {typeIndex = 5,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    ruins       = {typeIndex = 6,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    fire        = {typeIndex = 7,  shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,   },
+    sea         = {typeIndex = 8,  shapesCount = 47, framesCount = 8, durationPerFrame = 0.2,   },
+    bridge      = {typeIndex = 9,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999,},
+    river       = {typeIndex = 10, shapesCount = 16, framesCount = 1, durationPerFrame = 999999,},
+    beach       = {typeIndex = 11, shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,   },
+    rough       = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
+    mist        = {typeIndex = 13, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
+    reef        = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
+    city        = {typeIndex = 15, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    comtower    = {typeIndex = 16, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    radar       = {typeIndex = 17, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    silo        = {typeIndex = 18, shapesCount = 2,  framesCount = 1, durationPerFrame = 999999,},
+    plasma      = {typeIndex = 19, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,   },
+    meteor      = {typeIndex = 20, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    hq          = {typeIndex = 21, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,   },
+    factory     = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    airport     = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    seaport     = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,   },
+    tempairport = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999,},
+    tempseaport = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999,},
 }
 
 GameConstant.unitAnimations = {
@@ -1613,13 +828,58 @@ GameConstant.moveTypes = {
 }
 
 GameConstant.templateModelTiles = {
-    hq = {
+    plain = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 40,
+            amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
+    },
+
+    road = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
         },
 
         moveCost = {
@@ -1655,31 +915,547 @@ GameConstant.templateModelTiles = {
             },
         },
 
-        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
+        description = "A paved road. Easy to traverse, but offers little defensive cover.",
+    },
 
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "Defeat"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
+    wood = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 20,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
         },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 3,
+                tireB     = 3,
+                tank      = 2,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 3,
+                tireB     = 3,
+                tank      = 2,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 3,
+                tireB     = 3,
+                tank      = 2,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+    },
+
+    mountain = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Foot units",
+            targetList     = GameConstant.unitCatagory.footUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+    },
+
+    wasteland = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Foot units",
+            targetList     = GameConstant.unitCatagory.footUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+    },
+
+    ruins = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Foot units",
+            targetList     = GameConstant.unitCatagory.footUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+    },
+
+    fire = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Foot units",
+            targetList     = GameConstant.unitCatagory.footUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+    },
+
+    sea = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+        },
+
+        description = "A body of water. Only naval and air units can traverse seas.",
+    },
+
+    bridge = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+        },
+
+        description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
+    },
+
+    river = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 2,
+                mech      = 1,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A gentle, flowing river. Only infantry units can ford rivers.",
+    },
+
+    beach = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+        },
+
+        description = "A sandy shoal. Lander units load and unload units here.",
+    },
+
+    rough = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+        },
+
+        description = "A sandy shoal. Lander units load and unload units here.",
+    },
+
+    mist = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 2,
+                tireB     = 2,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = 1,
+            },
+        },
+
+        description = "A sandy shoal. Lander units load and unload units here.",
+    },
+
+    reef = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 10,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 2,
+                transport = 2,
+            },
+            rain  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 2,
+                transport = 2,
+            },
+            snow  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = 1,
+                ship      = 2,
+                transport = 2,
+            },
+        },
+
+        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
     },
 
     city = {
@@ -1751,7 +1527,327 @@ GameConstant.templateModelTiles = {
         }
     },
 
-    base = {
+    comtower = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A command tower.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
+            },
+        },
+    },
+
+    radar = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A command tower.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
+            },
+        },
+    },
+
+    silo = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
+    },
+
+    plasma = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
+    },
+
+    meteor = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.tileMaxHP,
+            currentHP        = GameConstant.tileMaxHP,
+            defenseType      = "mdtank",
+            isAffectedByLuck = false,
+        },
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = false,
+                mech      = false,
+                tireA     = false,
+                tireB     = false,
+                tank      = false,
+                air       = false,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+
+        specialProperties = {
+        },
+    },
+
+    hq = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = false,
+                transport = false,
+            },
+        },
+
+        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "Defeat"
+            },
+            {
+                name           = "RepairDoer",
+                targetCatagory = "Ground units",
+                targetList     = GameConstant.unitCatagory.groundUnits,
+                amount         = 2,
+            },
+            {
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
+            },
+            --[[
+            {
+                name = "SupplyProvider",
+                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+            },
+            --]]
+        },
+    },
+
+    factory = {
         GridIndexable = {},
 
         defenseBonus = {
@@ -1970,512 +2066,7 @@ GameConstant.templateModelTiles = {
         }
     },
 
-    plain = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 10,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
-    },
-
-    road = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A paved road. Easy to traverse, but offers little defensive cover.",
-    },
-
-    forest = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 20,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
-    },
-
-    river = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A gentle, flowing river. Only infantry units can ford rivers.",
-    },
-
-    sea = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-        },
-
-        description = "A body of water. Only naval and air units can traverse seas.",
-    },
-
-    reef = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 10,
-            targetCatagory = "Naval units",
-            targetList     = GameConstant.unitCatagory.navalUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
-        },
-
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
-    },
-
-    shoal = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-        },
-
-        description = "A sandy shoal. Lander units load and unload units here.",
-    },
-
-    mountain = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Foot units",
-            targetList     = GameConstant.unitCatagory.footUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
-    },
-
-    bridge = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-        },
-
-        description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
-    },
-
-    pipeline = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
-    },
-
-    joint = {
-        GridIndexable = {},
-
-        AttackTaker = {
-            maxHP            = GameConstant.tileMaxHP,
-            currentHP        = GameConstant.tileMaxHP,
-            defenseType      = "mdtank",
-            isAffectedByLuck = false,
-        },
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
-
-        specialProperties = {
-        },
-    },
-
-    silo = {
+    tempairport = {
         GridIndexable = {},
 
         defenseBonus = {
@@ -2517,52 +2108,7 @@ GameConstant.templateModelTiles = {
             },
         },
 
-        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
-    },
-
-    cmdtower = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        description = "A command tower.",
+        description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
 
         specialProperties = {
             {
@@ -2570,7 +2116,100 @@ GameConstant.templateModelTiles = {
                 maxCapturePoint = GameConstant.maxCapturePoint,
                 onCapture       = "ChangeCapturer"
             },
+            {
+                name           = "RepairDoer",
+                targetCatagory = "Air units",
+                targetList     = GameConstant.unitCatagory.airUnits,
+                amount         = 2,
+            },
+            {
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
+            },
+            --[[
+            {
+                name = "SupplyProvider",
+                target = {12, 13, 14, 15}
+            },
+            {
+                name = "RepairDoer",
+                target = {12, 13, 14, 15}
+            }
+            --]]
+        }
+    },
+
+    tempseaport = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 30,
+            targetCatagory = "Ground/naval units",
+            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
+
+        moveCost = {
+            clear = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            rain  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+            snow  = {
+                infantry  = 1,
+                mech      = 1,
+                tireA     = 1,
+                tireB     = 1,
+                tank      = 1,
+                air       = 1,
+                ship      = 1,
+                transport = 1,
+            },
+        },
+
+        description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "ChangeCapturer"
+            },
+            {
+                name           = "RepairDoer",
+                targetCatagory = "Naval units",
+                targetList     = GameConstant.unitCatagory.navalUnits,
+                amount         = 2,
+            },
+            {
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
+            },
+            --[[
+            {
+                name = "SupplyProvider",
+                target = {16, 17, 18, 19}
+            },
+            {
+                name = "RepairDoer",
+                target = {16, 17, 18, 19}
+            }
+            --]]
+        }
     },
 }
 

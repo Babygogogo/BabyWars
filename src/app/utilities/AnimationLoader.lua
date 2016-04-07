@@ -2,28 +2,28 @@
 local AnimationLoader = {}
 
 local GAME_CONSTANT = require("res.data.GameConstant")
+
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
-local function toAnimationName(tiledID)
-    return "tiledID" .. tiledID
-end
-
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function getUnitAnimationName(unitName, playerIndex, state)
     return unitName .. playerIndex .. state
 end
 
-local function loadTiledAnimation(tiledID, pattern, frameCount, frameDuration)
-    local animation = display.newAnimation(display.newFrames(pattern, 1, frameCount), frameDuration)
-    display.setAnimationCache(toAnimationName(tiledID), animation)
+local function getTileAnimationName(tileName, shapeIndex)
+    return tileName .. shapeIndex
 end
 
-local function loadTiledAnimations()
-    local views = GAME_CONSTANT.Mapping_TiledIdToTemplateViewTileOrUnit
-    for tiledID, view in ipairs(views) do
-        local animations = view.animations
-        local animation = animations.normal
-
-        loadTiledAnimation(tiledID, animation.pattern, animation.framesCount, animation.durationPerFrame)
+local function loadTileAnimations()
+    for tileName, data in pairs(GAME_CONSTANT.tileAnimations) do
+           -- plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+        for shapeIndex = 1, data.shapesCount do
+            local pattern = string.format("c01_t%02d_s%02d_%s.png", data.typeIndex, shapeIndex, "f%02d")
+            local animation = display.newAnimation(display.newFrames(pattern, 1, data.framesCount), data.durationPerFrame)
+            display.setAnimationCache(getTileAnimationName(tileName, shapeIndex), animation)
+        end
     end
 end
 
@@ -48,18 +48,13 @@ local function loadGridAnimations()
     display.setAnimationCache("GridExplosion", explosionAnimation)
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function AnimationLoader.load()
-    loadTiledAnimations()
+    loadTileAnimations()
     loadUnitAnimations()
     loadGridAnimations()
-end
-
-function AnimationLoader.getAnimationWithTiledID(tiledID)
-    return display.getAnimationCache(toAnimationName(tiledID))
-end
-
-function AnimationLoader.getAnimationWithTypeName(name)
-    return AnimationLoader.getAnimationWithTiledID(GameConstantFunctions.getTiledIdWithTileOrUnitName(name))
 end
 
 function AnimationLoader.getUnitAnimation(unitName, playerIndex, animationState)
@@ -68,6 +63,14 @@ end
 
 function AnimationLoader.getUnitAnimationWithTiledId(tiledID)
     return AnimationLoader.getUnitAnimation(GameConstantFunctions.getUnitNameWithTiledId(tiledID), GameConstantFunctions.getPlayerIndexWithTiledId(tiledID), "normal")
+end
+
+function AnimationLoader.getTileAnimation(tileName, shapeIndex)
+    return display.getAnimationCache(getTileAnimationName(tileName, shapeIndex or 1))
+end
+
+function AnimationLoader.getTileAnimationWithTiledId(tiledID)
+    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileNameWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
 end
 
 return AnimationLoader

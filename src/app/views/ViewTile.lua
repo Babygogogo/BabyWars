@@ -22,7 +22,7 @@ function ViewTile:updateWithTiledID(tiledID)
 
     self.m_TiledID = tiledID
     self:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
+        :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tiledID))
 
     return self
 end

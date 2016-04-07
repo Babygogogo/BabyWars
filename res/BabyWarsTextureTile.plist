@@ -7193,6 +7193,19 @@
                 <key>sourceSize</key>
                 <string>{72,84}</string>
             </dict>
+            <key>c01_t15_s05_f02.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{814,88},{72,84}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{72,84}}</string>
+                <key>sourceSize</key>
+                <string>{72,84}</string>
+            </dict>
             <key>c01_t16_s01_f01.png</key>
             <dict>
                 <key>frame</key>
@@ -7310,6 +7323,19 @@
                 <key>sourceSize</key>
                 <string>{72,90}</string>
             </dict>
+            <key>c01_t16_s05_f02.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{298,2},{72,90}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{72,90}}</string>
+                <key>sourceSize</key>
+                <string>{72,90}</string>
+            </dict>
             <key>c01_t17_s01_f01.png</key>
             <dict>
                 <key>frame</key>
@@ -7415,6 +7441,19 @@
                 <string>{72,78}</string>
             </dict>
             <key>c01_t17_s05_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{1184,82},{72,78}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{72,78}}</string>
+                <key>sourceSize</key>
+                <string>{72,78}</string>
+            </dict>
+            <key>c01_t17_s05_f02.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{1184,82},{72,78}}</string>
@@ -7726,6 +7765,19 @@
                 <key>sourceSize</key>
                 <string>{72,72}</string>
             </dict>
+            <key>c01_t22_s05_f02.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,1042},{72,72}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{72,72}}</string>
+                <key>sourceSize</key>
+                <string>{72,72}</string>
+            </dict>
             <key>c01_t23_s01_f01.png</key>
             <dict>
                 <key>frame</key>
@@ -7843,6 +7895,19 @@
                 <key>sourceSize</key>
                 <string>{72,84}</string>
             </dict>
+            <key>c01_t23_s05_f02.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{518,2},{72,84}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{72,84}}</string>
+                <key>sourceSize</key>
+                <string>{72,84}</string>
+            </dict>
             <key>c01_t24_s01_f01.png</key>
             <dict>
                 <key>frame</key>
@@ -7948,6 +8013,19 @@
                 <string>{72,90}</string>
             </dict>
             <key>c01_t24_s05_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{150,424},{70,90}}</string>
+                <key>offset</key>
+                <string>{1,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{2,0},{70,90}}</string>
+                <key>sourceSize</key>
+                <string>{72,90}</string>
+            </dict>
+            <key>c01_t24_s05_f02.png</key>
             <dict>
                 <key>frame</key>
                 <string>{{150,424},{70,90}}</string>
@@ -8100,7 +8178,7 @@
             <key>size</key>
             <string>{1704,2032}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:500a225c159b682ece47b853f01e5dba:6808bf63bc0ed286dd8b1025dbd67ad2:bac65cfb3d54b1baadbc9ddd78ee89b2$</string>
+            <string>$TexturePacker:SmartUpdate:ab90f92233e55e22446096b7c5a6fc4c:5e76beb1f72901f7a996de8b4c78073c:bac65cfb3d54b1baadbc9ddd78ee89b2$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureTile.png</string>
         </dict>
