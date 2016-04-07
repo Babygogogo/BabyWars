@@ -1245,58 +1245,91 @@ GameConstant.unitAnimations = {
 }
 
 GameConstant.unitCatagory = {
-    groundUnits = {
+    allUnits = {
         "infantry",
         "mech",
+        "bike",
         "recon",
+        "flare",
+        "antiair",
         "tank",
         "mdtank",
         "wartank",
-        "megatank",
-        "rig",
         "artillery",
+        "antitank",
         "rockets",
-        "antiair",
         "missiles",
-        "piperunner"
+        "rig",
+        "fighter",
+        "bomber",
+        "duster",
+        "bcopter",
+        "tcopter",
+        "seaplane",
+        "battleship",
+        "carrier",
+        "submarine",
+        "cruiser",
+        "lander",
+        "gunboat",
+    },
+
+    groundUnits = {
+        "infantry",
+        "mech",
+        "bike",
+        "recon",
+        "flare",
+        "antiair",
+        "tank",
+        "mdtank",
+        "wartank",
+        "artillery",
+        "antitank",
+        "rockets",
+        "missiles",
+        "rig",
     },
 
     navalUnits = {
         "battleship",
+        "carrier",
+        "submarine",
         "cruiser",
         "lander",
-        "submarine",
-        "blackboat",
-        "carrier"
+        "gunboat",
     },
 
     airUnits = {
         "fighter",
         "bomber",
+        "duster",
         "bcopter",
-        "tcopter"
+        "tcopter",
+        "seaplane",
     },
 
     groundOrNavalUnits = {
         "infantry",
         "mech",
+        "bike",
         "recon",
+        "flare",
+        "antiair",
         "tank",
         "mdtank",
         "wartank",
-        "megatank",
-        "rig",
         "artillery",
+        "antitank",
         "rockets",
-        "antiair",
         "missiles",
-        "piperunner",
+        "rig",
         "battleship",
+        "carrier",
+        "submarine",
         "cruiser",
         "lander",
-        "submarine",
-        "blackboat",
-        "carrier"
+        "gunboat",
     },
 
     none = {
@@ -2327,10 +2360,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech"
-                },
             },
         },
 
@@ -2352,15 +2381,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "artillery", "rockets", "antiair", "bomber", "battleship"
-            },
-            weak   = {
-                "infantry", "mech", "recon", "tank", "bcopter"
-            },
         },
 
         cost        = 1500,
@@ -2408,12 +2428,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 15,
                 },
-                fatal  = {
-                    "recon", "rockets", "missiles"
-                },
-                strong = {
-                    "tank", "rig", "artillery", "antiair"
-                },
                 maxAmmo     = 3,
                 currentAmmo = 3,
             },
@@ -2448,10 +2462,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech"
-                }
             },
         },
 
@@ -2473,15 +2483,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "artillery", "rockets", "antiair", "bomber", "battleship"
-            },
-            weak   = {
-                "infantry", "mech", "recon", "tank", "bcopter"
-            },
         },
 
         cost        = 2500,
@@ -2530,10 +2531,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech"
-                },
             },
         },
 
@@ -2555,15 +2552,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "artillery", "rockets", "antiair", "bomber", "battleship"
-            },
-            weak   = {
-                "infantry", "mech", "recon", "tank", "bcopter"
-            },
         },
 
         cost        = 2500,
@@ -2612,10 +2600,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech", "rig", "artillery", "rockets"
-                },
             },
         },
 
@@ -2637,15 +2621,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "wartank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak   = {
-                "antiair", "bcopter"
-            },
         },
 
         cost        = 4000,
@@ -2694,10 +2669,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 5,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech", "rig", "artillery", "rockets"
-                },
             },
         },
 
@@ -2719,15 +2690,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "wartank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak   = {
-                "antiair", "bcopter"
-            },
         },
 
         cost        = 5000,
@@ -2776,12 +2738,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 10,
                 },
-                fatal = {
-                    "infantry", "mech", "bcopter", "tcopter"
-                },
-                strong = {
-                    "recon", "rig", "artillery", "rockets", "antiair", "missiles", "fighter", "bomber"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -2806,15 +2762,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "tank", "artillery", "antiair"
-            },
         },
 
         cost        = 7000,
@@ -2864,12 +2811,6 @@ GameConstant.templateModelUnits = {
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
-                fatal  = {
-                    "recon", "rockets", "missiles"
-                },
-                strong = {
-                    "tank", "rig", "artillery", "antiair"
-                },
             },
             secondaryWeapon = {
                 name        = "Machine gun",
@@ -2902,10 +2843,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {},
-                strong = {
-                    "infantry", "mech", "recon", "rig", "artillery", "rockets", "tcopter"
-                }
             },
         },
 
@@ -2927,15 +2864,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "rockets", "bomber", "battleship"
-            },
-            weak   = {
-                "mech", "tank", "artillery", "bcopter"
-            },
         },
 
         cost        = 7000,
@@ -2983,12 +2911,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 55,
                     meteor     = 35,
                 },
-                fatal  = {
-                    "recon", "tank", "rig", "artillery", "rockets", "antiair", "missiles"
-                },
-                strong = {
-                    "mdtank", "wartank", "cruiser"
-                },
                 maxAmmo     = 5,
                 currentAmmo = 5,
             },
@@ -3023,12 +2945,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {
-                    "infantry", "mech"
-                },
-                strong = {
-                    "recon", "rig", "artillery", "rockets", "tcopter"
-                }
             },
         },
 
@@ -3050,15 +2966,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "bomber"
-            },
-            weak   = {
-                "mdtank", "wartank", "artillery", "rockets", "battleship"
-            },
         },
 
         cost        = 12000,
@@ -3106,12 +3013,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 65,
                     meteor     = 55,
                 },
-                fatal  = {
-                    "recon", "tank", "rig", "artillery", "rockets", "antiair", "missiles"
-                },
-                strong = {
-                    "mdtank", "wartank", "cruiser", "lander"
-                },
                 maxAmmo     = 5,
                 currentAmmo = 5,
             },
@@ -3146,12 +3047,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal  = {
-                    "infantry", "mech"
-                },
-                strong = {
-                    "recon", "rig", "artillery", "rockets", "missiles", "tcopter"
-                },
             },
         },
 
@@ -3173,15 +3068,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "bomber"
-            },
-            weak   = {
-                "mdtank", "wartank", "artillery", "rockets", "battleship"
-            },
         },
 
         cost        = 16000,
@@ -3229,12 +3115,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 100,
                     meteor     = 45,
                 },
-                fatal  = {
-                    "infantry", "mech", "recon", "rockets", "missiles"
-                },
-                strong = {
-                    "tank", "mdtank", "wartank", "rig", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -3259,15 +3139,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "recon", "tank", "artillery", "antiair", "bcopter"
-            },
         },
 
         cost        = 6000,
@@ -3315,12 +3186,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 55,
                 },
-                fatal  = {
-                    "infantry", "mech", "recon", "rockets", "missiles"
-                },
-                strong = {
-                    "tank", "mdtank", "wartank", "rig", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -3345,15 +3210,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "recon", "tank", "artillery", "antiair", "bcopter"
-            },
         },
 
         cost        = 11000,
@@ -3402,12 +3258,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 105,
                     meteor     = 55,
                 },
-                fatal  = {
-                    "infantry", "mech", "recon", "tank", "rig", "artillery", "rockets", "antiair", "missiles", "cruiser", "submarine"
-                },
-                strong = {
-                    "mdtank", "wartank", "battleship", "lander",
-                },
                 maxAmmo     = 5,
                 currentAmmo = 5,
             },
@@ -3432,15 +3282,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "wartank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "recon", "antiair", "bcopter"
-            },
         },
 
         cost        = 15000,
@@ -3488,11 +3329,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = nil,
                 },
-                fatal = {
-                    "fighter", "bomber", "bcopter", "tcopter"
-                },
-                strong = {
-                },
                 maxAmmo     = 5,
                 currentAmmo = 5,
             },
@@ -3517,15 +3353,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "wartank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "antiair", "bcopter"
-            },
         },
 
         cost        = 12000,
@@ -3555,15 +3382,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "wartank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "recon", "tank", "artillery", "antiair", "bcopter"
-            },
         },
 
         cost        = 5000,
@@ -3611,12 +3429,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = nil,
                 },
-                fatal = {
-                    "bomber", "bcopter", "tcopter"
-                },
-                strong = {
-                    "fighter"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -3641,15 +3453,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "missiles"
-            },
-            weak = {
-                "antiair", "fighter", "cruiser"
-            },
         },
 
         cost        = 20000,
@@ -3697,12 +3500,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 120,
                     meteor     = 90,
                 },
-                fatal = {
-                    "infantry", "mech", "recon", "tank", "mdtank", "wartank", "rig", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                },
-                strong = {
-                    "battleship"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -3727,15 +3524,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "missiles", "fighter"
-            },
-            weak = {
-                "antiair", "cruiser"
-            },
         },
 
         cost        = 20000,
@@ -3783,12 +3571,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal = {
-                    "bomber", "bcopter", "tcopter"
-                },
-                strong = {
-                    "fighter"
-                },
                 maxAmmo     = 9,
                 currentAmmo = 9,
             },
@@ -3813,15 +3595,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "missiles"
-            },
-            weak = {
-                "antiair", "fighter", "cruiser"
-            },
         },
 
         cost        = 13000,
@@ -3869,11 +3642,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 85,
                     meteor     = 20,
                 },
-                fatal = {
-                },
-                strong = {
-                    "recon", "tank", "rig", "artillery", "rockets", "missiles", "cruiser"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -3908,12 +3676,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = 1,
                 },
-                fatal = {
-                    "tcopter"
-                },
-                strong = {
-                    "infantry", "mech", "bcopter"
-                },
             },
         },
 
@@ -3935,15 +3697,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "antiair", "missiles", "fighter", "cruiser"
-            },
-            weak = {
-                "bcopter"
-            },
         },
 
         cost        = 9000,
@@ -3973,15 +3726,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "antiair", "missiles", "fighter", "bcopter", "cruiser"
-            },
-            weak = {
-                "tank", "mdtank", "wartank"
-            },
         },
 
         cost        = 5000,
@@ -4029,12 +3773,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 105,
                     meteor     = 55,
                 },
-                fatal = {
-                    "bomber", "bcopter", "tcopter"
-                },
-                strong = {
-                    "fighter"
-                },
                 maxAmmo     = 3,
                 currentAmmo = 3,
             },
@@ -4059,15 +3797,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "missiles"
-            },
-            weak = {
-                "antiair", "fighter", "cruiser"
-            },
         },
 
         cost        = 15000,
@@ -4115,12 +3844,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 95,
                     meteor     = 55,
                 },
-                fatal = {
-                    "infantry", "mech", "recon", "tank", "rig", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                },
-                strong = {
-                    "mdtank", "wartank", "battleship"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -4145,14 +3868,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-            },
-            weak = {
-                "artillery", "rockets", "bomber", "battleship", "submarine"
-            },
         },
 
         cost        = 25000,
@@ -4201,12 +3916,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = nil,
                 },
-                fatal = {
-                    "bcopter", "tcopter"
-                },
-                strong = {
-                    "fighter", "bomber"
-                },
             },
         },
 
@@ -4228,14 +3937,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-            },
-            weak = {
-                "artillery", "rockets", "bomber", "battleship", "submarine"
-            },
         },
 
         cost        = 28000,
@@ -4283,12 +3984,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 120,
                     meteor     = nil,
                 },
-                fatal = {
-                    "lander"
-                },
-                strong = {
-                    "battleship", "submarine"
-                },
                 maxAmmo     = 6,
                 currentAmmo = 6,
             },
@@ -4313,15 +4008,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "rockets", "bomber", "battleship", "cruiser"
-            },
-            weak = {
-                "artillery", "submarine"
-            },
         },
 
         cost        = 20000,
@@ -4369,11 +4055,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 85,
                     meteor     = nil,
                 },
-                fatal = {
-                    "submarine"
-                },
-                strong = {
-                },
                 maxAmmo     = 9,
                 currentAmmo = 9,
             },
@@ -4408,12 +4089,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = nil,
                     meteor     = nil,
                 },
-                fatal = {
-                    "bcopter", "tcopter"
-                },
-                strong = {
-                    "fighter", "bomber"
-                },
             },
         },
 
@@ -4435,15 +4110,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mdtank", "wartank", "artillery", "bcopter"
-            },
         },
 
         cost        = 16000,
@@ -4473,15 +4139,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "bomber", "battleship", "submarine"
-            },
-            weak = {
-                "wartank", "artillery", "rockets"
-            },
         },
 
         cost        = 10000,
@@ -4529,12 +4186,6 @@ GameConstant.templateModelUnits = {
                     gunboat    = 75,
                     meteor     = nil,
                 },
-                fatal = {
-                    "lander"
-                },
-                strong = {
-                    "battleship", "submarine"
-                },
                 maxAmmo     = 1,
                 currentAmmo = 1,
             },
@@ -4559,15 +4210,6 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "rockets", "bomber", "battleship", "cruiser"
-            },
-            weak = {
-                "artillery", "submarine"
-            },
         },
 
         cost        = 6000,

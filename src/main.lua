@@ -14,6 +14,7 @@ local function main()
     display.loadSpriteFrames("BabyWarsTextureUI.plist",   "BabyWarsTextureUI.png")
 
     require("app.utilities.AnimationLoader").load()
+    require("app.utilities.GameConstantFunctions").init()
 
     math.randomseed(os.time())
 

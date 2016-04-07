@@ -164,14 +164,6 @@ function ModelUnit:getVision()
     return self.m_Template.vision
 end
 
-function ModelUnit:getDefenseFatalList()
-    return self.m_Template.defense.fatal
-end
-
-function ModelUnit:getDefenseWeakList()
-    return self.m_Template.defense.weak
-end
-
 function ModelUnit:canJoin(rhsUnitModel)
     return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
 end

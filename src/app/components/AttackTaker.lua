@@ -9,6 +9,8 @@ local EXPORTED_METHODS = {
     "getNormalizedCurrentHP",
 
     "getDefenseType",
+    "getDefenseFatalList",
+    "getDefenseWeakList",
     "isAffectedByLuck",
 }
 
@@ -81,6 +83,14 @@ end
 
 function AttackTaker:isAffectedByLuck()
     return self.m_Template.isAffectByLuck
+end
+
+function AttackTaker:getDefenseFatalList()
+    return self.m_Template.fatal
+end
+
+function AttackTaker:getDefenseWeakList()
+    return self.m_Template.weak
 end
 
 return AttackTaker
