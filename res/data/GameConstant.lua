@@ -2,11 +2,13 @@
 local GameConstant = {}
 
 GameConstant.GridSize = {
-    width = 80, height = 80
+    width = 72, height = 72
 }
 
 GameConstant.indexesForTileOrUnit = {
     -- TiledID 0 + 1
+--    {name = "plain",    playerIndex = 0},
+
     {name = "hq",       playerIndex = 1},
     {name = "hq",       playerIndex = 2},
     {name = "hq",       playerIndex = 3},
@@ -140,6 +142,7 @@ GameConstant.indexesForTileOrUnit = {
     {name = "joint",    playerIndex = 0},
     {name = "joint",    playerIndex = 0},
 
+    -- Units
     {name = "infantry",   playerIndex = 1},
     {name = "infantry",   playerIndex = 2},
     {name = "infantry",   playerIndex = 3},
@@ -275,604 +278,787 @@ GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
     {
         -- TiledID 1
         animations = {
-            normal = {pattern = "c01_t01_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
+            normal = {pattern = "c01_t01_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
     {
-        -- TiledID 11
         animations = {
-            normal = {pattern = "c01_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
+            normal = {pattern = "c01_t02_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t03_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
+            normal = {pattern = "c01_t02_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t03_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
+            normal = {pattern = "c01_t02_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t03_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t02_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t04_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+            normal = {pattern = "c01_t02_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t04_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+            normal = {pattern = "c01_t02_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t04_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+            normal = {pattern = "c01_t02_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t04_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+            normal = {pattern = "c01_t02_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t04_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t02_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t05_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-
-    {
-        -- TiledID 21
-        animations = {
-            normal = {pattern = "c01_t05_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+            normal = {pattern = "c01_t02_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t05_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t02_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
     {
-        -- TiledID 31
         animations = {
-            normal = {pattern = "c01_t07_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s06_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s07_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s08_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s09_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s10_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s11_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t03_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
     {
-        -- TiledID 41
         animations = {
-            normal = {pattern = "c01_t09_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t04_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
-    -- TiledID 50 + 1
     {
         animations = {
-            normal = {pattern = "c01_t10_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s02_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s03_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s04_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s05_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s06_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s07_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s08_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s09_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s10_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t05_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
-    -- TiledID 60 + 1
     {
         animations = {
-            normal = {pattern = "c01_t10_s11_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s12_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s13_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s14_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s15_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s16_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s17_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s18_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s19_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s20_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t06_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
-    -- TiledID 70 + 1
     {
         animations = {
-            normal = {pattern = "c01_t10_s21_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s22_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s23_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s24_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s25_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s26_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s27_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s28_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s29_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 5, durationPerFrame = 0.2}
         }
     },
 
-    -- TiledID 80 + 1
     {
         animations = {
-            normal = {pattern = "c01_t12_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s02_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s03_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s04_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s05_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s06_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s07_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s08_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s09_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s10_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t08_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s11_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s12_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s13_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s14_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s15_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s16_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s17_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s18_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s19_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s20_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s21_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s22_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s23_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s24_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s25_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s26_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s27_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s28_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s29_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s30_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s31_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s32_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s33_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s34_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s35_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s36_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s37_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s38_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s39_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s40_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s41_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s42_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s43_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s44_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s45_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s46_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t08_s47_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
         }
     },
 
-    -- TiledID 90 + 1
     {
         animations = {
-            normal = {pattern = "c01_t12_s11_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s12_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s13_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s14_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s15_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s16_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s17_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s18_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s19_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
+            normal = {pattern = "c01_t09_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t12_s20_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 100 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t13_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t09_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t13_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t14_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t14_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s06_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t09_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 
-    -- TiledID 110 + 1; Units start from "c02..."
     {
         animations = {
-            normal = {pattern = "c01_t15_s07_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t15_s08_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t15_s09_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t15_s10_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t16_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
     {
         animations = {
-            normal = {pattern = "c01_t16_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
+            normal = {pattern = "c01_t10_s06_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s07_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s08_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s09_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s10_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s11_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s12_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s13_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s14_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s15_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t10_s16_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s11_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t11_s12_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t12_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t13_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t14_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t15_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t15_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t15_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t15_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t15_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t16_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t16_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t16_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t16_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t16_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t17_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t17_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t17_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t17_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t17_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t18_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t18_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t19_s01_f%02d.png", framesCount = 3, durationPerFrame = 0.1}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t20_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t21_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t21_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t21_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t21_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t22_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t22_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t22_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t22_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t22_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t23_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t23_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t23_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t23_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t23_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t24_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t24_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t24_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t24_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t24_s05_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t25_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t25_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t25_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t25_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+
+    {
+        animations = {
+            normal = {pattern = "c01_t26_s01_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t26_s02_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t26_s03_f%02d.png", framesCount = 1, durationPerFrame = 999999}
+        }
+    },
+    {
+        animations = {
+            normal = {pattern = "c01_t26_s04_f%02d.png", framesCount = 1, durationPerFrame = 999999}
         }
     },
 }

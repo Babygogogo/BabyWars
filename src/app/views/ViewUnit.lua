@@ -6,7 +6,6 @@ local COLOR_ACTIONED         = {r = 170, g = 170, b = 170}
 local MOVE_DURATION_PER_GRID = 0.1
 
 local TypeChecker           = require("app.utilities.TypeChecker")
-local GridSize              = require("res.data.GameConstant").GridSize
 local AnimationLoader       = require("app.utilities.AnimationLoader")
 local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")

@@ -154,7 +154,7 @@
         <key>globalSpriteSettings</key>
         <struct type="SpriteSettings">
             <key>scale</key>
-            <double>5</double>
+            <double>3</double>
             <key>scaleMode</key>
             <enum type="ScaleMode">Fast</enum>
             <key>innerPadding</key>

@@ -5,7 +5,6 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local MapFunctions       = require("app.utilities.MapFunctions")
 local ViewUnit           = require("app.views.ViewUnit")
 local ModelUnit          = require("app.models.ModelUnit")
-local GridSize           = require("res.data.GameConstant").GridSize
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------

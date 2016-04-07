@@ -4,7 +4,7 @@ local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH      = display.width * 0.85
+local BACKGROUND_WIDTH      = display.width * 0.86
 local BACKGROUND_HEIGHT     = math.min(LINE_HEIGHT * 11 + 10, display.height * 0.95)
 local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
@@ -45,7 +45,7 @@ local DEFENSE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
 local DEFENSE_INFO_POSITION_Y = SECONDARY_WEAPON_INFO_POSITION_Y - DEFENSE_INFO_HEIGHT
 
 local ICON_SCALE = FONT_SIZE * 0.016
-local GRID_WIDTH = require("res.data.GameConstant").GridSize.width
+local GRID_WIDTH = require("app.utilities.GameConstantFunctions").getGridSize().width
 
 local AnimationLoader = require("app.utilities.AnimationLoader")
 
@@ -56,10 +56,13 @@ local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
 local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
 
 local function createBottomLine(posX, poxY, width, height)
-    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
+    --    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
+    local line = cc.Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME)
     line:ignoreAnchorPointForPosition(true)
         :setPosition(posX, poxY)
-        :setContentSize(width, height)
+        :setAnchorPoint(0, 0)
+    --        :setContentSize(width, height)
+        :setScaleX(width / line:getContentSize().width)
 
     return line
 end
@@ -301,7 +304,7 @@ local function createPrimaryWeaponInfoFatalLabel()
 end
 
 local function createPrimaryWeaponInfoFatalIcons()
-    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y)
+    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y + 6)
 end
 
 local function createPrimaryWeaponInfoStrongLabel()
@@ -310,7 +313,7 @@ local function createPrimaryWeaponInfoStrongLabel()
 end
 
 local function createPrimaryWeaponInfoStrongIcons()
-    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y)
+    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y + 6)
 end
 
 local function createPrimaryWeaponInfo()
@@ -373,10 +376,7 @@ local function updatePrimaryWeaponInfoStrongLabel(label, unit, hasPrimaryWeapon,
     label:setVisible(hasPrimaryWeapon)
 
     if (hasPrimaryWeapon) then
-        local fatalInfoWidth = 85 + fatalIcons.m_Width
-        if (fatalInfoWidth < 300) then
-            fatalInfoWidth = 300
-        end
+        local fatalInfoWidth = math.max(85 + fatalIcons.m_Width, 120)
 
         label:setPosition(PRIMARY_WEAPON_INFO_POSITION_X + fatalInfoWidth, PRIMARY_WEAPON_INFO_POSITION_Y)
     end
@@ -418,7 +418,7 @@ local function createSecondaryWeaponInfoFatalLabel()
 end
 
 local function createSecondaryWeaponInfoFatalIcons()
-    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y)
+    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y + 6)
 end
 
 local function createSecondaryWeaponInfoStrongLabel()
@@ -427,7 +427,7 @@ local function createSecondaryWeaponInfoStrongLabel()
 end
 
 local function createSecondaryWeaponInfoStrongIcons()
-    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y)
+    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y + 6)
 end
 
 local function createSecondaryWeaponInfo()
@@ -525,7 +525,7 @@ local function createDefenseInfoFatalLabel()
 end
 
 local function createDefenseInfoFatalIcons()
-    return createUnitIcons(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y)
+    return createUnitIcons(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y + 6)
 end
 
 local function createDefenseInfoWeakLabel()
@@ -534,7 +534,7 @@ local function createDefenseInfoWeakLabel()
 end
 
 local function createDefenseInfoWeakIcons()
-    return createUnitIcons(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
+    return createUnitIcons(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y + 6)
 end
 
 local function createDefenseInfo()

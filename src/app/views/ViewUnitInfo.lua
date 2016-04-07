@@ -15,7 +15,7 @@ local LEFT_POSITION_Y = 10
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH * 2 - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local GRID_SIZE = require("res.data.GameConstant").GridSize
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 local ICON_SCALE = 0.5
 local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
 local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * ICON_SCALE - 25
