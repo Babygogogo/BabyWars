@@ -18,7 +18,6 @@ end
 
 local function loadTileAnimations()
     for tileName, data in pairs(GAME_CONSTANT.tileAnimations) do
-           -- plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
         for shapeIndex = 1, data.shapesCount do
             local pattern = string.format("c01_t%02d_s%02d_%s.png", data.typeIndex, shapeIndex, "f%02d")
             local animation = display.newAnimation(display.newFrames(pattern, 1, data.framesCount), data.durationPerFrame)

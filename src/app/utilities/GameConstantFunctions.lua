@@ -2,11 +2,11 @@
 local GameConstantFunctions = {}
 
 local GAME_CONSTANT        = require("res.data.GameConstant")
-local GRID_SIZE            = GAME_CONSTANT.GridSize
-local TILE_UNIT_INDEXES    = GAME_CONSTANT.indexesForTileOrUnit
+local GRID_SIZE            = GAME_CONSTANT.gridSize
 local UNIT_NAMES           = GAME_CONSTANT.unitCatagory.allUnits
 local TEMPLATE_MODEL_TILES = GAME_CONSTANT.templateModelTiles
 local TEMPLATE_MODEL_UNITS = GAME_CONSTANT.templateModelUnits
+local TILE_UNIT_INDEXES    = {}
 
 local FATAL_DAMAGE     = 90
 local EFFECTIVE_DAMAGE = 50
@@ -14,6 +14,18 @@ local EFFECTIVE_DAMAGE = 50
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function initTileUnitIndexes()
+    for _, data in ipairs(GAME_CONSTANT.indexesForTileOrUnit) do
+        local name        = data.name
+        local playerIndex = data.firstPlayerIndex
+
+        for shapeIndex = 1, data.shapesCount do
+            TILE_UNIT_INDEXES[#TILE_UNIT_INDEXES + 1] = {name = name, playerIndex = playerIndex, shapeIndex = shapeIndex}
+            playerIndex = (data.isSamePlayerIndex) and (playerIndex) or (playerIndex + 1)
+        end
+    end
+end
+
 local function getBaseDamage(weapon, defenseType)
     if (weapon) then
         return weapon.baseDamage[defenseType]
@@ -85,6 +97,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function GameConstantFunctions.init()
+    initTileUnitIndexes()
     initUnitAttackAndDefenseList()
 end
 
