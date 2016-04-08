@@ -7,67 +7,67 @@ local TileMap_Overwrite2 = {
             GridIndexable = {
                 gridIndex = {x = 6, y = 5},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 7, y = 5},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 5},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 4},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 6, y = 3},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 7, y = 3},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 3},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 6, y = 2},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 6, y = 1},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 7, y = 1},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 1},
             },
-            tiledID = 39,
+            tiledID = 107,
         },
     },
 }

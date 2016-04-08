@@ -22,7 +22,7 @@ local function requireMapData(param)
 end
 
 local function getTiledUnitLayer(tiledData)
-    return tiledData.layers[2]
+    return tiledData.layers[3]
 end
 
 local function iterateAllActorUnits(self, func)
