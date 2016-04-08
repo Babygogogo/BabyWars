@@ -1,6 +1,7 @@
 
 local ModelTileMap = class("ModelTileMap")
 
+local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
 local MapFunctions       = require("app.utilities.MapFunctions")
 local ViewTile           = require("app.views.ViewTile")
@@ -18,20 +19,70 @@ local function requireMapData(param)
     end
 end
 
-local function getTiledTileLayer(tiledData)
-    return tiledData.layers[1]
+local function getTiledTileBaseLayer(tiledData)
+    local layer = tiledData.layers[1]
+    assert(layer, "ModelTileMap-getTiledTileBaseLayer() the param tiledData has no tile base layer.")
+
+    return layer
+end
+
+local function getTiledTileObjectLayer(tiledData)
+    local layer = tiledData.layers[2]
+    assert(layer, "ModelTileMap-getTiledTileObjectLayer() the param tiledData has no tile object layer.")
+
+    return layer
+end
+
+local function createEmptyMap(width)
+    local map = {}
+    for x = 1, width do
+        map[x] = {}
+    end
+
+    return map
+end
+
+local function createActorTile(tiledID, x, y)
+    if (tiledID == 0) then
+        return nil
+    else
+        local actorData = {tiledID = tiledID, GridIndexable = {gridIndex = {x = x, y = y}}}
+        return Actor.createWithModelAndViewName("ModelTile", actorData, "ViewTile", actorData)
+    end
+end
+
+local function createActorTileObjectAndBase(objectTiledID, baseTiledID, x, y)
+    local actorObject = createActorTile(objectTiledID, x, y)
+    if (actorObject) and (actorObject:getModel():isFullGrid()) then
+        return actorObject, nil
+    else
+        local actorBase = createActorTile(baseTiledID, x, y)
+        assert(actorBase and actorBase:getModel():isFullGrid(), "ModelTileMap-createActorTileObjectAndBase() neither the base nor the object is full grid.")
+
+        return actorObject, actorBase
+    end
 end
 
 --------------------------------------------------------------------------------
 -- The composition tile actors.
 --------------------------------------------------------------------------------
 local function createTileActorsMapWithTemplate(mapData)
-    assert(type(mapData.template) == "string", "ModelTileMap-createTileActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
-    local templateTiledLayer = getTiledTileLayer(requireMapData(mapData.template))
-    assert(templateTiledLayer, "ModelTileMap-createTileActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
+    local templateMapData = requireMapData(mapData.template)
+    local tiledBaseLayer, tiledObjectLayer = getTiledTileBaseLayer(templateMapData), getTiledTileObjectLayer(templateMapData)
+    local width, height = tileBaseLayer.width, tileBaseLayer.height
+    local baseMap, objectMap = createEmptyMap(width), createEmptyMap(width)
 
-    local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelTile", "ViewTile")
-    assert(map, "ModelTileMap-createTileActorsMapWithTemplate() failed to create the template tile actors map.")
+    for x = 1, width do
+        for y = 1, height do
+            local idIndex = x + (height - y) * width
+            local objectTiledID, baseTiledID = tiledObjectLayer.data[idIndex], tiledBaseLayer.data[idIndex]
+            objectMap[x][y], baseMap[x][y] = createActorTileObjectAndBase(objectTiledID, baseTiledID, x, y)
+        end
+    end
+
+    for _, gridData in mapData.grids or {} do
+
+    end
 
     if (mapData.grids) then
         map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelTile", "ViewTile")
@@ -45,7 +96,7 @@ local function createTileActorsMapWithTemplate(mapData)
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
-    local tiledLayer = getTiledTileLayer(mapData)
+    local tiledLayer = getTiledTileBaseLayer(mapData)
     assert(tiledLayer, "ModelTileMap-createTileActorsMapWithoutTemplate() the param mapData is expected to have a tiled layer.")
 
     local map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelTile", "ViewTile")

@@ -613,6 +613,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = true,
         description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
     },
 
@@ -658,6 +660,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A paved road. Easy to traverse, but offers little defensive cover.",
     },
 
@@ -703,6 +707,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
     },
 
@@ -748,6 +754,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A steep mountain. Infantry units add 3 to their vision range from here.",
     },
 
@@ -793,6 +801,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A steep mountain. Infantry units add 3 to their vision range from here.",
     },
 
@@ -838,6 +848,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A steep mountain. Infantry units add 3 to their vision range from here.",
     },
 
@@ -883,6 +895,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A steep mountain. Infantry units add 3 to their vision range from here.",
     },
 
@@ -928,6 +942,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = true,
         description = "A body of water. Only naval and air units can traverse seas.",
     },
 
@@ -973,6 +989,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
     },
 
@@ -1018,6 +1036,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = true,
         description = "A gentle, flowing river. Only infantry units can ford rivers.",
     },
 
@@ -1063,6 +1083,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = true,
         description = "A sandy shoal. Lander units load and unload units here.",
     },
 
@@ -1108,6 +1130,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A sandy shoal. Lander units load and unload units here.",
     },
 
@@ -1153,6 +1177,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A sandy shoal. Lander units load and unload units here.",
     },
 
@@ -1198,6 +1224,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
     },
 
@@ -1243,6 +1271,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A normal city. Ground units gain supplies and HP in allied cities.",
 
         specialProperties = {
@@ -1312,6 +1342,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A command tower.",
 
         specialProperties = {
@@ -1365,6 +1397,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A command tower.",
 
         specialProperties = {
@@ -1418,6 +1452,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
     },
 
@@ -1463,6 +1499,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
     },
 
@@ -1515,6 +1553,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
 
         specialProperties = {
@@ -1563,6 +1603,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
 
         specialProperties = {
@@ -1632,6 +1674,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "A base. Allied bases deploy, supply, and restore HP to ground units.",
 
         specialProperties = {
@@ -1705,6 +1749,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
 
         specialProperties = {
@@ -1778,6 +1824,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
 
         specialProperties = {
@@ -1851,6 +1899,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = true,
+        isTileBase  = false,
         description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
 
         specialProperties = {
@@ -1924,6 +1974,8 @@ GameConstant.templateModelTiles = {
             },
         },
 
+        isFullGrid  = false,
+        isTileBase  = false,
         description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
 
         specialProperties = {

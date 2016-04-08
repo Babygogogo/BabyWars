@@ -25,7 +25,6 @@ local function initWithTiledID(self, tiledID)
             ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
         end
     end
---    ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {gridIndex = {x = 1, y = 1}}})
 
     if (template.specialProperties) then
         for _, specialProperty in ipairs(template.specialProperties) do
@@ -92,6 +91,14 @@ end
 
 function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
+end
+
+function ModelTile:isFullGrid()
+    return self.m_Template.isFullGrid
+end
+
+function ModelTile:isTileBase()
+    return self.m_Template.isTileBase
 end
 
 function ModelTile:getDefenseBonusAmount()
