@@ -114,7 +114,7 @@ function ModelTile:getDefenseBonusTargetCatagory()
 end
 
 function ModelTile:getMoveCost(moveType, weather)
-    return self.m_Template.moveCost[weather][moveType]
+    return self.m_Template.moveCost[moveType]
 end
 
 function ModelTile:getDescription()

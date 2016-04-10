@@ -63,16 +63,16 @@ GameConstant.indexesForTileOrUnit = {
 
 GameConstant.tileAnimations = {
     plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
-    river       = {typeIndex = 2, shapesCount = 16, framesCount = 1, durationPerFrame = 999999,},
+    river       = {typeIndex = 2,  shapesCount = 16, framesCount = 1, durationPerFrame = 999999,},
     sea         = {typeIndex = 3,  shapesCount = 47, framesCount = 8, durationPerFrame = 0.2,   },
-    beach       = {typeIndex = 4, shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,   },
+    beach       = {typeIndex = 4,  shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,   },
     road        = {typeIndex = 5,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999,},
     bridge      = {typeIndex = 6,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999,},
     wood        = {typeIndex = 7,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
     mountain    = {typeIndex = 8,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
     wasteland   = {typeIndex = 9,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
-    ruins       = {typeIndex = 10,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
-    fire        = {typeIndex = 11,  shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,   },
+    ruins       = {typeIndex = 10, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999,},
+    fire        = {typeIndex = 11, shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,   },
     rough       = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
     mist        = {typeIndex = 13, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
     reef        = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,   },
@@ -581,41 +581,94 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
         isTileBase  = true,
         description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
+    },
+
+    river = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = 2,
+            mech      = 1,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = true,
+        isTileBase  = true,
+        description = "A gentle, flowing river. Only infantry units can ford rivers.",
+    },
+
+    sea = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        isFullGrid  = true,
+        isTileBase  = true,
+        description = "A body of water. Only naval and air units can traverse seas.",
+    },
+
+    beach = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 2,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = 1,
+        },
+
+        isFullGrid  = true,
+        isTileBase  = true,
+        description = "A sandy shoal. Lander units load and unload units here.",
     },
 
     road = {
@@ -628,41 +681,94 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = false,
         isTileBase  = false,
         description = "A paved road. Easy to traverse, but offers little defensive cover.",
+    },
+
+    bridge = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        isFullGrid  = false,
+        isTileBase  = false,
+        description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
+    },
+
+    bridgeOnRiver = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = false,
+        isTileBase  = false,
+        description = "Naval units can't pass under river bridges.",
+    },
+
+    bridgeOnSea = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        isFullGrid  = false,
+        isTileBase  = false,
+        description = "Naval units can pass under sea bridges.",
     },
 
     wood = {
@@ -675,36 +781,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 3,
-                tireB     = 3,
-                tank      = 2,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 3,
+            tireB     = 3,
+            tank      = 2,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -722,36 +806,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 2,
+            mech      = 1,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -769,36 +831,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 3,
+            tireB     = 3,
+            tank      = 2,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -816,36 +856,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -863,229 +881,19 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
         isTileBase  = false,
         description = "A steep mountain. Infantry units add 3 to their vision range from here.",
-    },
-
-    sea = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-        },
-
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A body of water. Only naval and air units can traverse seas.",
-    },
-
-    bridge = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-        },
-
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
-    },
-
-    river = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 2,
-                mech      = 1,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A gentle, flowing river. Only infantry units can ford rivers.",
-    },
-
-    beach = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-        },
-
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A sandy shoal. Lander units load and unload units here.",
     },
 
     rough = {
@@ -1098,36 +906,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 2,
+            transport = 2,
         },
 
         isFullGrid  = true,
@@ -1145,36 +931,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 2,
-                tireB     = 2,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = 1,
-            },
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
         isFullGrid  = true,
@@ -1192,41 +956,153 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = 1,
-                ship      = 2,
-                transport = 2,
-            },
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 2,
+            transport = 2,
         },
 
         isFullGrid  = true,
         isTileBase  = false,
         description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+    },
+
+    plasma = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = false,
+        isTileBase  = false,
+        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
+    },
+
+    meteor = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.tileMaxHP,
+            currentHP        = GameConstant.tileMaxHP,
+            defenseType      = "mdtank",
+            isAffectedByLuck = false,
+        },
+
+        defenseBonus = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        moveCost = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = false,
+        isTileBase  = false,
+        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+
+        specialProperties = {
+        },
+    },
+
+    silo = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = true,
+        isTileBase  = false,
+        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
+    },
+
+    hq = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 40,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        moveCost = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        isFullGrid  = true,
+        isTileBase  = false,
+        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
+
+        specialProperties = {
+            {
+                name            = "CaptureTaker",
+                maxCapturePoint = GameConstant.maxCapturePoint,
+                onCapture       = "Defeat"
+            },
+            {
+                name           = "RepairDoer",
+                targetCatagory = "Ground units",
+                targetList     = GameConstant.unitCatagory.groundUnits,
+                amount         = 2,
+            },
+            {
+                name   = "IncomeProvider",
+                amount = GameConstant.incomePerTurn
+            },
+            --[[
+            {
+                name = "SupplyProvider",
+                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+            },
+            --]]
+        },
     },
 
     city = {
@@ -1239,36 +1115,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1310,36 +1164,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1365,36 +1197,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1410,228 +1220,6 @@ GameConstant.templateModelTiles = {
         },
     },
 
-    silo = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
-    },
-
-    plasma = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
-    },
-
-    meteor = {
-        GridIndexable = {},
-
-        AttackTaker = {
-            maxHP            = GameConstant.tileMaxHP,
-            currentHP        = GameConstant.tileMaxHP,
-            defenseType      = "mdtank",
-            isAffectedByLuck = false,
-        },
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = false,
-                mech      = false,
-                tireA     = false,
-                tireB     = false,
-                tank      = false,
-                air       = false,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
-
-        specialProperties = {
-        },
-    },
-
-    hq = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-        },
-
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "Defeat"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
-        },
-    },
-
     factory = {
         GridIndexable = {},
 
@@ -1642,36 +1230,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1717,36 +1283,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1792,36 +1336,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
         isFullGrid  = false,
@@ -1867,36 +1389,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = false,
-                transport = false,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
         isFullGrid  = true,
@@ -1942,36 +1442,14 @@ GameConstant.templateModelTiles = {
         },
 
         moveCost = {
-            clear = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            rain  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
-            snow  = {
-                infantry  = 1,
-                mech      = 1,
-                tireA     = 1,
-                tireB     = 1,
-                tank      = 1,
-                air       = 1,
-                ship      = 1,
-                transport = 1,
-            },
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
         isFullGrid  = false,
