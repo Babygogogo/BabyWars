@@ -574,13 +574,13 @@ GameConstant.templateModelTiles = {
     plain = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 2,
@@ -597,13 +597,13 @@ GameConstant.templateModelTiles = {
     river = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 2,
             mech      = 1,
             tireA     = false,
@@ -620,13 +620,13 @@ GameConstant.templateModelTiles = {
     sea = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -643,13 +643,13 @@ GameConstant.templateModelTiles = {
     beach = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 2,
@@ -666,13 +666,13 @@ GameConstant.templateModelTiles = {
     road = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -689,13 +689,13 @@ GameConstant.templateModelTiles = {
     bridge = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -712,13 +712,13 @@ GameConstant.templateModelTiles = {
     bridgeOnRiver = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -735,13 +735,13 @@ GameConstant.templateModelTiles = {
     bridgeOnSea = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -758,13 +758,13 @@ GameConstant.templateModelTiles = {
     wood = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 3,
@@ -781,13 +781,13 @@ GameConstant.templateModelTiles = {
     mountain = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 40,
             targetCatagory = "Foot units",
             targetList     = GameConstant.unitCatagory.footUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 2,
             mech      = 1,
             tireA     = false,
@@ -804,13 +804,13 @@ GameConstant.templateModelTiles = {
     wasteland = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 3,
@@ -827,13 +827,13 @@ GameConstant.templateModelTiles = {
     ruins = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 2,
@@ -850,13 +850,13 @@ GameConstant.templateModelTiles = {
     fire = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -873,13 +873,13 @@ GameConstant.templateModelTiles = {
     rough = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Naval units",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -896,13 +896,13 @@ GameConstant.templateModelTiles = {
     mist = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Naval units",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -919,13 +919,13 @@ GameConstant.templateModelTiles = {
     reef = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Naval units",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -942,13 +942,13 @@ GameConstant.templateModelTiles = {
     plasma = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -972,13 +972,13 @@ GameConstant.templateModelTiles = {
             isAffectedByLuck = false,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = false,
             mech      = false,
             tireA     = false,
@@ -995,13 +995,13 @@ GameConstant.templateModelTiles = {
     silo = {
         GridIndexable = {},
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1034,13 +1034,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 40,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1073,13 +1073,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1106,13 +1106,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1139,13 +1139,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1178,13 +1178,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1217,13 +1217,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1256,13 +1256,13 @@ GameConstant.templateModelTiles = {
             amount = 1000,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground/naval units",
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1291,13 +1291,13 @@ GameConstant.templateModelTiles = {
             amount         = 2,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,
@@ -1326,13 +1326,13 @@ GameConstant.templateModelTiles = {
             amount         = 2,
         },
 
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Ground/naval units",
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 
-        moveCost = {
+        MoveCostOwner = {
             infantry  = 1,
             mech      = 1,
             tireA     = 1,

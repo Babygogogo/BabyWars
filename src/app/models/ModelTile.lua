@@ -85,22 +85,6 @@ function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
-function ModelTile:getDefenseBonusAmount()
-    return self.m_Template.defenseBonus.amount
-end
-
-function ModelTile:getNormalizedDefenseBonusAmount()
-    return math.floor(self:getDefenseBonusAmount() / 10)
-end
-
-function ModelTile:getDefenseBonusTargetCatagory()
-    return self.m_Template.defenseBonus.targetCatagory
-end
-
-function ModelTile:getMoveCost(moveType, weather)
-    return self.m_Template.moveCost[moveType]
-end
-
 function ModelTile:getDescription()
     return self.m_Template.description
 end
