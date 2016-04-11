@@ -8,15 +8,16 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function initWithTiledID(self, tiledID)
-    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(tiledID)
-    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param tiledID.")
+local function initWithTiledID(self, objectID, baseID)
+    objectID = objectID or self.m_ObjectID
+    baseID   = baseID   or self.m_BaseID
+    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
+    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
-    self.m_TiledID = tiledID
+    self.m_ObjectID, self.m_BaseID = objectID, baseID
     if (self.m_Template == template) then
         return
     end
-
     self.m_Template = template
 
     ComponentManager.unbindAllComponents(self)
@@ -59,8 +60,8 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelTile:ctor(param)
-    if (param.tiledID) then
-        initWithTiledID(self, param.tiledID)
+    if (param.objectID or param.baseID) then
+        initWithTiledID(self, param.objectID, param.baseID)
     end
 
     loadInstantialData(self, param)
@@ -77,7 +78,7 @@ function ModelTile:initView()
     assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithTiledID(self.m_TiledID)
+    view:updateWithTiledID(self.m_ObjectID, self.m_BaseID)
 
     return self
 end
@@ -86,11 +87,19 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTile:getTiledID()
-    return self.m_TiledID
+    return (self.m_ObjectID and self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
+end
+
+function ModelTile:getObjectID()
+    return self.m_ObjectID
+end
+
+function ModelTile:getBaseID()
+    return self.m_BaseID
 end
 
 function ModelTile:getPlayerIndex()
-    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
 function ModelTile:isFullGrid()

@@ -6,6 +6,7 @@ local GRID_SIZE            = GAME_CONSTANT.gridSize
 local UNIT_NAMES           = GAME_CONSTANT.unitCatagory.allUnits
 local TEMPLATE_MODEL_TILES = GAME_CONSTANT.templateModelTiles
 local TEMPLATE_MODEL_UNITS = GAME_CONSTANT.templateModelUnits
+local TILE_ANIMATIONS      = GAME_CONSTANT.tileAnimations
 local TILE_UNIT_INDEXES    = {}
 
 local FATAL_DAMAGE     = 90
@@ -131,12 +132,35 @@ function GameConstantFunctions.getShapeIndexWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].shapeIndex
 end
 
-function GameConstantFunctions.getTemplateModelTileWithTiledId(tiledID)
-    return TEMPLATE_MODEL_TILES[TILE_UNIT_INDEXES[tiledID].name]
+function GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
+    assert(baseID > 0, "GameConstantFunctions.getTemplateModelTileWithTiledId() the param baseID is invalid.")
+    local baseName = GameConstantFunctions.getTileNameWithTiledId(baseID)
+    if (objectID == 0) then
+        return TEMPLATE_MODEL_TILES[baseName]
+    else
+        local objectName = GameConstantFunctions.getTileNameWithTiledId(objectID)
+        if (objectName ~= "bridge") then
+            return TEMPLATE_MODEL_TILES[objectName]
+        else
+            if (baseName == "sea") then
+                return TEMPLATE_MODEL_TILES["bridgeOnSea"]
+            else
+                return TEMPLATE_MODEL_TILES["bridgeOnRiver"]
+            end
+        end
+    end
 end
 
 function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     return TEMPLATE_MODEL_UNITS[TILE_UNIT_INDEXES[tiledID].name]
+end
+
+function GameConstantFunctions.doesViewTileFillGrid(tiledID)
+    if (tiledID == 0) then
+        return false
+    else
+        return TILE_ANIMATIONS[GameConstantFunctions.getTileNameWithTiledId(tiledID)].fillsGrid
+    end
 end
 
 return GameConstantFunctions
