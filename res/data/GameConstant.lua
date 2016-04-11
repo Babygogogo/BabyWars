@@ -1018,6 +1018,22 @@ GameConstant.templateModelTiles = {
     hq = {
         GridIndexable = {},
 
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = true,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
         defenseBonus = {
             amount         = 40,
             targetCatagory = "Ground units",
@@ -1036,34 +1052,26 @@ GameConstant.templateModelTiles = {
         },
 
         description = "HQs provide resupply for ground units. Battle ends if it's captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "Defeat"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
-        },
     },
 
     city = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 20,
@@ -1083,34 +1091,20 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Cities provide resupply for ground units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
-        }
     },
 
     comtower = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 30,
@@ -1130,18 +1124,20 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Command towers boosts your attack and defense once captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-        },
     },
 
     radar = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 30,
@@ -1161,18 +1157,26 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Radars reveal a 5-square area in Fog of War once captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-        },
     },
 
     factory = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 30,
@@ -1192,38 +1196,26 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Factories can be used to resupply and produce ground units once captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            {
-                name = "RepairDoer",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            }
-            --]]
-        }
     },
 
     airport = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Air units",
+            targetList     = GameConstant.unitCatagory.airUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 30,
@@ -1243,38 +1235,26 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Airports can be used to resupply and produce air units once captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Air units",
-                targetList     = GameConstant.unitCatagory.airUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {12, 13, 14, 15}
-            },
-            {
-                name = "RepairDoer",
-                target = {12, 13, 14, 15}
-            }
-            --]]
-        }
     },
 
     seaport = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
 
         defenseBonus = {
             amount         = 30,
@@ -1294,38 +1274,22 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Seaports can be used to resupply and produce naval units once captured.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Naval units",
-                targetList     = GameConstant.unitCatagory.navalUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {16, 17, 18, 19}
-            },
-            {
-                name = "RepairDoer",
-                target = {16, 17, 18, 19}
-            }
-            --]]
-        }
     },
 
     tempairport = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Air units",
+            targetList     = GameConstant.unitCatagory.airUnits,
+            amount         = 2,
+        },
 
         defenseBonus = {
             amount         = 10,
@@ -1345,38 +1309,22 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Temp airports provide resupply for air units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Air units",
-                targetList     = GameConstant.unitCatagory.airUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {12, 13, 14, 15}
-            },
-            {
-                name = "RepairDoer",
-                target = {12, 13, 14, 15}
-            }
-            --]]
-        }
     },
 
     tempseaport = {
         GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+            amount         = 2,
+        },
 
         defenseBonus = {
             amount         = 10,
@@ -1396,34 +1344,6 @@ GameConstant.templateModelTiles = {
         },
 
         description = "Temp seaports provide resupply for naval units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Naval units",
-                targetList     = GameConstant.unitCatagory.navalUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {16, 17, 18, 19}
-            },
-            {
-                name = "RepairDoer",
-                target = {16, 17, 18, 19}
-            }
-            --]]
-        }
     },
 }
 
