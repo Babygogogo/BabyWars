@@ -7,31 +7,31 @@ local TileMap_Overwrite1 = {
             GridIndexable = {
                 gridIndex = {x = 8, y = 1},
             },
-            tiledID = 107,
+            objectID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 2},
             },
-            tiledID = 107,
+            objectID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 3},
             },
-            tiledID = 107,
+            objectID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 4},
             },
-            tiledID = 107,
+            objectID = 107,
         },
         {
             GridIndexable = {
                 gridIndex = {x = 8, y = 5},
             },
-            tiledID = 107,
+            objectID = 107,
         },
     }
 }

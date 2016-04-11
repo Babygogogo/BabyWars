@@ -102,14 +102,6 @@ function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
-function ModelTile:isFullGrid()
-    return self.m_Template.isFullGrid
-end
-
-function ModelTile:isTileBase()
-    return self.m_Template.isTileBase
-end
-
 function ModelTile:getDefenseBonusAmount()
     return self.m_Template.defenseBonus.amount
 end

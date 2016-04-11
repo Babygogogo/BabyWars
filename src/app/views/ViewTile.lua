@@ -45,10 +45,15 @@ function ViewTile:updateWithTiledID(objectID, baseID)
     if (baseID ~= self.m_BaseID) then
         self.m_ViewBase:stopAllActions()
         self.m_BaseID = baseID
+        self.m_IsViewBaseShown = false
+    end
 
-        if (not GameConstantFunctions.doesViewTileFillGrid(objectID)) then
-            self.m_ViewBase:playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(baseID))
-        end
+    if (GameConstantFunctions.doesViewTileFillGrid(objectID)) then
+        self.m_ViewBase:stopAllActions()
+        self.m_IsViewBaseShown = false
+    elseif (not self.m_IsViewBaseShown) then
+        self.m_ViewBase:playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(self.m_BaseID))
+        self.m_IsViewBaseShown = true
     end
 
     return self

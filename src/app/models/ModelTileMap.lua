@@ -50,56 +50,54 @@ local function createActorTile(objectID, baseID, x, y)
     return Actor.createWithModelAndViewName("ModelTile", actorData, "ViewTile", actorData)
 end
 
---------------------------------------------------------------------------------
--- The composition tile actors.
---------------------------------------------------------------------------------
-local function createTileActorsMapWithTemplate(mapData)
-    local templateMapData = requireMapData(mapData.template)
-    local tiledBaseLayer, tiledObjectLayer = getTiledTileBaseLayer(templateMapData), getTiledTileObjectLayer(templateMapData)
-    local width, height = tiledBaseLayer.width, tiledBaseLayer.height
-    local map = createEmptyMap(width), createEmptyMap(width)
-    local mapSize = {width = width, height = height}
+local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
+    local width, height = baseLayer.width, baseLayer.height
+    local map = createEmptyMap(width)
 
     for x = 1, width do
         for y = 1, height do
             local idIndex = x + (height - y) * width
-            local objectTiledID, baseTiledID = tiledObjectLayer.data[idIndex], tiledBaseLayer.data[idIndex]
+            local objectTiledID, baseTiledID = objectLayer.data[idIndex], baseLayer.data[idIndex]
             map[x][y] = createActorTile(objectTiledID, baseTiledID, x, y)
         end
     end
 
-    for _, gridData in ipairs(mapData.grids or {}) do
+    return map, {width = width, height = height}
+end
+
+local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
+    for _, gridData in ipairs(gridsData) do
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-createTileActorsMapWithTemplate() the data of overwriting grid is invalid.")
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-updateTileActorsMapWithGridsData() the data of overwriting grid is invalid.")
         map[gridIndex.x][gridIndex.y]:getModel():ctor(gridData)
     end
+end
+
+--------------------------------------------------------------------------------
+-- The composition tile actors map.
+--------------------------------------------------------------------------------
+local function createTileActorsMapWithTemplate(mapData)
+    local templateMapData = requireMapData(mapData.template)
+    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
+    updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
     return map, mapSize
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
-    local tiledLayer = getTiledTileBaseLayer(mapData)
-    assert(tiledLayer, "ModelTileMap-createTileActorsMapWithoutTemplate() the param mapData is expected to have a tiled layer.")
+    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(mapData), getTiledTileBaseLayer(mapData))
+    updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
-    local map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelTile", "ViewTile")
-    assert(map, "ModelTileMap-createTileActorsMapWithoutTemplate() failed to create the map.")
-
-    return map
+    return map, mapSize
 end
 
 local function createTileActorsMap(param)
     local mapData = requireMapData(param)
---[[
-    local tileActorsMap = (mapData.template == nil) and
-        createTileActorsMapWithoutTemplate(mapData) or
-        createTileActorsMapWithTemplate(mapData)
-
-    assert(tileActorsMap, "ModelTileMap--createTileActorsMap() failed to create tile actors map.")
-    assert(not MapFunctions.hasNilGrid(tileActorsMap), "ModelTileMap--createTileActorsMap() some tiles are missing in the created map.")
-
-    return tileActorsMap
-]]
-    return createTileActorsMapWithTemplate(mapData)
+    if (mapData.template) then
+        return createTileActorsMapWithTemplate(mapData)
+    else
+        return createTileActorsMapWithoutTemplate(mapData)
+    end
 end
 
 local function initWithTileActorsMap(self, map, mapSize)

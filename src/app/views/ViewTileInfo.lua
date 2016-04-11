@@ -4,7 +4,7 @@ local ViewTileInfo = class("ViewTileInfo", cc.Node)
 local AnimationLoader  = require("app.utilities.AnimationLoader")
 local ComponentManager = require("global.components.ComponentManager")
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 140
 local LEFT_POSITION_X = 10
 local LEFT_POSITION_Y = 10
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 10

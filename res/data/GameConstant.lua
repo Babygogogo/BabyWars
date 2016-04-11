@@ -85,7 +85,7 @@ GameConstant.tileAnimations = {
     radar       = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
     factory     = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
     airport     = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    seaport     = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    seaport     = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
     tempairport = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
     tempseaport = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
 }
@@ -591,9 +591,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
+        description = "Plains are easily traveled but offer little defense.",
     },
 
     river = {
@@ -616,9 +614,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A gentle, flowing river. Only infantry units can ford rivers.",
+        description = "Rivers can be passed by foot soldiers only.",
     },
 
     sea = {
@@ -641,9 +637,7 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A body of water. Only naval and air units can traverse seas.",
+        description = "Seas provide good mobility for air and naval units.",
     },
 
     beach = {
@@ -666,9 +660,7 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = true,
-        isTileBase  = true,
-        description = "A sandy shoal. Lander units load and unload units here.",
+        description = "Beaches provide places for landers and gunboats to load and unload units.",
     },
 
     road = {
@@ -691,9 +683,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A paved road. Easy to traverse, but offers little defensive cover.",
+        description = "Roads provide optimum mobility but little defensive cover.",
     },
 
     bridge = {
@@ -716,8 +706,6 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
         description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
     },
 
@@ -741,8 +729,6 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
         description = "Naval units can't pass under river/land bridges.",
     },
 
@@ -766,8 +752,6 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
         description = "Naval units can pass under sea bridges.",
     },
 
@@ -791,9 +775,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+        description = "Woods provide hiding places for ground units in Fog of War.",
     },
 
     mountain = {
@@ -816,18 +798,16 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+        description = "Mountains add 3 vision for foot soldiers in Fog of War.",
     },
 
     wasteland = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Foot units",
-            targetList     = GameConstant.unitCatagory.footUnits,
+            amount         = 20,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
         moveCost = {
@@ -841,18 +821,16 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+        description = "Wastelands impair mobility for all but air units and foot soldiers.",
     },
 
     ruins = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Foot units",
-            targetList     = GameConstant.unitCatagory.footUnits,
+            amount         = 10,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
         moveCost = {
@@ -866,18 +844,16 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+        description = "Ruins provide hiding places for ground units in Fog of War.",
     },
 
     fire = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Foot units",
-            targetList     = GameConstant.unitCatagory.footUnits,
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
         },
 
         moveCost = {
@@ -891,66 +867,14 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+        description = "Fires prevent unit movement and illuminate a 5-square area in Fog of War.",
     },
 
     rough = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 2,
-            transport = 2,
-        },
-
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A sandy shoal. Lander units load and unload units here.",
-    },
-
-    mist = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
-        },
-
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A sandy shoal. Lander units load and unload units here.",
-    },
-
-    reef = {
-        GridIndexable = {},
-
-        defenseBonus = {
-            amount         = 10,
+            amount         = 20,
             targetCatagory = "Naval units",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
@@ -966,9 +890,53 @@ GameConstant.templateModelTiles = {
             transport = 2,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+        description = "Rough seas slow the movement of naval units.",
+    },
+
+    mist = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 10,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        moveCost = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        description = "Mists provide hiding places for naval units in Fog of War.",
+    },
+
+    reef = {
+        GridIndexable = {},
+
+        defenseBonus = {
+            amount         = 20,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        moveCost = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 2,
+            transport = 2,
+        },
+
+        description = "Reefs provide hiding places for naval units in Fog of War.",
     },
 
     plasma = {
@@ -991,9 +959,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
+        description = "Plasma is impassable.",
     },
 
     meteor = {
@@ -1002,7 +968,7 @@ GameConstant.templateModelTiles = {
         AttackTaker = {
             maxHP            = GameConstant.tileMaxHP,
             currentHP        = GameConstant.tileMaxHP,
-            defenseType      = "mdtank",
+            defenseType      = "meteor",
             isAffectedByLuck = false,
         },
 
@@ -1023,19 +989,14 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
-
-        specialProperties = {
-        },
+        description = "Meteors are impassable but can be destroyed.",
     },
 
     silo = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 30,
+            amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
@@ -1051,9 +1012,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
+        description = "Silos can be launched by infantry units and damage a 13-square area.",
     },
 
     hq = {
@@ -1076,9 +1035,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
+        description = "HQs provide resupply for ground units. Battle ends if it's captured.",
 
         specialProperties = {
             {
@@ -1109,7 +1066,7 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 30,
+            amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
@@ -1125,9 +1082,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A normal city. Ground units gain supplies and HP in allied cities.",
+        description = "Cities provide resupply for ground units.",
 
         specialProperties = {
             {
@@ -1174,9 +1129,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A command tower.",
+        description = "Command towers boosts your attack and defense once captured.",
 
         specialProperties = {
             {
@@ -1207,9 +1160,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A command tower.",
+        description = "Radars reveal a 5-square area in Fog of War once captured.",
 
         specialProperties = {
             {
@@ -1240,9 +1191,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "A base. Allied bases deploy, supply, and restore HP to ground units.",
+        description = "Factories can be used to resupply and produce ground units once captured.",
 
         specialProperties = {
             {
@@ -1293,9 +1242,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
+        description = "Airports can be used to resupply and produce air units once captured.",
 
         specialProperties = {
             {
@@ -1346,9 +1293,7 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
+        description = "Seaports can be used to resupply and produce naval units once captured.",
 
         specialProperties = {
             {
@@ -1383,7 +1328,7 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 30,
+            amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
@@ -1399,9 +1344,7 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        isFullGrid  = true,
-        isTileBase  = false,
-        description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
+        description = "Temp airports provide resupply for air units.",
 
         specialProperties = {
             {
@@ -1436,7 +1379,7 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         defenseBonus = {
-            amount         = 30,
+            amount         = 10,
             targetCatagory = "Ground/naval units",
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
@@ -1452,9 +1395,7 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        isFullGrid  = false,
-        isTileBase  = false,
-        description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
+        description = "Temp seaports provide resupply for naval units.",
 
         specialProperties = {
             {
@@ -1553,7 +1494,7 @@ GameConstant.templateModelUnits = {
         cost        = 1500,
         vision      = 2,
 
-        description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
+        description = "Infantry units are cheap. They can capture bases but have low firepower.",
     },
 
     mech       = {
@@ -1724,7 +1665,7 @@ GameConstant.templateModelUnits = {
         cost        = 2500,
         vision      = 2,
 
-        description = "Bike is an infantry unit with high mobility. They can capture bases but have low firepower.",
+        description = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
     },
 
     recon      = {
@@ -2382,7 +2323,7 @@ GameConstant.templateModelUnits = {
         cost        = 11000,
         vision      = 3,
 
-        description = "An indirect attacker that can counter-attack when under direct fire.",
+        description = "Anti-Tanks can counter-attack when under direct fire.",
     },
 
     rockets    = {
@@ -2554,7 +2495,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
-        description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
+        description = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
     },
 
     fighter    = {
@@ -2767,7 +2708,7 @@ GameConstant.templateModelUnits = {
         cost        = 13000,
         vision      = 4,
 
-        description = "A somewhat powerful plane that can attack both ground and air units.",
+        description = "Duster are somewhat powerful planes that can attack both ground and air units.",
     },
 
     bcopter    = {
@@ -2898,7 +2839,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
-        description = "T copters can transport both infantry and mech units.",
+        description = "T(transport) copters can transport both infantry and mech units.",
     },
 
     seaplane   = {
@@ -2969,7 +2910,7 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 4,
 
-        description = "A plane produced at sea by carriers. It can attack any unit.",
+        description = "Seaplanes are produced at sea by carriers. They can attack any unit.",
     },
 
     battleship = {
@@ -3040,7 +2981,7 @@ GameConstant.templateModelUnits = {
         cost        = 25000,
         vision      = 3,
 
-        description = "B(Battle) ships have a larger attack range than even rocket units.",
+        description = "B(Battle) ships can launch indirect attack after moving.",
     },
 
     carrier    = {
@@ -3109,7 +3050,7 @@ GameConstant.templateModelUnits = {
         cost        = 28000,
         vision      = 4,
 
-        description = "A naval unit that can carrier 2 air units and produce seaplanes.",
+        description = "Carriers can carrier 2 air units and produce seaplanes.",
     },
 
     submarine  = {
@@ -3180,7 +3121,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
-        description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
+        description = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
     },
 
     cruiser    = {
@@ -3382,7 +3323,7 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 2,
 
-        description = "A unit that can carry 1 foot soldier and attack other naval units.",
+        description = "Gunboats can carry 1 foot soldier and attack other naval units.",
     },
 }
 
