@@ -5,67 +5,67 @@ local TileMap_Overwrite2 = {
     grids = {
         {
             GridIndexable = {
-                gridIndex = {x = 6, y = 5},
+                gridIndex = {x = 17, y = 5},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 7, y = 5},
+                gridIndex = {x = 18, y = 5},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 8, y = 5},
+                gridIndex = {x = 19, y = 5},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 8, y = 4},
+                gridIndex = {x = 19, y = 4},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 6, y = 3},
+                gridIndex = {x = 17, y = 3},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 7, y = 3},
+                gridIndex = {x = 18, y = 3},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 8, y = 3},
+                gridIndex = {x = 19, y = 3},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 6, y = 2},
+                gridIndex = {x = 17, y = 2},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 6, y = 1},
+                gridIndex = {x = 17, y = 1},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 7, y = 1},
+                gridIndex = {x = 18, y = 1},
             },
             objectID = 107,
         },
         {
             GridIndexable = {
-                gridIndex = {x = 8, y = 1},
+                gridIndex = {x = 19, y = 1},
             },
             objectID = 107,
         },
