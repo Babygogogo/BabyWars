@@ -1,5 +1,5 @@
 
-local ModelTile = class("ModelTile")
+local ModelTileObject = class("ModelTileObject")
 
 local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
@@ -9,21 +9,21 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, objectID, baseID)
-    objectID = objectID or self.m_ObjectID
-    baseID   = baseID   or self.m_BaseID
-    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
-    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
+    self.m_ObjectID = objectID or self.m_ObjectID
+    self.m_BaseID   = baseID   or self.m_BaseID
+    assert(self.m_ObjectID > 0 and self.m_BaseID, "ModelTileObject-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
 
-    self.m_ObjectID, self.m_BaseID = objectID, baseID
-    if (self.m_Template == template) then
-        return
-    end
-    self.m_Template = template
+    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(self.m_ObjectID, self.m_BaseID)
+    assert(template, "ModelTileObject-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
-    ComponentManager.unbindAllComponents(self)
-    for name, data in pairs(template) do
-        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-            ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+    if (self.m_Template ~= template) then
+        self.m_Template = template
+
+        ComponentManager.unbindAllComponents(self)
+        for name, data in pairs(template) do
+            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+            end
         end
     end
 end
@@ -42,7 +42,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function ModelTile:ctor(param)
+function ModelTileObject:ctor(param)
     if (param.objectID or param.baseID) then
         initWithTiledID(self, param.objectID, param.baseID)
     end
@@ -56,12 +56,12 @@ function ModelTile:ctor(param)
     return self
 end
 
-function ModelTile:initView()
+function ModelTileObject:initView()
     local view = self.m_View
-    assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelTileObject:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithTiledID(self.m_ObjectID, self.m_BaseID)
+    view:updateWithTiledID(self.m_ObjectID)
 
     return self
 end
@@ -69,24 +69,16 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelTile:getTiledID()
-    return (self.m_ObjectID and self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
-end
-
-function ModelTile:getObjectID()
+function ModelTileObject:getTiledID()
     return self.m_ObjectID
 end
 
-function ModelTile:getBaseID()
-    return self.m_BaseID
-end
-
-function ModelTile:getPlayerIndex()
+function ModelTileObject:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
-function ModelTile:getDescription()
+function ModelTileObject:getDescription()
     return self.m_Template.description
 end
 
-return ModelTile
+return ModelTileObject

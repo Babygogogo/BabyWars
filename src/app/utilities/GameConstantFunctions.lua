@@ -156,7 +156,7 @@ function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
 end
 
 function GameConstantFunctions.doesViewTileFillGrid(tiledID)
-    if (tiledID == 0) then
+    if ((not tiledID) or (tiledID == 0)) then
         return false
     else
         return TILE_ANIMATIONS[GameConstantFunctions.getTileNameWithTiledId(tiledID)].fillsGrid

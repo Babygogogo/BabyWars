@@ -4,8 +4,6 @@ local ModelTileMap = class("ModelTileMap")
 local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
 local MapFunctions       = require("app.utilities.MapFunctions")
-local ViewTile           = require("app.views.ViewTile")
-local ModelTile          = require("app.models.ModelTile")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
@@ -45,31 +43,50 @@ local function createEmptyMap(width)
     return map
 end
 
-local function createActorTile(objectID, baseID, x, y)
-    local actorData = {objectID = objectID, baseID = baseID, GridIndexable = {gridIndex = {x = x, y = y}}}
-    return Actor.createWithModelAndViewName("ModelTile", actorData, "ViewTile", actorData)
-end
-
 local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
     local width, height = baseLayer.width, baseLayer.height
-    local map = createEmptyMap(width)
+    local objectMap, baseMap = createEmptyMap(width), createEmptyMap(width)
 
     for x = 1, width do
         for y = 1, height do
             local idIndex = x + (height - y) * width
-            local objectTiledID, baseTiledID = objectLayer.data[idIndex], baseLayer.data[idIndex]
-            map[x][y] = createActorTile(objectTiledID, baseTiledID, x, y)
+            local objectID, baseID = objectLayer.data[idIndex], baseLayer.data[idIndex]
+            local actorData = {objectID = objectID, baseID = baseID, GridIndexable = {gridIndex = {x = x, y = y}}}
+
+            if (objectID > 0) then
+                objectMap[x][y] = Actor.createWithModelAndViewName("ModelTileObject", actorData, "ViewTile", actorData)
+            end
+            baseMap[x][y] = Actor.createWithModelAndViewName("ModelTileBase", actorData, "ViewTile", actorData)
         end
     end
 
-    return map, {width = width, height = height}
+    return objectMap, baseMap, {width = width, height = height}
 end
 
-local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
+local function updateTileActorsMapWithGridsData(objectMap, baseMap, mapSize, gridsData)
     for _, gridData in ipairs(gridsData) do
         local gridIndex = gridData.GridIndexable.gridIndex
         assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-updateTileActorsMapWithGridsData() the data of overwriting grid is invalid.")
-        map[gridIndex.x][gridIndex.y]:getModel():ctor(gridData)
+        local x, y = gridIndex.x, gridIndex.y
+
+        local objectID = gridData.objectID
+        local objectActor = objectMap[x][y]
+        if (not objectID) then
+            if (objectActor) then
+                objectActor:getModel():ctor(gridData)
+            end
+        elseif (objectID == 0) then
+            objectMap[x][y] = nil
+        else
+            if (objectActor) then
+                objectActor:getModel():ctor(gridData)
+            else
+                gridData.baseID = gridData.baseID or baseMap[x][y]:getModel():getTiledID()
+                objectMap[x][y] = Actor.createWithModelAndViewName("ModelTileObject", gridData, "ViewTile", gridData)
+            end
+        end
+
+        baseMap[x][y]:getModel():ctor(gridData)
     end
 end
 
@@ -78,17 +95,17 @@ end
 --------------------------------------------------------------------------------
 local function createTileActorsMapWithTemplate(mapData)
     local templateMapData = requireMapData(mapData.template)
-    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
-    updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
+    local objectMap, baseMap, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
+    updateTileActorsMapWithGridsData(objectMap, baseMap, mapSize, mapData.grids or {})
 
-    return map, mapSize
+    return objectMap, baseMap, mapSize
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
-    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(mapData), getTiledTileBaseLayer(mapData))
-    updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
+    local objectMap, baseMap, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(mapData), getTiledTileBaseLayer(mapData))
+    updateTileActorsMapWithGridsData(objectMap, baseMap, mapSize, mapData.grids or {})
 
-    return map, mapSize
+    return objectMap, baseMap, mapSize
 end
 
 local function createTileActorsMap(param)
@@ -100,8 +117,9 @@ local function createTileActorsMap(param)
     end
 end
 
-local function initWithTileActorsMap(self, map, mapSize)
-    self.m_TileActorsMap = map
+local function initWithTileActorsMap(self, objectMap, baseMap, mapSize)
+    self.m_ObjectMap = objectMap
+    self.m_BaseMap = baseMap
     self.m_MapSize = mapSize
 end
 
@@ -127,7 +145,12 @@ function ModelTileMap:initView()
     local mapSize = self:getMapSize()
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
-            view:addChild(self.m_TileActorsMap[x][y]:getView())
+            local objectActor = self.m_ObjectMap[x][y]
+            if (objectActor) then
+                view:addViewTileObject(objectActor:getView())
+            end
+
+            view:addViewTileBase(self.m_BaseMap[x][y]:getView())
         end
     end
 
@@ -172,8 +195,7 @@ end
 
 function ModelTileMap:getActorTile(gridIndex)
     if (GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
- --       return self.m_TileObjectMap[gridIndex.x][gridIndex.y] or self.m_TileBaseMap[gridIndex.x][gridIndex.y]
-        return self.m_TileActorsMap[gridIndex.x][gridIndex.y]
+        return self.m_ObjectMap[gridIndex.x][gridIndex.y] or self.m_BaseMap[gridIndex.x][gridIndex.y]
     else
         return nil
     end
