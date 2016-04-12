@@ -4,50 +4,72 @@ local TileMap_Overwrite2 = {
 
     grids = {
         {
-            gridIndex = {x = 6, y = 5},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 17, y = 5},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 7, y = 5},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 18, y = 5},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 8, y = 5},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 19, y = 5},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 8, y = 4},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 19, y = 4},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 6, y = 3},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 17, y = 3},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 7, y = 3},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 18, y = 3},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 8, y = 3},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 19, y = 3},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 6, y = 2},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 17, y = 2},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 6, y = 1},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 17, y = 1},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 7, y = 1},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 18, y = 1},
+            },
+            objectID = 107,
         },
         {
-            gridIndex = {x = 8, y = 1},
-            tiledID = 39,
+            GridIndexable = {
+                gridIndex = {x = 19, y = 1},
+            },
+            objectID = 107,
         },
-    }
+    },
 }
 
 return TileMap_Overwrite2

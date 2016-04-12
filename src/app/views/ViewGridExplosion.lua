@@ -1,7 +1,7 @@
 
 local ViewGridExplosion = class("ViewGridExplosion", cc.Node)
 
-local GRID_SIZE          = require("res.data.GameConstant").GridSize
+local GRID_SIZE          = require("app.utilities.GameConstantFunctions").getGridSize()
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------

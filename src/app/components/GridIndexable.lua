@@ -15,16 +15,16 @@ local EXPORTED_METHODS = {
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function GridIndexable:ctor(param)
-    self.m_GridIndex = {x = 1, y = 1}
-    if (param) then
-        self:load(param)
-    end
+    self.m_GridIndex = {x = 0, y = 0}
+    self:loadInstantialData(param.instantialData)
 
     return self
 end
 
-function GridIndexable:load(param)
-    self:setGridIndex(param)
+function GridIndexable:loadInstantialData(data)
+    if (data.gridIndex) then
+        self:setGridIndex(data.gridIndex)
+    end
 
     return self
 end
@@ -70,7 +70,7 @@ end
 
 -- The param gridIndex may be nil. If so, the function set the position of view with self.m_GridIndex .
 function GridIndexable:setViewPositionWithGridIndex(gridIndex)
-    local view = self.m_Target.m_View
+    local view = self.m_Target and self.m_Target.m_View or nil
     if (view) then
         view:setPosition(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
     end

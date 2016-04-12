@@ -1,31 +1,9 @@
 
 local ModelUnit = class("ModelUnit")
 
-local ComponentManager	= require("global.components.ComponentManager")
-local TypeChecker       = require("app.utilities.TypeChecker")
-
-local TEMPLATE_MODEL_UNIT_IDS = require("res.data.GameConstant").Mapping_TiledIdToTemplateModelIdTileOrUnit
-local TEMPLATE_MODEL_UNITS    = require("res.data.GameConstant").Mapping_IdToTemplateModelUnit
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function isOfSameTemplateModelUnitID(tiledID1, tiledID2)
-    if (not tiledID1) or (not tiledID2) then
-        return false
-    end
-
-    return TEMPLATE_MODEL_UNIT_IDS[tiledID1].n == TEMPLATE_MODEL_UNIT_IDS[tiledID2].n
-end
-
-local function toTemplateModelUnit(tiledID)
-    return TEMPLATE_MODEL_UNITS[TEMPLATE_MODEL_UNIT_IDS[tiledID].n]
-end
-
-local function toPlayerIndex(tiledID)
-    return TEMPLATE_MODEL_UNIT_IDS[tiledID].p
-end
-
+local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The set state functions.
@@ -68,7 +46,7 @@ end
 -- The functions that loads the data for the model from a TiledID/lua table.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, tiledID)
-    local template = toTemplateModelUnit(tiledID)
+    local template = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template self unit with param tiledID.")
 
     self.m_TiledID = tiledID
@@ -80,36 +58,22 @@ local function initWithTiledID(self, tiledID)
     self.m_State    = "idle"
 
     ComponentManager.unbindAllComponents(self)
-        .bindComponent(self, "GridIndexable")
-        .bindComponent(self, "FuelOwner", {template = template.fuel, instantialData = template.fuel})
-        .bindComponent(self, "MoveDoer",  {template = template.movement})
-        .bindComponent(self, "AttackTaker")
-
-    if (template.specialProperties) then
-        for _, specialProperty in ipairs(template.specialProperties) do
-            if (not ComponentManager.getComponent(self, specialProperty.name)) then
-                ComponentManager.bindComponent(self, specialProperty.name)
-            end
-            ComponentManager.getComponent(self, specialProperty.name):load(specialProperty)
+    for name, data in pairs(template) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
         end
     end
 end
 
 local function loadInstantialData(self, param)
-    if (param.gridIndex) then
-        self:setGridIndex(param.gridIndex)
-    end
-
     self.m_State = param.state or self.m_State
-    if (param.fuel) then
-        ComponentManager.getComponent("FuelOwner"):loadInstantialData(param.fuel)
-    end
 
-    if (param.specialProperties) then
-        for _, specialProperty in ipairs(param.specialProperties) do
-            local component = ComponentManager.getComponent(self, specialProperty.name)
-            assert(component, "ModelUnit-loadInstantialData() attempting to load a component that the model hasn't bound with.")
-            component:load(specialProperty)
+    for name, data in pairs(param) do
+        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+            local component = ComponentManager.getComponent(self, name)
+            assert(component, "ModelUnit-loadInstantialData() attempting to update a component that the model hasn't bound with.")
+
+            component:loadInstantialData(data)
         end
     end
 end
@@ -181,7 +145,7 @@ function ModelUnit:getTiledID()
 end
 
 function ModelUnit:getPlayerIndex()
-    return toPlayerIndex(self.m_TiledID)
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
 end
 
 function ModelUnit:getState()
@@ -198,14 +162,6 @@ end
 
 function ModelUnit:getVision()
     return self.m_Template.vision
-end
-
-function ModelUnit:getDefenseFatalList()
-    return self.m_Template.defense.fatal
-end
-
-function ModelUnit:getDefenseWeakList()
-    return self.m_Template.defense.weak
 end
 
 function ModelUnit:canJoin(rhsUnitModel)

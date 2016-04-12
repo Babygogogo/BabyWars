@@ -1,10 +1,10 @@
 
 local ViewTile = class("ViewTile", cc.Sprite)
 
-local ComponentManager  = require("global.components.ComponentManager")
-local TypeChecker       = require("app.utilities.TypeChecker")
-local TemplateViewTiles = require("res.data.GameConstant").Mapping_TiledIdToTemplateViewTileOrUnit
-local AnimationLoader   = require("app.utilities.AnimationLoader")
+local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The constructor.
@@ -12,21 +12,18 @@ local AnimationLoader   = require("app.utilities.AnimationLoader")
 function ViewTile:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
-	return self
+    return self
 end
 
 function ViewTile:updateWithTiledID(tiledID)
-    assert(TypeChecker.isTiledID(tiledID))
-    if (self.m_TiledID == tiledID) then
-        return
+    if (tiledID ~= self.m_TiledID) then
+        self.m_TiledID = tiledID
+        if (tiledID > 0) then
+            self:playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tiledID))
+        else
+            self:stopAllActions()
+        end
     end
-
-    local template = TemplateViewTiles[tiledID]
-    assert(template, "ViewTile:updateWithTiledID() failed to get the template view with param tiledID.")
-
-    self.m_TiledID = tiledID
-    self:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tiledID))
 
     return self
 end

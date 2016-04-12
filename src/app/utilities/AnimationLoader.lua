@@ -3,22 +3,36 @@ local AnimationLoader = {}
 
 local GAME_CONSTANT = require("res.data.GameConstant")
 
-local function toAnimationName(tiledID)
-    return "tiledID" .. tiledID
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getUnitAnimationName(unitName, playerIndex, state)
+    return unitName .. playerIndex .. state
 end
 
-local function loadTiledAnimation(tiledID, pattern, frameCount, frameDuration)
-    local animation = display.newAnimation(display.newFrames(pattern, 1, frameCount), frameDuration)
-    display.setAnimationCache(toAnimationName(tiledID), animation)
+local function getTileAnimationName(tileName, shapeIndex)
+    return tileName .. shapeIndex
 end
 
-local function loadTiledAnimations()
-    local views = GAME_CONSTANT.Mapping_TiledIdToTemplateViewTileOrUnit
-    for tiledID, view in ipairs(views) do
-        local animations = view.animations
-        local animation = animations.normal
+local function loadTileAnimations()
+    for tileName, data in pairs(GAME_CONSTANT.tileAnimations) do
+        for shapeIndex = 1, data.shapesCount do
+            local pattern = string.format("c01_t%02d_s%02d_%s.png", data.typeIndex, shapeIndex, "f%02d")
+            local animation = display.newAnimation(display.newFrames(pattern, 1, data.framesCount), data.durationPerFrame)
+            display.setAnimationCache(getTileAnimationName(tileName, shapeIndex), animation)
+        end
+    end
+end
 
-        loadTiledAnimation(tiledID, animation.pattern, animation.framesCount, animation.durationPerFrame)
+local function loadUnitAnimations()
+    for unitName, animationsForPlayers in pairs(GAME_CONSTANT.unitAnimations) do
+        for playerIndex, animations in ipairs(animationsForPlayers) do
+            local normal = animations.normal
+            local animation = display.newAnimation(display.newFrames(normal.pattern, 1, normal.framesCount), normal.durationPerFrame)
+            display.setAnimationCache(getUnitAnimationName(unitName, playerIndex, "normal"), animation)
+        end
     end
 end
 
@@ -33,24 +47,29 @@ local function loadGridAnimations()
     display.setAnimationCache("GridExplosion", explosionAnimation)
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function AnimationLoader.load()
-    loadTiledAnimations()
+    loadTileAnimations()
+    loadUnitAnimations()
     loadGridAnimations()
 end
 
-function AnimationLoader.getAnimationWithTiledID(tiledID)
-    return display.getAnimationCache(toAnimationName(tiledID))
+function AnimationLoader.getUnitAnimation(unitName, playerIndex, animationState)
+    return display.getAnimationCache(getUnitAnimationName(unitName, playerIndex or 1, animationState or "normal"))
 end
 
-function AnimationLoader.getAnimationWithTypeName(name)
-    local mapping = GAME_CONSTANT.Mapping_TiledIdToTemplateModelIdTileOrUnit
-    for id, templateID in ipairs(mapping) do
-        if (templateID.n == name) then
-            return AnimationLoader.getAnimationWithTiledID(id)
-        end
-    end
+function AnimationLoader.getUnitAnimationWithTiledId(tiledID)
+    return AnimationLoader.getUnitAnimation(GameConstantFunctions.getUnitNameWithTiledId(tiledID), GameConstantFunctions.getPlayerIndexWithTiledId(tiledID), "normal")
+end
 
-    error("AnimationLoader.getAnimationWithTypeName() failed to find an animation with param name.")
+function AnimationLoader.getTileAnimation(tileName, shapeIndex)
+    return display.getAnimationCache(getTileAnimationName(tileName, shapeIndex or 1))
+end
+
+function AnimationLoader.getTileAnimationWithTiledId(tiledID)
+    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileNameWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
 end
 
 return AnimationLoader

@@ -91,13 +91,11 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:ctor(param)
     if (not ComponentManager:getComponent(self, "GridIndexable")) then
-        ComponentManager.bindComponent(self, "GridIndexable")
+        ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {gridIndex = param.gridIndex or {x = 1, y = 1}}})
     end
 
     assert(param.mapSize, "ModelMapCursor:ctor() param.mapSize expected.")
     self:setMapSize(param.mapSize)
-
-    self:setGridIndex(param.gridIndex or {x = 1, y = 1})
 
     if (self.m_View) then
         self:initView()

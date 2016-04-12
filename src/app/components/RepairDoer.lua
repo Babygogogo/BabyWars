@@ -13,16 +13,23 @@ local EXPORTED_METHODS = {
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function RepairDoer:ctor(param)
-    if (param) then
-        self:load(param)
-    end
+    self:loadTemplate(param.template)
+        :loadInstantialData(param.instantialData)
 
     return self
 end
 
-function RepairDoer:load(param)
-    self.m_Template = param
+function RepairDoer:loadTemplate(template)
+    assert(template.targetCatagory, "RepairDoer:loadTemplate() the param template.targetCatagory is invalid.")
+    assert(template.targetList,     "RepairDoer:loadTemplate() the param template.targetList is invalid.")
+    assert(template.amount,         "RepairDoer:loadTemplate() the param template.amount is invalid.")
 
+    self.m_Template = template
+
+    return self
+end
+
+function RepairDoer:loadInstantialData(data)
     return self
 end
 

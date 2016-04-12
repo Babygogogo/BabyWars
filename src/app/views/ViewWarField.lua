@@ -2,7 +2,8 @@
 local ViewWarField = class("ViewWarField", cc.Node)
 
 local TypeChecker  = require("app.utilities.TypeChecker")
-local GameConstant = require("res.data.GameConstant")
+
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 
 local ORIGIN = {x = 0, y = 0}
 local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.height - 10, lowerLeftX = 10, lowerLeftY = 10}
@@ -152,9 +153,8 @@ function ViewWarField:setViewGridExplosion(view)
 end
 
 function ViewWarField:setContentSizeWithMapSize(mapSize)
-    local gridSize = GameConstant.GridSize
-    self.m_ContentSize.width  = mapSize.width  * gridSize.width
-    self.m_ContentSize.height = mapSize.height * gridSize.height
+    self.m_ContentSize.width  = mapSize.width  * GRID_SIZE.width
+    self.m_ContentSize.height = mapSize.height * GRID_SIZE.height
     self.m_MaxScale = 2
     self.m_MinScale = math.min(BOUNDARY_RECT.width  / self.m_ContentSize.width,
                                BOUNDARY_RECT.height / self.m_ContentSize.height)

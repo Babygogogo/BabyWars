@@ -23,55 +23,30 @@ local EXPORTED_METHODS = {
     "canAttackAfterMove",
 }
 
-local function initPrimaryWeapon(self, param)
-    if (self.m_PrimaryWeapon) then
-        self.m_PrimaryWeapon.m_CurrentAmmo = param.currentAmmo
-    else
-        self.m_PrimaryWeapon = {}
-
-        local weapon = self.m_PrimaryWeapon
-        weapon.m_Template    = param
-        weapon.m_CurrentAmmo = param.maxAmmo
-    end
-end
-
-local function initSecondaryWeapon(doer, param)
-    if (not doer.m_SecondaryWeapon) then
-        doer.m_SecondaryWeapon = {}
-
-        local weapon = doer.m_SecondaryWeapon
-        weapon.m_Template = param
-    end
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function AttackDoer:ctor(param)
-    if (param) then
-        self:load(param)
-    end
+    self:loadTemplate(param.template)
+        :loadInstantialData(param.instantialData)
 
     return self
 end
 
-function AttackDoer:load(param)
-    self.m_MinAttackRange = param.minAttackRange or self.m_MinAttackRange
-    assert(self.m_MinAttackRange, "AttackDoer:load() failed to load the min attack range.")
+function AttackDoer:loadTemplate(template)
+    assert(template.minAttackRange ~= nil,     "AttackDoer:loadTemplate() the param template.minAttackRange is invalid.")
+    assert(template.maxAttackRange ~= nil,     "AttackDoer:loadTemplate() the param template.maxAttackRange is invalid.")
+    assert(template.canAttackAfterMove ~= nil, "AttackDoer:loadTemplate() the param template.canAttackAfterMove is invalid.")
+    assert(template.primaryWeapon or template.secondaryWeapon, "AttackDoer:loadTemplate() the template has no weapon.")
 
-    self.m_MaxAttackRange = param.maxAttackRange or self.m_MaxAttackRange
-    assert(self.m_MaxAttackRange, "AttackDoer:load() failed to load the max attack range.")
+    self.m_Template = template
 
-    if (param.canAttackAfterMove ~= nil) then
-        self.m_CanAttackAfterMove = param.canAttackAfterMove
-    end
-    assert(self.m_CanAttackAfterMove ~= nil, "AttackDoer:load() failed to load the attribute 'canAttackAfterMove'.")
+    return self
+end
 
-    if (param.primaryWeapon) then
-        initPrimaryWeapon(self, param.primaryWeapon)
-    end
-    if (param.secondaryWeapon) then
-        initSecondaryWeapon(self, param.secondaryWeapon)
+function AttackDoer:loadInstantialData(data)
+    if (data.primaryWeapon) then
+        self.m_PrimaryWeaponCurrentAmmo = data.primaryWeapon.currentAmmo or self.m_PrimaryWeaponCurrentAmmo
     end
 
     return self
@@ -102,51 +77,51 @@ end
 -- Exported methods.
 --------------------------------------------------------------------------------
 function AttackDoer:hasPrimaryWeapon()
-    return self.m_PrimaryWeapon ~= nil
+    return self.m_Template.primaryWeapon ~= nil
 end
 
 function AttackDoer:getPrimaryWeaponMaxAmmo()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponMaxAmmo() the attack doer has no primary weapon.")
-    return self.m_PrimaryWeapon.m_Template.maxAmmo
+    return self.m_Template.primaryWeapon.maxAmmo
 end
 
 function AttackDoer:getPrimaryWeaponCurrentAmmo()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
-    return self.m_PrimaryWeapon.m_CurrentAmmo
+    return self.m_PrimaryWeaponCurrentAmmo
 end
 
 function AttackDoer:getPrimaryWeaponName()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
-    return self.m_PrimaryWeapon.m_Template.name
+    return self.m_Template.primaryWeapon.name
 end
 
 function AttackDoer:getPrimaryWeaponFatalList()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponFatalList() the attack doer has no primary weapon.")
-    return self.m_PrimaryWeapon.m_Template.fatal
+    return self.m_Template.primaryWeapon.fatal
 end
 
 function AttackDoer:getPrimaryWeaponStrongList()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponStrongList() the attack doer has no primary weapon.")
-    return self.m_PrimaryWeapon.m_Template.strong
+    return self.m_Template.primaryWeapon.strong
 end
 
 function AttackDoer:hasSecondaryWeapon()
-    return self.m_SecondaryWeapon ~= nil
+    return self.m_Template.secondaryWeapon ~= nil
 end
 
 function AttackDoer:getSecondaryWeaponName()
     assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponName() the attack doer has no secondary weapon.")
-    return self.m_SecondaryWeapon.m_Template.name
+    return self.m_Template.secondaryWeapon.name
 end
 
 function AttackDoer:getSecondaryWeaponFatalList()
     assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponFatalList() the attack doer has no secondary weapon.")
-    return self.m_SecondaryWeapon.m_Template.fatal
+    return self.m_Template.secondaryWeapon.fatal
 end
 
 function AttackDoer:getSecondaryWeaponStrongList()
     assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponStrongList() the attack doer has no secondary weapon.")
-    return self.m_SecondaryWeapon.m_Template.strong
+    return self.m_Template.secondaryWeapon.strong
 end
 
 function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
@@ -157,20 +132,20 @@ function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
     end
 
     local distance = GridIndexFunctions.getDistance(selfGridIndex or self.m_Target:getGridIndex(), targetModel:getGridIndex())
-    if (distance < self.m_MinAttackRange) or (distance > self.m_MaxAttackRange) then
+    if (distance < self.m_Template.minAttackRange) or (distance > self.m_Template.maxAttackRange) then
         return false
     end
 
     local defenseType = targetModel:getDefenseType()
     if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        local baseDamage = self.m_PrimaryWeapon.m_Template.baseDamage[defenseType]
+        local baseDamage = self.m_Template.primaryWeapon.baseDamage[defenseType]
         if (baseDamage) then
             return true, baseDamage
         end
     end
 
     if (self:hasSecondaryWeapon()) then
-        local baseDamage = self.m_SecondaryWeapon.m_Template.baseDamage[defenseType]
+        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[defenseType]
         if (baseDamage) then
             return true, baseDamage
         end
@@ -180,11 +155,11 @@ function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
 end
 
 function AttackDoer:getAttackRangeMinMax()
-    return self.m_MinAttackRange, self.m_MaxAttackRange
+    return self.m_Template.minAttackRange, self.m_Template.maxAttackRange
 end
 
 function AttackDoer:canAttackAfterMove()
-    return self.m_CanAttackAfterMove
+    return self.m_Template.canAttackAfterMove
 end
 
 return AttackDoer

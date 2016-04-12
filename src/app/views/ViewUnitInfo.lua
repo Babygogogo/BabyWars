@@ -9,16 +9,16 @@ local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH = 2
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 140
 local LEFT_POSITION_X = 10 + CONTENT_SIZE_WIDTH
 local LEFT_POSITION_Y = 10
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH * 2 - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local GRID_SIZE = require("res.data.GameConstant").GridSize
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 local ICON_SCALE = 0.5
 local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
-local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * ICON_SCALE - 25
+local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * ICON_SCALE - 20
 
 local HP_INFO_POSITION_X = 10
 local HP_INFO_POSITION_Y = 60
@@ -93,7 +93,7 @@ end
 
 local function updateIconWithModelUnit(icon, unit)
     icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(unit:getTiledID()))
+        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(unit:getTiledID()))
 end
 
 --------------------------------------------------------------------------------

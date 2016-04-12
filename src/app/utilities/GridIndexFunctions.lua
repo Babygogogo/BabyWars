@@ -1,7 +1,7 @@
 
 local GridIndexFunctions = {}
 
-local GRID_SIZE = require("res.data.GameConstant").GridSize
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 local ADJACENT_GRIDS_OFFSET = {
     {x = -1, y =  0, direction = "left",  clockwiseOffset = {x =  1, y =  1},},
     {x =  1, y =  0, direction = "right", clockwiseOffset = {x = -1, y = -1},},

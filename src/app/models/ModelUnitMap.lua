@@ -5,7 +5,6 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local MapFunctions       = require("app.utilities.MapFunctions")
 local ViewUnit           = require("app.views.ViewUnit")
 local ModelUnit          = require("app.models.ModelUnit")
-local GridSize           = require("res.data.GameConstant").GridSize
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ local function requireMapData(param)
 end
 
 local function getTiledUnitLayer(tiledData)
-    return tiledData.layers[2]
+    return tiledData.layers[3]
 end
 
 local function iterateAllActorUnits(self, func)

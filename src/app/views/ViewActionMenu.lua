@@ -2,10 +2,10 @@
 local ViewActionMenu = class("ViewActionMenu", cc.Node)
 
 local MENU_BACKGROUND_WIDTH  = 180
-local MENU_BACKGROUND_HEIGHT = display.height - 10 - 88 - 150 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local MENU_BACKGROUND_HEIGHT = display.height - 10 - 88 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
 
 local LEFT_POSITION_X  = 10
-local LEFT_POSITION_Y  = 10 + 150
+local LEFT_POSITION_Y  = 10 + 140
 local RIGHT_POSITION_X = display.width - MENU_BACKGROUND_WIDTH - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 

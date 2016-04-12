@@ -8,7 +8,7 @@ local PULSE_IN_DURATION = 0.15
 local PULSE_OUT_DURATION = 0.15
 local PULSE_INTERVAL_DURATION = 0.3
 
-local GRID_SIZE = require("res.data.GameConstant").GridSize
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 local UPPER_LEFT_CORNER_OUTER_POSITION_X = -6
 local UPPER_LEFT_CORNER_INNER_POSITION_X =  4
 local UPPER_LEFT_CORNER_OUTER_POSITION_Y =  6 + GRID_SIZE.height

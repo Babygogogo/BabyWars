@@ -4,13 +4,13 @@ local ViewTileInfo = class("ViewTileInfo", cc.Node)
 local AnimationLoader  = require("app.utilities.AnimationLoader")
 local ComponentManager = require("global.components.ComponentManager")
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 150
+local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 140
 local LEFT_POSITION_X = 10
 local LEFT_POSITION_Y = 10
 local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
 
-local GRID_SIZE = require("res.data.GameConstant").GridSize
+local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 local ICON_SCALE      = 0.5
 local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
 local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * 2 * ICON_SCALE
@@ -89,8 +89,6 @@ local function createIcon()
 
         :setScale(ICON_SCALE)
 
-        :playAnimationForever(require("app.utilities.AnimationLoader").getAnimationWithTiledID(1))
-
     return icon
 end
 
@@ -101,7 +99,7 @@ end
 
 local function updateIconWithModelTile(icon, tile)
     icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getAnimationWithTiledID(tile:getTiledID()))
+        :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tile:getTiledID()))
 end
 
 --------------------------------------------------------------------------------

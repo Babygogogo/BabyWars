@@ -12,15 +12,20 @@ local EXPORTED_METHODS = {
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function IncomeProvider:ctor(param)
-    if (param) then
-        self:load(param)
-    end
+    self:loadTemplate(param.template)
+        :loadInstantialData(param.instantialData)
 
     return self
 end
 
-function IncomeProvider:load(param)
-    self.m_IncomeAmount = param.amount
+function IncomeProvider:loadTemplate(template)
+    assert(template.amount, "IncomeProvider:loadTemplate() the param template.amount is invalid.")
+    self.m_Template = template
+
+    return self
+end
+
+function IncomeProvider:loadInstantialData(data)
     return self
 end
 
@@ -49,7 +54,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function IncomeProvider:getIncomeAmount()
-    return self.m_IncomeAmount
+    return self.m_Template.amount
 end
 
 return IncomeProvider

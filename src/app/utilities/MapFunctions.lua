@@ -63,7 +63,7 @@ function MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, modelName, v
         for y = 1, height do
             local tiledID = tiledLayer.data[x + (height - y) * width]
             if (tiledID ~= 0) then
-                local actorData = {tiledID = tiledID, gridIndex = {x = x, y = y}}
+                local actorData = {tiledID = tiledID, GridIndexable = {gridIndex = {x = x, y = y}}}
                 local actor = Actor.createWithModelAndViewName(modelName, actorData, viewName, actorData)
                 assert(actor, "MapFunctions.createGridActorsMapWithTiledLayer() failed to create a grid actor.")
 
@@ -89,7 +89,7 @@ function MapFunctions.updateGridActorsMapWithGridsData(map, gridsData, modelName
     assert(TypeChecker.isMapSize(mapSize))
 
     for _, gridData in ipairs(gridsData) do
-        local gridIndex = gridData.gridIndex
+        local gridIndex = gridData.GridIndexable and gridData.GridIndexable.gridIndex or nil
         assert(TypeChecker.isGridIndex(gridIndex))
         assert(TypeChecker.isGridInMap(gridIndex, mapSize))
 

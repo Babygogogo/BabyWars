@@ -1,1123 +1,548 @@
 
 local GameConstant = {}
 
-GameConstant.GridSize = {
-    width = 80, height = 80
+GameConstant.gridSize = {
+    width = 72, height = 72
 }
 
-GameConstant.Mapping_TiledIdToTemplateModelIdTileOrUnit = {
-    -- TiledID 0 + 1
-    {n = "hq",       p = 1},    {n = "hq",       p = 2},    {n = "hq",       p = 3},    {n = "hq",       p = 4},
-    {n = "city",     p = 1},    {n = "city",     p = 2},    {n = "city",     p = 3},    {n = "city",     p = 4},    {n = "city",     p = 5},
-    {n = "base",     p = 1},    {n = "base",     p = 2},    {n = "base",     p = 3},    {n = "base",     p = 4},    {n = "base",     p = 5},
-    {n = "airport",  p = 1},    {n = "airport",  p = 2},    {n = "airport",  p = 3},    {n = "airport",  p = 4},    {n = "airport",  p = 5},
-    {n = "seaport",  p = 1},    {n = "seaport",  p = 2},    {n = "seaport",  p = 3},    {n = "seaport",  p = 4},    {n = "seaport",  p = 5},
+GameConstant.indexesForTileOrUnit = {
+    {name = "plain",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "river",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 16, },
+    {name = "sea",         firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 47, },
+    {name = "beach",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 12, },
+    {name = "road",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
+    {name = "bridge",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
+    {name = "wood",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "mountain",    firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "wasteland",   firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "ruins",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "fire",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "rough",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "mist",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "reef",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "plasma",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "meteor",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "silo",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 2,  },
+    {name = "hq",          firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "city",        firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "comtower",    firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "radar",       firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "factory",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "airport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "seaport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "tempairport", firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "tempseaport", firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
 
-    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},    {n = "plain",    p = 0},
-
-    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
-    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},    {n = "road",     p = 0},
-    {n = "road",     p = 0},
-
-    {n = "forest",   p = 0},
-
-    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
-    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},    {n = "river",    p = 0},
-
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},    {n = "sea",      p = 0},
-
-    {n = "reef",     p = 0},
-
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},    {n = "shoal",    p = 0},
-
-    -- TiledID 100 + 1
-    {n = "mountain", p = 0},    {n = "mountain", p = 0},
-
-    {n = "bridge",   p = 0},    {n = "bridge",   p = 0},
-
-    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
-    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},    {n = "pipeline", p = 0},
-
-    {n = "joint",    p = 0},    {n = "joint",    p = 0},
-
-    {n = "infantry",   p = 1},  {n = "infantry",   p = 2},  {n = "infantry",   p = 3},  {n = "infantry",   p = 4},
-    {n = "mech",       p = 1},  {n = "mech",       p = 2},  {n = "mech",       p = 3},  {n = "mech",       p = 4},
-    {n = "recon",      p = 1},  {n = "recon",      p = 2},  {n = "recon",      p = 3},  {n = "recon",      p = 4},
-    {n = "tank",       p = 1},  {n = "tank",       p = 2},  {n = "tank",       p = 3},  {n = "tank",       p = 4},
-    {n = "mdtank",     p = 1},  {n = "mdtank",     p = 2},  {n = "mdtank",     p = 3},  {n = "mdtank",     p = 4},
-    {n = "neotank",    p = 1},  {n = "neotank",    p = 2},  {n = "neotank",    p = 3},  {n = "neotank",    p = 4},
-    {n = "apc",        p = 1},  {n = "apc",        p = 2},  {n = "apc",        p = 3},  {n = "apc",        p = 4},
-    {n = "artillery",  p = 1},  {n = "artillery",  p = 2},  {n = "artillery",  p = 3},  {n = "artillery",  p = 4},
-    {n = "rockets",    p = 1},  {n = "rockets",    p = 2},  {n = "rockets",    p = 3},  {n = "rockets",    p = 4},
-    {n = "antiair",    p = 1},  {n = "antiair",    p = 2},  {n = "antiair",    p = 3},  {n = "antiair",    p = 4},
-    {n = "missiles",   p = 1},  {n = "missiles",   p = 2},  {n = "missiles",   p = 3},  {n = "missiles",   p = 4},
-    {n = "fighter",    p = 1},  {n = "fighter",    p = 2},  {n = "fighter",    p = 3},  {n = "fighter",    p = 4},
-    {n = "bomber",     p = 1},  {n = "bomber",     p = 2},  {n = "bomber",     p = 3},  {n = "bomber",     p = 4},
-    {n = "bcopter",    p = 1},  {n = "bcopter",    p = 2},  {n = "bcopter",    p = 3},  {n = "bcopter",    p = 4},
-    {n = "tcopter",    p = 1},  {n = "tcopter",    p = 2},  {n = "tcopter",    p = 3},  {n = "tcopter",    p = 4},
-    {n = "battleship", p = 1},  {n = "battleship", p = 2},  {n = "battleship", p = 3},  {n = "battleship", p = 4},
-    {n = "cruiser",    p = 1},  {n = "cruiser",    p = 2},  {n = "cruiser",    p = 3},  {n = "cruiser",    p = 4},
-    {n = "lander",     p = 1},  {n = "lander",     p = 2},  {n = "lander",     p = 3},  {n = "lander",     p = 4},
-    {n = "submarine",  p = 1},  {n = "submarine",  p = 2},  {n = "submarine",  p = 3},  {n = "submarine",  p = 4},
+    {name = "infantry",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "mech",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "bike",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "recon",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "flare",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "antiair",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "tank",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "mdtank",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "wartank",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "artillery",   firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "antitank",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "rockets",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "missiles",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "rig",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "fighter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "bomber",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "duster",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "bcopter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "tcopter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "seaplane",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "battleship",  firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "carrier",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "submarine",   firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "cruiser",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "lander",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "gunboat",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
 }
 
-GameConstant.Mapping_TiledIdToTemplateViewTileOrUnit = {
-    {
-        -- TiledID 1
-        animations = {
-            normal = {pattern = "c01_t01_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t01_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t02_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
-        }
-    },
+GameConstant.tileAnimations = {
+    plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    river       = {typeIndex = 2,  shapesCount = 16, framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    sea         = {typeIndex = 3,  shapesCount = 47, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    beach       = {typeIndex = 4,  shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    road        = {typeIndex = 5,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    bridge      = {typeIndex = 6,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    wood        = {typeIndex = 7,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    mountain    = {typeIndex = 8,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    wasteland   = {typeIndex = 9,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    ruins       = {typeIndex = 10, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    fire        = {typeIndex = 11, shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,    fillsGrid = true,  },
+    rough       = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    mist        = {typeIndex = 13, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    reef        = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    plasma      = {typeIndex = 15, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
+    meteor      = {typeIndex = 16, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    silo        = {typeIndex = 17, shapesCount = 2,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    hq          = {typeIndex = 18, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    city        = {typeIndex = 19, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    comtower    = {typeIndex = 20, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    radar       = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    factory     = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    airport     = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    seaport     = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
+    tempairport = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    tempseaport = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+}
 
-    {
-        -- TiledID 11
-        animations = {
-            normal = {pattern = "c01_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.25}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t03_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t04_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s01_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-
-    {
-        -- TiledID 21
-        animations = {
-            normal = {pattern = "c01_t05_s02_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s03_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s04_f%02d.png", framesCount = 2, durationPerFrame = 0.5}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t05_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t06_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-
-    {
-        -- TiledID 31
-        animations = {
-            normal = {pattern = "c01_t07_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s06_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s07_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s08_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s09_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s10_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t07_s11_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t08_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-
-    {
-        -- TiledID 41
-        animations = {
-            normal = {pattern = "c01_t09_s01_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s02_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s03_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s04_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s05_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s06_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s07_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s08_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s09_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t09_s10_f%02d.png", framesCount = 8, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 50 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s02_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s03_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s04_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s05_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s06_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s07_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s08_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s09_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s10_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 60 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s11_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s12_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s13_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s14_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s15_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s16_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s17_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s18_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s19_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s20_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 70 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s21_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s22_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s23_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s24_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s25_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s26_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s27_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s28_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t10_s29_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t11_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 80 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s01_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s02_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s03_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s04_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s05_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s06_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s07_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s08_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s09_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s10_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 90 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s11_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s12_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s13_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s14_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s15_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s16_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s17_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s18_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s19_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t12_s20_f%02d.png", framesCount = 6, durationPerFrame = 0.2}
-        }
-    },
-
-    -- TiledID 100 + 1
-    {
-        animations = {
-            normal = {pattern = "c01_t13_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t13_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t14_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t14_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s03_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s04_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s05_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s06_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-
-    -- TiledID 110 + 1; Units start from "c02..."
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s07_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s08_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s09_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t15_s10_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s01_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c01_t16_s02_f%02d.png", framesCount = 1, durationPerFrame = 99999}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t01_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t01_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t01_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t01_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    -- TiledID 120 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t02_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t02_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t02_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t02_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t03_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t03_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t04_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t04_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    -- TiledID 130 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t04_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t04_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t05_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t05_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t05_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t05_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t06_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t06_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t06_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t06_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t07_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 140 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t07_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t07_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t07_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t08_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t08_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t08_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t08_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t09_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t09_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t09_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 150 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t09_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t10_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t10_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t10_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t10_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t11_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t11_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t11_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t11_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t12_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 160 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t12_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t12_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t12_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t13_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t13_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t13_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t13_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t14_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t14_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t14_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 170 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t14_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t15_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t15_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t15_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t15_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t16_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t16_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t16_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t16_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t17_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 180 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t17_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t17_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t17_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t18_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t18_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t18_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t18_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t19_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-    {
-        animations = {
-            normal = {pattern = "c02_t19_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },
-
-    {
-        animations = {
-            normal = {pattern = "c02_t19_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
-    },    -- TiledID 190 + 1
-    {
-        animations = {
-            normal = {pattern = "c02_t19_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3}
-        }
+GameConstant.unitAnimations = {
+    infantry = {
+        {
+            normal = {pattern = "c02_t01_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t01_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t01_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t01_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    mech = {
+        {
+            normal = {pattern = "c02_t02_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t02_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t02_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t02_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    bike = {
+        {
+            normal = {pattern = "c02_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t03_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t03_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    recon = {
+        {
+            normal = {pattern = "c02_t04_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t04_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t04_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t04_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    flare = {
+        {
+            normal = {pattern = "c02_t05_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t05_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t05_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t05_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    antiair = {
+        {
+            normal = {pattern = "c02_t06_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t06_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t06_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t06_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    tank = {
+        {
+            normal = {pattern = "c02_t07_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t07_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t07_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t07_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    mdtank = {
+        {
+            normal = {pattern = "c02_t08_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t08_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t08_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t08_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    wartank = {
+        {
+            normal = {pattern = "c02_t09_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t09_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t09_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t09_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    artillery = {
+        {
+            normal = {pattern = "c02_t10_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t10_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t10_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t10_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    antitank = {
+        {
+            normal = {pattern = "c02_t11_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t11_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t11_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t11_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    rockets = {
+        {
+            normal = {pattern = "c02_t12_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t12_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t12_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t12_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    missiles = {
+        {
+            normal = {pattern = "c02_t13_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t13_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t13_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t13_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    rig = {
+        {
+            normal = {pattern = "c02_t14_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t14_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t14_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t14_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    fighter = {
+        {
+            normal = {pattern = "c02_t15_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t15_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t15_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t15_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    bomber = {
+        {
+            normal = {pattern = "c02_t16_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t16_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t16_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t16_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    duster = {
+        {
+            normal = {pattern = "c02_t17_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t17_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t17_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t17_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    bcopter = {
+        {
+            normal = {pattern = "c02_t18_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t18_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t18_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t18_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    tcopter = {
+        {
+            normal = {pattern = "c02_t19_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t19_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t19_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t19_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    seaplane = {
+        {
+            normal = {pattern = "c02_t20_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t20_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t20_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t20_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    battleship = {
+        {
+            normal = {pattern = "c02_t21_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t21_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t21_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t21_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    carrier = {
+        {
+            normal = {pattern = "c02_t22_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t22_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t22_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t22_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    submarine = {
+        {
+            normal = {pattern = "c02_t23_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t23_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t23_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t23_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    cruiser = {
+        {
+            normal = {pattern = "c02_t24_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t24_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t24_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t24_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    lander = {
+        {
+            normal = {pattern = "c02_t25_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t25_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t25_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t25_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+    },
+    gunboat = {
+        {
+            normal = {pattern = "c02_t26_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t26_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t26_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
+        {
+            normal = {pattern = "c02_t26_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+        },
     },
 }
 
 GameConstant.unitCatagory = {
+    allUnits = {
+        "infantry",
+        "mech",
+        "bike",
+        "recon",
+        "flare",
+        "antiair",
+        "tank",
+        "mdtank",
+        "wartank",
+        "artillery",
+        "antitank",
+        "rockets",
+        "missiles",
+        "rig",
+        "fighter",
+        "bomber",
+        "duster",
+        "bcopter",
+        "tcopter",
+        "seaplane",
+        "battleship",
+        "carrier",
+        "submarine",
+        "cruiser",
+        "lander",
+        "gunboat",
+    },
+
     groundUnits = {
         "infantry",
         "mech",
+        "bike",
         "recon",
+        "flare",
+        "antiair",
         "tank",
         "mdtank",
-        "neotank",
-        "megatank",
-        "apc",
+        "wartank",
         "artillery",
+        "antitank",
         "rockets",
-        "antiair",
         "missiles",
-        "piperunner"
+        "rig",
     },
 
     navalUnits = {
         "battleship",
+        "carrier",
+        "submarine",
         "cruiser",
         "lander",
-        "submarine",
-        "blackboat",
-        "carrier"
+        "gunboat",
     },
 
     airUnits = {
         "fighter",
         "bomber",
+        "duster",
         "bcopter",
-        "tcopter"
+        "tcopter",
+        "seaplane",
     },
 
     groundOrNavalUnits = {
         "infantry",
         "mech",
+        "bike",
         "recon",
+        "flare",
+        "antiair",
         "tank",
         "mdtank",
-        "neotank",
-        "megatank",
-        "apc",
+        "wartank",
         "artillery",
+        "antitank",
         "rockets",
-        "antiair",
         "missiles",
-        "piperunner",
+        "rig",
         "battleship",
+        "carrier",
+        "submarine",
         "cruiser",
         "lander",
-        "submarine",
-        "blackboat",
-        "carrier"
+        "gunboat",
     },
 
     none = {
@@ -1137,948 +562,848 @@ GameConstant.incomePerTurn   = 1000
 GameConstant.moveTypes = {
     "infantry",
     "mech",
-    "tires",
-    "treads",
+    "tireA",
+    "tireB",
+    "tank",
     "air",
     "ship",
-    "lander",
+    "transport",
 }
 
-GameConstant.Mapping_IdToTemplateModelTile = {
-    hq = {
-        defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-        },
-
-        description = "An army HQ. Battle ends if it's captured. Ground units get HP and supplies here.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "Defeat"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
-        },
-    },
-
-    city = {
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-        },
-
-        description = "A normal city. Ground units gain supplies and HP in allied cities.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            --]]
-        }
-    },
-
-    base = {
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-        },
-
-        description = "A base. Allied bases deploy, supply, and restore HP to ground units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Ground units",
-                targetList     = GameConstant.unitCatagory.groundUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            },
-            {
-                name = "RepairDoer",
-                target = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
-            }
-            --]]
-        }
-    },
-
-    airport = {
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-        },
-
-        description = "An air base. Allied bases deploy, supply, and restore HP to air units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Air units",
-                targetList     = GameConstant.unitCatagory.airUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {12, 13, 14, 15}
-            },
-            {
-                name = "RepairDoer",
-                target = {12, 13, 14, 15}
-            }
-            --]]
-        }
-    },
-
-    seaport = {
-        defenseBonus = {
-            amount         = 30,
-            targetCatagory = "Ground/naval units",
-            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = 1,
-                lander     = 1,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = 1,
-                lander     = 1,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = 2,
-                lander     = 2,
-                piperunner = false,
-            },
-        },
-
-        description = "A naval base. Allied bases deploy, supply, and restore HP to naval units.",
-
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
-            {
-                name           = "RepairDoer",
-                targetCatagory = "Naval units",
-                targetList     = GameConstant.unitCatagory.navalUnits,
-                amount         = 2,
-            },
-            {
-                name   = "IncomeProvider",
-                amount = GameConstant.incomePerTurn
-            },
-            --[[
-            {
-                name = "SupplyProvider",
-                target = {16, 17, 18, 19}
-            },
-            {
-                name = "RepairDoer",
-                target = {16, 17, 18, 19}
-            }
-            --]]
-        }
-    },
-
+GameConstant.templateModelTiles = {
     plain = {
-        defenseBonus = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 10,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 2,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 2,
-                tires      = 3,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = 2,
-                tires      = 3,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A rich, green plain. Easy to traverse, but offers little defensive cover.",
-    },
-
-    road = {
-        defenseBonus = {
-            amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-        },
-
-        description = "A paved road. Easy to traverse, but offers little defensive cover.",
-    },
-
-    forest = {
-        defenseBonus = {
-            amount         = 20,
-            targetCatagory = "Ground units",
-            targetList     = GameConstant.unitCatagory.groundUnits,
-        },
-
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 2,
-                tires      = 3,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 3,
-                tires      = 4,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = 3,
-                tires      = 4,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-        },
-
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
+        description = "Plains are easily traveled but offer little defense.",
     },
 
     river = {
-        defenseBonus = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = false,
-                tires      = false,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 2,
+            mech      = 1,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A gentle, flowing river. Only infantry units can ford rivers.",
+        description = "Rivers can be passed by foot soldiers only.",
     },
 
     sea = {
-        defenseBonus = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = 1,
-                lander     = 1,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = 1,
-                lander     = 1,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 2,
-                ship       = 2,
-                lander     = 2,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
-        description = "A body of water. Only naval and air units can traverse seas.",
+        description = "Seas provide good mobility for air and naval units.",
     },
 
-    reef = {
-        defenseBonus = {
-            amount         = 10,
-            targetCatagory = "Naval units",
-            targetList     = GameConstant.unitCatagory.navalUnits,
-        },
+    beach = {
+        GridIndexable = {},
 
-        moveCost = {
-            clear = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = 2,
-                lander     = 2,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = 2,
-                lander     = 2,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = 2,
-                ship       = 2,
-                lander     = 2,
-                piperunner = false,
-            },
-        },
-
-        description = "In Fog of War, units hidden here can only be seen by adjacent units and air units.",
-    },
-
-    shoal = {
-        defenseBonus = {
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = 1,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = 1,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = 1,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 2,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = 1,
         },
 
-        description = "A sandy shoal. Lander units load and unload units here.",
+        description = "Beaches provide places for landers and gunboats to load and unload units.",
     },
 
-    mountain = {
-        defenseBonus = {
-            amount         = 40,
-            targetCatagory = "Foot units",
-            targetList     = GameConstant.unitCatagory.footUnits,
+    road = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 2,
-                mech       = 1,
-                treads     = false,
-                tires      = false,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 4,
-                mech       = 2,
-                treads     = false,
-                tires      = false,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A steep mountain. Infantry units add 3 to their vision range from here.",
+        description = "Roads provide optimum mobility but little defensive cover.",
     },
 
     bridge = {
-        defenseBonus = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
         description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
     },
 
-    pipeline = {
-        defenseBonus = {
+    bridgeOnRiver = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            rain  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            snow  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A pipeline. Thick armor renders it indestructible. No units can pass it.",
+        description = "Naval units can't pass under river/land bridges.",
     },
 
-    joint = {
-        defenseBonus = {
+    bridgeOnSea = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
             amount         = 0,
             targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            rain  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
-            snow  = {
-                infantry   = false,
-                mech       = false,
-                treads     = false,
-                tires      = false,
-                air        = false,
-                ship       = false,
-                lander     = false,
-                piperunner = 1,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
         },
 
-        description = "A joint of pipelines. The armor is weaker here than on other sections of the pipeline.",
+        description = "Naval units can pass under sea bridges.",
+    },
 
-        specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.tileMaxHP,
-                defenseType      = "mdtank",
-                isAffectedByLuck = false,
-            },
+    wood = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 20,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
         },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 3,
+            tireB     = 3,
+            tank      = 2,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Woods provide hiding places for ground units in Fog of War.",
+    },
+
+    mountain = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 40,
+            targetCatagory = "Foot units",
+            targetList     = GameConstant.unitCatagory.footUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 2,
+            mech      = 1,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Mountains add 3 vision for foot soldiers in Fog of War.",
+    },
+
+    wasteland = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 20,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 3,
+            tireB     = 3,
+            tank      = 2,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Wastelands impair mobility for all but air units and foot soldiers.",
+    },
+
+    ruins = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 10,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 2,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Ruins provide hiding places for ground units in Fog of War.",
+    },
+
+    fire = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Fires prevent unit movement and illuminate a 5-square area in Fog of War.",
+    },
+
+    rough = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 20,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 2,
+            transport = 2,
+        },
+
+        description = "Rough seas slow the movement of naval units.",
+    },
+
+    mist = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 10,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        description = "Mists provide hiding places for naval units in Fog of War.",
+    },
+
+    reef = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 20,
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = 1,
+            ship      = 2,
+            transport = 2,
+        },
+
+        description = "Reefs provide hiding places for naval units in Fog of War.",
+    },
+
+    plasma = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Plasma is impassable.",
+    },
+
+    meteor = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.tileMaxHP,
+            currentHP        = GameConstant.tileMaxHP,
+            defenseType      = "meteor",
+            isAffectedByLuck = false,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 0,
+            targetCatagory = "None",
+            targetList     = GameConstant.unitCatagory.none,
+        },
+
+        MoveCostOwner = {
+            infantry  = false,
+            mech      = false,
+            tireA     = false,
+            tireB     = false,
+            tank      = false,
+            air       = false,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Meteors are impassable but can be destroyed.",
     },
 
     silo = {
-        defenseBonus = {
-            amount         = 30,
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 20,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A missile silo. Has a huge blast radius and unlimited range, but can only fire once.",
+        description = "Silos can be launched by infantry units and damage a 13-square area.",
     },
 
-    cmdtower = {
-        defenseBonus = {
+    hq = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = true,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 40,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "HQs provide resupply for ground units. Battle ends if it's captured.",
+    },
+
+    city = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 20,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Cities provide resupply for ground units.",
+    },
+
+    comtower = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
             amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
-        moveCost = {
-            clear = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            rain  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 1,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
-            snow  = {
-                infantry   = 1,
-                mech       = 1,
-                treads     = 1,
-                tires      = 1,
-                air        = 2,
-                ship       = false,
-                lander     = false,
-                piperunner = false,
-            },
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
         },
 
-        description = "A command tower.",
+        description = "Command towers boosts your attack and defense once captured.",
+    },
 
-        specialProperties = {
-            {
-                name            = "CaptureTaker",
-                maxCapturePoint = GameConstant.maxCapturePoint,
-                onCapture       = "ChangeCapturer"
-            },
+    radar = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
         },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Radars reveal a 5-square area in Fog of War once captured.",
+    },
+
+    factory = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Factories can be used to resupply and produce ground units once captured.",
+    },
+
+    airport = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Air units",
+            targetList     = GameConstant.unitCatagory.airUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 30,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Airports can be used to resupply and produce air units once captured.",
+    },
+
+    seaport = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+            amount         = 2,
+        },
+
+        IncomeProvider = {
+            amount = 1000,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 30,
+            targetCatagory = "Ground/naval units",
+            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        description = "Seaports can be used to resupply and produce naval units once captured.",
+    },
+
+    tempairport = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Air units",
+            targetList     = GameConstant.unitCatagory.airUnits,
+            amount         = 2,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 10,
+            targetCatagory = "Ground units",
+            targetList     = GameConstant.unitCatagory.groundUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = false,
+            transport = false,
+        },
+
+        description = "Temp airports provide resupply for air units.",
+    },
+
+    tempseaport = {
+        GridIndexable = {},
+
+        CaptureTaker = {
+            maxCapturePoint     = GameConstant.maxCapturePoint,
+            currentCapturePoint = GameConstant.maxCapturePoint,
+            defeatOnCapture     = false,
+        },
+
+        RepairDoer = {
+            targetCatagory = "Naval units",
+            targetList     = GameConstant.unitCatagory.navalUnits,
+            amount         = 2,
+        },
+
+        DefenseBonusProvider = {
+            amount         = 10,
+            targetCatagory = "Ground/naval units",
+            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
+        },
+
+        MoveCostOwner = {
+            infantry  = 1,
+            mech      = 1,
+            tireA     = 1,
+            tireB     = 1,
+            tank      = 1,
+            air       = 1,
+            ship      = 1,
+            transport = 1,
+        },
+
+        description = "Temp seaports provide resupply for naval units.",
     },
 }
 
-GameConstant.Mapping_IdToTemplateModelUnit = {
+GameConstant.templateModelUnits = {
     infantry   = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 55,
+                    mech       = 45,
+                    bike       = 45,
+                    recon      = 12,
+                    flare      = 10,
+                    antiair    = 3,
+                    tank       = 5,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 10,
+                    antitank   = 30,
+                    rockets    = 20,
+                    missiles   = 20,
+                    rig        = 14,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 8,
+                    tcopter    = 30,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "infantry",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 3,
             type  = "infantry",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 0,
@@ -2086,72 +1411,101 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = false,
         },
 
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "artillery", "rockets", "antiair", "bomber", "battleship"
-            },
-            weak   = {
-                "infantry", "mech", "recon", "tank", "bcopter"
-            },
-        },
+        cost        = 1500,
+        vision      = 2,
 
-        description = "Infantry units have the lowest deployment cost. They can capture bases but have low firepower.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon   = nil,
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 55,
-                        mech       = 45,
-                        recon      = 12,
-                        tank       = 5,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 14,
-                        artillery  = 15,
-                        rockets    = 25,
-                        antiair    = 5,
-                        missiles   = 26,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 7,
-                        tcopter    = 30,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech"
-                    }
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "infantry",
-                isAffectedByLuck = true,
-            },
-        },
+        description = "Infantry units are cheap. They can capture bases but have low firepower.",
     },
 
     mech       = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name = "Barzooka",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = 85,
+                    flare      = 80,
+                    antiair    = 55,
+                    tank       = 55,
+                    mdtank     = 25,
+                    wartank    = 15,
+                    artillery  = 70,
+                    antitank   = 55,
+                    rockets    = 85,
+                    missiles   = 85,
+                    rig        = 75,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 15,
+                },
+                maxAmmo     = 3,
+                currentAmmo = 3,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 65,
+                    mech       = 55,
+                    bike       = 55,
+                    recon      = 18,
+                    flare      = 15,
+                    antiair    = 5,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 15,
+                    antitank   = 35,
+                    rockets    = 35,
+                    missiles   = 35,
+                    rig        = 20,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 12,
+                    tcopter    = 35,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "mech",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 2,
             type  = "mech",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 70,
             current                = 70,
             consumptionPerTurn     = 0,
@@ -2159,103 +1513,137 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = false,
         },
 
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "artillery", "rockets", "antiair", "bomber", "battleship"
-            },
-            weak   = {
-                "infantry", "mech", "recon", "tank", "bcopter"
-            },
-        },
+        cost        = 2500,
+        vision      = 2,
 
         description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
+    },
 
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
+    bike       = {
+        GridIndexable = {},
 
-                primaryWeapon = {
-                    name = "Barzooka",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 85,
-                        tank       = 55,
-                        mdtank     = 15,
-                        neotank    = 15,
-                        apc        = 75,
-                        artillery  = 70,
-                        rockets    = 85,
-                        antiair    = 65,
-                        missiles   = 85,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "apc", "artillery", "antiair"
-                    },
-                    maxAmmo     = 3,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 65,
-                        mech       = 55,
-                        recon      = 18,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 20,
-                        artillery  = 32,
-                        rockets    = 35,
-                        antiair    = 6,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 9,
-                        tcopter    = 35,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech"
-                    }
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 65,
+                    mech       = 55,
+                    bike       = 55,
+                    recon      = 18,
+                    flare      = 15,
+                    antiair    = 5,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 15,
+                    antitank   = 35,
+                    rockets    = 35,
+                    missiles   = 35,
+                    rig        = 20,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 12,
+                    tcopter    = 35,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "mech",
-                isAffectedByLuck = true,
-            },
-
         },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "bike",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
+            type  = "tireB",
+        },
+
+        FuelOwner = {
+            max                    = 70,
+            current                = 70,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 2500,
+        vision      = 2,
+
+        description = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
     },
 
     recon      = {
-        movement = {
-            range = 8,
-            type  = "tires",
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 65,
+                    bike       = 65,
+                    recon      = 35,
+                    flare      = 30,
+                    antiair    = 8,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 45,
+                    antitank   = 25,
+                    rockets    = 55,
+                    missiles   = 55,
+                    rig        = 45,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 18,
+                    tcopter    = 35,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
         },
 
-        vision        = 5,
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "recon",
+            isAffectedByLuck = true,
+        },
 
-        fuel = {
+        MoveDoer = {
+            range = 8,
+            type  = "tireA",
+        },
+
+        FuelOwner = {
             max                    = 80,
             current                = 80,
             consumptionPerTurn     = 0,
@@ -2263,577 +1651,68 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = false,
         },
 
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak   = {
-                "antiair", "bcopter"
-            },
-        },
+        cost        = 4000,
+        vision      = 5,
 
         description = "Recon units have high movement range and are strong against infantry units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon   = nil,
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 70,
-                        mech       = 65,
-                        recon      = 35,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 4,
-                        missiles   = 28,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 12,
-                        tcopter    = 35,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech", "apc", "artillery", "rockets"
-                    },
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "recon",
-                isAffectedByLuck = true,
-            },
-
-        },
     },
 
-    tank       = {
-        movement = {
-            range = 6,
-            type  = "treads",
-        },
+    flare      = {
+        GridIndexable = {},
 
-        vision        = 3,
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
 
-        fuel = {
-            max                    = 70,
-            current                = 70,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "rockets", "bomber", "battleship"
-            },
-            weak   = {
-                "mech", "tank", "artillery", "bcopter"
-            },
-        },
-
-        description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 85,
-                        tank       = 55,
-                        mdtank     = 15,
-                        neotank    = 15,
-                        apc        = 75,
-                        artillery  = 70,
-                        rockets    = 85,
-                        antiair    = 65,
-                        missiles   = 85,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 1,
-                        cruiser    = 5,
-                        lander     = 10,
-                        submarine  = 1,
-                    },
-                    maxAmmo     = 9,
-                    fatal  = {
-                        "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "apc", "artillery", "antiair"
-                    },
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 75,
-                        mech       = 70,
-                        recon      = 40,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 5,
-                        missiles   = 30,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 10,
-                        tcopter    = 40,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {},
-                    strong = {
-                        "infantry", "mech", "recon", "apc", "artillery", "rockets", "tcopter"
-                    }
+            primaryWeapon   = nil,
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 80,
+                    mech       = 70,
+                    bike       = 70,
+                    recon      = 60,
+                    flare      = 50,
+                    antiair    = 45,
+                    tank       = 10,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 45,
+                    antitank   = 25,
+                    rockets    = 55,
+                    missiles   = 55,
+                    rig        = 45,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 18,
+                    tcopter    = 35,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 5,
                 },
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "tank",
-                isAffectedByLuck = true,
-            },
-
         },
-    },
 
-    mdtank     = {
-        movement = {
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "flare",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
-            type  = "treads",
+            type  = "tank",
         },
 
-        vision        = 1,
-
-        fuel = {
-            max                    = 50,
-            current                = 50,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "bomber"
-            },
-            weak   = {
-                "mdtank", "neotank", "artillery", "rockets", "battleship"
-            },
-        },
-
-        description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 105,
-                        tank       = 85,
-                        mdtank     = 55,
-                        neotank    = 45,
-                        apc        = 105,
-                        artillery  = 105,
-                        rockets    = 105,
-                        antiair    = 105,
-                        missiles   = 105,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 10,
-                        cruiser    = 45,
-                        lander     = 35,
-                        submarine  = 10,
-                    },
-                    fatal  = {
-                        "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "cruiser"
-                    },
-                    maxAmmo     = 8,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 105,
-                        mech       = 95,
-                        recon      = 45,
-                        tank       = 8,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 45,
-                        artillery  = 45,
-                        rockets    = 55,
-                        antiair    = 7,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 12,
-                        tcopter    = 45,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "infantry", "mech"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "tcopter"
-                    }
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "mdtank",
-                isAffectedByLuck = true,
-            },
-
-        },
-    },
-
-    neotank    = {
-        movement = {
-            range = 6,
-            type  = "treads",
-        },
-
-        vision        = 1,
-
-        fuel = {
-            max                    = 99,
-            current                = 99,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "bomber"
-            },
-            weak   = {
-                "mdtank", "neotank", "artillery", "rockets", "battleship"
-            },
-        },
-
-        description = "Neotank units are new weapons developed recently. They are more powerful than Md tanks.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 125,
-                        tank       = 105,
-                        mdtank     = 75,
-                        neotank    = 55,
-                        apc        = 125,
-                        artillery  = 115,
-                        rockets    = 125,
-                        antiair    = 115,
-                        missiles   = 125,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 15,
-                        cruiser    = 50,
-                        lander     = 50,
-                        submarine  = 15,
-                    },
-                    fatal  = {
-                        "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "cruiser", "lander"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 125,
-                        mech       = 115,
-                        recon      = 65,
-                        tank       = 10,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 65,
-                        artillery  = 65,
-                        rockets    = 75,
-                        antiair    = 17,
-                        missiles   = 55,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 22,
-                        tcopter    = 55,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal  = {
-                        "infantry", "mech"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "missiles", "tcopter"
-                    },
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "neotank",
-                isAffectedByLuck = true,
-            },
-        },
-    },
-
-    apc        = {
-        movement = {
-            range = 6,
-            type  = "treads",
-        },
-
-        vision        = 1,
-
-        fuel = {
-            max                    = 70,
-            current                = 70,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "recon", "tank", "artillery", "antiair", "bcopter"
-            },
-        },
-
-        description = "APC units transport infantry units and supply rations, gas, and ammo to deployed units.",
-
-        specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "apc",
-                isAffectedByLuck = true,
-            },
-        },
-    },
-
-    artillery  = {
-        movement = {
-            range = 5,
-            type  = "treads",
-        },
-
-        vision        = 1,
-
-        fuel = {
-            max                    = 50,
-            current                = 50,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "recon", "tank", "artillery", "antiair", "bcopter"
-            },
-        },
-
-        description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 2,
-                maxAttackRange     = 3,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name       = "Cannon",
-                    baseDamage = {
-                        infantry   = 90,
-                        mech       = 85,
-                        recon      = 80,
-                        tank       = 70,
-                        mdtank     = 45,
-                        neotank    = 40,
-                        apc        = 70,
-                        artillery  = 75,
-                        rockets    = 80,
-                        antiair    = 75,
-                        missiles   = 80,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 40,
-                        cruiser    = 65,
-                        lander     = 55,
-                        submarine  = 60,
-                    },
-                    fatal  = {
-                        "infantry", "mech", "recon", "rockets", "missiles"
-                    },
-                    strong = {
-                        "tank", "mdtank", "neotank", "apc", "artillery", "antiair", "battleship", "cruiser", "lander", "submarine"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "artillery",
-                isAffectedByLuck = true,
-            },
-        },
-    },
-
-    rockets    = {
-        movement = {
-            range = 5,
-            type  = "tires",
-        },
-
-        vision        = 1,
-
-        fuel = {
-            max                    = 50,
-            current                = 50,
-            consumptionPerTurn     = 0,
-            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
-            destroyOnOutOfFuel     = false,
-        },
-
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "recon", "antiair", "bcopter"
-            },
-        },
-
-        description = "Rocket units are valuable, because they can fire on both land and naval units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 5,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name        = "Rockets",
-                    baseDamage  = {
-                        infantry   = 95,
-                        mech       = 90,
-                        recon      = 90,
-                        tank       = 80,
-                        mdtank     = 55,
-                        neotank    = 50,
-                        apc        = 80,
-                        artillery  = 80,
-                        rockets    = 85,
-                        antiair    = 85,
-                        missiles   = 90,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 55,
-                        cruiser    = 85,
-                        lander     = 60,
-                        submarine  = 85,
-                    },
-                    fatal  = {
-                        "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "submarine"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "battleship", "lander",
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "rockets",
-                isAffectedByLuck = true,
-            },
-        },
-    },
-
-    antiair    = {
-        movement = {
-            range = 6,
-            type  = "treads",
-        },
-
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 60,
             current                = 60,
             consumptionPerTurn     = 0,
@@ -2841,75 +1720,275 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = false,
         },
 
-        defense = {
-            fatal = {
-                "mdtank", "neotank", "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mech", "tank", "artillery", "antiair"
-            },
-        },
+        cost        = 5000,
+        vision      = 2,
 
-        description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Vulcan",
-                    baseDamage  = {
-                        infantry   = 105,
-                        mech       = 105,
-                        recon      = 60,
-                        tank       = 25,
-                        mdtank     = 10,
-                        neotank    = 5,
-                        apc        = 50,
-                        artillery  = 50,
-                        rockets    = 55,
-                        antiair    = 45,
-                        missiles   = 55,
-                        fighter    = 65,
-                        bomber     = 75,
-                        bcopter    = 120,
-                        tcopter    = 120,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "infantry", "mech", "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "recon", "apc", "artillery", "rockets", "antiair", "missiles", "fighter", "bomber"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "antiair",
-                isAffectedByLuck = true,
-            },
-        },
+        description = "Flares fire bright rockets that reveal a 13-square area in Fog of War.",
     },
 
-    missiles   = {
-        movement = {
-            range = 5,
-            type  = "tires",
+    antiair    = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            name               = "AttackDoer",
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = 105,
+                    mech       = 105,
+                    bike       = 105,
+                    recon      = 60,
+                    flare      = 50,
+                    antiair    = 45,
+                    tank       = 15,
+                    mdtank     = 10,
+                    wartank    = 5,
+                    artillery  = 50,
+                    antitank   = 25,
+                    rockets    = 55,
+                    missiles   = 55,
+                    rig        = 50,
+                    fighter    = 70,
+                    bomber     = 70,
+                    duster     = 75,
+                    bcopter    = 105,
+                    tcopter    = 120,
+                    seaplane   = 75,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 10,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
         },
 
-        vision        = 5,
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "antiair",
+            isAffectedByLuck = true,
+        },
 
-        fuel = {
+        MoveDoer = {
+            range = 6,
+            type  = "tank",
+        },
+
+        FuelOwner = {
+            max                    = 60,
+            current                = 60,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 7000,
+        vision      = 3,
+
+        description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
+    },
+
+    tank       = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Tank Gun",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = 85,
+                    flare      = 80,
+                    antiair    = 75,
+                    tank       = 55,
+                    mdtank     = 35,
+                    wartank    = 20,
+                    artillery  = 70,
+                    antitank   = 30,
+                    rockets    = 85,
+                    missiles   = 85,
+                    rig        = 75,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 8,
+                    carrier    = 8,
+                    submarine  = 9,
+                    cruiser    = 9,
+                    lander     = 18,
+                    gunboat    = 55,
+                    meteor     = 20,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 70,
+                    bike       = 70,
+                    recon      = 40,
+                    flare      = 35,
+                    antiair    = 8,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 45,
+                    antitank   = 1,
+                    rockets    = 55,
+                    missiles   = 55,
+                    rig        = 45,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 18,
+                    tcopter    = 35,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "tank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 6,
+            type  = "tank",
+        },
+
+        FuelOwner = {
+            max                    = 70,
+            current                = 70,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 7000,
+        vision      = 3,
+
+        description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
+    },
+
+    mdtank     = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Heavy Tank Gun",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = 95,
+                    flare      = 90,
+                    antiair    = 90,
+                    tank       = 70,
+                    mdtank     = 55,
+                    wartank    = 35,
+                    artillery  = 85,
+                    antitank   = 35,
+                    rockets    = 90,
+                    missiles   = 90,
+                    rig        = 90,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 10,
+                    carrier    = 10,
+                    submarine  = 12,
+                    cruiser    = 12,
+                    lander     = 22,
+                    gunboat    = 55,
+                    meteor     = 35,
+                },
+                maxAmmo     = 5,
+                currentAmmo = 5,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 90,
+                    mech       = 80,
+                    bike       = 80,
+                    recon      = 40,
+                    flare      = 35,
+                    antiair    = 8,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 45,
+                    antitank   = 1,
+                    rockets    = 60,
+                    missiles   = 60,
+                    rig        = 45,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 24,
+                    tcopter    = 40,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "mdtank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
+            type  = "tank",
+        },
+
+        FuelOwner = {
             max                    = 50,
             current                = 50,
             consumptionPerTurn     = 0,
@@ -2917,74 +1996,486 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = false,
         },
 
-        defense = {
-            fatal = {
-                "mech", "tank", "mdtank", "neotank", "artillery", "rockets", "bomber", "battleship"
+        cost        = 12000,
+        vision      = 2,
+
+        description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
+    },
+
+    wartank    = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Mega Gun",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = 105,
+                    flare      = 105,
+                    antiair    = 105,
+                    tank       = 85,
+                    mdtank     = 75,
+                    wartank    = 55,
+                    artillery  = 105,
+                    antitank   = 40,
+                    rockets    = 105,
+                    missiles   = 105,
+                    rig        = 105,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 12,
+                    carrier    = 12,
+                    submarine  = 14,
+                    cruiser    = 14,
+                    lander     = 28,
+                    gunboat    = 65,
+                    meteor     = 55,
+                },
+                maxAmmo     = 5,
+                currentAmmo = 5,
             },
-            weak = {
-                "antiair", "bcopter"
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 105,
+                    mech       = 95,
+                    bike       = 95,
+                    recon      = 45,
+                    flare      = 40,
+                    antiair    = 10,
+                    tank       = 10,
+                    mdtank     = 10,
+                    wartank    = 1,
+                    artillery  = 45,
+                    antitank   = 1,
+                    rockets    = 65,
+                    missiles   = 65,
+                    rig        = 45,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 35,
+                    tcopter    = 45,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
             },
         },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "wartank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 4,
+            type  = "tank",
+        },
+
+        FuelOwner = {
+            max                    = 50,
+            current                = 50,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 16000,
+        vision      = 2,
+
+        description = "The strongest tank in terms of both attack and defense.",
+    },
+
+    artillery  = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 2,
+            maxAttackRange     = 3,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name       = "Cannon",
+                baseDamage = {
+                    infantry   = 90,
+                    mech       = 85,
+                    bike       = 85,
+                    recon      = 80,
+                    flare      = 75,
+                    antiair    = 65,
+                    tank       = 60,
+                    mdtank     = 45,
+                    wartank    = 35,
+                    artillery  = 75,
+                    antitank   = 55,
+                    rockets    = 80,
+                    missiles   = 80,
+                    rig        = 70,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 45,
+                    carrier    = 45,
+                    submarine  = 55,
+                    cruiser    = 55,
+                    lander     = 65,
+                    gunboat    = 100,
+                    meteor     = 45,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "artillery",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
+            type  = "tank",
+        },
+
+        FuelOwner = {
+            max                    = 50,
+            current                = 50,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 6000,
+        vision      = 3,
+
+        description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
+    },
+
+    antitank  = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 3,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name       = "Cannon",
+                baseDamage = {
+                    infantry   = 75,
+                    mech       = 65,
+                    bike       = 65,
+                    recon      = 75,
+                    flare      = 75,
+                    antiair    = 75,
+                    tank       = 75,
+                    mdtank     = 65,
+                    wartank    = 55,
+                    artillery  = 65,
+                    antitank   = 55,
+                    rockets    = 70,
+                    missiles   = 70,
+                    rig        = 65,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 45,
+                    tcopter    = 55,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 55,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "antitank",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 4,
+            type  = "tireB",
+        },
+
+        FuelOwner = {
+            max                    = 50,
+            current                = 50,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 11000,
+        vision      = 3,
+
+        description = "Anti-Tanks can counter-attack when under direct fire.",
+    },
+
+    rockets    = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            name               = "AttackDoer",
+            minAttackRange     = 3,
+            maxAttackRange     = 5,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name        = "Rockets",
+                baseDamage  = {
+                    infantry   = 95,
+                    mech       = 90,
+                    bike       = 90,
+                    recon      = 90,
+                    flare      = 85,
+                    antiair    = 75,
+                    tank       = 70,
+                    mdtank     = 55,
+                    wartank    = 45,
+                    artillery  = 80,
+                    antitank   = 65,
+                    rockets    = 85,
+                    missiles   = 85,
+                    rig        = 80,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 55,
+                    carrier    = 55,
+                    submarine  = 65,
+                    cruiser    = 65,
+                    lander     = 75,
+                    gunboat    = 105,
+                    meteor     = 55,
+                },
+                maxAmmo     = 5,
+                currentAmmo = 5,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "rockets",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
+            type  = "tireA",
+        },
+
+        FuelOwner = {
+            max                    = 50,
+            current                = 50,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 15000,
+        vision      = 3,
+
+        description = "Rocket units are valuable, because they can fire on both land and naval units.",
+    },
+
+    missiles   = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 3,
+            maxAttackRange     = 6,
+            canAttackAfterMove = false,
+
+            primaryWeapon = {
+                name        = "AA Missiles",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = 100,
+                    bomber     = 100,
+                    duster     = 100,
+                    bcopter    = 120,
+                    tcopter    = 120,
+                    seaplane   = 100,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = nil,
+                },
+                maxAmmo     = 5,
+                currentAmmo = 5,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "missiles",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
+            type  = "tireA",
+        },
+
+        FuelOwner = {
+            max                    = 50,
+            current                = 50,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 12000,
+        vision      = 5,
 
         description = "Missile units are essential in defending against air units. Their vision range is large.",
+    },
 
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 6,
-                canAttackAfterMove = false,
+    rig        = {
+        GridIndexable = {},
 
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 100,
-                        bomber     = 100,
-                        bcopter    = 120,
-                        tcopter    = 120,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "fighter", "bomber", "bcopter", "tcopter"
-                    },
-                    strong = {
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "missiles",
-                isAffectedByLuck = true,
-            },
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "rig",
+            isAffectedByLuck = true,
         },
+
+        MoveDoer = {
+            range = 6,
+            type  = "tank",
+        },
+
+        FuelOwner = {
+            max                    = 99,
+            current                = 99,
+            consumptionPerTurn     = 0,
+            descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
+            destroyOnOutOfFuel     = false,
+        },
+
+        cost        = 5000,
+        vision      = 1,
+
+        description = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
     },
 
     fighter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "AA Missiles",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = 55,
+                    bomber     = 65,
+                    duster     = 80,
+                    bcopter    = 120,
+                    tcopter    = 120,
+                    seaplane   = 65,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = nil,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "fighter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 9,
             type  = "air",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 5,
@@ -2992,75 +2483,70 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "missiles"
-            },
-            weak = {
-                "antiair", "fighter", "cruiser"
-            },
-        },
+        cost        = 20000,
+        vision      = 5,
 
         description = "Fighter units are strong vs. other air units. They also have the highest movements.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 55,
-                        bomber     = 100,
-                        bcopter    = 100,
-                        tcopter    = 100,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "bomber", "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "fighter"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "fighter",
-                isAffectedByLuck = true,
-            },
-        },
     },
 
     bomber     = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Bombs",
+                baseDamage  = {
+                    infantry   = 115,
+                    mech       = 110,
+                    bike       = 110,
+                    recon      = 105,
+                    flare      = 105,
+                    antiair    = 85,
+                    tank       = 105,
+                    mdtank     = 95,
+                    wartank    = 75,
+                    artillery  = 105,
+                    antitank   = 80,
+                    rockets    = 105,
+                    missiles   = 95,
+                    rig        = 105,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 85,
+                    carrier    = 85,
+                    submarine  = 95,
+                    cruiser    = 50,
+                    lander     = 95,
+                    gunboat    = 120,
+                    meteor     = 90,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "bomber",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 7,
             type  = "air",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 5,
@@ -3068,75 +2554,172 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "missiles", "fighter"
-            },
-            weak = {
-                "antiair", "cruiser"
-            },
-        },
+        cost        = 20000,
+        vision      = 3,
 
         description = "Bomber units can fire on ground and naval units with a high destructive force.",
+    },
 
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
+    duster     = {
+        GridIndexable = {},
 
-                primaryWeapon = {
-                    name        = "Bombs",
-                    baseDamage  = {
-                        infantry   = 110,
-                        mech       = 110,
-                        recon      = 105,
-                        tank       = 105,
-                        mdtank     = 95,
-                        neotank    = 90,
-                        apc        = 105,
-                        artillery  = 105,
-                        rockets    = 105,
-                        antiair    = 95,
-                        missiles   = 105,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 75,
-                        cruiser    = 85,
-                        lander     = 95,
-                        submarine  = 95,
-                    },
-                    fatal = {
-                        "infantry", "mech", "recon", "tank", "mdtank", "neotank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                    },
-                    strong = {
-                        "battleship"
-                    },
-                    maxAmmo     = 9,
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Machine Gun",
+                baseDamage  = {
+                    infantry   = 55,
+                    mech       = 45,
+                    bike       = 45,
+                    recon      = 18,
+                    flare      = 15,
+                    antiair    = 5,
+                    tank       = 8,
+                    mdtank     = 5,
+                    wartank    = 1,
+                    artillery  = 15,
+                    antitank   = 5,
+                    rockets    = 20,
+                    missiles   = 20,
+                    rig        = 15,
+                    fighter    = 40,
+                    bomber     = 45,
+                    duster     = 55,
+                    bcopter    = 75,
+                    tcopter    = 90,
+                    seaplane   = 45,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
                 },
-                secondaryWeapon = nil,
+                maxAmmo     = 9,
+                currentAmmo = 9,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "bomber",
-                isAffectedByLuck = true,
-            },
+            secondaryWeapon = nil,
         },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "duster",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 8,
+            type  = "air",
+        },
+
+        FuelOwner = {
+            max                    = 99,
+            current                = 99,
+            consumptionPerTurn     = 5,
+            descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+            destroyOnOutOfFuel     = true,
+        },
+
+        cost        = 13000,
+        vision      = 4,
+
+        description = "Duster are somewhat powerful planes that can attack both ground and air units.",
     },
 
     bcopter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = 75,
+                    flare      = 75,
+                    antiair    = 10,
+                    tank       = 70,
+                    mdtank     = 45,
+                    wartank    = 35,
+                    artillery  = 65,
+                    antitank   = 20,
+                    rockets    = 75,
+                    missiles   = 55,
+                    rig        = 70,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 25,
+                    carrier    = 25,
+                    submarine  = 25,
+                    cruiser    = 5,
+                    lander     = 25,
+                    gunboat    = 85,
+                    meteor     = 20,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = {
+                name        = "Machine gun",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 65,
+                    bike       = 65,
+                    recon      = 30,
+                    flare      = 30,
+                    antiair    = 1,
+                    tank       = 8,
+                    mdtank     = 8,
+                    wartank    = 1,
+                    artillery  = 25,
+                    antitank   = 1,
+                    rockets    = 35,
+                    missiles   = 25,
+                    rig        = 20,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = 65,
+                    tcopter    = 85,
+                    seaplane   = nil,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = 1,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "bcopter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "air",
         },
 
-        vision        = 3,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 2,
@@ -3144,103 +2727,28 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "antiair", "missiles", "fighter", "cruiser"
-            },
-            weak = {
-                "bcopter"
-            },
-        },
+        cost        = 9000,
+        vision      = 2,
 
         description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = 55,
-                        tank       = 55,
-                        mdtank     = 25,
-                        neotank    = 20,
-                        apc        = 60,
-                        artillery  = 65,
-                        rockets    = 65,
-                        antiair    = 25,
-                        missiles   = 65,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 25,
-                        cruiser    = 55,
-                        lander     = 25,
-                        submarine  = 25,
-                    },
-                    fatal = {
-                    },
-                    strong = {
-                        "recon", "tank", "apc", "artillery", "rockets", "missiles", "cruiser"
-                    },
-                    maxAmmo     = 6,
-                },
-                secondaryWeapon = {
-                    name        = "Machine gun",
-                    baseDamage  = {
-                        infantry   = 75,
-                        mech       = 75,
-                        recon      = 30,
-                        tank       = 6,
-                        mdtank     = 1,
-                        neotank    = 1,
-                        apc        = 20,
-                        artillery  = 25,
-                        rockets    = 35,
-                        antiair    = 6,
-                        missiles   = 35,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = 65,
-                        tcopter    = 95,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "tcopter"
-                    },
-                    strong = {
-                        "infantry", "mech", "bcopter"
-                    },
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "bcopter",
-                isAffectedByLuck = true,
-            },
-        },
     },
 
     tcopter    = {
-        movement = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "tcopter",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 6,
             type  = "air",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 2,
@@ -3248,36 +2756,141 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "antiair", "missiles", "fighter", "bcopter", "cruiser"
+        cost        = 5000,
+        vision      = 1,
+
+        description = "T(transport) copters can transport both infantry and mech units.",
+    },
+
+    seaplane   = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Missiles",
+                baseDamage  = {
+                    infantry   = 90,
+                    mech       = 85,
+                    bike       = 85,
+                    recon      = 80,
+                    flare      = 80,
+                    antiair    = 45,
+                    tank       = 75,
+                    mdtank     = 65,
+                    wartank    = 55,
+                    artillery  = 70,
+                    antitank   = 50,
+                    rockets    = 80,
+                    missiles   = 70,
+                    rig        = 75,
+                    fighter    = 45,
+                    bomber     = 55,
+                    duster     = 65,
+                    bcopter    = 85,
+                    tcopter    = 95,
+                    seaplane   = 55,
+                    battleship = 45,
+                    carrier    = 65,
+                    submarine  = 55,
+                    cruiser    = 40,
+                    lander     = 85,
+                    gunboat    = 105,
+                    meteor     = 55,
+                },
+                maxAmmo     = 3,
+                currentAmmo = 3,
             },
-            weak = {
-                "tank", "mdtank", "neotank"
-            },
+            secondaryWeapon = nil,
         },
 
-        description = "T copters can transport both infantry and mech units.",
-
-        specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "tcopter",
-                isAffectedByLuck = true,
-            },
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "seaplane",
+            isAffectedByLuck = true,
         },
+
+        MoveDoer = {
+            range = 7,
+            type  = "air",
+        },
+
+        FuelOwner = {
+            max                    = 40,
+            current                = 40,
+            consumptionPerTurn     = 5,
+            descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
+            destroyOnOutOfFuel     = true,
+        },
+
+        cost        = 15000,
+        vision      = 4,
+
+        description = "Seaplanes are produced at sea by carriers. They can attack any unit.",
     },
 
     battleship = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 3,
+            maxAttackRange     = 5,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Cannon",
+                baseDamage  = {
+                    infantry   = 75,
+                    mech       = 70,
+                    bike       = 70,
+                    recon      = 70,
+                    flare      = 70,
+                    antiair    = 65,
+                    tank       = 65,
+                    mdtank     = 50,
+                    wartank    = 40,
+                    artillery  = 70,
+                    antitank   = 55,
+                    rockets    = 75,
+                    missiles   = 75,
+                    rig        = 65,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 45,
+                    carrier    = 50,
+                    submarine  = 65,
+                    cruiser    = 65,
+                    lander     = 75,
+                    gunboat    = 95,
+                    meteor     = 55,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "battleship",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "ship",
         },
 
-        vision        = 2,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 1,
@@ -3285,74 +2898,68 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-            },
-            weak = {
-                "artillery", "rockets", "bomber", "battleship", "submarine"
-            },
-        },
+        cost        = 25000,
+        vision      = 3,
 
-        description = "B(Battle) ships have a larger attack range than even rocket units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 3,
-                maxAttackRange     = 6,
-                canAttackAfterMove = false,
-
-                primaryWeapon = {
-                    name        = "Cannon",
-                    baseDamage  = {
-                        infantry   = 95,
-                        mech       = 90,
-                        recon      = 90,
-                        tank       = 80,
-                        mdtank     = 55,
-                        neotank    = 50,
-                        apc        = 80,
-                        artillery  = 80,
-                        rockets    = 85,
-                        antiair    = 85,
-                        missiles   = 90,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 50,
-                        cruiser    = 95,
-                        lander     = 95,
-                        submarine  = 95,
-                    },
-                    fatal = {
-                        "infantry", "mech", "recon", "tank", "apc", "artillery", "rockets", "antiair", "missiles", "cruiser", "lander", "submarine"
-                    },
-                    strong = {
-                        "mdtank", "neotank", "battleship"
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = nil,
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "battleship",
-                isAffectedByLuck = true,
-            },
-        },
+        description = "B(Battle) ships can launch indirect attack after moving.",
     },
 
-    cruiser    = {
-        movement = {
-            range = 6,
+    carrier    = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = nil,
+            secondaryWeapon = {
+                name        = "AA Gun",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = 35,
+                    bomber     = 35,
+                    duster     = 40,
+                    bcopter    = 45,
+                    tcopter    = 55,
+                    seaplane   = 40,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = nil,
+                },
+            },
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "carrier",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 5,
             type  = "ship",
         },
 
-        vision        = 3,
-
-        fuel = {
+        FuelOwner = {
             max                    = 99,
             current                = 99,
             consumptionPerTurn     = 1,
@@ -3360,205 +2967,283 @@ GameConstant.Mapping_IdToTemplateModelUnit = {
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "rockets", "bomber", "battleship"
-            },
-            weak = {
-                "mdtank", "neotank", "artillery", "bcopter"
-            },
-        },
+        cost        = 28000,
+        vision      = 4,
 
-        description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
-
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
-
-                primaryWeapon = {
-                    name        = "Missiles",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = 90,
-                    },
-                    fatal = {
-                        "submarine"
-                    },
-                    strong = {
-                    },
-                    maxAmmo     = 9,
-                },
-                secondaryWeapon = {
-                    name        = "Anti-air gun",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = 55,
-                        bomber     = 65,
-                        bcopter    = 115,
-                        tcopter    = 115,
-                        battleship = false,
-                        cruiser    = false,
-                        lander     = false,
-                        submarine  = false,
-                    },
-                    fatal = {
-                        "bcopter", "tcopter"
-                    },
-                    strong = {
-                        "fighter", "bomber"
-                    },
-                },
-            },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "cruiser",
-                isAffectedByLuck = true,
-            },
-        },
-    },
-
-    lander     = {
-        movement = {
-            range = 6,
-            type  = "lander",
-        },
-
-        vision        = 1,
-
-        fuel = {
-            max                    = 99,
-            current                = 99,
-            consumptionPerTurn     = 1,
-            descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
-            destroyOnOutOfFuel     = true,
-        },
-
-        defense = {
-            fatal = {
-                "bomber", "battleship", "submarine"
-            },
-            weak = {
-                "neotank", "artillery", "rockets"
-            },
-        },
-
-        description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
-
-        specialProperties = {
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "lander",
-                isAffectedByLuck = true,
-            },
-        },
+        description = "Carriers can carrier 2 air units and produce seaplanes.",
     },
 
     submarine  = {
-        movement = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Torpedoes",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 80,
+                    carrier    = 110,
+                    submarine  = 55,
+                    cruiser    = 20,
+                    lander     = 85,
+                    gunboat    = 120,
+                    meteor     = nil,
+                },
+                maxAmmo     = 6,
+                currentAmmo = 6,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "submarine",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
             range = 5,
             type  = "ship",
         },
 
-        vision        = 5,
-
-        fuel = {
-            max                    = 60,
-            current                = 60,
+        FuelOwner = {
+            max                    = 70,
+            current                = 70,
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
         },
 
-        defense = {
-            fatal = {
-                "rockets", "bomber", "battleship", "cruiser"
-            },
-            weak = {
-                "artillery", "submarine"
-            },
-        },
+        cost        = 20000,
+        vision      = 5,
 
-        description = "Submerged subs are difficult to find, and only cruisers and subs can fire on them.",
+        description = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
+    },
 
-        specialProperties = {
-            {
-                name               = "AttackDoer",
-                minAttackRange     = 1,
-                maxAttackRange     = 1,
-                canAttackAfterMove = true,
+    cruiser    = {
+        GridIndexable = {},
 
-                primaryWeapon = {
-                    name        = "Torpedoes",
-                    baseDamage  = {
-                        infantry   = false,
-                        mech       = false,
-                        recon      = false,
-                        tank       = false,
-                        mdtank     = false,
-                        neotank    = false,
-                        apc        = false,
-                        artillery  = false,
-                        rockets    = false,
-                        antiair    = false,
-                        missiles   = false,
-                        fighter    = false,
-                        bomber     = false,
-                        bcopter    = false,
-                        tcopter    = false,
-                        battleship = 55,
-                        cruiser    = 25,
-                        lander     = 95,
-                        submarine  = 55,
-                    },
-                    fatal = {
-                        "lander"
-                    },
-                    strong = {
-                        "battleship", "submarine"
-                    },
-                    maxAmmo     = 6,
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Anti-Ship Missiles",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 38,
+                    carrier    = 38,
+                    submarine  = 95,
+                    cruiser    = 28,
+                    lander     = 40,
+                    gunboat    = 85,
+                    meteor     = nil,
                 },
-                secondaryWeapon = nil,
+                maxAmmo     = 9,
+                currentAmmo = 9,
             },
-            {
-                name             = "AttackTaker",
-                maxHP            = GameConstant.unitMaxHP,
-                defenseType      = "submarine",
-                isAffectedByLuck = true,
+            secondaryWeapon = {
+                name        = "AA gun",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = 105,
+                    bomber     = 105,
+                    duster     = 105,
+                    bcopter    = 120,
+                    tcopter    = 120,
+                    seaplane   = 105,
+                    battleship = nil,
+                    carrier    = nil,
+                    submarine  = nil,
+                    cruiser    = nil,
+                    lander     = nil,
+                    gunboat    = nil,
+                    meteor     = nil,
+                },
             },
         },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "cruiser",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 6,
+            type  = "ship",
+        },
+
+        FuelOwner = {
+            max                    = 99,
+            current                = 99,
+            consumptionPerTurn     = 1,
+            descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+            destroyOnOutOfFuel     = true,
+        },
+
+        cost        = 16000,
+        vision      = 5,
+
+        description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
+    },
+
+    lander     = {
+        GridIndexable = {},
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "lander",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 6,
+            type  = "transport",
+        },
+
+        FuelOwner = {
+            max                    = 99,
+            current                = 99,
+            consumptionPerTurn     = 1,
+            descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+            destroyOnOutOfFuel     = true,
+        },
+
+        cost        = 10000,
+        vision      = 1,
+
+        description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+    },
+
+    gunboat    = {
+        GridIndexable = {},
+
+        AttackDoer = {
+            minAttackRange     = 1,
+            maxAttackRange     = 1,
+            canAttackAfterMove = true,
+
+            primaryWeapon = {
+                name        = "Anti-Ship Missiles",
+                baseDamage  = {
+                    infantry   = nil,
+                    mech       = nil,
+                    bike       = nil,
+                    recon      = nil,
+                    flare      = nil,
+                    antiair    = nil,
+                    tank       = nil,
+                    mdtank     = nil,
+                    wartank    = nil,
+                    artillery  = nil,
+                    antitank   = nil,
+                    rockets    = nil,
+                    missiles   = nil,
+                    rig        = nil,
+                    fighter    = nil,
+                    bomber     = nil,
+                    duster     = nil,
+                    bcopter    = nil,
+                    tcopter    = nil,
+                    seaplane   = nil,
+                    battleship = 40,
+                    carrier    = 40,
+                    submarine  = 40,
+                    cruiser    = 40,
+                    lander     = 55,
+                    gunboat    = 75,
+                    meteor     = nil,
+                },
+                maxAmmo     = 1,
+                currentAmmo = 1,
+            },
+            secondaryWeapon = nil,
+        },
+
+        AttackTaker = {
+            maxHP            = GameConstant.unitMaxHP,
+            currentHP        = GameConstant.unitMaxHP,
+            defenseType      = "gunboat",
+            isAffectedByLuck = true,
+        },
+
+        MoveDoer = {
+            range = 7,
+            type  = "transport",
+        },
+
+        FuelOwner = {
+            max                    = 99,
+            current                = 99,
+            consumptionPerTurn     = 1,
+            descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
+            destroyOnOutOfFuel     = true,
+        },
+
+        cost        = 6000,
+        vision      = 2,
+
+        description = "Gunboats can carry 1 foot soldier and attack other naval units.",
     },
 }
 
