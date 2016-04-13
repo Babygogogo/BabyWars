@@ -97,6 +97,10 @@ local function translateWait(action, modelScene, currentPlayerID)
     end
 end
 
+local function translateAttack(action, modelScene, currentPlayerID)
+    return {actionName = "Attack"}
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -111,6 +115,8 @@ function ActionTranslator.translate(action, modelScene)
         return translateEndTurn(action, modelScene)
     elseif (actionName == "Wait") then
         return translateWait(action, modelScene, currentPlayerID)
+    elseif (actionName == "Attack") then
+        return translateAttack(action, modelScene, currentPlayerID)
     else
         return nil, "ActionTranslator.translate() unrecognized action name."
     end

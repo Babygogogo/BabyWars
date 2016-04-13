@@ -17,11 +17,11 @@ local function updateArea(area, gridIndex, prevGridIndex, totalMoveCost)
     area[x][y] = area[x][y] or {}
 
     local areaNode = area[x][y]
-    if ((areaNode.rangeConsumption) and (areaNode.rangeConsumption <= totalMoveCost)) then
+    if ((areaNode.totalMoveCost) and (areaNode.totalMoveCost <= totalMoveCost)) then
         return false
     else
-        areaNode.prevGridIndex    = (prevGridIndex) and (GridIndexFunctions.clone(prevGridIndex)) or nil
-        areaNode.rangeConsumption = totalMoveCost
+        areaNode.prevGridIndex = (prevGridIndex) and (GridIndexFunctions.clone(prevGridIndex)) or nil
+        areaNode.totalMoveCost = totalMoveCost
 
         return true
     end

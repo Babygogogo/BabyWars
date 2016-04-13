@@ -1,14 +1,15 @@
 
 local ModelActionPlanner = class("ModelActionPlanner")
 
-local GridIndexFunctions     = require("app.utilities.GridIndexFunctions")
-local ReachableAreaFunctions = require("app.utilities.ReachableAreaFunctions")
-local MovePathFunctions      = require("app.utilities.MovePathFunctions")
+local GridIndexFunctions          = require("app.utilities.GridIndexFunctions")
+local ReachableAreaFunctions      = require("app.utilities.ReachableAreaFunctions")
+local MovePathFunctions           = require("app.utilities.MovePathFunctions")
+local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getRangeConsumption(gridIndex, modelUnit, modelUnitMap, modelTileMap)
+local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
     local existingUnit = modelUnitMap:getModelUnit(gridIndex)
     if ((existingUnit) and (existingUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
         return nil
@@ -29,27 +30,15 @@ local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
     end
 end
 
-local function canAttackTargetOnGridIndex(attacker, destination, gridIndex, tileMapModel, unitMapModel)
-    if (not GridIndexFunctions.isWithinMap(gridIndex, tileMapModel:getMapSize())) then
-        return false
-    end
-
-    if (attacker:canAttackTarget(tileMapModel:getModelTile(gridIndex), destination)) then
-        return true
-    else
-        return attacker:canAttackTarget(unitMapModel:getModelUnit(gridIndex), destination)
-    end
-end
-
 --------------------------------------------------------------------------------
 -- The functions for MovePath.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange             = self.m_FocusModelUnit:getMoveRange(self.m_FocusModelUnit:getCurrentFuel())
-    local nextRangeConsumption = getRangeConsumption(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
+    local maxRange     = self.m_FocusModelUnit:getMoveRange(self.m_FocusModelUnit:getCurrentFuel())
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex)) and
-        (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextRangeConsumption, maxRange))) then
+        (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
         self.m_MovePath = MovePathFunctions.createShortestPath(gridIndex, self.m_ReachableArea)
     end
 end
@@ -57,8 +46,8 @@ end
 local function resetMovePath(self, focusUnitModel)
     if (self.m_FocusModelUnit ~= focusUnitModel) or (self.m_State == "idle") then
         self.m_MovePath       = {{
-            gridIndex        = GridIndexFunctions.clone(focusUnitModel:getGridIndex()),
-            rangeConsumption = 0
+            gridIndex     = GridIndexFunctions.clone(focusUnitModel:getGridIndex()),
+            totalMoveCost = 0,
         }}
         if (self.m_View) then
             self.m_View:setMovePath(self.m_MovePath)
@@ -72,7 +61,7 @@ end
 local function resetReachableArea(self, focusUnitModel)
     if (self.m_FocusModelUnit ~= focusUnitModel) or (self.m_State == "idle") then
         self.m_ReachableArea = ReachableAreaFunctions.createArea(focusUnitModel:getGridIndex(), focusUnitModel:getMoveRange(focusUnitModel:getCurrentFuel()), function(gridIndex)
-            return getRangeConsumption(gridIndex, focusUnitModel, self.m_ModelUnitMap, self.m_ModelTileMap)
+            return getMoveCost(gridIndex, focusUnitModel, self.m_ModelUnitMap, self.m_ModelTileMap)
         end)
 
         if (self.m_View) then
@@ -82,18 +71,30 @@ local function resetReachableArea(self, focusUnitModel)
 end
 
 --------------------------------------------------------------------------------
--- The functions for AttackableGrids.
+-- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
-local function getAttackableGrids(attacker, destination, tileMapModel, unitMapModel)
-    if (not attacker.canAttackTarget) or
-       ((not attacker:canAttackAfterMove()) and (not GridIndexFunctions.isEqual(attacker:getGridIndex(), destination))) then
-        return {}
-    end
+local function dispatchEventWait(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "Wait",
+        path       = self.m_MovePath,
+    })
+end
 
-    local minRange, maxRange = attacker:getAttackRangeMinMax()
-    return GridIndexFunctions.getGridsWithinDistance(destination, minRange, maxRange, function(gridIndex)
-        return canAttackTargetOnGridIndex(attacker, destination, gridIndex, tileMapModel, unitMapModel)
-    end)
+local function dispatchEventJoin(self)
+    print("The Join action is selected, but not implemented.")
+end
+
+local function dispatchEventAttack(self, targetGridIndex)
+    local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, targetGridIndex)
+    print("ModelActionPlanner-dispatchEventAttack()", listNode.baseDoDamage, listNode.baseGetDamage)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name            = "EvtPlayerRequestDoAction",
+        actionName      = "Attack",
+        path            = self.m_MovePath,
+        targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -108,7 +109,7 @@ local function getActionJoin(self, destination)
             return {
                 name     = "Join",
                 callback = function()
-                    print("The Join action is selected, but not implemented.")
+                    dispatchEventJoin(self)
                 end
             }
         end
@@ -118,7 +119,7 @@ local function getActionJoin(self, destination)
 end
 
 local function getActionAttack(self, destination)
-    if (#self.m_AttackableGrids > 0) then
+    if (#self.m_AttackableGridList > 0) then
         return {
             name     = "Attack",
             callback = function()
@@ -134,11 +135,7 @@ local function getActionWait(self, destination)
         return {
             name = "Wait",
             callback = function()
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name       = "EvtPlayerRequestDoAction",
-                    actionName = "Wait",
-                    path       = self.m_MovePath,
-                })
+                dispatchEventWait(self)
             end
         }
     else
@@ -194,7 +191,7 @@ end
 setStateChoosingAction = function(self, destination)
     updateMovePathWithDestinationGrid(self, destination)
     self.m_Destination     = destination or self.m_Destination
-    self.m_AttackableGrids = getAttackableGrids(self.m_FocusModelUnit, self.m_Destination, self.m_ModelTileMap, self.m_ModelUnitMap)
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, self.m_Destination, self.m_ModelTileMap, self.m_ModelUnitMap)
     self.m_State           = "choosingAction"
 
     if (self.m_View) then
@@ -213,7 +210,7 @@ setStateChoosingAttackTarget = function(self, destination)
     self.m_State = "choosingAttackTarget"
 
     if (self.m_View) then
-        self.m_View:setAttackableGrids(self.m_AttackableGrids)
+        self.m_View:setAttackableGrids(self.m_AttackableGridList)
             :setAttackableGridsVisible(true)
     end
 
@@ -239,7 +236,11 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
         setStateMakingMovePath(self, self.m_FocusModelUnit)
     elseif (self.m_State == "choosingAttackTarget") then
         -- TODO: enable to attack.
-        setStateChoosingAction(self, self.m_Destination)
+        if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
+            dispatchEventAttack(self, gridIndex)
+        else
+            setStateChoosingAction(self, self.m_Destination)
+        end
     else
         error("ModelActionPlanner-onEvtPlayerSelectedGrid() the state of the planner is invalid.")
     end

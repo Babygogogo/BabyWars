@@ -22,6 +22,36 @@ local EXPORTED_METHODS = {
     "getAttackRangeMinMax",
     "canAttackAfterMove",
 }
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getBaseDamage(self, selfGridIndex, targetDefenseType, targetGridIndex)
+    if (not self) then
+        return nil
+    end
+
+    local distance = GridIndexFunctions.getDistance(selfGridIndex, targetGridIndex)
+    local minRange, maxRange = self:getAttackRangeMinMax()
+    if (distance < minRange) or (distance > maxRange) then
+        return nil
+    end
+
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        local baseDamage = self.m_Template.primaryWeapon.baseDamage[targetDefenseType]
+        if (baseDamage) then
+            return baseDamage
+        end
+    end
+
+    if (self:hasSecondaryWeapon()) then
+        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[targetDefenseType]
+        if (baseDamage) then
+            return baseDamage
+        end
+    end
+
+    return nil
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -124,34 +154,34 @@ function AttackDoer:getSecondaryWeaponStrongList()
     return self.m_Template.secondaryWeapon.strong
 end
 
-function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
-    if (not targetModel) or
-       (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex()) or
-       (not targetModel.getDefenseType) then
+function AttackDoer:canAttackTarget(selfGridIndex, targetModel, targetGridIndex)
+    if ((not targetModel) or
+        (not targetModel.getDefenseType) or
+        (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex())) then
         return false
     end
 
-    local distance = GridIndexFunctions.getDistance(selfGridIndex or self.m_Target:getGridIndex(), targetModel:getGridIndex())
-    if (distance < self.m_Template.minAttackRange) or (distance > self.m_Template.maxAttackRange) then
+    local baseDoDamage  = getBaseDamage(self, selfGridIndex, targetModel:getDefenseType(), targetGridIndex)
+    local baseGetDamage = getBaseDamage(ComponentManager.getComponent(targetModel, "AttackDoer"), targetGridIndex, self.m_Target:getDefenseType(), selfGridIndex)
+    if (not baseDoDamage) then
         return false
+    else
+        return true, baseDoDamage, baseGetDamage
+    end
+end
+
+function AttackDoer:getAttackDamage(selfModelTile, targetModel, targetModelTile, modelPlayerManager, modelWeatherManager)
+    if ((not targetModel) or
+        (not targetModel.getDefenseType) or
+        (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex())) then
+        return nil, nil
     end
 
-    local defenseType = targetModel:getDefenseType()
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        local baseDamage = self.m_Template.primaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return true, baseDamage
-        end
-    end
+    local selfGridIndex, targetGridIndex = selfModelTile:getGridIndex(), targetModelTile:getGridIndex()
+    local baseDoDamage  = getBaseDamage(self, selfGridIndex, targetModel:getDefenseType(), targetGridIndex)
+    local baseGetDamage = getBaseDamage(ComponentManager.getComponent(targetModel, "AttackDoer"), targetGridIndex, self.m_Target:getDefenseType(), selfGridIndex)
 
-    if (self:hasSecondaryWeapon()) then
-        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return true, baseDamage
-        end
-    end
 
-    return false
 end
 
 function AttackDoer:getAttackRangeMinMax()

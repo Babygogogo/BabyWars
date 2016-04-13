@@ -38,7 +38,7 @@ end
 
 function MovePathFunctions.extendToGridIndex(path, gridIndex, nextMoveCost, maxMoveCost)
     local length = #path
-    local totalMoveCost = path[length].rangeConsumption + nextMoveCost
+    local totalMoveCost = path[length].totalMoveCost + nextMoveCost
 
     if ((totalMoveCost > maxMoveCost) or
         (not GridIndexFunctions.isAdjacent(path[length].gridIndex, gridIndex)) or
@@ -46,8 +46,8 @@ function MovePathFunctions.extendToGridIndex(path, gridIndex, nextMoveCost, maxM
         return false
     else
         path[length + 1] = {
-            gridIndex        = GridIndexFunctions.clone(gridIndex),
-            rangeConsumption = totalMoveCost,
+            gridIndex     = GridIndexFunctions.clone(gridIndex),
+            totalMoveCost = totalMoveCost,
         }
 
         return true
@@ -61,12 +61,12 @@ function MovePathFunctions.createShortestPath(destination, reachableArea)
     local reversedPath, gridIndex = {}, destination
     while (areaNode) do
         reversedPath[#reversedPath + 1] = {
-            gridIndex        = GridIndexFunctions.clone(gridIndex),
-            rangeConsumption = areaNode.rangeConsumption
+            gridIndex     = GridIndexFunctions.clone(gridIndex),
+            totalMoveCost = areaNode.totalMoveCost
         }
 
         gridIndex = areaNode.prevGridIndex
-        areaNode = ReachableAreaFunctions.getAreaNode(reachableArea, gridIndex)
+        areaNode  = ReachableAreaFunctions.getAreaNode(reachableArea, gridIndex)
     end
 
     return MovePathFunctions.createReversedPath(reversedPath)
