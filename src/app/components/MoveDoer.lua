@@ -73,8 +73,12 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function MoveDoer:getMoveRange()
-    return self.m_Template.range
+function MoveDoer:getMoveRange(currentFuel, weather)
+    local originRange = self.m_Template.range
+    currentFuel = currentFuel or originRange
+
+    -- TODO: Take weather into account.
+    return math.min(currentFuel, originRange)
 end
 
 function MoveDoer:getMoveType()

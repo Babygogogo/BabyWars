@@ -168,6 +168,10 @@ function ModelUnit:canJoin(rhsUnitModel)
     return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
 end
 
+function ModelUnit:canDoAction(playerIndex)
+    return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
+end
+
 function ModelUnit:doActionWait(action)
     setStateActioned(self)
     self:moveAlongPath(action.path, function()
