@@ -1,9 +1,10 @@
 
 local AttackDoer = class("AttackDoer")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",
@@ -19,38 +20,64 @@ local EXPORTED_METHODS = {
     "getSecondaryWeaponStrongList",
 
     "canAttackTarget",
+    "getEstimatedBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getBaseDamage(self, selfGridIndex, targetDefenseType, targetGridIndex)
+local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, maxRange)
+    local distance = GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)
+    return (distance >= minRange) and (distance <= maxRange)
+end
+
+local function getBaseDamage(self, defenseType)
     if (not self) then
         return nil
     end
 
-    local distance = GridIndexFunctions.getDistance(selfGridIndex, targetGridIndex)
-    local minRange, maxRange = self:getAttackRangeMinMax()
-    if (distance < minRange) or (distance > maxRange) then
-        return nil
-    end
-
     if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        local baseDamage = self.m_Template.primaryWeapon.baseDamage[targetDefenseType]
+        local baseDamage = self.m_Template.primaryWeapon.baseDamage[defenseType]
         if (baseDamage) then
             return baseDamage
         end
     end
 
     if (self:hasSecondaryWeapon()) then
-        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[targetDefenseType]
+        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[defenseType]
         if (baseDamage) then
             return baseDamage
         end
     end
 
     return nil
+end
+
+local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+    -- TODO: Calculate the bonus with attacker level, co skills and so on.
+    return 0
+end
+
+local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+    local attackerTypeName = GameConstantFunctions.getUnitNameWithTiledId(attacker:getTiledID())
+    local bonusFromTile = (targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(attackerTypeName)) or 0
+    -- TODO: Calculate the bonus with target level, co skills and so on.
+
+    return bonusFromTile
+end
+
+local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
+    if (not baseAttackDamage) then
+        return nil
+    else
+        local attackBonus  = getAttackBonus( attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+        local defenseBonus = getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+        attackerHP = math.max(attackerHP, 0)
+
+        return math.round(baseAttackDamage * (math.ceil(attackerHP / 10) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100))
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -154,34 +181,34 @@ function AttackDoer:getSecondaryWeaponStrongList()
     return self.m_Template.secondaryWeapon.strong
 end
 
-function AttackDoer:canAttackTarget(selfGridIndex, targetModel, targetGridIndex)
-    if ((not targetModel) or
-        (not targetModel.getDefenseType) or
-        (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex())) then
+function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
+    if ((not target) or
+        (not target.getDefenseType) or
+        (not isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax())) or
+        (self.m_Target:getPlayerIndex() == target:getPlayerIndex())) then
         return false
     end
 
-    local baseDoDamage  = getBaseDamage(self, selfGridIndex, targetModel:getDefenseType(), targetGridIndex)
-    local baseGetDamage = getBaseDamage(ComponentManager.getComponent(targetModel, "AttackDoer"), targetGridIndex, self.m_Target:getDefenseType(), selfGridIndex)
-    if (not baseDoDamage) then
-        return false
-    else
-        return true, baseDoDamage, baseGetDamage
-    end
+    return (getBaseDamage(self, target:getDefenseType()) ~= nil)
 end
 
-function AttackDoer:getAttackDamage(selfModelTile, targetModel, targetModelTile, modelPlayerManager, modelWeatherManager)
-    if ((not targetModel) or
-        (not targetModel.getDefenseType) or
-        (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex())) then
+function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
+    local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
+    if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
         return nil, nil
     end
 
-    local selfGridIndex, targetGridIndex = selfModelTile:getGridIndex(), targetModelTile:getGridIndex()
-    local baseDoDamage  = getBaseDamage(self, selfGridIndex, targetModel:getDefenseType(), targetGridIndex)
-    local baseGetDamage = getBaseDamage(ComponentManager.getComponent(targetModel, "AttackDoer"), targetGridIndex, self.m_Target:getDefenseType(), selfGridIndex)
+    local attacker = self.m_Target
+    local attackDamage = getEstimatedAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
+    assert(attackDamage, "AttackDoer:getEstimatedBattleDamage() failed to get the estimated attack damage.")
 
-
+    if ((target.canAttackTarget) and
+        (target:canAttackTarget(targetGridIndex, attacker, attackerGridIndex)) and
+        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1) then
+        return attackDamage, getEstimatedAttackDamage(target, targetTile, target:getCurrentHP() - attackDamage, attacker, attackerTile, modelPlayerManager, weather)
+    else
+        return attackDamage, nil
+    end
 end
 
 function AttackDoer:getAttackRangeMinMax()

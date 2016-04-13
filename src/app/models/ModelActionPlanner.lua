@@ -87,7 +87,7 @@ end
 
 local function dispatchEventAttack(self, targetGridIndex)
     local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, targetGridIndex)
-    print("ModelActionPlanner-dispatchEventAttack()", listNode.baseDoDamage, listNode.baseGetDamage)
+    print("ModelActionPlanner-dispatchEventAttack()", listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",

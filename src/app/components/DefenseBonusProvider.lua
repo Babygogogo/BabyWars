@@ -10,6 +10,18 @@ local EXPORTED_METHODS = {
     "getDefenseBonusTargetCatagory",
     "getDefenseBonusTargetList",
 }
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isDefenseBonusTarget(self, targetName)
+    for _, name in ipairs(self:getDefenseBonusTargetList()) do
+        if (targetName == name) then
+            return true
+        end
+    end
+
+    return false
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -59,8 +71,12 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function DefenseBonusProvider:getDefenseBonusAmount()
-    return self.m_Template.amount
+function DefenseBonusProvider:getDefenseBonusAmount(targetName)
+    if (not targetName) or (isDefenseBonusTarget(self, targetName)) then
+        return self.m_Template.amount
+    else
+        return 0
+    end
 end
 
 function DefenseBonusProvider:getNormalizedDefenseBonusAmount()
