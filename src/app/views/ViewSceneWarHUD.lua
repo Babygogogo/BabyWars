@@ -6,6 +6,7 @@ local BEGIN_TURN_EFFECT_Z_ORDER = 3
 local WAR_COMMAND_MENU_Z_ORDER  = 2
 local TILE_DETAIL_Z_ORDER       = 1
 local UNIT_DETAIL_Z_ORDER       = 1
+local BATTLE_INFO_Z_ORDER       = 0
 local ACTION_MENU_Z_ORDER       = 0
 
 local BEGIN_TURN_EFFECT_FONT_SIZE   = 40
@@ -146,6 +147,7 @@ local function createTouchListener(self)
         self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
 
         return true
     end
@@ -155,6 +157,7 @@ local function createTouchListener(self)
         self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
     end
 
     local function onTouchCancelled(touch, event)
@@ -165,6 +168,7 @@ local function createTouchListener(self)
         self.m_ViewActionMenu:adjustPositionOnTouch(touch)
         self.m_ViewTileInfo:adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
     end
 
     touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
@@ -308,6 +312,21 @@ function ViewSceneWarHUD:setViewUnitDetail(view)
     view:setEnabled(false)
     self.m_ViewUnitDetail = view
     self:addChild(view, UNIT_DETAIL_Z_ORDER)
+
+    return self
+end
+
+function ViewSceneWarHUD:setViewBattleInfo(view)
+    if (self.m_ViewBattleInfo) then
+        if (self.m_ViewBattleInfo == view) then
+            return self
+        else
+            self:removeChild(self.m_ViewBattleInfo)
+        end
+    end
+
+    self.m_ViewBattleInfo = view
+    self:addChild(view, BATTLE_INFO_Z_ORDER)
 
     return self
 end

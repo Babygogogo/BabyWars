@@ -268,6 +268,13 @@ local function onEvtPlayerMovedCursor(self, gridIndex)
                     :setMovePathVisible(true)
             end
         end
+    elseif (self.m_State == "choosingAttackTarget") then
+        local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
+        if (listNode) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerPreviewAttackTarget", attackDamage = listNode.estimatedAttackDamage, counterDamage = listNode.estimatedCounterDamage})
+        else
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerPreviewNoAttackTarget"})
+        end
     end
 end
 

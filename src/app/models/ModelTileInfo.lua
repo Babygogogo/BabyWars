@@ -61,15 +61,4 @@ function ModelTileInfo:onPlayerTouch()
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelTileInfo:adjustPositionOnTouch(touch)
-    if (self.m_View) then
-        self.m_View:adjustPositionOnTouch(touch)
-    end
-
-    return self
-end
-
 return ModelTileInfo
