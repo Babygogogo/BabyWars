@@ -55,7 +55,7 @@ end
 local function createLabel()
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 20)
     label:ignoreAnchorPointForPosition(true)
-        :setPosition(4, 3)
+        :setPosition(6, 3)
         :setDimensions(BACKGROUND_WIDTH - 6, BACKGROUND_HEIGHT - 6)
 
         :setTextColor({r = 255, g = 255, b = 255})

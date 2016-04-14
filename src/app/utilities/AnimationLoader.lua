@@ -45,6 +45,9 @@ local function loadGridAnimations()
 
     local explosionAnimation = display.newAnimation(display.newFrames("c03_t07_s09_f%02d.png", 1, 9), 0.06)
     display.setAnimationCache("GridExplosion", explosionAnimation)
+
+    local targetCursorAnimation = display.newAnimation(display.newFrames("c03_t07_s08_f%02d.png", 1, 4), 0.08)
+    display.setAnimationCache("TargetCursor", targetCursorAnimation)
 end
 
 --------------------------------------------------------------------------------

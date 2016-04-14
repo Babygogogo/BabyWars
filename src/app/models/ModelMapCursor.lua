@@ -7,6 +7,23 @@ local ComponentManager   = require("global.components.ComponentManager")
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 
 --------------------------------------------------------------------------------
+-- The callback functions on EvtPlayerPreviewAttackTarget/EvtPlayerPreviewNoAttackTarget.
+--------------------------------------------------------------------------------
+local function onEvtPlayerPreviewAttackTarget(self, event)
+    if (self.m_View) then
+        self.m_View:setNormalCursorVisible(false)
+            :setTargetCursorVisible(true)
+    end
+end
+
+local function onEvtPlayerPreviewNoAttackTarget(self, event)
+    if (self.m_View) then
+        self.m_View:setNormalCursorVisible(true)
+            :setTargetCursorVisible(false)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The touch/scroll event listeners.
 --------------------------------------------------------------------------------
 local function createTouchListener(model)
@@ -87,7 +104,7 @@ local function createMouseListener(model)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMapCursor:ctor(param)
     if (not ComponentManager:getComponent(self, "GridIndexable")) then
@@ -112,30 +129,56 @@ function ModelMapCursor:initView()
     view:setTouchListener(createTouchListener(self))
         :setMouseListener(createMouseListener(self))
 
+        :setNormalCursorVisible(true)
+        :setTargetCursorVisible(false)
+
+    return self
+end
+
+function ModelMapCursor:setMapSize(size)
+    self.m_MapSize = self.m_MapSize or {}
+    self.m_MapSize.width  = size.width
+    self.m_MapSize.height = size.height
+
     return self
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on node events.
+-- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelMapCursor:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = self:getGridIndex()})
+        :addEventListener("EvtPlayerPreviewAttackTarget",   self)
+        :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
+        :addEventListener("EvtActionPlannerIdle",           self)
+        :addEventListener("EvtActionPlannerMakingMovePath", self)
+        :addEventListener("EvtActionPlannerChoosingAction", self)
 
     return self
 end
 
 function ModelMapCursor:onCleanup(rootActor)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+        :removeEventListener("EvtActionPlannerMakingMovePath", self)
+        :removeEventListener("EvtActionPlannerIdle",           self)
+        :removeEventListener("EvtPlayerPreviewNoAttackTarget", self)
+        :removeEventListener("EvtPlayerPreviewAttackTarget",   self)
+    self.m_RootScriptEventDispatcher = nil
+
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelMapCursor:setMapSize(size)
-    self.m_MapSize = self.m_MapSize or {}
-    self.m_MapSize.width  = size.width
-    self.m_MapSize.height = size.height
+function ModelMapCursor:onEvent(event)
+    local eventName = event.name
+    if ((eventName == "EvtActionPlannerIdle") or
+        (eventName == "EvtActionPlannerMakingMovePath") or
+        (eventName == "EvtActionPlannerChoosingAction") or
+        (eventName == "EvtPlayerPreviewNoAttackTarget")) then
+        onEvtPlayerPreviewNoAttackTarget(self, event)
+    elseif (eventName == "EvtPlayerPreviewAttackTarget") then
+        onEvtPlayerPreviewAttackTarget(self, event)
+    end
 
     return self
 end

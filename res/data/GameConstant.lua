@@ -759,7 +759,7 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
-            amount         = 20,
+            amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
