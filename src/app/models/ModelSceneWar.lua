@@ -46,7 +46,7 @@ local function doActionWait(self, action)
 end
 
 local function doActionAttack(self, action)
-    print("ModelSceneWar-doActionAttack()")
+    print("ModelSceneWar-doActionAttack()", action.attackDamage, action.counterDamage)
 end
 
 --------------------------------------------------------------------------------

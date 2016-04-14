@@ -21,12 +21,17 @@ local EXPORTED_METHODS = {
 
     "canAttackTarget",
     "getEstimatedBattleDamage",
+    "getUltimateBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getNormalizedHP(hp)
+    return math.ceil(hp / 10)
+end
+
 local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, maxRange)
     local distance = GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)
     return (distance >= minRange) and (distance <= maxRange)
@@ -60,14 +65,18 @@ local function getAttackBonus(attacker, attackerTile, target, targetTile, modelP
 end
 
 local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    local attackerTypeName = GameConstantFunctions.getUnitNameWithTiledId(attacker:getTiledID())
-    local bonusFromTile = (targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(attackerTypeName)) or 0
+    local targetTypeName = GameConstantFunctions.getUnitNameWithTiledId(target:getTiledID())
+    local bonusFromTile  = (targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0
     -- TODO: Calculate the bonus with target level, co skills and so on.
 
     return bonusFromTile
 end
 
 local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (attackerHP <= 0) then
+        return nil
+    end
+
     local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
     if (not baseAttackDamage) then
         return nil
@@ -76,7 +85,43 @@ local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, targ
         local defenseBonus = getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
         attackerHP = math.max(attackerHP, 0)
 
-        return math.round(baseAttackDamage * (math.ceil(attackerHP / 10) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100))
+        return math.round(baseAttackDamage * (getNormalizedHP(attackerHP) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100))
+    end
+end
+
+local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (attackerHP <= 0) then
+        return nil
+    end
+
+    local estimatedAttackDamage = getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (not estimatedAttackDamage) then
+        return nil
+    else
+        if (not target:isAffectedByLuck()) then
+            return estimatedAttackDamage
+        else
+            return math.round(estimatedAttackDamage * (1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 9) / 100))
+        end
+    end
+end
+
+local function getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getAttackDamage)
+    local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
+    if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
+        return nil, nil
+    end
+
+    local attacker = self.m_Target
+    local attackDamage = getAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
+    assert(attackDamage, "AttackDoer-getBattleDamage() failed to get the attack damage.")
+
+    if ((target.canAttackTarget) and
+        (target:canAttackTarget(targetGridIndex, attacker, attackerGridIndex)) and
+        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1) then
+        return attackDamage, getAttackDamage(target, targetTile, target:getCurrentHP() - attackDamage, attacker, attackerTile, modelPlayerManager, weather)
+    else
+        return attackDamage, nil
     end
 end
 
@@ -185,6 +230,7 @@ function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
     if ((not target) or
         (not target.getDefenseType) or
         (not isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax())) or
+        ((not GridIndexFunctions.isEqual(self.m_Target:getGridIndex(), attackerGridIndex) and (not self:canAttackAfterMove()))) or
         (self.m_Target:getPlayerIndex() == target:getPlayerIndex())) then
         return false
     end
@@ -193,22 +239,11 @@ function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
 end
 
 function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
-    local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
-    if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
-        return nil, nil
-    end
+    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getEstimatedAttackDamage)
+end
 
-    local attacker = self.m_Target
-    local attackDamage = getEstimatedAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
-    assert(attackDamage, "AttackDoer:getEstimatedBattleDamage() failed to get the estimated attack damage.")
-
-    if ((target.canAttackTarget) and
-        (target:canAttackTarget(targetGridIndex, attacker, attackerGridIndex)) and
-        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1) then
-        return attackDamage, getEstimatedAttackDamage(target, targetTile, target:getCurrentHP() - attackDamage, attacker, attackerTile, modelPlayerManager, weather)
-    else
-        return attackDamage, nil
-    end
+function AttackDoer:getUltimateBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
+    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getUltimateAttackDamage)
 end
 
 function AttackDoer:getAttackRangeMinMax()

@@ -82,7 +82,7 @@ function AttackTaker:getDefenseType()
 end
 
 function AttackTaker:isAffectedByLuck()
-    return self.m_Template.isAffectByLuck
+    return self.m_Template.isAffectedByLuck
 end
 
 function AttackTaker:getDefenseFatalList()
