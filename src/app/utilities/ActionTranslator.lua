@@ -91,7 +91,9 @@ local function translateWait(action, modelScene, currentPlayerID)
     local modelWeatherManager = modelScene:getModelWeatherManager()
 
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
-    assert(translatedPath, "ActionTranslator-translateWait() failed to translate the move path:\n" .. (translateMsg or ""))
+    if (not translatedPath) then
+        return nil, "ActionTranslator-translateWait() failed to translate the move path:\n" .. (translateMsg or "")
+    end
 
     local existingModelUnit = modelUnitMap:getModelUnit(translatedPath[translatedPath.length])
     if (existingModelUnit) and (modelUnitMap:getModelUnit(translatedPath[1]) ~= existingModelUnit) then
@@ -109,7 +111,10 @@ local function translateAttack(action, modelScene, currentPlayerID)
     local modelWeatherManager = modelScene:getModelWeatherManager()
 
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
-    assert(translatedPath, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or ""))
+    if (not translatedPath) then
+        return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
+    end
+
     if (translatedPath.isBlocked) then
         return {actionName = "Wait", path = translatedPath}
     end
@@ -129,7 +134,7 @@ local function translateAttack(action, modelScene, currentPlayerID)
     end
 
     local attackDamage, counterDamage = attacker:getUltimateBattleDamage(modelTileMap:getModelTile(attackerGridIndex), target, modelTileMap:getModelTile(targetGridIndex), modelPlayerManager, modelWeatherManager:getCurrentWeather())
-    return {actionName = "Attack", path = translatedPath, attackDamage = attackDamage, counterDamage = counterDamage}
+    return {actionName = "Attack", path = translatedPath, targetGridIndex = GridIndexFunctions.clone(targetGridIndex), attackDamage = attackDamage, counterDamage = counterDamage}
 end
 
 --------------------------------------------------------------------------------

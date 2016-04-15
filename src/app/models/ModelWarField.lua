@@ -161,4 +161,10 @@ function ModelWarField:doActionWait(action)
     return self
 end
 
+function ModelWarField:doActionAttack(action)
+    self:getModelUnitMap():doActionAttack(action)
+
+    return self
+end
+
 return ModelWarField

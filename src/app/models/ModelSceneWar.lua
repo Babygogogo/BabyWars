@@ -46,18 +46,19 @@ local function doActionWait(self, action)
 end
 
 local function doActionAttack(self, action)
-    print("ModelSceneWar-doActionAttack()", action.attackDamage, action.counterDamage)
+    self:getModelWarField():doActionAttack(action)
 end
 
 --------------------------------------------------------------------------------
 -- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
-    if (event.actionName == "EndTurn") then
+    local actionName = event.actionName
+    if (actionName == "EndTurn") then
         doActionEndTurn(self, event)
-    elseif (event.actionName == "Wait") then
+    elseif (actionName == "Wait") then
         doActionWait(self, event)
-    elseif (event.actionName == "Attack") then
+    elseif (actionName == "Attack") then
         doActionAttack(self, event)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
