@@ -71,17 +71,20 @@ local function onEvtPlayerMovedCursor(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtDestroyUnit.
+-- The callback functions on EvtDestroyModelUnit/EvtDestroyViewUnit.
 --------------------------------------------------------------------------------
-local function onEvtDestroyUnit(self, event)
+local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
     local actorUnit = self:getActorUnit(gridIndex)
-    assert(actorUnit, "ModelUnitMap-onEvtDestroyUnit() there is no unit on event.gridIndex.")
+    assert(actorUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
 
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
+    setActorUnit(self, nil, gridIndex)
     actorUnit:getModel():unsetRootScriptEventDispatcher()
+end
+
+local function onEvtDestroyViewUnit(self, event)
     if (self.m_View) then
-        self.m_View:removeViewUnit(gridIndex)
+        self.m_View:removeViewUnit(event.gridIndex)
     end
 end
 
@@ -184,7 +187,8 @@ function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
-        :addEventListener("EvtDestroyUnit", self)
+        :addEventListener("EvtDestroyModelUnit",   self)
+        :addEventListener("EvtDestroyViewUnit",    self)
 
     iterateAllActorUnits(self, function(actor)
         actor:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
@@ -194,9 +198,10 @@ function ModelUnitMap:onEnter(rootActor)
 end
 
 function ModelUnitMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
+        :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
 
     iterateAllActorUnits(self, function(actor)
@@ -212,8 +217,10 @@ function ModelUnitMap:onEvent(event)
         onEvtPlayerMovedCursor(self, event)
     elseif (name == "EvtTurnPhaseBeginning") then
         self.m_PlayerIndex = event.playerIndex
-    elseif (name == "EvtDestroyUnit") then
-        onEvtDestroyUnit(self, event)
+    elseif (name == "EvtDestroyModelUnit") then
+        onEvtDestroyModelUnit(self, event)
+    elseif (name == "EvtDestroyViewUnit") then
+        onEvtDestroyViewUnit(self, event)
     end
 
     return self

@@ -13,13 +13,13 @@ end
 --------------------------------------------------------------------------------
 function ModelGridExplosion:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtDestroyUnit", self)
+    self.m_RootScriptEventDispatcher:addEventListener("EvtDestroyViewUnit", self)
 
     return self
 end
 
 function ModelGridExplosion:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -27,7 +27,7 @@ end
 
 function ModelGridExplosion:onEvent(event)
     local name = event.name
-    if (name == "EvtDestroyUnit") then
+    if (name == "EvtDestroyViewUnit") then
         self:showExplosion(event.gridIndex)
     end
 

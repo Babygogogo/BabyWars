@@ -136,6 +136,7 @@ end
 local function initWithActorTurnManager(self, actor)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelWarField(self.m_ActorWarField:getModel())
     self.m_ActorTurnManager = actor
 end
 

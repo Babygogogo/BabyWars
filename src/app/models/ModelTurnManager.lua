@@ -56,7 +56,12 @@ local function runTurnPhaseBeginning(self)
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseConsumeUnitFuel", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
+    self.m_ScriptEventDispatcher:dispatchEvent({
+        name         = "EvtTurnPhaseConsumeUnitFuel",
+        playerIndex  = self.m_PlayerIndex,
+        turnIndex    = self.m_TurnIndex,
+        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+    })
     self.m_TurnPhase = "main"
 end
 
@@ -79,6 +84,12 @@ end
 
 function ModelTurnManager:setScriptEventDispatcher(dispatcher)
     self.m_ScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function ModelTurnManager:setModelWarField(warField)
+    self.m_ModelWarField = warField
 
     return self
 end

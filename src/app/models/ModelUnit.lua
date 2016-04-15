@@ -25,10 +25,14 @@ end
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
-        local fuel = math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0)
         self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
-        if (self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel()) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyUnit", gridIndex = self:getGridIndex()})
+
+        if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
+            local tile = event.modelTileMap:getModelTile(self:getGridIndex())
+            if ((not tile.getRepairAmount) or (not tile:getRepairAmount(self:getTiledID()))) then
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self:getGridIndex()})
+                    :dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            end
         end
     end
 end
