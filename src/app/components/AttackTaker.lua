@@ -1,11 +1,16 @@
 
 local AttackTaker = class("AttackTaker")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+
+local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
+local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()
 
 local EXPORTED_METHODS = {
     "getCurrentHP",
+    "setCurrentHP",
     "getNormalizedCurrentHP",
 
     "getDefenseType",
@@ -71,6 +76,13 @@ end
 
 function AttackTaker:getCurrentHP()
     return self.m_CurrentHP
+end
+
+function AttackTaker:setCurrentHP(hp)
+    assert((hp >= 0) and (hp <= math.max(UNIT_MAX_HP, TILE_MAX_HP)) and (hp == math.floor(hp)), "AttackTaker:setCurrentHP() the param hp is invalid.")
+    self.m_CurrentHP = hp
+
+    return self
 end
 
 function AttackTaker:getNormalizedCurrentHP()

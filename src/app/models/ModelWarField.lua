@@ -162,6 +162,14 @@ function ModelWarField:doActionWait(action)
 end
 
 function ModelWarField:doActionAttack(action)
+    local targetGridIndex = action.targetGridIndex
+    local targetUnit = self.m_ActorUnitMap:getModel():getModelUnit(targetGridIndex)
+    if (targetUnit) then
+        action.target, action.targetType = targetUnit,                                                   "unit"
+    else
+        action.target, action.targetType = self.m_ActorTileMap:getModel():getModelTile(targetGridIndex), "tile"
+    end
+
     self:getModelUnitMap():doActionAttack(action)
 
     return self

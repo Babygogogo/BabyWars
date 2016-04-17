@@ -24,6 +24,8 @@ local EXPORTED_METHODS = {
     "getUltimateBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
+
+    "updateAmmoOnAttack",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -37,26 +39,28 @@ local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, max
     return (distance >= minRange) and (distance <= maxRange)
 end
 
+local function getPrimaryWeaponBaseDamage(self, defenseType)
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        return self.m_Template.primaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
+end
+
+local function getSecondaryWeaponBaseDamage(self, defenseType)
+    if (self:hasSecondaryWeapon()) then
+        return self.m_Template.secondaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
+end
+
 local function getBaseDamage(self, defenseType)
     if (not self) then
         return nil
     end
 
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        local baseDamage = self.m_Template.primaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return baseDamage
-        end
-    end
-
-    if (self:hasSecondaryWeapon()) then
-        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return baseDamage
-        end
-    end
-
-    return nil
+    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
 end
 
 local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
@@ -252,6 +256,14 @@ end
 
 function AttackDoer:canAttackAfterMove()
     return self.m_Template.canAttackAfterMove
+end
+
+function AttackDoer:updateAmmoOnAttack(defenseType)
+    if (getPrimaryWeaponBaseDamage(self, defenseType)) then
+        self.m_PrimaryWeaponCurrentAmmo = self.m_PrimaryWeaponCurrentAmmo - 1
+    end
+
+    return self
 end
 
 return AttackDoer

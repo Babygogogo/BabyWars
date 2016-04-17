@@ -106,6 +106,14 @@ function GameConstantFunctions.getGridSize()
     return GRID_SIZE
 end
 
+function GameConstantFunctions.getUnitMaxHP()
+    return GAME_CONSTANT.unitMaxHP
+end
+
+function GameConstantFunctions.getTileMaxHP()
+    return GAME_CONSTANT.tileMaxHP
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if (index.name == name) then

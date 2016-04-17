@@ -9,8 +9,6 @@ local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {
     "getMoveRange",
     "getMoveType",
-
-    "moveAlongPath"
 }
 
 MoveDoer.DEPENDS = {}
@@ -83,20 +81,6 @@ end
 
 function MoveDoer:getMoveType()
     return self.m_Template.type
-end
-
-function MoveDoer:moveAlongPath(path, callbackOnFinish)
-    local target = self.m_Target
-    target:setCurrentFuel(target:getCurrentFuel() - path.fuelConsumption)
-
-    local view = target.m_View
-    if (view) then
-        view:moveAlongPath(path, callbackOnFinish)
-    else
-        callbackOnFinish()
-    end
-
-    return target
 end
 
 return MoveDoer

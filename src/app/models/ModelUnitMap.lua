@@ -257,19 +257,13 @@ function ModelUnitMap:doActionWait(action)
 end
 
 function ModelUnitMap:doActionAttack(action)
---[[
-    local path               = action.path
-    local beginningGridIndex = GridIndexFunctions.clone(path[1])
-    local endingGridIndex    = GridIndexFunctions.clone(path[#path])
-    local attackerActorUnit  = self:getActorUnit(beginningGridIndex)
+    local path = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
-    self.m_UnitActorsMap[endingGridIndex.x   ][endingGridIndex.y   ] = attackerActorUnit
-
-    attackerActorUnit:getModel():doActionAttack(action)
+    swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    self:getModelUnit(endingGridIndex):doActionAttack(action)
 
     return self
-]]
 end
 
 return ModelUnitMap
