@@ -16,7 +16,7 @@ local function initWithTiledID(self, objectID, baseID)
         return
     end
 
-    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(self.m_ObjectID, self.m_BaseID)
+    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(0, self.m_BaseID)
     assert(template, "ModelTileBase-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
     if (self.m_Template ~= template) then

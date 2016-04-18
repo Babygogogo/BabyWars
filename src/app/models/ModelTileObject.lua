@@ -66,6 +66,33 @@ function ModelTileObject:initView()
     return self
 end
 
+function ModelTileObject:setRootScriptEventDispatcher(dispatcher)
+    self:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.setRootScriptEventDispatcher) then
+            component:setRootScriptEventDispatcher(dispatcher)
+        end
+    end
+
+    return self
+end
+
+function ModelTileObject:unsetRootScriptEventDispatcher(dispatcher)
+    if (self.m_RootScriptEventDispatcher) then
+        self.m_RootScriptEventDispatcher = nil
+
+        for _, component in pairs(ComponentManager.getAllComponents(self)) do
+            if (component.unsetRootScriptEventDispatcher) then
+                component:unsetRootScriptEventDispatcher()
+            end
+        end
+    end
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -83,7 +110,11 @@ end
 
 function ModelTileObject:doActionAttack(action, isAttacker)
     assert(not isAttacker, "ModelTileObject:doActionAttack() the param is invalid.")
-    print("ModelTileObject:doActionAttack() not implemented.")
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionAttack) then
+            component:doActionAttack(action, isAttacker)
+        end
+    end
 
     return self
 end

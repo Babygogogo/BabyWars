@@ -2628,7 +2628,7 @@ GameConstant.templateModelUnits = {
         cost        = 13000,
         vision      = 4,
 
-        description = "Duster are somewhat powerful planes that can attack both ground and air units.",
+        description = "Dusters are somewhat powerful planes that can attack both ground and air units.",
     },
 
     bcopter    = {

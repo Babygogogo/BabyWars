@@ -43,6 +43,18 @@ local function createEmptyMap(width)
     return map
 end
 
+local function iterateAllActorTiles(tileMap, mapSize, func)
+    local width, height = mapSize.width, mapSize.height
+    for x = 1, width do
+        for y = 1, height do
+            local actorTile = tileMap[x][y]
+            if (actorTile) then
+                func(actorTile)
+            end
+        end
+    end
+end
+
 local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
     local width, height = baseLayer.width, baseLayer.height
     local objectMap, baseMap = createEmptyMap(width), createEmptyMap(width)
@@ -87,6 +99,30 @@ local function updateTileActorsMapWithGridsData(objectMap, baseMap, mapSize, gri
         end
 
         baseMap[x][y]:getModel():ctor(gridData)
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtPlayerMovedCursor(self, event)
+    local modelTile = self:getModelTile(event.gridIndex)
+    assert(modelTile, "ModelTileMap:onEvent() failed to get the tile model with event.gridIndex.")
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = modelTile})
+end
+
+local function onEvtDestroyModelTile(self, event)
+    local x, y = event.gridIndex.x, event.gridIndex.y
+    local actorTile = self.m_ObjectMap[x][y]
+    assert(actorTile, "ModelTileMap-onEvtDestroyModelTile() the model tile object doesn't exists.")
+
+    self.m_ObjectMap[x][y] = nil
+    actorTile:getModel():unsetRootScriptEventDispatcher()
+end
+
+local function onEvtDestroyViewTile(self, event)
+    if (self.m_View) then
+        self.m_View:removeViewTileObject(event.gridIndex)
     end
 end
 
@@ -140,17 +176,19 @@ function ModelTileMap:initView()
     local view = self.m_View
     assert(view, "ModelTileMap:initView() no view is attached to the owner actor of the model.")
 
-    view:removeAllChildren()
-
     local mapSize = self:getMapSize()
+    view:setMapSize(mapSize)
+        :removeAllChildren()
+
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local objectActor = self.m_ObjectMap[x][y]
+            local gridIndex = {x = x, y = y}
             if (objectActor) then
-                view:addViewTileObject(objectActor:getView())
+                view:addViewTileObject(objectActor:getView(), gridIndex)
             end
 
-            view:addViewTileBase(self.m_BaseMap[x][y]:getView())
+            view:addViewTileBase(self.m_BaseMap[x][y]:getView(), gridIndex)
         end
     end
 
@@ -161,26 +199,42 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelTileMap:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
+    local dispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
+        :addEventListener("EvtDestroyModelTile",   self)
+        :addEventListener("EvtDestroyViewTile",    self)
+
+    iterateAllActorTiles(self.m_ObjectMap, self.m_MapSize, function(actorTile)
+        actorTile:getModel():setRootScriptEventDispatcher(dispatcher)
+    end)
 
     return self
 end
 
 function ModelTileMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile", self)
+        :removeEventListener("EvtDestroyModelTile",   self)
+        :removeEventListener("EvtTurnPhaseBeginning", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
+
+    iterateAllActorTiles(self.m_ObjectMap, self.m_MapSize, function(actorTile)
+        actorTile:getModel():unsetRootScriptEventDispatcher()
+    end)
 
     return self
 end
 
 function ModelTileMap:onEvent(event)
-    if (event.name == "EvtPlayerMovedCursor") then
-        local modelTile = self:getModelTile(event.gridIndex)
-        assert(modelTile, "ModelTileMap:onEvent() failed to get the tile model with event.gridIndex.")
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = modelTile})
+    local eventName = event.name
+    if (eventName == "EvtPlayerMovedCursor") then
+        onEvtPlayerMovedCursor(self, event)
+    elseif (eventName == "EvtDestroyModelTile") then
+        onEvtDestroyModelTile(self, event)
+    elseif (eventName == "EvtDestroyViewTile") then
+        onEvtDestroyViewTile(self, event)
     end
 
     return self

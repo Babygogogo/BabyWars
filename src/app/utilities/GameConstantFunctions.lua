@@ -143,7 +143,7 @@ end
 function GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
     assert(baseID > 0, "GameConstantFunctions.getTemplateModelTileWithTiledId() the param baseID is invalid.")
     local baseName = GameConstantFunctions.getTileNameWithTiledId(baseID)
-    if (objectID == 0) then
+    if ((objectID == 0) or (not objectID)) then
         return TEMPLATE_MODEL_TILES[baseName]
     else
         local objectName = GameConstantFunctions.getTileNameWithTiledId(objectID)

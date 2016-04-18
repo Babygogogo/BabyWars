@@ -43,7 +43,6 @@ local function setActorUnit(self, actor, gridIndex)
     end
 end
 
-
 local function swapActorUnit(self, gridIndex1, gridIndex2)
     if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
         return
