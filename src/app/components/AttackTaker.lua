@@ -46,6 +46,18 @@ function AttackTaker:loadInstantialData(data)
     return self
 end
 
+function AttackTaker:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function AttackTaker:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -63,6 +75,29 @@ function AttackTaker:onUnbind()
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function AttackTaker:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
+        if (self:getCurrentHP() <= 0) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+        end
+    else
+        self:setCurrentHP(math.max(self:getCurrentHP() - action.attackDamage, 0))
+        if (self:getCurrentHP() <= 0) then
+            if (action.targetType == "unit") then
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+            else
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelTile", gridIndex = self.m_Target:getGridIndex()})
+            end
+        end
+    end
 
     return self
 end

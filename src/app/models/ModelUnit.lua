@@ -206,38 +206,27 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action)
-    setStateActioned(self)
-    self:setCurrentFuel(self:getCurrentFuel() - action.path.fuelConsumption)
-    self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
-
-    local target = action.target
-    self:updateAmmoOnAttack(target:getDefenseType())
-    target:setCurrentHP(math.max(target:getCurrentHP() - action.attackDamage, 0))
-    if (action.counterDamage) then
-        target:updateAmmoOnAttack(self:getDefenseType())
+function ModelUnit:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        setStateActioned(self)
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    if (self:getCurrentHP() <= 0) then
-        rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self:getGridIndex()})
-    end
-    if (target:getCurrentHP() <= 0) then
-        if (action.targetType == "unit") then
-            rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = action.targetGridIndex})
-        else
-            rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelTile", gridIndex = action.targetGridIndex})
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionAttack) then
+            component:doActionAttack(action, isAttacker)
         end
     end
 
-    if (self.m_View) then
+    if ((isAttacker) and (self.m_View)) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:setStateActioned()
 
             if (self:getCurrentHP() == 0) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
             end
-            if (target:getCurrentHP() == 0) then
+            if (action.target:getCurrentHP() == 0) then
                 if (action.targetType == "unit") then
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
                 else

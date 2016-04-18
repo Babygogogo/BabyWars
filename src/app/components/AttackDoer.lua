@@ -24,8 +24,6 @@ local EXPORTED_METHODS = {
     "getUltimateBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
-
-    "updateAmmoOnAttack",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -158,6 +156,18 @@ function AttackDoer:loadInstantialData(data)
     return self
 end
 
+function AttackDoer:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function AttackDoer:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -175,6 +185,18 @@ function AttackDoer:onUnbind()
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function AttackDoer:doActionAttack(action, isAttacker)
+    if (((isAttacker)     and (getPrimaryWeaponBaseDamage(self, action.target:getDefenseType()))                             ) or
+        ((not isAttacker) and (getPrimaryWeaponBaseDamage(self, action.attacker:getDefenseType())) and (action.counterDamage))) then
+        self.m_PrimaryWeaponCurrentAmmo = self.m_PrimaryWeaponCurrentAmmo - 1
+    end
 
     return self
 end
@@ -256,14 +278,6 @@ end
 
 function AttackDoer:canAttackAfterMove()
     return self.m_Template.canAttackAfterMove
-end
-
-function AttackDoer:updateAmmoOnAttack(defenseType)
-    if (getPrimaryWeaponBaseDamage(self, defenseType)) then
-        self.m_PrimaryWeaponCurrentAmmo = self.m_PrimaryWeaponCurrentAmmo - 1
-    end
-
-    return self
 end
 
 return AttackDoer

@@ -206,4 +206,11 @@ function ModelTileMap:getModelTile(gridIndex)
     return tileActor and tileActor:getModel() or nil
 end
 
+function ModelTileMap:doActionAttack(action)
+    assert(action.targetType == "tile", "ModelTileMap:doActionAttack() the param action is invalid.")
+    action.target:doActionAttack(action, false)
+
+    return self
+end
+
 return ModelTileMap

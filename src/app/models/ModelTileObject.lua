@@ -81,4 +81,11 @@ function ModelTileObject:getDescription()
     return self.m_Template.description
 end
 
+function ModelTileObject:doActionAttack(action, isAttacker)
+    assert(not isAttacker, "ModelTileObject:doActionAttack() the param is invalid.")
+    print("ModelTileObject:doActionAttack() not implemented.")
+
+    return self
+end
+
 return ModelTileObject

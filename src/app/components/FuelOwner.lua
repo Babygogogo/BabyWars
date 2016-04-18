@@ -95,8 +95,10 @@ function FuelOwner:doActionWait(action)
     return self
 end
 
-function FuelOwner:doActionAttack(action)
-    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+function FuelOwner:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+    end
 
     return self
 end
