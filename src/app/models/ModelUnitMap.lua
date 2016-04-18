@@ -251,7 +251,12 @@ function ModelUnitMap:doActionWait(action)
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
     swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    self:getModelUnit(endingGridIndex):doActionWait(action)
+
+    local modelUnit = self:getModelUnit(endingGridIndex)
+    modelUnit:doActionWait(action)
+    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
+    end
 
     return self
 end

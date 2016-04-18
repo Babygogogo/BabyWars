@@ -113,6 +113,12 @@ function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :addEventListener("EvtTurnPhaseResetUnitState", self)
 
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.setRootScriptEventDispatcher) then
+            component:setRootScriptEventDispatcher(dispatcher)
+        end
+    end
+
     return self
 end
 
@@ -122,6 +128,12 @@ function ModelUnit:unsetRootScriptEventDispatcher()
             :removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
 
         self.m_RootScriptEventDispatcher = nil
+
+        for _, component in pairs(ComponentManager.getAllComponents(self)) do
+            if (component.unsetRootScriptEventDispatcher) then
+                component:unsetRootScriptEventDispatcher()
+            end
+        end
     end
 
     return self
@@ -178,7 +190,12 @@ end
 
 function ModelUnit:doActionWait(action)
     setStateActioned(self)
-    self:setCurrentFuel(self:getCurrentFuel() - action.path.fuelConsumption)
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionWait) then
+            component:doActionWait(action)
+        end
+    end
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()

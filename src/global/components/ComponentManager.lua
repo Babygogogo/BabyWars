@@ -95,9 +95,13 @@ function ComponentManager.getComponent(target, componentName)
     end
 end
 
+function ComponentManager.getAllComponents(target)
+    return target.components_
+end
+
 function ComponentManager.setMethods(target, component, methods)
     for _, name in ipairs(methods) do
-        assert(target[name] == nil, "ComponentManager.setMethods() the target already has a field named" .. name)
+        assert(target[name] == nil, "ComponentManager.setMethods() the target already has a field named " .. name)
         target[name] = function(__, ...)
             return component[name](component, ...)
         end

@@ -22,6 +22,10 @@ local function isFuelAmount(param)
     return (param >= 0) and (math.ceil(param) == param)
 end
 
+local function isShortage(self)
+    return self:getCurrentFuel() / self:getMaxFuel() <= 1 / 3
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -44,7 +48,19 @@ end
 function FuelOwner:loadInstantialData(data)
     assert(isFuelAmount(data.current), "FuelOwner:loadInstantialData() the data.current is expected to be a non-negative integer.")
 
-    self.m_Current = data.current
+    self.m_CurrentFuel = data.current
+
+    return self
+end
+
+function FuelOwner:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function FuelOwner:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end
@@ -71,10 +87,25 @@ function FuelOwner:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function FuelOwner:doActionWait(action)
+    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+
+    return self
+end
+
+function FuelOwner:doActionAttack(action)
+    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function FuelOwner:getCurrentFuel()
-    return self.m_Current
+    return self.m_CurrentFuel
 end
 
 function FuelOwner:getMaxFuel()
@@ -95,7 +126,13 @@ end
 
 function FuelOwner:setCurrentFuel(fuelAmount)
     assert(isFuelAmount(fuelAmount), "FuelOwner:setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
-    self.m_Current = fuelAmount
+    self.m_CurrentFuel = fuelAmount
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtCurrentFuelUpdated",
+        amount     = fuelAmount,
+        gridIndex  = self.m_Target:getGridIndex(),
+        isShortage = isShortage(self)
+    })
 
     return self
 end
