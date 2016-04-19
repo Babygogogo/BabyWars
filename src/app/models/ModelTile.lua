@@ -118,6 +118,8 @@ function ModelTile:destroyModelTileObject()
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
     self:setRootScriptEventDispatcher(dispatcher)
 
+    dispatcher:dispatchEvent({name = "EvtModelTileUpdated", modelTile = self})
+
     return self
 end
 
@@ -134,6 +136,8 @@ function ModelTile:doActionAttack(action, isAttacker)
             component:doActionAttack(action, isAttacker)
         end
     end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileUpdated", modelTile = self})
 
     return self
 end

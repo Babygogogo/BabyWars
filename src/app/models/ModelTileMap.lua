@@ -89,7 +89,7 @@ end
 local function onEvtPlayerMovedCursor(self, event)
     local modelTile = self:getModelTile(event.gridIndex)
     assert(modelTile, "ModelTileMap:onEvent() failed to get the tile model with event.gridIndex.")
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", tileModel = modelTile})
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", modelTile = modelTile})
 end
 
 local function onEvtDestroyModelTile(self, event)
