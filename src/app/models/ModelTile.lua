@@ -1,5 +1,5 @@
 
-local ModelTileObject = class("ModelTileObject")
+local ModelTile = class("ModelTile")
 
 local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
@@ -11,10 +11,10 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local function initWithTiledID(self, objectID, baseID)
     self.m_ObjectID = objectID or self.m_ObjectID
     self.m_BaseID   = baseID   or self.m_BaseID
-    assert(self.m_ObjectID > 0 and self.m_BaseID, "ModelTileObject-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
+    assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
 
     local template = GameConstantFunctions.getTemplateModelTileWithTiledId(self.m_ObjectID, self.m_BaseID)
-    assert(template, "ModelTileObject-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
+    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
     if (self.m_Template ~= template) then
         self.m_Template = template
@@ -40,9 +40,9 @@ local function loadInstantialData(self, param)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelTileObject:ctor(param)
+function ModelTile:ctor(param)
     if (param.objectID or param.baseID) then
         initWithTiledID(self, param.objectID, param.baseID)
     end
@@ -56,17 +56,18 @@ function ModelTileObject:ctor(param)
     return self
 end
 
-function ModelTileObject:initView()
+function ModelTile:initView()
     local view = self.m_View
-    assert(view, "ModelTileObject:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithTiledID(self.m_ObjectID)
+    view:setViewObjectWithTiledId(self.m_ObjectID)
+        :setViewBaseWithTiledId(self.m_BaseID)
 
     return self
 end
 
-function ModelTileObject:setRootScriptEventDispatcher(dispatcher)
+function ModelTile:setRootScriptEventDispatcher(dispatcher)
     self:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = dispatcher
 
@@ -79,7 +80,7 @@ function ModelTileObject:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelTileObject:unsetRootScriptEventDispatcher(dispatcher)
+function ModelTile:unsetRootScriptEventDispatcher(dispatcher)
     if (self.m_RootScriptEventDispatcher) then
         self.m_RootScriptEventDispatcher = nil
 
@@ -96,20 +97,38 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelTileObject:getTiledID()
-    return self.m_ObjectID
+function ModelTile:getTiledID()
+    return (self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
 end
 
-function ModelTileObject:getPlayerIndex()
+function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
-function ModelTileObject:getDescription()
+function ModelTile:getDescription()
     return self.m_Template.description
 end
 
-function ModelTileObject:doActionAttack(action, isAttacker)
-    assert(not isAttacker, "ModelTileObject:doActionAttack() the param is invalid.")
+function ModelTile:destroyModelTileObject()
+    assert(self.m_ObjectID > 0, "ModelTile:destroyModelTileObject() there's no tile object.")
+
+    local gridIndex, dispatcher = self:getGridIndex(), self.m_RootScriptEventDispatcher
+    self:unsetRootScriptEventDispatcher()
+    initWithTiledID(self, 0, self.m_BaseID)
+    loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
+    self:setRootScriptEventDispatcher(dispatcher)
+
+    return self
+end
+
+function ModelTile:destroyViewTileObject()
+    if (self.m_View) then
+        self.m_View:setViewObjectWithTiledId(0)
+    end
+end
+
+function ModelTile:doActionAttack(action, isAttacker)
+    assert(not isAttacker, "ModelTile:doActionAttack() the param is invalid.")
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
             component:doActionAttack(action, isAttacker)
@@ -119,4 +138,4 @@ function ModelTileObject:doActionAttack(action, isAttacker)
     return self
 end
 
-return ModelTileObject
+return ModelTile

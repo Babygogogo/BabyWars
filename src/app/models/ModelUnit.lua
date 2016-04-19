@@ -212,6 +212,8 @@ function ModelUnit:doActionAttack(action, isAttacker)
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
+    local shouldDestroyAttacker = self:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget   = action.target:getCurrentHP() <= action.attackDamage
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
@@ -223,10 +225,10 @@ function ModelUnit:doActionAttack(action, isAttacker)
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:setStateActioned()
 
-            if (self:getCurrentHP() == 0) then
+            if (shouldDestroyAttacker) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
             end
-            if (action.target:getCurrentHP() == 0) then
+            if (shouldDestroyTarget) then
                 if (action.targetType == "unit") then
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
                 else
