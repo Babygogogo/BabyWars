@@ -4,15 +4,22 @@ local ModelUnitInfo = class("ModelUnitInfo")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function updateWithModelUnit(self, modelUnit)
+    self.m_ModelUnit = modelUnit
+
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(modelUnit)
+            :setVisible(true)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerTouchUnit(self, event)
-    self.m_ModelUnit = event.unitModel
-
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(event.unitModel)
-        self.m_View:setVisible(true)
-    end
+    updateWithModelUnit(self, event.modelUnit)
 end
 
 local function onEvtPlayerTouchNoUnit(self, event)
@@ -36,9 +43,19 @@ local function onEvtDestroyModelUnit(self, event)
 end
 
 local function onEvtModelUnitMoved(self, event)
-    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelUnit:getGridIndex()) and (self.m_View)) then
-        self.m_View:updateWithModelUnit(event.modelUnit)
-            :setVisible(true)
+    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelUnit:getGridIndex())) then
+        updateWithModelUnit(self, event.modelUnit)
+    end
+end
+
+local function onEvtModelUnitUpdated(self, event)
+    local modelUnit = event.modelUnit
+    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, modelUnit:getGridIndex())) then
+        if ((modelUnit:getCurrentHP() <= 0) and (self.m_View)) then
+            self.m_View:setVisible(false)
+        else
+            updateWithModelUnit(self, modelUnit)
+        end
     end
 end
 
@@ -46,6 +63,8 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
+    self.m_CursorGridIndex = {x = 1, y = 1}
+
     return self
 end
 
@@ -66,18 +85,20 @@ function ModelUnitInfo:onEnter(rootActor)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtModelUnitMoved",     self)
+        :addEventListener("EvtModelUnitUpdated",   self)
 
     return self
 end
 
 function ModelUnitInfo:onCleanup(rootActor)
     -- removeEventListener can be commented out because the dispatcher itself is being destroyed.
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitMoved", self)
-        :removeEventListener("EvtDestroyModelUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitUpdated", self)
+        :removeEventListener("EvtModelUnitMoved",     self)
+        :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtPlayerTouchUnit",   self)
-        :removeEventListener("EvtPlayerTouchNoUnit", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtPlayerTouchUnit",    self)
+        :removeEventListener("EvtPlayerTouchNoUnit",  self)
 
     self.m_RootScriptEventDispatcher = nil
 
@@ -98,6 +119,8 @@ function ModelUnitInfo:onEvent(event)
         onEvtDestroyModelUnit(self, event)
     elseif (eventName == "EvtModelUnitMoved") then
         onEvtModelUnitMoved(self, event)
+    elseif (eventName == "EvtModelUnitUpdated") then
+        onEvtModelUnitUpdated(self, event)
     end
 
     return self

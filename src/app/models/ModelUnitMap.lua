@@ -63,7 +63,7 @@ end
 local function onEvtPlayerMovedCursor(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
     if (unitModel) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitModel})
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", modelUnit = unitModel})
     else
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
     end

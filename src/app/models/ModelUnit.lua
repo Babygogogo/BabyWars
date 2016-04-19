@@ -21,23 +21,6 @@ local function setStateActioned(self)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseConsumeUnitFuel.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
-        self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
-
-        if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
-            local tile = event.modelTileMap:getModelTile(self:getGridIndex())
-            if ((not tile.getRepairAmount) or (not tile:getRepairAmount(self:getTiledID()))) then
-                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self:getGridIndex()})
-                    :dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
-            end
-        end
-    end
-end
-
---------------------------------------------------------------------------------
 -- The callback functions on EvtTurnPhaseResetUnitState.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseResetUnitState(self, event)
@@ -110,8 +93,7 @@ end
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     self:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-        :addEventListener("EvtTurnPhaseResetUnitState", self)
+    dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.setRootScriptEventDispatcher) then
@@ -125,7 +107,6 @@ end
 function ModelUnit:unsetRootScriptEventDispatcher()
     if (self.m_RootScriptEventDispatcher) then
         self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
-            :removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
 
         self.m_RootScriptEventDispatcher = nil
 
@@ -144,9 +125,7 @@ end
 --------------------------------------------------------------------------------
 function ModelUnit:onEvent(event)
     local name = event.name
-    if (name == "EvtTurnPhaseConsumeUnitFuel") then
-        onEvtTurnPhaseConsumeUnitFuel(self, event)
-    elseif (name == "EvtTurnPhaseResetUnitState") then
+    if (name == "EvtTurnPhaseResetUnitState") then
         onEvtTurnPhaseResetUnitState(self, event)
     end
 
@@ -220,6 +199,8 @@ function ModelUnit:doActionAttack(action, isAttacker)
             component:doActionAttack(action, isAttacker)
         end
     end
+
+    rootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
 
     if ((isAttacker) and (self.m_View)) then
         self.m_View:moveAlongPath(action.path, function()
