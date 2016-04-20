@@ -49,21 +49,6 @@ function LevelOwner:loadInstantialData(data)
     return self
 end
 
-function LevelOwner:setRootScriptEventDispatcher(dispatcher)
-    self:unsetRootScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function LevelOwner:unsetRootScriptEventDispatcher()
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher = nil
-    end
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -89,11 +74,16 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function LevelOwner:doActionAttack(action, isAttacker)
-    if ((isAttacker) and
-        (action.targetType == "unit") and
-        (action.attackDamage >= action.target:getCurrentHP()) and
-        (self.m_Level < MAX_LEVEL)) then
-        setLevel(self, self.m_Level + 1)
+    if (self.m_Level < MAX_LEVEL) then
+        if (isAttacker) then
+            if ((action.targetType == "unit") and (action.attackDamage >= action.target:getCurrentHP())) then
+                setLevel(self, self.m_Level + 1)
+            end
+        else
+            if (action.attacker:getCurrentHP() <= 0) then -- The hp for the attacker is already updated with the counter damage, so just compare it with 0
+                setLevel(self, self.m_Level + 1)
+            end
+        end
     end
 
     return self
