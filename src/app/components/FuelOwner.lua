@@ -41,7 +41,8 @@ local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     local modelUnit = self.m_Target
     if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
         setCurrentFuel(self, math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self.m_Target})
+        modelUnit:updateView()
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = modelUnit})
 
         if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
             local gridIndex = modelUnit:getGridIndex()

@@ -114,6 +114,14 @@ function GameConstantFunctions.getTileMaxHP()
     return GAME_CONSTANT.tileMaxHP
 end
 
+function GameConstantFunctions.getMaxLevel()
+    return GAME_CONSTANT.maxLevel
+end
+
+function GameConstantFunctions.getLevelBonus()
+    return GAME_CONSTANT.levelBonus
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if (index.name == name) then

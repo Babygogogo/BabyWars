@@ -37,7 +37,7 @@ end
 
 local function getLevelIndicatorFrame(unit)
     if ((unit.getLevel) and (unit:getLevel() > 0)) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. level .. ".png")
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getLevel() .. ".png")
     else
         return nil
     end

@@ -63,16 +63,21 @@ local function getBaseDamage(self, defenseType)
 end
 
 local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    -- TODO: Calculate the bonus with attacker level, co skills and so on.
-    return 0
+    -- TODO: Calculate the bonus with co skills and so on.
+    local bonus = 0
+    bonus = bonus + ((attacker.getLevelAttackBonus) and (attacker:getLevelAttackBonus()) or 0)
+
+    return bonus
 end
 
 local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
     local targetTypeName = GameConstantFunctions.getUnitNameWithTiledId(target:getTiledID())
-    local bonusFromTile  = (targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0
-    -- TODO: Calculate the bonus with target level, co skills and so on.
+    local bonus = 0
+    bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
+    bonus = bonus + ((target.getLevelDefenseBonus) and (target:getLevelDefenseBonus()) or 0)
+    -- TODO: Calculate the bonus with co skills and so on.
 
-    return bonusFromTile
+    return bonus
 end
 
 local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
