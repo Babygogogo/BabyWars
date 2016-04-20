@@ -3,6 +3,7 @@
 local ViewMapCursor = class("ViewMapCursor", cc.Node)
 
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local AnimationLoader    = require("app.utilities.AnimationLoader")
 
 local PULSE_IN_DURATION = 0.15
 local PULSE_OUT_DURATION = 0.15
@@ -29,6 +30,12 @@ local LOWER_RIGHT_CORNER_INNER_POSITION_X =  21 + GRID_SIZE.width
 local LOWER_RIGHT_CORNER_OUTER_POSITION_Y = -31
 local LOWER_RIGHT_CORNER_INNER_POSITION_Y = -21
 
+local TARGET_CURSOR_OFFSET_X = - GRID_SIZE.width  / 2
+local TARGET_CURSOR_OFFSET_Y = - GRID_SIZE.height / 2
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function createCornerPulseAction(outerX, outerY, innerX, innerY)
     local pulseIn  = cc.MoveTo:create(PULSE_IN_DURATION,  {x = innerX, y = innerY})
     local pulseOut = cc.MoveTo:create(PULSE_OUT_DURATION, {x = outerX, y = outerY})
@@ -38,7 +45,7 @@ local function createCornerPulseAction(outerX, outerY, innerX, innerY)
 end
 
 --------------------------------------------------------------------------------
--- The composition cursor.
+-- The composition normal cursor.
 --------------------------------------------------------------------------------
 local function createUpperLeftCorner()
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
@@ -110,7 +117,7 @@ local function initWithLowerRightCorner(view, corner)
     view:addChild(corner)
 end
 
-local function createCursor()
+local function createNormalCursor()
     local cursor = cc.Node:create()
     cursor:setAnchorPoint(0.5, 0.5)
         :ignoreAnchorPointForPosition(true)
@@ -123,25 +130,39 @@ local function createCursor()
     return cursor
 end
 
-local function initWithCursor(view, cursor)
-    view.m_Cursor = cursor
+local function initWithNormalCursor(view, cursor)
+    view.m_NormalCursor = cursor
     view:addChild(cursor)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The composition target cursor.
+--------------------------------------------------------------------------------
+local function createTargetCursor()
+    local cursor = cc.Sprite:create()
+    cursor:ignoreAnchorPointForPosition(true)
+        :playAnimationForever(display.getAnimationCache("TargetCursor"))
+
+    return cursor
+end
+
+local function initWithTargetCursor(self, cursor)
+    self.m_TargetCursor = cursor
+    self:addChild(cursor)
+end
+
+--------------------------------------------------------------------------------
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewMapCursor:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
-    initWithCursor(self, createCursor())
+    initWithNormalCursor(self, createNormalCursor())
+    initWithTargetCursor(self, createTargetCursor())
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
 function ViewMapCursor:setTouchListener(listener)
     local eventDispatcher = self:getEventDispatcher()
     if (self.m_TouchListener) then
@@ -174,8 +195,28 @@ function ViewMapCursor:setMouseListener(listener)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ViewMapCursor:setPosition(x, y)
-    self.m_Cursor:setPosition(x, y)
+    self.m_NormalCursor:setPosition(x, y)
+    self.m_TargetCursor:setPosition(x + TARGET_CURSOR_OFFSET_X, y + TARGET_CURSOR_OFFSET_Y)
+
+    return self
+end
+
+function ViewMapCursor:getPosition()
+    return self.m_NormalCursor:getPosition()
+end
+
+function ViewMapCursor:setNormalCursorVisible(visible)
+    self.m_NormalCursor:setVisible(visible)
+
+    return self
+end
+
+function ViewMapCursor:setTargetCursorVisible(visible)
+    self.m_TargetCursor:setVisible(visible)
 
     return self
 end

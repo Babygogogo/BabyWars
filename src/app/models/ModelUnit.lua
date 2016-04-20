@@ -10,27 +10,10 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 --------------------------------------------------------------------------------
 local function setStateIdle(self)
     self.m_State = "idle"
-
-    if (self.m_View) then
-        self.m_View:setStateIdle()
-    end
 end
 
 local function setStateActioned(self)
     self.m_State = "actioned"
-end
-
---------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseConsumeUnitFuel.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    if (self:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1) then
-        local fuel = math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0)
-        self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
-        if (self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel()) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyUnit", gridIndex = self:getGridIndex()})
-        end
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -39,6 +22,7 @@ end
 local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
         setStateIdle(self)
+        self:updateView()
     end
 end
 
@@ -100,14 +84,19 @@ function ModelUnit:initView()
     assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithTiledID(self.m_TiledID)
+        :updateView()
 end
 
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     self:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-        :addEventListener("EvtTurnPhaseResetUnitState", self)
+    dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.setRootScriptEventDispatcher) then
+            component:setRootScriptEventDispatcher(dispatcher)
+        end
+    end
 
     return self
 end
@@ -115,9 +104,14 @@ end
 function ModelUnit:unsetRootScriptEventDispatcher()
     if (self.m_RootScriptEventDispatcher) then
         self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
-            :removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
 
         self.m_RootScriptEventDispatcher = nil
+
+        for _, component in pairs(ComponentManager.getAllComponents(self)) do
+            if (component.unsetRootScriptEventDispatcher) then
+                component:unsetRootScriptEventDispatcher()
+            end
+        end
     end
 
     return self
@@ -128,9 +122,7 @@ end
 --------------------------------------------------------------------------------
 function ModelUnit:onEvent(event)
     local name = event.name
-    if (name == "EvtTurnPhaseConsumeUnitFuel") then
-        onEvtTurnPhaseConsumeUnitFuel(self, event)
-    elseif (name == "EvtTurnPhaseResetUnitState") then
+    if (name == "EvtTurnPhaseResetUnitState") then
         onEvtTurnPhaseResetUnitState(self, event)
     end
 
@@ -168,15 +160,77 @@ function ModelUnit:canJoin(rhsUnitModel)
     return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
 end
 
-function ModelUnit:doActionWait(action)
-    setStateActioned(self)
-    self:moveAlongPath(action.path, function()
-        if (self.m_View) then
-            self.m_View:setStateActioned()
-        end
-    end)
+function ModelUnit:canDoAction(playerIndex)
+    return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
+end
+
+function ModelUnit:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+    end
 
     return self
 end
+
+function ModelUnit:doActionWait(action)
+    setStateActioned(self)
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionWait) then
+            component:doActionWait(action)
+        end
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        setStateActioned(self)
+    end
+
+    local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
+    local shouldDestroyAttacker = self:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget   = action.target:getCurrentHP() <= action.attackDamage
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionAttack) then
+            component:doActionAttack(action, isAttacker)
+        end
+    end
+
+    rootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
+
+    if ((self.m_View) and (isAttacker)) then
+        self.m_View:moveAlongPath(action.path, function()
+            self:updateView()
+            if (action.target.updateView) then
+                action.target:updateView()
+            end
+
+            if (shouldDestroyAttacker) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            end
+            if (shouldDestroyTarget) then
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                end
+            end
+        end)
+    end
+
+    return self
+end
+
 
 return ModelUnit

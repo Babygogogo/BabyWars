@@ -36,29 +36,54 @@ local function iterateAllActorUnits(self, func)
     end
 end
 
+local function setActorUnit(self, actor, gridIndex)
+    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actor
+    if (actor) then
+        actor:getModel():setGridIndex(gridIndex, false)
+    end
+end
+
+local function swapActorUnit(self, gridIndex1, gridIndex2)
+    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
+        return
+    end
+
+    local actorUnit1, actorUnit2 = self:getActorUnit(gridIndex1), self:getActorUnit(gridIndex2)
+    setActorUnit(self, actorUnit1, gridIndex2)
+    setActorUnit(self, actorUnit2, gridIndex1)
+
+    if (self.m_View) then
+        self.m_View:swapViewUnit(gridIndex1, gridIndex2)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerMovedCursor.
 --------------------------------------------------------------------------------
 local function onEvtPlayerMovedCursor(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
     if (unitModel) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", unitModel = unitModel})
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", modelUnit = unitModel})
     else
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
     end
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtDestroyUnit.
+-- The callback functions on EvtDestroyModelUnit/EvtDestroyViewUnit.
 --------------------------------------------------------------------------------
-local function onEvtDestroyUnit(self, event)
-    local actorUnit = self:getActorUnit(event.gridIndex)
-    assert(actorUnit, "ModelUnitMap-onEvtDestroyUnit() there is no unit on event.gridIndex.")
+local function onEvtDestroyModelUnit(self, event)
+    local gridIndex = event.gridIndex
+    local actorUnit = self:getActorUnit(gridIndex)
+    assert(actorUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
 
-    self.m_UnitActorsMap[event.gridIndex.x][event.gridIndex.y] = nil
+    setActorUnit(self, nil, gridIndex)
     actorUnit:getModel():unsetRootScriptEventDispatcher()
+end
+
+local function onEvtDestroyViewUnit(self, event)
     if (self.m_View) then
-        self.m_View:removeChild(actorUnit:getView())
+        self.m_View:removeViewUnit(event.gridIndex)
     end
 end
 
@@ -112,15 +137,16 @@ local function createUnitActorsMap(param)
         createUnitActorsMapWithTemplate(mapData)
     assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
 
-    return unitActorsMap
+    return unitActorsMap, unitActorsMap.size
 end
 
-local function initWithUnitActorsMap(model, map)
-    model.m_UnitActorsMap = map
+local function initWithUnitActorsMap(self, map, mapSize)
+    self.m_UnitActorsMap = map
+    self.m_MapSize       = mapSize
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
     initWithUnitActorsMap(self, createUnitActorsMap(param))
@@ -134,17 +160,18 @@ end
 
 function ModelUnitMap:initView()
     local view = self.m_View
-    assert(TypeChecker.isView(view))
+    assert(view, "ModelUnitMap:initView() there's no view attached to the owner actor of the model.")
 
-    view:removeAllChildren()
+    local mapSize = self.m_MapSize
+    view:setMapSize(mapSize)
+        :removeAllViewUnits()
 
     local unitActors = self.m_UnitActorsMap
-    local mapSize = unitActors.size
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
             local unitActor = unitActors[x][y]
             if (unitActor) then
-                view:addChild(unitActor:getView())
+                view:addViewUnit(unitActor:getView(), {x = x, y = y})
             end
         end
     end
@@ -159,7 +186,8 @@ function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
-        :addEventListener("EvtDestroyUnit", self)
+        :addEventListener("EvtDestroyModelUnit",   self)
+        :addEventListener("EvtDestroyViewUnit",    self)
 
     iterateAllActorUnits(self, function(actor)
         actor:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
@@ -169,9 +197,10 @@ function ModelUnitMap:onEnter(rootActor)
 end
 
 function ModelUnitMap:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
+        :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
 
     iterateAllActorUnits(self, function(actor)
@@ -187,8 +216,10 @@ function ModelUnitMap:onEvent(event)
         onEvtPlayerMovedCursor(self, event)
     elseif (name == "EvtTurnPhaseBeginning") then
         self.m_PlayerIndex = event.playerIndex
-    elseif (name == "EvtDestroyUnit") then
-        onEvtDestroyUnit(self, event)
+    elseif (name == "EvtDestroyModelUnit") then
+        onEvtDestroyModelUnit(self, event)
+    elseif (name == "EvtDestroyViewUnit") then
+        onEvtDestroyViewUnit(self, event)
     end
 
     return self
@@ -215,18 +246,29 @@ function ModelUnitMap:getModelUnit(gridIndex)
 end
 
 function ModelUnitMap:doActionWait(action)
-    local path               = action.path
-    -- HACK: sometimes the path is modified mysteriously after calling actorFocusUnit:getModel():doActionWait(action)
-    -- and the value of path[1] will become the same as path[#path].
-    -- so I clone them for later use.
-    local beginningGridIndex = GridIndexFunctions.clone(path[1])
-    local endingGridIndex    = GridIndexFunctions.clone(path[path.length])
-    local actorFocusUnit     = self:getActorUnit(beginningGridIndex)
+    local path = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
-    self.m_UnitActorsMap[endingGridIndex.x   ][endingGridIndex.y   ] = actorFocusUnit
+    swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
-    actorFocusUnit:getModel():doActionWait(action)
+    local modelUnit = self:getModelUnit(endingGridIndex)
+    modelUnit:doActionWait(action)
+    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
+    end
+
+    return self
+end
+
+function ModelUnitMap:doActionAttack(action)
+    local path = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+
+    swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    action.attacker:doActionAttack(action, true)
+    if (action.targetType == "unit") then
+        action.target:doActionAttack(action, false)
+    end
 
     return self
 end

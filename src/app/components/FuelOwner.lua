@@ -8,11 +8,11 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {
     "getCurrentFuel",
-    "setCurrentFuel",
     "getMaxFuel",
     "getFuelConsumptionPerTurn",
     "getDescriptionOnOutOfFuel",
     "shouldDestroyOnOutOfFuel",
+    "isFuelInShort",
 }
 
 --------------------------------------------------------------------------------
@@ -20,6 +20,40 @@ local EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 local function isFuelAmount(param)
     return (param >= 0) and (math.ceil(param) == param)
+end
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isShortage(self)
+    return self:getCurrentFuel() / self:getMaxFuel() <= 1 / 3
+end
+
+local function setCurrentFuel(self, fuelAmount)
+    assert(isFuelAmount(fuelAmount), "FuelOwner-setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
+    self.m_CurrentFuel = fuelAmount
+end
+
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtTurnPhaseConsumeUnitFuel(self, event)
+    local modelUnit = self.m_Target
+    if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
+        setCurrentFuel(self, math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
+        modelUnit:updateView()
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = modelUnit})
+
+        if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
+            local gridIndex = modelUnit:getGridIndex()
+            local tile = event.modelTileMap:getModelTile(gridIndex)
+
+            if ((not tile.getRepairAmount) or (not tile:getRepairAmount(modelUnit:getTiledID()))) then
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = gridIndex})
+                    :dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = gridIndex})
+            end
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -44,7 +78,26 @@ end
 function FuelOwner:loadInstantialData(data)
     assert(isFuelAmount(data.current), "FuelOwner:loadInstantialData() the data.current is expected to be a non-negative integer.")
 
-    self.m_Current = data.current
+    self.m_CurrentFuel = data.current
+
+    return self
+end
+
+function FuelOwner:setRootScriptEventDispatcher(dispatcher)
+    self:unsetRootScriptEventDispatcher()
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
+
+    return self
+end
+
+function FuelOwner:unsetRootScriptEventDispatcher()
+    if (self.m_RootScriptEventDispatcher) then
+        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
+
+        self.m_RootScriptEventDispatcher = nil
+    end
 
     return self
 end
@@ -71,10 +124,38 @@ function FuelOwner:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+function FuelOwner:onEvent(event)
+    if (event.name == "EvtTurnPhaseConsumeUnitFuel") then
+        onEvtTurnPhaseConsumeUnitFuel(self, event)
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function FuelOwner:doActionWait(action)
+    setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+
+    return self
+end
+
+function FuelOwner:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function FuelOwner:getCurrentFuel()
-    return self.m_Current
+    return self.m_CurrentFuel
 end
 
 function FuelOwner:getMaxFuel()
@@ -93,11 +174,8 @@ function FuelOwner:shouldDestroyOnOutOfFuel()
     return self.m_Template.destroyOnOutOfFuel
 end
 
-function FuelOwner:setCurrentFuel(fuelAmount)
-    assert(isFuelAmount(fuelAmount), "FuelOwner:setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
-    self.m_Current = fuelAmount
-
-    return self
+function FuelOwner:isFuelInShort()
+    return (self:getCurrentFuel() / self:getMaxFuel()) <= 0.4
 end
 
 return FuelOwner

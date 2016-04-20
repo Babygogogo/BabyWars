@@ -559,6 +559,13 @@ GameConstant.unitMaxHP       = 100
 GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
 
+GameConstant.maxLevel   = 3
+GameConstant.levelBonus = {
+    {attack = 5,  defense = 5 },
+    {attack = 10, defense = 10},
+    {attack = 20, defense = 20},
+}
+
 GameConstant.moveTypes = {
     "infantry",
     "mech",
@@ -759,7 +766,7 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
-            amount         = 20,
+            amount         = 30,
             targetCatagory = "Ground units",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
@@ -1411,6 +1418,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 1500,
         vision      = 2,
 
@@ -1513,6 +1524,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 2500,
         vision      = 2,
 
@@ -1580,6 +1595,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 2500,
@@ -1651,6 +1670,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 4000,
         vision      = 5,
 
@@ -1718,6 +1741,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 5000,
@@ -1790,6 +1817,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 7000,
@@ -1894,6 +1925,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 7000,
         vision      = 3,
 
@@ -1994,6 +2029,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 12000,
@@ -2098,6 +2137,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 16000,
         vision      = 2,
 
@@ -2169,6 +2212,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 6000,
         vision      = 3,
 
@@ -2238,6 +2285,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 11000,
@@ -2312,6 +2363,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 15000,
         vision      = 3,
 
@@ -2381,6 +2436,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 0,
             descriptionOnOutOfFuel = "This unit can't move when out of fuel.",
             destroyOnOutOfFuel     = false,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 12000,
@@ -2483,6 +2542,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 20000,
         vision      = 5,
 
@@ -2552,6 +2615,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 5,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 20000,
@@ -2625,10 +2692,14 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 13000,
         vision      = 4,
 
-        description = "Duster are somewhat powerful planes that can attack both ground and air units.",
+        description = "Dusters are somewhat powerful planes that can attack both ground and air units.",
     },
 
     bcopter    = {
@@ -2725,6 +2796,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 2,
             descriptionOnOutOfFuel = "This unit crashes when out of fuel.",
             destroyOnOutOfFuel     = true,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 9000,
@@ -2827,6 +2902,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 15000,
         vision      = 4,
 
@@ -2898,6 +2977,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 25000,
         vision      = 3,
 
@@ -2965,6 +3048,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 28000,
@@ -3036,6 +3123,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 20000,
@@ -3140,6 +3231,10 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        LevelOwner = {
+            level = 0,
+        },
+
         cost        = 16000,
         vision      = 5,
 
@@ -3238,6 +3333,10 @@ GameConstant.templateModelUnits = {
             consumptionPerTurn     = 1,
             descriptionOnOutOfFuel = "This unit sinks when out of fuel.",
             destroyOnOutOfFuel     = true,
+        },
+
+        LevelOwner = {
+            level = 0,
         },
 
         cost        = 6000,

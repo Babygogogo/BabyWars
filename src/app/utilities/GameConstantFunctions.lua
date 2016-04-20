@@ -106,6 +106,22 @@ function GameConstantFunctions.getGridSize()
     return GRID_SIZE
 end
 
+function GameConstantFunctions.getUnitMaxHP()
+    return GAME_CONSTANT.unitMaxHP
+end
+
+function GameConstantFunctions.getTileMaxHP()
+    return GAME_CONSTANT.tileMaxHP
+end
+
+function GameConstantFunctions.getMaxLevel()
+    return GAME_CONSTANT.maxLevel
+end
+
+function GameConstantFunctions.getLevelBonus()
+    return GAME_CONSTANT.levelBonus
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if (index.name == name) then
@@ -135,7 +151,7 @@ end
 function GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
     assert(baseID > 0, "GameConstantFunctions.getTemplateModelTileWithTiledId() the param baseID is invalid.")
     local baseName = GameConstantFunctions.getTileNameWithTiledId(baseID)
-    if (objectID == 0) then
+    if ((objectID == 0) or (not objectID)) then
         return TEMPLATE_MODEL_TILES[baseName]
     else
         local objectName = GameConstantFunctions.getTileNameWithTiledId(objectID)

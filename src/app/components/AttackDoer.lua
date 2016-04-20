@@ -1,9 +1,10 @@
 
 local AttackDoer = class("AttackDoer")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",
@@ -19,9 +20,118 @@ local EXPORTED_METHODS = {
     "getSecondaryWeaponStrongList",
 
     "canAttackTarget",
+    "getEstimatedBattleDamage",
+    "getUltimateBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
+    "isPrimaryWeaponAmmoInShort",
 }
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getNormalizedHP(hp)
+    return math.ceil(hp / 10)
+end
+
+local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, maxRange)
+    local distance = GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)
+    return (distance >= minRange) and (distance <= maxRange)
+end
+
+local function getPrimaryWeaponBaseDamage(self, defenseType)
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        return self.m_Template.primaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
+end
+
+local function getSecondaryWeaponBaseDamage(self, defenseType)
+    if (self:hasSecondaryWeapon()) then
+        return self.m_Template.secondaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
+end
+
+local function getBaseDamage(self, defenseType)
+    if (not self) then
+        return nil
+    end
+
+    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
+end
+
+local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+    -- TODO: Calculate the bonus with co skills and so on.
+    local bonus = 0
+    bonus = bonus + ((attacker.getLevelAttackBonus) and (attacker:getLevelAttackBonus()) or 0)
+
+    return bonus
+end
+
+local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+    local targetTypeName = GameConstantFunctions.getUnitNameWithTiledId(target:getTiledID())
+    local bonus = 0
+    bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
+    bonus = bonus + ((target.getLevelDefenseBonus) and (target:getLevelDefenseBonus()) or 0)
+    -- TODO: Calculate the bonus with co skills and so on.
+
+    return bonus
+end
+
+local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (attackerHP <= 0) then
+        return nil
+    end
+
+    local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
+    if (not baseAttackDamage) then
+        return nil
+    else
+        local attackBonus  = getAttackBonus( attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+        local defenseBonus = getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
+        attackerHP = math.max(attackerHP, 0)
+
+        return math.round(baseAttackDamage * (getNormalizedHP(attackerHP) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100))
+    end
+end
+
+local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (attackerHP <= 0) then
+        return nil
+    end
+
+    local estimatedAttackDamage = getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
+    if (not estimatedAttackDamage) then
+        return nil
+    else
+        if (not target:isAffectedByLuck()) then
+            return estimatedAttackDamage
+        else
+            return math.round(estimatedAttackDamage * (1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 9) / 100))
+        end
+    end
+end
+
+local function getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getAttackDamage)
+    local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
+    if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
+        return nil, nil
+    end
+
+    local attacker = self.m_Target
+    local attackDamage = getAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
+    assert(attackDamage, "AttackDoer-getBattleDamage() failed to get the attack damage.")
+
+    if ((target.canAttackTarget) and
+        (target:canAttackTarget(targetGridIndex, attacker, attackerGridIndex)) and
+        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1) then
+        return attackDamage, getAttackDamage(target, targetTile, target:getCurrentHP() - attackDamage, attacker, attackerTile, modelPlayerManager, weather)
+    else
+        return attackDamage, nil
+    end
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -52,6 +162,18 @@ function AttackDoer:loadInstantialData(data)
     return self
 end
 
+function AttackDoer:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function AttackDoer:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -69,6 +191,18 @@ function AttackDoer:onUnbind()
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function AttackDoer:doActionAttack(action, isAttacker)
+    if (((isAttacker)     and (getPrimaryWeaponBaseDamage(self, action.target:getDefenseType()))                             ) or
+        ((not isAttacker) and (getPrimaryWeaponBaseDamage(self, action.attacker:getDefenseType())) and (action.counterDamage))) then
+        self.m_PrimaryWeaponCurrentAmmo = self.m_PrimaryWeaponCurrentAmmo - 1
+    end
 
     return self
 end
@@ -124,34 +258,24 @@ function AttackDoer:getSecondaryWeaponStrongList()
     return self.m_Template.secondaryWeapon.strong
 end
 
-function AttackDoer:canAttackTarget(targetModel, selfGridIndex)
-    if (not targetModel) or
-       (self.m_Target:getPlayerIndex() == targetModel:getPlayerIndex()) or
-       (not targetModel.getDefenseType) then
+function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
+    if ((not target) or
+        (not target.getDefenseType) or
+        (not isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax())) or
+        ((not GridIndexFunctions.isEqual(self.m_Target:getGridIndex(), attackerGridIndex) and (not self:canAttackAfterMove()))) or
+        (self.m_Target:getPlayerIndex() == target:getPlayerIndex())) then
         return false
     end
 
-    local distance = GridIndexFunctions.getDistance(selfGridIndex or self.m_Target:getGridIndex(), targetModel:getGridIndex())
-    if (distance < self.m_Template.minAttackRange) or (distance > self.m_Template.maxAttackRange) then
-        return false
-    end
+    return (getBaseDamage(self, target:getDefenseType()) ~= nil)
+end
 
-    local defenseType = targetModel:getDefenseType()
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        local baseDamage = self.m_Template.primaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return true, baseDamage
-        end
-    end
+function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
+    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getEstimatedAttackDamage)
+end
 
-    if (self:hasSecondaryWeapon()) then
-        local baseDamage = self.m_Template.secondaryWeapon.baseDamage[defenseType]
-        if (baseDamage) then
-            return true, baseDamage
-        end
-    end
-
-    return false
+function AttackDoer:getUltimateBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
+    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getUltimateAttackDamage)
 end
 
 function AttackDoer:getAttackRangeMinMax()
@@ -160,6 +284,14 @@ end
 
 function AttackDoer:canAttackAfterMove()
     return self.m_Template.canAttackAfterMove
+end
+
+function AttackDoer:isPrimaryWeaponAmmoInShort()
+    if (not self:hasPrimaryWeapon()) then
+        return false
+    else
+        return (self:getPrimaryWeaponCurrentAmmo() / self:getPrimaryWeaponMaxAmmo()) <= 0.4
+    end
 end
 
 return AttackDoer

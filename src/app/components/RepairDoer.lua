@@ -1,13 +1,33 @@
 
 local RepairDoer = class("RepairDoer")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 local EXPORTED_METHODS = {
     "getRepairTargetCatagory",
+    "getRepairTargetList",
     "getRepairAmount",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isRepairTarget(self, targetTiledID)
+    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Target:getPlayerIndex()) then
+        return false
+    end
+
+    local targetName = GameConstantFunctions.getUnitNameWithTiledId(targetTiledID)
+    for _, name in ipairs(self:getRepairTargetList()) do
+        if (targetName == name) then
+            return true
+        end
+    end
+
+    return false
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -61,8 +81,16 @@ function RepairDoer:getRepairTargetCatagory()
     return self.m_Template.targetCatagory
 end
 
-function RepairDoer:getRepairAmount()
-    return self.m_Template.amount
+function RepairDoer:getRepairTargetList()
+    return self.m_Template.targetList
+end
+
+function RepairDoer:getRepairAmount(targetTiledID)
+    if ((not targetTiledID) or (isRepairTarget(self, targetTiledID))) then
+        return self.m_Template.amount
+    else
+        return nil
+    end
 end
 
 return RepairDoer

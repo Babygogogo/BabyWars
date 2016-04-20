@@ -1,12 +1,31 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
-local function onEvtPlayerTouchTile(model, event)
-    model.m_ModelTile = event.tileModel
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
-    if (model.m_View) then
-        model.m_View:updateWithModelTile(event.tileModel)
-        model.m_View:setVisible(true)
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtPlayerTouchTile(self, event)
+    self.m_ModelTile = event.modelTile
+
+    if (self.m_View) then
+        self.m_View:updateWithModelTile(event.modelTile)
+            :setVisible(true)
+    end
+end
+
+local function onEvtPlayerMovedCursor(self, event)
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
+local function onEvtPlayerSelectedGrid(self, event)
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
+local function onEvtModelTileUpdated(self, event)
+    if ((GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelTile:getGridIndex())) and (self.m_View)) then
+        self.m_View:updateWithModelTile(self.m_ModelTile)
     end
 end
 
@@ -14,6 +33,8 @@ end
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileInfo:ctor(param)
+    self.m_CursorGridIndex = {x = 1, y = 1}
+
     return self
 end
 
@@ -29,33 +50,37 @@ end
 function ModelTileInfo:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchTile", self)
-        :addEventListener("EvtWeatherChanged", self)
+        :addEventListener("EvtWeatherChanged",     self)
+        :addEventListener("EvtPlayerMovedCursor",  self)
+        :addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtModelTileUpdated",   self)
 
     return self
 end
 
 function ModelTileInfo:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWeatherChanged", self)
-        :removeEventListener("EvtPlayerTouchTile", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelTileUpdated", self)
+        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtPlayerMovedCursor", self)
+        :removeEventListener("EvtWeatherChanged",    self)
+        :removeEventListener("EvtPlayerTouchTile",   self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
 function ModelTileInfo:onEvent(event)
-    if (event.name == "EvtPlayerTouchTile") then
+    local eventName = event.name
+    if (eventName == "EvtPlayerTouchTile") then
         onEvtPlayerTouchTile(self, event)
-    elseif (event.name == "EvtWeatherChanged") then
+    elseif (eventName == "EvtWeatherChanged") then
         self.m_Weather = event.weather
-    end
-
-    return self
-end
-
-function ModelTileInfo:onPlayerTouch()
-    if (self.m_TileDetailModel) then
-        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_Weather)
-            :setEnabled(true)
+    elseif (eventName == "EvtPlayerMovedCursor") then
+        onEvtPlayerMovedCursor(self, event)
+    elseif (eventName == "EvtPlayerSelectedGrid") then
+        onEvtPlayerSelectedGrid(self, event)
+    elseif (eventName == "EvtModelTileUpdated") then
+        onEvtModelTileUpdated(self, event)
     end
 
     return self
@@ -64,9 +89,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelTileInfo:adjustPositionOnTouch(touch)
-    if (self.m_View) then
-        self.m_View:adjustPositionOnTouch(touch)
+function ModelTileInfo:onPlayerTouch()
+    if (self.m_TileDetailModel) then
+        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_Weather)
+            :setEnabled(true)
     end
 
     return self

@@ -1,11 +1,16 @@
 
 local AttackTaker = class("AttackTaker")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local ComponentManager      = require("global.components.ComponentManager")
+
+local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
+local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()
 
 local EXPORTED_METHODS = {
     "getCurrentHP",
+    "setCurrentHP",
     "getNormalizedCurrentHP",
 
     "getDefenseType",
@@ -41,6 +46,18 @@ function AttackTaker:loadInstantialData(data)
     return self
 end
 
+function AttackTaker:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function AttackTaker:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -63,6 +80,29 @@ function AttackTaker:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function AttackTaker:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
+        if (self:getCurrentHP() <= 0) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+        end
+    else
+        self:setCurrentHP(math.max(self:getCurrentHP() - action.attackDamage, 0))
+        if (self:getCurrentHP() <= 0) then
+            if (action.targetType == "unit") then
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+            else
+                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelTile", gridIndex = self.m_Target:getGridIndex()})
+            end
+        end
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function AttackTaker:getMaxHP()
@@ -71,6 +111,13 @@ end
 
 function AttackTaker:getCurrentHP()
     return self.m_CurrentHP
+end
+
+function AttackTaker:setCurrentHP(hp)
+    assert((hp >= 0) and (hp <= math.max(UNIT_MAX_HP, TILE_MAX_HP)) and (hp == math.floor(hp)), "AttackTaker:setCurrentHP() the param hp is invalid.")
+    self.m_CurrentHP = hp
+
+    return self
 end
 
 function AttackTaker:getNormalizedCurrentHP()
@@ -82,7 +129,7 @@ function AttackTaker:getDefenseType()
 end
 
 function AttackTaker:isAffectedByLuck()
-    return self.m_Template.isAffectByLuck
+    return self.m_Template.isAffectedByLuck
 end
 
 function AttackTaker:getDefenseFatalList()

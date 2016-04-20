@@ -28,6 +28,7 @@ local function createCompositionActors(param)
     local unitDetailActor      = Actor.createWithModelAndViewName("ModelUnitDetail",      nil, "ViewUnitDetail")
     local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
     local tileDetailActor      = Actor.createWithModelAndViewName("ModelTileDetail",      nil, "ViewTileDetail")
+    local battleInfoActor      = Actor.createWithModelAndViewName("ModelBattleInfo",      nil, "ViewBattleInfo")
 
     return {
         confirmBoxActor      = confirmBoxActor,
@@ -37,7 +38,8 @@ local function createCompositionActors(param)
         unitInfoActor        = unitInfoActor,
         unitDetailActor      = unitDetailActor,
         tileInfoActor        = tileInfoActor,
-        tileDetailActor      = tileDetailActor
+        tileDetailActor      = tileDetailActor,
+        battleInfoActor      = battleInfoActor,
     }
 end
 
@@ -58,6 +60,8 @@ local function initWithCompositionActors(self, actors)
     self.m_TileDetailActor = actors.tileDetailActor
     self.m_TileInfoActor   = actors.tileInfoActor
     self.m_TileInfoActor:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
+
+    self.m_BattleInfoActor = actors.battleInfoActor
 end
 
 --------------------------------------------------------------------------------
@@ -85,6 +89,7 @@ function ModelSceneWarHUD:initView()
         :setViewTileDetail(     self.m_TileDetailActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
         :setViewUnitDetail(     self.m_UnitDetailActor:getView())
+        :setViewBattleInfo(     self.m_BattleInfoActor:getView())
 
     return self
 end
@@ -98,6 +103,7 @@ function ModelSceneWarHUD:onEnter(rootActor)
     self.m_MoneyEnergyInfoActor:onEnter(rootActor)
     self.m_TileInfoActor:onEnter(rootActor)
     self.m_UnitInfoActor:onEnter(rootActor)
+    self.m_BattleInfoActor:onEnter(rootActor)
 
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
@@ -114,6 +120,7 @@ function ModelSceneWarHUD:onCleanup(rootActor)
     self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
     self.m_TileInfoActor:onCleanup(rootActor)
     self.m_UnitInfoActor:onCleanup(rootActor)
+    self.m_BattleInfoActor:onCleanup(rootActor)
 
     return self
 end
