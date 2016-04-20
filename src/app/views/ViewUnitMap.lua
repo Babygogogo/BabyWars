@@ -17,6 +17,10 @@ end
 
 local function setViewUnit(self, view, gridIndex)
     self.m_Map[gridIndex.x][gridIndex.y] = view
+
+    if (view) then
+        view:setLocalZOrder(self.m_MapSize.height - gridIndex.y)
+    end
 end
 
 --------------------------------------------------------------------------------
