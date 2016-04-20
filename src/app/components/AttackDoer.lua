@@ -24,6 +24,7 @@ local EXPORTED_METHODS = {
     "getUltimateBattleDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
+    "isPrimaryWeaponAmmoInShort",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -278,6 +279,14 @@ end
 
 function AttackDoer:canAttackAfterMove()
     return self.m_Template.canAttackAfterMove
+end
+
+function AttackDoer:isPrimaryWeaponAmmoInShort()
+    if (not self:hasPrimaryWeapon()) then
+        return false
+    else
+        return (self:getPrimaryWeaponCurrentAmmo() / self:getPrimaryWeaponMaxAmmo()) <= 0.4
+    end
 end
 
 return AttackDoer

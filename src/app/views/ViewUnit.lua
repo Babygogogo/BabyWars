@@ -11,11 +11,16 @@ local COLOR_IDLE             = {r = 255, g = 255, b = 255}
 local COLOR_ACTIONED         = {r = 170, g = 170, b = 170}
 local MOVE_DURATION_PER_GRID = 0.1
 
+local STATE_INDICATOR_POSITION_X = 3
+local STATE_INDICATOR_POSITION_Y = 0
 local HP_INDICATOR_POSITION_X = GRID_SIZE.width - 24 -- 24 is the width of the indicator
 local HP_INDICATOR_POSITION_Y = 0
 
-local HP_INDICATOR_Z_ORDER = 1
-local UNIT_SPRITE_Z_ORDER  = 0
+local STATE_INDICATOR_DURATION = 0.8
+
+local HP_INDICATOR_Z_ORDER    = 1
+local STATE_INDICATOR_Z_ORDER = 1
+local UNIT_SPRITE_Z_ORDER     = 0
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -28,6 +33,46 @@ local function createActionMoveAlongPath(path, callback)
 
     steps[#steps + 1] = cc.CallFunc:create(callback)
     return cc.Sequence:create(unpack(steps))
+end
+
+local function getLevelIndicatorFrame(unit)
+    if ((unit.getLevel) and (unit:getLevel() > 0)) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. level .. ".png")
+    else
+        return nil
+    end
+end
+
+local function getFuelIndicatorFrame(unit)
+    if ((unit.isFuelInShort) and (unit:isFuelInShort())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s02_f01.png")
+    else
+        return nil
+    end
+end
+
+local function getAmmoIndicatorFrame(unit)
+    if ((unit.isPrimaryWeaponAmmoInShort) and (unit:isPrimaryWeaponAmmoInShort())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s02_f02.png")
+    else
+        return nil
+    end
+end
+
+local function getSubmergedIndicatorFrame(unit)
+    if ((unit.isSumberged) and (unit:isSumberged())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s03_f0" .. unit:getPlayerIndex() .. ".png")
+    else
+        return nil
+    end
+end
+
+local function getCaptureIndicatorFrame(unit)
+    if ((unit.isCapturing) and (unit:isCapturing())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s04_f0" .. unit:getPlayerIndex() .. ".png")
+    else
+        return nil
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -97,14 +142,49 @@ local function updateHpIndicator(indicator, hp)
 end
 
 --------------------------------------------------------------------------------
+-- The state indicator.
+--------------------------------------------------------------------------------
+local function createStateIndicator()
+    local indicator = cc.Sprite:createWithSpriteFrameName("c02_t99_s02_f01.png")
+    indicator:ignoreAnchorPointForPosition(true)
+        :setPosition(STATE_INDICATOR_POSITION_X, STATE_INDICATOR_POSITION_Y)
+        :setVisible(true)
+
+    return indicator
+end
+
+local function initWithStateIndicator(self, indicator)
+    self.m_StateIndicator = indicator
+    self:addChild(indicator, STATE_INDICATOR_Z_ORDER)
+end
+
+local function updateStateIndicator(indicator, unit)
+    local frames = {}
+    frames[#frames + 1] = getLevelIndicatorFrame(    unit)
+    frames[#frames + 1] = getFuelIndicatorFrame(     unit)
+    frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
+    frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
+    frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
+
+    indicator:stopAllActions()
+    if (#frames == 0) then
+        indicator:setVisible(false)
+    else
+        indicator:setVisible(true)
+            :playAnimationForever(display.newAnimation(frames, STATE_INDICATOR_DURATION))
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewUnit:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :setCascadeColorEnabled(true)
 
-    initWithUnitSprite(self,  createUnitSprite())
-    initWithHpIndicator(self, createHpIndicator())
+    initWithUnitSprite(    self, createUnitSprite())
+    initWithHpIndicator(   self, createHpIndicator())
+    initWithStateIndicator(self, createStateIndicator())
 
     return self
 end
@@ -113,9 +193,10 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    updateUnitSprite( self,               unit:getTiledID())
-    updateUnitState(  self,               unit:getState())
-    updateHpIndicator(self.m_HpIndicator, unit:getNormalizedCurrentHP())
+    updateUnitSprite(    self,                  unit:getTiledID())
+    updateUnitState(     self,                  unit:getState())
+    updateHpIndicator(   self.m_HpIndicator,    unit:getNormalizedCurrentHP())
+    updateStateIndicator(self.m_StateIndicator, unit)
 end
 
 function ViewUnit:moveAlongPath(path, callbackOnFinish)

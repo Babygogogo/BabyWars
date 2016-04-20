@@ -22,10 +22,7 @@ end
 local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
         setStateIdle(self)
-
-        if (self.m_View) then
-            self.m_View:updateWithModelUnit(self)
-        end
+        self:updateView()
     end
 end
 
@@ -87,7 +84,7 @@ function ModelUnit:initView()
     assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:updateWithModelUnit(self)
+        :updateView()
 end
 
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
@@ -167,6 +164,14 @@ function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end
 
+function ModelUnit:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionWait(action)
     setStateActioned(self)
 
@@ -176,9 +181,11 @@ function ModelUnit:doActionWait(action)
         end
     end
 
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
+
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
+            self:updateView()
         end)
     end
 
@@ -202,25 +209,24 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
     rootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
 
-    if (self.m_View) then
-        if (not isAttacker) then
-            self.m_View:updateWithModelUnit(self)
-        else
-            self.m_View:moveAlongPath(action.path, function()
-                self.m_View:updateWithModelUnit(self)
+    if ((self.m_View) and (isAttacker)) then
+        self.m_View:moveAlongPath(action.path, function()
+            self:updateView()
+            if (action.target.updateView) then
+                action.target:updateView()
+            end
 
-                if (shouldDestroyAttacker) then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            if (shouldDestroyAttacker) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            end
+            if (shouldDestroyTarget) then
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
                 end
-                if (shouldDestroyTarget) then
-                    if (action.targetType == "unit") then
-                        rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
-                    else
-                        rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
-                    end
-                end
-            end)
-        end
+            end
+        end)
     end
 
     return self

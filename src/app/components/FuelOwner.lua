@@ -12,6 +12,7 @@ local EXPORTED_METHODS = {
     "getFuelConsumptionPerTurn",
     "getDescriptionOnOutOfFuel",
     "shouldDestroyOnOutOfFuel",
+    "isFuelInShort",
 }
 
 --------------------------------------------------------------------------------
@@ -30,14 +31,7 @@ end
 
 local function setCurrentFuel(self, fuelAmount)
     assert(isFuelAmount(fuelAmount), "FuelOwner-setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
-    if (self.m_CurrentFuel ~= fuelAmount) then
-        self.m_CurrentFuel = fuelAmount
-
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtModelUnitUpdated",
-            modelUnit = self.m_Target,
-        })
-    end
+    self.m_CurrentFuel = fuelAmount
 end
 
 --------------------------------------------------------------------------------
@@ -47,6 +41,7 @@ local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     local modelUnit = self.m_Target
     if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
         setCurrentFuel(self, math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self.m_Target})
 
         if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
             local gridIndex = modelUnit:getGridIndex()
@@ -176,6 +171,10 @@ end
 
 function FuelOwner:shouldDestroyOnOutOfFuel()
     return self.m_Template.destroyOnOutOfFuel
+end
+
+function FuelOwner:isFuelInShort()
+    return (self:getCurrentFuel() / self:getMaxFuel()) <= 0.4
 end
 
 return FuelOwner
