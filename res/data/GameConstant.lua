@@ -1422,6 +1422,10 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        CaptureDoer = {
+            isCapturing = false,
+        },
+
         cost        = 1500,
         vision      = 2,
 
@@ -1528,6 +1532,10 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        CaptureDoer = {
+            isCapturing = false,
+        },
+
         cost        = 2500,
         vision      = 2,
 
@@ -1599,6 +1607,10 @@ GameConstant.templateModelUnits = {
 
         LevelOwner = {
             level = 0,
+        },
+
+        CaptureDoer = {
+            isCapturing = false,
         },
 
         cost        = 2500,

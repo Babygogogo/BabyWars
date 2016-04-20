@@ -44,7 +44,7 @@ local WarScene_Test2 = {
         },
         {
             id      = 4,
-            name    = "Green Dog",
+            name    = "Black Dog",
             fund    = 444444,
             isAlive = true,
             co      = {

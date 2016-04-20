@@ -128,6 +128,20 @@ local function getActionAttack(self, destination)
     end
 end
 
+local function getActionCapture(self, destination)
+    local modelTile = self.m_ModelTileMap:getModelTile(destination)
+    if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
+        return {
+            name     = "Capture",
+            callback = function()
+                print("Capture action selected, but not implemented.")
+            end,
+        }
+    else
+        return nil
+    end
+end
+
 local function getActionWait(self, destination)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
@@ -149,8 +163,9 @@ local function getAvaliableActionList(self, destination)
     end
 
     local list = {}
-    list[#list + 1] = getActionAttack(self, destination)
-    list[#list + 1] = getActionWait(  self, destination)
+    list[#list + 1] = getActionAttack( self, destination)
+    list[#list + 1] = getActionCapture(self, destination)
+    list[#list + 1] = getActionWait(   self, destination)
 
     assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
     return list
