@@ -137,8 +137,8 @@ function ModelTile:destroyViewTileObject()
     end
 end
 
-function ModelTile:updateCapturer(playerIndex)
-    assert(self:getPlayerIndex() ~= playerIndex, "ModelTile:updateCapturer() the param playerIndex is the same as the one of self.")
+function ModelTile:updateWithPlayerIndex(playerIndex)
+    assert(self:getPlayerIndex() ~= playerIndex, "ModelTile:updateWithPlayerIndex() the param playerIndex is the same as the one of self.")
     self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(GameConstantFunctions.getTileNameWithTiledId(self:getTiledID()), playerIndex)
 
     return self
@@ -161,6 +161,18 @@ function ModelTile:doActionCapture(action)
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionCapture) then
             component:doActionCapture(action)
+        end
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileUpdated", modelTile = self})
+
+    return self
+end
+
+function ModelTile:doActionWait(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionWait) then
+            component:doActionWait(action)
         end
     end
 

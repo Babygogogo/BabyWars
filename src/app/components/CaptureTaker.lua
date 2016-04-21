@@ -3,11 +3,25 @@ local CaptureTaker = class("CaptureTaker")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "getCurrentCapturePoint",
     "getMaxCapturePoint",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isCapturerMovedAway(selfGridIndex, beginningGridIndex, endingGridIndex)
+    return ((GridIndexFunctions.isEqual(selfGridIndex, beginningGridIndex)) and
+            (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)))
+end
+
+local function isCapturerDestroyed(selfGridIndex, capturer)
+    return ((GridIndexFunctions.isEqual(selfGridIndex, capturer:getGridIndex())) and
+            (capturer:getCurrentHP() <= 0))
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -77,17 +91,44 @@ function CaptureTaker:doActionCapture(action)
     else
         self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - action.capturer:getCaptureAmount(), 0)
         if (self.m_CurrentCapturePoint <= 0) then
-            --[[
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name            = "EvtTileCapturerUpdated",
-                gridIndex       = modelTile:getGridIndex(),
-                prevPlayerIndex = modelTile:getPlayerIndex(),
-                nextplayerIndex = action.capturer:getPlayerIndex(),
-            })
-            ]]
             self.m_CurrentCapturePoint = maxCapturePoint
-            modelTile:updateCapturer(action.capturer:getPlayerIndex())
+            modelTile:updateWithPlayerIndex(action.capturer:getPlayerIndex())
         end
+    end
+
+    return self
+end
+
+function CaptureTaker:doActionAttack(action, isAttacker)
+    local path = action.path
+    local selfGridIndex = self.m_Target:getGridIndex()
+
+    --[[ -- These codes are working but too complicated.
+    if (GridIndexFunctions.isEqual(selfGridIndex, beginningGridIndex)) then
+        if ((not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) or
+            (action.attacker:getCurrentHP() <= 0)) then
+            self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+        end
+    elseif (GridIndexFunctions.isEqual(selfGridIndex, action.target:getGridIndex())) then
+        if ((action.targetType == "unit") and (action.target:getCurrentHP() <= 0)) then
+            self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+        end
+    end
+    ]]
+
+    if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
+        (isCapturerDestroyed(selfGridIndex, action.attacker)) or
+        ((action.targetType == "unit") and (isCapturerDestroyed(selfGridIndex, action.target)))) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    end
+
+    return self
+end
+
+function CaptureTaker:doActionWait(action)
+    local path = action.path
+    if (isCapturerMovedAway(self.m_Target:getGridIndex(), path[1], path[#path])) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
     end
 
     return self

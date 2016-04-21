@@ -226,8 +226,8 @@ function ModelTileMap:getModelTile(gridIndex)
 end
 
 function ModelTileMap:doActionAttack(action)
-    assert(action.targetType == "tile", "ModelTileMap:doActionAttack() the param action is invalid.")
-    action.target:doActionAttack(action, false)
+    self:getModelTile(action.path[1]):doActionAttack(action, false)
+    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
 
     return self
 end
@@ -237,6 +237,12 @@ function ModelTileMap:doActionCapture(action)
         action.prevTarget:doActionCapture(action)
     end
     action.nextTarget:doActionCapture(action)
+
+    return self
+end
+
+function ModelTileMap:doActionWait(action)
+    self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
 end

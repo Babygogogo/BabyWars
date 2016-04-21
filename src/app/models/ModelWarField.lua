@@ -158,6 +158,7 @@ end
 
 function ModelWarField:doActionWait(action)
     self:getModelUnitMap():doActionWait(action)
+    self:getModelTileMap():doActionWait(action)
 
     return self
 end
@@ -176,9 +177,7 @@ function ModelWarField:doActionAttack(action)
     end
 
     modelUnitMap:doActionAttack(action)
-    if (not targetUnit) then
-        modelTileMap:doActionAttack(action)
-    end
+    modelTileMap:doActionAttack(action)
 
     return self
 end

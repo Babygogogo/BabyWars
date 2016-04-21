@@ -248,7 +248,6 @@ end
 function ModelUnitMap:doActionWait(action)
     local path = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
     swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
     local modelUnit = self:getModelUnit(endingGridIndex)
@@ -274,10 +273,14 @@ end
 
 function ModelUnitMap:doActionCapture(action)
     local path = action.path
-    local endingGridIndex = path[#path]
-    swapActorUnit(self, path[1], endingGridIndex)
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
-    self:getModelUnit(endingGridIndex):doActionCapture(action)
+    local modelUnit = self:getModelUnit(endingGridIndex)
+    modelUnit:doActionCapture(action)
+    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
+    end
 
     return self
 end

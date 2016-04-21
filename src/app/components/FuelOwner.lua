@@ -151,6 +151,12 @@ function FuelOwner:doActionAttack(action, isAttacker)
     return self
 end
 
+function FuelOwner:doActionCapture(action)
+    setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
