@@ -6,7 +6,6 @@ local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getCurrentCapturePoint",
-    "setCurrentCapturePoint",
     "getMaxCapturePoint",
 }
 
@@ -34,6 +33,18 @@ function CaptureTaker:loadInstantialData(data)
     return self
 end
 
+function CaptureTaker:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function CaptureTaker:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
@@ -56,16 +67,37 @@ function CaptureTaker:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function CaptureTaker:doActionCapture(action)
+    local modelTile       = self.m_Target
+    local maxCapturePoint = self:getMaxCapturePoint()
+    if ((action.prevTarget) and (modelTile == action.prevTarget)) then
+        self.m_CurrentCapturePoint = maxCapturePoint
+    else
+        self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - action.capturer:getCaptureAmount(), 0)
+        if (self.m_CurrentCapturePoint <= 0) then
+            --[[
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name            = "EvtTileCapturerUpdated",
+                gridIndex       = modelTile:getGridIndex(),
+                prevPlayerIndex = modelTile:getPlayerIndex(),
+                nextplayerIndex = action.capturer:getPlayerIndex(),
+            })
+            ]]
+            self.m_CurrentCapturePoint = maxCapturePoint
+            modelTile:updateCapturer(action.capturer:getPlayerIndex())
+        end
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function CaptureTaker:getCurrentCapturePoint()
     return self.m_CurrentCapturePoint
-end
-
-function CaptureTaker:setCurrentCapturePoint(point)
-    self.m_CurrentCapturePoint = point
-
-    return self
 end
 
 function CaptureTaker:getMaxCapturePoint()

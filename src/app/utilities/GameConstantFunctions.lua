@@ -122,10 +122,11 @@ function GameConstantFunctions.getLevelBonus()
     return GAME_CONSTANT.levelBonus
 end
 
-function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
+function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
-        if (index.name == name) then
-            return id
+        if ((index.name == name) and
+            ((not playerIndex) or (playerIndex == index.playerIndex))) then
+                return id
         end
     end
 

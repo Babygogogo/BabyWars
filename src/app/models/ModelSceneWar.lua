@@ -49,6 +49,10 @@ local function doActionAttack(self, action)
     self:getModelWarField():doActionAttack(action)
 end
 
+local function doActionCapture(self, action)
+    self:getModelWarField():doActionCapture(action)
+end
+
 --------------------------------------------------------------------------------
 -- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
 --------------------------------------------------------------------------------
@@ -60,6 +64,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionWait(self, event)
     elseif (actionName == "Attack") then
         doActionAttack(self, event)
+    elseif (actionName == "Capture") then
+        doActionCapture(self, event)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end

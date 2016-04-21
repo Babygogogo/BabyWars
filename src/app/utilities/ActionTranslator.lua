@@ -137,6 +137,34 @@ local function translateAttack(action, modelScene, currentPlayerID)
     return {actionName = "Attack", path = translatedPath, targetGridIndex = GridIndexFunctions.clone(targetGridIndex), attackDamage = attackDamage, counterDamage = counterDamage}
 end
 
+local function translateCapture(action, modelScene, currentPlayerID)
+    local modelWarField       = modelScene:getModelWarField()
+    local modelUnitMap        = modelWarField:getModelUnitMap()
+    local modelTileMap        = modelWarField:getModelTileMap()
+    local modelPlayerManager  = modelScene:getModelPlayerManager()
+    local modelWeatherManager = modelScene:getModelWeatherManager()
+
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
+    if (not translatedPath) then
+        return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
+    end
+    if (translatedPath.isBlocked) then
+        return {actionName = "Wait", path = translatedPath}
+    end
+
+    local destination = translatedPath[#translatedPath]
+    local capturer          = modelUnitMap:getModelUnit(translatedPath[1])
+    local existingModelUnit = modelUnitMap:getModelUnit(destination)
+    if ((existingModelUnit) and (existingModelUnit ~= capturer)) then
+        return nil, "ActionTranslator-translateCapture() failed because there's another unit on the destination grid."
+    end
+    if ((not capturer.canCapture) or (not capturer:canCapture(modelTileMap:getModelTile(destination)))) then
+        return nil, "ActionTranslator-translateCapture() failed because the focus unit can't capture the target tile."
+    end
+
+    return {actionName = "Capture", path = translatedPath}
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -150,9 +178,11 @@ function ActionTranslator.translate(action, modelScene)
     if (actionName == "EndTurn") then
         return translateEndTurn(action, modelScene)
     elseif (actionName == "Wait") then
-        return translateWait(action, modelScene, currentPlayerID)
+        return translateWait(   action, modelScene, currentPlayerID)
     elseif (actionName == "Attack") then
-        return translateAttack(action, modelScene, currentPlayerID)
+        return translateAttack( action, modelScene, currentPlayerID)
+    elseif (actionName == "Capture") then
+        return translateCapture(action, modelScene, currentPlayerID)
     else
         return nil, "ActionTranslator.translate() unrecognized action name."
     end

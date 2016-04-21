@@ -73,26 +73,32 @@ end
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
-local function dispatchEventWait(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "Wait",
-        path       = self.m_MovePath,
-    })
-end
-
 local function dispatchEventJoin(self)
     print("The Join action is selected, but not implemented.")
 end
 
 local function dispatchEventAttack(self, targetGridIndex)
-    local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, targetGridIndex)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",
         actionName      = "Attack",
         path            = self.m_MovePath,
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
+    })
+end
+
+local function dispatchEventCapture(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "Capture",
+        path       = self.m_MovePath,
+    })
+end
+
+local function dispatchEventWait(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "Wait",
+        path       = self.m_MovePath,
     })
 end
 
@@ -134,7 +140,7 @@ local function getActionCapture(self, destination)
         return {
             name     = "Capture",
             callback = function()
-                print("Capture action selected, but not implemented.")
+                dispatchEventCapture(self)
             end,
         }
     else

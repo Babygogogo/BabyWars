@@ -3,12 +3,23 @@ local CaptureDoer = class("CaptureDoer")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "isCapturing",
     "canCapture",
     "getCaptureAmount",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function updateIsCapturingWithPath(self, path)
+    if ((self.m_IsCapturing) and
+        ((#path ~= 1) and (not GridIndexFunctions.isEqual(path[1], path[#path])))) then
+            self.m_IsCapturing = false
+    end
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -48,6 +59,29 @@ function CaptureDoer:onUnbind()
 
     ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
     self.m_Target = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function CaptureDoer:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        updateIsCapturingWithPath(self, action.path)
+    end
+
+    return self
+end
+
+function CaptureDoer:doActionCapture(action)
+    self.m_IsCapturing = (self:getCaptureAmount() < action.nextTarget:getCurrentCapturePoint())
+
+    return self
+end
+
+function CaptureDoer:doActionWait(action)
+    updateIsCapturingWithPath(self, action.path)
 
     return self
 end

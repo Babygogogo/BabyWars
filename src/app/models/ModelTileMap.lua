@@ -232,4 +232,13 @@ function ModelTileMap:doActionAttack(action)
     return self
 end
 
+function ModelTileMap:doActionCapture(action)
+    if (action.prevTarget) then
+        action.prevTarget:doActionCapture(action)
+    end
+    action.nextTarget:doActionCapture(action)
+
+    return self
+end
+
 return ModelTileMap

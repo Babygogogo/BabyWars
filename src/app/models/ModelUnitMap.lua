@@ -262,13 +262,22 @@ end
 
 function ModelUnitMap:doActionAttack(action)
     local path = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    swapActorUnit(self, path[1], path[#path])
 
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
     action.attacker:doActionAttack(action, true)
     if (action.targetType == "unit") then
         action.target:doActionAttack(action, false)
     end
+
+    return self
+end
+
+function ModelUnitMap:doActionCapture(action)
+    local path = action.path
+    local endingGridIndex = path[#path]
+    swapActorUnit(self, path[1], endingGridIndex)
+
+    self:getModelUnit(endingGridIndex):doActionCapture(action)
 
     return self
 end

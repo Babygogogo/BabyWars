@@ -132,6 +132,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelUnit:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
 function ModelUnit:getTiledID()
     return self.m_TiledID
 end
@@ -162,14 +170,6 @@ end
 
 function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
-end
-
-function ModelUnit:updateView()
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(self)
-    end
-
-    return self
 end
 
 function ModelUnit:doActionWait(action)
@@ -232,5 +232,23 @@ function ModelUnit:doActionAttack(action, isAttacker)
     return self
 end
 
+function ModelUnit:doActionCapture(action)
+    setStateActioned(self)
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionCapture) then
+            component:doActionCapture(action)
+        end
+    end
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self:updateView()
+            action.nextTarget:updateView()
+        end)
+    end
+
+    return self
+end
 
 return ModelUnit

@@ -1,9 +1,10 @@
 
 local ModelWarField = class("ModelWarField")
 
-local Actor        = require("global.actors.Actor")
-local TypeChecker  = require("app.utilities.TypeChecker")
-local GameConstant = require("res.data.GameConstant")
+local Actor              = require("global.actors.Actor")
+local TypeChecker        = require("app.utilities.TypeChecker")
+local GameConstant       = require("res.data.GameConstant")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireFieldData(param)
     local t = type(param)
@@ -178,6 +179,26 @@ function ModelWarField:doActionAttack(action)
     if (not targetUnit) then
         modelTileMap:doActionAttack(action)
     end
+
+    return self
+end
+
+function ModelWarField:doActionCapture(action)
+    local modelUnitMap = self:getModelUnitMap()
+    local modelTileMap = self:getModelTileMap()
+
+    local beginningGridIndex, endingGridIndex = action.path[1], action.path[#action.path]
+    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
+        local prevTarget = modelTileMap:getModelTile(beginningGridIndex)
+        if (prevTarget.getCurrentCapturePoint) then
+            action.prevTarget = prevTarget
+        end
+    end
+    action.nextTarget = modelTileMap:getModelTile(endingGridIndex)
+    action.capturer   = modelUnitMap:getModelUnit(beginningGridIndex)
+
+    modelUnitMap:doActionCapture(action)
+    modelTileMap:doActionCapture(action)
 
     return self
 end
