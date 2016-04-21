@@ -210,7 +210,7 @@ end
 local function updateRepairInfoWithModelTile(info, tile)
     if (tile.getRepairTargetCatagory) then
         local catagory = tile:getRepairTargetCatagory()
-        local amount   = tile:getRepairAmount()
+        local amount   = tile:getNormalizedRepairAmount()
         info.m_Label:setString("Repair:  +" .. amount .. "HP (" .. catagory .. ")")
     else
         info.m_Label:setString("Repair: None")

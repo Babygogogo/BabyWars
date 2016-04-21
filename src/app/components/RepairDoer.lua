@@ -9,6 +9,7 @@ local EXPORTED_METHODS = {
     "getRepairTargetCatagory",
     "getRepairTargetList",
     "getRepairAmount",
+    "getNormalizedRepairAmount",
 }
 
 --------------------------------------------------------------------------------
@@ -85,12 +86,17 @@ function RepairDoer:getRepairTargetList()
     return self.m_Template.targetList
 end
 
-function RepairDoer:getRepairAmount(targetTiledID)
-    if ((not targetTiledID) or (isRepairTarget(self, targetTiledID))) then
-        return self.m_Template.amount
-    else
+function RepairDoer:getRepairAmount(target)
+    if ((not target) or (not isRepairTarget(self, target:getTiledID()))) then
         return nil
+    else
+        local normalizedHpAfterRepair = math.min(10, target:getNormalizedCurrentHP() + self:getNormalizedCurrentHP())
+        return normalizedHpAfterRepair * 10 - target:getCurrentHP()
     end
+end
+
+function RepairDoer:getNormalizedRepairAmount()
+    return self.m_Template.amount
 end
 
 return RepairDoer

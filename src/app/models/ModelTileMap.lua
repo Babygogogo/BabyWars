@@ -225,6 +225,17 @@ function ModelTileMap:getModelTile(gridIndex)
     return tileActor and tileActor:getModel() or nil
 end
 
+function ModelTileMap:forEachModelTile(func)
+    local mapSize = self:getMapSize()
+    for x = 1, mapSize.width do
+        for y = 1, mapSize.height do
+            func(self.m_ActorTilesMap[x][y]:getModel())
+        end
+    end
+
+    return self
+end
+
 function ModelTileMap:doActionAttack(action)
     self:getModelTile(action.path[1]):doActionAttack(action, false)
     self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)

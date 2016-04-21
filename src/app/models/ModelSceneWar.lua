@@ -201,6 +201,7 @@ function ModelSceneWar:onEnter(rootActor)
 
     self.m_ActorSceneWarHUD:onEnter(rootActor)
     self.m_ActorWarField:onEnter(rootActor)
+    self.m_ActorPlayerManager:onEnter(rootActor)
 
     self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
 
@@ -219,8 +220,9 @@ function ModelSceneWar:onCleanup(rootActor)
     self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
         :removeEventListener("EvtPlayerRequestDoAction", self)
 
-    self.m_ActorSceneWarHUD:onCleanup(rootActor)
+    self.m_ActorPlayerManager:onCleanup(rootActor)
     self.m_ActorWarField:onCleanup(rootActor)
+    self.m_ActorSceneWarHUD:onCleanup(rootActor)
 
     return self
 end

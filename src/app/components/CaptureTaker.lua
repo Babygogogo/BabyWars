@@ -103,19 +103,6 @@ function CaptureTaker:doActionAttack(action, isAttacker)
     local path = action.path
     local selfGridIndex = self.m_Target:getGridIndex()
 
-    --[[ -- These codes are working but too complicated.
-    if (GridIndexFunctions.isEqual(selfGridIndex, beginningGridIndex)) then
-        if ((not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) or
-            (action.attacker:getCurrentHP() <= 0)) then
-            self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-        end
-    elseif (GridIndexFunctions.isEqual(selfGridIndex, action.target:getGridIndex())) then
-        if ((action.targetType == "unit") and (action.target:getCurrentHP() <= 0)) then
-            self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-        end
-    end
-    ]]
-
     if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
         (isCapturerDestroyed(selfGridIndex, action.attacker)) or
         ((action.targetType == "unit") and (isCapturerDestroyed(selfGridIndex, action.target)))) then
