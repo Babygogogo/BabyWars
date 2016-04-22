@@ -1,11 +1,11 @@
 
 local ModelUnitMap = class("ModelUnitMap")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local MapFunctions       = require("app.utilities.MapFunctions")
-local ViewUnit           = require("app.views.ViewUnit")
-local ModelUnit          = require("app.models.ModelUnit")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local MapFunctions          = require("app.utilities.MapFunctions")
+local ViewUnit              = require("app.views.ViewUnit")
+local ModelUnit             = require("app.models.ModelUnit")
+local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -57,6 +57,15 @@ local function swapActorUnit(self, gridIndex1, gridIndex2)
     end
 end
 
+local function createEmptyMap(width)
+    local map = {}
+    for x = 1, width do
+        map[x] = {}
+    end
+
+    return map
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerMovedCursor.
 --------------------------------------------------------------------------------
@@ -90,6 +99,29 @@ end
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
+local function createUnitActorsMapWithTiledLayer(layer)
+    local width, height = layer.width, layer.height
+    local map    = createEmptyMap(width)
+    local unitID = 0
+
+    for x = 1, width do
+        for y = 1, height do
+            local tiledID     = layer.data[x + (height - y) * width]
+            if (tiledID > 0) then
+                local actorData = {
+                    tiledID       = tiledID,
+                    unitID        = unitID,
+                    GridIndexable = {gridIndex = {x = x, y = y}},
+                }
+
+                map[x][y] = Actor.createWithModelAndViewName("ModelTile", actorData, "ViewTile", actorData)
+            end
+        end
+    end
+
+    return map, {width = width, height = height}
+end
+
 local function createUnitActorsMapWithTemplate(mapData)
     assert(type(mapData.template) == "string", "ModelUnitMap-createUnitActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
     local templateTiledLayer = getTiledUnitLayer(requireMapData(mapData.template))
@@ -229,7 +261,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()
-    return self.m_UnitActorsMap.size
+    return self.m_MapSize
 end
 
 function ModelUnitMap:getActorUnit(gridIndex)
