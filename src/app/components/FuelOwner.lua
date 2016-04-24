@@ -13,6 +13,8 @@ local EXPORTED_METHODS = {
     "getDescriptionOnOutOfFuel",
     "shouldDestroyOnOutOfFuel",
     "isFuelInShort",
+
+    "setCurrentFuel",
 }
 
 --------------------------------------------------------------------------------
@@ -29,18 +31,13 @@ local function isShortage(self)
     return self:getCurrentFuel() / self:getMaxFuel() <= 1 / 3
 end
 
-local function setCurrentFuel(self, fuelAmount)
-    assert(isFuelAmount(fuelAmount), "FuelOwner-setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
-    self.m_CurrentFuel = fuelAmount
-end
-
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     local modelUnit = self.m_Target
     if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
-        setCurrentFuel(self, math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
+        self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
         modelUnit:updateView()
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = modelUnit})
 
@@ -138,21 +135,21 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function FuelOwner:doActionWait(action)
-    setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
 
     return self
 end
 
 function FuelOwner:doActionAttack(action, isAttacker)
     if (isAttacker) then
-        setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+        self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
     end
 
     return self
 end
 
 function FuelOwner:doActionCapture(action)
-    setCurrentFuel(self, self.m_CurrentFuel - action.path.fuelConsumption)
+    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
 
     return self
 end
@@ -182,6 +179,11 @@ end
 
 function FuelOwner:isFuelInShort()
     return (self:getCurrentFuel() / self:getMaxFuel()) <= 0.4
+end
+
+function FuelOwner:setCurrentFuel(fuelAmount)
+    assert(isFuelAmount(fuelAmount), "FuelOwner:setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
+    self.m_CurrentFuel = fuelAmount
 end
 
 return FuelOwner

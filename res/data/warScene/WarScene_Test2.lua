@@ -12,7 +12,7 @@ local WarScene_Test2 = {
         {
             id      = 1,
             name    = "Red Alice",
-            fund    = 111111,
+            fund    = 0,
             isAlive = true,
             co      = {
                 currentEnergy    = 1,
@@ -23,7 +23,7 @@ local WarScene_Test2 = {
         {
             id      = 2,
             name    = "Blue Bob",
-            fund    = 222222,
+            fund    = 0,
             isAlive = true,
             co      = {
                 currentEnergy    = 2,
@@ -34,7 +34,7 @@ local WarScene_Test2 = {
         {
             id      = 3,
             name    = "Yellow Cat",
-            fund    = 333333,
+            fund    = 0,
             isAlive = true,
             co      = {
                 currentEnergy    = 3,
@@ -45,7 +45,7 @@ local WarScene_Test2 = {
         {
             id      = 4,
             name    = "Black Dog",
-            fund    = 444444,
+            fund    = 0,
             isAlive = true,
             co      = {
                 currentEnergy    = 4,

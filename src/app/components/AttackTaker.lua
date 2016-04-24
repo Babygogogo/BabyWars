@@ -117,7 +117,7 @@ function AttackTaker:setCurrentHP(hp)
     assert((hp >= 0) and (hp <= math.max(UNIT_MAX_HP, TILE_MAX_HP)) and (hp == math.floor(hp)), "AttackTaker:setCurrentHP() the param hp is invalid.")
     self.m_CurrentHP = hp
 
-    return self
+    return self.m_Target
 end
 
 function AttackTaker:getNormalizedCurrentHP()

@@ -50,7 +50,8 @@ local function initWithTiledID(self, tiledID)
 end
 
 local function loadInstantialData(self, param)
-    self.m_State = param.state or self.m_State
+    self.m_State  = param.state  or self.m_State
+    self.m_UnitID = param.unitID or self.m_UnitID
 
     for name, data in pairs(param) do
         if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
@@ -144,6 +145,10 @@ function ModelUnit:getTiledID()
     return self.m_TiledID
 end
 
+function ModelUnit:getUnitId()
+    return self.m_UnitID
+end
+
 function ModelUnit:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
 end
@@ -162,6 +167,10 @@ end
 
 function ModelUnit:getVision()
     return self.m_Template.vision
+end
+
+function ModelUnit:getProductionCost()
+    return self.m_Template.cost
 end
 
 function ModelUnit:canJoin(rhsUnitModel)

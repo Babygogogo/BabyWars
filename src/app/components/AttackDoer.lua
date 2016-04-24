@@ -25,6 +25,8 @@ local EXPORTED_METHODS = {
     "getAttackRangeMinMax",
     "canAttackAfterMove",
     "isPrimaryWeaponAmmoInShort",
+
+    "setPrimaryWeaponCurrentAmmo",
 }
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -292,6 +294,15 @@ function AttackDoer:isPrimaryWeaponAmmoInShort()
     else
         return (self:getPrimaryWeaponCurrentAmmo() / self:getPrimaryWeaponMaxAmmo()) <= 0.4
     end
+end
+
+function AttackDoer:setPrimaryWeaponCurrentAmmo(ammo)
+    assert(self:hasPrimaryWeapon(), "AttackDoer:setPrimaryWeaponCurrentAmmo() there's no primary weapon.")
+    assert((ammo >= 0) and (ammo <= self:getPrimaryWeaponMaxAmmo()) and (math.floor(ammo) == ammo), "AttackDoer:setPrimaryWeaponCurrentAmmo() the param ammo is invalid.")
+
+    self.m_PrimaryWeaponCurrentAmmo = ammo
+
+    return self
 end
 
 return AttackDoer

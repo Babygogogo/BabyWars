@@ -70,14 +70,15 @@ local function runTurnPhaseConsumeUnitFuel(self)
         turnIndex    = self.m_TurnIndex,
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
     })
-    self.m_TurnPhase = "main"
+    self.m_TurnPhase = "repairUnit"
 end
 
 local function runTurnPhaseRepairUnit(self)
     self.m_ScriptEventDispatcher:dispatchEvent({
-        name        = "EvtTurnPhaseRepairUnit",
-        playerIndex = self.m_PlayerIndex,
-
+        name         = "EvtTurnPhaseRepairUnit",
+        playerIndex  = self.m_PlayerIndex,
+        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
     })
     self.m_TurnPhase = "main"
 end
@@ -142,6 +143,10 @@ function ModelTurnManager:runTurn(nextWeather)
 
     if (self.m_TurnPhase == "consumeUnitFuel") then
         runTurnPhaseConsumeUnitFuel(self)
+    end
+
+    if (self.m_TurnPhase == "repairUnit") then
+        runTurnPhaseRepairUnit(self)
     end
 
     assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function.")

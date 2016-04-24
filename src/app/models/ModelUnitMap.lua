@@ -1,11 +1,12 @@
 
 local ModelUnitMap = class("ModelUnitMap")
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local MapFunctions          = require("app.utilities.MapFunctions")
-local ViewUnit              = require("app.views.ViewUnit")
-local ModelUnit             = require("app.models.ModelUnit")
-local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
+local TypeChecker        = require("app.utilities.TypeChecker")
+local MapFunctions       = require("app.utilities.MapFunctions")
+local ViewUnit           = require("app.views.ViewUnit")
+local ModelUnit          = require("app.models.ModelUnit")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local Actor              = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -23,17 +24,6 @@ end
 
 local function getTiledUnitLayer(tiledData)
     return tiledData.layers[3]
-end
-
-local function iterateAllActorUnits(self, func)
-    for x = 1, self.m_UnitActorsMap.size.width do
-        for y = 1, self.m_UnitActorsMap.size.height do
-            local actorUnit = self.m_UnitActorsMap[x][y]
-            if (actorUnit) then
-                func(actorUnit)
-            end
-        end
-    end
 end
 
 local function setActorUnit(self, actor, gridIndex)
@@ -114,12 +104,20 @@ local function createUnitActorsMapWithTiledLayer(layer)
                     GridIndexable = {gridIndex = {x = x, y = y}},
                 }
 
-                map[x][y] = Actor.createWithModelAndViewName("ModelTile", actorData, "ViewTile", actorData)
+                map[x][y] = Actor.createWithModelAndViewName("ModelUnit", actorData, "ViewUnit", actorData)
             end
         end
     end
 
     return map, {width = width, height = height}
+end
+
+local function updateUnitActorsMapWithGridsData(map, mapSize, gridsData)
+    for _, gridData in ipairs(gridsData) do
+        local gridIndex = gridData.GridIndexable.gridIndex
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-updateUnitActorsMapWithGridsData() the data of overwriting grid is invalid.")
+        map[gridIndex.x][gridIndex.y]:getModel():ctor(gridData)
+    end
 end
 
 local function createUnitActorsMapWithTemplate(mapData)
@@ -142,6 +140,7 @@ local function createUnitActorsMapWithTemplate(mapData)
 end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
+    --[[
     local tiledLayer = getTiledUnitLayer(mapData)
     local map
     if (not tiledLayer) then
@@ -158,18 +157,21 @@ local function createUnitActorsMapWithoutTemplate(mapData)
     end
 
     map.m_Name = mapData.name
-
     return map
+    --]]
+    local map, mapSize = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(mapData))
+    updateUnitActorsMapWithGridsData(map, mapSize, mapData.grids or {})
+
+    return map, mapSize
 end
 
 local function createUnitActorsMap(param)
     local mapData = requireMapData(param)
-    local unitActorsMap =(mapData.template == nil) and
-        createUnitActorsMapWithoutTemplate(mapData) or
-        createUnitActorsMapWithTemplate(mapData)
-    assert(unitActorsMap, "ModelUnitMap--createUnitActorsMap() failed to create the unit actors map.")
-
-    return unitActorsMap, unitActorsMap.size
+    if (mapData.template == nil) then
+        return createUnitActorsMapWithoutTemplate(mapData)
+    else
+        return createUnitActorsMapWithTemplate(mapData)
+    end
 end
 
 local function initWithUnitActorsMap(self, map, mapSize)
@@ -221,8 +223,8 @@ function ModelUnitMap:onEnter(rootActor)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
-    iterateAllActorUnits(self, function(actor)
-        actor:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+    self:forEachModelUnit(function(modelUnit)
+        modelUnit:setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
     end)
 
     return self
@@ -235,8 +237,8 @@ function ModelUnitMap:onCleanup(rootActor)
         :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
 
-    iterateAllActorUnits(self, function(actor)
-        actor:getModel():unsetRootScriptEventDispatcher()
+    self:forEachModelUnit(function(modelUnit)
+        modelUnit:unsetRootScriptEventDispatcher()
     end)
 
     return self
@@ -275,6 +277,20 @@ end
 function ModelUnitMap:getModelUnit(gridIndex)
     local unitActor = self:getActorUnit(gridIndex)
     return unitActor and unitActor:getModel() or nil
+end
+
+function ModelUnitMap:forEachModelUnit(func)
+    local mapSize = self:getMapSize()
+    for x = 1, mapSize.width do
+        for y = 1, mapSize.height do
+            local actorUnit = self.m_UnitActorsMap[x][y]
+            if (actorUnit) then
+                func(actorUnit:getModel())
+            end
+        end
+    end
+
+    return self
 end
 
 function ModelUnitMap:doActionWait(action)
