@@ -267,7 +267,8 @@ end
 -- The callback functions on EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
 local function onEvtPlayerSelectedGrid(self, gridIndex)
-    if (self.m_State == "idle") then
+    local state = self.m_State
+    if (state == "idle") then
         local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
         if (modelUnit) then
             if (modelUnit:canDoAction(self.m_PlayerIndex)) then
@@ -279,17 +280,17 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
                 setStateChoosingProductionTarget(self, modelTile)
             end
         end
-    elseif (self.m_State == "choosingProductionTarget") then
+    elseif (state == "choosingProductionTarget") then
         setStateIdle(self)
-    elseif (self.m_State == "makingMovePath") then
+    elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             setStateIdle(self)
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
             setStateChoosingAction(self, gridIndex)
         end
-    elseif (self.m_State == "choosingAction") then
+    elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_FocusModelUnit)
-    elseif (self.m_State == "choosingAttackTarget") then
+    elseif (state == "choosingAttackTarget") then
         if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
             dispatchEventAttack(self, gridIndex)
         else

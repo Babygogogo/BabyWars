@@ -57,7 +57,7 @@ local function createEmptyMap(width)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor.
+-- The callback functions on EvtPlayerMovedCursor/EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
 local function onEvtPlayerMovedCursor(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
@@ -225,6 +225,7 @@ end
 function ModelUnitMap:onEnter(rootActor)
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
+        :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
@@ -240,6 +241,7 @@ function ModelUnitMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
         :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
+        :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -252,7 +254,8 @@ end
 
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if (name == "EvtPlayerMovedCursor") then
+    if ((name == "EvtPlayerMovedCursor") or
+        (name == "EvtPlayerSelectedGrid")) then
         onEvtPlayerMovedCursor(self, event)
     elseif (name == "EvtTurnPhaseBeginning") then
         self.m_PlayerIndex = event.playerIndex

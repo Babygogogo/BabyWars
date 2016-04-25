@@ -169,6 +169,7 @@ function ModelTileMap:onEnter(rootActor)
     dispatcher:addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",    self)
         :addEventListener("EvtPlayerMovedCursor",  self)
+        :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
 
     iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
@@ -180,9 +181,10 @@ end
 
 function ModelTileMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtDestroyViewTile",   self)
-        :removeEventListener("EvtDestroyModelTile",  self)
+        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtDestroyViewTile",    self)
+        :removeEventListener("EvtDestroyModelTile",   self)
     self.m_RootScriptEventDispatcher = nil
 
     iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
@@ -194,7 +196,8 @@ end
 
 function ModelTileMap:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerMovedCursor") then
+    if ((eventName == "EvtPlayerMovedCursor") or
+        (eventName == "EvtPlayerSelectedGrid")) then
         onEvtPlayerMovedCursor(self, event)
     elseif (eventName == "EvtDestroyModelTile") then
         onEvtDestroyModelTile(self, event)

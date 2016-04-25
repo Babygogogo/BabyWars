@@ -30,7 +30,8 @@ local BUTTON_WIDTH_FOR_ACTION_ITEM      = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM 
 local BUTTON_HEIGHT_FOR_ACTION_ITEM     = TITLE_FONT_SIZE / 5 * 8
 local BUTTON_WIDTH_FOR_PRODUCTION_ITEM  = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 15
 local BUTTON_HEIGHT_FOR_PRODUCTION_ITEM = BUTTON_HEIGHT_FOR_ACTION_ITEM
-local BUTTON_DISABLED_COLOR = {r = 180, g = 180, b = 180}
+local BUTTON_DISABLED_COLOR             = {r = 180, g = 180, b = 180}
+local BUTTON_CAPINSETS                  = {x = 0, y = 0, width = 1, height = 2}
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -40,7 +41,7 @@ local function createViewAction(itemModel)
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
+        :setCapInsets(BUTTON_CAPINSETS)
         :setContentSize(BUTTON_WIDTH_FOR_ACTION_ITEM, BUTTON_HEIGHT_FOR_ACTION_ITEM)
 
         :setZoomScale(-0.05)
@@ -66,7 +67,7 @@ local function createViewProduction(itemModel)
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
+        :setCapInsets(BUTTON_CAPINSETS)
         :setContentSize(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
 
         :setZoomScale(-0.05)
