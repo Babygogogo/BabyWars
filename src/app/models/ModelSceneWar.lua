@@ -53,6 +53,13 @@ local function doActionCapture(self, action)
     self:getModelWarField():doActionCapture(action)
 end
 
+local function doActionProduceOnTile(self, action)
+    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
+
+    self:getModelPlayerManager():doActionProduceOnTile(action)
+    self:getModelWarField():doActionProduceOnTile(action)
+end
+
 --------------------------------------------------------------------------------
 -- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
 --------------------------------------------------------------------------------
@@ -66,6 +73,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionAttack(self, event)
     elseif (actionName == "Capture") then
         doActionCapture(self, event)
+    elseif (actionName == "ProduceOnTile") then
+        doActionProduceOnTile(self, event)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end

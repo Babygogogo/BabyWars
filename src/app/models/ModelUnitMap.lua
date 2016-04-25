@@ -56,6 +56,16 @@ local function createEmptyMap(width)
     return map
 end
 
+local function createActorUnit(tiledID, unitID, gridIndex)
+    local actorData = {
+        tiledID       = tiledID,
+        unitID        = unitID,
+        GridIndexable = {gridIndex = gridIndex},
+    }
+
+    return Actor.createWithModelAndViewName("ModelUnit", actorData, "ViewUnit", actorData)
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerMovedCursor/EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
@@ -99,13 +109,7 @@ local function createUnitActorsMapWithTiledLayer(layer)
             local tiledID = layer.data[x + (height - y) * width]
             unitID = unitID + 1
             if (tiledID > 0) then
-                local actorData = {
-                    tiledID       = tiledID,
-                    unitID        = unitID,
-                    GridIndexable = {gridIndex = {x = x, y = y}},
-                }
-
-                map[x][y] = Actor.createWithModelAndViewName("ModelUnit", actorData, "ViewUnit", actorData)
+                map[x][y] = createActorUnit(tiledID, unitID, {x = x, y = y})
             end
         end
     end
@@ -338,6 +342,24 @@ function ModelUnitMap:doActionCapture(action)
     if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
         self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
     end
+
+    return self
+end
+
+function ModelUnitMap:doActionProduceOnTile(action)
+    local gridIndex = action.gridIndex
+    local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
+    actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setStateActioned()
+        :updateView()
+
+    self.m_AvailableUnitID = self.m_AvailableUnitID + 1
+    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actorUnit
+    if (self.m_View) then
+        self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitProduced", modelUnit = actorUnit:getModel()})
 
     return self
 end

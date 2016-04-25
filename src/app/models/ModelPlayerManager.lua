@@ -26,6 +26,14 @@ local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
     return units
 end
 
+local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerIndex)
+    dispatcher:dispatchEvent({
+        name        = "EvtModelPlayerUpdated",
+        modelPlayer = modelPlayer,
+        playerIndex = playerIndex,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -42,11 +50,7 @@ local function onEvtTurnPhaseGetFund(self, event)
         end)
 
         modelPlayer:setFund(modelPlayer:getFund() + income)
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name        = "EvtModelPlayerUpdated",
-            modelPlayer = modelPlayer,
-            playerIndex = playerIndex,
-        })
+        dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
     end
 end
 
@@ -69,11 +73,7 @@ local function onEvtTurnPhaseRepairUnit(self, event)
         modelPlayer:setFund(modelPlayer:getFund() - repairCost)
     end
 
-    eventDispatcher:dispatchEvent({
-        name        = "EvtModelPlayerUpdated",
-        modelPlayer = modelPlayer,
-        playerIndex = playerIndex,
-    })
+    dispatchEvtModelPlayerUpdated(eventDispatcher, modelPlayer, playerIndex)
 end
 
 --------------------------------------------------------------------------------
@@ -127,6 +127,16 @@ end
 
 function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
+end
+
+function ModelPlayerManager:doActionProduceOnTile(action)
+    local playerIndex = action.playerIndex
+    local modelPlayer = self:getModelPlayer(action.playerIndex)
+
+    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
+    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+
+    return self
 end
 
 return ModelPlayerManager

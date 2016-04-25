@@ -12,10 +12,6 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
-local function setStateActioned(self)
-    self.m_State = "actioned"
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on EvtTurnPhaseResetUnitState.
 --------------------------------------------------------------------------------
@@ -157,6 +153,12 @@ function ModelUnit:getState()
     return self.m_State
 end
 
+function ModelUnit:setStateActioned()
+    self.m_State = "actioned"
+
+    return self
+end
+
 function ModelUnit:isInStealthMode()
     return false
 end
@@ -182,7 +184,7 @@ function ModelUnit:canDoAction(playerIndex)
 end
 
 function ModelUnit:doActionWait(action)
-    setStateActioned(self)
+    self:setStateActioned()
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionWait) then
@@ -203,7 +205,7 @@ end
 
 function ModelUnit:doActionAttack(action, isAttacker)
     if (isAttacker) then
-        setStateActioned(self)
+        self:setStateActioned()
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
@@ -242,7 +244,7 @@ function ModelUnit:doActionAttack(action, isAttacker)
 end
 
 function ModelUnit:doActionCapture(action)
-    setStateActioned(self)
+    self:setStateActioned()
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionCapture) then

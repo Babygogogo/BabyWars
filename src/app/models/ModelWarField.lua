@@ -202,4 +202,10 @@ function ModelWarField:doActionCapture(action)
     return self
 end
 
+function ModelWarField:doActionProduceOnTile(action)
+    self:getModelUnitMap():doActionProduceOnTile(action)
+
+    return self
+end
+
 return ModelWarField

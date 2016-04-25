@@ -59,6 +59,12 @@ local function onEvtModelUnitUpdated(self, event)
     end
 end
 
+local function onEvtModelUnitProduced(self, event)
+    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelUnit:getGridIndex())) then
+        updateWithModelUnit(self, event.modelUnit)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
@@ -86,13 +92,15 @@ function ModelUnitInfo:onEnter(rootActor)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtModelUnitMoved",     self)
         :addEventListener("EvtModelUnitUpdated",   self)
+        :addEventListener("EvtModelUnitProduced",  self)
 
     return self
 end
 
 function ModelUnitInfo:onCleanup(rootActor)
     -- removeEventListener can be commented out because the dispatcher itself is being destroyed.
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitProduced", self)
+        :removeEventListener("EvtModelUnitUpdated",   self)
         :removeEventListener("EvtModelUnitMoved",     self)
         :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
@@ -121,6 +129,8 @@ function ModelUnitInfo:onEvent(event)
         onEvtModelUnitMoved(self, event)
     elseif (eventName == "EvtModelUnitUpdated") then
         onEvtModelUnitUpdated(self, event)
+    elseif (eventName == "EvtModelUnitProduced") then
+        onEvtModelUnitProduced(self, event)
     end
 
     return self

@@ -6,6 +6,7 @@ local ComponentManager      = require("global.components.ComponentManager")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 local EXPORTED_METHODS = {
+    "getProductionCostWithTiledId",
     "getProductionList",
 }
 
@@ -54,6 +55,16 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
+function UnitProducer:getProductionCostWithTiledId(tiledID, modelPlayer)
+    if (GameConstantFunctions.getPlayerIndexWithTiledId(tiledID) ~= self.m_Target:getPlayerIndex()) then
+        return nil
+    end
+
+    local templateUnit = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
+    -- TODO: take the ablities of the player into account
+    return templateUnit.cost
+end
+
 function UnitProducer:getProductionList(modelPlayer)
     local list        = {}
     local fund        = modelPlayer:getFund()
@@ -61,13 +72,13 @@ function UnitProducer:getProductionList(modelPlayer)
 
     for i, unitName in ipairs(self.m_Template.productionList) do
         list[i]            = {}
-        local templateUnit = GameConstantFunctions.getTemplateModelUnitWithName(unitName)
-        local cost         = templateUnit.cost -- TODO: take the ablities of the player into account
+        local tiledID      = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
+        local cost         = self:getProductionCostWithTiledId(tiledID, modelPlayer)
 
-        list[i].fullName    = templateUnit.fullName
+        list[i].fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName
         list[i].cost        = cost
         list[i].isAvaliable = cost <= fund
-        list[i].tiledID     = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
+        list[i].tiledID     = tiledID
     end
 
     return list
