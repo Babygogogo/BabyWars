@@ -96,7 +96,8 @@ local function createUnitActorsMapWithTiledLayer(layer)
 
     for x = 1, width do
         for y = 1, height do
-            local tiledID     = layer.data[x + (height - y) * width]
+            local tiledID = layer.data[x + (height - y) * width]
+            unitID = unitID + 1
             if (tiledID > 0) then
                 local actorData = {
                     tiledID       = tiledID,
@@ -109,15 +110,19 @@ local function createUnitActorsMapWithTiledLayer(layer)
         end
     end
 
-    return map, {width = width, height = height}
+    return map, {width = width, height = height}, unitID
 end
 
 local function updateUnitActorsMapWithGridsData(map, mapSize, gridsData)
+    local unitID = 0
     for _, gridData in ipairs(gridsData) do
+        unitID = math.max(gridData.unitID or unitID, unitID)
         local gridIndex = gridData.GridIndexable.gridIndex
         assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-updateUnitActorsMapWithGridsData() the data of overwriting grid is invalid.")
         map[gridIndex.x][gridIndex.y]:getModel():ctor(gridData)
     end
+
+    return unitID
 end
 
 local function createUnitActorsMapWithTemplate(mapData)
@@ -159,10 +164,10 @@ local function createUnitActorsMapWithoutTemplate(mapData)
     map.m_Name = mapData.name
     return map
     --]]
-    local map, mapSize = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(mapData))
-    updateUnitActorsMapWithGridsData(map, mapSize, mapData.grids or {})
+    local map, mapSize, unitID = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(mapData))
+    unitID = math.max(updateUnitActorsMapWithGridsData(map, mapSize, mapData.grids or {}), unitID) + 1
 
-    return map, mapSize
+    return map, mapSize, unitID
 end
 
 local function createUnitActorsMap(param)
@@ -174,9 +179,10 @@ local function createUnitActorsMap(param)
     end
 end
 
-local function initWithUnitActorsMap(self, map, mapSize)
-    self.m_UnitActorsMap = map
-    self.m_MapSize       = mapSize
+local function initWithUnitActorsMap(self, map, mapSize, unitID)
+    self.m_UnitActorsMap   = map
+    self.m_MapSize         = mapSize
+    self.m_AvailableUnitID = unitID
 end
 
 --------------------------------------------------------------------------------

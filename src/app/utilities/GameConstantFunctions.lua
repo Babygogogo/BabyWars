@@ -172,6 +172,10 @@ function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     return TEMPLATE_MODEL_UNITS[TILE_UNIT_INDEXES[tiledID].name]
 end
 
+function GameConstantFunctions.getTemplateModelUnitWithName(name)
+    return TEMPLATE_MODEL_UNITS[name]
+end
+
 function GameConstantFunctions.doesViewTileFillGrid(tiledID)
     if ((not tiledID) or (tiledID == 0)) then
         return false

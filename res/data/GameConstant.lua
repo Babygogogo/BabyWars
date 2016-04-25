@@ -1202,6 +1202,25 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
+        UnitProducer = {
+            productionList = {
+                "infantry",
+                "mech",
+                "bike",
+                "recon",
+                "flare",
+                "antiair",
+                "tank",
+                "mdtank",
+                "wartank",
+                "artillery",
+                "antitank",
+                "rockets",
+                "missiles",
+                "rig",
+            },
+        },
+
         description = "Factories can be used to resupply and produce ground units once captured.",
     },
 
@@ -1241,6 +1260,16 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
+        UnitProducer = {
+            productionList = {
+                "fighter",
+                "bomber",
+                "duster",
+                "bcopter",
+                "tcopter",
+            },
+        },
+
         description = "Airports can be used to resupply and produce air units once captured.",
     },
 
@@ -1278,6 +1307,17 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = 1,
             transport = 1,
+        },
+
+        UnitProducer = {
+            productionList = {
+                "battleship",
+                "carrier",
+                "submarine",
+                "cruiser",
+                "lander",
+                "gunboat",
+            },
         },
 
         description = "Seaports can be used to resupply and produce naval units once captured.",
@@ -1429,6 +1469,7 @@ GameConstant.templateModelUnits = {
         cost        = 1500,
         vision      = 2,
 
+        fullName    = "Infantry",
         description = "Infantry units are cheap. They can capture bases but have low firepower.",
     },
 
@@ -1539,6 +1580,7 @@ GameConstant.templateModelUnits = {
         cost        = 2500,
         vision      = 2,
 
+        fullName    = "Mech",
         description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
     },
 
@@ -1616,6 +1658,7 @@ GameConstant.templateModelUnits = {
         cost        = 2500,
         vision      = 2,
 
+        fullName    = "Bike",
         description = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
     },
 
@@ -1689,6 +1732,7 @@ GameConstant.templateModelUnits = {
         cost        = 4000,
         vision      = 5,
 
+        fullName    = "Recon",
         description = "Recon units have high movement range and are strong against infantry units.",
     },
 
@@ -1762,6 +1806,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 2,
 
+        fullName    = "Flare",
         description = "Flares fire bright rockets that reveal a 13-square area in Fog of War.",
     },
 
@@ -1838,7 +1883,8 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
-        description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
+        fullName    = "Anti-Air",
+        description = "Anti-Air units work well against infantry and air units. They're weak against tanks.",
     },
 
     tank       = {
@@ -1944,6 +1990,7 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
+        fullName    = "Tank",
         description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
     },
 
@@ -2050,7 +2097,8 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 2,
 
-        description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
+        fullName    = "Md Tank",
+        description = "Md(Medium) tank units' defensive and offensive ratings are the second best among ground units.",
     },
 
     wartank    = {
@@ -2156,7 +2204,8 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 2,
 
-        description = "The strongest tank in terms of both attack and defense.",
+        fullName    = "War Tank",
+        description = "War Tank units are the strongest tanks in terms of both attack and defense.",
     },
 
     artillery  = {
@@ -2231,10 +2280,11 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 3,
 
+        fullName    = "Artillery",
         description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
     },
 
-    antitank  = {
+    antitank   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2306,6 +2356,7 @@ GameConstant.templateModelUnits = {
         cost        = 11000,
         vision      = 3,
 
+        fullName    = "Anti-Tank",
         description = "Anti-Tanks can counter-attack when under direct fire.",
     },
 
@@ -2382,7 +2433,8 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 3,
 
-        description = "Rocket units are valuable, because they can fire on both land and naval units.",
+        fullName    = "Rockets",
+        description = "Rockets units are valuable, because they can fire on both land and naval units.",
     },
 
     missiles   = {
@@ -2457,7 +2509,8 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 5,
 
-        description = "Missile units are essential in defending against air units. Their vision range is large.",
+        fullName    = "Missiles",
+        description = "Missiles units are essential in defending against air units. Their vision range is large.",
     },
 
     rig        = {
@@ -2486,6 +2539,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
+        fullName    = "Rig",
         description = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
     },
 
@@ -2561,6 +2615,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
+        fullName    = "Fighter",
         description = "Fighter units are strong vs. other air units. They also have the highest movements.",
     },
 
@@ -2636,6 +2691,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 3,
 
+        fullName    = "Bomber",
         description = "Bomber units can fire on ground and naval units with a high destructive force.",
     },
 
@@ -2711,6 +2767,7 @@ GameConstant.templateModelUnits = {
         cost        = 13000,
         vision      = 4,
 
+        fullName    = "Duster",
         description = "Dusters are somewhat powerful planes that can attack both ground and air units.",
     },
 
@@ -2817,6 +2874,7 @@ GameConstant.templateModelUnits = {
         cost        = 9000,
         vision      = 2,
 
+        fullName    = "B Copter",
         description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
     },
 
@@ -2846,6 +2904,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
+        fullName    = "T Copter",
         description = "T(transport) copters can transport both infantry and mech units.",
     },
 
@@ -2921,6 +2980,7 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 4,
 
+        fullName    = "Seaplane",
         description = "Seaplanes are produced at sea by carriers. They can attack any unit.",
     },
 
@@ -2996,6 +3056,7 @@ GameConstant.templateModelUnits = {
         cost        = 25000,
         vision      = 3,
 
+        fullName    = "Battleship",
         description = "B(Battle) ships can launch indirect attack after moving.",
     },
 
@@ -3069,6 +3130,7 @@ GameConstant.templateModelUnits = {
         cost        = 28000,
         vision      = 4,
 
+        fullName    = "Carrier",
         description = "Carriers can carrier 2 air units and produce seaplanes.",
     },
 
@@ -3144,6 +3206,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
+        fullName    = "Submarine",
         description = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
     },
 
@@ -3250,6 +3313,7 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 5,
 
+        fullName    = "Cruiser",
         description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
     },
 
@@ -3279,6 +3343,7 @@ GameConstant.templateModelUnits = {
         cost        = 10000,
         vision      = 1,
 
+        fullName    = "Lander",
         description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
     },
 
@@ -3354,6 +3419,7 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 2,
 
+        fullName    = "Gunboat",
         description = "Gunboats can carry 1 foot soldier and attack other naval units.",
     },
 }
