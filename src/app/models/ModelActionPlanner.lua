@@ -190,7 +190,9 @@ end
 -- The set state functions.
 --------------------------------------------------------------------------------
 setStateIdle = function(self)
-    self.m_State = "idle"
+    self.m_State          = "idle"
+    self.m_FocusModelUnit = nil
+
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(false)
             :setAttackableGridsVisible(false)
@@ -218,11 +220,11 @@ setStateChoosingProductionTarget = function(self, modelTile)
     })
 end
 
-setStateMakingMovePath = function(self, focusUnitModel)
-    resetReachableArea(self, focusUnitModel)
-    resetMovePath(      self, focusUnitModel)
+setStateMakingMovePath = function(self, focusModelUnit)
+    resetReachableArea(self, focusModelUnit)
+    resetMovePath(      self, focusModelUnit)
     self.m_State          = "makingMovePath"
-    self.m_FocusModelUnit = focusUnitModel
+    self.m_FocusModelUnit = focusModelUnit
 
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(true)
@@ -272,6 +274,7 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
         local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
         if (modelUnit) then
             if (modelUnit:canDoAction(self.m_PlayerIndex)) then
+                modelUnit:showMovingAnimation()
                 setStateMakingMovePath(self, modelUnit)
             end
         else
@@ -284,6 +287,7 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
         setStateIdle(self)
     elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
+            self.m_FocusModelUnit:showNormalAnimation()
             setStateIdle(self)
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
             setStateChoosingAction(self, gridIndex)

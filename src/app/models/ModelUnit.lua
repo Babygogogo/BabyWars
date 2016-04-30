@@ -18,7 +18,11 @@ end
 local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
         setStateIdle(self)
-        self:updateView()
+
+        if (self.m_View) then
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+        end
     end
 end
 
@@ -159,6 +163,22 @@ function ModelUnit:setStateActioned()
     return self
 end
 
+function ModelUnit:showNormalAnimation()
+    if (self.m_View) then
+        self.m_View:showNormalAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:showMovingAnimation()
+    if (self.m_View) then
+        self.m_View:showMovingAnimation()
+    end
+
+    return self
+end
+
 function ModelUnit:isInStealthMode()
     return false
 end
@@ -196,7 +216,8 @@ function ModelUnit:doActionWait(action)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
-            self:updateView()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
         end)
     end
 
@@ -222,7 +243,9 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
     if ((self.m_View) and (isAttacker)) then
         self.m_View:moveAlongPath(action.path, function()
-            self:updateView()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
             if (action.target.updateView) then
                 action.target:updateView()
             end
@@ -254,7 +277,8 @@ function ModelUnit:doActionCapture(action)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
-            self:updateView()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
             action.nextTarget:updateView()
         end)
     end

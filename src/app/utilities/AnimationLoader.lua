@@ -29,9 +29,13 @@ end
 local function loadUnitAnimations()
     for unitName, animationsForPlayers in pairs(GAME_CONSTANT.unitAnimations) do
         for playerIndex, animations in ipairs(animationsForPlayers) do
-            local normal = animations.normal
-            local animation = display.newAnimation(display.newFrames(normal.pattern, 1, normal.framesCount), normal.durationPerFrame)
-            display.setAnimationCache(getUnitAnimationName(unitName, playerIndex, "normal"), animation)
+            local normal          = animations.normal
+            local normalAnimation = display.newAnimation(display.newFrames(normal.pattern, 1, normal.framesCount), normal.durationPerFrame)
+            display.setAnimationCache(getUnitAnimationName(unitName, playerIndex, "normal"), normalAnimation)
+
+            local moving          = animations.moving
+            local movingAnimation = display.newAnimation(display.newFrames(moving.pattern, 1, moving.framesCount), moving.durationPerFrame)
+            display.setAnimationCache(getUnitAnimationName(unitName, playerIndex, "moving"), movingAnimation)
         end
     end
 end

@@ -9,7 +9,7 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}
 local COLOR_ACTIONED         = {r = 170, g = 170, b = 170}
-local MOVE_DURATION_PER_GRID = 0.1
+local MOVE_DURATION_PER_GRID = 0.15
 
 local STATE_INDICATOR_POSITION_X = 3
 local STATE_INDICATOR_POSITION_Y = 0
@@ -25,12 +25,26 @@ local UNIT_SPRITE_Z_ORDER     = 0
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createActionMoveAlongPath(path, callback)
+local function createActionMoveAlongPath(self, path, callback)
     local steps = {}
+    local playerIndexMod = self.m_PlayerIndex % 2
+
     for i = 2, #path do
+        local currentX, previousX = path[i].x, path[i - 1].x
+        if (currentX < previousX) then
+            steps[#steps + 1] = cc.CallFunc:create(function()
+                self.m_UnitSprite:runAction(cc.FlipX:create((playerIndexMod == 1)))
+            end)
+        elseif (currentX > previousX) then
+            steps[#steps + 1] = cc.CallFunc:create(function()
+                self.m_UnitSprite:runAction(cc.FlipX:create((playerIndexMod == 0)))
+            end)
+        end
+
         steps[#steps + 1] = cc.MoveTo:create(MOVE_DURATION_PER_GRID, GridIndexFunctions.toPositionTable(path[i]))
     end
 
+    steps[#steps + 1] = cc.CallFunc:create(function() self.m_UnitSprite:runAction(cc.FlipX:create(false)) end)
     steps[#steps + 1] = cc.CallFunc:create(callback)
     return cc.Sequence:create(unpack(steps))
 end
@@ -75,6 +89,19 @@ local function getCaptureIndicatorFrame(unit)
     end
 end
 
+local function playSpriteAnimation(sprite, tiledID, state)
+    if (state == "moving") then
+        sprite:setPosition(-18, 0)
+    else
+        sprite:setPosition(0, 0)
+    end
+
+    local unitName       = GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+    local playerIndex    = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
+    sprite:stopAllActions()
+        :playAnimationForever(AnimationLoader.getUnitAnimation(unitName, playerIndex, state))
+end
+
 --------------------------------------------------------------------------------
 -- The unit sprite.
 --------------------------------------------------------------------------------
@@ -91,14 +118,8 @@ local function initWithUnitSprite(self, sprite)
 end
 
 local function updateUnitSprite(self, tiledID)
-    assert(TypeChecker.isTiledID(tiledID))
     if (self.m_TiledID ~= tiledID) then
-        self.m_TiledID = tiledID
-
-        local unitName    = GameConstantFunctions.getUnitNameWithTiledId(tiledID)
-        local playerIndex = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
-        self.m_UnitSprite:stopAllActions()
-            :playAnimationForever(AnimationLoader.getUnitAnimation(unitName, playerIndex, "normal"))
+        playSpriteAnimation(self.m_UnitSprite, tiledID, "normal")
     end
 end
 
@@ -106,12 +127,12 @@ end
 -- The unit state.
 --------------------------------------------------------------------------------
 local function updateUnitState(self, state)
-    if (state == "idle") then
-        self:setColor(COLOR_IDLE)
-    elseif (state == "actioned") then
-        self:setColor(COLOR_ACTIONED)
-    else
-        error("ViewUnit-updateUnitState() unrecognized unit state.")
+    if (self.m_State ~= state) then
+        if (state == "idle") then
+            self:setColor(COLOR_IDLE)
+        elseif (state == "actioned") then
+            self:setColor(COLOR_ACTIONED)
+        end
     end
 end
 
@@ -181,6 +202,7 @@ end
 function ViewUnit:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :setCascadeColorEnabled(true)
+    self.m_IsShowingNormalAnimation = true
 
     initWithUnitSprite(    self, createUnitSprite())
     initWithHpIndicator(   self, createHpIndicator())
@@ -193,14 +215,44 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    updateUnitSprite(    self,                  unit:getTiledID())
-    updateUnitState(     self,                  unit:getState())
+    local tiledID = unit:getTiledID()
+    local state   = unit:getState()
+    updateUnitSprite(    self,                  tiledID)
+    updateUnitState(     self,                  state)
     updateHpIndicator(   self.m_HpIndicator,    unit:getNormalizedCurrentHP())
     updateStateIndicator(self.m_StateIndicator, unit)
+
+    self.m_PlayerIndex = unit:getPlayerIndex()
+    self.m_TiledID     = tiledID
+    self.m_State       = state
+
+    return self
+end
+
+function ViewUnit:showNormalAnimation()
+    if (not self.m_IsShowingNormalAnimation) then
+        self.m_UnitSprite:setFlippedX(false)
+        playSpriteAnimation(self.m_UnitSprite, self.m_TiledID, "normal")
+
+        self.m_IsShowingNormalAnimation = true
+    end
+
+    return self
+end
+
+function ViewUnit:showMovingAnimation()
+    print(self.m_IsShowingNormalAnimation)
+    if (self.m_IsShowingNormalAnimation) then
+        playSpriteAnimation(self.m_UnitSprite, self.m_TiledID, "moving")
+
+        self.m_IsShowingNormalAnimation = false
+    end
+
+    return self
 end
 
 function ViewUnit:moveAlongPath(path, callbackOnFinish)
-    self:runAction(createActionMoveAlongPath(path, callbackOnFinish))
+    self:runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
 
     return self
 end
