@@ -241,7 +241,6 @@ function ViewUnit:showNormalAnimation()
 end
 
 function ViewUnit:showMovingAnimation()
-    print(self.m_IsShowingNormalAnimation)
     if (self.m_IsShowingNormalAnimation) then
         playSpriteAnimation(self.m_UnitSprite, self.m_TiledID, "moving")
 
