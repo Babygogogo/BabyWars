@@ -91,7 +91,7 @@ local function createListView()
 
         :setContentSize(LIST_WIDTH, LIST_HEIGHT)
 
-        :setItemsMargin(5)
+        :setItemsMargin(20)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
         :setCascadeOpacityEnabled(true)
 

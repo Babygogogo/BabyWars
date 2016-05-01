@@ -163,7 +163,7 @@ local function createListView()
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(LIST_POSITION_X, LIST_POSITION_Y)
 
-        :setItemsMargin(5)
+        :setItemsMargin(20)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
         :setCascadeOpacityEnabled(true)
 
