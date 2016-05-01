@@ -1,11 +1,12 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     // Configure glob patterns for excluding files and folders.
-	"files.exclude": {
-		"**/.git": true,
-		"**/.DS_Store": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
         "**/.vscode": true,
         "**/runtime": true,
-        "**/simulator": true
-	}
+        "**/simulator": true,
+        "**/frameworks/runtime-src": true
+    }
 }

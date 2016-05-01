@@ -3,12 +3,25 @@ local CaptureTaker = class("CaptureTaker")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "getCurrentCapturePoint",
-    "setCurrentCapturePoint",
     "getMaxCapturePoint",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isCapturerMovedAway(selfGridIndex, beginningGridIndex, endingGridIndex)
+    return ((GridIndexFunctions.isEqual(selfGridIndex, beginningGridIndex)) and
+            (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)))
+end
+
+local function isCapturerDestroyed(selfGridIndex, capturer)
+    return ((GridIndexFunctions.isEqual(selfGridIndex, capturer:getGridIndex())) and
+            (capturer:getCurrentHP() <= 0))
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -30,6 +43,18 @@ end
 function CaptureTaker:loadInstantialData(data)
     assert(data.currentCapturePoint, "CaptureTaker:loadInstantialData() the param data.currentCapturePoint is invalid.")
     self.m_CurrentCapturePoint = data.currentCapturePoint
+
+    return self
+end
+
+function CaptureTaker:setRootScriptEventDispatcher(dispatcher)
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function CaptureTaker:unsetRootScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end
@@ -56,16 +81,51 @@ function CaptureTaker:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for doing the actions.
+--------------------------------------------------------------------------------
+function CaptureTaker:doActionCapture(action)
+    local modelTile       = self.m_Target
+    local maxCapturePoint = self:getMaxCapturePoint()
+    if ((action.prevTarget) and (modelTile == action.prevTarget)) then
+        self.m_CurrentCapturePoint = maxCapturePoint
+    else
+        self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - action.capturer:getCaptureAmount(), 0)
+        if (self.m_CurrentCapturePoint <= 0) then
+            self.m_CurrentCapturePoint = maxCapturePoint
+            modelTile:updateWithPlayerIndex(action.capturer:getPlayerIndex())
+        end
+    end
+
+    return self
+end
+
+function CaptureTaker:doActionAttack(action, isAttacker)
+    local path = action.path
+    local selfGridIndex = self.m_Target:getGridIndex()
+
+    if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
+        (isCapturerDestroyed(selfGridIndex, action.attacker)) or
+        ((action.targetType == "unit") and (isCapturerDestroyed(selfGridIndex, action.target)))) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    end
+
+    return self
+end
+
+function CaptureTaker:doActionWait(action)
+    local path = action.path
+    if (isCapturerMovedAway(self.m_Target:getGridIndex(), path[1], path[#path])) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function CaptureTaker:getCurrentCapturePoint()
     return self.m_CurrentCapturePoint
-end
-
-function CaptureTaker:setCurrentCapturePoint(point)
-    self.m_CurrentCapturePoint = point
-
-    return self
 end
 
 function CaptureTaker:getMaxCapturePoint()

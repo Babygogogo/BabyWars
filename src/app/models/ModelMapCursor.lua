@@ -7,6 +7,25 @@ local ComponentManager   = require("global.components.ComponentManager")
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function dispatchEventPlayerMovedCursor(self, gridIndex)
+    self:setGridIndex(gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name = "EvtPlayerMovedCursor",
+        gridIndex = gridIndex
+    })
+end
+
+local function dispatchEventPlayerSelectedGrid(self, gridIndex)
+    self:setGridIndex(gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name = "EvtPlayerSelectedGrid",
+        gridIndex = gridIndex
+    })
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerPreviewAttackTarget/EvtPlayerPreviewNoAttackTarget.
 --------------------------------------------------------------------------------
 local function onEvtPlayerPreviewAttackTarget(self, event)
@@ -26,68 +45,67 @@ end
 --------------------------------------------------------------------------------
 -- The touch/scroll event listeners.
 --------------------------------------------------------------------------------
-local function createTouchListener(model)
+local function createTouchListener(self)
     local isTouchMoved, isTouchingCursor
     local initialTouchPosition, initialTouchGridIndex
-    local touchListener = cc.EventListenerTouchOneByOne:create()
+    local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
-    local function onTouchBegan(touch, event)
+    local function onTouchesBegan(touches, event)
         isTouchMoved = false
-        initialTouchPosition = touch:getLocation()
-        initialTouchGridIndex = GridIndexFunctions.worldPosToGridIndexInNode(initialTouchPosition, model.m_View)
-        isTouchingCursor = GridIndexFunctions.isEqual(initialTouchGridIndex, model:getGridIndex())
-
-        touchListener:setSwallowTouches(isTouchingCursor)
-
-        return true
+        initialTouchPosition = touches[1]:getLocation()
+        initialTouchGridIndex = GridIndexFunctions.worldPosToGridIndexInNode(initialTouchPosition, self.m_View)
+        isTouchingCursor = GridIndexFunctions.isEqual(initialTouchGridIndex, self:getGridIndex())
     end
 
-    local function onTouchMoved(touch, event)
-        isTouchMoved = (isTouchMoved) or (cc.pDistanceSQ(touch:getLocation(), initialTouchPosition) > DRAG_FIELD_TRIGGER_DISTANCE_SQUARED)
+    local function onTouchesMoved(touches, event)
+        local touchesCount = #touches
+        isTouchMoved = (isTouchMoved) or
+            (touchesCount > 1) or
+            (cc.pDistanceSQ(touches[1]:getLocation(), initialTouchPosition) > DRAG_FIELD_TRIGGER_DISTANCE_SQUARED)
 
-        if (isTouchingCursor) then
-            local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), model.m_View)
-            if (GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)) and
-               (not GridIndexFunctions.isEqual(gridIndex, model:getGridIndex())) then
-                model:setGridIndex(gridIndex)
-                model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = gridIndex})
-                isTouchMoved = true
-            end
+        if (touchesCount >= 2) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name    = "EvtPlayerZoomFieldWithTouches",
+                touches = touches,
+            })
         else
-            if (isTouchMoved) then
-                model.m_RootScriptEventDispatcher:dispatchEvent({
-                    name             = "EvtPlayerDragField",
-                    previousPosition = touch:getPreviousLocation(),
-                    currentPosition  = touch:getLocation()
-                })
+            if (isTouchingCursor) then
+                local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
+                if ((GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) and
+                    (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
+                    dispatchEventPlayerMovedCursor(self, gridIndex)
+                    isTouchMoved = true
+                end
+            else
+                if (isTouchMoved) then
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name             = "EvtPlayerDragField",
+                        previousPosition = touches[1]:getPreviousLocation(),
+                        currentPosition  = touches[1]:getLocation()
+                    })
+                end
             end
         end
     end
 
-    local function onTouchCancelled(touch, event)
+    local function onTouchesCancelled(touch, event)
     end
 
-    local function onTouchEnded(touch, event)
-        local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touch:getLocation(), model.m_View)
-        if (not GridIndexFunctions.isWithinMap(gridIndex, model.m_MapSize)) then
-            return
-        end
-
-        if ((not isTouchMoved) or (isTouchingCursor)) and
-           (not GridIndexFunctions.isEqual(model:getGridIndex(), gridIndex)) then
-            model:setGridIndex(gridIndex)
-            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = gridIndex})
-        end
-
-        if (not isTouchMoved) then
-            model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerSelectedGrid", gridIndex = gridIndex})
+    local function onTouchesEnded(touches, event)
+        local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
+        if (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) then
+            if (not isTouchMoved) then
+                dispatchEventPlayerSelectedGrid(self, gridIndex)
+            elseif ((isTouchingCursor) and (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
+                dispatchEventPlayerMovedCursor(self, gridIndex)
+            end
         end
     end
 
-    touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
-    touchListener:registerScriptHandler(onTouchMoved,     cc.Handler.EVENT_TOUCH_MOVED)
-    touchListener:registerScriptHandler(onTouchCancelled, cc.Handler.EVENT_TOUCH_CANCELLED)
-    touchListener:registerScriptHandler(onTouchEnded,     cc.Handler.EVENT_TOUCH_ENDED)
+    touchListener:registerScriptHandler(onTouchesBegan,     cc.Handler.EVENT_TOUCHES_BEGAN)
+    touchListener:registerScriptHandler(onTouchesMoved,     cc.Handler.EVENT_TOUCHES_MOVED)
+    touchListener:registerScriptHandler(onTouchesCancelled, cc.Handler.EVENT_TOUCHES_CANCELLED)
+    touchListener:registerScriptHandler(onTouchesEnded,     cc.Handler.EVENT_TOUCHES_ENDED)
 
     return touchListener
 end

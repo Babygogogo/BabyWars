@@ -94,365 +94,494 @@ GameConstant.unitAnimations = {
     infantry = {
         {
             normal = {pattern = "c02_t01_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t01_s05_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t01_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t01_s06_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t01_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t01_s07_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t01_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t01_s08_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
     },
+
     mech = {
         {
             normal = {pattern = "c02_t02_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t02_s05_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t02_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t02_s06_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t02_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t02_s07_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t02_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t02_s08_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
         },
     },
+
     bike = {
         {
             normal = {pattern = "c02_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t03_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t03_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t03_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t03_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t03_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t03_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t03_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     recon = {
         {
             normal = {pattern = "c02_t04_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t04_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t04_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t04_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t04_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t04_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t04_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t04_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     flare = {
         {
             normal = {pattern = "c02_t05_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t05_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t05_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t05_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t05_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t05_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t05_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t05_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     antiair = {
         {
             normal = {pattern = "c02_t06_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t06_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t06_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t06_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t06_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t06_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t06_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t06_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     tank = {
         {
             normal = {pattern = "c02_t07_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t07_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t07_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t07_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t07_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t07_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t07_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t07_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     mdtank = {
         {
             normal = {pattern = "c02_t08_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t08_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t08_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t08_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t08_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t08_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t08_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t08_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     wartank = {
         {
             normal = {pattern = "c02_t09_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t09_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t09_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t09_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t09_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t09_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t09_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t09_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     artillery = {
         {
             normal = {pattern = "c02_t10_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t10_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t10_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t10_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t10_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t10_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t10_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t10_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     antitank = {
         {
             normal = {pattern = "c02_t11_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t11_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t11_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t11_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t11_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t11_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t11_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t11_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     rockets = {
         {
             normal = {pattern = "c02_t12_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t12_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t12_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t12_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t12_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t12_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t12_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t12_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     missiles = {
         {
             normal = {pattern = "c02_t13_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t13_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t13_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t13_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t13_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t13_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t13_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t13_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     rig = {
         {
             normal = {pattern = "c02_t14_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t14_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t14_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t14_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t14_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t14_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t14_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t14_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     fighter = {
         {
             normal = {pattern = "c02_t15_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t15_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t15_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t15_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t15_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t15_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t15_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t15_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     bomber = {
         {
             normal = {pattern = "c02_t16_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t16_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t16_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t16_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t16_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t16_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t16_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t16_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     duster = {
         {
             normal = {pattern = "c02_t17_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t17_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t17_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t17_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t17_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t17_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t17_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t17_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     bcopter = {
         {
             normal = {pattern = "c02_t18_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t18_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t18_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t18_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t18_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t18_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t18_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t18_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     tcopter = {
         {
             normal = {pattern = "c02_t19_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t19_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t19_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t19_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t19_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t19_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t19_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t19_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     seaplane = {
         {
             normal = {pattern = "c02_t20_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t20_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t20_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t20_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t20_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t20_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t20_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t20_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     battleship = {
         {
             normal = {pattern = "c02_t21_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t21_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t21_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t21_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t21_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t21_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t21_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t21_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     carrier = {
         {
             normal = {pattern = "c02_t22_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t22_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t22_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t22_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t22_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t22_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t22_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t22_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     submarine = {
         {
             normal = {pattern = "c02_t23_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t23_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t23_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t23_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t23_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t23_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t23_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t23_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     cruiser = {
         {
             normal = {pattern = "c02_t24_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t24_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t24_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t24_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t24_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t24_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t24_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t24_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     lander = {
         {
             normal = {pattern = "c02_t25_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t25_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t25_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t25_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t25_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t25_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t25_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t25_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
+
     gunboat = {
         {
             normal = {pattern = "c02_t26_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t26_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t26_s02_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t26_s06_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t26_s03_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t26_s07_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
         {
             normal = {pattern = "c02_t26_s04_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
+            moving = {pattern = "c02_t26_s08_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
         },
     },
 }
@@ -1202,6 +1331,25 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
+        UnitProducer = {
+            productionList = {
+                "infantry",
+                "mech",
+                "bike",
+                "recon",
+                "flare",
+                "antiair",
+                "tank",
+                "mdtank",
+                "wartank",
+                "artillery",
+                "antitank",
+                "rockets",
+                "missiles",
+                "rig",
+            },
+        },
+
         description = "Factories can be used to resupply and produce ground units once captured.",
     },
 
@@ -1241,6 +1389,16 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
+        UnitProducer = {
+            productionList = {
+                "fighter",
+                "bomber",
+                "duster",
+                "bcopter",
+                "tcopter",
+            },
+        },
+
         description = "Airports can be used to resupply and produce air units once captured.",
     },
 
@@ -1278,6 +1436,17 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = 1,
             transport = 1,
+        },
+
+        UnitProducer = {
+            productionList = {
+                "battleship",
+                "carrier",
+                "submarine",
+                "cruiser",
+                "lander",
+                "gunboat",
+            },
         },
 
         description = "Seaports can be used to resupply and produce naval units once captured.",
@@ -1422,9 +1591,14 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        CaptureDoer = {
+            isCapturing = false,
+        },
+
         cost        = 1500,
         vision      = 2,
 
+        fullName    = "Infantry",
         description = "Infantry units are cheap. They can capture bases but have low firepower.",
     },
 
@@ -1528,9 +1702,14 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        CaptureDoer = {
+            isCapturing = false,
+        },
+
         cost        = 2500,
         vision      = 2,
 
+        fullName    = "Mech",
         description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
     },
 
@@ -1601,9 +1780,14 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        CaptureDoer = {
+            isCapturing = false,
+        },
+
         cost        = 2500,
         vision      = 2,
 
+        fullName    = "Bike",
         description = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
     },
 
@@ -1677,6 +1861,7 @@ GameConstant.templateModelUnits = {
         cost        = 4000,
         vision      = 5,
 
+        fullName    = "Recon",
         description = "Recon units have high movement range and are strong against infantry units.",
     },
 
@@ -1750,6 +1935,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 2,
 
+        fullName    = "Flare",
         description = "Flares fire bright rockets that reveal a 13-square area in Fog of War.",
     },
 
@@ -1826,7 +2012,8 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
-        description = "Anti-air units work well against infantry and air units. They're weak against tanks.",
+        fullName    = "Anti-Air",
+        description = "Anti-Air units work well against infantry and air units. They're weak against tanks.",
     },
 
     tank       = {
@@ -1932,6 +2119,7 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
+        fullName    = "Tank",
         description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
     },
 
@@ -2038,7 +2226,8 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 2,
 
-        description = "Md(medium) tank units' defensive and offensive ratings are the second best among ground units.",
+        fullName    = "Md Tank",
+        description = "Md(Medium) tank units' defensive and offensive ratings are the second best among ground units.",
     },
 
     wartank    = {
@@ -2144,7 +2333,8 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 2,
 
-        description = "The strongest tank in terms of both attack and defense.",
+        fullName    = "War Tank",
+        description = "War Tank units are the strongest tanks in terms of both attack and defense.",
     },
 
     artillery  = {
@@ -2219,10 +2409,11 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 3,
 
+        fullName    = "Artillery",
         description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
     },
 
-    antitank  = {
+    antitank   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2294,6 +2485,7 @@ GameConstant.templateModelUnits = {
         cost        = 11000,
         vision      = 3,
 
+        fullName    = "Anti-Tank",
         description = "Anti-Tanks can counter-attack when under direct fire.",
     },
 
@@ -2370,7 +2562,8 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 3,
 
-        description = "Rocket units are valuable, because they can fire on both land and naval units.",
+        fullName    = "Rockets",
+        description = "Rockets units are valuable, because they can fire on both land and naval units.",
     },
 
     missiles   = {
@@ -2445,7 +2638,8 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 5,
 
-        description = "Missile units are essential in defending against air units. Their vision range is large.",
+        fullName    = "Missiles",
+        description = "Missiles units are essential in defending against air units. Their vision range is large.",
     },
 
     rig        = {
@@ -2474,6 +2668,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
+        fullName    = "Rig",
         description = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
     },
 
@@ -2549,6 +2744,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
+        fullName    = "Fighter",
         description = "Fighter units are strong vs. other air units. They also have the highest movements.",
     },
 
@@ -2624,6 +2820,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 3,
 
+        fullName    = "Bomber",
         description = "Bomber units can fire on ground and naval units with a high destructive force.",
     },
 
@@ -2699,6 +2896,7 @@ GameConstant.templateModelUnits = {
         cost        = 13000,
         vision      = 4,
 
+        fullName    = "Duster",
         description = "Dusters are somewhat powerful planes that can attack both ground and air units.",
     },
 
@@ -2805,6 +3003,7 @@ GameConstant.templateModelUnits = {
         cost        = 9000,
         vision      = 2,
 
+        fullName    = "B Copter",
         description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
     },
 
@@ -2834,6 +3033,7 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
+        fullName    = "T Copter",
         description = "T(transport) copters can transport both infantry and mech units.",
     },
 
@@ -2909,6 +3109,7 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 4,
 
+        fullName    = "Seaplane",
         description = "Seaplanes are produced at sea by carriers. They can attack any unit.",
     },
 
@@ -2984,6 +3185,7 @@ GameConstant.templateModelUnits = {
         cost        = 25000,
         vision      = 3,
 
+        fullName    = "Battleship",
         description = "B(Battle) ships can launch indirect attack after moving.",
     },
 
@@ -3057,6 +3259,7 @@ GameConstant.templateModelUnits = {
         cost        = 28000,
         vision      = 4,
 
+        fullName    = "Carrier",
         description = "Carriers can carrier 2 air units and produce seaplanes.",
     },
 
@@ -3132,6 +3335,7 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
+        fullName    = "Submarine",
         description = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
     },
 
@@ -3238,6 +3442,7 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 5,
 
+        fullName    = "Cruiser",
         description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
     },
 
@@ -3267,6 +3472,7 @@ GameConstant.templateModelUnits = {
         cost        = 10000,
         vision      = 1,
 
+        fullName    = "Lander",
         description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
     },
 
@@ -3342,6 +3548,7 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 2,
 
+        fullName    = "Gunboat",
         description = "Gunboats can carry 1 foot soldier and attack other naval units.",
     },
 }

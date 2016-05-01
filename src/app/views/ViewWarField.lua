@@ -1,7 +1,7 @@
 
 local ViewWarField = class("ViewWarField", cc.Node)
 
-local TypeChecker  = require("app.utilities.TypeChecker")
+local TypeChecker        = require("app.utilities.TypeChecker")
 
 local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 
@@ -17,6 +17,33 @@ local ACTION_PLANNER_Z_ORDER = 1
 local TILE_MAP_Z_ORDER       = 0
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getScaleWithModifier(self, modifier)
+    local newScale = self:getScale() * modifier
+    newScale = math.max(self.m_MinScale, newScale)
+    newScale = math.min(self.m_MaxScale, newScale)
+
+    return newScale
+end
+
+local function getScaleModifierWithScrollValue(value)
+    return 1 - value / 10
+end
+
+local function getMiddlePointForTouches(touches)
+    local director = cc.Director:getInstance()
+    local pos1, pos2 = director:convertToGL(touches[1]:getLocation()), director:convertToGL(touches[2]:getLocation())
+    return {x = (pos1.x + pos2.x) / 2, y = (pos1.y + pos2.y) / 2}
+end
+
+local function getScaleModifierWithTouches(touches)
+    local currentPos1, prevPos1 = touches[1]:getLocation(), touches[1]:getPreviousLocation()
+    local currentPos2, prevPos2 = touches[2]:getLocation(), touches[2]:getPreviousLocation()
+    return cc.pGetDistance(currentPos1, currentPos2) / cc.pGetDistance(prevPos1, prevPos2)
+end
+
+--------------------------------------------------------------------------------
 -- The functions that deals with zooming/dragging.
 --------------------------------------------------------------------------------
 local function isViewSmallerThanBoundaryRect(scale, contentSize)
@@ -26,31 +53,29 @@ local function isViewSmallerThanBoundaryRect(scale, contentSize)
     return (width <= BOUNDARY_RECT.width) and (height <= BOUNDARY_RECT.height)
 end
 
-local function shouldZoomWithScroll(view, focusPosInNode, value)
-    if (focusPosInNode.x < 0) or (focusPosInNode.x > view.m_ContentSize.width) or
-    (focusPosInNode.y < 0) or (focusPosInNode.y > view.m_ContentSize.height) then
-    return false
+local function shouldZoom(self, focusPosInNode, scaleModifier)
+    if ((focusPosInNode.x < 0) or (focusPosInNode.x > self.m_ContentSize.width) or
+        (focusPosInNode.y < 0) or (focusPosInNode.y > self.m_ContentSize.height)) then
+        return false
     end
 
-    local currentScale = view:getScale()
-    if ((value > 0) and (isViewSmallerThanBoundaryRect(currentScale, view.m_ContentSize))) or
-    ((value < 0) and (currentScale >= view.m_MaxScale)) or
-    (value == 0) then
+    local currentScale = self:getScale()
+    if (((scaleModifier < 1) and (isViewSmallerThanBoundaryRect(currentScale, self.m_ContentSize))) or
+        ((scaleModifier > 1) and (currentScale >= self.m_MaxScale)) or
+        (scaleModifier == 1)) then
         return false
     else
         return true
     end
 end
 
-local function getScaleWithScrollValue(view, value)
-    local scale = view:getScale() * (1 - value / 10)
-    if (scale > view.m_MaxScale) then
-        scale = view.m_MaxScale
-    elseif (scale < view.m_MinScale) then
-        scale = view.m_MinScale
-    end
+local function setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
+    self:setScale(getScaleWithModifier(self, scaleModifier))
+    local scaledFocusPosInWorld = self:convertToWorldSpace(focusPosInNode)
 
-    return scale
+    self:setPosition(   - scaledFocusPosInWorld.x + focusPosInWorld.x + self:getPositionX(),
+                        - scaledFocusPosInWorld.y + focusPosInWorld.y + self:getPositionY())
+        :placeInDragBoundary()
 end
 
 local function getNewPosComponentOnDrag(currentPosComp, dragDeltaComp, targetSizeComp, targetOriginComp, boundaryUpperRightComp, boundaryLowerLeftComp)
@@ -170,13 +195,9 @@ end
 --------------------------------------------------------------------------------
 function ViewWarField:setZoomWithScroll(focusPosInWorld, scrollValue)
     local focusPosInNode = self:convertToNodeSpace(focusPosInWorld)
-    if (shouldZoomWithScroll(self, focusPosInNode, scrollValue)) then
-        self:setScale(getScaleWithScrollValue(self, scrollValue))
-        local scaledFocusPosInWorld = self:convertToWorldSpace(focusPosInNode)
-
-        self:setPosition(- scaledFocusPosInWorld.x + focusPosInWorld.x + self:getPositionX(),
-                         - scaledFocusPosInWorld.y + focusPosInWorld.y + self:getPositionY())
-            :placeInDragBoundary()
+    local scaleModifier  = getScaleModifierWithScrollValue(scrollValue)
+    if (shouldZoom(self, focusPosInNode, scaleModifier)) then
+        setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
     end
 
     return self
@@ -194,6 +215,17 @@ end
 
 function ViewWarField:placeInDragBoundary()
     self:setPositionOnDrag(ORIGIN, ORIGIN)
+
+    return self
+end
+
+function ViewWarField:setZoomWithTouches(touches)
+    local focusPosInWorld = getMiddlePointForTouches(touches)
+    local focusPosInNode  = self:convertToNodeSpace(focusPosInWorld)
+    local scaleModifier   = getScaleModifierWithTouches(touches)
+    if (shouldZoom(self, focusPosInNode, scaleModifier)) then
+        setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
+    end
 
     return self
 end

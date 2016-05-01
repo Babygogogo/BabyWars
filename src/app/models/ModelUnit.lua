@@ -12,17 +12,17 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
-local function setStateActioned(self)
-    self.m_State = "actioned"
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on EvtTurnPhaseResetUnitState.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
         setStateIdle(self)
-        self:updateView()
+
+        if (self.m_View) then
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+        end
     end
 end
 
@@ -50,7 +50,8 @@ local function initWithTiledID(self, tiledID)
 end
 
 local function loadInstantialData(self, param)
-    self.m_State = param.state or self.m_State
+    self.m_State  = param.state  or self.m_State
+    self.m_UnitID = param.unitID or self.m_UnitID
 
     for name, data in pairs(param) do
         if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
@@ -132,8 +133,20 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelUnit:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
 function ModelUnit:getTiledID()
     return self.m_TiledID
+end
+
+function ModelUnit:getUnitId()
+    return self.m_UnitID
 end
 
 function ModelUnit:getPlayerIndex()
@@ -142,6 +155,28 @@ end
 
 function ModelUnit:getState()
     return self.m_State
+end
+
+function ModelUnit:setStateActioned()
+    self.m_State = "actioned"
+
+    return self
+end
+
+function ModelUnit:showNormalAnimation()
+    if (self.m_View) then
+        self.m_View:showNormalAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:showMovingAnimation()
+    if (self.m_View) then
+        self.m_View:showMovingAnimation()
+    end
+
+    return self
 end
 
 function ModelUnit:isInStealthMode()
@@ -156,6 +191,10 @@ function ModelUnit:getVision()
     return self.m_Template.vision
 end
 
+function ModelUnit:getProductionCost()
+    return self.m_Template.cost
+end
+
 function ModelUnit:canJoin(rhsUnitModel)
     return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
 end
@@ -164,16 +203,8 @@ function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end
 
-function ModelUnit:updateView()
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(self)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionWait(action)
-    setStateActioned(self)
+    self:setStateActioned()
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionWait) then
@@ -185,7 +216,8 @@ function ModelUnit:doActionWait(action)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
-            self:updateView()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
         end)
     end
 
@@ -194,7 +226,7 @@ end
 
 function ModelUnit:doActionAttack(action, isAttacker)
     if (isAttacker) then
-        setStateActioned(self)
+        self:setStateActioned()
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
@@ -211,7 +243,9 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
     if ((self.m_View) and (isAttacker)) then
         self.m_View:moveAlongPath(action.path, function()
-            self:updateView()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
             if (action.target.updateView) then
                 action.target:updateView()
             end
@@ -232,5 +266,24 @@ function ModelUnit:doActionAttack(action, isAttacker)
     return self
 end
 
+function ModelUnit:doActionCapture(action)
+    self:setStateActioned()
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionCapture) then
+            component:doActionCapture(action)
+        end
+    end
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            action.nextTarget:updateView()
+        end)
+    end
+
+    return self
+end
 
 return ModelUnit

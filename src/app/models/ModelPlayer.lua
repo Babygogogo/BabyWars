@@ -37,6 +37,12 @@ function ModelPlayer:getFund()
     return self.m_Fund
 end
 
+function ModelPlayer:setFund(fund)
+    self.m_Fund = fund
+
+    return self
+end
+
 function ModelPlayer:getCOEnergy()
     return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
 end

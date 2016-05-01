@@ -61,8 +61,7 @@ function ModelTile:initView()
     assert(view, "ModelTile:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-    view:setViewObjectWithTiledId(self.m_ObjectID)
-        :setViewBaseWithTiledId(self.m_BaseID)
+        :updateView()
 
     return self
 end
@@ -97,6 +96,15 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelTile:updateView()
+    if (self.m_View) then
+        self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
+            :setViewBaseWithTiledId(self.m_BaseID)
+    end
+
+    return self
+end
+
 function ModelTile:getTiledID()
     return (self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
 end
@@ -129,11 +137,42 @@ function ModelTile:destroyViewTileObject()
     end
 end
 
+function ModelTile:updateWithPlayerIndex(playerIndex)
+    assert(self:getPlayerIndex() ~= playerIndex, "ModelTile:updateWithPlayerIndex() the param playerIndex is the same as the one of self.")
+    self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(GameConstantFunctions.getTileNameWithTiledId(self:getTiledID()), playerIndex)
+
+    return self
+end
+
 function ModelTile:doActionAttack(action, isAttacker)
     assert(not isAttacker, "ModelTile:doActionAttack() the param is invalid.")
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
             component:doActionAttack(action, isAttacker)
+        end
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileUpdated", modelTile = self})
+
+    return self
+end
+
+function ModelTile:doActionCapture(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionCapture) then
+            component:doActionCapture(action)
+        end
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileUpdated", modelTile = self})
+
+    return self
+end
+
+function ModelTile:doActionWait(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionWait) then
+            component:doActionWait(action)
         end
     end
 

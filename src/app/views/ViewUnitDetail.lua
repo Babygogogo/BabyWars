@@ -56,13 +56,12 @@ local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
 local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
 
 local function createBottomLine(posX, poxY, width, height)
-    --    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
     local line = cc.Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME)
     line:ignoreAnchorPointForPosition(true)
         :setPosition(posX, poxY)
         :setAnchorPoint(0, 0)
-    --        :setContentSize(width, height)
         :setScaleX(width / line:getContentSize().width)
+        :setScaleY(0.5)
 
     return line
 end

@@ -49,6 +49,17 @@ local function doActionAttack(self, action)
     self:getModelWarField():doActionAttack(action)
 end
 
+local function doActionCapture(self, action)
+    self:getModelWarField():doActionCapture(action)
+end
+
+local function doActionProduceOnTile(self, action)
+    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
+
+    self:getModelPlayerManager():doActionProduceOnTile(action)
+    self:getModelWarField():doActionProduceOnTile(action)
+end
+
 --------------------------------------------------------------------------------
 -- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
 --------------------------------------------------------------------------------
@@ -60,6 +71,10 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionWait(self, event)
     elseif (actionName == "Attack") then
         doActionAttack(self, event)
+    elseif (actionName == "Capture") then
+        doActionCapture(self, event)
+    elseif (actionName == "ProduceOnTile") then
+        doActionProduceOnTile(self, event)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
@@ -195,6 +210,7 @@ function ModelSceneWar:onEnter(rootActor)
 
     self.m_ActorSceneWarHUD:onEnter(rootActor)
     self.m_ActorWarField:onEnter(rootActor)
+    self.m_ActorPlayerManager:onEnter(rootActor)
 
     self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
 
@@ -213,8 +229,9 @@ function ModelSceneWar:onCleanup(rootActor)
     self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
         :removeEventListener("EvtPlayerRequestDoAction", self)
 
-    self.m_ActorSceneWarHUD:onCleanup(rootActor)
+    self.m_ActorPlayerManager:onCleanup(rootActor)
     self.m_ActorWarField:onCleanup(rootActor)
+    self.m_ActorSceneWarHUD:onCleanup(rootActor)
 
     return self
 end

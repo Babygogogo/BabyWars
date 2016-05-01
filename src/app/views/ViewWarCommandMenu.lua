@@ -11,6 +11,11 @@ local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
 local LIST_POSITION_X = MENU_BACKGROUND_POSITION_X + 5
 local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
 
+local BUTTON_CAPINSETS           = {x = 0, y = 0, width = 1, height = 2}
+local BUTTON_TITLE_COLOR         = {r = 255, g = 255, b = 255}
+local BUTTON_TITLE_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local BUTTON_TITLE_OUTLINE_WIDTH = 2
+
 local CONFIRM_BOX_Z_ORDER = 99
 
 --------------------------------------------------------------------------------
@@ -21,17 +26,17 @@ local function createItemView(itemModel)
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
+        :setCapInsets(BUTTON_CAPINSETS)
         :setContentSize(230, 45)
 
         :setZoomScale(-0.05)
 
         :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(28)
-        :setTitleColor({r = 255, g = 255, b = 255})
+        :setTitleColor(BUTTON_TITLE_COLOR)
         :setTitleText(itemModel:getTitleText())
 
-    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+    view:getTitleRenderer():enableOutline(BUTTON_TITLE_OUTLINE_COLOR, BUTTON_TITLE_OUTLINE_WIDTH)
 
     view:addTouchEventListener(function(sender, eventType)
         if eventType == ccui.TouchEventType.ended then
@@ -86,7 +91,7 @@ local function createListView()
 
         :setContentSize(LIST_WIDTH, LIST_HEIGHT)
 
-        :setItemsMargin(5)
+        :setItemsMargin(20)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
         :setCascadeOpacityEnabled(true)
 

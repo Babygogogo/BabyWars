@@ -40,19 +40,27 @@ local function runTurnPhaseResetUnitState(self)
 end
 
 local function runTurnPhaseBeginning(self)
-    local player = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
     self.m_ScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnPhaseBeginning",
-        player      = player,
+        player      = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
         playerIndex = self.m_PlayerIndex,
         turnIndex   = self.m_TurnIndex,
 
         -- Basically, this is to show the begin turn effect and set the turn phase affer that. There should be a better way to do it.
         callbackOnBeginTurnEffectDisappear = function()
-            self.m_TurnPhase = "consumeUnitFuel"
+            self.m_TurnPhase = "getFund"
             self:runTurn()
         end,
     })
+end
+
+local function runTurnPhaseGetFund(self)
+    self.m_ScriptEventDispatcher:dispatchEvent({
+        name         = "EvtTurnPhaseGetFund",
+        playerIndex  = self.m_PlayerIndex,
+        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+    })
+    self.m_TurnPhase = "consumeUnitFuel"
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
@@ -61,6 +69,16 @@ local function runTurnPhaseConsumeUnitFuel(self)
         playerIndex  = self.m_PlayerIndex,
         turnIndex    = self.m_TurnIndex,
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
+    })
+    self.m_TurnPhase = "repairUnit"
+end
+
+local function runTurnPhaseRepairUnit(self)
+    self.m_ScriptEventDispatcher:dispatchEvent({
+        name         = "EvtTurnPhaseRepairUnit",
+        playerIndex  = self.m_PlayerIndex,
+        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
     })
     self.m_TurnPhase = "main"
 end
@@ -119,8 +137,16 @@ function ModelTurnManager:runTurn(nextWeather)
         return self
     end
 
+    if (self.m_TurnPhase == "getFund") then
+        runTurnPhaseGetFund(self)
+    end
+
     if (self.m_TurnPhase == "consumeUnitFuel") then
         runTurnPhaseConsumeUnitFuel(self)
+    end
+
+    if (self.m_TurnPhase == "repairUnit") then
+        runTurnPhaseRepairUnit(self)
     end
 
     assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function.")

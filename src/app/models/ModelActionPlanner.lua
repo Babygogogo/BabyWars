@@ -73,21 +73,11 @@ end
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
-local function dispatchEventWait(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "Wait",
-        path       = self.m_MovePath,
-    })
-end
-
 local function dispatchEventJoin(self)
     print("The Join action is selected, but not implemented.")
 end
 
 local function dispatchEventAttack(self, targetGridIndex)
-    local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, targetGridIndex)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",
         actionName      = "Attack",
@@ -96,10 +86,35 @@ local function dispatchEventAttack(self, targetGridIndex)
     })
 end
 
+local function dispatchEventCapture(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "Capture",
+        path       = self.m_MovePath,
+    })
+end
+
+local function dispatchEventWait(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "Wait",
+        path       = self.m_MovePath,
+    })
+end
+
+local function dispatchEventProduceOnTile(self, gridIndex, tiledID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "ProduceOnTile",
+        gridIndex  = GridIndexFunctions.clone(gridIndex),
+        tiledID    = tiledID,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The functions for avaliable action list.
 --------------------------------------------------------------------------------
-local setStateIdle, setStateMakingMovePath, setStateChoosingAction, setStateChoosingAttackTarget
+local setStateIdle, setStateChoosingProductionTarget, setStateMakingMovePath, setStateChoosingAction, setStateChoosingAttackTarget
 
 local function getActionJoin(self, destination)
     if (not GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
@@ -128,6 +143,20 @@ local function getActionAttack(self, destination)
     end
 end
 
+local function getActionCapture(self, destination)
+    local modelTile = self.m_ModelTileMap:getModelTile(destination)
+    if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
+        return {
+            name     = "Capture",
+            callback = function()
+                dispatchEventCapture(self)
+            end,
+        }
+    else
+        return nil
+    end
+end
+
 local function getActionWait(self, destination)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
@@ -149,8 +178,9 @@ local function getAvaliableActionList(self, destination)
     end
 
     local list = {}
-    list[#list + 1] = getActionAttack(self, destination)
-    list[#list + 1] = getActionWait(  self, destination)
+    list[#list + 1] = getActionAttack( self, destination)
+    list[#list + 1] = getActionCapture(self, destination)
+    list[#list + 1] = getActionWait(   self, destination)
 
     assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
     return list
@@ -160,7 +190,9 @@ end
 -- The set state functions.
 --------------------------------------------------------------------------------
 setStateIdle = function(self)
-    self.m_State = "idle"
+    self.m_State          = "idle"
+    self.m_FocusModelUnit = nil
+
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(false)
             :setAttackableGridsVisible(false)
@@ -171,11 +203,28 @@ setStateIdle = function(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
 end
 
-setStateMakingMovePath = function(self, focusUnitModel)
-    resetReachableArea(self, focusUnitModel)
-    resetMovePath(      self, focusUnitModel)
+setStateChoosingProductionTarget = function(self, modelTile)
+    self.m_State = "choosingProductionTarget"
+    local productionList = modelTile:getProductionList(self.m_ModelPlayer)
+    local gridIndex      = modelTile:getGridIndex()
+
+    for _, listItem in ipairs(productionList) do
+        listItem.callback = function()
+            dispatchEventProduceOnTile(self, gridIndex, listItem.tiledID)
+        end
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name           = "EvtActionPlannerChoosingProductionTarget",
+        productionList = productionList,
+    })
+end
+
+setStateMakingMovePath = function(self, focusModelUnit)
+    resetReachableArea(self, focusModelUnit)
+    resetMovePath(      self, focusModelUnit)
     self.m_State          = "makingMovePath"
-    self.m_FocusModelUnit = focusUnitModel
+    self.m_FocusModelUnit = focusModelUnit
 
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(true)
@@ -189,9 +238,9 @@ end
 
 setStateChoosingAction = function(self, destination)
     updateMovePathWithDestinationGrid(self, destination)
-    self.m_Destination     = destination or self.m_Destination
+    self.m_Destination        = destination or self.m_Destination
     self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, self.m_Destination, self.m_ModelTileMap, self.m_ModelUnitMap)
-    self.m_State           = "choosingAction"
+    self.m_State              = "choosingAction"
 
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(false)
@@ -220,21 +269,32 @@ end
 -- The callback functions on EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
 local function onEvtPlayerSelectedGrid(self, gridIndex)
-    if (self.m_State == "idle") then
+    local state = self.m_State
+    if (state == "idle") then
         local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
-        if ((modelUnit) and (modelUnit:canDoAction(self.m_PlayerIndex))) then
-            setStateMakingMovePath(self, modelUnit)
+        if (modelUnit) then
+            if (modelUnit:canDoAction(self.m_PlayerIndex)) then
+                modelUnit:showMovingAnimation()
+                setStateMakingMovePath(self, modelUnit)
+            end
+        else
+            local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
+            if ((modelTile:getPlayerIndex() == self.m_PlayerIndex) and (modelTile.getProductionList)) then
+                setStateChoosingProductionTarget(self, modelTile)
+            end
         end
-    elseif (self.m_State == "makingMovePath") then
+    elseif (state == "choosingProductionTarget") then
+        setStateIdle(self)
+    elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
+            self.m_FocusModelUnit:showNormalAnimation()
             setStateIdle(self)
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
             setStateChoosingAction(self, gridIndex)
         end
-    elseif (self.m_State == "choosingAction") then
+    elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_FocusModelUnit)
-    elseif (self.m_State == "choosingAttackTarget") then
-        -- TODO: enable to attack.
+    elseif (state == "choosingAttackTarget") then
         if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
             dispatchEventAttack(self, gridIndex)
         else
@@ -250,6 +310,7 @@ end
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseBeginning(self, event)
     self.m_PlayerIndex = event.playerIndex
+    self.m_ModelPlayer = event.player
     setStateIdle(self)
 end
 
@@ -259,6 +320,8 @@ end
 local function onEvtPlayerMovedCursor(self, gridIndex)
     if (self.m_State == "idle") then
         return
+    elseif (self.m_State == "choosingProductionTarget") then
+        setStateIdle(self)
     elseif (self.m_State == "makingMovePath") then
         if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             updateMovePathWithDestinationGrid(self, gridIndex)

@@ -8,26 +8,10 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local EXPORTED_METHODS = {
     "getRepairTargetCatagory",
     "getRepairTargetList",
-    "getRepairAmount",
+    "canRepairTarget",
+    "getRepairAmountAndCost",
+    "getNormalizedRepairAmount",
 }
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function isRepairTarget(self, targetTiledID)
-    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Target:getPlayerIndex()) then
-        return false
-    end
-
-    local targetName = GameConstantFunctions.getUnitNameWithTiledId(targetTiledID)
-    for _, name in ipairs(self:getRepairTargetList()) do
-        if (targetName == name) then
-            return true
-        end
-    end
-
-    return false
-end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -85,11 +69,40 @@ function RepairDoer:getRepairTargetList()
     return self.m_Template.targetList
 end
 
-function RepairDoer:getRepairAmount(targetTiledID)
-    if ((not targetTiledID) or (isRepairTarget(self, targetTiledID))) then
+function RepairDoer:canRepairTarget(target)
+    local targetTiledID = target:getTiledID()
+    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Target:getPlayerIndex()) then
+        return false
+    end
+
+    local targetName = GameConstantFunctions.getUnitNameWithTiledId(targetTiledID)
+    for _, name in ipairs(self:getRepairTargetList()) do
+        if (targetName == name) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
+    local normalizedCurrentHP    = target:getNormalizedCurrentHP()
+    local productionCost         = target:getProductionCost()
+    local normalizedRepairAmount = math.min(
+        10 - normalizedCurrentHP,
+        self:getNormalizedRepairAmount(modelPlayer),
+        math.floor(modelPlayer:getFund() * 10 / productionCost)
+    )
+
+    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - target:getCurrentHP(), normalizedRepairAmount * productionCost / 10
+end
+
+function RepairDoer:getNormalizedRepairAmount(modelPlayer)
+    if (not modelPlayer) then
         return self.m_Template.amount
     else
-        return nil
+        -- TODO: take the abilities of the player into account.
+        return self.m_Template.amount
     end
 end
 

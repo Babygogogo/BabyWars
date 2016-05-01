@@ -30,18 +30,12 @@ local BEGIN_TURN_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local BEGIN_TURN_EFFECT_FONT_OUTLINE_WIDTH = math.ceil(BEGIN_TURN_EFFECT_FONT_SIZE / 15)
 
-
 --------------------------------------------------------------------------------
 -- The begin turn effect.
 --------------------------------------------------------------------------------
 local function setBeginTurnEffectEnabled(effect, enabled)
-    if (enabled) then
-        effect:setVisible(true)
-            :getEventDispatcher():resumeEventListenersForTarget(effect)
-    else
-        effect:setVisible(false)
-            :getEventDispatcher():pauseEventListenersForTarget(effect)
-    end
+    effect:setVisible(enabled)
+    effect.m_TouchListener:setEnabled(enabled)
 end
 
 local function createBeginTurnEffectMoveInAction(effect)
@@ -89,14 +83,15 @@ local function createBeginTurnEffectTouchListener(effect)
     listener:setSwallowTouches(true)
 
     listener:registerScriptHandler(function()
-            return true
-        end, cc.Handler.EVENT_TOUCH_BEGAN)
+        return true
+    end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     listener:registerScriptHandler(function(touch, event)
-            if (effect.m_IsMoveInFinished) then
-                effect:runAction(createBeginTurnEffectMoveOutAction(effect))
-            end
-        end, cc.Handler.EVENT_TOUCH_ENDED)
+        if ((effect.m_IsMoveInFinished) and (not effect.m_IsMoveOutStarted)) then
+            effect.m_IsMoveOutStarted = true
+            effect:runAction(createBeginTurnEffectMoveOutAction(effect))
+        end
+    end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return listener
 end
@@ -119,7 +114,7 @@ local function createBeginTurnEffect()
 
     effect.m_Background    = background
     effect.m_Label         = label
-    effect.m_TouchListener = listener
+    effect.m_TouchListener = touchListener
 
     return effect
 end
@@ -337,6 +332,7 @@ end
 function ViewSceneWarHUD:showBeginTurnEffect(turnIndex, playerName, callbackOnDisappear)
     local effect = self.m_BeginTurnEffect
     effect.m_CallbackOnDisappear = callbackOnDisappear
+    effect.m_IsMoveOutStarted    = false
 
     setBeginTurnEffectEnabled(effect, true)
     setBeginTurnEffectLabel(effect, turnIndex, playerName)

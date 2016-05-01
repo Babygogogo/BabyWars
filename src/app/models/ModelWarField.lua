@@ -1,9 +1,10 @@
 
 local ModelWarField = class("ModelWarField")
 
-local Actor        = require("global.actors.Actor")
-local TypeChecker  = require("app.utilities.TypeChecker")
-local GameConstant = require("res.data.GameConstant")
+local Actor              = require("global.actors.Actor")
+local TypeChecker        = require("app.utilities.TypeChecker")
+local GameConstant       = require("res.data.GameConstant")
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireFieldData(param)
     local t = type(param)
@@ -13,6 +14,28 @@ local function requireFieldData(param)
         return require("data.warField." .. param)
     else
         return nil
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtPlayerDragField(self, event)
+    if (self.m_View) then
+        self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
+    end
+end
+
+local function onEvtPlayerZoomField(self, event)
+    if (self.m_View) then
+        local scrollEvent = event.scrollEvent
+        self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
+    end
+end
+
+local function onEvtPlayerZoomFieldWithTouches(self, event)
+    if (self.m_View) then
+        self.m_View:setZoomWithTouches(event.touches)
     end
 end
 
@@ -110,8 +133,8 @@ function ModelWarField:onEnter(rootActor)
 
     self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
-        :addEventListener("EvtPlayerZoomField", self)
-        :addEventListener("EvtPlayerSelectedGrid",   self)
+        :addEventListener("EvtPlayerZoomField",            self)
+        :addEventListener("EvtPlayerZoomFieldWithTouches", self)
 
     return self
 end
@@ -123,7 +146,7 @@ function ModelWarField:onCleanup(rootActor)
     self.m_ActorActionPlanner:onCleanup(rootActor)
     self.m_ActorGridExplosion:onCleanup(rootActor)
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid",   self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerZoomFieldWithTouches",   self)
         :removeEventListener("EvtPlayerZoomField", self)
         :removeEventListener("EvtPlayerDragField", self)
     self.m_RootScriptEventDispatcher = nil
@@ -132,13 +155,13 @@ function ModelWarField:onCleanup(rootActor)
 end
 
 function ModelWarField:onEvent(event)
-    if (event.name == "EvtPlayerDragField") and (self.m_View) then
-        self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
-    elseif (event.name == "EvtPlayerZoomField") and (self.m_View) then
-        local scrollEvent = event.scrollEvent
-        self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
-    elseif (event.name == "EvtPlayerSelectedGrid") then
-
+    local eventName = event.name
+    if (eventName == "EvtPlayerDragField") then
+        onEvtPlayerDragField(self, event)
+    elseif (eventName == "EvtPlayerZoomField") then
+        onEvtPlayerZoomField(self, event)
+    elseif (eventName == "EvtPlayerZoomFieldWithTouches") then
+        onEvtPlayerZoomFieldWithTouches(self, event)
     end
 
     return self
@@ -157,6 +180,7 @@ end
 
 function ModelWarField:doActionWait(action)
     self:getModelUnitMap():doActionWait(action)
+    self:getModelTileMap():doActionWait(action)
 
     return self
 end
@@ -175,9 +199,33 @@ function ModelWarField:doActionAttack(action)
     end
 
     modelUnitMap:doActionAttack(action)
-    if (not targetUnit) then
-        modelTileMap:doActionAttack(action)
+    modelTileMap:doActionAttack(action)
+
+    return self
+end
+
+function ModelWarField:doActionCapture(action)
+    local modelUnitMap = self:getModelUnitMap()
+    local modelTileMap = self:getModelTileMap()
+
+    local beginningGridIndex, endingGridIndex = action.path[1], action.path[#action.path]
+    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
+        local prevTarget = modelTileMap:getModelTile(beginningGridIndex)
+        if (prevTarget.getCurrentCapturePoint) then
+            action.prevTarget = prevTarget
+        end
     end
+    action.nextTarget = modelTileMap:getModelTile(endingGridIndex)
+    action.capturer   = modelUnitMap:getModelUnit(beginningGridIndex)
+
+    modelUnitMap:doActionCapture(action)
+    modelTileMap:doActionCapture(action)
+
+    return self
+end
+
+function ModelWarField:doActionProduceOnTile(action)
+    self:getModelUnitMap():doActionProduceOnTile(action)
 
     return self
 end

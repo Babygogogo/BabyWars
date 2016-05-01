@@ -169,6 +169,7 @@ function ModelTileMap:onEnter(rootActor)
     dispatcher:addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",    self)
         :addEventListener("EvtPlayerMovedCursor",  self)
+        :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
 
     iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
@@ -180,9 +181,10 @@ end
 
 function ModelTileMap:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtDestroyViewTile",   self)
-        :removeEventListener("EvtDestroyModelTile",  self)
+        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtDestroyViewTile",    self)
+        :removeEventListener("EvtDestroyModelTile",   self)
     self.m_RootScriptEventDispatcher = nil
 
     iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
@@ -194,7 +196,8 @@ end
 
 function ModelTileMap:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerMovedCursor") then
+    if ((eventName == "EvtPlayerMovedCursor") or
+        (eventName == "EvtPlayerSelectedGrid")) then
         onEvtPlayerMovedCursor(self, event)
     elseif (eventName == "EvtDestroyModelTile") then
         onEvtDestroyModelTile(self, event)
@@ -225,9 +228,35 @@ function ModelTileMap:getModelTile(gridIndex)
     return tileActor and tileActor:getModel() or nil
 end
 
+function ModelTileMap:forEachModelTile(func)
+    local mapSize = self:getMapSize()
+    for x = 1, mapSize.width do
+        for y = 1, mapSize.height do
+            func(self.m_ActorTilesMap[x][y]:getModel())
+        end
+    end
+
+    return self
+end
+
 function ModelTileMap:doActionAttack(action)
-    assert(action.targetType == "tile", "ModelTileMap:doActionAttack() the param action is invalid.")
-    action.target:doActionAttack(action, false)
+    self:getModelTile(action.path[1]):doActionAttack(action, false)
+    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
+
+    return self
+end
+
+function ModelTileMap:doActionCapture(action)
+    if (action.prevTarget) then
+        action.prevTarget:doActionCapture(action)
+    end
+    action.nextTarget:doActionCapture(action)
+
+    return self
+end
+
+function ModelTileMap:doActionWait(action)
+    self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
 end

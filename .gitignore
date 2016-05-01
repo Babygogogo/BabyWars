@@ -1,10 +1,9 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
+﻿
 /simulator/win32
 /runtime/win32
 /frameworks/cocos2d-x
+/frameworks/runtime-src/proj.win32
+/frameworks/runtime-src/proj.android
 *.suo
 *.tlog
 *.obj
@@ -19,3 +18,4 @@
 *.opendb
 *.tags
 *.tags_sorted_by_file
+*.apk

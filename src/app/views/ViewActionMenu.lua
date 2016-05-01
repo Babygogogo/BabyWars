@@ -1,42 +1,57 @@
 
 local ViewActionMenu = class("ViewActionMenu", cc.Node)
 
-local MENU_BACKGROUND_WIDTH  = 180
-local MENU_BACKGROUND_HEIGHT = display.height - 10 - 88 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local AnimationLoader = require("app.utilities.AnimationLoader")
 
-local LEFT_POSITION_X  = 10
-local LEFT_POSITION_Y  = 10 + 140
-local RIGHT_POSITION_X = display.width - MENU_BACKGROUND_WIDTH - 10
-local RIGHT_POSITION_Y = LEFT_POSITION_Y
+local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 180
+local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 88 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 240
+local MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM = MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM
 
-local LIST_WIDTH  = MENU_BACKGROUND_WIDTH - 10
-local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
+local LEFT_POSITION_X_FOR_ACTION_ITEM     = 10
+local LEFT_POSITION_Y_FOR_ACTION_ITEM     = 10 + 140
+local LEFT_POSITION_X_FOR_PRODUCTION_ITEM = LEFT_POSITION_X_FOR_ACTION_ITEM
+local LEFT_POSITION_Y_FOR_PRODUCTION_ITEM = LEFT_POSITION_Y_FOR_ACTION_ITEM
+
+local RIGHT_POSITION_X_FOR_ACTION_ITEM     = display.width - MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 10
+local RIGHT_POSITION_Y_FOR_ACTION_ITEM     = LEFT_POSITION_Y_FOR_ACTION_ITEM
+local RIGHT_POSITION_X_FOR_PRODUCTION_ITEM = display.width - MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 10
+local RIGHT_POSITION_Y_FOR_PRODUCTION_ITEM = RIGHT_POSITION_Y_FOR_ACTION_ITEM
+
 local LIST_POSITION_X = 5
 local LIST_POSITION_Y = 6
 
-local FONT_SIZE     = 25
-local BUTTON_WIDTH  = MENU_BACKGROUND_WIDTH - 15
-local BUTTON_HEIGHT = FONT_SIZE / 5 * 8
+local TITLE_FONT_SIZE                   = 25
+local TITLE_COLOR                       = {r = 255, g = 255, b = 255}
+local TITLE_OUTLINE_COLOR               = {r = 0,   g = 0,   b = 0}
+local TITLE_OUTLINE_WIDTH               = 2
+local TITLE_FONT_NAME                   = "res/fonts/msyhbd.ttc"
+local BUTTON_WIDTH_FOR_ACTION_ITEM      = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 15
+local BUTTON_HEIGHT_FOR_ACTION_ITEM     = TITLE_FONT_SIZE / 5 * 8
+local BUTTON_WIDTH_FOR_PRODUCTION_ITEM  = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 15
+local BUTTON_HEIGHT_FOR_PRODUCTION_ITEM = BUTTON_HEIGHT_FOR_ACTION_ITEM
+local BUTTON_DISABLED_COLOR             = {r = 180, g = 180, b = 180}
+local BUTTON_CAPINSETS                  = {x = 0, y = 0, width = 1, height = 2}
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createItemView(itemModel)
+local function createViewAction(itemModel)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 2, y = 0, width = 1, height = 1})
-        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        :setCapInsets(BUTTON_CAPINSETS)
+        :setContentSize(BUTTON_WIDTH_FOR_ACTION_ITEM, BUTTON_HEIGHT_FOR_ACTION_ITEM)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName("res/fonts/msyhbd.ttc")
-        :setTitleFontSize(25)
-        :setTitleColor({r = 255, g = 255, b = 255})
+        :setTitleFontName(TITLE_FONT_NAME)
+        :setTitleFontSize(TITLE_FONT_SIZE)
+        :setTitleColor(TITLE_COLOR)
         :setTitleText(itemModel.name)
 
-    view:getTitleRenderer():enableOutline({r = 0, g = 0, b = 0}, 2)
+    view:getTitleRenderer():enableOutline(TITLE_OUTLINE_COLOR, TITLE_OUTLINE_WIDTH)
 
     view:addTouchEventListener(function(sender, eventType)
         if eventType == ccui.TouchEventType.ended then
@@ -47,12 +62,79 @@ local function createItemView(itemModel)
     return view
 end
 
+local function createViewProduction(itemModel)
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(BUTTON_CAPINSETS)
+        :setContentSize(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(TITLE_FONT_NAME)
+        :setTitleFontSize(20)
+        :setTitleColor(TITLE_COLOR)
+        :setTitleText("     " .. itemModel.fullName .. "   " .. itemModel.cost)
+        :setTitleAlignment(cc.TEXT_ALIGNMENT_LEFT)
+
+    view:getTitleRenderer():setDimensions(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
+        :enableOutline({r = 0, g = 0, b = 0}, 2)
+
+    local icon = cc.Sprite:create()
+    icon:setScale(0.4)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(-22, -13)
+        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(itemModel.tiledID))
+    view:addChild(icon)
+
+    if (not itemModel.isAvaliable) then
+        view:setEnabled(false)
+            :setColor(BUTTON_DISABLED_COLOR)
+    end
+
+    view:addTouchEventListener(function(sender, eventType)
+        if (eventType == ccui.TouchEventType.ended) then
+            itemModel.callback()
+        end
+    end)
+
+    return view
+end
+
+local function setContentSize(self, width, height)
+    self.m_MenuBackground:setContentSize(width, height)
+    self.m_ListView:setContentSize(width - 10, height - 14)
+end
+
 local function moveToLeftSide(self)
-    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+    if (self.m_IsShowingActionList) then
+        self:setPosition(LEFT_POSITION_X_FOR_ACTION_ITEM, LEFT_POSITION_Y_FOR_ACTION_ITEM)
+    else
+        self:setPosition(LEFT_POSITION_X_FOR_PRODUCTION_ITEM, LEFT_POSITION_Y_FOR_PRODUCTION_ITEM)
+    end
+
+    self.m_IsInLeftSide = true
 end
 
 local function moveToRightSide(self)
-    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+    if (self.m_IsShowingActionList) then
+        self:setPosition(RIGHT_POSITION_X_FOR_ACTION_ITEM, RIGHT_POSITION_Y_FOR_ACTION_ITEM)
+    else
+        self:setPosition(RIGHT_POSITION_X_FOR_PRODUCTION_ITEM, RIGHT_POSITION_Y_FOR_PRODUCTION_ITEM)
+    end
+
+    self.m_IsInLeftSide = false
+end
+
+local function adjustPositionOnShowingList(self, isShowingActionList)
+    self.m_IsShowingActionList = isShowingActionList
+
+    if (self.m_IsInLeftSide) then
+        moveToLeftSide(self)
+    else
+        moveToRightSide(self)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -61,7 +143,7 @@ end
 local function createMenuBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
+        :setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
 
         :setOpacity(200)
 
@@ -81,9 +163,7 @@ local function createListView()
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(LIST_POSITION_X, LIST_POSITION_Y)
 
-        :setContentSize(LIST_WIDTH, LIST_HEIGHT)
-
-        :setItemsMargin(5)
+        :setItemsMargin(20)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
         :setCascadeOpacityEnabled(true)
 
@@ -96,41 +176,17 @@ local function initWithListView(view, listView)
 end
 
 --------------------------------------------------------------------------------
--- The touch listener.
---------------------------------------------------------------------------------
-local function createTouchListener(view)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
-    touchListener:setSwallowTouches(true)
-
-    touchListener:registerScriptHandler(function()
-        return true
-    end, cc.Handler.EVENT_TOUCH_BEGAN)
-
-    touchListener:registerScriptHandler(function()
-        view:setEnabled(false)
-    end, cc.Handler.EVENT_TOUCH_ENDED)
-
-    return touchListener
-end
-
-local function initWithTouchListener(view, touchListener)
-    view.m_TouchListener = touchListener
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewActionMenu:ctor(param)
     initWithMenuBackground(  self, createMenuBackground())
     initWithListView(        self, createListView())
---    initWithTouchListener(   self, createTouchListener(self))
 
     self:ignoreAnchorPointForPosition(true)
-        :setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
-
         :setOpacity(200)
         :setVisible(false)
+
+    adjustPositionOnShowingList(self, true)
 
     return self
 end
@@ -138,14 +194,22 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewActionMenu:createAndPushBackItemView(itemModel)
-    self.m_ListView:pushBackCustomItem(createItemView(itemModel))
+function ViewActionMenu:showActionList(list)
+    setContentSize(self, MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
+    adjustPositionOnShowingList(self, true)
 
-    return self
+    for _, listItem in ipairs(list) do
+        self.m_ListView:pushBackCustomItem(createViewAction(listItem))
+    end
 end
 
-function ViewActionMenu:pushBackItemView(itemView)
-    self.m_ListView:pushBackCustomItem(itemView)
+function ViewActionMenu:showProductionList(list)
+    setContentSize(self, MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM)
+    adjustPositionOnShowingList(self, false)
+
+    for _, listItem in ipairs(list) do
+        self.m_ListView:pushBackCustomItem(createViewProduction(listItem))
+    end
 
     return self
 end
@@ -159,10 +223,8 @@ end
 function ViewActionMenu:setEnabled(enabled)
     if (enabled) then
         self:setVisible(true)
---        self.m_TouchListener:setEnabled(true)
     else
         self:setVisible(false)
---        self.m_TouchListener:setEnabled(false)
     end
 
     return self

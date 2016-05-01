@@ -5,7 +5,7 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
-    "getIncomeAmount"
+    "getIncomeAmount",
 }
 
 --------------------------------------------------------------------------------
@@ -53,8 +53,12 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function IncomeProvider:getIncomeAmount()
-    return self.m_Template.amount
+function IncomeProvider:getIncomeAmount(playerIndex)
+    if ((not playerIndex) or (self.m_Target:getPlayerIndex() == playerIndex)) then
+        return self.m_Template.amount
+    else
+        return nil
+    end
 end
 
 return IncomeProvider

@@ -122,10 +122,11 @@ function GameConstantFunctions.getLevelBonus()
     return GAME_CONSTANT.levelBonus
 end
 
-function GameConstantFunctions.getTiledIdWithTileOrUnitName(name)
+function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
-        if (index.name == name) then
-            return id
+        if ((index.name == name) and
+            ((not playerIndex) or (playerIndex == index.playerIndex))) then
+                return id
         end
     end
 
@@ -169,6 +170,10 @@ end
 
 function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     return TEMPLATE_MODEL_UNITS[TILE_UNIT_INDEXES[tiledID].name]
+end
+
+function GameConstantFunctions.getTemplateModelUnitWithName(name)
+    return TEMPLATE_MODEL_UNITS[name]
 end
 
 function GameConstantFunctions.doesViewTileFillGrid(tiledID)

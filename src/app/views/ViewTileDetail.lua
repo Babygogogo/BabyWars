@@ -41,10 +41,12 @@ local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
 local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
 
 local function createButtomLine(posX, poxY, width, height)
-    local line = cc.Scale9Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME, BUTTOM_LINE_CAPINSETS)
+    local line = cc.Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME)
     line:ignoreAnchorPointForPosition(true)
         :setPosition(posX, poxY)
-        :setContentSize(width, height)
+        :setAnchorPoint(0, 0)
+        :setScaleX(width / line:getContentSize().width)
+        :setScaleY(0.5)
 
     return line
 end
@@ -210,7 +212,7 @@ end
 local function updateRepairInfoWithModelTile(info, tile)
     if (tile.getRepairTargetCatagory) then
         local catagory = tile:getRepairTargetCatagory()
-        local amount   = tile:getRepairAmount()
+        local amount   = tile:getNormalizedRepairAmount()
         info.m_Label:setString("Repair:  +" .. amount .. "HP (" .. catagory .. ")")
     else
         info.m_Label:setString("Repair: None")

@@ -31,7 +31,8 @@ function ViewTile:setViewObjectWithTiledId(objectID)
             self:addChild(self.m_ViewObject, TILE_OBJECT_Z_ORDER)
         end
         if (self.m_ObjectID ~= objectID) then
-            self.m_ViewObject:playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(objectID))
+            self.m_ViewObject:stopAllActions()
+                :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(objectID))
         end
     else
         if ((self.m_ObjectID) and (self.m_ObjectID > 0)) then
@@ -53,7 +54,8 @@ function ViewTile:setViewBaseWithTiledId(baseID)
         self:addChild(self.m_ViewBase, TILE_BASE_Z_ORDER)
     end
     if (self.m_BaseID ~= baseID) then
-        self.m_ViewBase:playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(baseID))
+        self.m_ViewBase:stopAllActions()
+            :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(baseID))
     end
 
     self.m_BaseID = baseID
