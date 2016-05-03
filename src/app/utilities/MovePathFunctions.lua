@@ -1,4 +1,15 @@
 
+--[[--------------------------------------------------------------------------------
+-- MovePathFunctions是和MovePath相关的函数集合。
+-- 所谓MovePath就是玩家操作unit时，在地图上绘制的移动路线。
+-- 主要职责：
+--   计算及访问MovePath
+-- 使用场景举例：
+--   玩家操作单位绘制移动路线时，需要调用这里的函数
+-- 其他：
+--   这些函数原本都是在ModelActionPlanner内的，由于planner日益臃肿，因此独立出来。
+--]]--------------------------------------------------------------------------------
+
 local MovePathFunctions = {}
 
 local GridIndexFunctions     = require("app.utilities.GridIndexFunctions")

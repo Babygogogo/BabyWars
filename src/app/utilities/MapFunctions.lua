@@ -1,4 +1,11 @@
 
+--[[--------------------------------------------------------------------------------
+-- MapFunctions是关于UnitMap和TileMap的函数的集合。
+-- 项目初期，ModelUnitMap和ModelTileMap比较相似，因此抽象出了本函数集合，但现在已基本用不上了（还有少数函数在用，以后可以视情况消除掉）
+-- 主要职责及使用场景：
+--   创建ModelUnitMap/ModelTileMap内部的unit/tile的Actor矩阵
+--]]--------------------------------------------------------------------------------
+
 local MapFunctions = {}
 
 local TypeChecker = require("app.utilities.TypeChecker")

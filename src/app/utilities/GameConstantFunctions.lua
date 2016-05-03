@@ -1,4 +1,43 @@
 
+--[[--------------------------------------------------------------------------------
+-- GameConstantFunctions是一组与GameConstant相关的函数的集合。
+-- 主要职责：
+--   在游戏刚开始运行时，读入GameConstant并进行初始化（GameConstant里的某些数据是高度浓缩的，要处理一下才能给其他代码使用）
+--   提供接口给外界读取有关GameConstant的数据
+-- 使用场景举例：
+--   参照上述主要职责
+-- 其他：
+--   - 关于TiledID：
+--     TiledID指的是Tiled（一个地图编辑器）所生成的地图所带有的id值（如res/data/tileMap/TileMap_Test.lua文件里的data表的数据）。
+--     TiledID是非负整数。0表示无，1及以上表示相应的unit或tile。
+--     游戏中所有ModelUnit/ModelTile都带有自己的tiledID（无论model是文件中读入的还是游戏中动态产生的）。
+--     TiledID与游戏中的许多相关信息都有固定的联系，因此在整个游戏中都很重要。
+--
+--     从Tiled的角度来看：
+--       Tiled并不知道游戏的设定，它只会机械地对tileset里的所有图片逐一编号，而这个编号就是tiledID。
+--       Tiled所生成的地图，实际上就是一个由tiledID组成的矩阵（严格来说是三个相同大小的矩阵，其中一个表示unit层，其余两个一起表示tile层）。
+--       Tiled不能自动处理图块交界，因此tileset里包含了游戏中可能出现的unit或tile所有图块（的第一帧），由地图编辑者自行选择。
+--       举例而言，像plain之类的tile就只有一种形态，而sea就有多达40种以上的形态，而不同的形态的tiledID也是不同的（尽管游戏逻辑上它们没有区别）。
+--
+--     从游戏的角度来看：
+--       一个TiledID就代表了一个unit或tile，因此游戏必须能够以TiledID重建一个完整的unit或tile。
+--       为此，在GameConstant内列出游戏所有的unit和tile的模板，也就是templateModelUnits/templateModelTiles。
+--       同时，通过GameConstant.indexesForTileOrUnit，使得每一个TiledID都和正确的unit或tile的模板联系起来，这就使得ModelUnit/ModelTile能够仅通过TiledID来获取模板并初始化自身。
+--       通过模板初始化的tile/unit都是满血满状态的，但游戏中它们的状态都有可能发生变化。模板无法记录这些变化，因此使用别的机制来记录这些变化（参考ModelTile/ModelUnit）。
+--
+--   - 关于PlayerIndex：
+--     PlayerIndex是一个正整数，表示战局中的第几个玩家。举例来说，PlayerIndex为2，就表示是第二个玩家（换言之，这个玩家在回合中是第二个行动的）。
+--
+--     PlayerIndex可以由TiledID计算得到。
+--       假设一个TiledID代表的是plain，而plain是中立的，由这个TiledID所计算出来的PlayerIndex就是0。
+--       再考虑city。city有5种形态（包括中立、以及分别属于四名玩家的形态），5种形态下的TiledID各不相同，因此也可以由此计算出对应的PlayerIndex。
+--       现阶段，PlayerIndex的合法取值为0、1、2、3、4，分别表示属于中立、红色势力、蓝色势力、黄色势力、黑色势力。
+--
+--     PlayerIndex和unit/tile的类型名字联合，可以反推得到TiledID。
+--       这一点非常重要。考虑占领，一个city由A势力变为B势力，实质上就是TiledID发生了变化。
+--       我们可以利用占领者的PlayerIndex和city的名字反推出新的TiledID，其他相关代码可以再由此获取更多信息（如动画）。
+--]]--------------------------------------------------------------------------------
+
 local GameConstantFunctions = {}
 
 local GAME_CONSTANT        = require("res.data.GameConstant")

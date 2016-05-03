@@ -1,4 +1,16 @@
 
+--[[--------------------------------------------------------------------------------
+-- ReachableAreaFunctions是和ReachableArea相关的函数集合。
+-- 所谓ReachableArea就是玩家操作unit时，在地图上绘制的可移动范围。
+-- 主要职责：
+--   计算及访问ReachableArea
+-- 使用场景举例：
+--   玩家操作单时，需要调用这里的函数
+-- 其他：
+--   这些函数原本都是在ModelActionPlanner内的，由于planner日益臃肿，因此独立出来。
+--   计算ReachableArea时，势必会顺便计算出各个格子的最短移动路径，因此把这些路径都记录下来，方便MovePath二次利用
+--]]--------------------------------------------------------------------------------
+
 local ReachableAreaFunctions = {}
 
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
