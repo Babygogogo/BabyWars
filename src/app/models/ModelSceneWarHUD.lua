@@ -1,4 +1,23 @@
 
+--[[--------------------------------------------------------------------------------
+-- ModelSceneWarHUD是战局场景上的各个UI的集合。
+--
+-- 主要职责和使用场景举例：
+--   构造和显示各个UI。
+--
+-- 其他：
+--  - ModelSceneWarHUD目前由以下子actor组成：
+--    - ConfirmBox
+--    - MoneyEnergyInfo
+--    - WarCommandMenu
+--    - ActionMenu
+--    - UnitInfo
+--    - UnitDetail
+--    - TileInfo
+--    - TileDetail
+--    - BattleInfo
+--]]--------------------------------------------------------------------------------
+
 local ModelSceneWarHUD = class("ModelSceneWarHUD")
 
 local Actor = require("global.actors.Actor")
