@@ -12,8 +12,11 @@
 local ModelWarList = class("ModelWarList")
 
 local Actor            = require("global.actors.Actor")
-local TypeChecker      = require("app.utilities.TypeChecker")
+local ActorManager = require("global.actors.ActorManager")
 
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function requireListData(param)
     local t = type(param)
     if (t == "table") then
@@ -25,50 +28,68 @@ local function requireListData(param)
     end
 end
 
+local function enableConfirmBoxForEnteringSceneWar(self, name, data)
+    self.m_ModelConfirmBox:setConfirmText("You are entering a war:\n" .. name .. ".\nAre you sure?")
+        :setOnConfirmYes(function()
+            local actorSceneWar = Actor.createWithModelAndViewName("ModelSceneWar", data, "ViewSceneWar")
+            ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
+        end)
+        :setEnabled(true)
+end
+
 --------------------------------------------------------------------------------
--- The composition item actors.
+-- The composition list items.
 --------------------------------------------------------------------------------
-local function createItemActors(param)
+local function createListItems(self, param)
     local listData = requireListData(param)
-    assert(type(listData) == "table", "ModelWarList-createItemActors() failed to require list data from with param.")
+    assert(type(listData) == "table", "ModelWarList-createListItems() failed to require list data from with param.")
 
-    local actors = {}
+    local items = {}
     for _, itemData in ipairs(listData) do
-        local actor = Actor.createWithModelAndViewName("ModelWarListItem", itemData, "ViewWarListItem", itemData)
-        assert(actor, "ModelWarList-createItemActors() failed to create a item actor.")
-
-        actors[#actors + 1] = actor
+        items[#items + 1] = {
+            name     = itemData.name,
+            data     = itemData.data,
+            callback = function()
+                enableConfirmBoxForEnteringSceneWar(self, itemData.name, itemData.data)
+            end,
+        }
     end
 
-    return actors
+    return items
 end
 
-local function initWithItemActors(model, actors)
-    model.m_ItemActors = actors
+local function initWithListItems(self, items)
+    self.m_ListItems = items
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarList:ctor(param)
-    initWithItemActors(self, createItemActors(param))
+    initWithListItems(self, createListItems(self, param))
 
     if (self.m_View) then
         self:initView()
     end
 
-	return self
+    return self
 end
 
 function ModelWarList:initView()
     local view = self.m_View
-	assert(view, "ModelWarList:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelWarList:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
-    for _, itemActor in ipairs(self.m_ItemActors) do
-        local itemView = itemActor:getView()
-        if (itemView) then view:pushBackItem(itemView) end
-    end
+        :showWarList(self.m_ListItems)
+
+    return self
+end
+
+function ModelWarList:setModelConfirmBox(model)
+    assert(self.m_ModelConfirmBox == nil, "ModelWarList:setModelConfirmBox() the model has been set already.")
+    self.m_ModelConfirmBox = model
+
+    return self
 end
 
 return ModelWarList

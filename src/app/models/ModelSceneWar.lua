@@ -240,13 +240,12 @@ function ModelSceneWar:onEnter(rootActor)
     self.m_ActorPlayerManager:onEnter(rootActor)
 
     self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
+    self:getModelTurnManager():runTurn()
 
     return self
 end
 
 function ModelSceneWar:onEnterTransitionFinish(rootActor)
-    self:getModelTurnManager():runTurn()
-
     return self
 end
 

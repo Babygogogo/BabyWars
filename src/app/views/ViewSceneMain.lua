@@ -1,8 +1,9 @@
 
 local ViewSceneMain = class("ViewSceneMain", cc.Scene)
 
-local BACKGROUND_Z_ORDER    = 0
-local WAR_LIST_VIEW_Z_ORDER = 1
+local CONFIRM_BOX_Z_ORDER = 99
+local WAR_LIST_Z_ORDER    = 1
+local BACKGROUND_Z_ORDER  = 0
 
 --------------------------------------------------------------------------------
 -- The composition background.
@@ -20,7 +21,7 @@ local function initWithBackground(view, background)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewSceneMain:ctor(param)
     initWithBackground(self, createBackground())
@@ -31,17 +32,20 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewSceneMain:setWarListView(view)
-    if (self.m_WarListView) then
-        if (self.m_WarListView == view) then
-            return self
-        else
-            self:removeChild(self.m_WarListView)
-        end
-    end
+function ViewSceneMain:setViewConfirmBox(view)
+    assert(self.m_ViewConfirmBox == nil, "ViewSceneMain:setViewConfirmBox() the view has been set already.")
 
-    self.m_WarListView = view
-    self:addChild(view, WAR_LIST_VIEW_Z_ORDER)
+    self.m_ViewConfirmBox = view
+    self:addChild(view, CONFIRM_BOX_Z_ORDER)
+
+    return self
+end
+
+function ViewSceneMain:setViewWarList(view)
+    assert(self.m_ViewWarList == nil, "ViewSceneMain:setViewWarList() the view has been set already.")
+
+    self.m_ViewWarList = view
+    self:addChild(view, WAR_LIST_Z_ORDER)
 
     return self
 end

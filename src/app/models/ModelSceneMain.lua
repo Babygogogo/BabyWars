@@ -18,21 +18,35 @@ local ModelSceneMain = class("ModelSceneMain")
 local Actor	= require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The composition confirm box actor.
+--------------------------------------------------------------------------------
+local function createActorConfirmBox()
+    return Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+end
+
+local function initWithActorConfirmBox(self, actor)
+    actor:getModel():setEnabled(false)
+    self.m_ActorConfirmBox = actor
+end
+
+--------------------------------------------------------------------------------
 -- The composition war list actor.
 --------------------------------------------------------------------------------
-local function createWarListActor(mapListData)
+local function createActorWarList(mapListData)
     return Actor.createWithModelAndViewName("ModelWarList", mapListData, "ViewWarList", mapListData)
 end
 
-local function initWithWarListActor(model, actor)
-    model.m_WarListActor = actor
+local function initWithActorWarList(self, actor)
+    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+    self.m_ActorWarList = actor
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneMain:ctor(param)
-    initWithWarListActor(self, createWarListActor("WarSceneList"))
+    initWithActorConfirmBox(self, createActorConfirmBox())
+    initWithActorWarList(   self, createActorWarList("WarSceneList"))
 
     if (self.m_View) then
         self:initView()
@@ -45,7 +59,8 @@ function ModelSceneMain:initView()
     local view = self.m_View
     assert(view, "ModelSceneMain:initView() no view is attached to the owner actor of the model.")
 
-    view:setWarListView(self.m_WarListActor:getView())
+    view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
+        :setViewWarList(   self.m_ActorWarList:getView())
 
     return self
 end

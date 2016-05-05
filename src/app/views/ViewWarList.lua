@@ -1,6 +1,47 @@
 
 local ViewWarList = class("ViewWarList", cc.Node)
 
+local ITEM_CAPINSETS          = {x = 0, y = 0, width = 1, height = 2}
+local ITEM_WIDTH              = 230
+local ITEM_HEIGHT             = 45
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function createViewWarItem(item)
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(ITEM_CAPINSETS)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor(ITEM_FONT_COLOR)
+        :setTitleText(item.name)
+
+    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    view:addTouchEventListener(function(sender, eventType)
+        if (eventType == ccui.TouchEventType.ended) then
+            item.callback()
+        end
+    end)
+
+    return view
+end
+
+--------------------------------------------------------------------------------
+-- The composition background.
+--------------------------------------------------------------------------------
 local function createBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
@@ -13,6 +54,9 @@ local function initWithBackground(view, background)
     view:addChild(background)
 end
 
+--------------------------------------------------------------------------------
+-- The composition list view.
+--------------------------------------------------------------------------------
 local function createListView()
     local listView = ccui.ListView:create()
     listView:setPosition(5, 6)
@@ -39,14 +83,8 @@ function ViewWarList:ctor(param)
         :setPosition(30, 30)
         :setCascadeOpacityEnabled(true)
         :setOpacity(180)
---[[
-        listView:setDirection(ccui.ScrollViewDir.vertical)
-        listView:setBounceEnabled(true)
-        listView:addEventListener(listViewEvent)
-        listView:addScrollViewEventListener(scrollViewEvent)
-]]
 
-	return self
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -67,6 +105,14 @@ end
 
 function ViewWarList:removeAllItems()
     self.m_ListView:removeAllItems()
+
+    return self
+end
+
+function ViewWarList:showWarList(list)
+    for _, listItem in ipairs(list) do
+        self.m_ListView:pushBackCustomItem(createViewWarItem(listItem))
+    end
 
     return self
 end
