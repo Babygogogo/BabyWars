@@ -142,7 +142,7 @@ local function createTouchListener(view)
     local isTouchWithinBackground = false
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_Background)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, view.m_Background)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 

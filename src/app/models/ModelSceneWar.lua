@@ -33,7 +33,6 @@ local isServer = true
 local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ActionTranslator = require("app.utilities.ActionTranslator")
-local ActionExecutor   = require("app.utilities.ActionExecutor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
