@@ -1,4 +1,15 @@
 
+--[[--------------------------------------------------------------------------------
+-- ModelUnit是战场上的一个作战单位。
+--
+-- 主要职责和使用场景举例：
+--   构造作战单位，维护相关数值，提供接口给外界访问
+--
+-- 其他：
+--   - ModelUnit中的许多概念都和ModelTile很相似，包括tiledID、instantialData、构造过程等，因此可以参照ModelTile的注释，这里不赘述。
+--     有点不同的是，ModelUnit只需一个tiledID即可构造，而ModelTile可能需要1-2个。
+--]]--------------------------------------------------------------------------------
+
 local ModelUnit = class("ModelUnit")
 
 local ComponentManager      = require("global.components.ComponentManager")

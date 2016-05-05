@@ -1,4 +1,21 @@
 
+--[[--------------------------------------------------------------------------------
+-- ModelUnitMap是战场上的ModelUnit组成的矩阵，类似于ModelTileMap与ModelTile的关系。
+--
+-- 主要职责和使用场景举例：
+--   构造unit矩阵，维护相关数值，提供接口给外界访问
+--
+-- 其他：
+--   - ModelUnitMap的数据文件
+--     与ModelTileMap不同，对于ModelUnitMap而言，数据文件中的“模板”的用处相对较小。
+--     这是因为所有种类的ModelUnit都具有“非模板”的属性，所以即使使用了模板，数据文件也还是要配上大量的instantialData才能描述整个ModelUnitMap。
+--     但模板也并非完全无用。考虑某些地图一开始就已经为对战各方配置了满状态的unit，那么这时候，模板就可以派上用场了。
+--
+--     综上，ModelUnitMap在构造还是会读入模板数据，但保存为数据文件时时就不保留模板数据了，而只保存instantialData。
+--
+--   - ModelUnitMap中，其他的许多概念都和ModelTileMap很相似，直接参照ModelTileMap即可。
+--]]--------------------------------------------------------------------------------
+
 local ModelUnitMap = class("ModelUnitMap")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
