@@ -67,7 +67,7 @@ local function initWithCompositionActors(self, actors)
     self.m_WarCommandMenuActor = actors.warCommandMenuActor
     self.m_WarCommandMenuActor:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
 
-    self.m_ActionMenuActor = actors.actionMenuActor
+    self.m_ActorActionMenu = actors.actionMenuActor
 
     self.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
     self.m_MoneyEnergyInfoActor:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
@@ -80,7 +80,7 @@ local function initWithCompositionActors(self, actors)
     self.m_TileInfoActor   = actors.tileInfoActor
     self.m_TileInfoActor:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
 
-    self.m_BattleInfoActor = actors.battleInfoActor
+    self.m_ActorBattleInfo = actors.battleInfoActor
 end
 
 --------------------------------------------------------------------------------
@@ -103,12 +103,12 @@ function ModelSceneWarHUD:initView()
     view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
         :setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
         :setViewWarCommandMenu( self.m_WarCommandMenuActor:getView())
-        :setViewActionMenu(     self.m_ActionMenuActor:getView())
+        :setViewActionMenu(     self.m_ActorActionMenu:getView())
         :setViewTileInfo(       self.m_TileInfoActor:getView())
         :setViewTileDetail(     self.m_TileDetailActor:getView())
         :setViewUnitInfo(       self.m_UnitInfoActor:getView())
         :setViewUnitDetail(     self.m_UnitDetailActor:getView())
-        :setViewBattleInfo(     self.m_BattleInfoActor:getView())
+        :setViewBattleInfo(     self.m_ActorBattleInfo:getView())
 
     return self
 end
@@ -117,14 +117,15 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelSceneWarHUD:onEnter(rootActor)
-    self.m_ActionMenuActor:onEnter(rootActor)
+    local dispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_ActorActionMenu:getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_WarCommandMenuActor:onEnter(rootActor)
     self.m_MoneyEnergyInfoActor:onEnter(rootActor)
     self.m_TileInfoActor:onEnter(rootActor)
     self.m_UnitInfoActor:onEnter(rootActor)
-    self.m_BattleInfoActor:onEnter(rootActor)
+    self.m_ActorBattleInfo:getModel():setRootScriptEventDispatcher(dispatcher)
 
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = dispatcher
     self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
 
     return self
@@ -134,12 +135,12 @@ function ModelSceneWarHUD:onCleanup(rootActor)
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
 
-    self.m_ActionMenuActor:onCleanup(rootActor)
+    self.m_ActorActionMenu:getModel():unsetRootScriptEventDispatcher()
     self.m_WarCommandMenuActor:onCleanup(rootActor)
     self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
     self.m_TileInfoActor:onCleanup(rootActor)
     self.m_UnitInfoActor:onCleanup(rootActor)
-    self.m_BattleInfoActor:onCleanup(rootActor)
+    self.m_ActorBattleInfo:getModel():unsetRootScriptEventDispatcher()
 
     return self
 end

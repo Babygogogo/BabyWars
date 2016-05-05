@@ -220,20 +220,17 @@ function ModelSceneWar:initView()
     view:setWarFieldView(self.m_ActorWarField:getView())
         :setSceneHudView(self.m_ActorSceneWarHUD:getView())
 
-        :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
-
     return self
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on node events.
+-- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
-function ModelSceneWar:onEnter(rootActor)
-    print("ModelSceneWar:onEnter()")
-
+function ModelSceneWar:onStartRunning()
     self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
 
+    local rootActor = self.m_Actor
     self.m_ActorSceneWarHUD:onEnter(rootActor)
     self.m_ActorWarField:onEnter(rootActor)
     self.m_ActorPlayerManager:onEnter(rootActor)
@@ -244,16 +241,11 @@ function ModelSceneWar:onEnter(rootActor)
     return self
 end
 
-function ModelSceneWar:onEnterTransitionFinish(rootActor)
-    return self
-end
-
-function ModelSceneWar:onCleanup(rootActor)
-    print("ModelSceneWar:onCleanup()")
-
+function ModelSceneWar:onStopRunning()
     self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
         :removeEventListener("EvtPlayerRequestDoAction", self)
 
+    local rootActor = self.m_Actor
     self.m_ActorPlayerManager:onCleanup(rootActor)
     self.m_ActorWarField:onCleanup(rootActor)
     self.m_ActorSceneWarHUD:onCleanup(rootActor)
@@ -262,9 +254,10 @@ function ModelSceneWar:onCleanup(rootActor)
 end
 
 function ModelSceneWar:onEvent(event)
-    if (event.name == "EvtPlayerRequestDoAction") then
+    local eventName = event.name
+    if (eventName == "EvtPlayerRequestDoAction") then
         onEvtPlayerRequestDoAction(self, event)
-    elseif (event.name == "EvtSystemRequestDoAction") then
+    elseif (eventName == "EvtSystemRequestDoAction") then
         onEvtSystemRequestDoAction(self, event)
     end
 

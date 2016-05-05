@@ -88,7 +88,7 @@ local function createActorCursor(param)
 end
 
 local function initWithActorCursor(self, actor)
-    self.m_ActorCursor = actor
+    self.m_ActorMapCursor = actor
 end
 
 local function createActorGridExplosion()
@@ -128,7 +128,7 @@ function ModelWarField:initView()
     view:setViewTileMap(      self.m_ActorTileMap:getView())
         :setViewUnitMap(      self.m_ActorUnitMap:getView())
         :setViewActionPlanner(self.m_ActorActionPlanner:getView())
-        :setViewMapCursor(    self.m_ActorCursor:getView())
+        :setViewMapCursor(    self.m_ActorMapCursor:getView())
         :setViewGridExplosion(self.m_ActorGridExplosion:getView())
 
         :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
@@ -140,13 +140,14 @@ end
 -- The callback functions on node/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onEnter(rootActor)
+    local dispatcher = rootActor:getModel():getScriptEventDispatcher()
     self.m_ActorTileMap:onEnter(      rootActor)
     self.m_ActorUnitMap:onEnter(      rootActor)
-    self.m_ActorCursor:onEnter(       rootActor)
-    self.m_ActorActionPlanner:onEnter(rootActor)
-    self.m_ActorGridExplosion:onEnter(rootActor)
+    self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
 
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+    self.m_RootScriptEventDispatcher = dispatcher
     self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
         :addEventListener("EvtPlayerZoomField",            self)
         :addEventListener("EvtPlayerZoomFieldWithTouches", self)
@@ -157,9 +158,9 @@ end
 function ModelWarField:onCleanup(rootActor)
     self.m_ActorTileMap:onCleanup(      rootActor)
     self.m_ActorUnitMap:onCleanup(      rootActor)
-    self.m_ActorCursor:onCleanup(       rootActor)
-    self.m_ActorActionPlanner:onCleanup(rootActor)
-    self.m_ActorGridExplosion:onCleanup(rootActor)
+    self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerZoomFieldWithTouches",   self)
         :removeEventListener("EvtPlayerZoomField", self)

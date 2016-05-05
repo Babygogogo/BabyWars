@@ -355,7 +355,7 @@ local function onEvtPlayerMovedCursor(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The constructor and initializer.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
     self.m_State = "idle"
@@ -370,42 +370,48 @@ function ModelActionPlanner:initView()
 end
 
 function ModelActionPlanner:setModelUnitMap(model)
+    assert(self.m_ModelUnitMap == nil, "ModelActionPlanner:setModelUnitMap() the model has been set already.")
     self.m_ModelUnitMap = model
 
     return self
 end
 
 function ModelActionPlanner:setModelTileMap(model)
+    assert(self.m_ModelTileMap == nil, "ModelActionPlanner:setModelTileMap() the model has been set already.")
     self.m_ModelTileMap = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelActionPlanner:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtTurnPhaseBeginning", self)
-        :addEventListener("EvtWeatherChanged", self)
-        :addEventListener("EvtPlayerRequestDoAction", self)
+function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtPlayerMovedCursor",        self)
+        :addEventListener("EvtTurnPhaseBeginning",       self)
+        :addEventListener("EvtWeatherChanged",           self)
+        :addEventListener("EvtPlayerRequestDoAction",    self)
 
     return self
 end
 
-function ModelActionPlanner:onCleanup(rootActor)
+function ModelActionPlanner:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
-        :removeEventListener("EvtWeatherChanged", self)
+        :removeEventListener("EvtWeatherChanged",     self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
     if (name == "EvtPlayerSelectedGrid") then

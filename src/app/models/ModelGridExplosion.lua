@@ -18,18 +18,19 @@ function ModelGridExplosion:ctor()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelGridExplosion:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtDestroyViewUnit", self)
+function ModelGridExplosion:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelGridExplosion:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtDestroyViewUnit", self)
         :addEventListener("EvtDestroyViewTile", self)
 
     return self
 end
 
-function ModelGridExplosion:onCleanup(rootActor)
+function ModelGridExplosion:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelGridExplosion:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile", self)
         :removeEventListener("EvtDestroyViewUnit", self)
     self.m_RootScriptEventDispatcher = nil
@@ -37,9 +38,13 @@ function ModelGridExplosion:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelGridExplosion:onEvent(event)
     local name = event.name
-    if ((name == "EvtDestroyViewUnit") or (name == "EvtDestroyViewTile")) then
+    if ((name == "EvtDestroyViewUnit") or
+        (name == "EvtDestroyViewTile")) then
         self:showExplosion(event.gridIndex)
     end
 

@@ -46,12 +46,11 @@ function ModelBattleInfo:initView()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelBattleInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
+function ModelBattleInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelBattleInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
         :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
@@ -60,7 +59,9 @@ function ModelBattleInfo:onEnter(rootActor)
     return self
 end
 
-function ModelBattleInfo:onCleanup(rootActor)
+function ModelBattleInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelBattleInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
@@ -71,6 +72,9 @@ function ModelBattleInfo:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelBattleInfo:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtActionPlannerIdle") or

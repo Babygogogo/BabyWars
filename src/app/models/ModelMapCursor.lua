@@ -186,11 +186,10 @@ function ModelMapCursor:setMapSize(size)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelMapCursor:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = self:getGridIndex()})
         :addEventListener("EvtPlayerPreviewAttackTarget",   self)
         :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
@@ -201,7 +200,9 @@ function ModelMapCursor:onEnter(rootActor)
     return self
 end
 
-function ModelMapCursor:onCleanup(rootActor)
+function ModelMapCursor:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
@@ -212,6 +213,9 @@ function ModelMapCursor:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtActionPlannerIdle") or
