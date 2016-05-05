@@ -1,4 +1,22 @@
 
+--[[--------------------------------------------------------------------------------
+-- ModelTurnManager是战局中的回合控制器。
+--
+-- 主要职责和使用场景举例：
+--   维护相关数值（如当前回合数、回合阶段、当前活动玩家序号PlayerIndex等），提供接口给外界访问
+--
+-- 其他：
+--   - 一个回合包括以下阶段（以发生顺序排序，可能还有未列出的）
+--     - 初始阶段（EvtTurnPhaseBeginning，通过此event使得begin turn effect（也就是回合初弹出的消息框）出现）
+--     - 计算玩家收入（EvtTurnPhaseGetFund）
+--     - 消耗unit燃料（EvtTurnPhaseConsumeUnitFuel，符合特定条件的unit会随之毁灭）
+--     - 维修unit（EvtTurnPhaseRepairUnit，指的是tile对unit的维修和补给）
+--     - 补给unit（EvtTurnPhaseSupplyUnit，指的是unit对unit的补给，目前未实现）
+--     - 主要阶段（EvtTurnPhaseMain，即玩家可以进行操作的阶段）
+--     - 恢复unit状态（EvtTurnPhaseResetUnitState，即玩家结束回合后，使得移动过的unit恢复为可移动的状态；切换活动玩家，确保当前玩家不能再次操控unit）
+--     - 更换weather（EvtTurnPhaseChangeWeather，目前未实现。具体切换与否，由ModelWeatherManager决定）
+--]]--------------------------------------------------------------------------------
+
 local ModelTurnManager = class("ModelTurnManager")
 
 --------------------------------------------------------------------------------

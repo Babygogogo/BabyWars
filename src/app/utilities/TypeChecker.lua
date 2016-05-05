@@ -1,4 +1,9 @@
 
+--[[--------------------------------------------------------------------------------
+-- TypeChecker是用于验证某个变量是否属于特定类型、值是否合法的。
+-- 目前处于边缘化状态，基本不用了。
+--]]--------------------------------------------------------------------------------
+
 local TypeChecker = {}
 
 local function isExpectedType(checkee, checkeeName, checkParams)
@@ -23,7 +28,7 @@ local function isKindOf_(cls, name)
     for _, super in ipairs(__supers) do
         if iskindof_(super, name) then return true end
     end
-	
+
     return false
 end
 
@@ -112,7 +117,7 @@ local function batchCheck(callerName, batch)
 			return false, string.format("TypeChecker.%s() failed:\n%s", callerName, checkMsg)
 		end
 	end
-	
+
 	return true
 end
 
@@ -123,7 +128,7 @@ function TypeChecker.batchCheck(name, batch)
 			return false, name .. " failed:\n" .. checkMsg
 		end
 	end
-	
+
 	return true
 end
 

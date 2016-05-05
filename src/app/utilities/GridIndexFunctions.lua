@@ -1,4 +1,14 @@
 
+--[[--------------------------------------------------------------------------------
+-- GridIndexFunctions是和GridIndex相关的函数集合。
+-- 关于GridIndex，请参看GridIndexable的注释。
+-- 主要职责：
+--   提供接口用于对GridIndex进行各种操作，包括加、减、缩放、克隆、计算距离、获取一定范围内的其他GridIndex的集合等
+--   同时也提供接口用于对GridIndex和绘图用到的position进行相互转换
+-- 使用场景举例：
+--   到处都在用，因为本集合里的都是小工具函数，应该不必过多描述了，直接看名字基本都可以懂
+--]]--------------------------------------------------------------------------------
+
 local GridIndexFunctions = {}
 
 local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()

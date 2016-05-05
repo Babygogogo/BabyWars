@@ -1,4 +1,19 @@
 
+--[[--------------------------------------------------------------------------------
+-- ModelWarField是战局场景中除了UI元素以外的其他元素的集合。
+--
+-- 主要职责和使用场景举例：
+--   ModelWarField自身功能不多，更多的是扮演了各个子actor的容器的角色。
+--
+-- 其他：
+--   - ModelWarField目前包括以下子actor：
+--     - TileMap
+--     - UnitMap
+--     - MapCursor
+--     - ActionPlanner
+--     - GridExplosion
+--]]--------------------------------------------------------------------------------
+
 local ModelWarField = class("ModelWarField")
 
 local Actor              = require("global.actors.Actor")
