@@ -44,11 +44,11 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseResetUnitState(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseResetUnitState", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseResetUnitState", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
 --[[
     if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
         self.m_Weather.m_CurrentWeather = nextWeather
-        self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = nextWeather})
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = nextWeather})
     end
 ]]
 
@@ -58,7 +58,7 @@ local function runTurnPhaseResetUnitState(self)
 end
 
 local function runTurnPhaseBeginning(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self.m_RootScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnPhaseBeginning",
         player      = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
         playerIndex = self.m_PlayerIndex,
@@ -73,7 +73,7 @@ local function runTurnPhaseBeginning(self)
 end
 
 local function runTurnPhaseGetFund(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtTurnPhaseGetFund",
         playerIndex  = self.m_PlayerIndex,
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
@@ -82,7 +82,7 @@ local function runTurnPhaseGetFund(self)
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtTurnPhaseConsumeUnitFuel",
         playerIndex  = self.m_PlayerIndex,
         turnIndex    = self.m_TurnIndex,
@@ -92,7 +92,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
 end
 
 local function runTurnPhaseRepairUnit(self)
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtTurnPhaseRepairUnit",
         playerIndex  = self.m_PlayerIndex,
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
@@ -113,19 +113,29 @@ function ModelTurnManager:ctor(param)
 end
 
 function ModelTurnManager:setModelPlayerManager(playerManager)
+    assert(self.m_ModelPlayerManager == nil, "ModelTurnManager:setModelPlayerManager() the manager has been set.")
     self.m_ModelPlayerManager = playerManager
 
     return self
 end
 
-function ModelTurnManager:setScriptEventDispatcher(dispatcher)
-    self.m_ScriptEventDispatcher = dispatcher
+function ModelTurnManager:setModelWarField(warField)
+    assert(self.m_ModelWarField == nil, "ModelTurnManager:setModelWarField() the model has been set.")
+    self.m_ModelWarField = warField
 
     return self
 end
 
-function ModelTurnManager:setModelWarField(warField)
-    self.m_ModelWarField = warField
+function ModelTurnManager:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelTurnManager:setRootScriptEventDispatcher() the dispatcher has been set.")
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+function ModelTurnManager:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelTurnManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end

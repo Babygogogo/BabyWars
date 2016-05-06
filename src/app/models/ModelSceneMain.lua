@@ -42,7 +42,7 @@ local function initWithActorWarList(self, actor)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneMain:ctor(param)
     initWithActorConfirmBox(self, createActorConfirmBox())

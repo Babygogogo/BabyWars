@@ -77,7 +77,7 @@ local function onEvtModelUnitProduced(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The constructor and initializer.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
     self.m_CursorGridIndex = {x = 1, y = 1}
@@ -91,12 +91,11 @@ function ModelUnitInfo:setModelUnitDetail(model)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelUnitInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchUnit", self)
+function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerTouchUnit", self)
         :addEventListener("EvtPlayerTouchNoUnit",  self)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
@@ -108,8 +107,9 @@ function ModelUnitInfo:onEnter(rootActor)
     return self
 end
 
-function ModelUnitInfo:onCleanup(rootActor)
-    -- removeEventListener can be commented out because the dispatcher itself is being destroyed.
+function ModelUnitInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitProduced", self)
         :removeEventListener("EvtModelUnitUpdated",   self)
         :removeEventListener("EvtModelUnitMoved",     self)
@@ -118,12 +118,14 @@ function ModelUnitInfo:onCleanup(rootActor)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerTouchUnit",    self)
         :removeEventListener("EvtPlayerTouchNoUnit",  self)
-
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerTouchNoUnit") then

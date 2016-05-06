@@ -162,7 +162,7 @@ local function initWithTileActorsMap(self, map, mapSize)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileMap:ctor(param)
     initWithTileActorsMap(self, createTileActorsMap(param))
@@ -189,11 +189,9 @@ function ModelTileMap:initView()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelTileMap:onEnter(rootActor)
-    local dispatcher = rootActor:getModel():getScriptEventDispatcher()
+function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelTileMap:setRootScriptEventDispatcher() the dispatcher has been set.")
+
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",    self)
@@ -201,14 +199,16 @@ function ModelTileMap:onEnter(rootActor)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
 
-    iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
-        actorTile:getModel():setRootScriptEventDispatcher(dispatcher)
+    self:forEachModelTile(function(modelTile)
+        modelTile:setRootScriptEventDispatcher(dispatcher)
     end)
 
     return self
 end
 
-function ModelTileMap:onCleanup(rootActor)
+function ModelTileMap:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
@@ -216,13 +216,16 @@ function ModelTileMap:onCleanup(rootActor)
         :removeEventListener("EvtDestroyModelTile",   self)
     self.m_RootScriptEventDispatcher = nil
 
-    iterateAllActorTiles(self.m_ActorTilesMap, self.m_MapSize, function(actorTile)
-        actorTile:getModel():unsetRootScriptEventDispatcher()
+    self:forEachModelTile(function(modelTile)
+        modelTile:unsetRootScriptEventDispatcher()
     end)
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelTileMap:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtPlayerMovedCursor") or

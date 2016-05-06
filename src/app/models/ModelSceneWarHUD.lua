@@ -69,16 +69,16 @@ local function initWithCompositionActors(self, actors)
 
     self.m_ActorActionMenu = actors.actionMenuActor
 
-    self.m_MoneyEnergyInfoActor = actors.moneyEnergyInfoActor
-    self.m_MoneyEnergyInfoActor:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
+    self.m_ActorMoneyEnergyInfo = actors.moneyEnergyInfoActor
+    self.m_ActorMoneyEnergyInfo:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
 
     self.m_UnitDetailActor = actors.unitDetailActor
-    self.m_UnitInfoActor   = actors.unitInfoActor
-    self.m_UnitInfoActor:getModel():setModelUnitDetail(self.m_UnitDetailActor:getModel())
+    self.m_ActorUnitInfo   = actors.unitInfoActor
+    self.m_ActorUnitInfo:getModel():setModelUnitDetail(self.m_UnitDetailActor:getModel())
 
     self.m_TileDetailActor = actors.tileDetailActor
-    self.m_TileInfoActor   = actors.tileInfoActor
-    self.m_TileInfoActor:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
+    self.m_ActorTileInfo   = actors.tileInfoActor
+    self.m_ActorTileInfo:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
 
     self.m_ActorBattleInfo = actors.battleInfoActor
 end
@@ -101,29 +101,27 @@ function ModelSceneWarHUD:initView()
     assert(view, "ModelSceneWarHUD:initView() no view is attached to the actor of the model.")
 
     view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
-        :setViewMoneyEnergyInfo(self.m_MoneyEnergyInfoActor:getView())
+        :setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
         :setViewWarCommandMenu( self.m_WarCommandMenuActor:getView())
         :setViewActionMenu(     self.m_ActorActionMenu:getView())
-        :setViewTileInfo(       self.m_TileInfoActor:getView())
+        :setViewTileInfo(       self.m_ActorTileInfo:getView())
         :setViewTileDetail(     self.m_TileDetailActor:getView())
-        :setViewUnitInfo(       self.m_UnitInfoActor:getView())
+        :setViewUnitInfo(       self.m_ActorUnitInfo:getView())
         :setViewUnitDetail(     self.m_UnitDetailActor:getView())
         :setViewBattleInfo(     self.m_ActorBattleInfo:getView())
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelSceneWarHUD:onEnter(rootActor)
-    local dispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_ActorActionMenu:getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_WarCommandMenuActor:onEnter(rootActor)
-    self.m_MoneyEnergyInfoActor:onEnter(rootActor)
-    self.m_TileInfoActor:onEnter(rootActor)
-    self.m_UnitInfoActor:onEnter(rootActor)
-    self.m_ActorBattleInfo:getModel():setRootScriptEventDispatcher(dispatcher)
+function ModelSceneWarHUD:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelSceneWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_ActorActionMenu     :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_WarCommandMenuActor :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorMoneyEnergyInfo:getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorTileInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorUnitInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorBattleInfo     :getModel():setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
@@ -131,20 +129,25 @@ function ModelSceneWarHUD:onEnter(rootActor)
     return self
 end
 
-function ModelSceneWarHUD:onCleanup(rootActor)
+function ModelSceneWarHUD:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelSceneWarHUD:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
 
-    self.m_ActorActionMenu:getModel():unsetRootScriptEventDispatcher()
-    self.m_WarCommandMenuActor:onCleanup(rootActor)
-    self.m_MoneyEnergyInfoActor:onCleanup(rootActor)
-    self.m_TileInfoActor:onCleanup(rootActor)
-    self.m_UnitInfoActor:onCleanup(rootActor)
-    self.m_ActorBattleInfo:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorActionMenu     :getModel():unsetRootScriptEventDispatcher()
+    self.m_WarCommandMenuActor :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorMoneyEnergyInfo:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorTileInfo       :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorUnitInfo       :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorBattleInfo     :getModel():unsetRootScriptEventDispatcher()
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelSceneWarHUD:onEvent(event)
     if (event.name == "EvtTurnPhaseBeginning") then
         onEvtTurnPhaseBeginning(self, event)

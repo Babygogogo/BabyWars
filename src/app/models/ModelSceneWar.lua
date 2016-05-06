@@ -37,18 +37,6 @@ local ActionTranslator = require("app.utilities.ActionTranslator")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createNodeEventHandler(model, rootActor)
-    return function(event)
-        if (event == "enter") then
-            model:onEnter(rootActor)
-        elseif (event == "enterTransitionFinish") then
-            model:onEnterTransitionFinish(rootActor)
-        elseif (event == "cleanup") then
-            model:onCleanup(rootActor)
-        end
-    end
-end
-
 local function requireSceneData(param)
     local t = type(param)
     if (t == "table") then
@@ -176,7 +164,6 @@ end
 
 local function initWithActorTurnManager(self, actor)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
-        :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :setModelWarField(self.m_ActorWarField:getModel())
     self.m_ActorTurnManager = actor
 end
@@ -227,15 +214,16 @@ end
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+    local dispatcher = self.m_ScriptEventDispatcher
+    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
 
-    local rootActor = self.m_Actor
-    self.m_ActorSceneWarHUD:onEnter(rootActor)
-    self.m_ActorWarField:onEnter(rootActor)
-    self.m_ActorPlayerManager:onEnter(rootActor)
+    self.m_ActorSceneWarHUD  :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorWarField     :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorTurnManager  :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorPlayerManager:getModel():setRootScriptEventDispatcher(dispatcher)
 
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
+    dispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
     self:getModelTurnManager():runTurn()
 
     return self
@@ -245,10 +233,10 @@ function ModelSceneWar:onStopRunning()
     self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
         :removeEventListener("EvtPlayerRequestDoAction", self)
 
-    local rootActor = self.m_Actor
-    self.m_ActorPlayerManager:onCleanup(rootActor)
-    self.m_ActorWarField:onCleanup(rootActor)
-    self.m_ActorSceneWarHUD:onCleanup(rootActor)
+    self.m_ActorPlayerManager:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorTurnManager  :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorWarField     :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorSceneWarHUD  :getModel():unsetRootScriptEventDispatcher()
 
     return self
 end

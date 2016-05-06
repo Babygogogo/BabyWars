@@ -117,7 +117,7 @@ function ModelTile:initView()
 end
 
 function ModelTile:setRootScriptEventDispatcher(dispatcher)
-    self:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelTile:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
@@ -129,14 +129,13 @@ function ModelTile:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelTile:unsetRootScriptEventDispatcher(dispatcher)
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher = nil
+function ModelTile:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelTile:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+    self.m_RootScriptEventDispatcher = nil
 
-        for _, component in pairs(ComponentManager.getAllComponents(self)) do
-            if (component.unsetRootScriptEventDispatcher) then
-                component:unsetRootScriptEventDispatcher()
-            end
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.unsetRootScriptEventDispatcher) then
+            component:unsetRootScriptEventDispatcher()
         end
     end
 

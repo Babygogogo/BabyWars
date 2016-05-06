@@ -55,12 +55,11 @@ function ModelTileInfo:setModelTileDetail(model)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelTileInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchTile", self)
+function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelTileInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerTouchTile", self)
         :addEventListener("EvtWeatherChanged",     self)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
@@ -69,7 +68,9 @@ function ModelTileInfo:onEnter(rootActor)
     return self
 end
 
-function ModelTileInfo:onCleanup(rootActor)
+function ModelTileInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtModelTileUpdated", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor", self)
@@ -80,6 +81,9 @@ function ModelTileInfo:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerTouchTile") then

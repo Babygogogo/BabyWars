@@ -28,7 +28,7 @@ local function createQuitWarItem(model)
     local item = {}
 
     item.onPlayerTouch = function(self)
-        model.m_ConfirmBoxModel:setConfirmText("You are quitting the war (you may reenter it later).\nAre you sure?")
+        model.m_ModelConfirmBox:setConfirmText("You are quitting the war (you may reenter it later).\nAre you sure?")
 
             :setOnConfirmYes(function()
                 local mainSceneActor = Actor.createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
@@ -57,10 +57,10 @@ local function createEndTurnItem(model)
     local item = {}
 
     item.onPlayerTouch = function(self)
-        model.m_ConfirmBoxModel:setConfirmText("You are ending your turn, with some units unactioned.\nAre you sure?")
+        model.m_ModelConfirmBox:setConfirmText("You are ending your turn, with some units unactioned.\nAre you sure?")
 
             :setOnConfirmYes(function()
-                model.m_ConfirmBoxModel:setEnabled(false)
+                model.m_ModelConfirmBox:setEnabled(false)
                 model:setEnabled(false)
                 model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerRequestDoAction", actionName = "EndTurn"})
             end)
@@ -80,7 +80,7 @@ local function initWithEndTurnItem(model, item)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
     initWithQuitWarItem(self, createQuitWarItem(self))
@@ -105,21 +105,25 @@ function ModelWarCommandMenu:initView()
 end
 
 function ModelWarCommandMenu:setModelConfirmBox(model)
+    assert(self.m_ModelConfirmBox == nil, "ModelWarCommandMenu:setModelConfirmBox() the model has been set.")
+    self.m_ModelConfirmBox = model
     model:setEnabled(false)
-    self.m_ConfirmBoxModel = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelWarCommandMenu:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
+function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarCommandMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
 end
 
-function ModelWarCommandMenu:onCleanup(rootActor)
+function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher = nil
+
+    return self
 end
 
 --------------------------------------------------------------------------------

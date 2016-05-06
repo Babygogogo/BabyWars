@@ -100,7 +100,7 @@ function ModelUnit:initView()
 end
 
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
-    self:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnit:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
 
@@ -114,15 +114,13 @@ function ModelUnit:setRootScriptEventDispatcher(dispatcher)
 end
 
 function ModelUnit:unsetRootScriptEventDispatcher()
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
+    assert(self.m_RootScriptEventDispatcher, "ModelUnit:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
+    self.m_RootScriptEventDispatcher = nil
 
-        self.m_RootScriptEventDispatcher = nil
-
-        for _, component in pairs(ComponentManager.getAllComponents(self)) do
-            if (component.unsetRootScriptEventDispatcher) then
-                component:unsetRootScriptEventDispatcher()
-            end
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.unsetRootScriptEventDispatcher) then
+            component:unsetRootScriptEventDispatcher()
         end
     end
 

@@ -240,25 +240,26 @@ function ModelUnitMap:initView()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelUnitMap:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
+function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitMap:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
     self:forEachModelUnit(function(modelUnit)
-        modelUnit:setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        modelUnit:setRootScriptEventDispatcher(dispatcher)
     end)
 
     return self
 end
 
-function ModelUnitMap:onCleanup(rootActor)
+function ModelUnitMap:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
         :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
@@ -273,6 +274,9 @@ function ModelUnitMap:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if ((name == "EvtPlayerMovedCursor") or
