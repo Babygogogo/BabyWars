@@ -246,7 +246,6 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
@@ -262,7 +261,6 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
         :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
@@ -282,8 +280,6 @@ function ModelUnitMap:onEvent(event)
     if ((name == "EvtPlayerMovedCursor") or
         (name == "EvtPlayerSelectedGrid")) then
         onEvtPlayerMovedCursor(self, event)
-    elseif (name == "EvtTurnPhaseBeginning") then
-        self.m_PlayerIndex = event.playerIndex
     elseif (name == "EvtDestroyModelUnit") then
         onEvtDestroyModelUnit(self, event)
     elseif (name == "EvtDestroyViewUnit") then

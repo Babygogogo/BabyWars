@@ -197,7 +197,6 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtDestroyViewTile",    self)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtTurnPhaseBeginning", self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -209,8 +208,7 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtDestroyViewTile",    self)
         :removeEventListener("EvtDestroyModelTile",   self)

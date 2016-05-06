@@ -72,7 +72,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
             end
         end
 
-        local fuelConsumption = modelTileMap:getModelTile(path[i].gridIndex):getMoveCost(moveType, weather)
+        local fuelConsumption = modelTileMap:getModelTile(path[i].gridIndex):getMoveCost(moveType)
         if (not fuelConsumption) then
             return nil, "ActionTranslator-translatedPath() the path is invalid because some tiles on it is impassable."
         end

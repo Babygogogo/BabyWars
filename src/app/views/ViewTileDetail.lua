@@ -330,14 +330,14 @@ local function initWithMoveCostInfo(view, info)
     view:addChild(info)
 end
 
-local function updateMoveCostInfoDetailLabels(labels, tile, weather)
+local function updateMoveCostInfoDetailLabels(labels, tile, modelPlayer)
     for key, label in pairs(labels) do
-        label:setString(key .. ": " .. (tile:getMoveCost(key, weather) or "-"))
+        label:setString(key .. ": " .. (tile:getMoveCost(key, modelPlayer) or "-"))
     end
 end
 
-local function updateMoveCostInfoWithModelTile(info, tile, weather)
-    updateMoveCostInfoDetailLabels(info.m_DetailLabels, tile, weather)
+local function updateMoveCostInfoWithModelTile(info, modelTile, modelPlayer)
+    updateMoveCostInfoDetailLabels(info.m_DetailLabels, modelTile, modelPlayer)
 end
 
 --------------------------------------------------------------------------------
@@ -389,24 +389,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewTileDetail:updateWithModelTile(tile, weather)
-    updateDescriptionWithModelTile(         self.m_Description,          tile)
-    updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          tile)
-    updateRepairInfoWithModelTile(          self.m_RepairInfo,           tile)
-    updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, tile)
-    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         tile, weather)
+function ViewTileDetail:updateWithModelTile(modelTile, modelPlayer)
+    updateDescriptionWithModelTile(         self.m_Description,          modelTile)
+    updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          modelTile)
+    updateRepairInfoWithModelTile(          self.m_RepairInfo,           modelTile)
+    updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, modelTile)
+    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         modelTile, modelPlayer)
 
     return self
 end
 
 function ViewTileDetail:setEnabled(enabled)
-    if (enabled) then
-        self:setVisible(true)
-        self.m_TouchListener:setEnabled(true)
-    else
-        self:setVisible(false)
-        self.m_TouchListener:setEnabled(false)
-    end
+    self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end

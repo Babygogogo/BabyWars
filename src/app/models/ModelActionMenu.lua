@@ -15,7 +15,6 @@ local ModelActionMenu = class("ModelActionMenu")
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtActionPlannerChoosingAction(self, event)
-    print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAction")
     self:setEnabled(true)
 
     local view = self.m_View
@@ -26,7 +25,6 @@ local function onEvtActionPlannerChoosingAction(self, event)
 end
 
 local function onEvtActionPlannerChoosingProductionTarget(self, event)
-    print("ModelActionMenu-onEvent() EvtActionPlannerChoosingProductionTarget")
     self:setEnabled(true)
 
     local view = self.m_View
@@ -74,19 +72,14 @@ end
 --------------------------------------------------------------------------------
 function ModelActionMenu:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtActionPlannerIdle") then
+    if ((eventName == "EvtActionPlannerIdle") or
+        (eventName == "EvtActionPlannerMakingMovePath") or
+        (eventName == "EvtActionPlannerChoosingAttackTarget")) then
         self:setEnabled(false)
-        print("ModelActionMenu-onEvent() EvtActionPlannerIdle")
     elseif (eventName == "EvtActionPlannerChoosingProductionTarget") then
         onEvtActionPlannerChoosingProductionTarget(self, event)
-    elseif (eventName == "EvtActionPlannerMakingMovePath") then
-        self:setEnabled(false)
-        print("ModelActionMenu-onEvent() EvtActionPlannerMakingMovePath")
     elseif (eventName == "EvtActionPlannerChoosingAction") then
         onEvtActionPlannerChoosingAction(self, event)
-    elseif (eventName == "EvtActionPlannerChoosingAttackTarget") then
-        print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAttackTarget")
-        self:setEnabled(false)
     end
 
     return self

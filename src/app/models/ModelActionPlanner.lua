@@ -320,17 +320,17 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseBeginning.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseBeginning(self, event)
-    self.m_PlayerIndex = event.playerIndex
-    self.m_ModelPlayer = event.player
     setStateIdle(self)
 end
 
---------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor.
---------------------------------------------------------------------------------
+local function onEvtTurnPhaseMain(self, event)
+    self.m_PlayerIndex = event.playerIndex
+    self.m_ModelPlayer = event.modelPlayer
+end
+
 local function onEvtPlayerMovedCursor(self, gridIndex)
     if (self.m_State == "idle") then
         return
@@ -390,6 +390,7 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
     dispatcher:addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtPlayerMovedCursor",        self)
         :addEventListener("EvtTurnPhaseBeginning",       self)
+        :addEventListener("EvtTurnPhaseMain",            self)
         :addEventListener("EvtWeatherChanged",           self)
         :addEventListener("EvtPlayerRequestDoAction",    self)
 
@@ -401,6 +402,7 @@ function ModelActionPlanner:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
         :removeEventListener("EvtWeatherChanged",     self)
+        :removeEventListener("EvtTurnPhaseMain",      self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
@@ -418,6 +420,8 @@ function ModelActionPlanner:onEvent(event)
         onEvtPlayerSelectedGrid(self, event.gridIndex)
     elseif (name == "EvtTurnPhaseBeginning") then
         onEvtTurnPhaseBeginning(self, event)
+    elseif (name == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
     elseif (name == "EvtWeatherChanged") then
         self.m_CurrentWeather = event.weather
     elseif (name == "EvtPlayerMovedCursor") then

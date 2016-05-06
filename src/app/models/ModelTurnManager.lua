@@ -60,7 +60,7 @@ end
 local function runTurnPhaseBeginning(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnPhaseBeginning",
-        player      = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
+        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
         playerIndex = self.m_PlayerIndex,
         turnIndex   = self.m_TurnIndex,
 
@@ -99,6 +99,14 @@ local function runTurnPhaseRepairUnit(self)
         modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
     })
     self.m_TurnPhase = "main"
+end
+
+local function runTurnPhaseMain(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name        = "EvtTurnPhaseMain",
+        playerIndex = self.m_PlayerIndex,
+        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -175,6 +183,10 @@ function ModelTurnManager:runTurn(nextWeather)
 
     if (self.m_TurnPhase == "repairUnit") then
         runTurnPhaseRepairUnit(self)
+    end
+
+    if (self.m_TurnPhase == "main") then
+        runTurnPhaseMain(self)
     end
 
     assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function.")

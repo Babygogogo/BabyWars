@@ -65,7 +65,9 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function MoveCostOwner:getMoveCost(moveType)
+function MoveCostOwner:getMoveCost(moveType, modelPlayer)
+    -- TODO: take the modelPlayer into account.
+
     return self.m_Template[moveType]
 end
 

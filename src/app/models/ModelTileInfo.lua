@@ -40,6 +40,10 @@ local function onEvtModelTileUpdated(self, event)
     end
 end
 
+local function onEvtTurnPhaseMain(self, event)
+    self.m_ModelPlayer = event.modelPlayer
+end
+
 --------------------------------------------------------------------------------
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
@@ -64,6 +68,7 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtModelTileUpdated",   self)
+        :addEventListener("EvtTurnPhaseMain",      self)
 
     return self
 end
@@ -71,11 +76,12 @@ end
 function ModelTileInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelTileUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
+        :removeEventListener("EvtModelTileUpdated",   self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtWeatherChanged",    self)
-        :removeEventListener("EvtPlayerTouchTile",   self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtWeatherChanged",     self)
+        :removeEventListener("EvtPlayerTouchTile",    self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -96,6 +102,8 @@ function ModelTileInfo:onEvent(event)
         onEvtPlayerSelectedGrid(self, event)
     elseif (eventName == "EvtModelTileUpdated") then
         onEvtModelTileUpdated(self, event)
+    elseif (eventName == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
     end
 
     return self
@@ -106,7 +114,7 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
     if (self.m_TileDetailModel) then
-        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_Weather)
+        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_ModelPlayer)
             :setEnabled(true)
     end
 

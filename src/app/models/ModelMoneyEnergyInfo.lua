@@ -18,8 +18,8 @@ local function onEvtTurnPhaseBeginning(self, event)
     self.m_PlayerIndex = event.playerIndex
 
     if (self.m_View) then
-        self.m_View:setFund(event.player:getFund())
-            :setEnergy(event.player:getCOEnergy())
+        self.m_View:setFund(event.modelPlayer:getFund())
+            :setEnergy(event.modelPlayer:getCOEnergy())
     end
 end
 

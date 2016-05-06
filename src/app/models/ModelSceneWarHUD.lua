@@ -27,7 +27,7 @@ local Actor = require("global.actors.Actor")
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseBeginning(self, event)
     if (self.m_View) then
-        self.m_View:showBeginTurnEffect(event.turnIndex, event.player:getName(), event.callbackOnBeginTurnEffectDisappear)
+        self.m_View:showBeginTurnEffect(event.turnIndex, event.modelPlayer:getName(), event.callbackOnBeginTurnEffectDisappear)
     else
         event.callbackOnBeginTurnEffect()
     end
@@ -64,13 +64,13 @@ end
 
 local function initWithCompositionActors(self, actors)
     self.m_ConfirmBoxActor     = actors.confirmBoxActor
-    self.m_WarCommandMenuActor = actors.warCommandMenuActor
-    self.m_WarCommandMenuActor:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
+    self.m_ActorWarCommandMenu = actors.warCommandMenuActor
+    self.m_ActorWarCommandMenu:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
 
     self.m_ActorActionMenu = actors.actionMenuActor
 
     self.m_ActorMoneyEnergyInfo = actors.moneyEnergyInfoActor
-    self.m_ActorMoneyEnergyInfo:getModel():setModelWarCommandMenu(self.m_WarCommandMenuActor:getModel())
+    self.m_ActorMoneyEnergyInfo:getModel():setModelWarCommandMenu(self.m_ActorWarCommandMenu:getModel())
 
     self.m_UnitDetailActor = actors.unitDetailActor
     self.m_ActorUnitInfo   = actors.unitInfoActor
@@ -102,7 +102,7 @@ function ModelSceneWarHUD:initView()
 
     view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
         :setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
-        :setViewWarCommandMenu( self.m_WarCommandMenuActor:getView())
+        :setViewWarCommandMenu( self.m_ActorWarCommandMenu:getView())
         :setViewActionMenu(     self.m_ActorActionMenu:getView())
         :setViewTileInfo(       self.m_ActorTileInfo:getView())
         :setViewTileDetail(     self.m_TileDetailActor:getView())
@@ -117,7 +117,7 @@ function ModelSceneWarHUD:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelSceneWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_ActorActionMenu     :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_WarCommandMenuActor :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorWarCommandMenu :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorMoneyEnergyInfo:getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorTileInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorUnitInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
@@ -136,7 +136,7 @@ function ModelSceneWarHUD:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = nil
 
     self.m_ActorActionMenu     :getModel():unsetRootScriptEventDispatcher()
-    self.m_WarCommandMenuActor :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorWarCommandMenu :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorMoneyEnergyInfo:getModel():unsetRootScriptEventDispatcher()
     self.m_ActorTileInfo       :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorUnitInfo       :getModel():unsetRootScriptEventDispatcher()

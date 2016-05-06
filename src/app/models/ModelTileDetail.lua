@@ -21,9 +21,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelTileDetail:updateWithModelTile(tile, weather)
+function ModelTileDetail:updateWithModelTile(modelTile, modelPlayer)
     if (self.m_View) then
-        self.m_View:updateWithModelTile(tile, weather)
+        self.m_View:updateWithModelTile(modelTile, modelPlayer)
     end
 
     return self
