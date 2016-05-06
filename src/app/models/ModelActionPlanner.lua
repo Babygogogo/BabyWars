@@ -23,24 +23,28 @@ local AttackableGridListFunctions = require("app.utilities.AttackableGridListFun
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
+local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
     local existingUnit = modelUnitMap:getModelUnit(gridIndex)
     if ((existingUnit) and (existingUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
         return nil
+    else
+        local modelTile = modelTileMap:getModelTile(gridIndex)
+        return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType(), modelPlayer)) or (nil)
     end
-
-    local modelTile = modelTileMap:getModelTile(gridIndex)
-    return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType())) or (nil)
 end
 
-local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
-    if (GridIndexFunctions.isEqual(unitModel:getGridIndex(), gridIndex)) then
+local function getMoveRange(modelUnit, modelPlayer, modelWeather)
+    return math.min(modelUnit:getMoveRange(modelPlayer, modelWeather), modelUnit:getCurrentFuel())
+end
+
+local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
+    if (GridIndexFunctions.isEqual(modelUnit:getGridIndex(), gridIndex)) then
         return true
     else
-        local existingUnitModel = unitMapModel:getModelUnit(gridIndex)
-        return (not existingUnitModel) or
-               (existingUnitModel:canJoin(unitModel)) or
-               (existingUnitModel.canLoad and existingUnitModel:canLoad(unitModel))
+        local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        return (not existingModelUnit) or
+               (existingModelUnit:canJoin(modelUnit)) or
+               (existingModelUnit.canLoad and existingModelUnit:canLoad(modelUnit))
     end
 end
 
@@ -48,8 +52,8 @@ end
 -- The functions for MovePath.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = self.m_FocusModelUnit:getMoveRange(self.m_FocusModelUnit:getCurrentFuel())
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
+    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_ModelPlayer, self.m_ModelWeather)
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex)) and
         (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
@@ -72,11 +76,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for ReachableArea.
 --------------------------------------------------------------------------------
-local function resetReachableArea(self, focusUnitModel)
-    if (self.m_FocusModelUnit ~= focusUnitModel) or (self.m_State == "idle") then
-        self.m_ReachableArea = ReachableAreaFunctions.createArea(focusUnitModel:getGridIndex(), focusUnitModel:getMoveRange(focusUnitModel:getCurrentFuel()), function(gridIndex)
-            return getMoveCost(gridIndex, focusUnitModel, self.m_ModelUnitMap, self.m_ModelTileMap)
-        end)
+local function resetReachableArea(self, focusModelUnit)
+    if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
+        self.m_ReachableArea = ReachableAreaFunctions.createArea(
+            focusModelUnit:getGridIndex(),
+            getMoveRange(focusModelUnit, self.m_ModelPlayer, self.m_ModelWeather),
+            function(gridIndex)
+                return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
+            end)
 
         if (self.m_View) then
             self.m_View:setReachableGrids(self.m_ReachableArea)
@@ -236,7 +243,7 @@ end
 
 setStateMakingMovePath = function(self, focusModelUnit)
     resetReachableArea(self, focusModelUnit)
-    resetMovePath(      self, focusModelUnit)
+    resetMovePath(     self, focusModelUnit)
     self.m_State          = "makingMovePath"
     self.m_FocusModelUnit = focusModelUnit
 
@@ -331,6 +338,10 @@ local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
 end
 
+local function onEvtModelWeatherUpdated(self, event)
+    self.m_ModelWeather = event.modelWeather
+end
+
 local function onEvtPlayerMovedCursor(self, gridIndex)
     if (self.m_State == "idle") then
         return
@@ -391,7 +402,7 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtPlayerMovedCursor",        self)
         :addEventListener("EvtTurnPhaseBeginning",       self)
         :addEventListener("EvtTurnPhaseMain",            self)
-        :addEventListener("EvtWeatherChanged",           self)
+        :addEventListener("EvtModelWeatherUpdated",      self)
         :addEventListener("EvtPlayerRequestDoAction",    self)
 
     return self
@@ -401,11 +412,11 @@ function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
-        :removeEventListener("EvtWeatherChanged",     self)
-        :removeEventListener("EvtTurnPhaseMain",      self)
-        :removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor",  self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtModelWeatherUpdated", self)
+        :removeEventListener("EvtTurnPhaseMain",       self)
+        :removeEventListener("EvtTurnPhaseBeginning",  self)
+        :removeEventListener("EvtPlayerMovedCursor",   self)
+        :removeEventListener("EvtPlayerSelectedGrid",  self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -422,8 +433,8 @@ function ModelActionPlanner:onEvent(event)
         onEvtTurnPhaseBeginning(self, event)
     elseif (name == "EvtTurnPhaseMain") then
         onEvtTurnPhaseMain(self, event)
-    elseif (name == "EvtWeatherChanged") then
-        self.m_CurrentWeather = event.weather
+    elseif (name == "EvtModelWeatherUpdated") then
+        onEvtModelWeatherUpdated(self, event)
     elseif (name == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event.gridIndex)
     elseif (name == "EvtPlayerRequestDoAction") then

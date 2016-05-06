@@ -223,7 +223,7 @@ function ModelSceneWar:onStartRunning()
     self.m_ActorTurnManager  :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorPlayerManager:getModel():setRootScriptEventDispatcher(dispatcher)
 
-    dispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
+    dispatcher:dispatchEvent({name = "EvtModelWeatherUpdated", modelWeather = self:getModelWeatherManager():getCurrentWeather()})
     self:getModelTurnManager():runTurn()
 
     return self

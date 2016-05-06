@@ -212,8 +212,10 @@ local function initWithMovementInfo(view, info)
     view:addChild(info)
 end
 
-local function updateMovementInfoWithModelUnit(info, unit)
-    info.m_Label:setString("Movement Range:  " .. unit:getMoveRange() .. "(" .. unit:getMoveType() .. ")")
+local function updateMovementInfoWithModelUnit(info, unit, modelPlayer, modelWeather)
+    info.m_Label:setString("Movement Range:  " ..
+        unit:getMoveRange(modelPlayer, modelWeather) ..
+        "(" .. unit:getMoveType() .. ")")
 end
 
 --------------------------------------------------------------------------------
@@ -640,14 +642,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewUnitDetail:updateWithModelUnit(unit)
-    updateDescriptionWithModelUnit(        self.m_Description, unit)
-    updateMovementInfoWithModelUnit(       self.m_MovementInfo, unit)
-    updateVisionInfoWithModelUnit(         self.m_VisionInfo, unit)
-    updateFuelInfoWithModelUnit(           self.m_FuelInfo, unit)
-    updatePrimaryWeaponInfoWithModelUnit(  self.m_PrimaryWeaponInfo, unit)
-    updateSecondaryWeaponInfoWithModelUnit(self.m_SecondaryWeaponInfo, unit)
-    updateDefenseInfoWithModelUnit(        self.m_DefenseInfo, unit)
+function ViewUnitDetail:updateWithModelUnit(modelUnit, modelPlayer, modelWeather)
+    updateDescriptionWithModelUnit(        self.m_Description,         modelUnit)
+    updateMovementInfoWithModelUnit(       self.m_MovementInfo,        modelUnit, modelPlayer, modelWeather)
+    updateVisionInfoWithModelUnit(         self.m_VisionInfo,          modelUnit)
+    updateFuelInfoWithModelUnit(           self.m_FuelInfo,            modelUnit)
+    updatePrimaryWeaponInfoWithModelUnit(  self.m_PrimaryWeaponInfo,   modelUnit)
+    updateSecondaryWeaponInfoWithModelUnit(self.m_SecondaryWeaponInfo, modelUnit)
+    updateDefenseInfoWithModelUnit(        self.m_DefenseInfo,         modelUnit)
 
     return self
 end

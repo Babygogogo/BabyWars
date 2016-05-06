@@ -45,14 +45,8 @@ end
 --------------------------------------------------------------------------------
 local function runTurnPhaseResetUnitState(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseResetUnitState", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
---[[
-    if (self.m_Weather.m_CurrentWeather ~= nextWeather) then
-        self.m_Weather.m_CurrentWeather = nextWeather
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = nextWeather})
-    end
-]]
 
-    -- TODO: Change state for units, vision and so on.
+    -- TODO: Change state for units, vision, weather and so on.
     self.m_TurnPhase = "beginning"
     self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
 end

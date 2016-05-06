@@ -64,7 +64,6 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerTouchTile", self)
-        :addEventListener("EvtWeatherChanged",     self)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtModelTileUpdated",   self)
@@ -80,7 +79,6 @@ function ModelTileInfo:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtModelTileUpdated",   self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
-        :removeEventListener("EvtWeatherChanged",     self)
         :removeEventListener("EvtPlayerTouchTile",    self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -94,8 +92,6 @@ function ModelTileInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerTouchTile") then
         onEvtPlayerTouchTile(self, event)
-    elseif (eventName == "EvtWeatherChanged") then
-        self.m_Weather = event.weather
     elseif (eventName == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event)
     elseif (eventName == "EvtPlayerSelectedGrid") then
