@@ -51,7 +51,7 @@ local function dispatchEventPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerPreviewAttackTarget/EvtPlayerPreviewNoAttackTarget.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerPreviewAttackTarget(self, event)
     if (self.m_View) then

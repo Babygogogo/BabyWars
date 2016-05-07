@@ -93,7 +93,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTile:ctor(param)
-    if (param.objectID or param.baseID) then
+    if ((param.objectID) or (param.baseID)) then
         initWithTiledID(self, param.objectID, param.baseID)
     end
 

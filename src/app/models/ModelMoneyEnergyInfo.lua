@@ -49,8 +49,10 @@ function ModelMoneyEnergyInfo:initView()
 end
 
 function ModelMoneyEnergyInfo:setModelWarCommandMenu(model)
+    assert(self.m_ModelWarCommandMenu == nil, "ModelMoneyEnergyInfo:setModelWarCommandMenu() the model has been set.")
+
     model:setEnabled(false)
-    self.m_WarCommandMenuModel = model
+    self.m_ModelWarCommandMenu = model
 
     return self
 end
@@ -91,7 +93,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    self.m_WarCommandMenuModel:setEnabled(true)
+    self.m_ModelWarCommandMenu:setEnabled(true)
 
     return self
 end

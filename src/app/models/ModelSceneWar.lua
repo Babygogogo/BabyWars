@@ -75,7 +75,7 @@ local function doActionProduceOnTile(self, action)
 end
 
 --------------------------------------------------------------------------------
--- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
@@ -137,11 +137,11 @@ end
 -- The composition HUD actor.
 --------------------------------------------------------------------------------
 local function createActorSceneWarHUD()
-    return Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
+    return Actor.createWithModelAndViewName("ModelWarHUD", nil, "ViewWarHUD")
 end
 
-local function initWithActorSceneWarHUD(self, actor)
-    self.m_ActorSceneWarHUD = actor
+local function initWithActorWarHud(self, actor)
+    self.m_ActorWarHud = actor
 end
 
 --------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ function ModelSceneWar:ctor(param)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))
-    initWithActorSceneWarHUD(     self, createActorSceneWarHUD())
+    initWithActorWarHud(          self, createActorSceneWarHUD())
     initWithActorPlayerManager(   self, createActorPlayerManager(sceneData.players))
     initWithActorTurnManager(     self, createActorTurnManager(sceneData.turn))
     initWithActorWeatherManager(  self, createActorWeatherManager(sceneData.weather))
@@ -204,8 +204,8 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setWarFieldView(self.m_ActorWarField:getView())
-        :setSceneHudView(self.m_ActorSceneWarHUD:getView())
+    view:setViewWarField(self.m_ActorWarField:getView())
+        :setViewWarHud(self.m_ActorWarHud:getView())
 
     return self
 end
@@ -218,7 +218,7 @@ function ModelSceneWar:onStartRunning()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
 
-    self.m_ActorSceneWarHUD  :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorWarHud       :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorWarField     :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorTurnManager  :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorPlayerManager:getModel():setRootScriptEventDispatcher(dispatcher)
@@ -236,7 +236,7 @@ function ModelSceneWar:onStopRunning()
     self.m_ActorPlayerManager:getModel():unsetRootScriptEventDispatcher()
     self.m_ActorTurnManager  :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorWarField     :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorSceneWarHUD  :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorWarHud       :getModel():unsetRootScriptEventDispatcher()
 
     return self
 end

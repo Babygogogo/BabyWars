@@ -17,7 +17,7 @@
 
 local ModelPlayerManager = class("ModelPlayerManager")
 
-local Player      = require("app.models.ModelPlayer")
+local ModelPlayer = require("app.models.ModelPlayer")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -98,7 +98,7 @@ end
 function ModelPlayerManager:ctor(param)
     self.m_Players = {}
     for i, player in ipairs(param) do
-        self.m_Players[i] = Player:create(player)
+        self.m_Players[i] = ModelPlayer:create(player)
     end
 
     return self

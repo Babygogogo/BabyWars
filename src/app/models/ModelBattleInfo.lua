@@ -9,13 +9,13 @@
 --   - 本类不负责计算预估伤害，该数值由ModelActionPlanner计算。
 --     这是因为ModelActionPlanner在生成单位可攻击目标列表时已经计算了预估伤害，所以这里没必要再算一次，直接利用算好的数值就行。
 --
---   - ModelBattleInfo是ModelSceneWarHUD的子model，与ModelActionPlanner没有直接联系，因此需要通过event来传递参数。
+--   - ModelBattleInfo是ModelWarHUD的子model，与ModelActionPlanner没有直接联系，因此需要通过event来传递参数。
 --]]--------------------------------------------------------------------------------
 
 local ModelBattleInfo = class("ModelBattleInfo")
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerPreviewAttackTarget/EvtPlayerPreviewNoAttackTarget and so on.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerPreviewAttackTarget(self, event)
     if (self.m_View) then

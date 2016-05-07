@@ -239,8 +239,8 @@ function ModelUnit:doActionAttack(action, isAttacker)
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    local shouldDestroyAttacker = self:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget   = action.target:getCurrentHP() <= action.attackDamage
+    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
@@ -261,12 +261,21 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
             if (shouldDestroyAttacker) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            elseif (action.counterDamage) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
             end
+
             if (shouldDestroyTarget) then
                 if (action.targetType == "unit") then
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
                 else
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                end
+            else
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
                 end
             end
         end)

@@ -24,6 +24,8 @@ function ModelGridExplosion:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyViewUnit", self)
         :addEventListener("EvtDestroyViewTile", self)
+        :addEventListener("EvtAttackViewUnit",  self)
+        :addEventListener("EvtAttackViewTile",  self)
 
     return self
 end
@@ -31,7 +33,9 @@ end
 function ModelGridExplosion:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelGridExplosion:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtAttackViewTile", self)
+        :removeEventListener("EvtAttackViewUnit",  self)
+        :removeEventListener("EvtDestroyViewTile", self)
         :removeEventListener("EvtDestroyViewUnit", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -45,7 +49,10 @@ function ModelGridExplosion:onEvent(event)
     local name = event.name
     if ((name == "EvtDestroyViewUnit") or
         (name == "EvtDestroyViewTile")) then
-        self:showExplosion(event.gridIndex)
+        self:showAnimationExplosion(event.gridIndex)
+    elseif ((name == "EvtAttackViewUnit") or
+        (name == "EvtAttackViewTile")) then
+        self:showAnimationDamage(event.gridIndex)
     end
 
     return self
@@ -54,9 +61,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelGridExplosion:showExplosion(gridIndex, callbackOnFinish)
+function ModelGridExplosion:showAnimationExplosion(gridIndex, callbackOnFinish)
     if (self.m_View) then
-        self.m_View:showExplosion(gridIndex, callbackOnFinish)
+        self.m_View:showAnimationExplosion(gridIndex, callbackOnFinish)
+    elseif (callbackOnFinish) then
+        callbackOnFinish()
+    end
+
+    return self
+end
+
+function ModelGridExplosion:showAnimationDamage(gridIndex, callbackOnFinish)
+    if (self.m_View) then
+        self.m_View:showAnimationDamage(gridIndex, callbackOnFinish)
     elseif (callbackOnFinish) then
         callbackOnFinish()
     end
