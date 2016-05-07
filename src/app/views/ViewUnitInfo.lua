@@ -51,7 +51,7 @@ local function createButton(view)
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
+        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
 
         :setZoomScale(-0.05)

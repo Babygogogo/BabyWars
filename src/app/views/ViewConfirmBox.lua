@@ -32,7 +32,7 @@ local function createConfirmButton(posX, posY, color, text, callback)
         :setPosition(posX, posY)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
+        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
         :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
         :setZoomScale(-0.05)
@@ -59,7 +59,7 @@ end
 -- The composition background.
 --------------------------------------------------------------------------------
 local function createBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 

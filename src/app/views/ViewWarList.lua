@@ -1,9 +1,9 @@
 
 local ViewWarList = class("ViewWarList", cc.Node)
 
-local ITEM_CAPINSETS          = {x = 0, y = 0, width = 1, height = 2}
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 45
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local ITEM_FONT_SIZE          = 28
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
@@ -43,7 +43,7 @@ end
 -- The composition background.
 --------------------------------------------------------------------------------
 local function createBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
 
     return background

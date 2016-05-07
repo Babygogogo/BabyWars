@@ -11,7 +11,9 @@ local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
 local LIST_POSITION_X = MENU_BACKGROUND_POSITION_X + 5
 local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
 
-local BUTTON_CAPINSETS           = {x = 0, y = 0, width = 1, height = 2}
+local BUTTON_WIDTH               = MENU_BACKGROUND_WIDTH - 20
+local BUTTON_HEIGHT              = 45
+local BUTTON_CAPINSETS           = {x = 1, y = BUTTON_HEIGHT, width = 1, height = 1}
 local BUTTON_TITLE_COLOR         = {r = 255, g = 255, b = 255}
 local BUTTON_TITLE_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local BUTTON_TITLE_OUTLINE_WIDTH = 2
@@ -27,7 +29,7 @@ local function createItemView(itemModel)
 
         :setScale9Enabled(true)
         :setCapInsets(BUTTON_CAPINSETS)
-        :setContentSize(230, 45)
+        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
         :setZoomScale(-0.05)
 
@@ -67,7 +69,7 @@ end
 -- The menu background.
 --------------------------------------------------------------------------------
 local function createMenuBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_BACKGROUND_POSITION_X, MENU_BACKGROUND_POSITION_Y)
 

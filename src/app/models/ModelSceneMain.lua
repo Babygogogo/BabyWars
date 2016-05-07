@@ -15,7 +15,8 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
-local Actor	= require("global.actors.Actor")
+local Actor	                = require("global.actors.Actor")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The composition confirm box actor.
@@ -61,6 +62,7 @@ function ModelSceneMain:initView()
 
     view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
         :setViewWarList(   self.m_ActorWarList:getView())
+        :setGameVersion(GameConstantFunctions.getGameVersion())
 
     return self
 end

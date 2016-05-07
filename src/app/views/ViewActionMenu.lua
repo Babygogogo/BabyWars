@@ -31,7 +31,7 @@ local BUTTON_HEIGHT_FOR_ACTION_ITEM     = TITLE_FONT_SIZE / 5 * 8
 local BUTTON_WIDTH_FOR_PRODUCTION_ITEM  = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 15
 local BUTTON_HEIGHT_FOR_PRODUCTION_ITEM = BUTTON_HEIGHT_FOR_ACTION_ITEM
 local BUTTON_DISABLED_COLOR             = {r = 180, g = 180, b = 180}
-local BUTTON_CAPINSETS                  = {x = 0, y = 0, width = 1, height = 2}
+local BUTTON_CAPINSETS                  = {x = 1, y = BUTTON_HEIGHT_FOR_ACTION_ITEM, width = 1, height = 1}
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -141,7 +141,7 @@ end
 -- The menu background.
 --------------------------------------------------------------------------------
 local function createMenuBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
 

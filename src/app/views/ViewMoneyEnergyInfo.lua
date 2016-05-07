@@ -63,7 +63,7 @@ local function createBackground(view)
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
+        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
         :setZoomScale(-0.05)
