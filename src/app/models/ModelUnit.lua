@@ -188,10 +188,6 @@ function ModelUnit:showMovingAnimation()
     return self
 end
 
-function ModelUnit:isInStealthMode()
-    return false
-end
-
 function ModelUnit:getDescription()
     return self.m_Template.description
 end
@@ -261,7 +257,7 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
             if (shouldDestroyAttacker) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
-            elseif (action.counterDamage) then
+            elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
             end
 

@@ -98,7 +98,7 @@ end
 
 local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
     if (attackerHP <= 0) then
-        return nil
+        return 0
     end
 
     local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
@@ -115,7 +115,7 @@ end
 
 local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
     if (attackerHP <= 0) then
-        return nil
+        return 0
     end
 
     local estimatedAttackDamage = getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)

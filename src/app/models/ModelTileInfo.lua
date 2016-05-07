@@ -54,6 +54,7 @@ function ModelTileInfo:ctor(param)
 end
 
 function ModelTileInfo:setModelTileDetail(model)
+    assert(self.m_TileDetailModel == nil, "ModelTileInfo:setModelTileDetail() the model has been set.")
     self.m_TileDetailModel = model
 
     return self

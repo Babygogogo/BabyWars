@@ -94,6 +94,7 @@ function ModelUnitInfo:ctor(param)
 end
 
 function ModelUnitInfo:setModelUnitDetail(model)
+    assert(self.m_ModelUnitDetail == nil, "ModelUnitInfo:setModelUnitDetail() the model has been set.")
     self.m_ModelUnitDetail = model
 
     return self
@@ -165,6 +166,9 @@ function ModelUnitInfo:onEvent(event)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:onPlayerTouch()
     if (self.m_ModelUnitDetail) then
         self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnit, self.m_ModelPlayer, self.m_ModelWeather)

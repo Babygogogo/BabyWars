@@ -32,7 +32,6 @@ local ModelTileMap = class("ModelTileMap")
 
 local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
-local MapFunctions       = require("app.utilities.MapFunctions")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
@@ -72,18 +71,6 @@ local function createEmptyMap(width)
     return map
 end
 
-local function iterateAllActorTiles(tileMap, mapSize, func)
-    local width, height = mapSize.width, mapSize.height
-    for x = 1, width do
-        for y = 1, height do
-            local actorTile = tileMap[x][y]
-            if (actorTile) then
-                func(actorTile)
-            end
-        end
-    end
-end
-
 local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
     local width, height = baseLayer.width, baseLayer.height
     local map = createEmptyMap(width)
@@ -117,7 +104,8 @@ end
 --------------------------------------------------------------------------------
 local function onEvtPlayerMovedCursor(self, event)
     local modelTile = self:getModelTile(event.gridIndex)
-    assert(modelTile, "ModelTileMap:onEvent() failed to get the tile model with event.gridIndex.")
+    assert(modelTile, "ModelTileMap-onEvtPlayerMovedCursor() failed to get the tile model with event.gridIndex.")
+
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", modelTile = modelTile})
 end
 
