@@ -11,38 +11,36 @@ local LIST_HEIGHT = MENU_BACKGROUND_HEIGHT - 14
 local LIST_POSITION_X = MENU_BACKGROUND_POSITION_X + 5
 local LIST_POSITION_Y = MENU_BACKGROUND_POSITION_Y + 6
 
-local BUTTON_WIDTH               = MENU_BACKGROUND_WIDTH - 20
-local BUTTON_HEIGHT              = 45
-local BUTTON_CAPINSETS           = {x = 1, y = BUTTON_HEIGHT, width = 1, height = 1}
-local BUTTON_TITLE_COLOR         = {r = 255, g = 255, b = 255}
-local BUTTON_TITLE_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
-local BUTTON_TITLE_OUTLINE_WIDTH = 2
-
-local CONFIRM_BOX_Z_ORDER = 99
+local ITEM_WIDTH              = MENU_BACKGROUND_WIDTH - 20
+local ITEM_HEIGHT             = 45
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createItemView(itemModel)
+local function createViewItem(item)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets(BUTTON_CAPINSETS)
-        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        :setCapInsets(ITEM_CAPINSETS)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
 
         :setZoomScale(-0.05)
 
         :setTitleFontName("res/fonts/msyhbd.ttc")
         :setTitleFontSize(28)
-        :setTitleColor(BUTTON_TITLE_COLOR)
-        :setTitleText(itemModel:getTitleText())
+        :setTitleColor(ITEM_FONT_COLOR)
+        :setTitleText(item.name)
 
-    view:getTitleRenderer():enableOutline(BUTTON_TITLE_OUTLINE_COLOR, BUTTON_TITLE_OUTLINE_WIDTH)
+    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
     view:addTouchEventListener(function(sender, eventType)
-        if eventType == ccui.TouchEventType.ended then
-            itemModel:onPlayerTouch()
+        if (eventType == ccui.TouchEventType.ended) then
+            item.callback()
         end
     end)
 
@@ -148,14 +146,8 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarCommandMenu:createAndPushBackItemView(itemModel)
-    self.m_ListView:pushBackCustomItem(createItemView(itemModel))
-
-    return self
-end
-
-function ViewWarCommandMenu:pushBackItemView(itemView)
-    self.m_ListView:pushBackCustomItem(itemView)
+function ViewWarCommandMenu:createAndPushBackViewItem(item)
+    self.m_ListView:pushBackCustomItem(createViewItem(item))
 
     return self
 end
@@ -167,13 +159,8 @@ function ViewWarCommandMenu:removeAllItems()
 end
 
 function ViewWarCommandMenu:setEnabled(enabled)
-    if (enabled) then
-        self:setVisible(true)
-        self.m_TouchListener:setEnabled(true)
-    else
-        self:setVisible(false)
-        self.m_TouchListener:setEnabled(false)
-    end
+    self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end

@@ -97,12 +97,6 @@ function ViewWarList:setContentSize(width, height)
     return self
 end
 
-function ViewWarList:pushBackItem(item)
-    self.m_ListView:pushBackCustomItem(item)
-
-    return self
-end
-
 function ViewWarList:removeAllItems()
     self.m_ListView:removeAllItems()
 

@@ -8,13 +8,13 @@
 -- 其他：
 --  - ModelWarHUD目前由以下子actor组成：
 --    - ConfirmBox
---    - MoneyEnergyInfo
 --    - WarCommandMenu
+--    - MoneyEnergyInfo
 --    - ActionMenu
---    - UnitInfo
 --    - UnitDetail
---    - TileInfo
+--    - UnitInfo
 --    - TileDetail
+--    - TileInfo
 --    - BattleInfo
 --]]--------------------------------------------------------------------------------
 
@@ -38,56 +38,95 @@ end
 --------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
-local function createCompositionActors(param)
-    local confirmBoxActor      = Actor.createWithModelAndViewName("ModelConfirmBox",      nil, "ViewConfirmBox")
-    local moneyEnergyInfoActor = Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
-    local warCommandMenuActor  = Actor.createWithModelAndViewName("ModelWarCommandMenu",  nil, "ViewWarCommandMenu")
-    local actionMenuActor      = Actor.createWithModelAndViewName("ModelActionMenu",      nil, "ViewActionMenu")
-    local unitInfoActor        = Actor.createWithModelAndViewName("ModelUnitInfo",        nil, "ViewUnitInfo")
-    local unitDetailActor      = Actor.createWithModelAndViewName("ModelUnitDetail",      nil, "ViewUnitDetail")
-    local tileInfoActor        = Actor.createWithModelAndViewName("ModelTileInfo",        nil, "ViewTileInfo")
-    local tileDetailActor      = Actor.createWithModelAndViewName("ModelTileDetail",      nil, "ViewTileDetail")
-    local battleInfoActor      = Actor.createWithModelAndViewName("ModelBattleInfo",      nil, "ViewBattleInfo")
-
-    return {
-        confirmBoxActor      = confirmBoxActor,
-        moneyEnergyInfoActor = moneyEnergyInfoActor,
-        warCommandMenuActor  = warCommandMenuActor,
-        actionMenuActor      = actionMenuActor,
-        unitInfoActor        = unitInfoActor,
-        unitDetailActor      = unitDetailActor,
-        tileInfoActor        = tileInfoActor,
-        tileDetailActor      = tileDetailActor,
-        battleInfoActor      = battleInfoActor,
-    }
+local function createActorConfirmBox()
+    return Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
 end
 
-local function initWithCompositionActors(self, actors)
-    self.m_ConfirmBoxActor     = actors.confirmBoxActor
-    self.m_ActorWarCommandMenu = actors.warCommandMenuActor
-    self.m_ActorWarCommandMenu:getModel():setModelConfirmBox(self.m_ConfirmBoxActor:getModel())
+local function initWithActorConfirmBox(self, actor)
+    self.m_ActorConfirmBox = actor
+end
 
-    self.m_ActorActionMenu = actors.actionMenuActor
+local function createActorWarCommandMenu()
+    return Actor.createWithModelAndViewName("ModelWarCommandMenu", nil, "ViewWarCommandMenu")
+end
 
-    self.m_ActorMoneyEnergyInfo = actors.moneyEnergyInfoActor
-    self.m_ActorMoneyEnergyInfo:getModel():setModelWarCommandMenu(self.m_ActorWarCommandMenu:getModel())
+local function initWithActorWarCommandMenu(self, actor)
+    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+    self.m_ActorWarCommandMenu = actor
+end
 
-    self.m_UnitDetailActor = actors.unitDetailActor
-    self.m_ActorUnitInfo   = actors.unitInfoActor
-    self.m_ActorUnitInfo:getModel():setModelUnitDetail(self.m_UnitDetailActor:getModel())
+local function createActorMoneyEnergyInfo()
+    return Actor.createWithModelAndViewName("ModelMoneyEnergyInfo", nil, "ViewMoneyEnergyInfo")
+end
 
-    self.m_TileDetailActor = actors.tileDetailActor
-    self.m_ActorTileInfo   = actors.tileInfoActor
-    self.m_ActorTileInfo:getModel():setModelTileDetail(self.m_TileDetailActor:getModel())
+local function initWithActorMoneyEnergyInfo(self, actor)
+    actor:getModel():setModelWarCommandMenu(self.m_ActorWarCommandMenu:getModel())
+    self.m_ActorMoneyEnergyInfo = actor
+end
 
-    self.m_ActorBattleInfo = actors.battleInfoActor
+local function createActorActionMenu()
+    return Actor.createWithModelAndViewName("ModelActionMenu", nil, "ViewActionMenu")
+end
+
+local function initWithActorActionMenu(self, actor)
+    self.m_ActorActionMenu = actor
+end
+
+local function createActorUnitDetail()
+    return Actor.createWithModelAndViewName("ModelUnitDetail", nil, "ViewUnitDetail")
+end
+
+local function initWithActorUnitDetail(self, actor)
+    self.m_ActorUnitDetail = actor
+end
+
+local function createActorUnitInfo()
+    return Actor.createWithModelAndViewName("ModelUnitInfo", nil, "ViewUnitInfo")
+end
+
+local function initWithActorUnitInfo(self, actor)
+    actor:getModel():setModelUnitDetail(self.m_ActorUnitDetail:getModel())
+    self.m_ActorUnitInfo = actor
+end
+
+local function createActorTileDetail()
+    return Actor.createWithModelAndViewName("ModelTileDetail", nil, "ViewTileDetail")
+end
+
+local function initWithActorTileDetail(self, actor)
+    self.m_ActorTileDetail = actor
+end
+
+local function createActorTileInfo()
+    return Actor.createWithModelAndViewName("ModelTileInfo", nil, "ViewTileInfo")
+end
+
+local function initWithActorTileInfo(self, actor)
+    actor:getModel():setModelTileDetail(self.m_ActorTileDetail:getModel())
+    self.m_ActorTileInfo = actor
+end
+
+local function createActorBattleInfo()
+    return Actor.createWithModelAndViewName("ModelBattleInfo", nil, "ViewBattleInfo")
+end
+
+local function initWithActorBattleInfo(self, actor)
+    self.m_ActorBattleInfo = actor
 end
 
 --------------------------------------------------------------------------------
 -- The contructor.
 --------------------------------------------------------------------------------
 function ModelWarHUD:ctor(param)
-    initWithCompositionActors(self, createCompositionActors())
+    initWithActorConfirmBox(     self, createActorConfirmBox())
+    initWithActorWarCommandMenu( self, createActorWarCommandMenu())
+    initWithActorMoneyEnergyInfo(self, createActorMoneyEnergyInfo())
+    initWithActorActionMenu(     self, createActorActionMenu())
+    initWithActorUnitDetail(     self, createActorUnitDetail())
+    initWithActorUnitInfo(       self, createActorUnitInfo())
+    initWithActorTileDetail(     self, createActorTileDetail())
+    initWithActorTileInfo(       self, createActorTileInfo())
+    initWithActorBattleInfo(     self, createActorBattleInfo())
 
     if (self.m_View) then
         self:initView()
@@ -100,14 +139,14 @@ function ModelWarHUD:initView()
     local view = self.m_View
     assert(view, "ModelWarHUD:initView() no view is attached to the actor of the model.")
 
-    view:setViewConfirmBox(     self.m_ConfirmBoxActor:getView())
+    view:setViewConfirmBox(     self.m_ActorConfirmBox:getView())
         :setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
         :setViewWarCommandMenu( self.m_ActorWarCommandMenu:getView())
         :setViewActionMenu(     self.m_ActorActionMenu:getView())
         :setViewTileInfo(       self.m_ActorTileInfo:getView())
-        :setViewTileDetail(     self.m_TileDetailActor:getView())
+        :setViewTileDetail(     self.m_ActorTileDetail:getView())
         :setViewUnitInfo(       self.m_ActorUnitInfo:getView())
-        :setViewUnitDetail(     self.m_UnitDetailActor:getView())
+        :setViewUnitDetail(     self.m_ActorUnitDetail:getView())
         :setViewBattleInfo(     self.m_ActorBattleInfo:getView())
 
     return self

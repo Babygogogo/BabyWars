@@ -48,7 +48,6 @@ local function createListItems(self, param)
     for _, itemData in ipairs(listData) do
         items[#items + 1] = {
             name     = itemData.name,
-            data     = itemData.data,
             callback = function()
                 enableConfirmBoxForEnteringSceneWar(self, itemData.name, itemData.data)
             end,
