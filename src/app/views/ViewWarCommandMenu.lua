@@ -58,9 +58,9 @@ local function createScreenBackground()
     return background
 end
 
-local function initWithScreenBackground(view, background)
-    view.m_ScreenBackground = background
-    view:addChild(background)
+local function initWithScreenBackground(self, background)
+    self.m_ScreenBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -76,9 +76,9 @@ local function createMenuBackground()
     return background
 end
 
-local function initWithMenuBackground(view, background)
-    view.m_MenuBackground = background
-    view:addChild(background)
+local function initWithMenuBackground(self, background)
+    self.m_MenuBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -98,15 +98,15 @@ local function createListView()
     return listView
 end
 
-local function initWithListView(view, listView)
-    view.m_ListView = listView
-    view:addChild(listView)
+local function initWithListView(self, listView)
+    self.m_ListView = listView
+    self:addChild(listView)
 end
 
 --------------------------------------------------------------------------------
 -- The touch listener.
 --------------------------------------------------------------------------------
-local function createTouchListener(view)
+local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
 
@@ -115,15 +115,15 @@ local function createTouchListener(view)
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function()
-        view:setEnabled(false)
+        self:setEnabled(false)
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
 end
 
-local function initWithTouchListener(view, touchListener)
-    view.m_TouchListener = touchListener
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
+local function initWithTouchListener(self, touchListener)
+    self.m_TouchListener = touchListener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
 end
 
 --------------------------------------------------------------------------------

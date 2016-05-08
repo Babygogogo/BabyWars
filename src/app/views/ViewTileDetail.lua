@@ -77,9 +77,9 @@ local function createScreenBackground()
     return background
 end
 
-local function initWithScreenBackground(view, background)
-    view.m_ScreenBackground = background
-    view:addChild(background)
+local function initWithScreenBackground(self, background)
+    self.m_ScreenBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -95,9 +95,9 @@ local function createDetailBackground()
     return background
 end
 
-local function initWithDetailBackground(view, background)
-    view.m_DetailBackground = background
-    view:addChild(background)
+local function initWithDetailBackground(self, background)
+    self.m_DetailBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ end
 
 local function createDescriptionLabel()
     return createLabel(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6,
-                    BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
+                        BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
 end
 
 local function createDescription()
@@ -128,9 +128,9 @@ local function createDescription()
     return description
 end
 
-local function initWithDescription(view, description)
-    view.m_Description = description
-    view:addChild(description)
+local function initWithDescription(self, description)
+    self.m_Description = description
+    self:addChild(description)
 end
 
 local function updateDescriptionWithModelTile(description, tile)
@@ -159,15 +159,15 @@ local function createDefenseInfo()
         :addChild(buttomLine)
         :addChild(defenseLabel)
 
-    info.m_ButtomLine   = buttomLine
+    info.m_ButtomLine = buttomLine
     info.m_Label = defenseLabel
 
     return info
 end
 
-local function initWithDefenseInfo(view, info)
-    view.m_DefenseInfo = info
-    view:addChild(info)
+local function initWithDefenseInfo(self, info)
+    self.m_DefenseInfo = info
+    self:addChild(info)
 end
 
 local function updateDefenseInfoWithModelTile(info, tile)
@@ -202,9 +202,9 @@ local function createRepairInfo()
     return info
 end
 
-local function initWithRepairInfo(view, info)
-    view.m_RepairInfo = info
-    view:addChild(info)
+local function initWithRepairInfo(self, info)
+    self.m_RepairInfo = info
+    self:addChild(info)
 end
 
 local function updateRepairInfoWithModelTile(info, tile)
@@ -253,9 +253,9 @@ local function createCaptureAndIncomeInfo()
     return info
 end
 
-local function initWithCaptureAndIncomeInfo(view, info)
-    view.m_CaptureAndIncomeInfo = info
-    view:addChild(info)
+local function initWithCaptureAndIncomeInfo(self, info)
+    self.m_CaptureAndIncomeInfo = info
+    self:addChild(info)
 end
 
 local function updateCaptureAndIncomeInfoCaptureLabel(label, tile)
@@ -323,9 +323,9 @@ local function createMoveCostInfo()
     return info
 end
 
-local function initWithMoveCostInfo(view, info)
-    view.m_MoveCostInfo = info
-    view:addChild(info)
+local function initWithMoveCostInfo(self, info)
+    self.m_MoveCostInfo = info
+    self:addChild(info)
 end
 
 local function updateMoveCostInfoDetailLabels(labels, tile, modelPlayer)
@@ -341,28 +341,28 @@ end
 --------------------------------------------------------------------------------
 -- The touch listener.
 --------------------------------------------------------------------------------
-local function createTouchListener(view)
+local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
     local isTouchWithinBackground
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, view.m_DetailBackground)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_DetailBackground)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function(touch, event)
         if (not isTouchWithinBackground) then
-            view:setEnabled(false)
+            self:setEnabled(false)
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
 end
 
-local function initWithTouchListener(view, touchListener)
-    view.m_TouchListener = touchListener
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
+local function initWithTouchListener(self, touchListener)
+    self.m_TouchListener = touchListener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(touchListener, self)
 end
 
 --------------------------------------------------------------------------------

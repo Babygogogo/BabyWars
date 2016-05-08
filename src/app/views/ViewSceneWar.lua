@@ -17,9 +17,9 @@ local function createBackground()
                                    {x = -1,  y = 1})
 end
 
-local function initWithBackground(view, background)
-    view.m_Background = background
-    view:addChild(background, BACKGROUND_Z_ORDER)
+local function initWithBackground(self, background)
+    self.m_Background = background
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------

@@ -49,9 +49,9 @@ local function createBackground()
     return background
 end
 
-local function initWithBackground(view, background)
-    view.m_Background = background
-    view:addChild(background)
+local function initWithBackground(self, background)
+    self.m_Background = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -67,9 +67,9 @@ local function createListView()
     return listView
 end
 
-local function initWithListView(view, listView)
-    view.m_ListView = listView
-    view:addChild(listView)
+local function initWithListView(self, listView)
+    self.m_ListView = listView
+    self:addChild(listView)
 end
 
 --------------------------------------------------------------------------------

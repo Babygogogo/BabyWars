@@ -4,8 +4,9 @@ local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH  = FONT_SIZE / 5 * 36
-local BACKGROUND_HEIGHT = LINE_HEIGHT * 2 + 8
+local BACKGROUND_WIDTH     = FONT_SIZE / 5 * 36
+local BACKGROUND_HEIGHT    = LINE_HEIGHT * 2 + 8
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 local FUND_INFO_WIDTH      = BACKGROUND_WIDTH - 10
 local FUND_INFO_HEIGHT     = LINE_HEIGHT
@@ -45,34 +46,34 @@ end
 --------------------------------------------------------------------------------
 -- The functions that adjust the position of the view.
 --------------------------------------------------------------------------------
-local function moveToLeftSide(view)
-    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+local function moveToLeftSide(self)
+    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
 end
 
-local function moveToRightSide(view)
-    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+local function moveToRightSide(self)
+    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 end
 
 --------------------------------------------------------------------------------
 -- The button background.
 --------------------------------------------------------------------------------
-local function createBackground(view)
+local function createBackground(self)
     local background = ccui.Button:create()
     background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
 
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
+        :setCapInsets(BACKGROUND_CAPINSETS)
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
         :setZoomScale(-0.05)
         :setOpacity(200)
 
         :addTouchEventListener(function(sender, eventType)
-            if eventType == ccui.TouchEventType.ended then
-                if (view.m_Model) then
-                    view.m_Model:onPlayerTouch()
+            if (eventType == ccui.TouchEventType.ended) then
+                if (self.m_Model) then
+                    self.m_Model:onPlayerTouch()
                 end
             end
         end)
@@ -80,9 +81,9 @@ local function createBackground(view)
     return background
 end
 
-local function initWithBackground(view, background)
-    view.m_Background = background
-    view:addChild(background)
+local function initWithBackground(self, background)
+    self.m_Background = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -94,9 +95,9 @@ local function createFundLabel()
                        "F:")
 end
 
-local function initWithFundLabel(view, label)
-    view.m_FundLabel = label
-    view:addChild(label)
+local function initWithFundLabel(self, label)
+    self.m_FundLabel = label
+    self:addChild(label)
 end
 
 --------------------------------------------------------------------------------
@@ -108,9 +109,9 @@ local function createEnergyLabel()
                        "EN:")
 end
 
-local function initWithEnergyLabel(view, label)
-    view.m_EnergyLabel = label
-    view:addChild(label)
+local function initWithEnergyLabel(self, label)
+    self.m_EnergyLabel = label
+    self:addChild(label)
 end
 
 --------------------------------------------------------------------------------

@@ -79,7 +79,7 @@ local function createViewProduction(itemModel)
         :setTitleAlignment(cc.TEXT_ALIGNMENT_LEFT)
 
     view:getTitleRenderer():setDimensions(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+        :enableOutline(TITLE_OUTLINE_COLOR, TITLE_OUTLINE_WIDTH)
 
     local icon = cc.Sprite:create()
     icon:setScale(0.4)
@@ -221,11 +221,7 @@ function ViewActionMenu:removeAllItems()
 end
 
 function ViewActionMenu:setEnabled(enabled)
-    if (enabled) then
-        self:setVisible(true)
-    else
-        self:setVisible(false)
-    end
+    self:setVisible(enabled)
 
     return self
 end

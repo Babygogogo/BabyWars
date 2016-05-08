@@ -119,10 +119,10 @@ local function createBeginTurnEffect()
     return effect
 end
 
-local function initWithBeginTurnEffect(view, effect)
-    view.m_BeginTurnEffect = effect
+local function initWithBeginTurnEffect(self, effect)
+    self.m_BeginTurnEffect = effect
     setBeginTurnEffectEnabled(effect, false)
-    view:addChild(effect, BEGIN_TURN_EFFECT_Z_ORDER)
+    self:addChild(effect, BEGIN_TURN_EFFECT_Z_ORDER)
 end
 
 local function setBeginTurnEffectLabel(effect, turnIndex, playerName)
@@ -139,20 +139,20 @@ local function createTouchListener(self)
 
     local function onTouchBegan(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
-        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
-        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
-        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
-        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu     :adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
 
         return true
     end
 
     local function onTouchMoved(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
-        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
-        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
-        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
-        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu     :adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
     end
 
     local function onTouchCancelled(touch, event)
@@ -160,10 +160,10 @@ local function createTouchListener(self)
 
     local function onTouchEnded(touch, event)
         self.m_ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
-        self.m_ViewActionMenu:adjustPositionOnTouch(touch)
-        self.m_ViewTileInfo:adjustPositionOnTouch(touch)
-        self.m_ViewUnitInfo:adjustPositionOnTouch(touch)
-        self.m_ViewBattleInfo:adjustPositionOnTouch(touch)
+        self.m_ViewActionMenu     :adjustPositionOnTouch(touch)
+        self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
+        self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
     end
 
     touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
@@ -190,13 +190,7 @@ function ViewWarHUD:ctor(param)
 end
 
 function ViewWarHUD:setViewConfirmBox(view)
-    if (self.m_ViewConfirmBox) then
-        if (self.m_ViewConfirmBox == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewConfirmBox)
-        end
-    end
+    assert(self.m_ViewConfirmBox == nil, "ViewWarHUD:setViewConfirmBox() the view has been set.")
 
     self.m_ViewConfirmBox = view
     self:addChild(view, CONFIRM_BOX_Z_ORDER)
@@ -205,13 +199,7 @@ function ViewWarHUD:setViewConfirmBox(view)
 end
 
 function ViewWarHUD:setViewMoneyEnergyInfo(view)
-    if (self.m_ViewMoneyEnergyInfo) then
-        if (self.m_ViewMoneyEnergyInfo == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewMoneyEnergyInfo)
-        end
-    end
+    assert(self.m_ViewMoneyEnergyInfo == nil, "ViewWarHUD:setViewMoneyEnergyInfo() the view has been set.")
 
     self.m_ViewMoneyEnergyInfo = view
     self:addChild(view)
@@ -220,13 +208,7 @@ function ViewWarHUD:setViewMoneyEnergyInfo(view)
 end
 
 function ViewWarHUD:setViewWarCommandMenu(view)
-    if (self.m_ViewWarCommandMenu) then
-        if (self.m_ViewWarCommandMenu == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewWarCommandMenu)
-        end
-    end
+    assert(self.m_ViewWarCommandMenu == nil, "ViewWarHUD:setViewWarCommandMenu() the view has been set.")
 
     self.m_ViewWarCommandMenu = view
     self:addChild(view, WAR_COMMAND_MENU_Z_ORDER)
@@ -235,13 +217,7 @@ function ViewWarHUD:setViewWarCommandMenu(view)
 end
 
 function ViewWarHUD:setViewActionMenu(view)
-    if (self.m_ViewActionMenu) then
-        if (self.m_ViewActionMenu == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewActionMenu)
-        end
-    end
+    assert(self.m_ViewActionMenu == nil, "ViewWarHUD:setViewActionMenu() the view has been set.")
 
     self.m_ViewActionMenu = view
     self:addChild(view, ACTION_MENU_Z_ORDER)
@@ -250,13 +226,7 @@ function ViewWarHUD:setViewActionMenu(view)
 end
 
 function ViewWarHUD:setViewTileInfo(view)
-    if (self.m_ViewTileInfo) then
-        if (self.m_ViewTileInfo == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewTileInfo)
-        end
-    end
+    assert(self.m_ViewTileInfo == nil, "ViewWarHUD:setViewTileInfo() the view has been set.")
 
     self.m_ViewTileInfo = view
     self:addChild(view)
@@ -265,13 +235,7 @@ function ViewWarHUD:setViewTileInfo(view)
 end
 
 function ViewWarHUD:setViewTileDetail(view)
-    if (self.m_ViewTileDetail) then
-        if (self.m_ViewTileDetail == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewTileDetail)
-        end
-    end
+    assert(self.m_ViewTileDetail == nil, "ViewWarHUD:setViewTileDetail() the view has been set.")
 
     view:setEnabled(false)
     self.m_ViewTileDetail = view
@@ -281,13 +245,7 @@ function ViewWarHUD:setViewTileDetail(view)
 end
 
 function ViewWarHUD:setViewUnitInfo(view)
-    if (self.m_ViewUnitInfo) then
-        if (self.m_ViewUnitInfo == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewUnitInfo)
-        end
-    end
+    assert(self.m_ViewUnitInfo == nil, "ViewWarHUD:setViewUnitInfo() the view has been set.")
 
     self.m_ViewUnitInfo = view
     self:addChild(view)
@@ -296,13 +254,7 @@ function ViewWarHUD:setViewUnitInfo(view)
 end
 
 function ViewWarHUD:setViewUnitDetail(view)
-    if (self.m_ViewUnitDetail) then
-        if (self.m_ViewUnitDetail == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewUnitDetail)
-        end
-    end
+    assert(self.m_ViewUnitDetail == nil, "ViewWarHUD:setViewUnitDetail() the view has been set.")
 
     view:setEnabled(false)
     self.m_ViewUnitDetail = view
@@ -312,13 +264,7 @@ function ViewWarHUD:setViewUnitDetail(view)
 end
 
 function ViewWarHUD:setViewBattleInfo(view)
-    if (self.m_ViewBattleInfo) then
-        if (self.m_ViewBattleInfo == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewBattleInfo)
-        end
-    end
+    assert(self.m_ViewBattleInfo == nil, "ViewWarHUD:setViewBattleInfo() the view has been set.")
 
     self.m_ViewBattleInfo = view
     self:addChild(view, BATTLE_INFO_Z_ORDER)

@@ -59,9 +59,9 @@ local function createUpperLeftCorner()
     return corner
 end
 
-local function initWithUpperLeftCorner(view, corner)
-    view.m_UpperLeftCorner = corner
-    view:addChild(corner)
+local function initWithUpperLeftCorner(self, corner)
+    self.m_UpperLeftCorner = corner
+    self:addChild(corner)
 end
 
 local function createUpperRightCorner()
@@ -77,9 +77,9 @@ local function createUpperRightCorner()
     return corner
 end
 
-local function initWithUpperRightCorner(view, corner)
-    view.m_UpperRightCorner = corner
-    view:addChild(corner)
+local function initWithUpperRightCorner(self, corner)
+    self.m_UpperRightCorner = corner
+    self:addChild(corner)
 end
 
 local function createLowerLeftCorner()
@@ -95,9 +95,9 @@ local function createLowerLeftCorner()
     return corner
 end
 
-local function initWithLowerLeftCorner(view, corner)
-    view.m_LowerLeftCorner = corner
-    view:addChild(corner)
+local function initWithLowerLeftCorner(self, corner)
+    self.m_LowerLeftCorner = corner
+    self:addChild(corner)
 end
 
 local function createLowerRightCorner()
@@ -112,9 +112,9 @@ local function createLowerRightCorner()
     return corner
 end
 
-local function initWithLowerRightCorner(view, corner)
-    view.m_LowerRightCorner = corner
-    view:addChild(corner)
+local function initWithLowerRightCorner(self, corner)
+    self.m_LowerRightCorner = corner
+    self:addChild(corner)
 end
 
 local function createNormalCursor()
@@ -130,9 +130,9 @@ local function createNormalCursor()
     return cursor
 end
 
-local function initWithNormalCursor(view, cursor)
-    view.m_NormalCursor = cursor
-    view:addChild(cursor)
+local function initWithNormalCursor(self, cursor)
+    self.m_NormalCursor = cursor
+    self:addChild(cursor)
 end
 
 --------------------------------------------------------------------------------
@@ -164,33 +164,19 @@ function ViewMapCursor:ctor(param)
 end
 
 function ViewMapCursor:setTouchListener(listener)
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_TouchListener) then
-        if (self.m_TouchListener == listener) then
-            return self
-        else
-            eventDispatcher:removeEventListener(self.m_TouchListener)
-        end
-    end
+    assert(self.m_TouchListener == nil, "ViewMapCursor:setTouchListener() the listener has been set.")
 
     self.m_TouchListener = listener
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
 
     return self
 end
 
 function ViewMapCursor:setMouseListener(listener)
-    local eventDispatcher = self:getEventDispatcher()
-    if (self.m_MouseListener) then
-        if (self.m_MouseListener == listener) then
-            return self
-        else
-            eventDispatcher:removeEventListener(self.m_MouseListener)
-        end
-    end
+    assert(self.m_MouseListener == nil, "ViewMapCursor:setMouseListener() the listener has been set.")
 
     self.m_MouseListener = listener
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
 
     return self
 end

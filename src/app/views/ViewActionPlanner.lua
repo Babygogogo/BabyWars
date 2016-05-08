@@ -23,7 +23,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 --------------------------------------------------------------------------------
 -- The reachable grids view.
 --------------------------------------------------------------------------------
-local function createSingleReachableGridView(gridIndex)
+local function createViewSingleReachableGrid(gridIndex)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
         :setPosition(GridIndexFunctions.toPosition(gridIndex))
@@ -32,7 +32,7 @@ local function createSingleReachableGridView(gridIndex)
     return view
 end
 
-local function createReachableGridsView()
+local function createViewReachableGrids()
     local view = cc.Node:create()
     view:setOpacity(160)
         :setCascadeOpacityEnabled(true)
@@ -40,15 +40,15 @@ local function createReachableGridsView()
     return view
 end
 
-local function initWithReachableGridsView(view, gridsView)
-    view.m_ReachableGridsView = gridsView
-    view:addChild(gridsView, REACHABLE_GRIDS_Z_ORDER)
+local function initWithViewReachableGrids(self, view)
+    self.m_ViewReachableGrids = view
+    self:addChild(view, REACHABLE_GRIDS_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
 -- The attackable grids view.
 --------------------------------------------------------------------------------
-local function createSingleAttackableGridView(gridIndex)
+local function createViewSingleAttackableGrid(gridIndex)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
         :setPosition(GridIndexFunctions.toPosition(gridIndex))
@@ -57,7 +57,7 @@ local function createSingleAttackableGridView(gridIndex)
     return view
 end
 
-local function createAttackableGridsView()
+local function createViewAttackableGrids()
     local view = cc.Node:create()
     view:setOpacity(180)
         :setCascadeOpacityEnabled(true)
@@ -65,9 +65,9 @@ local function createAttackableGridsView()
     return view
 end
 
-local function initWithAttackableGridsView(self, gridsView)
-    self.m_AttackableGridsView = gridsView
-    self:addChild(gridsView, ATTACKABLE_GRIDS_Z_ORDER)
+local function initWithViewAttackableGrids(self, view)
+    self.m_ViewAttackableGrids = view
+    self:addChild(view, ATTACKABLE_GRIDS_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ local function getSpriteFrameName(prevDirection, nextDirection)
     end
 end
 
-local function createSingleMovePathGridView(gridIndex, prevGridIndex, nextGridIndex)
+local function createViewSingleMovePathGrid(gridIndex, prevGridIndex, nextGridIndex)
     local prevDirection   = GridIndexFunctions.getAdjacentDirection(prevGridIndex, gridIndex)
     local nextDirection   = GridIndexFunctions.getAdjacentDirection(nextGridIndex, gridIndex)
     local spriteFrameName = getSpriteFrameName(prevDirection, nextDirection)
@@ -139,11 +139,11 @@ local function createSingleMovePathGridView(gridIndex, prevGridIndex, nextGridIn
     end
 end
 
-local function createMovePathView()
+local function createViewMovePath()
     return cc.Node:create()
 end
 
-local function initWithMovePathView(view, pathView)
+local function initWithViewMothPath(view, pathView)
     view.m_MovePathView = pathView
     view:addChild(pathView, MOVE_PATH_Z_ORDER)
 end
@@ -151,7 +151,7 @@ end
 --------------------------------------------------------------------------------
 -- The move path destination view.
 --------------------------------------------------------------------------------
-local function createMovePathDestinationView()
+local function createViewMovePathDestination()
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
         :setOpacity(160)
@@ -160,7 +160,7 @@ local function createMovePathDestinationView()
     return view
 end
 
-local function initWithMovePathDestinationView(self, view)
+local function initWithViewMovePathDestination(self, view)
     view:setVisible(false)
     self.m_MovePathDestinationView = view
     self:addChild(view, MOVE_PATH_DESTINATION_Z_ORDER)
@@ -170,10 +170,10 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewActionPlanner:ctor(param)
-    initWithReachableGridsView(     self, createReachableGridsView())
-    initWithAttackableGridsView(    self, createAttackableGridsView())
-    initWithMovePathDestinationView(self, createMovePathDestinationView())
-    initWithMovePathView(           self, createMovePathView())
+    initWithViewReachableGrids(     self, createViewReachableGrids())
+    initWithViewAttackableGrids(    self, createViewAttackableGrids())
+    initWithViewMovePathDestination(self, createViewMovePathDestination())
+    initWithViewMothPath(           self, createViewMovePath())
 
     return self
 end
@@ -182,12 +182,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewActionPlanner:setReachableGrids(grids)
-    self.m_ReachableGridsView:removeAllChildren()
+    self.m_ViewReachableGrids:removeAllChildren()
 
     for x, column in pairs(grids) do
         if (type(column) == "table") then
             for y, _ in pairs(column) do
-                self.m_ReachableGridsView:addChild(createSingleReachableGridView({x = x, y = y}))
+                self.m_ViewReachableGrids:addChild(createViewSingleReachableGrid({x = x, y = y}))
             end
         end
     end
@@ -196,23 +196,23 @@ function ViewActionPlanner:setReachableGrids(grids)
 end
 
 function ViewActionPlanner:setReachableGridsVisible(visible)
-    self.m_ReachableGridsView:setVisible(visible)
+    self.m_ViewReachableGrids:setVisible(visible)
 
     return self
 end
 
 function ViewActionPlanner:setAttackableGrids(grids)
-    self.m_AttackableGridsView:removeAllChildren()
+    self.m_ViewAttackableGrids:removeAllChildren()
 
     for _, gridIndex in ipairs(grids) do
-        self.m_AttackableGridsView:addChild(createSingleAttackableGridView(gridIndex))
+        self.m_ViewAttackableGrids:addChild(createViewSingleAttackableGrid(gridIndex))
     end
 
     return self
 end
 
 function ViewActionPlanner:setAttackableGridsVisible(visible)
-    self.m_AttackableGridsView:setVisible(visible)
+    self.m_ViewAttackableGrids:setVisible(visible)
 
     return self
 end
@@ -224,7 +224,7 @@ function ViewActionPlanner:setMovePath(path)
         local prevGridIndex = path[i - 1] and path[i - 1].gridIndex or nil
         local nextGridIndex = path[i + 1] and path[i + 1].gridIndex or nil
 
-        local gridView = createSingleMovePathGridView(path[i].gridIndex, prevGridIndex, nextGridIndex)
+        local gridView = createViewSingleMovePathGrid(path[i].gridIndex, prevGridIndex, nextGridIndex)
         if (gridView) then
             self.m_MovePathView:addChild(gridView)
         end

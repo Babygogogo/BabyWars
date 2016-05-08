@@ -103,13 +103,7 @@ function ViewWarField:ctor(param)
 end
 
 function ViewWarField:setViewTileMap(view)
-    if (self.m_ViewTileMap) then
-        if (self.m_ViewTileMap == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewTileMap)
-        end
-    end
+    assert(self.m_ViewTileMap == nil, "ViewWarField:setViewTileMap() the view has been set.")
 
     self.m_ViewTileMap = view
     self:addChild(view, TILE_MAP_Z_ORDER)
@@ -118,13 +112,7 @@ function ViewWarField:setViewTileMap(view)
 end
 
 function ViewWarField:setViewUnitMap(view)
-    if (self.m_ViewUnitMap) then
-        if (self.m_ViewUnitMap == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewUnitMap)
-        end
-    end
+    assert(self.m_ViewUnitMap == nil, "ViewWarField:setViewUnitMap() the view has been set.")
 
     self.m_ViewUnitMap = view
     self:addChild(view, UNIT_MAP_Z_ORDER)
@@ -133,13 +121,7 @@ function ViewWarField:setViewUnitMap(view)
 end
 
 function ViewWarField:setViewActionPlanner(view)
-    if (self.m_ViewActionPlanner) then
-        if (self.m_ViewActionPlanner == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewActionPlanner)
-        end
-    end
+    assert(self.m_ViewActionPlanner == nil, "ViewWarField:setViewActionPlanner() the view has been set.")
 
     self.m_ViewActionPlanner = view
     self:addChild(view, ACTION_PLANNER_Z_ORDER)
@@ -148,28 +130,16 @@ function ViewWarField:setViewActionPlanner(view)
 end
 
 function ViewWarField:setViewMapCursor(view)
-    if (self.m_MapCursorView) then
-        if (self.m_MapCursorView == view) then
-            return self
-        else
-            self:removeChild(self.m_MapCursorView)
-        end
-    end
+    assert(self.m_ViewMapCursor == nil, "ViewWarField:setViewMapCursor() the view has been set.")
 
-    self.m_MapCursorView = view
+    self.m_ViewMapCursor = view
     self:addChild(view, MAP_CURSOR_Z_ORDER)
 
     return self
 end
 
 function ViewWarField:setViewGridExplosion(view)
-    if (self.m_ViewGridExplosion) then
-        if (self.m_ViewGridExplosion == view) then
-            return self
-        else
-            self:removeChild(self.m_ViewGridExplosion)
-        end
-    end
+    assert(self.m_ViewGridExplosion == nil, "ViewWarField:setViewGridExplosion() the view has been set.")
 
     self.m_ViewGridExplosion = view
     self:addChild(view, GRID_EXPLOSION_Z_ORDER)

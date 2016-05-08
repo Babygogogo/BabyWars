@@ -44,7 +44,7 @@ end
 --------------------------------------------------------------------------------
 -- The button background.
 --------------------------------------------------------------------------------
-local function createButton(view)
+local function createButton(self)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -58,8 +58,8 @@ local function createButton(view)
 
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
-                if (view.m_Model) then
-                    view.m_Model:onPlayerTouch()
+                if (self.m_Model) then
+                    self.m_Model:onPlayerTouch()
                 end
             end
         end)
@@ -67,9 +67,9 @@ local function createButton(view)
     return button
 end
 
-local function initWithButton(view, button)
-    view.m_Button = button
-    view:addChild(button)
+local function initWithButton(self, button)
+    self.m_Button = button
+    self:addChild(button)
 end
 
 --------------------------------------------------------------------------------
@@ -86,9 +86,9 @@ local function createIcon()
     return icon
 end
 
-local function initWithIcon(view, icon)
-    view.m_Icon = icon
-    view:addChild(icon)
+local function initWithIcon(self, icon)
+    self.m_Icon = icon
+    self:addChild(icon)
 end
 
 local function updateIconWithModelUnit(icon, unit)
@@ -127,9 +127,9 @@ local function createHPInfo()
     return info
 end
 
-local function initWithHPInfo(view, info)
-    view.m_HPInfo = info
-    view:addChild(info)
+local function initWithHPInfo(self, info)
+    self.m_HPInfo = info
+    self:addChild(info)
 end
 
 local function updateHPInfoWithModelUnit(info, unit)
@@ -172,9 +172,9 @@ local function createFuelInfo()
     return info
 end
 
-local function initWithFuelInfo(view, info)
-    view.m_FuelInfo = info
-    view:addChild(info)
+local function initWithFuelInfo(self, info)
+    self.m_FuelInfo = info
+    self:addChild(info)
 end
 
 local function updateFuelInfoWithModelUnit(info, unit)
@@ -217,9 +217,9 @@ local function createAmmoInfo()
     return info
 end
 
-local function initWithAmmoInfo(view, info)
-    view.m_AmmoInfo = info
-    view:addChild(info)
+local function initWithAmmoInfo(self, info)
+    self.m_AmmoInfo = info
+    self:addChild(info)
 end
 
 local function updateAmmoInfoWithModelUnit(info, unit)
@@ -240,21 +240,21 @@ end
 --------------------------------------------------------------------------------
 -- The functions that adjust the position of the view.
 --------------------------------------------------------------------------------
-local function moveToLeftSide(view)
-    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+local function moveToLeftSide(self)
+    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
 end
 
-local function moveToRightSide(view)
-    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+local function moveToRightSide(self)
+    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewUnitInfo:ctor(param)
-    initWithButton(self, createButton(self))
-    initWithIcon(self, createIcon())
-    initWithHPInfo(self, createHPInfo())
+    initWithButton(  self, createButton(self))
+    initWithIcon(    self, createIcon())
+    initWithHPInfo(  self, createHPInfo())
     initWithFuelInfo(self, createFuelInfo())
     initWithAmmoInfo(self, createAmmoInfo())
 
@@ -287,8 +287,8 @@ function ViewUnitInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewUnitInfo:updateWithModelUnit(model)
-    updateIconWithModelUnit(self.m_Icon, model)
-    updateHPInfoWithModelUnit(self.m_HPInfo, model)
+    updateIconWithModelUnit(    self.m_Icon,     model)
+    updateHPInfoWithModelUnit(  self.m_HPInfo,   model)
     updateFuelInfoWithModelUnit(self.m_FuelInfo, model)
     updateAmmoInfoWithModelUnit(self.m_AmmoInfo, model)
 
