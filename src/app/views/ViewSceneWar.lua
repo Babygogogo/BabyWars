@@ -1,7 +1,7 @@
 
 local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
-local SCENE_HUD_Z_ORDER  = 1
+local WAR_HUD_Z_ORDER    = 1
 local WAR_FIELD_Z_ORDER  = 0
 local BACKGROUND_Z_ORDER = -1
 
@@ -17,13 +17,13 @@ local function createBackground()
                                    {x = -1,  y = 1})
 end
 
-local function initWithBackground(view, background)
-    view.m_Background = background
-    view:addChild(background, BACKGROUND_Z_ORDER)
+local function initWithBackground(self, background)
+    self.m_Background = background
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewSceneWar:ctor(param)
     initWithBackground(self, createBackground())
@@ -31,35 +31,20 @@ function ViewSceneWar:ctor(param)
     return self
 end
 
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ViewSceneWar:setWarFieldView(view)
-    if (self.m_WarFieldView) then
-        if (self.m_WarFieldView == view) then
-            return self
-        else
-            self:removeChild(self.m_WarFieldView)
-        end
-    end
+function ViewSceneWar:setViewWarField(view)
+    assert(self.m_ViewWarField == nil, "ViewSceneWar:setViewWarField() the view has been set.")
 
-    self.m_WarFieldView = view
+    self.m_ViewWarField = view
     self:addChild(view, WAR_FIELD_Z_ORDER)
 
     return self
 end
 
-function ViewSceneWar:setSceneHudView(view)
-    if (self.m_SceneHudView) then
-        if (self.m_SceneHudView == view) then
-            return self
-        else
-            self:removeChild(self.m_SceneHudView)
-        end
-    end
+function ViewSceneWar:setViewWarHud(view)
+    assert(self.m_ViewWarHud == nil, "ViewSceneWar:setViewWarHud() the view has been set.")
 
-    self.m_SceneHudView = view
-    self:addChild(view, SCENE_HUD_Z_ORDER)
+    self.m_ViewWarHud = view
+    self:addChild(view, WAR_HUD_Z_ORDER)
 
     return self
 end

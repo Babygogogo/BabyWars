@@ -22,16 +22,22 @@ local CAPTURE_INFO_POSITION_Y = 10
 local HP_INFO_POSITION_X      = DEFENSE_INFO_POSITION_X
 local HP_INFO_POSITION_Y      = 10
 
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_SIZE          = 22
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local FONT_OUTLINE_WIDTH = 2
+
 --------------------------------------------------------------------------------
--- Util functions.
+-- The util functions.
 --------------------------------------------------------------------------------
 local function createLabel(posX, posY)
-    local label = cc.Label:createWithTTF("0", "res/fonts/msyhbd.ttc", 22)
+    local label = cc.Label:createWithTTF("0", FONT_NAME, FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
 
-        :setTextColor({r = 255, g = 255, b = 255})
-        :enableOutline({r = 0, g = 0, b = 0}, 2)
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
     return label
 end
@@ -39,33 +45,33 @@ end
 --------------------------------------------------------------------------------
 -- The functions that adjust the position of the view.
 --------------------------------------------------------------------------------
-local function moveToLeftSide(view)
-    view:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+local function moveToLeftSide(self)
+    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
 end
 
-local function moveToRightSide(view)
-    view:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+local function moveToRightSide(self)
+    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
 end
 
 --------------------------------------------------------------------------------
 -- The button.
 --------------------------------------------------------------------------------
-local function createButton(view)
+local function createButton(self)
     local button = ccui.Button:create()
     button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
 
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 5, width = 1, height = 1})
+        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
         :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
 
         :setZoomScale(-0.05)
 
         :addTouchEventListener(function(sender, eventType)
             if eventType == ccui.TouchEventType.ended then
-                if (view.m_Model) then
-                    view.m_Model:onPlayerTouch()
+                if (self.m_Model) then
+                    self.m_Model:onPlayerTouch()
                 end
             end
         end)
@@ -73,9 +79,9 @@ local function createButton(view)
     return button
 end
 
-local function initWithButton(view, button)
-    view.m_Button = button
-    view:addChild(button)
+local function initWithButton(self, button)
+    self.m_Button = button
+    self:addChild(button)
 end
 
 --------------------------------------------------------------------------------
@@ -92,9 +98,9 @@ local function createIcon()
     return icon
 end
 
-local function initWithIcon(view, icon)
-    view.m_Icon = icon
-    view:addChild(icon)
+local function initWithIcon(self, icon)
+    self.m_Icon = icon
+    self:addChild(icon)
 end
 
 local function updateIconWithModelTile(icon, tile)
@@ -132,9 +138,9 @@ local function createDefenseInfo()
     return info
 end
 
-local function initWithDefenseInfo(view, info)
-    view.m_DefenseInfo = info
-    view:addChild(info)
+local function initWithDefenseInfo(self, info)
+    self.m_DefenseInfo = info
+    self:addChild(info)
 end
 
 local function updateDefenseInfoLabel(label, defenseBonus)
@@ -179,9 +185,9 @@ local function createCaptureInfo()
     return info
 end
 
-local function initWithCaptureInfo(view, info)
-    view.m_CaptureInfo = info
-    view:addChild(info)
+local function initWithCaptureInfo(self, info)
+    self.m_CaptureInfo = info
+    self:addChild(info)
 end
 
 local function updateCaptureInfoLabel(label, capturePoint)
@@ -233,9 +239,9 @@ local function createHPInfo()
     return info
 end
 
-local function initWithHPInfo(view, info)
-    view.m_HPInfo = info
-    view:addChild(info)
+local function initWithHPInfo(self, info)
+    self.m_HPInfo = info
+    self:addChild(info)
 end
 
 local function updateHPInfoWithModelTile(info, tile)

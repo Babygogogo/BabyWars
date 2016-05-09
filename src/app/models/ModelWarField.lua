@@ -88,7 +88,7 @@ local function createActorCursor(param)
 end
 
 local function initWithActorCursor(self, actor)
-    self.m_ActorCursor = actor
+    self.m_ActorMapCursor = actor
 end
 
 local function createActorGridExplosion()
@@ -100,7 +100,7 @@ local function initWithActorGridExplosion(self, actor)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarField:ctor(param)
     local warFieldData = requireFieldData(param)
@@ -128,7 +128,7 @@ function ModelWarField:initView()
     view:setViewTileMap(      self.m_ActorTileMap:getView())
         :setViewUnitMap(      self.m_ActorUnitMap:getView())
         :setViewActionPlanner(self.m_ActorActionPlanner:getView())
-        :setViewMapCursor(    self.m_ActorCursor:getView())
+        :setViewMapCursor(    self.m_ActorMapCursor:getView())
         :setViewGridExplosion(self.m_ActorGridExplosion:getView())
 
         :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
@@ -136,32 +136,33 @@ function ModelWarField:initView()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelWarField:onEnter(rootActor)
-    self.m_ActorTileMap:onEnter(      rootActor)
-    self.m_ActorUnitMap:onEnter(      rootActor)
-    self.m_ActorCursor:onEnter(       rootActor)
-    self.m_ActorActionPlanner:onEnter(rootActor)
-    self.m_ActorGridExplosion:onEnter(rootActor)
+function ModelWarField:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerDragField", self)
+    self.m_ActorTileMap      :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorUnitMap      :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerDragField",      self)
         :addEventListener("EvtPlayerZoomField",            self)
         :addEventListener("EvtPlayerZoomFieldWithTouches", self)
 
     return self
 end
 
-function ModelWarField:onCleanup(rootActor)
-    self.m_ActorTileMap:onCleanup(      rootActor)
-    self.m_ActorUnitMap:onCleanup(      rootActor)
-    self.m_ActorCursor:onCleanup(       rootActor)
-    self.m_ActorActionPlanner:onCleanup(rootActor)
-    self.m_ActorGridExplosion:onCleanup(rootActor)
+function ModelWarField:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerZoomFieldWithTouches",   self)
+    self.m_ActorTileMap      :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorUnitMap      :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerZoomFieldWithTouches", self)
         :removeEventListener("EvtPlayerZoomField", self)
         :removeEventListener("EvtPlayerDragField", self)
     self.m_RootScriptEventDispatcher = nil
@@ -169,6 +170,9 @@ function ModelWarField:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelWarField:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerDragField") then

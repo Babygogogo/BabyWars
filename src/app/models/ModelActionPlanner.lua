@@ -23,24 +23,28 @@ local AttackableGridListFunctions = require("app.utilities.AttackableGridListFun
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
+local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
     local existingUnit = modelUnitMap:getModelUnit(gridIndex)
     if ((existingUnit) and (existingUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
         return nil
+    else
+        local modelTile = modelTileMap:getModelTile(gridIndex)
+        return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType(), modelPlayer)) or (nil)
     end
-
-    local modelTile = modelTileMap:getModelTile(gridIndex)
-    return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType())) or (nil)
 end
 
-local function canUnitStayInGrid(unitModel, gridIndex, unitMapModel)
-    if (GridIndexFunctions.isEqual(unitModel:getGridIndex(), gridIndex)) then
+local function getMoveRange(modelUnit, modelPlayer, modelWeather)
+    return math.min(modelUnit:getMoveRange(modelPlayer, modelWeather), modelUnit:getCurrentFuel())
+end
+
+local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
+    if (GridIndexFunctions.isEqual(modelUnit:getGridIndex(), gridIndex)) then
         return true
     else
-        local existingUnitModel = unitMapModel:getModelUnit(gridIndex)
-        return (not existingUnitModel) or
-               (existingUnitModel:canJoin(unitModel)) or
-               (existingUnitModel.canLoad and existingUnitModel:canLoad(unitModel))
+        local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        return (not existingModelUnit) or
+               (existingModelUnit:canJoin(modelUnit)) or
+               (existingModelUnit.canLoad and existingModelUnit:canLoad(modelUnit))
     end
 end
 
@@ -48,8 +52,8 @@ end
 -- The functions for MovePath.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = self.m_FocusModelUnit:getMoveRange(self.m_FocusModelUnit:getCurrentFuel())
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
+    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_ModelPlayer, self.m_ModelWeather)
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex)) and
         (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
@@ -57,10 +61,10 @@ local function updateMovePathWithDestinationGrid(self, gridIndex)
     end
 end
 
-local function resetMovePath(self, focusUnitModel)
-    if (self.m_FocusModelUnit ~= focusUnitModel) or (self.m_State == "idle") then
+local function resetMovePath(self, focusModelUnit)
+    if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
         self.m_MovePath       = {{
-            gridIndex     = GridIndexFunctions.clone(focusUnitModel:getGridIndex()),
+            gridIndex     = GridIndexFunctions.clone(focusModelUnit:getGridIndex()),
             totalMoveCost = 0,
         }}
         if (self.m_View) then
@@ -72,11 +76,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for ReachableArea.
 --------------------------------------------------------------------------------
-local function resetReachableArea(self, focusUnitModel)
-    if (self.m_FocusModelUnit ~= focusUnitModel) or (self.m_State == "idle") then
-        self.m_ReachableArea = ReachableAreaFunctions.createArea(focusUnitModel:getGridIndex(), focusUnitModel:getMoveRange(focusUnitModel:getCurrentFuel()), function(gridIndex)
-            return getMoveCost(gridIndex, focusUnitModel, self.m_ModelUnitMap, self.m_ModelTileMap)
-        end)
+local function resetReachableArea(self, focusModelUnit)
+    if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
+        self.m_ReachableArea = ReachableAreaFunctions.createArea(
+            focusModelUnit:getGridIndex(),
+            getMoveRange(focusModelUnit, self.m_ModelPlayer, self.m_ModelWeather),
+            function(gridIndex)
+                return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
+            end)
 
         if (self.m_View) then
             self.m_View:setReachableGrids(self.m_ReachableArea)
@@ -236,7 +243,7 @@ end
 
 setStateMakingMovePath = function(self, focusModelUnit)
     resetReachableArea(self, focusModelUnit)
-    resetMovePath(      self, focusModelUnit)
+    resetMovePath(     self, focusModelUnit)
     self.m_State          = "makingMovePath"
     self.m_FocusModelUnit = focusModelUnit
 
@@ -280,10 +287,59 @@ setStateChoosingAttackTarget = function(self, destination)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerSelectedGrid.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerSelectedGrid(self, gridIndex)
-    local state = self.m_State
+local function onEvtTurnPhaseBeginning(self, event)
+    setStateIdle(self)
+end
+
+local function onEvtTurnPhaseMain(self, event)
+    self.m_PlayerIndex = event.playerIndex
+    self.m_ModelPlayer = event.modelPlayer
+end
+
+local function onEvtModelWeatherUpdated(self, event)
+    self.m_ModelWeather = event.modelWeather
+end
+
+local function onEvtPlayerRequestDoAction(self, event)
+    setStateIdle(self)
+end
+
+local function onEvtPlayerMovedCursor(self, event)
+    local state     = self.m_State
+    local gridIndex = event.gridIndex
+
+    if (state == "idle") then
+        return
+    elseif (state == "choosingProductionTarget") then
+        setStateIdle(self)
+    elseif (state == "makingMovePath") then
+        if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
+            updateMovePathWithDestinationGrid(self, gridIndex)
+            if (self.m_View) then
+                self.m_View:setMovePath(self.m_MovePath)
+                    :setMovePathVisible(true)
+            end
+        end
+    elseif (state == "choosingAttackTarget") then
+        local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
+        if (listNode) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name          = "EvtPlayerPreviewAttackTarget",
+                attackDamage  = listNode.estimatedAttackDamage,
+                counterDamage = listNode.estimatedCounterDamage
+            })
+        else
+            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerPreviewNoAttackTarget"})
+        end
+    end
+end
+
+local function onEvtPlayerSelectedGrid(self, event)
+    local state     = self.m_State
+    local gridIndex = event.gridIndex
+
     if (state == "idle") then
         local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
         if (modelUnit) then
@@ -320,42 +376,7 @@ local function onEvtPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseBeginning.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseBeginning(self, event)
-    self.m_PlayerIndex = event.playerIndex
-    self.m_ModelPlayer = event.player
-    setStateIdle(self)
-end
-
---------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor.
---------------------------------------------------------------------------------
-local function onEvtPlayerMovedCursor(self, gridIndex)
-    if (self.m_State == "idle") then
-        return
-    elseif (self.m_State == "choosingProductionTarget") then
-        setStateIdle(self)
-    elseif (self.m_State == "makingMovePath") then
-        if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
-            updateMovePathWithDestinationGrid(self, gridIndex)
-            if (self.m_View) then
-                self.m_View:setMovePath(self.m_MovePath)
-                    :setMovePathVisible(true)
-            end
-        end
-    elseif (self.m_State == "choosingAttackTarget") then
-        local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
-        if (listNode) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerPreviewAttackTarget", attackDamage = listNode.estimatedAttackDamage, counterDamage = listNode.estimatedCounterDamage})
-        else
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerPreviewNoAttackTarget"})
-        end
-    end
-end
-
---------------------------------------------------------------------------------
--- The constructor and initializer.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
     self.m_State = "idle"
@@ -370,54 +391,64 @@ function ModelActionPlanner:initView()
 end
 
 function ModelActionPlanner:setModelUnitMap(model)
+    assert(self.m_ModelUnitMap == nil, "ModelActionPlanner:setModelUnitMap() the model has been set already.")
     self.m_ModelUnitMap = model
 
     return self
 end
 
 function ModelActionPlanner:setModelTileMap(model)
+    assert(self.m_ModelTileMap == nil, "ModelActionPlanner:setModelTileMap() the model has been set already.")
     self.m_ModelTileMap = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelActionPlanner:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtTurnPhaseBeginning", self)
-        :addEventListener("EvtWeatherChanged", self)
-        :addEventListener("EvtPlayerRequestDoAction", self)
+function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtPlayerMovedCursor",        self)
+        :addEventListener("EvtTurnPhaseBeginning",       self)
+        :addEventListener("EvtTurnPhaseMain",            self)
+        :addEventListener("EvtModelWeatherUpdated",      self)
+        :addEventListener("EvtPlayerRequestDoAction",    self)
 
     return self
 end
 
-function ModelActionPlanner:onCleanup(rootActor)
+function ModelActionPlanner:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
-        :removeEventListener("EvtWeatherChanged", self)
-        :removeEventListener("EvtTurnPhaseBeginning", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtModelWeatherUpdated", self)
+        :removeEventListener("EvtTurnPhaseMain",       self)
+        :removeEventListener("EvtTurnPhaseBeginning",  self)
+        :removeEventListener("EvtPlayerMovedCursor",   self)
+        :removeEventListener("EvtPlayerSelectedGrid",  self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
     if (name == "EvtPlayerSelectedGrid") then
-        onEvtPlayerSelectedGrid(self, event.gridIndex)
+        onEvtPlayerSelectedGrid(self, event)
     elseif (name == "EvtTurnPhaseBeginning") then
         onEvtTurnPhaseBeginning(self, event)
-    elseif (name == "EvtWeatherChanged") then
-        self.m_CurrentWeather = event.weather
+    elseif (name == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
+    elseif (name == "EvtModelWeatherUpdated") then
+        onEvtModelWeatherUpdated(self, event)
     elseif (name == "EvtPlayerMovedCursor") then
-        onEvtPlayerMovedCursor(self, event.gridIndex)
+        onEvtPlayerMovedCursor(self, event)
     elseif (name == "EvtPlayerRequestDoAction") then
-        setStateIdle(self)
+        onEvtPlayerRequestDoAction(self, event)
     end
 
     return self

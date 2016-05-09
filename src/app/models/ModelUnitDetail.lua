@@ -18,9 +18,12 @@ function ModelUnitDetail:ctor(param)
     return self
 end
 
-function ModelUnitDetail:updateWithModelUnit(unit)
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelUnitDetail:updateWithModelUnit(unit, modelPlayer, modelWeather)
     if (self.m_View) then
-        self.m_View:updateWithModelUnit(unit)
+        self.m_View:updateWithModelUnit(unit, modelPlayer, modelWeather)
     end
 
     return self

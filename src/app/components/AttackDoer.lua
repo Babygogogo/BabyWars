@@ -98,7 +98,7 @@ end
 
 local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
     if (attackerHP <= 0) then
-        return nil
+        return 0
     end
 
     local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
@@ -115,7 +115,7 @@ end
 
 local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
     if (attackerHP <= 0) then
-        return nil
+        return 0
     end
 
     local estimatedAttackDamage = getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
@@ -174,18 +174,6 @@ function AttackDoer:loadInstantialData(data)
     if (data.primaryWeapon) then
         self.m_PrimaryWeaponCurrentAmmo = data.primaryWeapon.currentAmmo or self.m_PrimaryWeaponCurrentAmmo
     end
-
-    return self
-end
-
-function AttackDoer:setRootScriptEventDispatcher(dispatcher)
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function AttackDoer:unsetRootScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher = nil
 
     return self
 end

@@ -53,7 +53,6 @@ local AnimationLoader = require("app.utilities.AnimationLoader")
 -- Util functions.
 --------------------------------------------------------------------------------
 local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
-local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
 
 local function createBottomLine(posX, poxY, width, height)
     local line = cc.Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME)
@@ -61,7 +60,6 @@ local function createBottomLine(posX, poxY, width, height)
         :setPosition(posX, poxY)
         :setAnchorPoint(0, 0)
         :setScaleX(width / line:getContentSize().width)
-        :setScaleY(0.5)
 
     return line
 end
@@ -119,16 +117,16 @@ local function createScreenBackground()
     return background
 end
 
-local function initWithScreenBackground(view, background)
-    view.m_ScreenBackground = background
-    view:addChild(background)
+local function initWithScreenBackground(self, background)
+    self.m_ScreenBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
 -- The detail panel background.
 --------------------------------------------------------------------------------
 local function createDetailBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
@@ -137,9 +135,9 @@ local function createDetailBackground()
     return background
 end
 
-local function initWithDetailBackground(view, background)
-    view.m_DetailBackground = background
-    view:addChild(background)
+local function initWithDetailBackground(self, background)
+    self.m_DetailBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -152,7 +150,7 @@ end
 
 local function createDescriptionLabel()
     return createLabel(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y,
-                    DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
+                        DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
 end
 
 local function createDescription()
@@ -170,9 +168,9 @@ local function createDescription()
     return description
 end
 
-local function initWithDescription(view, description)
-    view.m_Description = description
-    view:addChild(description)
+local function initWithDescription(self, description)
+    self.m_Description = description
+    self:addChild(description)
 end
 
 local function updateDescriptionWithModelUnit(description, unit)
@@ -207,13 +205,15 @@ local function createMovementInfo()
     return info
 end
 
-local function initWithMovementInfo(view, info)
-    view.m_MovementInfo = info
-    view:addChild(info)
+local function initWithMovementInfo(self, info)
+    self.m_MovementInfo = info
+    self:addChild(info)
 end
 
-local function updateMovementInfoWithModelUnit(info, unit)
-    info.m_Label:setString("Movement Range:  " .. unit:getMoveRange() .. "(" .. unit:getMoveType() .. ")")
+local function updateMovementInfoWithModelUnit(info, unit, modelPlayer, modelWeather)
+    info.m_Label:setString("Movement Range:  " ..
+        unit:getMoveRange(modelPlayer, modelWeather) ..
+        "(" .. unit:getMoveType() .. ")")
 end
 
 --------------------------------------------------------------------------------
@@ -236,9 +236,9 @@ local function createVisionInfo()
     return info
 end
 
-local function initWithVisionInfo(view, info)
-    view.m_VisionInfo = info
-    view:addChild(info)
+local function initWithVisionInfo(self, info)
+    self.m_VisionInfo = info
+    self:addChild(info)
 end
 
 local function updateVisionInfoWithModelUnit(info, unit)
@@ -273,9 +273,9 @@ local function createFuelInfo()
     return info
 end
 
-local function initWithFuelInfo(view, info)
-    view.m_FuelInfo = info
-    view:addChild(info)
+local function initWithFuelInfo(self, info)
+    self.m_FuelInfo = info
+    self:addChild(info)
 end
 
 local function updateFuelInfoWithModelUnit(info, unit)
@@ -342,9 +342,9 @@ local function createPrimaryWeaponInfo()
     return info
 end
 
-local function initWithPrimaryWeaponInfo(view, info)
-    view.m_PrimaryWeaponInfo = info
-    view:addChild(info)
+local function initWithPrimaryWeaponInfo(self, info)
+    self.m_PrimaryWeaponInfo = info
+    self:addChild(info)
 end
 
 local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
@@ -456,9 +456,9 @@ local function createSecondaryWeaponInfo()
     return info
 end
 
-local function initWithSecondaryWeaponInfo(view, info)
-    view.m_SecondaryWeaponInfo = info
-    view:addChild(info)
+local function initWithSecondaryWeaponInfo(self, info)
+    self.m_SecondaryWeaponInfo = info
+    self:addChild(info)
 end
 
 local function updateSecondaryWeaponInfoBriefLabel(label, unit, hasSecondaryWeapon)
@@ -560,9 +560,9 @@ local function createDefenseInfo()
     return info
 end
 
-local function initWithDefenseInfo(view, info)
-    view.m_DefenseInfo = info
-    view:addChild(info)
+local function initWithDefenseInfo(self, info)
+    self.m_DefenseInfo = info
+    self:addChild(info)
 end
 
 local function updateDefenseInfoFatalIcons(icons, unit)
@@ -592,28 +592,28 @@ end
 --------------------------------------------------------------------------------
 -- The touch listener.
 --------------------------------------------------------------------------------
-local function createTouchListener(view)
+local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
     local isTouchWithinBackground
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_DetailBackground)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_DetailBackground)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function(touch, event)
         if (not isTouchWithinBackground) then
-            view:setEnabled(false)
+            self:setEnabled(false)
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
 end
 
-local function initWithTouchListener(view, touchListener)
-    view.m_TouchListener = touchListener
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
+local function initWithTouchListener(self, touchListener)
+    self.m_TouchListener = touchListener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
 end
 
 --------------------------------------------------------------------------------
@@ -640,26 +640,21 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewUnitDetail:updateWithModelUnit(unit)
-    updateDescriptionWithModelUnit(        self.m_Description, unit)
-    updateMovementInfoWithModelUnit(       self.m_MovementInfo, unit)
-    updateVisionInfoWithModelUnit(         self.m_VisionInfo, unit)
-    updateFuelInfoWithModelUnit(           self.m_FuelInfo, unit)
-    updatePrimaryWeaponInfoWithModelUnit(  self.m_PrimaryWeaponInfo, unit)
-    updateSecondaryWeaponInfoWithModelUnit(self.m_SecondaryWeaponInfo, unit)
-    updateDefenseInfoWithModelUnit(        self.m_DefenseInfo, unit)
+function ViewUnitDetail:updateWithModelUnit(modelUnit, modelPlayer, modelWeather)
+    updateDescriptionWithModelUnit(        self.m_Description,         modelUnit)
+    updateMovementInfoWithModelUnit(       self.m_MovementInfo,        modelUnit, modelPlayer, modelWeather)
+    updateVisionInfoWithModelUnit(         self.m_VisionInfo,          modelUnit)
+    updateFuelInfoWithModelUnit(           self.m_FuelInfo,            modelUnit)
+    updatePrimaryWeaponInfoWithModelUnit(  self.m_PrimaryWeaponInfo,   modelUnit)
+    updateSecondaryWeaponInfoWithModelUnit(self.m_SecondaryWeaponInfo, modelUnit)
+    updateDefenseInfoWithModelUnit(        self.m_DefenseInfo,         modelUnit)
 
     return self
 end
 
 function ViewUnitDetail:setEnabled(enabled)
-    if (enabled) then
-        self:setVisible(true)
-        self.m_TouchListener:setEnabled(true)
-    else
-        self:setVisible(false)
-        self.m_TouchListener:setEnabled(false)
-    end
+    self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end

@@ -23,7 +23,7 @@ local function createDefaultCallbackOnConfirm(self)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelConfirmBox:ctor(param)
     if (param) then

@@ -100,7 +100,7 @@ function ModelUnit:initView()
 end
 
 function ModelUnit:setRootScriptEventDispatcher(dispatcher)
-    self:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnit:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
 
@@ -114,15 +114,13 @@ function ModelUnit:setRootScriptEventDispatcher(dispatcher)
 end
 
 function ModelUnit:unsetRootScriptEventDispatcher()
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
+    assert(self.m_RootScriptEventDispatcher, "ModelUnit:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
+    self.m_RootScriptEventDispatcher = nil
 
-        self.m_RootScriptEventDispatcher = nil
-
-        for _, component in pairs(ComponentManager.getAllComponents(self)) do
-            if (component.unsetRootScriptEventDispatcher) then
-                component:unsetRootScriptEventDispatcher()
-            end
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.unsetRootScriptEventDispatcher) then
+            component:unsetRootScriptEventDispatcher()
         end
     end
 
@@ -190,10 +188,6 @@ function ModelUnit:showMovingAnimation()
     return self
 end
 
-function ModelUnit:isInStealthMode()
-    return false
-end
-
 function ModelUnit:getDescription()
     return self.m_Template.description
 end
@@ -241,8 +235,8 @@ function ModelUnit:doActionAttack(action, isAttacker)
     end
 
     local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    local shouldDestroyAttacker = self:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget   = action.target:getCurrentHP() <= action.attackDamage
+    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
@@ -263,12 +257,21 @@ function ModelUnit:doActionAttack(action, isAttacker)
 
             if (shouldDestroyAttacker) then
                 rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
             end
+
             if (shouldDestroyTarget) then
                 if (action.targetType == "unit") then
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
                 else
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                end
+            else
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
                 end
             end
         end)

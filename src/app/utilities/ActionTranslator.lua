@@ -41,7 +41,7 @@ end
 -- The translate functions.
 --------------------------------------------------------------------------------
 -- This translation ignores the existing unit of the same player at the end of the path, so that the actions of Join/Attack/Wait can reuse this function.
-local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
+local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
     local modelFocusUnit = modelUnitMap:getModelUnit(path[1].gridIndex)
     if (not modelFocusUnit) then
         return nil, "ActionTranslator-translatePath() there is no unit on the starting grid of the path."
@@ -52,7 +52,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
     end
 
     local moveType             = modelFocusUnit:getMoveType()
-    local weather              = modelWeatherManager:getCurrentWeather()
+    local modelWeather         = modelWeatherManager:getCurrentWeather()
     local totalFuelConsumption = 0
     local translatedPath       = {GridIndexFunctions.clone(path[1].gridIndex), length = 1}
 
@@ -72,7 +72,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
             end
         end
 
-        local fuelConsumption = modelTileMap:getModelTile(path[i].gridIndex):getMoveCost(moveType, weather)
+        local fuelConsumption = modelTileMap:getModelTile(path[i].gridIndex):getMoveCost(moveType)
         if (not fuelConsumption) then
             return nil, "ActionTranslator-translatedPath() the path is invalid because some tiles on it is impassable."
         end
@@ -82,7 +82,8 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
         translatedPath[translatedPath.length] = gridIndex
     end
 
-    if (totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or (totalFuelConsumption > modelFocusUnit:getMoveRange()) then
+    if ((totalFuelConsumption > modelFocusUnit:getCurrentFuel()) or
+        (totalFuelConsumption > modelFocusUnit:getMoveRange(modelPlayer, modelWeather))) then
         return nil, "ActionTranslator-translatedPath() the path is invalid because the fuel consumption is too high."
     else
         translatedPath.fuelConsumption = totalFuelConsumption
@@ -107,8 +108,9 @@ local function translateWait(action, modelScene, currentPlayerID)
     local modelTileMap        = modelWarField:getModelTileMap()
     local modelPlayerManager  = modelScene:getModelPlayerManager()
     local modelWeatherManager = modelScene:getModelWeatherManager()
+    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateWait() failed to translate the move path:\n" .. (translateMsg or "")
     end
@@ -127,8 +129,9 @@ local function translateAttack(action, modelScene, currentPlayerID)
     local modelTileMap        = modelWarField:getModelTileMap()
     local modelPlayerManager  = modelScene:getModelPlayerManager()
     local modelWeatherManager = modelScene:getModelWeatherManager()
+    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
     end
@@ -161,8 +164,9 @@ local function translateCapture(action, modelScene, currentPlayerID)
     local modelTileMap        = modelWarField:getModelTileMap()
     local modelPlayerManager  = modelScene:getModelPlayerManager()
     local modelWeatherManager = modelScene:getModelWeatherManager()
+    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
     end

@@ -33,23 +33,10 @@ local isServer = true
 local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ActionTranslator = require("app.utilities.ActionTranslator")
-local ActionExecutor   = require("app.utilities.ActionExecutor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createNodeEventHandler(model, rootActor)
-    return function(event)
-        if (event == "enter") then
-            model:onEnter(rootActor)
-        elseif (event == "enterTransitionFinish") then
-            model:onEnterTransitionFinish(rootActor)
-        elseif (event == "cleanup") then
-            model:onCleanup(rootActor)
-        end
-    end
-end
-
 local function requireSceneData(param)
     local t = type(param)
     if (t == "table") then
@@ -88,7 +75,7 @@ local function doActionProduceOnTile(self, action)
 end
 
 --------------------------------------------------------------------------------
--- The functions on EvtPlayerRequestDoAction/EvtSystemRequestDoAction.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
@@ -131,8 +118,10 @@ local function createScriptEventDispatcher()
     return require("global.events.EventDispatcher"):create()
 end
 
-local function initWithScriptEventDispatcher(model, dispatcher)
-    model.m_ScriptEventDispatcher = dispatcher
+local function initWithScriptEventDispatcher(self, dispatcher)
+    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtSystemRequestDoAction", self)
+    self.m_ScriptEventDispatcher = dispatcher
 end
 
 --------------------------------------------------------------------------------
@@ -143,6 +132,7 @@ local function createActorWarField(warFieldData)
 end
 
 local function initWithActorWarField(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorWarField = actor
 end
 
@@ -150,11 +140,12 @@ end
 -- The composition HUD actor.
 --------------------------------------------------------------------------------
 local function createActorSceneWarHUD()
-    return Actor.createWithModelAndViewName("ModelSceneWarHUD", nil, "ViewSceneWarHUD")
+    return Actor.createWithModelAndViewName("ModelWarHUD", nil, "ViewWarHUD")
 end
 
-local function initWithActorSceneWarHUD(self, actor)
-    self.m_ActorSceneWarHUD = actor
+local function initWithActorWarHud(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    self.m_ActorWarHud = actor
 end
 
 --------------------------------------------------------------------------------
@@ -165,6 +156,7 @@ local function createActorPlayerManager(playersData)
 end
 
 local function initWithActorPlayerManager(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorPlayerManager = actor
 end
 
@@ -177,8 +169,8 @@ end
 
 local function initWithActorTurnManager(self, actor)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
-        :setScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :setModelWarField(self.m_ActorWarField:getModel())
+        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorTurnManager = actor
 end
 
@@ -202,7 +194,7 @@ function ModelSceneWar:ctor(param)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))
-    initWithActorSceneWarHUD(     self, createActorSceneWarHUD())
+    initWithActorWarHud(          self, createActorSceneWarHUD())
     initWithActorPlayerManager(   self, createActorPlayerManager(sceneData.players))
     initWithActorTurnManager(     self, createActorTurnManager(sceneData.turn))
     initWithActorWeatherManager(  self, createActorWeatherManager(sceneData.weather))
@@ -218,55 +210,37 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setWarFieldView(self.m_ActorWarField:getView())
-        :setSceneHudView(self.m_ActorSceneWarHUD:getView())
-
-        :registerScriptHandler(createNodeEventHandler(self, self.m_Actor))
+    view:setViewWarField(self.m_ActorWarField:getView())
+        :setViewWarHud(self.m_ActorWarHud:getView())
 
     return self
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on node events.
+-- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
-function ModelSceneWar:onEnter(rootActor)
-    print("ModelSceneWar:onEnter()")
-
-    self.m_ScriptEventDispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtSystemRequestDoAction", self)
-
-    self.m_ActorSceneWarHUD:onEnter(rootActor)
-    self.m_ActorWarField:onEnter(rootActor)
-    self.m_ActorPlayerManager:onEnter(rootActor)
-
-    self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtWeatherChanged", weather = self:getModelWeatherManager():getCurrentWeather()})
-
-    return self
-end
-
-function ModelSceneWar:onEnterTransitionFinish(rootActor)
+function ModelSceneWar:onStartRunning()
+    self.m_ScriptEventDispatcher:dispatchEvent({
+            name = "EvtModelWeatherUpdated",
+            modelWeather = self:getModelWeatherManager():getCurrentWeather()
+        })
+        :dispatchEvent({
+            name = "EvtSceneWarStarted",
+        })
     self:getModelTurnManager():runTurn()
 
     return self
 end
 
-function ModelSceneWar:onCleanup(rootActor)
-    print("ModelSceneWar:onCleanup()")
-
-    self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
-        :removeEventListener("EvtPlayerRequestDoAction", self)
-
-    self.m_ActorPlayerManager:onCleanup(rootActor)
-    self.m_ActorWarField:onCleanup(rootActor)
-    self.m_ActorSceneWarHUD:onCleanup(rootActor)
-
+function ModelSceneWar:onStopRunning()
     return self
 end
 
 function ModelSceneWar:onEvent(event)
-    if (event.name == "EvtPlayerRequestDoAction") then
+    local eventName = event.name
+    if (eventName == "EvtPlayerRequestDoAction") then
         onEvtPlayerRequestDoAction(self, event)
-    elseif (event.name == "EvtSystemRequestDoAction") then
+    elseif (eventName == "EvtSystemRequestDoAction") then
         onEvtSystemRequestDoAction(self, event)
     end
 

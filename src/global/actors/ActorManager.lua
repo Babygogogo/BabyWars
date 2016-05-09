@@ -21,8 +21,22 @@ local ActorManager = {}
 local s_RootActor
 
 function ActorManager.setAndRunRootActor(actor, transition, time, more)
+    if (s_RootActor) then
+        local model = s_RootActor:getModel()
+        if ((model) and (model.onStopRunning)) then
+            model:onStopRunning()
+        end
+    end
+
     s_RootActor = actor
     display.runScene(actor:getView(), transition, time, more)
+
+    local model = actor:getModel()
+    if ((model) and (model.onStartRunning)) then
+        model:onStartRunning()
+    end
+
+    return ActorManager
 end
 
 function ActorManager.getRootActor()

@@ -15,7 +15,6 @@ local ModelActionMenu = class("ModelActionMenu")
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtActionPlannerChoosingAction(self, event)
-    print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAction")
     self:setEnabled(true)
 
     local view = self.m_View
@@ -26,7 +25,6 @@ local function onEvtActionPlannerChoosingAction(self, event)
 end
 
 local function onEvtActionPlannerChoosingProductionTarget(self, event)
-    print("ModelActionMenu-onEvent() EvtActionPlannerChoosingProductionTarget")
     self:setEnabled(true)
 
     local view = self.m_View
@@ -37,18 +35,17 @@ local function onEvtActionPlannerChoosingProductionTarget(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionMenu:ctor(param)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelActionMenu:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtActionPlannerIdle", self)
+function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelActionMenu:setRootScriptEventDispatcher() the dispatcher has been set already.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtActionPlannerIdle",               self)
         :addEventListener("EvtActionPlannerChoosingProductionTarget", self)
         :addEventListener("EvtActionPlannerMakingMovePath",           self)
         :addEventListener("EvtActionPlannerChoosingAction",           self)
@@ -57,7 +54,9 @@ function ModelActionMenu:onEnter(rootActor)
     return self
 end
 
-function ModelActionMenu:onCleanup(rootActor)
+function ModelActionMenu:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelActionMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAttackTarget", self)
         :removeEventListener("EvtActionPlannerChoosingAction",           self)
         :removeEventListener("EvtActionPlannerMakingMovePath",           self)
@@ -68,21 +67,19 @@ function ModelActionMenu:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelActionMenu:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtActionPlannerIdle") then
+    if ((eventName == "EvtActionPlannerIdle") or
+        (eventName == "EvtActionPlannerMakingMovePath") or
+        (eventName == "EvtActionPlannerChoosingAttackTarget")) then
         self:setEnabled(false)
-        print("ModelActionMenu-onEvent() EvtActionPlannerIdle")
     elseif (eventName == "EvtActionPlannerChoosingProductionTarget") then
         onEvtActionPlannerChoosingProductionTarget(self, event)
-    elseif (eventName == "EvtActionPlannerMakingMovePath") then
-        self:setEnabled(false)
-        print("ModelActionMenu-onEvent() EvtActionPlannerMakingMovePath")
     elseif (eventName == "EvtActionPlannerChoosingAction") then
         onEvtActionPlannerChoosingAction(self, event)
-    elseif (eventName == "EvtActionPlannerChoosingAttackTarget") then
-        print("ModelActionMenu-onEvent() EvtActionPlannerChoosingAttackTarget")
-        self:setEnabled(false)
     end
 
     return self

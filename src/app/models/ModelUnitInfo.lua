@@ -76,8 +76,16 @@ local function onEvtModelUnitProduced(self, event)
     end
 end
 
+local function onEvtTurnPhaseMain(self, event)
+    self.m_ModelPlayer = event.modelPlayer
+end
+
+local function onEvtModelWeatherUpdated(self, event)
+    self.m_ModelWeather = event.modelWeather
+end
+
 --------------------------------------------------------------------------------
--- The constructor and initializer.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:ctor(param)
     self.m_CursorGridIndex = {x = 1, y = 1}
@@ -86,31 +94,36 @@ function ModelUnitInfo:ctor(param)
 end
 
 function ModelUnitInfo:setModelUnitDetail(model)
-    self.m_UnitDetailModel = model
+    assert(self.m_ModelUnitDetail == nil, "ModelUnitInfo:setModelUnitDetail() the model has been set.")
+    self.m_ModelUnitDetail = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelUnitInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchUnit", self)
-        :addEventListener("EvtPlayerTouchNoUnit",  self)
-        :addEventListener("EvtPlayerMovedCursor",  self)
-        :addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtDestroyModelUnit",   self)
-        :addEventListener("EvtModelUnitMoved",     self)
-        :addEventListener("EvtModelUnitUpdated",   self)
-        :addEventListener("EvtModelUnitProduced",  self)
+function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerTouchUnit", self)
+        :addEventListener("EvtPlayerTouchNoUnit",     self)
+        :addEventListener("EvtPlayerMovedCursor",     self)
+        :addEventListener("EvtPlayerSelectedGrid",    self)
+        :addEventListener("EvtDestroyModelUnit",      self)
+        :addEventListener("EvtModelUnitMoved",        self)
+        :addEventListener("EvtModelUnitUpdated",      self)
+        :addEventListener("EvtModelUnitProduced",     self)
+        :addEventListener("EvtTurnPhaseMain",         self)
+        :addEventListener("EvtModelWeatherUpdated",   self)
 
     return self
 end
 
-function ModelUnitInfo:onCleanup(rootActor)
-    -- removeEventListener can be commented out because the dispatcher itself is being destroyed.
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelUnitProduced", self)
+function ModelUnitInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelWeatherUpdated", self)
+        :removeEventListener("EvtTurnPhaseMain",      self)
+        :removeEventListener("EvtModelUnitProduced",  self)
         :removeEventListener("EvtModelUnitUpdated",   self)
         :removeEventListener("EvtModelUnitMoved",     self)
         :removeEventListener("EvtDestroyModelUnit",   self)
@@ -118,12 +131,14 @@ function ModelUnitInfo:onCleanup(rootActor)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerTouchUnit",    self)
         :removeEventListener("EvtPlayerTouchNoUnit",  self)
-
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerTouchNoUnit") then
@@ -142,14 +157,21 @@ function ModelUnitInfo:onEvent(event)
         onEvtModelUnitUpdated(self, event)
     elseif (eventName == "EvtModelUnitProduced") then
         onEvtModelUnitProduced(self, event)
+    elseif (eventName == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
+    elseif (eventName == "EvtModelWeatherUpdated") then
+        onEvtModelWeatherUpdated(self, event)
     end
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function ModelUnitInfo:onPlayerTouch()
-    if (self.m_UnitDetailModel) then
-        self.m_UnitDetailModel:updateWithModelUnit(self.m_ModelUnit)
+    if (self.m_ModelUnitDetail) then
+        self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnit, self.m_ModelPlayer, self.m_ModelWeather)
             :setEnabled(true)
     end
 

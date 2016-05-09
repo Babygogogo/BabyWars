@@ -17,7 +17,7 @@
 
 local ModelPlayerManager = class("ModelPlayerManager")
 
-local Player      = require("app.models.ModelPlayer")
+local ModelPlayer = require("app.models.ModelPlayer")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -93,29 +93,30 @@ local function onEvtTurnPhaseRepairUnit(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:ctor(param)
     self.m_Players = {}
     for i, player in ipairs(param) do
-        self.m_Players[i] = Player:create(player)
+        self.m_Players[i] = ModelPlayer:create(player)
     end
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelPlayerManager:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseGetFund", self)
+function ModelPlayerManager:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelPlayerManager:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtTurnPhaseGetFund", self)
         :addEventListener("EvtTurnPhaseRepairUnit", self)
 
     return self
 end
 
-function ModelPlayerManager:onCleanup(rootActor)
+function ModelPlayerManager:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelPlayerManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseRepairUnit", self)
         :removeEventListener("EvtTurnPhaseGetFund", self)
     self.m_RootScriptEventDispatcher = nil
@@ -123,6 +124,9 @@ function ModelPlayerManager:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelPlayerManager:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtTurnPhaseGetFund") then

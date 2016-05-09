@@ -40,6 +40,10 @@ local function onEvtModelTileUpdated(self, event)
     end
 end
 
+local function onEvtTurnPhaseMain(self, event)
+    self.m_ModelPlayer = event.modelPlayer
+end
+
 --------------------------------------------------------------------------------
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
@@ -50,48 +54,53 @@ function ModelTileInfo:ctor(param)
 end
 
 function ModelTileInfo:setModelTileDetail(model)
+    assert(self.m_TileDetailModel == nil, "ModelTileInfo:setModelTileDetail() the model has been set.")
     self.m_TileDetailModel = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelTileInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerTouchTile", self)
-        :addEventListener("EvtWeatherChanged",     self)
+function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelTileInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerTouchTile", self)
         :addEventListener("EvtPlayerMovedCursor",  self)
         :addEventListener("EvtPlayerSelectedGrid", self)
         :addEventListener("EvtModelTileUpdated",   self)
+        :addEventListener("EvtTurnPhaseMain",      self)
 
     return self
 end
 
-function ModelTileInfo:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelTileUpdated", self)
+function ModelTileInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
+        :removeEventListener("EvtModelTileUpdated",   self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
-        :removeEventListener("EvtPlayerMovedCursor", self)
-        :removeEventListener("EvtWeatherChanged",    self)
-        :removeEventListener("EvtPlayerTouchTile",   self)
+        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtPlayerTouchTile",    self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtPlayerTouchTile") then
         onEvtPlayerTouchTile(self, event)
-    elseif (eventName == "EvtWeatherChanged") then
-        self.m_Weather = event.weather
     elseif (eventName == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event)
     elseif (eventName == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event)
     elseif (eventName == "EvtModelTileUpdated") then
         onEvtModelTileUpdated(self, event)
+    elseif (eventName == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
     end
 
     return self
@@ -102,7 +111,7 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
     if (self.m_TileDetailModel) then
-        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_Weather)
+        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_ModelPlayer)
             :setEnabled(true)
     end
 

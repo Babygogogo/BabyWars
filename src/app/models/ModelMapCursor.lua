@@ -51,7 +51,7 @@ local function dispatchEventPlayerSelectedGrid(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerPreviewAttackTarget/EvtPlayerPreviewNoAttackTarget.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerPreviewAttackTarget(self, event)
     if (self.m_View) then
@@ -67,15 +67,20 @@ local function onEvtPlayerPreviewNoAttackTarget(self, event)
     end
 end
 
+local function onEvtSceneWarStarted(self, event)
+    dispatchEventPlayerMovedCursor(self, self:getGridIndex())
+end
+
 --------------------------------------------------------------------------------
 -- The touch/scroll event listeners.
 --------------------------------------------------------------------------------
 local function createTouchListener(self)
-    local isTouchMoved, isTouchingCursor
+    local isTouchBegan, isTouchMoved, isTouchingCursor
     local initialTouchPosition, initialTouchGridIndex
     local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
     local function onTouchesBegan(touches, event)
+        isTouchBegan = true
         isTouchMoved = false
         initialTouchPosition = touches[1]:getLocation()
         initialTouchGridIndex = GridIndexFunctions.worldPosToGridIndexInNode(initialTouchPosition, self.m_View)
@@ -83,6 +88,10 @@ local function createTouchListener(self)
     end
 
     local function onTouchesMoved(touches, event)
+        if (not isTouchBegan) then --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            return
+        end
+
         local touchesCount = #touches
         isTouchMoved = (isTouchMoved) or
             (touchesCount > 1) or
@@ -117,6 +126,10 @@ local function createTouchListener(self)
     end
 
     local function onTouchesEnded(touches, event)
+        if (not isTouchBegan) then --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            return
+        end
+
         local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
         if (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) then
             if (not isTouchMoved) then
@@ -186,23 +199,25 @@ function ModelMapCursor:setMapSize(size)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelMapCursor:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = self:getGridIndex()})
-        :addEventListener("EvtPlayerPreviewAttackTarget",   self)
+function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
         :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
+        :addEventListener("EvtSceneWarStarted",             self)
 
     return self
 end
 
-function ModelMapCursor:onCleanup(rootActor)
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+function ModelMapCursor:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
+        :removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
         :removeEventListener("EvtPlayerPreviewNoAttackTarget", self)
@@ -212,6 +227,9 @@ function ModelMapCursor:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtActionPlannerIdle") or
@@ -221,6 +239,8 @@ function ModelMapCursor:onEvent(event)
         onEvtPlayerPreviewNoAttackTarget(self, event)
     elseif (eventName == "EvtPlayerPreviewAttackTarget") then
         onEvtPlayerPreviewAttackTarget(self, event)
+    elseif (eventName == "EvtSceneWarStarted") then
+        onEvtSceneWarStarted(self, event)
     end
 
     return self

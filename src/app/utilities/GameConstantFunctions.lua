@@ -141,6 +141,10 @@ function GameConstantFunctions.init()
     initUnitAttackAndDefenseList()
 end
 
+function GameConstantFunctions.getGameVersion()
+    return GAME_CONSTANT.version
+end
+
 function GameConstantFunctions.getGridSize()
     return GRID_SIZE
 end

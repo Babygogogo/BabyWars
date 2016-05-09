@@ -18,9 +18,12 @@ function ModelTileDetail:ctor(param)
     return self
 end
 
-function ModelTileDetail:updateWithModelTile(tile, weather)
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelTileDetail:updateWithModelTile(modelTile, modelPlayer)
     if (self.m_View) then
-        self.m_View:updateWithModelTile(tile, weather)
+        self.m_View:updateWithModelTile(modelTile, modelPlayer)
     end
 
     return self

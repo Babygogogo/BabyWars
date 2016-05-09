@@ -38,7 +38,6 @@ local MOVE_COST_INFO_POSITION_Y = CAPTURE_INFO_POSITION_Y - MOVE_COST_INFO_HEIGH
 -- Util functions.
 --------------------------------------------------------------------------------
 local BUTTOM_LINE_SPRITE_FRAME_NAME = "c03_t06_s01_f01.png"
-local BUTTOM_LINE_CAPINSETS         = {x = 2, y = 0, width = 1, height = 1}
 
 local function createButtomLine(posX, poxY, width, height)
     local line = cc.Sprite:createWithSpriteFrameName(BUTTOM_LINE_SPRITE_FRAME_NAME)
@@ -46,7 +45,6 @@ local function createButtomLine(posX, poxY, width, height)
         :setPosition(posX, poxY)
         :setAnchorPoint(0, 0)
         :setScaleX(width / line:getContentSize().width)
-        :setScaleY(0.5)
 
     return line
 end
@@ -79,16 +77,16 @@ local function createScreenBackground()
     return background
 end
 
-local function initWithScreenBackground(view, background)
-    view.m_ScreenBackground = background
-    view:addChild(background)
+local function initWithScreenBackground(self, background)
+    self.m_ScreenBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
 -- The detail panel background.
 --------------------------------------------------------------------------------
 local function createDetailBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 5, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
@@ -97,9 +95,9 @@ local function createDetailBackground()
     return background
 end
 
-local function initWithDetailBackground(view, background)
-    view.m_DetailBackground = background
-    view:addChild(background)
+local function initWithDetailBackground(self, background)
+    self.m_DetailBackground = background
+    self:addChild(background)
 end
 
 --------------------------------------------------------------------------------
@@ -112,7 +110,7 @@ end
 
 local function createDescriptionLabel()
     return createLabel(BACKGROUND_POSITION_X + 5, BACKGROUND_POSITION_Y + 6,
-                    BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
+                        BACKGROUND_WIDTH - 10, BACKGROUND_HEIGHT - 14)
 end
 
 local function createDescription()
@@ -130,9 +128,9 @@ local function createDescription()
     return description
 end
 
-local function initWithDescription(view, description)
-    view.m_Description = description
-    view:addChild(description)
+local function initWithDescription(self, description)
+    self.m_Description = description
+    self:addChild(description)
 end
 
 local function updateDescriptionWithModelTile(description, tile)
@@ -161,15 +159,15 @@ local function createDefenseInfo()
         :addChild(buttomLine)
         :addChild(defenseLabel)
 
-    info.m_ButtomLine   = buttomLine
+    info.m_ButtomLine = buttomLine
     info.m_Label = defenseLabel
 
     return info
 end
 
-local function initWithDefenseInfo(view, info)
-    view.m_DefenseInfo = info
-    view:addChild(info)
+local function initWithDefenseInfo(self, info)
+    self.m_DefenseInfo = info
+    self:addChild(info)
 end
 
 local function updateDefenseInfoWithModelTile(info, tile)
@@ -204,9 +202,9 @@ local function createRepairInfo()
     return info
 end
 
-local function initWithRepairInfo(view, info)
-    view.m_RepairInfo = info
-    view:addChild(info)
+local function initWithRepairInfo(self, info)
+    self.m_RepairInfo = info
+    self:addChild(info)
 end
 
 local function updateRepairInfoWithModelTile(info, tile)
@@ -255,9 +253,9 @@ local function createCaptureAndIncomeInfo()
     return info
 end
 
-local function initWithCaptureAndIncomeInfo(view, info)
-    view.m_CaptureAndIncomeInfo = info
-    view:addChild(info)
+local function initWithCaptureAndIncomeInfo(self, info)
+    self.m_CaptureAndIncomeInfo = info
+    self:addChild(info)
 end
 
 local function updateCaptureAndIncomeInfoCaptureLabel(label, tile)
@@ -325,46 +323,46 @@ local function createMoveCostInfo()
     return info
 end
 
-local function initWithMoveCostInfo(view, info)
-    view.m_MoveCostInfo = info
-    view:addChild(info)
+local function initWithMoveCostInfo(self, info)
+    self.m_MoveCostInfo = info
+    self:addChild(info)
 end
 
-local function updateMoveCostInfoDetailLabels(labels, tile, weather)
+local function updateMoveCostInfoDetailLabels(labels, tile, modelPlayer)
     for key, label in pairs(labels) do
-        label:setString(key .. ": " .. (tile:getMoveCost(key, weather) or "-"))
+        label:setString(key .. ": " .. (tile:getMoveCost(key, modelPlayer) or "-"))
     end
 end
 
-local function updateMoveCostInfoWithModelTile(info, tile, weather)
-    updateMoveCostInfoDetailLabels(info.m_DetailLabels, tile, weather)
+local function updateMoveCostInfoWithModelTile(info, modelTile, modelPlayer)
+    updateMoveCostInfoDetailLabels(info.m_DetailLabels, modelTile, modelPlayer)
 end
 
 --------------------------------------------------------------------------------
 -- The touch listener.
 --------------------------------------------------------------------------------
-local function createTouchListener(view)
+local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
     local isTouchWithinBackground
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.IsTouchWithinNode")(touch, view.m_DetailBackground)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_DetailBackground)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function(touch, event)
         if (not isTouchWithinBackground) then
-            view:setEnabled(false)
+            self:setEnabled(false)
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     return touchListener
 end
 
-local function initWithTouchListener(view, touchListener)
-    view.m_TouchListener = touchListener
-    view:getEventDispatcher():addEventListenerWithSceneGraphPriority(view.m_TouchListener, view)
+local function initWithTouchListener(self, touchListener)
+    self.m_TouchListener = touchListener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(touchListener, self)
 end
 
 --------------------------------------------------------------------------------
@@ -389,24 +387,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewTileDetail:updateWithModelTile(tile, weather)
-    updateDescriptionWithModelTile(         self.m_Description,          tile)
-    updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          tile)
-    updateRepairInfoWithModelTile(          self.m_RepairInfo,           tile)
-    updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, tile)
-    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         tile, weather)
+function ViewTileDetail:updateWithModelTile(modelTile, modelPlayer)
+    updateDescriptionWithModelTile(         self.m_Description,          modelTile)
+    updateDefenseInfoWithModelTile(         self.m_DefenseInfo,          modelTile)
+    updateRepairInfoWithModelTile(          self.m_RepairInfo,           modelTile)
+    updateCaptureAndIncomeInfoWithModelTile(self.m_CaptureAndIncomeInfo, modelTile)
+    updateMoveCostInfoWithModelTile(        self.m_MoveCostInfo,         modelTile, modelPlayer)
 
     return self
 end
 
 function ViewTileDetail:setEnabled(enabled)
-    if (enabled) then
-        self:setVisible(true)
-        self.m_TouchListener:setEnabled(true)
-    else
-        self:setVisible(false)
-        self.m_TouchListener:setEnabled(false)
-    end
+    self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end

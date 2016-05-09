@@ -18,8 +18,8 @@ local function onEvtTurnPhaseBeginning(self, event)
     self.m_PlayerIndex = event.playerIndex
 
     if (self.m_View) then
-        self.m_View:setFund(event.player:getFund())
-            :setEnergy(event.player:getCOEnergy())
+        self.m_View:setFund(event.modelPlayer:getFund())
+            :setEnergy(event.modelPlayer:getCOEnergy())
     end
 end
 
@@ -49,24 +49,27 @@ function ModelMoneyEnergyInfo:initView()
 end
 
 function ModelMoneyEnergyInfo:setModelWarCommandMenu(model)
+    assert(self.m_ModelWarCommandMenu == nil, "ModelMoneyEnergyInfo:setModelWarCommandMenu() the model has been set.")
+
     model:setEnabled(false)
-    self.m_WarCommandMenuModel = model
+    self.m_ModelWarCommandMenu = model
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelMoneyEnergyInfo:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
+function ModelMoneyEnergyInfo:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelMoneyEnergyInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtModelPlayerUpdated", self)
 
     return self
 end
 
-function ModelMoneyEnergyInfo:onCleanup(rootActor)
+function ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtModelPlayerUpdated", self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
@@ -74,6 +77,9 @@ function ModelMoneyEnergyInfo:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onEvent(event)
     local eventName = event.name
     if (eventName == "EvtTurnPhaseBeginning") then
@@ -87,7 +93,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    self.m_WarCommandMenuModel:setEnabled(true)
+    self.m_ModelWarCommandMenu:setEnabled(true)
 
     return self
 end

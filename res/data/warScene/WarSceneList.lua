@@ -10,7 +10,7 @@ local WarSceneList = {
     },
     {
         name = "WarSceneTest3",
-        data = "WarScene_Test1"
+        data = "WarScene_Test3"
     },
     {
         name = "WarSceneTest4",

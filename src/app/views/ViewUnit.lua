@@ -33,19 +33,22 @@ local function createActionMoveAlongPath(self, path, callback)
         local currentX, previousX = path[i].x, path[i - 1].x
         if (currentX < previousX) then
             steps[#steps + 1] = cc.CallFunc:create(function()
-                self.m_UnitSprite:runAction(cc.FlipX:create((playerIndexMod == 1)))
+                self.m_UnitSprite:setFlippedX(playerIndexMod == 1)
             end)
         elseif (currentX > previousX) then
             steps[#steps + 1] = cc.CallFunc:create(function()
-                self.m_UnitSprite:runAction(cc.FlipX:create((playerIndexMod == 0)))
+                self.m_UnitSprite:setFlippedX(playerIndexMod == 0)
             end)
         end
 
         steps[#steps + 1] = cc.MoveTo:create(MOVE_DURATION_PER_GRID, GridIndexFunctions.toPositionTable(path[i]))
     end
 
-    steps[#steps + 1] = cc.CallFunc:create(function() self.m_UnitSprite:runAction(cc.FlipX:create(false)) end)
+    steps[#steps + 1] = cc.CallFunc:create(function()
+        self.m_UnitSprite:setFlippedX(false)
+    end)
     steps[#steps + 1] = cc.CallFunc:create(callback)
+
     return cc.Sequence:create(unpack(steps))
 end
 

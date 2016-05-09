@@ -119,84 +119,57 @@ end
 local function createUnitActorsMapWithTiledLayer(layer)
     local width, height = layer.width, layer.height
     local map    = createEmptyMap(width)
-    local unitID = 0
+    local avaliableUnitID = 1
 
     for x = 1, width do
         for y = 1, height do
             local tiledID = layer.data[x + (height - y) * width]
-            unitID = unitID + 1
             if (tiledID > 0) then
-                map[x][y] = createActorUnit(tiledID, unitID, {x = x, y = y})
+                map[x][y] = createActorUnit(tiledID, avaliableUnitID, {x = x, y = y})
+                avaliableUnitID = avaliableUnitID + 1
             end
         end
     end
 
-    return map, {width = width, height = height}, unitID
+    return map, {width = width, height = height}, avaliableUnitID
 end
 
-local function updateUnitActorsMapWithGridsData(map, mapSize, gridsData)
-    local unitID = 0
+local function createUnitActorsMapWithGridsData(gridsData, mapSize)
+    local map = createEmptyMap(mapSize.width)
+    local maxUsedUnitID = 0
+
     for _, gridData in ipairs(gridsData) do
-        unitID = math.max(gridData.unitID or unitID, unitID)
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-updateUnitActorsMapWithGridsData() the data of overwriting grid is invalid.")
-        map[gridIndex.x][gridIndex.y]:getModel():ctor(gridData)
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
+
+        maxUsedUnitID = math.max(gridData.unitID, maxUsedUnitID)
+        map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("ModelUnit", gridData, "ViewUnit", gridData)
     end
 
-    return unitID
+    return map, mapSize, maxUsedUnitID + 1
 end
 
 local function createUnitActorsMapWithTemplate(mapData)
-    assert(type(mapData.template) == "string", "ModelUnitMap-createUnitActorsMapWithTemplate() the param mapData.template is expected to be a file name.")
-    local templateTiledLayer = getTiledUnitLayer(requireMapData(mapData.template))
-    assert(templateTiledLayer, "ModelUnitMap-createUnitActorsMapWithTemplate() the template of the param mapData is expected to have a tiled layer.")
+    -- If the map is created with template, then the mapData.grids is ignored.
+    local templateMapData = requireMapData(mapData.template)
+    local map, mapSize, avaliableUnitID = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
 
-    local map = MapFunctions.createGridActorsMapWithTiledLayer(templateTiledLayer, "ModelUnit", "ViewUnit")
-    assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to create the template unit actors map.")
-
-    if (mapData.grids) then
-        map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
-        assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
-    end
-
-    map.m_TemplateName = mapData.template
-    map.m_Name         = mapData.name
-
-    return map
+    return map, mapSize, avaliableUnitID
 end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
-    --[[
-    local tiledLayer = getTiledUnitLayer(mapData)
-    local map
-    if (not tiledLayer) then
-        map = MapFunctions.createGridActorsMapWithMapData(mapData.grids, "ModelUnit", "ViewUnit")
-        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the param mapData.grids")
-    else
-        map = MapFunctions.createGridActorsMapWithTiledLayer(tiledLayer, "ModelUnit", "ViewUnit")
-        assert(map, "ModelUnitMap-createUnitActorsMapWithoutTemplate() failed to create the map with the tiled layer within the param.")
+    -- If the map is created without template, then we build the map with mapData.grids only.
+    local map, mapSize, avaliableUnitID = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
 
-        if (mapData.grids) then
-            map = MapFunctions.updateGridActorsMapWithGridsData(map, mapData.grids, "ModelUnit", "ViewUnit")
-            assert(map, "ModelUnitMap-createUnitActorsMapWithTemplate() failed to update the unit actors map with the param mapData.grids.")
-        end
-    end
-
-    map.m_Name = mapData.name
-    return map
-    --]]
-    local map, mapSize, unitID = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(mapData))
-    unitID = math.max(updateUnitActorsMapWithGridsData(map, mapSize, mapData.grids or {}), unitID) + 1
-
-    return map, mapSize, unitID
+    return map, mapSize, avaliableUnitID
 end
 
 local function createUnitActorsMap(param)
     local mapData = requireMapData(param)
-    if (mapData.template == nil) then
-        return createUnitActorsMapWithoutTemplate(mapData)
-    else
+    if (mapData.template) then
         return createUnitActorsMapWithTemplate(mapData)
+    else
+        return createUnitActorsMapWithoutTemplate(mapData)
     end
 end
 
@@ -240,28 +213,27 @@ function ModelUnitMap:initView()
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on node/script events.
---------------------------------------------------------------------------------
-function ModelUnitMap:onEnter(rootActor)
-    self.m_RootScriptEventDispatcher = rootActor:getModel():getScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher:addEventListener("EvtPlayerMovedCursor", self)
+function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitMap:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerMovedCursor", self)
         :addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtTurnPhaseBeginning", self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
     self:forEachModelUnit(function(modelUnit)
-        modelUnit:setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        modelUnit:setRootScriptEventDispatcher(dispatcher)
     end)
 
     return self
 end
 
-function ModelUnitMap:onCleanup(rootActor)
+function ModelUnitMap:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
         :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtTurnPhaseBeginning", self)
         :removeEventListener("EvtPlayerSelectedGrid", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
@@ -273,13 +245,14 @@ function ModelUnitMap:onCleanup(rootActor)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if ((name == "EvtPlayerMovedCursor") or
         (name == "EvtPlayerSelectedGrid")) then
         onEvtPlayerMovedCursor(self, event)
-    elseif (name == "EvtTurnPhaseBeginning") then
-        self.m_PlayerIndex = event.playerIndex
     elseif (name == "EvtDestroyModelUnit") then
         onEvtDestroyModelUnit(self, event)
     elseif (name == "EvtDestroyViewUnit") then
