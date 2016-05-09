@@ -56,18 +56,6 @@ function CaptureTaker:loadInstantialData(data)
     return self
 end
 
-function CaptureTaker:setRootScriptEventDispatcher(dispatcher)
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function CaptureTaker:unsetRootScriptEventDispatcher()
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

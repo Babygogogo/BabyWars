@@ -62,12 +62,14 @@ function AttackTaker:loadInstantialData(data)
 end
 
 function AttackTaker:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "AttackTaker:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end
 
 function AttackTaker:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "AttackTaker:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher = nil
 
     return self

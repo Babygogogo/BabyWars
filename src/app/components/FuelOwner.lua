@@ -36,13 +36,6 @@ local function isFuelAmount(param)
 end
 
 --------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function isShortage(self)
-    return self:getCurrentFuel() / self:getMaxFuel() <= 1 / 3
-end
-
---------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
@@ -92,7 +85,7 @@ function FuelOwner:loadInstantialData(data)
 end
 
 function FuelOwner:setRootScriptEventDispatcher(dispatcher)
-    self:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher == nil, "FuelOwner:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
@@ -101,11 +94,10 @@ function FuelOwner:setRootScriptEventDispatcher(dispatcher)
 end
 
 function FuelOwner:unsetRootScriptEventDispatcher()
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
+    assert(self.m_RootScriptEventDispatcher, "FuelOwner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-        self.m_RootScriptEventDispatcher = nil
-    end
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end

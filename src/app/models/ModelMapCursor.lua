@@ -67,6 +67,10 @@ local function onEvtPlayerPreviewNoAttackTarget(self, event)
     end
 end
 
+local function onEvtSceneWarStarted(self, event)
+    dispatchEventPlayerMovedCursor(self, self:getGridIndex())
+end
+
 --------------------------------------------------------------------------------
 -- The touch/scroll event listeners.
 --------------------------------------------------------------------------------
@@ -199,12 +203,12 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:dispatchEvent({name = "EvtPlayerMovedCursor", gridIndex = self:getGridIndex()})
-        :addEventListener("EvtPlayerPreviewAttackTarget",   self)
+    dispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
         :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
+        :addEventListener("EvtSceneWarStarted",             self)
 
     return self
 end
@@ -212,7 +216,8 @@ end
 function ModelMapCursor:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
+        :removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
         :removeEventListener("EvtPlayerPreviewNoAttackTarget", self)
@@ -234,6 +239,8 @@ function ModelMapCursor:onEvent(event)
         onEvtPlayerPreviewNoAttackTarget(self, event)
     elseif (eventName == "EvtPlayerPreviewAttackTarget") then
         onEvtPlayerPreviewAttackTarget(self, event)
+    elseif (eventName == "EvtSceneWarStarted") then
+        onEvtSceneWarStarted(self, event)
     end
 
     return self

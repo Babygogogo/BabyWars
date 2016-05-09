@@ -118,8 +118,10 @@ local function createScriptEventDispatcher()
     return require("global.events.EventDispatcher"):create()
 end
 
-local function initWithScriptEventDispatcher(model, dispatcher)
-    model.m_ScriptEventDispatcher = dispatcher
+local function initWithScriptEventDispatcher(self, dispatcher)
+    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtSystemRequestDoAction", self)
+    self.m_ScriptEventDispatcher = dispatcher
 end
 
 --------------------------------------------------------------------------------
@@ -130,6 +132,7 @@ local function createActorWarField(warFieldData)
 end
 
 local function initWithActorWarField(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorWarField = actor
 end
 
@@ -141,6 +144,7 @@ local function createActorSceneWarHUD()
 end
 
 local function initWithActorWarHud(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorWarHud = actor
 end
 
@@ -152,6 +156,7 @@ local function createActorPlayerManager(playersData)
 end
 
 local function initWithActorPlayerManager(self, actor)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorPlayerManager = actor
 end
 
@@ -165,6 +170,7 @@ end
 local function initWithActorTurnManager(self, actor)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setModelWarField(self.m_ActorWarField:getModel())
+        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorTurnManager = actor
 end
 
@@ -214,30 +220,19 @@ end
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local dispatcher = self.m_ScriptEventDispatcher
-    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtSystemRequestDoAction", self)
-
-    self.m_ActorWarHud       :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorWarField     :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorTurnManager  :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorPlayerManager:getModel():setRootScriptEventDispatcher(dispatcher)
-
-    dispatcher:dispatchEvent({name = "EvtModelWeatherUpdated", modelWeather = self:getModelWeatherManager():getCurrentWeather()})
+    self.m_ScriptEventDispatcher:dispatchEvent({
+            name = "EvtModelWeatherUpdated",
+            modelWeather = self:getModelWeatherManager():getCurrentWeather()
+        })
+        :dispatchEvent({
+            name = "EvtSceneWarStarted",
+        })
     self:getModelTurnManager():runTurn()
 
     return self
 end
 
 function ModelSceneWar:onStopRunning()
-    self.m_ScriptEventDispatcher:removeEventListener("EvtSystemRequestDoAction", self)
-        :removeEventListener("EvtPlayerRequestDoAction", self)
-
-    self.m_ActorPlayerManager:getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorTurnManager  :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorWarField     :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorWarHud       :getModel():unsetRootScriptEventDispatcher()
-
     return self
 end
 
