@@ -125,15 +125,15 @@ function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
     end
 end
 
-function ModelPlayer:serialize(spacesCount)
-    spacesCount = spacesCount or 0
-    local spaces    = string.rep(" ", spacesCount)
-    local subSpaces = string.rep(" ", spacesCount + 4)
+function ModelPlayer:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
 
-    return string.format("%s{\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s}",
+    return string.format("%s{\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s}",
         spaces,
         serializeID(           self, subSpaces),
         serializeName(         self, subSpaces),
+        serializeFund(         self, subSpaces),
         serializeIsAlive(      self, subSpaces),
         serializeCurrentEnergy(self, subSpaces),
         serializePassiveSkill( self, subSpaces),

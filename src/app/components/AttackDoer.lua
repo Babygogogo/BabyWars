@@ -149,6 +149,10 @@ local function getBattleDamage(self, attackerTile, target, targetTile, modelPlay
     end
 end
 
+local function serializePrimaryWeapon(self, spaces)
+    return string.format("%sprimaryWeapon = {currentAmmo = %d}", spaces or "", self:getPrimaryWeaponCurrentAmmo())
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -176,6 +180,23 @@ function AttackDoer:loadInstantialData(data)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialzation.
+--------------------------------------------------------------------------------
+function AttackDoer:serialize(spaces)
+    if ((not self:hasPrimaryWeapon()) or (self:getPrimaryWeaponCurrentAmmo() == self:getPrimaryWeaponMaxAmmo())) then
+        return nil
+    else
+        spaces = spaces or ""
+        local subSpaces = spaces .. "    "
+        return string.format("%sAttackDoer = {\n%s\n%s}",
+            spaces,
+            serializePrimaryWeapon(self, subSpaces),
+            spaces
+        )
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -229,7 +250,7 @@ function AttackDoer:getPrimaryWeaponCurrentAmmo()
 end
 
 function AttackDoer:getPrimaryWeaponName()
-    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponCurrentAmmo() the attack doer has no primary weapon.")
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponName() the attack doer has no primary weapon.")
     return self.m_Template.primaryWeapon.name
 end
 

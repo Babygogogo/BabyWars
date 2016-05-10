@@ -197,15 +197,15 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
-function ModelWarField:serialize(spacesCount)
-    spacesCount = spacesCount or 0
-    local spacesPrefix        = string.rep(" ", spacesCount)
-    local subTableSpacesCount = spacesCount + 4
+function ModelWarField:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
 
-    return string.format("%swarField = {%s\n\n%s}",
-        spacesPrefix,
-        "",
-        spacesPrefix
+    return string.format("%swarField = {\n%s,\n%s,\n%s}",
+        spaces,
+        spaces .. "    tileMap = {}",
+        self:getModelUnitMap():serialize(subSpaces),
+        spaces
     )
 end
 

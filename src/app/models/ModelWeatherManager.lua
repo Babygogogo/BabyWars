@@ -46,10 +46,9 @@ function ModelWeatherManager:isInFog()
     return false
 end
 
-function ModelWeatherManager:serialize(spacesCount)
-    spacesCount = spacesCount or 0
-    local spaces    = string.rep(" ", spacesCount)
-    local subSpaces = string.rep(" ", spacesCount + 4)
+function ModelWeatherManager:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
 
     return string.format('%sweather = {\n%s,\n%s}',
         spaces,

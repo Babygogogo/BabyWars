@@ -50,13 +50,13 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
-local function serializePlayers(self, spacesCount)
-    local str = ""
+local function serializePlayers(self, spaces)
+    local strList = {}
     for _, modelPlayer in ipairs(self.m_Players) do
-        str = str .. modelPlayer:serialize(spacesCount) .. ",\n"
+        strList[#strList + 1] = modelPlayer:serialize(spaces)
     end
 
-    return str
+    return table.concat(strList, ",\n")
 end
 
 --------------------------------------------------------------------------------
@@ -158,13 +158,13 @@ function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
 end
 
-function ModelPlayerManager:serialize(spacesCount)
-    spacesCount = spacesCount or 0
-    local spaces         = string.rep(" ", spacesCount)
+function ModelPlayerManager:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
 
-    return string.format("%splayers = {\n%s%s}",
+    return string.format("%splayers = {\n%s\n%s}",
         spaces,
-        serializePlayers(self, spacesCount + 4),
+        serializePlayers(self, subSpaces),
         spaces
     )
 end

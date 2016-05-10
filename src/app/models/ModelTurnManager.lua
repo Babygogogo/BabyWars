@@ -169,10 +169,9 @@ function ModelTurnManager:getPlayerIndex()
     return self.m_PlayerIndex
 end
 
-function ModelTurnManager:serialize(spacesCount)
-    spacesCount = spacesCount or 0
-    local spaces    = string.rep(" ", spacesCount)
-    local subSpaces = string.rep(" ", spacesCount + 4)
+function ModelTurnManager:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
 
     return string.format("%sturn = {\n%s,\n%s,\n%s,\n%s}",
         spaces,

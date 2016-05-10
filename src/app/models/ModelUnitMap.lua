@@ -83,6 +83,26 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     return Actor.createWithModelAndViewName("ModelUnit", actorData, "ViewUnit", actorData)
 end
 
+local function serializeMapSize(mapSize, spaces)
+    return string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)
+end
+
+local function serializeModelUnitsOnMap(self, spaces)
+    local strList = {}
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    self:forEachModelUnit(function(modelUnit)
+        strList[#strList + 1] = modelUnit:serialize(subSpaces)
+    end)
+
+    return string.format("%sgrids = {\n%s\n%s}",
+        spaces,
+        table.concat(strList, ",\n"),
+        spaces
+    )
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on EvtPlayerMovedCursor/EvtPlayerSelectedGrid.
 --------------------------------------------------------------------------------
@@ -296,6 +316,22 @@ function ModelUnitMap:forEachModelUnit(func)
     return self
 end
 
+function ModelUnitMap:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%sunitMap = {\n%s,\n%s,\n%s\n%s}",
+        spaces,
+        serializeMapSize(        self:getMapSize(), subSpaces),
+        serializeModelUnitsOnMap(self,              subSpaces),
+        spaces .. "    loaded = {}", -- TODO: serialize the units that are loaded in loaders
+        spaces
+    )
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelUnitMap:doActionWait(action)
     local path = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]

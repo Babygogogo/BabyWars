@@ -47,10 +47,20 @@ function CaptureDoer:loadTemplate(template)
 end
 
 function CaptureDoer:loadInstantialData(data)
-    assert(type(data.isCapturing) == "boolean", "CaptureDoer:loadInstantialData() the param data.isCapturing is invalid.")
-    self.m_IsCapturing = data.isCapturing
+    self.m_IsCapturing = (data.isCapturing == true) and (true) or (false)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function CaptureDoer:serialize(spaces)
+    if (self:isCapturing()) then
+        return string.format("%sCaptureDoer = {isCapturing = true}", spaces or "")
+    else
+        return nil
+    end
 end
 
 --------------------------------------------------------------------------------
