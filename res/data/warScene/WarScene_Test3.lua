@@ -111,47 +111,67 @@ local WarScen_Test3 = {
 
     players = {
         {
-            id      = 1,
-            name    = "Red Alice",
-            fund    = 0,
-            isAlive = true,
-            co      = {
-                currentEnergy    = 1,
-                coPowerEnergy    = 2,
-                superPowerEnergy = 10,
+            id            = 1,
+            name          = "Red Alice",
+            fund          = 0,
+            isAlive       = true,
+            currentEnergy = 1,
+            passiveSkill = {
+
+            },
+            activeSkill1 = {
+                energyRequirement = 2,
+            },
+            activeSkill2 = {
+                energyRequirement = 3,
             },
         },
         {
-            id      = 2,
-            name    = "Blue Bob",
-            fund    = 0,
-            isAlive = true,
-            co      = {
-                currentEnergy    = 2,
-                coPowerEnergy    = 4,
-                superPowerEnergy = 10,
+            id            = 2,
+            name          = "Blue Bob",
+            fund          = 0,
+            isAlive       = true,
+            currentEnergy = 2,
+            passiveSkill = {
+
+            },
+            activeSkill1 = {
+                energyRequirement = 4,
+            },
+            activeSkill2 = {
+                energyRequirement = 6,
             },
         },
         {
-            id      = 3,
-            name    = "Yellow Cat",
-            fund    = 0,
-            isAlive = true,
-            co      = {
-                currentEnergy    = 3,
-                coPowerEnergy    = 6,
-                superPowerEnergy = 10,
+            id            = 3,
+            name          = "Yellow Cat",
+            fund          = 0,
+            isAlive       = true,
+            currentEnergy = 3,
+            passiveSkill = {
+
+            },
+            activeSkill1 = {
+                energyRequirement = 6,
+            },
+            activeSkill2 = {
+                energyRequirement = 9,
             },
         },
         {
-            id      = 4,
-            name    = "Black Dog",
-            fund    = 0,
-            isAlive = true,
-            co      = {
-                currentEnergy    = 4,
-                coPowerEnergy    = 6,
-                superPowerEnergy = 10,
+            id            = 4,
+            name          = "Black Dog",
+            fund          = 0,
+            isAlive       = true,
+            currentEnergy = 4,
+            passiveSkill = {
+
+            },
+            activeSkill1 = {
+                energyRequirement = 8,
+            },
+            activeSkill2 = {
+                energyRequirement = 12,
             },
         },
     },

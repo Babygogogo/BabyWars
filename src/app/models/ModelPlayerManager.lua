@@ -50,6 +50,15 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
+local function serializePlayers(self, spacesCount)
+    local str = ""
+    for _, modelPlayer in ipairs(self.m_Players) do
+        str = str .. modelPlayer:serialize(spacesCount) .. ",\n"
+    end
+
+    return str
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -151,13 +160,12 @@ end
 
 function ModelPlayerManager:serialize(spacesCount)
     spacesCount = spacesCount or 0
-    local spacesPrefix        = string.rep(" ", spacesCount)
-    local subTableSpacesCount = spacesCount + 4
+    local spaces         = string.rep(" ", spacesCount)
 
-    return string.format("%splayers = {%s\n\n%s}",
-        spacesPrefix,
-        "",
-        spacesPrefix
+    return string.format("%splayers = {\n%s%s}",
+        spaces,
+        serializePlayers(self, spacesCount + 4),
+        spaces
     )
 end
 
