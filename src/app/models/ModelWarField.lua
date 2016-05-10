@@ -197,6 +197,21 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
+function ModelWarField:serialize(spacesCount)
+    spacesCount = spacesCount or 0
+    local spacesPrefix        = string.rep(" ", spacesCount)
+    local subTableSpacesCount = spacesCount + 4
+
+    return string.format("%swarField = {%s\n\n%s}",
+        spacesPrefix,
+        "",
+        spacesPrefix
+    )
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelWarField:doActionWait(action)
     self:getModelUnitMap():doActionWait(action)
     self:getModelTileMap():doActionWait(action)

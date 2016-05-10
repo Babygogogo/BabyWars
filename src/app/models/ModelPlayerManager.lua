@@ -149,6 +149,21 @@ function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
 end
 
+function ModelPlayerManager:serialize(spacesCount)
+    spacesCount = spacesCount or 0
+    local spacesPrefix        = string.rep(" ", spacesCount)
+    local subTableSpacesCount = spacesCount + 4
+
+    return string.format("%splayers = {%s\n\n%s}",
+        spacesPrefix,
+        "",
+        spacesPrefix
+    )
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelPlayerManager:doActionProduceOnTile(action)
     local playerIndex = action.playerIndex
     local modelPlayer = self:getModelPlayer(action.playerIndex)

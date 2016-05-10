@@ -203,6 +203,12 @@ function ModelSceneWar:ctor(param)
         self:initView()
     end
 
+---[[ -- These codes are for testing the serialize() and should be removed.
+    local testFile = io.open("SceneWarSerialization.lua", "w")
+    testFile:write(self:serialize(0))
+    testFile:close()
+--]]
+
     return self
 end
 
@@ -268,6 +274,21 @@ end
 
 function ModelSceneWar:getModelWarField()
     return self.m_ActorWarField:getModel()
+end
+
+function ModelSceneWar:serialize(spacesCount)
+    spacesCount = spacesCount or 0
+    local prefix = string.rep(" ", spacesCount)
+    local subTableSpacesCount = spacesCount + 4
+
+    return string.format("%sreturn {\n%s,\n\n%s,\n\n%s,\n\n%s,\n%s}",
+        prefix,
+        self:getModelWarField()      :serialize(subTableSpacesCount),
+        self:getModelTurnManager()   :serialize(subTableSpacesCount),
+        self:getModelPlayerManager() :serialize(subTableSpacesCount),
+        self:getModelWeatherManager():serialize(subTableSpacesCount),
+        prefix
+    )
 end
 
 return ModelSceneWar

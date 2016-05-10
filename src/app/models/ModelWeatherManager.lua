@@ -16,6 +16,13 @@
 local ModelWeatherManager = class("ModelWeatherManager")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function serializeCurrentWeather(self, spaces)
+    return string.format('%scurrent = "%s"', spaces or "", self:getCurrentWeather())
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWeatherManager:ctor(param)
@@ -37,6 +44,18 @@ end
 function ModelWeatherManager:isInFog()
     -- TODO: add code to do the real job.
     return false
+end
+
+function ModelWeatherManager:serialize(spacesCount)
+    spacesCount = spacesCount or 0
+    local spaces    = string.rep(" ", spacesCount)
+    local subSpaces = string.rep(" ", spacesCount + 4)
+
+    return string.format('%sweather = {\n%s,\n%s}',
+        spaces,
+        serializeCurrentWeather(self, subSpaces),
+        spaces
+    )
 end
 
 return ModelWeatherManager

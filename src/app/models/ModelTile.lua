@@ -59,6 +59,9 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, objectID, baseID)
+    self.m_InitialObjectID = self.m_InitialObjectID or objectID
+    self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
+
     self.m_ObjectID = objectID or self.m_ObjectID
     self.m_BaseID   = baseID   or self.m_BaseID
     assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
