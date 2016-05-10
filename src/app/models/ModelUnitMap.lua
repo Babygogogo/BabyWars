@@ -31,7 +31,7 @@ local Actor              = require("global.actors.Actor")
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.unitMap." .. param)
+        return require("data.templateWarField." .. param)
     elseif (t == "table") then
         return param
     else

@@ -40,7 +40,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.tileMap." .. param)
+        return require("data.templateWarField." .. param)
     elseif (t == "table") then
         return param
     else
