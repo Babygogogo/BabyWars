@@ -85,6 +85,15 @@ local function serializeUnitID(self, spaces)
     return string.format("%sunitID = %d", spaces, self:getUnitId())
 end
 
+local function serializeState(self, spaces)
+    local state = self:getState()
+    if (state == "idle") then
+        return nil
+    else
+        return string.format("%sstate = %q", spaces, state)
+    end
+end
+
 local function serializeComponents(self, spaces)
     local strList = {}
     spaces = spaces or ""
@@ -149,6 +158,24 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelUnit:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strState = serializeState(self, subSpaces)
+
+    return string.format("%s{\n%s,\n%s,\n%s%s,\n%s}",
+        spaces,
+        serializeTiledID(   self, subSpaces),
+        serializeUnitID(    self, subSpaces),
+        (strState) and (strState .. ",\n") or (""),
+        serializeComponents(self, subSpaces),
+        spaces
+    )
 end
 
 --------------------------------------------------------------------------------
@@ -230,19 +257,6 @@ end
 
 function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
-end
-
-function ModelUnit:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format("%s{\n%s,\n%s,\n%s,\n%s}",
-        spaces,
-        serializeTiledID(   self, subSpaces),
-        serializeUnitID(    self, subSpaces),
-        serializeComponents(self, subSpaces),
-        spaces
-    )
 end
 
 --------------------------------------------------------------------------------

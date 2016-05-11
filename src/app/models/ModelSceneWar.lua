@@ -42,7 +42,9 @@ local function requireSceneData(param)
     if (t == "table") then
         return param
     elseif (t == "string") then
-        return require("res.data.warScene." .. param)
+        local dataName = "res.data.warScene." .. param
+        package.loaded[dataName] = nil
+        return require(dataName)
     else
         error("ModelSceneWar-requireSceneData() the param is invalid.")
     end
@@ -94,7 +96,7 @@ local function onEvtSystemRequestDoAction(self, event)
     end
 
 ---[[ -- These codes are for testing the serialize() and should be modified to do the real job.
-    local testFile = io.open("SceneWarSerialization.lua", "w")
+    local testFile = io.open(self.m_FileName, "w")
     testFile:write(self:serialize())
     testFile:close()
 --]]
@@ -196,9 +198,10 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(param)
-    assert(param, "ModelSceneWar:ctor() tempting to initialize the instance with no param.")
-    local sceneData = requireSceneData(param)
+    assert(type(param) == "string", "ModelSceneWar:ctor() the param is invalid.")
+    self.m_FileName = "res/data/warScene/" .. param .. ".lua"
 
+    local sceneData = requireSceneData(param)
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))
     initWithActorWarHud(          self, createActorSceneWarHUD())
@@ -221,6 +224,23 @@ function ModelSceneWar:initView()
         :setViewWarHud(self.m_ActorWarHud:getView())
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelSceneWar:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%sreturn {\n%s,\n\n%s,\n\n%s,\n\n%s,\n%s}",
+        spaces,
+        self:getModelWarField()      :serialize(subSpaces),
+        self:getModelTurnManager()   :serialize(subSpaces),
+        self:getModelPlayerManager() :serialize(subSpaces),
+        self:getModelWeatherManager():serialize(subSpaces),
+        spaces
+    )
 end
 
 --------------------------------------------------------------------------------
@@ -275,20 +295,6 @@ end
 
 function ModelSceneWar:getModelWarField()
     return self.m_ActorWarField:getModel()
-end
-
-function ModelSceneWar:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format("%sreturn {\n%s,\n\n%s,\n\n%s,\n\n%s,\n%s}",
-        spaces,
-        self:getModelWarField()      :serialize(subSpaces),
-        self:getModelTurnManager()   :serialize(subSpaces),
-        self:getModelPlayerManager() :serialize(subSpaces),
-        self:getModelWeatherManager():serialize(subSpaces),
-        spaces
-    )
 end
 
 return ModelSceneWar

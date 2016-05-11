@@ -30,7 +30,9 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerTouchUnit(self, event)
-    updateWithModelUnit(self, event.modelUnit)
+    local modelUnit = event.modelUnit
+    self.m_CursorGridIndex = GridIndexFunctions.clone(modelUnit:getGridIndex())
+    updateWithModelUnit(self, modelUnit)
 end
 
 local function onEvtPlayerTouchNoUnit(self, event)

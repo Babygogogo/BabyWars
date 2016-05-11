@@ -62,6 +62,7 @@ function ModelMoneyEnergyInfo:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseBeginning", self)
+        :addEventListener("EvtTurnPhaseMain",      self)
         :addEventListener("EvtModelPlayerUpdated", self)
 
     return self
@@ -71,6 +72,7 @@ function ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtModelPlayerUpdated", self)
+        :removeEventListener("EvtTurnPhaseMain",      self)
         :removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -82,7 +84,8 @@ end
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtTurnPhaseBeginning") then
+    if ((eventName == "EvtTurnPhaseBeginning") or
+        (eventName == "EvtTurnPhaseMain")) then
         onEvtTurnPhaseBeginning(self, event)
     elseif (eventName == "EvtModelPlayerUpdated") then
         onEvtModelPlayerUpdated(self, event)
