@@ -92,6 +92,34 @@ local function loadInstantialData(self, param)
     end
 end
 
+local function serializeObjectID(self, spaces)
+    if (self.m_InitialObjectID == self.m_ObjectID) then
+        return nil
+    else
+        return string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)
+    end
+end
+
+local function serializeBaseID(self, spaces)
+    if (self.m_InitialBaseID == self.m_BaseID) then
+        return nil
+    else
+        return string.format("%sbaseID = %d", spaces or "", self.m_BaseID)
+    end
+end
+
+local function serializeComponents(self, spaces)
+    spaces = spaces or ""
+    local strList = {}
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.serialize) then
+            strList[#strList + 1] = component:serialize(spaces)
+        end
+    end
+
+    return table.concat(strList, ",\n"), #strList
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -143,6 +171,29 @@ function ModelTile:unsetRootScriptEventDispatcher()
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelTile:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {}
+    local componentsCount
+    strList[#strList + 1] = serializeObjectID(  self, subSpaces)
+    strList[#strList + 1] = serializeBaseID(    self, subSpaces)
+    strList[#strList + 1], componentsCount = serializeComponents(self, subSpaces)
+
+    if ((#strList <= 1) and (componentsCount <= 1)) then
+        return nil
+    else
+        return string.format("%s{\n%s\n%s}",
+            spaces,
+            table.concat(strList, ",\n"),
+            spaces
+        )
+    end
 end
 
 --------------------------------------------------------------------------------

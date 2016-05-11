@@ -203,7 +203,7 @@ function ModelWarField:serialize(spaces)
 
     return string.format("%swarField = {\n%s,\n%s,\n%s}",
         spaces,
-        spaces .. "    tileMap = {}",
+        self:getModelTileMap():serialize(subSpaces),
         self:getModelUnitMap():serialize(subSpaces),
         spaces
     )
