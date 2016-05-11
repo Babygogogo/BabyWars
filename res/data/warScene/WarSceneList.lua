@@ -12,6 +12,14 @@ local WarSceneList = {
         name = "WarSceneTest3",
         data = "WarScene_Test3"
     },
+    {
+        name = "Chessboard",
+        data = "Chessboard",
+    },
+    {
+        name = "Equal Island",
+        data = "EqualIsland",
+    }
 }
 
 return WarSceneList
