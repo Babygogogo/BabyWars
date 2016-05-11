@@ -62,6 +62,18 @@ function LevelOwner:loadInstantialData(data)
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function LevelOwner:serialize(spaces)
+    local level = self:getLevel()
+    if (level ~= 0) then
+        return string.format("%sLevelOwner = {level = %d}", spaces, level)
+    else
+        return nil
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function LevelOwner:onBind(target)

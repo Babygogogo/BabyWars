@@ -43,6 +43,13 @@ function GridIndexable:loadInstantialData(data)
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function GridIndexable:serialize(spaces)
+    return string.format("%sGridIndexable = {gridIndex = {x = %d, y = %d}}", spaces or "", self.m_GridIndex.x, self.m_GridIndex.y)
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function GridIndexable:onBind(target)

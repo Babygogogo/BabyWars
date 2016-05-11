@@ -150,8 +150,8 @@ function ViewMoneyEnergyInfo:setFund(fund)
     return self
 end
 
-function ViewMoneyEnergyInfo:setEnergy(current, coPower, superPower)
-    self.m_EnergyLabel:setString("EN:  " .. current .. "/" .. coPower .. "/" .. superPower)
+function ViewMoneyEnergyInfo:setEnergy(current, requirement1, requirement2)
+    self.m_EnergyLabel:setString(string.format("EN:  %.1f/%d/%d", current, requirement1, requirement2))
 
     return self
 end

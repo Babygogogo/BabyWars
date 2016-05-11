@@ -75,6 +75,39 @@ local function loadInstantialData(self, param)
 end
 
 --------------------------------------------------------------------------------
+-- The private functions for serialization.
+--------------------------------------------------------------------------------
+local function serializeTiledID(self, spaces)
+    return string.format("%stiledID = %d", spaces, self:getTiledID())
+end
+
+local function serializeUnitID(self, spaces)
+    return string.format("%sunitID = %d", spaces, self:getUnitId())
+end
+
+local function serializeState(self, spaces)
+    local state = self:getState()
+    if (state == "idle") then
+        return nil
+    else
+        return string.format("%sstate = %q", spaces, state)
+    end
+end
+
+local function serializeComponents(self, spaces)
+    local strList = {}
+    spaces = spaces or ""
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.serialize) then
+            strList[#strList + 1] = component:serialize(spaces)
+        end
+    end
+
+    return table.concat(strList, ",\n")
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
@@ -125,6 +158,24 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelUnit:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strState = serializeState(self, subSpaces)
+
+    return string.format("%s{\n%s,\n%s,\n%s%s,\n%s}",
+        spaces,
+        serializeTiledID(   self, subSpaces),
+        serializeUnitID(    self, subSpaces),
+        (strState) and (strState .. ",\n") or (""),
+        serializeComponents(self, subSpaces),
+        spaces
+    )
 end
 
 --------------------------------------------------------------------------------
@@ -208,6 +259,9 @@ function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end
 
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
 

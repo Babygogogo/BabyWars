@@ -50,6 +50,15 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
+local function serializePlayers(self, spaces)
+    local strList = {}
+    for _, modelPlayer in ipairs(self.m_Players) do
+        strList[#strList + 1] = modelPlayer:serialize(spaces)
+    end
+
+    return table.concat(strList, ",\n")
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -149,6 +158,20 @@ function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
 end
 
+function ModelPlayerManager:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%splayers = {\n%s\n%s}",
+        spaces,
+        serializePlayers(self, subSpaces),
+        spaces
+    )
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelPlayerManager:doActionProduceOnTile(action)
     local playerIndex = action.playerIndex
     local modelPlayer = self:getModelPlayer(action.playerIndex)

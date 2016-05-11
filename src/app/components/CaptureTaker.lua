@@ -57,6 +57,18 @@ function CaptureTaker:loadInstantialData(data)
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function CaptureTaker:serialize(spaces)
+    local currentCapturePoint = self:getCurrentCapturePoint()
+    if (currentCapturePoint == self:getMaxCapturePoint()) then
+        return nil
+    else
+        return string.format("%sCaptureTaker = {currentCapturePoint = %d}", spaces or "", currentCapturePoint)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function CaptureTaker:onBind(target)

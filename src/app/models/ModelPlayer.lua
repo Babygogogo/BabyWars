@@ -23,18 +23,65 @@
 local ModelPlayer = class("ModelPlayer")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function serializeID(self, spaces)
+    return string.format("%sid = %d", spaces, self:getID())
+end
+
+local function serializeName(self, spaces)
+    return string.format("%sname = %q", spaces, self:getName())
+end
+
+local function serializeFund(self, spaces)
+    return string.format("%sfund = %d", spaces, self:getFund())
+end
+
+local function serializeIsAlive(self, spaces)
+    return string.format("%sisAlive = %s", spaces, self:isAlive() and "true" or "false")
+end
+
+local function serializeCurrentEnergy(self, spaces)
+    return string.format("%scurrentEnergy = %f", spaces, self:getEnergy())
+end
+
+local function serializePassiveSkill(self, spaces)
+    return string.format("%spassiveSkill = {\n%s}",
+        spaces,
+        spaces
+    )
+end
+
+local function serializeEnergyRequirement(self, spaces, skillIndex)
+    return string.format("%senergyRequirement = %d",
+        spaces,
+        self:getActiveSkillEnergyRequirement(skillIndex)
+    )
+end
+
+local function serializeActiveSkill(self, spaces, skillIndex)
+    local subSpaces = spaces .. "    "
+
+    return string.format("%s%s = {\n%s,\n%s}",
+        spaces, "activeSkill" .. skillIndex,
+        serializeEnergyRequirement(self, subSpaces, skillIndex),
+        spaces
+    )
+end
+
+--------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_ID      = param.id
-    self.m_Name    = param.name
-    self.m_Fund    = param.fund
-    self.m_IsAlive = param.isAlive
-    self.m_CO      = {
-        m_CurrentEnergy    = param.co.currentEnergy,
-        m_COPowerEnergy    = param.co.coPowerEnergy,
-        m_SuperPowerEnergy = param.co.superPowerEnergy,
-    }
+    self.m_ID            = param.id
+    self.m_Name          = param.name
+    self.m_Fund          = param.fund
+    self.m_IsAlive       = param.isAlive
+    self.m_CurrentEnergy = param.currentEnergy
+
+    self.m_PassiveSkill = param.passiveSkill
+    self.m_ActiveSkill1 = param.activeSkill1
+    self.m_ActiveSkill2 = param.activeSkill2
 
     return self
 end
@@ -64,8 +111,36 @@ function ModelPlayer:setFund(fund)
     return self
 end
 
-function ModelPlayer:getCOEnergy()
-    return self.m_CO.m_CurrentEnergy, self.m_CO.m_COPowerEnergy, self.m_CO.m_SuperPowerEnergy
+function ModelPlayer:getEnergy()
+    return self.m_CurrentEnergy, self:getActiveSkillEnergyRequirement(1), self:getActiveSkillEnergyRequirement(2)
+end
+
+function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
+    assert((skillIndex == 1) or (skillIndex == 2), "ModelPlayer:getActiveSkillEnergyRequirement() the param skillIndex is invalid.")
+
+    if (skillIndex == 1) then
+        return self.m_ActiveSkill1.energyRequirement
+    else
+        return self.m_ActiveSkill2.energyRequirement
+    end
+end
+
+function ModelPlayer:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%s{\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s}",
+        spaces,
+        serializeID(           self, subSpaces),
+        serializeName(         self, subSpaces),
+        serializeFund(         self, subSpaces),
+        serializeIsAlive(      self, subSpaces),
+        serializeCurrentEnergy(self, subSpaces),
+        serializePassiveSkill( self, subSpaces),
+        serializeActiveSkill(  self, subSpaces, 1),
+        serializeActiveSkill(  self, subSpaces, 2),
+        spaces
+    )
 end
 
 return ModelPlayer

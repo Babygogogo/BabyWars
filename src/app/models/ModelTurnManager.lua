@@ -40,6 +40,18 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
     end
 end
 
+local function serializeTurnIndex(self, spaces)
+    return string.format('%sturnIndex = %d', spaces or "", self:getTurnIndex())
+end
+
+local function serializePlayerIndex(self, spaces)
+    return string.format('%splayerIndex = %d', spaces or "", self:getPlayerIndex())
+end
+
+local function serializeTurnPhase(self, spaces)
+    return string.format('%sphase = %q', spaces or "", self:getTurnPhase())
+end
+
 --------------------------------------------------------------------------------
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
@@ -155,6 +167,19 @@ end
 
 function ModelTurnManager:getPlayerIndex()
     return self.m_PlayerIndex
+end
+
+function ModelTurnManager:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%sturn = {\n%s,\n%s,\n%s,\n%s}",
+        spaces,
+        serializeTurnIndex(  self, subSpaces),
+        serializePlayerIndex(self, subSpaces),
+        serializeTurnPhase(  self, subSpaces),
+        spaces
+    )
 end
 
 function ModelTurnManager:runTurn(nextWeather)

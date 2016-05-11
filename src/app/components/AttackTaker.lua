@@ -76,6 +76,18 @@ function AttackTaker:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function AttackTaker:serialize(spaces)
+    local currentHP = self:getCurrentHP()
+    if (currentHP ~= self:getMaxHP()) then
+        return string.format("%sAttackTaker = {currentHP = %d}", spaces, currentHP)
+    else
+        return nil
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function AttackTaker:onBind(target)

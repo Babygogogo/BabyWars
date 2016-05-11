@@ -40,7 +40,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.tileMap." .. param)
+        return require("data.templateWarField." .. param)
     elseif (t == "table") then
         return param
     else
@@ -99,6 +99,26 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
     end
 end
 
+local function serializeTemplateName(self, spaces)
+    return string.format("%stemplate = %q", spaces or "", self.m_TemplateName)
+end
+
+local function serializeModelTiles(self, spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {}
+
+    self:forEachModelTile(function(modelTile)
+        strList[#strList + 1] = modelTile:serialize(subSpaces)
+    end)
+
+    return string.format("%sgrids = {\n%s\n%s}",
+        spaces,
+        table.concat(strList, ",\n"),
+        spaces
+    )
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
@@ -125,7 +145,7 @@ local function createTileActorsMapWithTemplate(mapData)
     local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
     updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
-    return map, mapSize
+    return map, mapSize, mapData.template
 end
 
 local function createTileActorsMapWithoutTemplate(mapData)
@@ -137,16 +157,22 @@ end
 
 local function createTileActorsMap(param)
     local mapData = requireMapData(param)
+    -- The data for a tile map that contains no template is too large, so it's forbidden.
+    assert(mapData.template, "ModelTileMap-createTileActorsMap() the param contains no template.")
+    return createTileActorsMapWithTemplate(mapData)
+--[[
     if (mapData.template) then
         return createTileActorsMapWithTemplate(mapData)
     else
         return createTileActorsMapWithoutTemplate(mapData)
     end
+--]]
 end
 
-local function initWithTileActorsMap(self, map, mapSize)
+local function initWithTileActorsMap(self, map, mapSize, templateName)
     self.m_ActorTilesMap = map
     self.m_MapSize       = mapSize
+    self.m_TemplateName  = templateName
 end
 
 --------------------------------------------------------------------------------
@@ -207,6 +233,21 @@ function ModelTileMap:unsetRootScriptEventDispatcher()
     end)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelTileMap:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%stileMap = {\n%s,\n%s,\n%s}",
+        spaces,
+        serializeTemplateName(self, subSpaces),
+        serializeModelTiles(  self, subSpaces),
+        spaces
+    )
 end
 
 --------------------------------------------------------------------------------

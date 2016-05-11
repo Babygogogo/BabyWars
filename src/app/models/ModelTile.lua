@@ -59,6 +59,9 @@ local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, objectID, baseID)
+    self.m_InitialObjectID = self.m_InitialObjectID or objectID
+    self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
+
     self.m_ObjectID = objectID or self.m_ObjectID
     self.m_BaseID   = baseID   or self.m_BaseID
     assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
@@ -87,6 +90,34 @@ local function loadInstantialData(self, param)
             component:loadInstantialData(data)
         end
     end
+end
+
+local function serializeObjectID(self, spaces)
+    if (self.m_InitialObjectID == self.m_ObjectID) then
+        return nil
+    else
+        return string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)
+    end
+end
+
+local function serializeBaseID(self, spaces)
+    if (self.m_InitialBaseID == self.m_BaseID) then
+        return nil
+    else
+        return string.format("%sbaseID = %d", spaces or "", self.m_BaseID)
+    end
+end
+
+local function serializeComponents(self, spaces)
+    spaces = spaces or ""
+    local strList = {}
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.serialize) then
+            strList[#strList + 1] = component:serialize(spaces)
+        end
+    end
+
+    return table.concat(strList, ",\n"), #strList
 end
 
 --------------------------------------------------------------------------------
@@ -140,6 +171,29 @@ function ModelTile:unsetRootScriptEventDispatcher()
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelTile:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {}
+    local componentsCount
+    strList[#strList + 1] = serializeObjectID(  self, subSpaces)
+    strList[#strList + 1] = serializeBaseID(    self, subSpaces)
+    strList[#strList + 1], componentsCount = serializeComponents(self, subSpaces)
+
+    if ((#strList <= 1) and (componentsCount <= 1)) then
+        return nil
+    else
+        return string.format("%s{\n%s\n%s}",
+            spaces,
+            table.concat(strList, ",\n"),
+            spaces
+        )
+    end
 end
 
 --------------------------------------------------------------------------------

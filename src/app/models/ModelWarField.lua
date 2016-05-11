@@ -106,8 +106,8 @@ function ModelWarField:ctor(param)
     local warFieldData = requireFieldData(param)
     assert(TypeChecker.isWarFieldData(warFieldData))
 
-    initWithActorTileMap(      self, createActorTileMap(warFieldData.TileMap))
-    initWithActorUnitMap(      self, createActorUnitMap(warFieldData.UnitMap))
+    initWithActorTileMap(      self, createActorTileMap(warFieldData.tileMap))
+    initWithActorUnitMap(      self, createActorUnitMap(warFieldData.unitMap))
     initWithActorActionPlanner(self, createActorActionPlanner())
     initWithActorCursor(       self, createActorCursor({mapSize = self:getModelTileMap():getMapSize()}))
     initWithActorGridExplosion(self, createActorGridExplosion())
@@ -197,6 +197,21 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
+function ModelWarField:serialize(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+
+    return string.format("%swarField = {\n%s,\n%s,\n%s}",
+        spaces,
+        self:getModelTileMap():serialize(subSpaces),
+        self:getModelUnitMap():serialize(subSpaces),
+        spaces
+    )
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
 function ModelWarField:doActionWait(action)
     self:getModelUnitMap():doActionWait(action)
     self:getModelTileMap():doActionWait(action)
