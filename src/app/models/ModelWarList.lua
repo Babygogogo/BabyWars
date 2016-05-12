@@ -69,7 +69,7 @@ local function createItemBack(self)
         name     = "Back",
         callback = function()
             self:setEnabled(false)
-            self.m_ModelMainMenu:setEnabled(true)
+            self.m_ModelMainMenu:setMenuEnabled(true)
         end,
     }
 end

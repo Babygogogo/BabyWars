@@ -70,18 +70,6 @@ function ViewSceneMain:setViewMainMenu(view)
     return self
 end
 
-function ViewSceneMain:setViewWarList(view)
-    assert(self.m_ViewWarList == nil, "ViewSceneMain:setViewWarList() the view has been set already.")
-
-    self.m_ViewWarList = view
-    self:addChild(view, WAR_LIST_Z_ORDER)
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
 function ViewSceneMain:setGameVersion(version)
     self.m_VersionIndicator:setString("Version: " .. version)
 

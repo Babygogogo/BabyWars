@@ -38,25 +38,8 @@ local function createActorMainMenu()
 end
 
 local function initWithActorMainMenu(self, actor)
+    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
     self.m_ActorMainMenu = actor
-end
-
---------------------------------------------------------------------------------
--- The composition war list actor.
---------------------------------------------------------------------------------
-local function createActorWarList(mapListData)
-    return Actor.createWithModelAndViewName("ModelWarList", mapListData, "ViewWarList", mapListData)
-end
-
-local function initWithActorWarList(self, actor)
-    local modelMainMenu = self.m_ActorMainMenu:getModel()
-    local modelWarList  = actor:getModel()
-    modelMainMenu:setModelWarList(modelWarList)
-    modelWarList:setModelConfirmBox(self.m_ActorConfirmBox:getModel())
-        :setModelMainMenu(modelMainMenu)
-        :setEnabled(false)
-
-    self.m_ActorWarList = actor
 end
 
 --------------------------------------------------------------------------------
@@ -65,7 +48,6 @@ end
 function ModelSceneMain:ctor(param)
     initWithActorConfirmBox(self, createActorConfirmBox())
     initWithActorMainMenu(  self, createActorMainMenu())
-    initWithActorWarList(   self, createActorWarList("WarSceneList"))
 
     if (self.m_View) then
         self:initView()
@@ -80,7 +62,6 @@ function ModelSceneMain:initView()
 
     view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
         :setViewMainMenu(  self.m_ActorMainMenu:getView())
-        :setViewWarList(   self.m_ActorWarList:getView())
         :setGameVersion(GameConstantFunctions.getGameVersion())
 
     return self
