@@ -3,6 +3,7 @@ local ViewSceneMain = class("ViewSceneMain", cc.Scene)
 
 local CONFIRM_BOX_Z_ORDER       = 99
 local VERSION_INDICATOR_Z_ORDER = 2
+local MAIN_MENU_Z_ORDER         = 2
 local WAR_LIST_Z_ORDER          = 1
 local BACKGROUND_Z_ORDER        = 0
 
@@ -56,6 +57,15 @@ function ViewSceneMain:setViewConfirmBox(view)
 
     self.m_ViewConfirmBox = view
     self:addChild(view, CONFIRM_BOX_Z_ORDER)
+
+    return self
+end
+
+function ViewSceneMain:setViewMainMenu(view)
+    assert(self.m_ViewMainMenu == nil, "ViewSceneMain:setViewMainMenu() the view has been set.")
+
+    self.m_ViewMainMenu = view
+    self:addChild(view, MAIN_MENU_Z_ORDER)
 
     return self
 end

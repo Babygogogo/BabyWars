@@ -111,4 +111,10 @@ function ViewWarList:showWarList(list)
     return self
 end
 
+function ViewWarList:createAndPushBackItem(item)
+    self.m_ListView:pushBackCustomItem(createViewWarItem(item))
+
+    return self
+end
+
 return ViewWarList

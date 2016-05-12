@@ -31,6 +31,17 @@ local function initWithActorConfirmBox(self, actor)
 end
 
 --------------------------------------------------------------------------------
+-- The composition main menu actor.
+--------------------------------------------------------------------------------
+local function createActorMainMenu()
+    return Actor.createWithModelAndViewName("ModelMainMenu", nil, "ViewMainMenu")
+end
+
+local function initWithActorMainMenu(self, actor)
+    self.m_ActorMainMenu = actor
+end
+
+--------------------------------------------------------------------------------
 -- The composition war list actor.
 --------------------------------------------------------------------------------
 local function createActorWarList(mapListData)
@@ -38,7 +49,13 @@ local function createActorWarList(mapListData)
 end
 
 local function initWithActorWarList(self, actor)
-    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+    local modelMainMenu = self.m_ActorMainMenu:getModel()
+    local modelWarList  = actor:getModel()
+    modelMainMenu:setModelWarList(modelWarList)
+    modelWarList:setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+        :setModelMainMenu(modelMainMenu)
+        :setEnabled(false)
+
     self.m_ActorWarList = actor
 end
 
@@ -47,6 +64,7 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneMain:ctor(param)
     initWithActorConfirmBox(self, createActorConfirmBox())
+    initWithActorMainMenu(  self, createActorMainMenu())
     initWithActorWarList(   self, createActorWarList("WarSceneList"))
 
     if (self.m_View) then
@@ -61,6 +79,7 @@ function ModelSceneMain:initView()
     assert(view, "ModelSceneMain:initView() no view is attached to the owner actor of the model.")
 
     view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
+        :setViewMainMenu(  self.m_ActorMainMenu:getView())
         :setViewWarList(   self.m_ActorWarList:getView())
         :setGameVersion(GameConstantFunctions.getGameVersion())
 

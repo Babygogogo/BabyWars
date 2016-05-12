@@ -62,10 +62,28 @@ local function initWithListItems(self, items)
 end
 
 --------------------------------------------------------------------------------
+-- The back item.
+--------------------------------------------------------------------------------
+local function createItemBack(self)
+    return {
+        name     = "Back",
+        callback = function()
+            self:setEnabled(false)
+            self.m_ModelMainMenu:setEnabled(true)
+        end,
+    }
+end
+
+local function initWithItemBack(self, item)
+    self.m_ItemBack = item
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarList:ctor(param)
     initWithListItems(self, createListItems(self, param))
+    initWithItemBack( self, createItemBack(self))
 
     if (self.m_View) then
         self:initView()
@@ -80,6 +98,7 @@ function ModelWarList:initView()
 
     view:removeAllItems()
         :showWarList(self.m_ListItems)
+        :createAndPushBackItem(self.m_ItemBack)
 
     return self
 end
@@ -87,6 +106,24 @@ end
 function ModelWarList:setModelConfirmBox(model)
     assert(self.m_ModelConfirmBox == nil, "ModelWarList:setModelConfirmBox() the model has been set already.")
     self.m_ModelConfirmBox = model
+
+    return self
+end
+
+function ModelWarList:setModelMainMenu(model)
+    assert(self.m_ModelMainMenu == nil, "ModelWarList:setModelMainMenu() the model has been set.")
+    self.m_ModelMainMenu = model
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelWarList:setEnabled(enabled)
+    if (self.m_View) then
+        self.m_View:setVisible(enabled)
+    end
 
     return self
 end
