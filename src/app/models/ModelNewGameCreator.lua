@@ -5,12 +5,17 @@ local ModelNewGameCreator = class("ModelNewGameCreator")
 -- The new game item.
 --------------------------------------------------------------------------------
 local function createItemListWarField(self)
-    return {
-        name = "New Game",
-        callback = function()
-            print("New Game is not implemented.")
-        end,
-    }
+    local list = {}
+    for _, warField in ipairs(require("res.data.templateWarField.WarFieldList")) do
+        list[#list + 1] = {
+            name     = warField.name,
+            callback = function()
+                print(string.format("Creating a game with '%s' is not implemented.", warField.name))
+            end,
+        }
+    end
+
+    return list
 end
 
 local function initWithItemListWarField(self, list)
@@ -38,8 +43,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelNewGameCreator:ctor(param)
- --   initWithItemListWarField(     self, createItemListWarField(self))
-    initWithItemBack(    self, createItemBack(self))
+    initWithItemListWarField(self, createItemListWarField(self))
+    initWithItemBack(        self, createItemBack(self))
 
     if (self.m_View) then
         self:initView()
@@ -53,8 +58,8 @@ function ModelNewGameCreator:initView()
     assert(view, "ModelNewGameCreator:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
-  --      :createAndPushBackItem(self.m_ItemListWarField)
-        :createAndPushBackItem(self.m_ItemBack)
+        :setItemBack(self.m_ItemBack)
+        :showListWarField(self.m_ItemListWarField)
 
     return self
 end

@@ -28,7 +28,7 @@ local function createItemContinue(self)
         name     = "Continue",
         callback = function()
             self:setMenuEnabled(false)
-            self.m_ActorWarList:getModel():setEnabled(true)
+            self.m_ActorContinueGameSelector:getModel():setEnabled(true)
         end,
     }
 end
@@ -67,27 +67,27 @@ local function initWithActorNewGameCreator(self, actor)
 end
 
 --------------------------------------------------------------------------------
--- The composition war list actor.
+-- The composition continue game selector actor.
 --------------------------------------------------------------------------------
-local function createActorWarList(mapListData)
-    return Actor.createWithModelAndViewName("ModelWarList", mapListData, "ViewWarList", mapListData)
+local function createActorContinueGameSelector(mapListData)
+    return Actor.createWithModelAndViewName("ModelContinueGameSelector", mapListData, "ViewContinueGameSelector", mapListData)
 end
 
-local function initWithActorWarList(self, actor)
+local function initWithActorContinueGameSelector(self, actor)
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
-    self.m_ActorWarList = actor
+    self.m_ActorContinueGameSelector = actor
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initWithItemNewGame(        self, createItemNewGame(self))
-    initWithItemContinue(       self, createItemContinue(self))
-    initWithItemConfigSkills(   self, createItemConfigSkills(self))
-    initWithActorNewGameCreator(self, createActorNewGameCreator())
-    initWithActorWarList(       self, createActorWarList("WarSceneList"))
+    initWithItemNewGame(              self, createItemNewGame(self))
+    initWithItemContinue(             self, createItemContinue(self))
+    initWithItemConfigSkills(         self, createItemConfigSkills(self))
+    initWithActorNewGameCreator(      self, createActorNewGameCreator())
+    initWithActorContinueGameSelector(self, createActorContinueGameSelector("WarSceneList"))
 
     if (self.m_View) then
         self:initView()
@@ -101,7 +101,7 @@ function ModelMainMenu:initView()
     assert(view, "ModelMainMenu:initView() no view is attached to the actor of the model.")
 
     view:setViewNewGameCreator(self.m_ActorNewGameCreator:getView())
-        :setViewWarList(       self.m_ActorWarList:getView())
+        :setViewWarList(       self.m_ActorContinueGameSelector:getView())
 
         :removeAllItems()
         :createAndPushBackItem(self.m_ItemNewGame)
@@ -114,7 +114,7 @@ end
 function ModelMainMenu:setModelConfirmBox(model)
     assert(self.m_ModelConfirmBox == nil, "ModelMainMenu:setModelConfirmBox() the model has been set.")
     self.m_ModelConfirmBox = model
-    self.m_ActorWarList:getModel():setModelConfirmBox(model)
+    self.m_ActorContinueGameSelector:getModel():setModelConfirmBox(model)
 
     return self
 end

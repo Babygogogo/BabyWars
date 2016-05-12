@@ -1,8 +1,27 @@
 
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
-local NEW_GAME_CREATOR_Z_ORDER = 0
-local WAR_LIST_Z_ORDER         = 0
+local NEW_GAME_CREATOR_Z_ORDER = 3
+local MENU_TITLE_Z_ORDER       = 2
+local MENU_LIST_VIEW_Z_ORDER   = 1
+local MENU_BACKGROUND_Z_ORDER  = 0
+
+local MENU_BACKGROUND_WIDTH  = 250
+local MENU_BACKGROUND_HEIGHT = display.height - 60
+local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
+local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50
+local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT      = 40
+
+local MENU_BACKGROUND_POS_X = 30
+local MENU_BACKGROUND_POS_Y = 30
+local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
+local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6
+local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
+
+local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE  = 28
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 45
@@ -16,11 +35,6 @@ local ITEM_FONT_OUTLINE_WIDTH = 2
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function setMenuContentSize(self, width, height)
-    self.m_MenuBackground:setContentSize(width, height)
-    self.m_MenuListView:setContentSize(width - 10, height - 14) -- 10/14 are the height/width of the edging of background
-end
-
 local function createViewItem(item)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
@@ -53,7 +67,8 @@ end
 local function createMenuBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setPosition(30, 30)
+        :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
+        :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
         :setOpacity(180)
 
     return background
@@ -61,7 +76,7 @@ end
 
 local function initWithMenuBackground(self, background)
     self.m_MenuBackground = background
-    self:addChild(background)
+    self:addChild(background, MENU_BACKGROUND_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -69,7 +84,9 @@ end
 --------------------------------------------------------------------------------
 local function createMenuListView()
     local listView = ccui.ListView:create()
-    listView:setPosition(35, 36)
+    listView:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
         :setItemsMargin(15)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
         :setCascadeOpacityEnabled(true)
@@ -80,7 +97,32 @@ end
 
 local function initWithMenuListView(self, listView)
     self.m_MenuListView = listView
-    self:addChild(listView)
+    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
+-- The composition menu title.
+--------------------------------------------------------------------------------
+local function createMenuTitle()
+    local title = cc.Label:createWithTTF("Main Menu", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    title:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
+
+        :setDimensions(MENU_TITLE_WIDTH, MENU_TITLE_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+
+        :setTextColor(MENU_TITLE_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+        :setOpacity(180)
+
+    return title
+end
+
+local function initWithMenuTitle(self, title)
+    self.m_MenuTitle = title
+    self:addChild(title, MENU_TITLE_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -89,8 +131,7 @@ end
 function ViewMainMenu:ctor(param)
     initWithMenuBackground(self, createMenuBackground())
     initWithMenuListView(  self, createMenuListView())
-
-    setMenuContentSize(self, 250, display.height - 60)
+    initWithMenuTitle(     self, createMenuTitle())
 
     return self
 end
@@ -105,8 +146,10 @@ end
 
 function ViewMainMenu:setViewWarList(view)
     assert(self.m_ViewWarList == nil, "ViewMainMenu:setViewWarList() the view has been set.")
-    self.m_ViewWarList = view
-    self:addChild(view, WAR_LIST_Z_ORDER)
+    self.m_ViewWarList = vie3
+    local MENU_TITLE_Z_ORDER       = 2
+    local MENU_LIST_VIEW_Z_ORDER   = 1
+    self:addChild(view, MENU_BACKGROUND_Z_ORDER)
 
     return self
 end
@@ -128,7 +171,8 @@ end
 
 function ViewMainMenu:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
-    self.m_MenuListView:setVisible(visible)
+    self.m_MenuListView  :setVisible(visible)
+    self.m_MenuTitle     :setVisible(visible)
 
     return self
 end
