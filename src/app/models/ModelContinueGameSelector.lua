@@ -22,7 +22,9 @@ local function requireListData(param)
     if (t == "table") then
         return param
     elseif (t == "string") then
-        return require("res.data.warScene." .. param)
+        local fileName = "res.data.warScene." .. param
+        package.loaded[fileName] = nil
+        return require(fileName)
     else
         return nil
     end
@@ -40,8 +42,8 @@ end
 --------------------------------------------------------------------------------
 -- The composition list items.
 --------------------------------------------------------------------------------
-local function createListItems(self, param)
-    local listData = requireListData(param)
+local function createListItems(self)
+    local listData = requireListData("WarSceneList")
     assert(type(listData) == "table", "ModelContinueGameSelector-createListItems() failed to require list data from with param.")
 
     local items = {}
@@ -66,7 +68,7 @@ end
 --------------------------------------------------------------------------------
 local function createItemBack(self)
     return {
-        name     = "Back",
+        name     = "back",
         callback = function()
             self:setEnabled(false)
             self.m_ModelMainMenu:setMenuEnabled(true)
@@ -82,7 +84,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:ctor(param)
-    initWithListItems(self, createListItems(self, param))
     initWithItemBack( self, createItemBack(self))
 
     if (self.m_View) then
@@ -97,8 +98,7 @@ function ModelContinueGameSelector:initView()
     assert(view, "ModelContinueGameSelector:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
-        :showWarList(self.m_ListItems)
-        :createAndPushBackItem(self.m_ItemBack)
+        :setButtonBack(self.m_ItemBack)
 
     return self
 end
@@ -121,8 +121,17 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:setEnabled(enabled)
-    if (self.m_View) then
-        self.m_View:setVisible(enabled)
+    if (enabled) then
+        initWithListItems(self, createListItems(self))
+    end
+
+    local view = self.m_View
+    if (view) then
+        view:setVisible(enabled)
+        if (enabled) then
+            view:removeAllItems()
+                :showWarList(self.m_ListItems)
+        end
     end
 
     return self

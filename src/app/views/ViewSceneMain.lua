@@ -13,8 +13,8 @@ local BACKGROUND_Z_ORDER        = 0
 local function createVersionIndicator()
     local indicator = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
     indicator:ignoreAnchorPointForPosition(true)
-        :setPosition(display.width - 220, 10)
-        :setDimensions(220, 40)
+        :setPosition(display.width - 250, 10)
+        :setDimensions(250, 40)
 
         :setTextColor({r = 255, g = 255, b = 255})
         :enableOutline({r = 0,  g = 0,   b = 0}, 2)
@@ -71,7 +71,7 @@ function ViewSceneMain:setViewMainMenu(view)
 end
 
 function ViewSceneMain:setGameVersion(version)
-    self.m_VersionIndicator:setString("Version: " .. version)
+    self.m_VersionIndicator:setString("BabyWars v" .. version)
 
     return self
 end

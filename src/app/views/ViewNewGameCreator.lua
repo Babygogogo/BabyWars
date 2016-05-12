@@ -106,7 +106,7 @@ end
 -- The composition menu title.
 --------------------------------------------------------------------------------
 local function createMenuTitle()
-    local title = cc.Label:createWithTTF("New Game", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF("New Game..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -130,7 +130,7 @@ end
 --------------------------------------------------------------------------------
 -- The composition back button.
 --------------------------------------------------------------------------------
-local function createButtonBack(self)
+local function createButtonBack()
     local button = ccui.Button:create()
     button:ignoreAnchorPointForPosition(true)
         :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
@@ -156,13 +156,24 @@ local function initWithButtonBack(self, button)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewNewGameCreator:ctor(param)
     initWithMenuBackground(self, createMenuBackground())
     initWithMenuListView(  self, createMenuListView())
     initWithMenuTitle(     self, createMenuTitle())
     initWithButtonBack(    self, createButtonBack(self))
+
+    return self
+end
+
+function ViewNewGameCreator:setItemBack(item)
+    self.m_ButtonBack:setTitleText(item.name)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
 
     return self
 end
@@ -186,17 +197,6 @@ end
 
 function ViewNewGameCreator:createAndPushBackItem(item)
     self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
-
-    return self
-end
-
-function ViewNewGameCreator:setItemBack(item)
-    self.m_ButtonBack:setTitleText(item.name)
-        :addTouchEventListener(function(sender, eventType)
-            if (eventType == ccui.TouchEventType.ended) then
-                item.callback()
-            end
-        end)
 
     return self
 end
