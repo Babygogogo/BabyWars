@@ -26,7 +26,7 @@ local ModelPlayer = class("ModelPlayer")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function serializeAccount(self, spaces)
-    return string.format("%saccount = %d", spaces, self:getAccount())
+    return string.format("%saccount = %q", spaces, self:getAccount())
 end
 
 local function serializeNickname(self, spaces)

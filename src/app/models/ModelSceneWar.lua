@@ -105,7 +105,8 @@ end
 
 local function onEvtPlayerRequestDoAction(self, event)
     local requestedAction = event
-    requestedAction.playerID = self:getModelPlayerManager():getModelPlayer(self:getModelTurnManager():getPlayerIndex()):getID() -- This should be replaced by the ID of the logged in player.
+    -- TODO: requestedAction.playerAccount should be assigned with the account of the logged in player.
+    requestedAction.playerAccount = self:getModelPlayerManager():getModelPlayer(self:getModelTurnManager():getPlayerIndex()):getAccount()
 
     if (isServer) then
         local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)

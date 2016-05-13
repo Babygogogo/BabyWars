@@ -24,12 +24,12 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getCurrentPlayerID(playerManagerModel, turnManagerModel)
-    return playerManagerModel:getModelPlayer(turnManagerModel:getPlayerIndex()):getID()
+local function getCurrentPlayerAccount(playerManagerModel, turnManagerModel)
+    return playerManagerModel:getModelPlayer(turnManagerModel:getPlayerIndex()):getAccount()
 end
 
-local function getPlayerIDForModelUnit(modelUnit, modelPlayerManager)
-    return modelPlayerManager:getModelPlayer(modelUnit:getPlayerIndex()):getID()
+local function getPlayerAccountForModelUnit(modelUnit, modelPlayerManager)
+    return modelPlayerManager:getModelPlayer(modelUnit:getPlayerIndex()):getAccount()
 end
 
 local function isModelUnitVisible(modelUnit, modelWeatherManager)
@@ -41,12 +41,12 @@ end
 -- The translate functions.
 --------------------------------------------------------------------------------
 -- This translation ignores the existing unit of the same player at the end of the path, so that the actions of Join/Attack/Wait can reuse this function.
-local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
+local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     local modelFocusUnit = modelUnitMap:getModelUnit(path[1].gridIndex)
     if (not modelFocusUnit) then
         return nil, "ActionTranslator-translatePath() there is no unit on the starting grid of the path."
-    elseif (getPlayerIDForModelUnit(modelFocusUnit, modelPlayerManager) ~= currentPlayerID) then
-        return nil, "ActionTranslator-translatePath() the player ID of the moving unit is not the same as the one of the in-turn player."
+    elseif (getPlayerAccountForModelUnit(modelFocusUnit, modelPlayerManager) ~= currentPlayerAccount) then
+        return nil, "ActionTranslator-translatePath() the player account of the moving unit is not the same as the one of the in-turn player."
     elseif (modelFocusUnit:getState() ~= "idle") then
         return nil, "ActionTranslator-translatePath() the moving unit is not in idle state."
     end
@@ -63,7 +63,7 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
         end
 
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if (existingModelUnit) and (getPlayerIDForModelUnit(existingModelUnit, modelPlayerManager) ~= currentPlayerID) then
+        if (existingModelUnit) and (getPlayerAccountForModelUnit(existingModelUnit, modelPlayerManager) ~= currentPlayerAccount) then
             if (isModelUnitVisible(existingModelUnit, modelWeatherManager)) then
                 return nil, "ActionTranslator-translatePath() the path is invalid because it is blocked by a visible enemy unit."
             else
@@ -102,7 +102,7 @@ local function translateEndTurn(action, modelScene)
     return {actionName = "EndTurn", nextWeather = modelScene:getModelWeatherManager():getNextWeather()}
 end
 
-local function translateWait(action, modelScene, currentPlayerID)
+local function translateWait(action, modelScene, currentPlayerAccount)
     local modelWarField       = modelScene:getModelWarField()
     local modelUnitMap        = modelWarField:getModelUnitMap()
     local modelTileMap        = modelWarField:getModelTileMap()
@@ -110,7 +110,7 @@ local function translateWait(action, modelScene, currentPlayerID)
     local modelWeatherManager = modelScene:getModelWeatherManager()
     local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateWait() failed to translate the move path:\n" .. (translateMsg or "")
     end
@@ -123,7 +123,7 @@ local function translateWait(action, modelScene, currentPlayerID)
     end
 end
 
-local function translateAttack(action, modelScene, currentPlayerID)
+local function translateAttack(action, modelScene, currentPlayerAccount)
     local modelWarField       = modelScene:getModelWarField()
     local modelUnitMap        = modelWarField:getModelUnitMap()
     local modelTileMap        = modelWarField:getModelTileMap()
@@ -131,7 +131,7 @@ local function translateAttack(action, modelScene, currentPlayerID)
     local modelWeatherManager = modelScene:getModelWeatherManager()
     local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
     end
@@ -158,7 +158,7 @@ local function translateAttack(action, modelScene, currentPlayerID)
     return {actionName = "Attack", path = translatedPath, targetGridIndex = GridIndexFunctions.clone(targetGridIndex), attackDamage = attackDamage, counterDamage = counterDamage}
 end
 
-local function translateCapture(action, modelScene, currentPlayerID)
+local function translateCapture(action, modelScene, currentPlayerAccount)
     local modelWarField       = modelScene:getModelWarField()
     local modelUnitMap        = modelWarField:getModelUnitMap()
     local modelTileMap        = modelWarField:getModelTileMap()
@@ -166,7 +166,7 @@ local function translateCapture(action, modelScene, currentPlayerID)
     local modelWeatherManager = modelScene:getModelWeatherManager()
     local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
 
-    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerID, modelPlayer)
+    local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
         return nil, "ActionTranslator-translateAttack() failed to translate the move path:\n" .. (translateMsg or "")
     end
@@ -215,22 +215,22 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ActionTranslator.translate(action, modelScene)
-    local currentPlayerID = getCurrentPlayerID(modelScene:getModelPlayerManager(), modelScene:getModelTurnManager())
-    if (currentPlayerID ~= action.playerID) then
-        return nil, "ActionTranslator.translate() the ID of the actioning player is not the same as the one of the in-turn player."
+    local currentPlayerAccount = getCurrentPlayerAccount(modelScene:getModelPlayerManager(), modelScene:getModelTurnManager())
+    if (currentPlayerAccount ~= action.playerAccount) then
+        return nil, "ActionTranslator.translate() the account of the actioning player is not the same as the one of the in-turn player."
     end
 
     local actionName = action.actionName
     if (actionName == "EndTurn") then
         return translateEndTurn(action, modelScene)
     elseif (actionName == "Wait") then
-        return translateWait(   action, modelScene, currentPlayerID)
+        return translateWait(   action, modelScene, currentPlayerAccount)
     elseif (actionName == "Attack") then
-        return translateAttack( action, modelScene, currentPlayerID)
+        return translateAttack( action, modelScene, currentPlayerAccount)
     elseif (actionName == "Capture") then
-        return translateCapture(action, modelScene, currentPlayerID)
+        return translateCapture(action, modelScene, currentPlayerAccount)
     elseif (actionName == "ProduceOnTile") then
-        return translateProduceOnTile(action, modelScene, currentPlayerID)
+        return translateProduceOnTile(action, modelScene, currentPlayerAccount)
     else
         return nil, "ActionTranslator.translate() unrecognized action name."
     end
