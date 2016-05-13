@@ -25,12 +25,12 @@ local ModelPlayer = class("ModelPlayer")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function serializeID(self, spaces)
-    return string.format("%sid = %d", spaces, self:getID())
+local function serializeAccount(self, spaces)
+    return string.format("%saccount = %d", spaces, self:getAccount())
 end
 
-local function serializeName(self, spaces)
-    return string.format("%sname = %q", spaces, self:getName())
+local function serializeNickname(self, spaces)
+    return string.format("%snickname = %q", spaces, self:getNickname())
 end
 
 local function serializeFund(self, spaces)
@@ -73,8 +73,8 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_ID            = param.id
-    self.m_Name          = param.name
+    self.m_Account       = param.account
+    self.m_Nickname      = param.nickname
     self.m_Fund          = param.fund
     self.m_IsAlive       = param.isAlive
     self.m_CurrentEnergy = param.currentEnergy
@@ -89,12 +89,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelPlayer:getID()
-    return self.m_ID
+function ModelPlayer:getAccount()
+    return self.m_Account
 end
 
-function ModelPlayer:getName()
-    return self.m_Name
+function ModelPlayer:getNickname()
+    return self.m_Nickname
 end
 
 function ModelPlayer:isAlive()
@@ -131,8 +131,8 @@ function ModelPlayer:serialize(spaces)
 
     return string.format("%s{\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s}",
         spaces,
-        serializeID(           self, subSpaces),
-        serializeName(         self, subSpaces),
+        serializeAccount(      self, subSpaces),
+        serializeNickname(     self, subSpaces),
         serializeFund(         self, subSpaces),
         serializeIsAlive(      self, subSpaces),
         serializeCurrentEnergy(self, subSpaces),

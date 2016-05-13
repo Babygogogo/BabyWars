@@ -87,7 +87,7 @@ function ModelMainMenu:ctor(param)
     initWithItemContinue(             self, createItemContinue(self))
     initWithItemConfigSkills(         self, createItemConfigSkills(self))
     initWithActorNewGameCreator(      self, createActorNewGameCreator())
-    initWithActorContinueGameSelector(self, createActorContinueGameSelector("WarSceneList"))
+    initWithActorContinueGameSelector(self, createActorContinueGameSelector())
 
     if (self.m_View) then
         self:initView()

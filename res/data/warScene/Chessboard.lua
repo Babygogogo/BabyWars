@@ -18,8 +18,8 @@ return {
 
     players = {
         {
-            id            = 1,
-            name          = "Red Alice",
+            account       = "babygogogo",
+            nickname      = "Red Alice",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 1,
@@ -34,8 +34,8 @@ return {
             },
         },
         {
-            id            = 2,
-            name          = "Blue Bob",
+            account       = "tester1",
+            nickname      = "Blue Bob",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 2,

@@ -111,8 +111,8 @@ local WarScen_Test3 = {
 
     players = {
         {
-            id            = 1,
-            name          = "Red Alice",
+            account       = "babygogogo",
+            nickname      = "Red Alice",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 1,
@@ -127,8 +127,8 @@ local WarScen_Test3 = {
             },
         },
         {
-            id            = 2,
-            name          = "Blue Bob",
+            account       = "tester1",
+            nickname      = "Blue Bob",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 2,
@@ -143,8 +143,8 @@ local WarScen_Test3 = {
             },
         },
         {
-            id            = 3,
-            name          = "Yellow Cat",
+            account       = "tester2",
+            nickname      = "Yellow Cat",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 3,
@@ -159,8 +159,8 @@ local WarScen_Test3 = {
             },
         },
         {
-            id            = 4,
-            name          = "Black Dog",
+            account       = "tester3",
+            nickname      = "Black Dog",
             fund          = 0,
             isAlive       = true,
             currentEnergy = 4,

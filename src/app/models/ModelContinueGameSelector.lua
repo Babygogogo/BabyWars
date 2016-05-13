@@ -22,9 +22,10 @@ local function requireListData(param)
     if (t == "table") then
         return param
     elseif (t == "string") then
-        local fileName = "res.data.warScene." .. param
+        -- TODO: get the list of the games in progress from the server.
+        local fileName = "res.data.playerProfile." .. param
         package.loaded[fileName] = nil
-        return require(fileName)
+        return require(fileName).gamesInProgress
     else
         return nil
     end
@@ -43,15 +44,16 @@ end
 -- The composition list items.
 --------------------------------------------------------------------------------
 local function createListItems(self)
-    local listData = requireListData("WarSceneList")
+    local listData = requireListData("babygogogo") -- TODO: replace "babygogogo" with the account of the player.
     assert(type(listData) == "table", "ModelContinueGameSelector-createListItems() failed to require list data from with param.")
 
     local items = {}
-    for _, itemData in ipairs(listData) do
+    for fileName, warSceneName in pairs(listData) do
         items[#items + 1] = {
-            name     = itemData.name,
+            name     = warSceneName,
             callback = function()
-                enableConfirmBoxForEnteringSceneWar(self, itemData.name, itemData.data)
+                -- TODO: get the war scene data from the server.
+                enableConfirmBoxForEnteringSceneWar(self, warSceneName, fileName)
             end,
         }
     end
