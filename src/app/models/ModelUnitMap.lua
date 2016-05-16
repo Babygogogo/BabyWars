@@ -19,10 +19,10 @@
 local ModelUnitMap = class("ModelUnitMap")
 
 local TypeChecker        = require("app.utilities.TypeChecker")
-local MapFunctions       = require("app.utilities.MapFunctions")
 local ViewUnit           = require("app.views.ViewUnit")
 local ModelUnit          = require("app.models.ModelUnit")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TableFunctions     = require("app.utilities.TableFunctions")
 local Actor              = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
@@ -83,24 +83,27 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     return Actor.createWithModelAndViewName("ModelUnit", actorData, "ViewUnit", actorData)
 end
 
-local function serializeMapSize(mapSize, spaces)
-    return string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)
+local function serializeMapSizeToStringList(mapSize, spaces)
+    return {string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)}
 end
 
-local function serializeModelUnitsOnMap(self, spaces)
-    local strList = {}
+local function serializeModelUnitsOnMapToStringList(self, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
+    local strList = {spaces .. "grids = {\n"}
+    local appendList = TableFunctions.appendList
 
     self:forEachModelUnit(function(modelUnit)
-        strList[#strList + 1] = modelUnit:serialize(subSpaces)
+        appendList(strList, modelUnit:toStringList(subSpaces), ",\n")
     end)
+    strList[#strList + 1] = spaces .. "}"
 
-    return string.format("%sgrids = {\n%s\n%s}",
-        spaces,
-        table.concat(strList, ",\n"),
-        spaces
-    )
+    return strList
+end
+
+local function serializeLoadedModelUnitsToStringList(self, spaces)
+    -- TODO: add code to do the job.
+    return {spaces .. "loaded = {}"}
 end
 
 --------------------------------------------------------------------------------
@@ -266,6 +269,22 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelUnitMap:toStringList(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {spaces .. "unitMap = {\n"}
+    local appendList = TableFunctions.appendList
+
+    appendList(strList, serializeMapSizeToStringList(self:getMapSize(), subSpaces), ",\n")
+    appendList(strList, serializeModelUnitsOnMapToStringList(self, subSpaces),      ",\n")
+    appendList(strList, serializeLoadedModelUnitsToStringList(self, subSpaces),     "\n" .. spaces .. "}")
+
+    return strList
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
@@ -314,19 +333,6 @@ function ModelUnitMap:forEachModelUnit(func)
     end
 
     return self
-end
-
-function ModelUnitMap:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format("%sunitMap = {\n%s,\n%s,\n%s\n%s}",
-        spaces,
-        serializeMapSize(        self:getMapSize(), subSpaces),
-        serializeModelUnitsOnMap(self,              subSpaces),
-        spaces .. "    loaded = {}", -- TODO: serialize the units that are loaded in loaders
-        spaces
-    )
 end
 
 --------------------------------------------------------------------------------

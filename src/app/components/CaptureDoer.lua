@@ -55,9 +55,9 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function CaptureDoer:serialize(spaces)
+function CaptureDoer:toStringList(spaces)
     if (self:isCapturing()) then
-        return string.format("%sCaptureDoer = {isCapturing = true}", spaces or "")
+        return {string.format("%sCaptureDoer = {isCapturing = true}", spaces or "")}
     else
         return nil
     end

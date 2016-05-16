@@ -17,7 +17,8 @@
 
 local ModelPlayerManager = class("ModelPlayerManager")
 
-local ModelPlayer = require("app.models.ModelPlayer")
+local ModelPlayer    = require("app.models.ModelPlayer")
+local TableFunctions = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -50,13 +51,15 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
-local function serializePlayers(self, spaces)
+local function serializeModelPlayersToStringList(self, spaces)
     local strList = {}
+    local appendList = TableFunctions.appendList
+
     for _, modelPlayer in ipairs(self.m_Players) do
-        strList[#strList + 1] = modelPlayer:serialize(spaces)
+        appendList(strList, modelPlayer:toStringList(spaces), ",\n")
     end
 
-    return table.concat(strList, ",\n")
+    return strList
 end
 
 --------------------------------------------------------------------------------
@@ -134,6 +137,19 @@ function ModelPlayerManager:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelPlayerManager:toStringList(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {spaces .. "players = {\n"}
+
+    TableFunctions.appendList(strList, serializeModelPlayersToStringList(self, subSpaces), spaces .. "}")
+
+    return strList
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:onEvent(event)
@@ -156,17 +172,6 @@ end
 
 function ModelPlayerManager:getPlayersCount()
     return #self.m_Players
-end
-
-function ModelPlayerManager:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format("%splayers = {\n%s\n%s}",
-        spaces,
-        serializePlayers(self, subSpaces),
-        spaces
-    )
 end
 
 --------------------------------------------------------------------------------

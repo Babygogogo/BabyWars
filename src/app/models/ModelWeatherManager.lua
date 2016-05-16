@@ -18,8 +18,8 @@ local ModelWeatherManager = class("ModelWeatherManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function serializeCurrentWeather(self, spaces)
-    return string.format('%scurrent = "%s"', spaces or "", self:getCurrentWeather())
+local function serializeCurrentWeatherToStringList(self, spaces)
+    return {string.format('%scurrent = "%s"', spaces or "", self:getCurrentWeather())}
 end
 
 --------------------------------------------------------------------------------
@@ -27,6 +27,22 @@ end
 --------------------------------------------------------------------------------
 function ModelWeatherManager:ctor(param)
     self.m_CurrentWeather = param.current
+end
+
+--------------------------------------------------------------------------------
+-- The function for serialization.
+--------------------------------------------------------------------------------
+function ModelWeatherManager:toStringList(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local appendList = require("app.utilities.TableFunctions").appendList
+    local strList = {spaces .. "weather = {\n"}
+
+    appendList(strList, serializeCurrentWeatherToStringList(self, subSpaces), ",\n")
+    -- TODO: add code to serialize other information, such as whether the weather is random or not.
+
+    strList[#strList + 1] = spaces .. "}"
+    return strList
 end
 
 --------------------------------------------------------------------------------
@@ -44,17 +60,6 @@ end
 function ModelWeatherManager:isInFog()
     -- TODO: add code to do the real job.
     return false
-end
-
-function ModelWeatherManager:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format('%sweather = {\n%s,\n%s}',
-        spaces,
-        serializeCurrentWeather(self, subSpaces),
-        spaces
-    )
 end
 
 return ModelWeatherManager

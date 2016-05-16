@@ -105,10 +105,10 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function FuelOwner:serialize(spaces)
+function FuelOwner:toStringList(spaces)
     local currentFuel = self:getCurrentFuel()
     if (currentFuel ~= self:getMaxFuel()) then
-        return string.format("%sFuelOwner = {current = %d}", spaces or "", currentFuel)
+        return {string.format("%sFuelOwner = {current = %d}", spaces or "", currentFuel)}
     else
         return nil
     end

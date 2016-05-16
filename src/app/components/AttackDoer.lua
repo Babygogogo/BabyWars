@@ -185,17 +185,17 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialzation.
 --------------------------------------------------------------------------------
-function AttackDoer:serialize(spaces)
+function AttackDoer:toStringList(spaces)
     if ((not self:hasPrimaryWeapon()) or (self:getPrimaryWeaponCurrentAmmo() == self:getPrimaryWeaponMaxAmmo())) then
         return nil
     else
         spaces = spaces or ""
         local subSpaces = spaces .. "    "
-        return string.format("%sAttackDoer = {\n%s\n%s}",
-            spaces,
+        return {
+            spaces .. "AttackDoer = {\n",
             serializePrimaryWeapon(self, subSpaces),
-            spaces
-        )
+            "\n" .. spaces .. "}"
+        }
     end
 end
 

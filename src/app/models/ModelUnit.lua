@@ -15,6 +15,7 @@ local ModelUnit = class("ModelUnit")
 local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TableFunctions        = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The set state functions.
@@ -77,34 +78,35 @@ end
 --------------------------------------------------------------------------------
 -- The private functions for serialization.
 --------------------------------------------------------------------------------
-local function serializeTiledID(self, spaces)
-    return string.format("%stiledID = %d", spaces, self:getTiledID())
+local function serializeTiledIdToStringList(self, spaces)
+    return {string.format("%stiledID = %d", spaces, self:getTiledID())}
 end
 
-local function serializeUnitID(self, spaces)
-    return string.format("%sunitID = %d", spaces, self:getUnitId())
+local function serializeUnitIdToStringList(self, spaces)
+    return {string.format("%sunitID = %d", spaces, self:getUnitId())}
 end
 
-local function serializeState(self, spaces)
+local function serializeStateToStringList(self, spaces)
     local state = self:getState()
     if (state == "idle") then
         return nil
     else
-        return string.format("%sstate = %q", spaces, state)
+        return {string.format("%sstate = %q", spaces, state)}
     end
 end
 
-local function serializeComponents(self, spaces)
-    local strList = {}
+local function serializeComponentsToStringList(self, spaces)
     spaces = spaces or ""
+    local strList = {}
+    local appendList = TableFunctions.appendList
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.serialize) then
-            strList[#strList + 1] = component:serialize(spaces)
+        if (component.toStringList) then
+            appendList(strList, component:toStringList(spaces), ",\n")
         end
     end
 
-    return table.concat(strList, ",\n")
+    return strList
 end
 
 --------------------------------------------------------------------------------
@@ -163,19 +165,18 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelUnit:serialize(spaces)
+function ModelUnit:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
-    local strState = serializeState(self, subSpaces)
+    local strList = {spaces .. "{\n"}
+    local appendList = TableFunctions.appendList
 
-    return string.format("%s{\n%s,\n%s,\n%s%s,\n%s}",
-        spaces,
-        serializeTiledID(   self, subSpaces),
-        serializeUnitID(    self, subSpaces),
-        (strState) and (strState .. ",\n") or (""),
-        serializeComponents(self, subSpaces),
-        spaces
-    )
+    appendList(strList, serializeTiledIdToStringList(   self, subSpaces), ",\n")
+    appendList(strList, serializeUnitIdToStringList(    self, subSpaces), ",\n")
+    appendList(strList, serializeStateToStringList(     self, subSpaces), ",\n")
+    appendList(strList, serializeComponentsToStringList(self, subSpaces), spaces .. "}")
+
+    return strList
 end
 
 --------------------------------------------------------------------------------

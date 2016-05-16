@@ -102,9 +102,11 @@ local function onEvtSystemRequestDoAction(self, event)
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
 
----[[ -- These codes are for testing the serialize() and should be modified to do the real job.
+---[[ -- These codes are for testing the toStringList() and should be modified to do the real job.
     local testFile = io.open(self.m_DataFileFullPath, "w")
-    testFile:write(self:serialize())
+    for _, str in ipairs(self:toStringList()) do
+        testFile:write(str)
+    end
     testFile:close()
 --]]
 
@@ -237,18 +239,18 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelSceneWar:serialize(spaces)
+function ModelSceneWar:toStringList(spaces)
     spaces = spaces or ""
-    local subSpaces = spaces .. "    "
+    local subSpaces  = spaces .. "    "
+    local strList    = {spaces .. "return {\n"}
 
-    return string.format("%sreturn {\n%s,\n\n%s,\n\n%s,\n\n%s,\n%s}",
-        spaces,
-        self:getModelWarField()      :serialize(subSpaces),
-        self:getModelTurnManager()   :serialize(subSpaces),
-        self:getModelPlayerManager() :serialize(subSpaces),
-        self:getModelWeatherManager():serialize(subSpaces),
-        spaces
-    )
+    local appendList = require("app.utilities.TableFunctions").appendList
+    appendList(strList, self:getModelWarField()      :toStringList(subSpaces), ",\n")
+    appendList(strList, self:getModelTurnManager()   :toStringList(subSpaces), ",\n")
+    appendList(strList, self:getModelPlayerManager() :toStringList(subSpaces), ",\n")
+    appendList(strList, self:getModelWeatherManager():toStringList(subSpaces), "\n" .. spaces .. "}")
+
+    return strList
 end
 
 --------------------------------------------------------------------------------

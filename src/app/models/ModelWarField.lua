@@ -197,16 +197,16 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
-function ModelWarField:serialize(spaces)
+function ModelWarField:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
+    local strList = {spaces .. "warField = {\n"}
 
-    return string.format("%swarField = {\n%s,\n%s,\n%s}",
-        spaces,
-        self:getModelTileMap():serialize(subSpaces),
-        self:getModelUnitMap():serialize(subSpaces),
-        spaces
-    )
+    local appendList = require("app.utilities.TableFunctions").appendList
+    appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
+    appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
+
+    return strList
 end
 
 --------------------------------------------------------------------------------
