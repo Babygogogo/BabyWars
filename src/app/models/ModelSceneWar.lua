@@ -29,6 +29,7 @@
 local ModelSceneWar = class("ModelSceneWar")
 
 local isServer = true
+local SCENE_DATA_PATH = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/warScene/"
 
 local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
@@ -38,15 +39,21 @@ local ActionTranslator = require("app.utilities.ActionTranslator")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function requireSceneData(param)
-    local t = type(param)
-    if (t == "table") then
-        return param
-    elseif (t == "string") then
-        local dataName = "res.data.warScene." .. param
-        package.loaded[dataName] = nil
-        return require(dataName)
-    else
+    if (type(param) ~= "string") then
         error("ModelSceneWar-requireSceneData() the param is invalid.")
+    else
+        local fullName = SCENE_DATA_PATH .. param .. ".lua"
+        local fileUtils = cc.FileUtils:getInstance()
+
+        if (not fileUtils:isFileExist(fullName)) then
+            fileUtils:createDirectory(SCENE_DATA_PATH)
+
+            local saveFile = io.open(fullName, "w")
+            saveFile:write("return " .. require("app.utilities.SerializationFunctions").serialize(require("res.data.warScene." .. param)))
+            saveFile:close()
+        end
+
+        return dofile(fullName), fullName
     end
 end
 
@@ -96,7 +103,7 @@ local function onEvtSystemRequestDoAction(self, event)
     end
 
 ---[[ -- These codes are for testing the serialize() and should be modified to do the real job.
-    local testFile = io.open(self.m_FileName, "w")
+    local testFile = io.open(self.m_DataFileFullPath, "w")
     testFile:write(self:serialize())
     testFile:close()
 --]]
@@ -200,9 +207,9 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(param)
     assert(type(param) == "string", "ModelSceneWar:ctor() the param is invalid.")
-    self.m_FileName = "res/data/warScene/" .. param .. ".lua"
+    local sceneData
+    sceneData, self.m_DataFileFullPath = requireSceneData(param)
 
-    local sceneData = requireSceneData(param)
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))
     initWithActorWarHud(          self, createActorSceneWarHUD())

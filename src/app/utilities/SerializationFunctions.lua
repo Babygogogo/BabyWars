@@ -3,17 +3,23 @@ local SerializationFunctions = {}
 
 function SerializationFunctions.serialize(o)
     if (type(o) == "number") then
-        io.write(o)
+        return "" .. o
     elseif (type(o) == "string") then
-        io.write(string.format("%q", o))
+        return string.format("%q", o)
+    elseif (type(o) == "boolean") then
+        return (o) and ("true") or ("false")
     elseif (type(o) == "table") then
-        io.write("{\n")
+        local strList = {"{\n"}
         for k, v in pairs(o) do
-            io.write(" ", k, " = ")
-            serialize(v)
-            io.write(",\n")
+            if (type(k) ~= "number") then
+                strList[#strList + 1] = " " .. k .. " = "
+            end
+            strList[#strList + 1] = SerializationFunctions.serialize(v)
+            strList[#strList + 1] = ",\n"
         end
-        io.write("}\n")
+        strList[#strList + 1] = "}"
+
+        return table.concat(strList)
     else
         error("cannot serialize a " .. type(o))
     end
