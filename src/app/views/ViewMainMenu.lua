@@ -2,6 +2,7 @@
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
 local NEW_GAME_CREATOR_Z_ORDER = 3
+local LOGIN_PANEL_Z_ORDER      = 3
 local MENU_TITLE_Z_ORDER       = 2
 local MENU_LIST_VIEW_Z_ORDER   = 1
 local MENU_BACKGROUND_Z_ORDER  = 0
@@ -146,10 +147,16 @@ end
 
 function ViewMainMenu:setViewWarList(view)
     assert(self.m_ViewWarList == nil, "ViewMainMenu:setViewWarList() the view has been set.")
-    self.m_ViewWarList = vie3
-    local MENU_TITLE_Z_ORDER       = 2
-    local MENU_LIST_VIEW_Z_ORDER   = 1
+    self.m_ViewWarList = view
     self:addChild(view, MENU_BACKGROUND_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewLoginPanel(view)
+    assert(self.m_ViewLoginPanel == nil, "ViewMainMenu:setViewLoginPanel() the view has been set.")
+    self.m_ViewLoginPanel = view
+    self:addChild(view, LOGIN_PANEL_Z_ORDER)
 
     return self
 end

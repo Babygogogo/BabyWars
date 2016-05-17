@@ -4,6 +4,45 @@ local ModelMainMenu = class("ModelMainMenu")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The composition new game creator actor.
+--------------------------------------------------------------------------------
+local function createActorNewGameCreator()
+    return Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
+end
+
+local function initWithActorNewGameCreator(self, actor)
+    actor:getModel():setModelMainMenu(self)
+        :setEnabled(false)
+    self.m_ActorNewGameCreator = actor
+end
+
+--------------------------------------------------------------------------------
+-- The composition continue game selector actor.
+--------------------------------------------------------------------------------
+local function createActorContinueGameSelector(mapListData)
+    return Actor.createWithModelAndViewName("ModelContinueGameSelector", mapListData, "ViewContinueGameSelector", mapListData)
+end
+
+local function initWithActorContinueGameSelector(self, actor)
+    actor:getModel():setModelMainMenu(self)
+        :setEnabled(false)
+    self.m_ActorContinueGameSelector = actor
+end
+
+--------------------------------------------------------------------------------
+-- The composition login panel actor.
+--------------------------------------------------------------------------------
+local function createActorLoginPanel()
+    return Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
+end
+
+local function initWithActorLoginPanel(self, actor)
+    actor:getModel():setModelMainMenu(self)
+        :setEnabled(false)
+    self.m_ActorLoginPanel = actor
+end
+
+--------------------------------------------------------------------------------
 -- The new game item.
 --------------------------------------------------------------------------------
 local function createItemNewGame(self)
@@ -54,29 +93,27 @@ local function initWithItemConfigSkills(self, item)
 end
 
 --------------------------------------------------------------------------------
--- The composition new game creator actor.
+-- The login item.
 --------------------------------------------------------------------------------
-local function createActorNewGameCreator()
-    return Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
+local function createItemLogin(self)
+    return {
+        name = "Login",
+        callback = function()
+            if (not self.m_ActorLoginPanel) then
+                initWithActorLoginPanel(self, createActorLoginPanel())
+                if (self.m_View) then
+                    self.m_View:setViewLoginPanel(self.m_ActorLoginPanel:getView())
+                end
+            end
+
+            self:setMenuEnabled(false)
+            self.m_ActorLoginPanel:getModel():setEnabled(true)
+        end,
+    }
 end
 
-local function initWithActorNewGameCreator(self, actor)
-    actor:getModel():setModelMainMenu(self)
-        :setEnabled(false)
-    self.m_ActorNewGameCreator = actor
-end
-
---------------------------------------------------------------------------------
--- The composition continue game selector actor.
---------------------------------------------------------------------------------
-local function createActorContinueGameSelector(mapListData)
-    return Actor.createWithModelAndViewName("ModelContinueGameSelector", mapListData, "ViewContinueGameSelector", mapListData)
-end
-
-local function initWithActorContinueGameSelector(self, actor)
-    actor:getModel():setModelMainMenu(self)
-        :setEnabled(false)
-    self.m_ActorContinueGameSelector = actor
+local function initWithItemLogin(self, item)
+    self.m_ItemLogin = item
 end
 
 --------------------------------------------------------------------------------
@@ -86,6 +123,7 @@ function ModelMainMenu:ctor(param)
     initWithItemNewGame(              self, createItemNewGame(self))
     initWithItemContinue(             self, createItemContinue(self))
     initWithItemConfigSkills(         self, createItemConfigSkills(self))
+    initWithItemLogin(                self, createItemLogin(self))
     initWithActorNewGameCreator(      self, createActorNewGameCreator())
     initWithActorContinueGameSelector(self, createActorContinueGameSelector())
 
@@ -100,13 +138,14 @@ function ModelMainMenu:initView()
     local view = self.m_View
     assert(view, "ModelMainMenu:initView() no view is attached to the actor of the model.")
 
-    view:setViewNewGameCreator(self.m_ActorNewGameCreator:getView())
+    view:setViewNewGameCreator(self.m_ActorNewGameCreator      :getView())
         :setViewWarList(       self.m_ActorContinueGameSelector:getView())
 
         :removeAllItems()
         :createAndPushBackItem(self.m_ItemNewGame)
         :createAndPushBackItem(self.m_ItemContinue)
         :createAndPushBackItem(self.m_ItemConfigSkills)
+        :createAndPushBackItem(self.m_ItemLogin)
 
     return self
 end
