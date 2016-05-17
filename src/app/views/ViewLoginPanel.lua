@@ -1,12 +1,14 @@
 
 local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 
-local LABEL_TITLE_Z_ORDER    = 1
-local LABEL_ACCOUNT_Z_ORDER  = 1
-local LABEL_PASSWORD_Z_ORDER = 1
-local BUTTON_CONFIRM_Z_ORDER = 1
-local BUTTON_CANCEL_Z_ORDER  = 1
-local BACKGROUND_Z_ORDER     = 0
+local LABEL_TITLE_Z_ORDER       = 1
+local LABEL_ACCOUNT_Z_ORDER     = 1
+local LABEL_PASSWORD_Z_ORDER    = 1
+local BUTTON_CONFIRM_Z_ORDER    = 1
+local BUTTON_CANCEL_Z_ORDER     = 1
+local EDIT_BOX_ACCOUNT_Z_ORDER  = 1
+local EDIT_BOX_PASSWORD_Z_ORDER = 1
+local BACKGROUND_Z_ORDER        = 0
 
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 local BACKGROUND_WIDTH     = 500
@@ -30,8 +32,8 @@ local LABEL_ACCOUNT_HEIGHT = 60
 local LABEL_ACCOUNT_POS_X  = BACKGROUND_POS_X + 10
 local LABEL_ACCOUNT_POS_Y  = LABEL_TITLE_POS_Y - LABEL_ACCOUNT_HEIGHT - 10
 
-local LABEL_PASSWORD_WIDTH  = 100
-local LABEL_PASSWORD_HEIGHT = 60
+local LABEL_PASSWORD_WIDTH  = LABEL_ACCOUNT_WIDTH
+local LABEL_PASSWORD_HEIGHT = LABEL_ACCOUNT_HEIGHT
 local LABEL_PASSWORD_POS_X  = BACKGROUND_POS_X + 10
 local LABEL_PASSWORD_POS_Y  = LABEL_ACCOUNT_POS_Y - LABEL_ACCOUNT_HEIGHT - 10
 
@@ -44,6 +46,16 @@ local BUTTON_CONFIRM_TEXT_COLOR = {r = 104, g = 248, b = 200}
 local BUTTON_CANCEL_POS_X      = BACKGROUND_POS_X + BACKGROUND_WIDTH - BUTTON_WIDTH - 60
 local BUTTON_CANCEL_POS_Y      = BUTTON_CONFIRM_POS_Y
 local BUTTON_CANCEL_TEXT_COLOR = {r = 240, g = 80, b = 56}
+
+local EDIT_BOX_WIDTH        = 345
+local EDIT_BOX_HEIGHT       = LABEL_ACCOUNT_HEIGHT
+local EDIT_BOX_TEXTURE_NAME = "c03_t06_s01_f01.png"
+local EDIT_BOX_CAPINSETS    = {x = 1, y = EDIT_BOX_HEIGHT - 7, width = 1, height = 1}
+
+local EDIT_BOX_ACCOUNT_POS_X  = LABEL_ACCOUNT_POS_X + LABEL_ACCOUNT_WIDTH + 35
+local EDIT_BOX_ACCOUNT_POS_Y  = LABEL_ACCOUNT_POS_Y + 14
+local EDIT_BOX_PASSWORD_POS_X = EDIT_BOX_ACCOUNT_POS_X
+local EDIT_BOX_PASSWORD_POS_Y = LABEL_PASSWORD_POS_Y + 14
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -89,6 +101,21 @@ local function createButton(posX, posY, text, textColor, callback)
     button:getTitleRenderer():enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
     return button
+end
+
+local function createEditBox(posX, posY)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(EDIT_BOX_TEXTURE_NAME, EDIT_BOX_CAPINSETS)
+    local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_WIDTH, EDIT_BOX_HEIGHT), background, background, background)
+    editBox:ignoreAnchorPointForPosition(true)
+        :setPosition(posX, posY)
+        :setFontSize(FONT_SIZE + 5)
+        :setFontColor({r = 0, g = 0, b = 0})
+        :setPlaceholderFontSize(FONT_SIZE + 5)
+
+        :setMaxLength(16)
+        :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+
+    return editBox
 end
 
 --------------------------------------------------------------------------------
@@ -154,7 +181,9 @@ end
 --------------------------------------------------------------------------------
 local function createButtonConfirm(self)
     return createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "Confirm", BUTTON_CONFIRM_TEXT_COLOR, function()
-        print("confirm is not implemented.")
+        if (self.m_Model) then
+            self.m_Model:onButtonConfirmTouched()
+        end
     end)
 end
 
@@ -180,15 +209,49 @@ local function initWithButtonCancel(self, button)
 end
 
 --------------------------------------------------------------------------------
+-- The composition account edit box.
+--------------------------------------------------------------------------------
+local function createEditBoxAccount()
+    local editBox = createEditBox(EDIT_BOX_ACCOUNT_POS_X, EDIT_BOX_ACCOUNT_POS_Y)
+    editBox:setPlaceHolder("input account here")
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+
+    return editBox
+end
+
+local function initWithEditBoxAccount(self, box)
+    self.m_EditBoxAccount = box
+    self:addChild(box, EDIT_BOX_ACCOUNT_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
+-- The composition password edit box.
+--------------------------------------------------------------------------------
+local function createEditBoxPassword()
+    local editBox = createEditBox(EDIT_BOX_PASSWORD_POS_X, EDIT_BOX_PASSWORD_POS_Y)
+    editBox:setPlaceHolder("input password here")
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
+
+    return editBox
+end
+
+local function initWithEditBoxPassword(self, box)
+    self.m_EditBoxPassword = box
+    self:addChild(box, EDIT_BOX_PASSWORD_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewLoginPanel:ctor(param)
-    initWithBackground(   self, createBackground())
-    initWithLabelTitle(   self, createLabelTitle())
-    initWithLabelAccount( self, createLabelAccount())
-    initWithLabelPassword(self, createLabelPassword())
-    initWithButtonConfirm(self, createButtonConfirm(self))
-    initWithButtonCancel( self, createButtonCancel(self))
+    initWithBackground(     self, createBackground())
+    initWithLabelTitle(     self, createLabelTitle())
+    initWithLabelAccount(   self, createLabelAccount())
+    initWithLabelPassword(  self, createLabelPassword())
+    initWithButtonConfirm(  self, createButtonConfirm(self))
+    initWithButtonCancel(   self, createButtonCancel(self))
+    initWithEditBoxAccount( self, createEditBoxAccount())
+    initWithEditBoxPassword(self, createEditBoxPassword())
 
     return self
 end

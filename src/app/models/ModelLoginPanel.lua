@@ -5,6 +5,7 @@ local ModelLoginPanel = class("ModelLoginPanel")
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:ctor(param)
+    return self
 end
 
 function ModelLoginPanel:setModelMainMenu(model)
@@ -21,6 +22,12 @@ function ModelLoginPanel:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setEnabled(enabled)
     end
+
+    return self
+end
+
+function ModelLoginPanel:onButtonConfirmTouched()
+    error("ModelLoginPanel:onButtonConfirmTouched() is not implemented.")
 
     return self
 end
