@@ -44,7 +44,7 @@ end
 -- The composition list items.
 --------------------------------------------------------------------------------
 local function createListItems(self)
-    local listData = requireListData("babygogogo") -- TODO: replace "babygogogo" with the account of the player.
+    local listData = requireListData(self.m_PlayerAccount)
     assert(type(listData) == "table", "ModelContinueGameSelector-createListItems() failed to require list data from with param.")
 
     local items = {}
@@ -86,7 +86,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:ctor(param)
-    initWithItemBack( self, createItemBack(self))
+    initWithItemBack(self, createItemBack(self))
 
     if (self.m_View) then
         self:initView()
@@ -115,6 +115,18 @@ end
 function ModelContinueGameSelector:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelContinueGameSelector:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelContinueGameSelector:doActionLogin(action)
+    if (action.isSuccessful) then
+        self.m_PlayerAccount = action.account
+        self:setEnabled(false)
+    end
 
     return self
 end

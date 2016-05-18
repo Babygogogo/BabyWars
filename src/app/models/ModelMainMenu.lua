@@ -23,10 +23,21 @@ local function createActorNewGameCreator()
     return Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
 end
 
-local function initWithActorNewGameCreator(self, actor)
+local function lazyInitWithActorNewGameCreator(self, actor)
+    assert(self.m_View, "ModelMainMenu-lazyInitWithActorNewGameCreator() no view is attached to the owner actor of the model.")
+    self.m_View:setViewNewGameCreator(actor:getView())
+
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
     self.m_ActorNewGameCreator = actor
+end
+
+local function getActorNewGameCreator(self)
+    if (not self.m_ActorNewGameCreator) then
+        lazyInitWithActorNewGameCreator(self, createActorNewGameCreator())
+    end
+
+    return self.m_ActorNewGameCreator
 end
 
 --------------------------------------------------------------------------------
@@ -36,12 +47,23 @@ local function createActorContinueGameSelector()
     return Actor.createWithModelAndViewName("ModelContinueGameSelector", nil, "ViewContinueGameSelector")
 end
 
-local function initWithActorContinueGameSelector(self, actor)
+local function lazyInitWithActorContinueGameSelector(self, actor)
+    assert(self.m_View, "ModelMainMenu-lazyInitWithActorContinueGameSelector() no view is attached to the owner actor of the model.")
+    self.m_View:setViewContinueGameSelector(actor:getView())
+
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
         :setModelConfirmBox(self.m_ModelConfirmBox)
 
     self.m_ActorContinueGameSelector = actor
+end
+
+local function getActorContinueGameSelector(self)
+    if (not self.m_ActorContinueGameSelector) then
+        lazyInitWithActorContinueGameSelector(self, createActorContinueGameSelector())
+    end
+
+    return self.m_ActorContinueGameSelector
 end
 
 --------------------------------------------------------------------------------
@@ -51,12 +73,23 @@ local function createActorLoginPanel()
     return Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
 end
 
-local function initWithActorLoginPanel(self, actor)
+local function lazyInitWithActorLoginPanel(self, actor)
+    assert(self.m_View, "ModelMainMenu-lazyInitWithActorLoginPanel() no view is attached to the owner actor of the model.")
+    self.m_View:setViewLoginPanel(actor:getView())
+
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
         :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
     self.m_ActorLoginPanel = actor
+end
+
+local function getActorLoginPanel(self)
+    if (not self.m_ActorLoginPanel) then
+        lazyInitWithActorLoginPanel(self, createActorLoginPanel())
+    end
+
+    return self.m_ActorLoginPanel
 end
 
 --------------------------------------------------------------------------------
@@ -66,15 +99,8 @@ local function createItemNewGame(self)
     return {
         name = "New Game",
         callback = function()
-            if (self.m_ActorNewGameCreator == nil) then
-                initWithActorNewGameCreator(self, createActorNewGameCreator())
-                if (self.m_View) then
-                    self.m_View:setViewNewGameCreator(self.m_ActorNewGameCreator:getView())
-                end
-            end
-
             self:setMenuEnabled(false)
-            self.m_ActorNewGameCreator:getModel():setEnabled(true)
+            getActorNewGameCreator(self):getModel():setEnabled(true)
         end,
     }
 end
@@ -90,15 +116,8 @@ local function createItemContinue(self)
     return {
         name     = "Continue",
         callback = function()
-            if (self.m_ActorContinueGameSelector == nil) then
-                initWithActorContinueGameSelector(self, createActorContinueGameSelector())
-                if (self.m_View) then
-                    self.m_View:setViewWarList(self.m_ActorContinueGameSelector:getView())
-                end
-            end
-
             self:setMenuEnabled(false)
-            self.m_ActorContinueGameSelector:getModel():setEnabled(true)
+            getActorContinueGameSelector(self):getModel():setEnabled(true)
         end,
     }
 end
@@ -130,15 +149,8 @@ local function createItemLogin(self)
     return {
         name = "Login",
         callback = function()
-            if (not self.m_ActorLoginPanel) then
-                initWithActorLoginPanel(self, createActorLoginPanel())
-                if (self.m_View) then
-                    self.m_View:setViewLoginPanel(self.m_ActorLoginPanel:getView())
-                end
-            end
-
             self:setMenuEnabled(false)
-            self.m_ActorLoginPanel:getModel():setEnabled(true)
+            getActorLoginPanel(self):getModel():setEnabled(true)
         end,
     }
 end
@@ -196,7 +208,10 @@ function ModelMainMenu:doActionLogin(action)
         self:setMenuEnabled(true)
     end
 
-    self.m_ActorLoginPanel:getModel():doActionLogin(action)
+    getActorLoginPanel(self)          :getModel():doActionLogin(action)
+    getActorContinueGameSelector(self):getModel():doActionLogin(action)
+
+    return self
 end
 
 --------------------------------------------------------------------------------

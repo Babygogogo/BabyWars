@@ -42,6 +42,7 @@ local function requireSceneData(param)
     if (type(param) ~= "string") then
         error("ModelSceneWar-requireSceneData() the param is invalid.")
     else
+        -- TODO: in release version, the data should be downloaded from server and should not be saved locally.
         local fullName = SCENE_DATA_PATH .. param .. ".lua"
         local fileUtils = cc.FileUtils:getInstance()
 

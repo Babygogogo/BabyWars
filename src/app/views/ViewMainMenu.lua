@@ -1,11 +1,12 @@
 
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
-local NEW_GAME_CREATOR_Z_ORDER = 3
-local LOGIN_PANEL_Z_ORDER      = 3
-local MENU_TITLE_Z_ORDER       = 2
-local MENU_LIST_VIEW_Z_ORDER   = 1
-local MENU_BACKGROUND_Z_ORDER  = 0
+local NEW_GAME_CREATOR_Z_ORDER       = 3
+local LOGIN_PANEL_Z_ORDER            = 3
+local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
+local MENU_TITLE_Z_ORDER             = 2
+local MENU_LIST_VIEW_Z_ORDER         = 1
+local MENU_BACKGROUND_Z_ORDER        = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
 local MENU_BACKGROUND_HEIGHT = display.height - 60
@@ -145,10 +146,10 @@ function ViewMainMenu:setViewNewGameCreator(view)
     return self
 end
 
-function ViewMainMenu:setViewWarList(view)
-    assert(self.m_ViewWarList == nil, "ViewMainMenu:setViewWarList() the view has been set.")
-    self.m_ViewWarList = view
-    self:addChild(view, MENU_BACKGROUND_Z_ORDER)
+function ViewMainMenu:setViewContinueGameSelector(view)
+    assert(self.m_ViewContinueGameSelector == nil, "ViewMainMenu:setViewContinueGameSelector() the view has been set.")
+    self.m_ViewContinueGameSelector = view
+    self:addChild(view, CONTINUE_GAME_SELECTOR_Z_ORDER)
 
     return self
 end
