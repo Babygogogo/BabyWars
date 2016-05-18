@@ -4,6 +4,19 @@ local ModelMainMenu = class("ModelMainMenu")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function showMenuItems(self, ...)
+    local view = self.m_View
+    assert(view, "ModelMainMenu-showMenuItems() no view is attached to the owner actor of the model.")
+
+    view:removeAllItems()
+    for _, item in ipairs({...}) do
+        view:createAndPushBackItem(item)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The composition new game creator actor.
 --------------------------------------------------------------------------------
 local function createActorNewGameCreator()
@@ -19,13 +32,15 @@ end
 --------------------------------------------------------------------------------
 -- The composition continue game selector actor.
 --------------------------------------------------------------------------------
-local function createActorContinueGameSelector(mapListData)
-    return Actor.createWithModelAndViewName("ModelContinueGameSelector", mapListData, "ViewContinueGameSelector", mapListData)
+local function createActorContinueGameSelector()
+    return Actor.createWithModelAndViewName("ModelContinueGameSelector", nil, "ViewContinueGameSelector")
 end
 
 local function initWithActorContinueGameSelector(self, actor)
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
+        :setModelConfirmBox(self.m_ModelConfirmBox)
+
     self.m_ActorContinueGameSelector = actor
 end
 
@@ -39,6 +54,8 @@ end
 local function initWithActorLoginPanel(self, actor)
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
+        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+
     self.m_ActorLoginPanel = actor
 end
 
@@ -49,6 +66,13 @@ local function createItemNewGame(self)
     return {
         name = "New Game",
         callback = function()
+            if (self.m_ActorNewGameCreator == nil) then
+                initWithActorNewGameCreator(self, createActorNewGameCreator())
+                if (self.m_View) then
+                    self.m_View:setViewNewGameCreator(self.m_ActorNewGameCreator:getView())
+                end
+            end
+
             self:setMenuEnabled(false)
             self.m_ActorNewGameCreator:getModel():setEnabled(true)
         end,
@@ -66,6 +90,13 @@ local function createItemContinue(self)
     return {
         name     = "Continue",
         callback = function()
+            if (self.m_ActorContinueGameSelector == nil) then
+                initWithActorContinueGameSelector(self, createActorContinueGameSelector())
+                if (self.m_View) then
+                    self.m_View:setViewWarList(self.m_ActorContinueGameSelector:getView())
+                end
+            end
+
             self:setMenuEnabled(false)
             self.m_ActorContinueGameSelector:getModel():setEnabled(true)
         end,
@@ -120,12 +151,10 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initWithItemNewGame(              self, createItemNewGame(self))
-    initWithItemContinue(             self, createItemContinue(self))
-    initWithItemConfigSkills(         self, createItemConfigSkills(self))
-    initWithItemLogin(                self, createItemLogin(self))
-    initWithActorNewGameCreator(      self, createActorNewGameCreator())
-    initWithActorContinueGameSelector(self, createActorContinueGameSelector())
+    initWithItemNewGame(     self, createItemNewGame(self))
+    initWithItemContinue(    self, createItemContinue(self))
+    initWithItemConfigSkills(self, createItemConfigSkills(self))
+    initWithItemLogin(       self, createItemLogin(self))
 
     if (self.m_View) then
         self:initView()
@@ -138,13 +167,7 @@ function ModelMainMenu:initView()
     local view = self.m_View
     assert(view, "ModelMainMenu:initView() no view is attached to the actor of the model.")
 
-    view:setViewNewGameCreator(self.m_ActorNewGameCreator      :getView())
-        :setViewWarList(       self.m_ActorContinueGameSelector:getView())
-
-        :removeAllItems()
-        :createAndPushBackItem(self.m_ItemNewGame)
-        :createAndPushBackItem(self.m_ItemContinue)
-        :createAndPushBackItem(self.m_ItemConfigSkills)
+    view:removeAllItems()
         :createAndPushBackItem(self.m_ItemLogin)
 
     return self
@@ -153,9 +176,27 @@ end
 function ModelMainMenu:setModelConfirmBox(model)
     assert(self.m_ModelConfirmBox == nil, "ModelMainMenu:setModelConfirmBox() the model has been set.")
     self.m_ModelConfirmBox = model
-    self.m_ActorContinueGameSelector:getModel():setModelConfirmBox(model)
 
     return self
+end
+
+function ModelMainMenu:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelMainMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelMainMenu:doActionLogin(action)
+    if (action.isSuccessful) then
+        showMenuItems(self, self.m_ItemNewGame, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
+        self:setMenuEnabled(true)
+    end
+
+    self.m_ActorLoginPanel:getModel():doActionLogin(action)
 end
 
 --------------------------------------------------------------------------------

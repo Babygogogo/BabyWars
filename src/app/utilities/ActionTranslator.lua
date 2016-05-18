@@ -24,8 +24,8 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getCurrentPlayerAccount(playerManagerModel, turnManagerModel)
-    return playerManagerModel:getModelPlayer(turnManagerModel:getPlayerIndex()):getAccount()
+local function getCurrentPlayerAccount(modelPlayerManager, modelTurnManager)
+    return modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex()):getAccount()
 end
 
 local function getPlayerAccountForModelUnit(modelUnit, modelPlayerManager)
@@ -92,23 +92,33 @@ local function translatePath(path, modelUnitMap, modelTileMap, modelWeatherManag
 end
 
 local function translateEndTurn(action, modelScene)
-    local playerManagerModel = modelScene:getModelPlayerManager()
-    local turnManagerModel   = modelScene:getModelTurnManager()
+    local modelPlayerManager = modelScene:getModelPlayerManager()
+    local modelTurnManager   = modelScene:getModelTurnManager()
 
-    if (turnManagerModel:getTurnPhase() ~= "main") then
+    if (getCurrentPlayerAccount(modelPlayerManager, modelTurnManager) ~= action.playerAccount) then
+        return nil, "ActionTranslator-translateEndTurn() the account of the actioning player is not the same as the one of the in-turn player."
+    end
+
+    if (modelTurnManager:getTurnPhase() ~= "main") then
         return nil, "ActionTranslator-translateEndTurn() the current turn phase is expected to be 'main'."
     end
 
     return {actionName = "EndTurn", nextWeather = modelScene:getModelWeatherManager():getNextWeather()}
 end
 
-local function translateWait(action, modelScene, currentPlayerAccount)
-    local modelWarField       = modelScene:getModelWarField()
-    local modelUnitMap        = modelWarField:getModelUnitMap()
-    local modelTileMap        = modelWarField:getModelTileMap()
-    local modelPlayerManager  = modelScene:getModelPlayerManager()
-    local modelWeatherManager = modelScene:getModelWeatherManager()
-    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
+local function translateWait(action, modelScene)
+    local modelWarField        = modelScene:getModelWarField()
+    local modelUnitMap         = modelWarField:getModelUnitMap()
+    local modelTileMap         = modelWarField:getModelTileMap()
+    local modelPlayerManager   = modelScene:getModelPlayerManager()
+    local modelTurnManager     = modelScene:getModelTurnManager()
+    local modelWeatherManager  = modelScene:getModelWeatherManager()
+    local modelPlayer          = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex())
+    local currentPlayerAccount = modelPlayer:getAccount()
+
+    if (currentPlayerAccount ~= action.playerAccount) then
+        return nil, "ActionTranslator-translateWait() the account of the actioning player is not the same as the one of the in-turn player."
+    end
 
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
@@ -123,13 +133,18 @@ local function translateWait(action, modelScene, currentPlayerAccount)
     end
 end
 
-local function translateAttack(action, modelScene, currentPlayerAccount)
-    local modelWarField       = modelScene:getModelWarField()
-    local modelUnitMap        = modelWarField:getModelUnitMap()
-    local modelTileMap        = modelWarField:getModelTileMap()
-    local modelPlayerManager  = modelScene:getModelPlayerManager()
-    local modelWeatherManager = modelScene:getModelWeatherManager()
-    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
+local function translateAttack(action, modelScene)
+    local modelWarField        = modelScene:getModelWarField()
+    local modelUnitMap         = modelWarField:getModelUnitMap()
+    local modelTileMap         = modelWarField:getModelTileMap()
+    local modelPlayerManager   = modelScene:getModelPlayerManager()
+    local modelWeatherManager  = modelScene:getModelWeatherManager()
+    local modelPlayer          = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
+    local currentPlayerAccount = modelPlayer:getAccount()
+
+    if (currentPlayerAccount ~= action.playerAccount) then
+        return nil, "ActionTranslator-translateAttack() the account of the actioning player is not the same as the one of the in-turn player."
+    end
 
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
@@ -158,13 +173,18 @@ local function translateAttack(action, modelScene, currentPlayerAccount)
     return {actionName = "Attack", path = translatedPath, targetGridIndex = GridIndexFunctions.clone(targetGridIndex), attackDamage = attackDamage, counterDamage = counterDamage}
 end
 
-local function translateCapture(action, modelScene, currentPlayerAccount)
-    local modelWarField       = modelScene:getModelWarField()
-    local modelUnitMap        = modelWarField:getModelUnitMap()
-    local modelTileMap        = modelWarField:getModelTileMap()
-    local modelPlayerManager  = modelScene:getModelPlayerManager()
-    local modelWeatherManager = modelScene:getModelWeatherManager()
-    local modelPlayer         = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
+local function translateCapture(action, modelScene)
+    local modelWarField        = modelScene:getModelWarField()
+    local modelUnitMap         = modelWarField:getModelUnitMap()
+    local modelTileMap         = modelWarField:getModelTileMap()
+    local modelPlayerManager   = modelScene:getModelPlayerManager()
+    local modelWeatherManager  = modelScene:getModelWeatherManager()
+    local modelPlayer          = modelPlayerManager:getModelPlayer(modelScene:getModelTurnManager():getPlayerIndex())
+    local currentPlayerAccount = modelPlayer:getAccount()
+
+    if (currentPlayerAccount ~= action.playerAccount) then
+        return nil, "ActionTranslator-translateCapture() the account of the actioning player is not the same as the one of the in-turn player."
+    end
 
     local translatedPath, translateMsg = translatePath(action.path, modelUnitMap, modelTileMap, modelWeatherManager, modelPlayerManager, currentPlayerAccount, modelPlayer)
     if (not translatedPath) then
@@ -194,6 +214,10 @@ local function translateProduceOnTile(action, modelScene)
     local gridIndex     = action.gridIndex
     local tiledID       = action.tiledID
 
+    if (modelPlayer:getAccount() ~= action.playerAccount) then
+        return nil, "ActionTranslator-translateProduceOnTile() the account of the actioning player is not the same as the one of the in-turn player."
+    end
+
     if (modelWarField:getModelUnitMap():getModelUnit(gridIndex)) then
         return nil, "ActionTranslator-translateProduceOnTile() failed because there's a unit on the tile."
     end
@@ -211,26 +235,36 @@ local function translateProduceOnTile(action, modelScene)
     return {actionName = "ProduceOnTile", gridIndex = GridIndexFunctions.clone(gridIndex), tiledID = tiledID, cost = cost}
 end
 
+local function translateLogin(action)
+    local fileName = "./res/data/playerProfile/" .. action.account .. ".lua"
+    local file = io.open(fileName, "r")
+    local isSuccessful = false
+
+    if (file) then
+        file:close()
+        isSuccessful = dofile(fileName).password == action.password
+    end
+
+    return {actionName = "Login", isSuccessful = isSuccessful, account = action.account}
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ActionTranslator.translate(action, modelScene)
-    local currentPlayerAccount = getCurrentPlayerAccount(modelScene:getModelPlayerManager(), modelScene:getModelTurnManager())
-    if (currentPlayerAccount ~= action.playerAccount) then
-        return nil, "ActionTranslator.translate() the account of the actioning player is not the same as the one of the in-turn player."
-    end
-
     local actionName = action.actionName
     if (actionName == "EndTurn") then
-        return translateEndTurn(action, modelScene)
+        return translateEndTurn(      action, modelScene)
     elseif (actionName == "Wait") then
-        return translateWait(   action, modelScene, currentPlayerAccount)
+        return translateWait(         action, modelScene)
     elseif (actionName == "Attack") then
-        return translateAttack( action, modelScene, currentPlayerAccount)
+        return translateAttack(       action, modelScene)
     elseif (actionName == "Capture") then
-        return translateCapture(action, modelScene, currentPlayerAccount)
+        return translateCapture(      action, modelScene)
     elseif (actionName == "ProduceOnTile") then
-        return translateProduceOnTile(action, modelScene, currentPlayerAccount)
+        return translateProduceOnTile(action, modelScene)
+    elseif (actionName == "Login") then
+        return translateLogin(action)
     else
         return nil, "ActionTranslator.translate() unrecognized action name."
     end

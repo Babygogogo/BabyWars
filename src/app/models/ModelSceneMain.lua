@@ -17,6 +17,65 @@ local ModelSceneMain = class("ModelSceneMain")
 
 local Actor	                = require("global.actors.Actor")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local ActionTranslator      = require("app.utilities.ActionTranslator")
+
+local isServer = true -- This is for testing and should be removed.
+
+--------------------------------------------------------------------------------
+-- The functions for doing actions.
+--------------------------------------------------------------------------------
+local function doActionLogin(self, action)
+    if ((action.isSuccessful) and (action.account ~= self.m_PlayerAccount)) then
+        self.m_PlayerAccount = action.account
+        if (self.m_View) then
+            self.m_View:showMessage("Welcome, " .. action.account .. "!")
+        end
+    end
+
+    self.m_ActorMainMenu:getModel():doActionLogin(action)
+end
+
+--------------------------------------------------------------------------------
+-- The private callback function on script events.
+--------------------------------------------------------------------------------
+local function onEvtSystemRequestDoAction(self, event)
+    local actionName = event.actionName
+    if (actionName == "Login") then
+        doActionLogin(self, event)
+    else
+        print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action.")
+    end
+end
+
+local function onEvtPlayerRequestDoAction(self, event)
+    local request = event
+    request.playerAccount = self.m_PlayerAccount
+
+    if (isServer) then
+        local translatedAction, translateMsg = ActionTranslator.translate(request)
+        if (not translatedAction) then
+            print("ModelSceneMain-onEvtPlayerRequestDoAction() action translation failed: " .. (translateMsg or ""))
+        else
+            onEvtSystemRequestDoAction(self, translatedAction)
+            -- TODO: send the translatedAction to clients.
+        end
+    else
+        -- TODO: send the requestedAction to the server.
+    end
+end
+
+--------------------------------------------------------------------------------
+-- The composition script event dispatcher.
+--------------------------------------------------------------------------------
+local function createScriptEventDispatcher()
+    return require("global.events.EventDispatcher"):create()
+end
+
+local function initWithScriptEventDispatcher(self, dispatcher)
+    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtSystemRequestDoAction", self)
+    self.m_ScriptEventDispatcher = dispatcher
+end
 
 --------------------------------------------------------------------------------
 -- The composition confirm box actor.
@@ -39,6 +98,7 @@ end
 
 local function initWithActorMainMenu(self, actor)
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
     self.m_ActorMainMenu = actor
 end
 
@@ -46,8 +106,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneMain:ctor(param)
-    initWithActorConfirmBox(self, createActorConfirmBox())
-    initWithActorMainMenu(  self, createActorMainMenu())
+    initWithScriptEventDispatcher(self, createScriptEventDispatcher())
+    initWithActorConfirmBox(      self, createActorConfirmBox())
+    initWithActorMainMenu(        self, createActorMainMenu())
 
     if (self.m_View) then
         self:initView()
@@ -63,6 +124,20 @@ function ModelSceneMain:initView()
     view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
         :setViewMainMenu(  self.m_ActorMainMenu:getView())
         :setGameVersion(GameConstantFunctions.getGameVersion())
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback function on script events.
+--------------------------------------------------------------------------------
+function ModelSceneMain:onEvent(event)
+    local eventName = event.name
+    if (eventName == "EvtPlayerRequestDoAction") then
+        onEvtPlayerRequestDoAction(self, event)
+    elseif (eventName == "EvtSystemRequestDoAction") then
+        onEvtSystemRequestDoAction(self, event)
+    end
 
     return self
 end

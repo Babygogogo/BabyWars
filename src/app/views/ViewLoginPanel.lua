@@ -1,6 +1,7 @@
 
 local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 
+local MESSAGE_INDICATOR_Z_ORDER = 2
 local LABEL_TITLE_Z_ORDER       = 1
 local LABEL_ACCOUNT_Z_ORDER     = 1
 local LABEL_PASSWORD_Z_ORDER    = 1
@@ -10,9 +11,14 @@ local EDIT_BOX_ACCOUNT_Z_ORDER  = 1
 local EDIT_BOX_PASSWORD_Z_ORDER = 1
 local BACKGROUND_Z_ORDER        = 0
 
+local MESSAGE_INDICATOR_WIDTH  = display.width
+local MESSAGE_INDICATOR_HEIGHT = 80
+local MESSAGE_INDICATOR_POS_X  = 0
+local MESSAGE_INDICATOR_POS_Y  = display.height - MESSAGE_INDICATOR_HEIGHT
+
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 local BACKGROUND_WIDTH     = 500
-local BACKGROUND_HEIGHT    = 300
+local BACKGROUND_HEIGHT    = 270
 local BACKGROUND_POS_X     = (display.width  - BACKGROUND_WIDTH)  / 2
 local BACKGROUND_POS_Y     = (display.height - BACKGROUND_HEIGHT) / 1.5
 
@@ -35,12 +41,12 @@ local LABEL_ACCOUNT_POS_Y  = LABEL_TITLE_POS_Y - LABEL_ACCOUNT_HEIGHT - 10
 local LABEL_PASSWORD_WIDTH  = LABEL_ACCOUNT_WIDTH
 local LABEL_PASSWORD_HEIGHT = LABEL_ACCOUNT_HEIGHT
 local LABEL_PASSWORD_POS_X  = BACKGROUND_POS_X + 10
-local LABEL_PASSWORD_POS_Y  = LABEL_ACCOUNT_POS_Y - LABEL_ACCOUNT_HEIGHT - 10
+local LABEL_PASSWORD_POS_Y  = LABEL_ACCOUNT_POS_Y - LABEL_ACCOUNT_HEIGHT
 
 local BUTTON_WIDTH              = 150
 local BUTTON_HEIGHT             = 50
 local BUTTON_CONFIRM_POS_X      = BACKGROUND_POS_X + 60
-local BUTTON_CONFIRM_POS_Y      = BACKGROUND_POS_Y + 30
+local BUTTON_CONFIRM_POS_Y      = BACKGROUND_POS_Y + 25
 local BUTTON_CONFIRM_TEXT_COLOR = {r = 104, g = 248, b = 200}
 
 local BUTTON_CANCEL_POS_X      = BACKGROUND_POS_X + BACKGROUND_WIDTH - BUTTON_WIDTH - 60
@@ -119,6 +125,35 @@ local function createEditBox(posX, posY)
 end
 
 --------------------------------------------------------------------------------
+-- The composition message indicator.
+--------------------------------------------------------------------------------
+local function createMessageIndicator()
+    local indicator = createLabel(MESSAGE_INDICATOR_POS_X, MESSAGE_INDICATOR_POS_Y, MESSAGE_INDICATOR_WIDTH, MESSAGE_INDICATOR_HEIGHT)
+    indicator:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+
+    indicator.showMessage = function(self, msg)
+        self:setVisible(true)
+            :setOpacity(255)
+            :setString(msg)
+
+            :stopAllActions()
+            :runAction(cc.Sequence:create(
+                cc.DelayTime:create(2),
+                cc.FadeOut:create(1),
+                cc.CallFunc:create(function() self:setVisible(false) end)
+            ))
+    end
+
+    return indicator
+end
+
+local function initWithMessageIndicator(self, indicator)
+    self.m_MessageIndicator = indicator
+    self:addChild(indicator, MESSAGE_INDICATOR_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
 -- The composition background.
 --------------------------------------------------------------------------------
 local function createBackground()
@@ -182,7 +217,7 @@ end
 local function createButtonConfirm(self)
     return createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "Confirm", BUTTON_CONFIRM_TEXT_COLOR, function()
         if (self.m_Model) then
-            self.m_Model:onButtonConfirmTouched()
+            self.m_Model:onButtonConfirmTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
     end)
 end
@@ -213,7 +248,7 @@ end
 --------------------------------------------------------------------------------
 local function createEditBoxAccount()
     local editBox = createEditBox(EDIT_BOX_ACCOUNT_POS_X, EDIT_BOX_ACCOUNT_POS_Y)
-    editBox:setPlaceHolder("input account here")
+    editBox:setPlaceHolder("input at least 6 characters")
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
 
     return editBox
@@ -229,7 +264,7 @@ end
 --------------------------------------------------------------------------------
 local function createEditBoxPassword()
     local editBox = createEditBox(EDIT_BOX_PASSWORD_POS_X, EDIT_BOX_PASSWORD_POS_Y)
-    editBox:setPlaceHolder("input password here")
+    editBox:setPlaceHolder("input at least 6 characters")
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
 
     return editBox
@@ -244,14 +279,15 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewLoginPanel:ctor(param)
-    initWithBackground(     self, createBackground())
-    initWithLabelTitle(     self, createLabelTitle())
-    initWithLabelAccount(   self, createLabelAccount())
-    initWithLabelPassword(  self, createLabelPassword())
-    initWithButtonConfirm(  self, createButtonConfirm(self))
-    initWithButtonCancel(   self, createButtonCancel(self))
-    initWithEditBoxAccount( self, createEditBoxAccount())
-    initWithEditBoxPassword(self, createEditBoxPassword())
+    initWithMessageIndicator(self, createMessageIndicator())
+    initWithBackground(      self, createBackground())
+    initWithLabelTitle(      self, createLabelTitle())
+    initWithLabelAccount(    self, createLabelAccount())
+    initWithLabelPassword(   self, createLabelPassword())
+    initWithButtonConfirm(   self, createButtonConfirm(self))
+    initWithButtonCancel(    self, createButtonCancel(self))
+    initWithEditBoxAccount(  self, createEditBoxAccount())
+    initWithEditBoxPassword( self, createEditBoxPassword())
 
     return self
 end
@@ -261,6 +297,23 @@ end
 --------------------------------------------------------------------------------
 function ViewLoginPanel:setEnabled(enabled)
     self:setVisible(enabled)
+
+    return self
+end
+
+function ViewLoginPanel:showMessage(msg)
+    self.m_MessageIndicator:showMessage(msg)
+
+    return self
+end
+
+function ViewLoginPanel:disableButtonConfirmForSecs(secs)
+    self.m_ButtonConfirm:setEnabled(false)
+        :stopAllActions()
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(secs),
+            cc.CallFunc:create(function() self.m_ButtonConfirm:setEnabled(true) end)
+        ))
 
     return self
 end
