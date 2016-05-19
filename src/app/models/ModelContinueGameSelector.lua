@@ -11,30 +11,18 @@
 
 local ModelContinueGameSelector = class("ModelContinueGameSelector")
 
-local Actor        = require("global.actors.Actor")
-local ActorManager = require("global.actors.ActorManager")
+local Actor            = require("global.actors.Actor")
+local ActorManager     = require("global.actors.ActorManager")
+local WebSocketManager = require("app.utilities.WebSocketManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function requireListData(param)
-    local t = type(param)
-    if (t == "table") then
-        return param
-    elseif (t == "string") then
-        -- TODO: get the list of the games in progress from the server.
-        local fileName = "res.data.playerProfile." .. param
-        package.loaded[fileName] = nil
-        return require(fileName).gamesInProgress
-    else
-        return nil
-    end
-end
-
 local function enableConfirmBoxForEnteringSceneWar(self, name, data)
     self.m_ModelConfirmBox:setConfirmText("You are entering a war:\n" .. name .. ".\nAre you sure?")
         :setOnConfirmYes(function()
             local actorSceneWar = Actor.createWithModelAndViewName("ModelSceneWar", data, "ViewSceneWar")
+            WebSocketManager.setOwner(actorSceneWar:getModel())
             ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
         end)
         :setEnabled(true)
@@ -43,17 +31,16 @@ end
 --------------------------------------------------------------------------------
 -- The composition list items.
 --------------------------------------------------------------------------------
-local function createListItems(self)
-    local listData = requireListData(self.m_PlayerAccount)
-    assert(type(listData) == "table", "ModelContinueGameSelector-createListItems() failed to require list data from with param.")
+local function createListItems(self, list)
+    assert(type(list) == "table", "ModelContinueGameSelector-createListItems() failed to require list data from with param.")
 
     local items = {}
-    for fileName, warSceneName in pairs(listData) do
-        items[#items + 1] = {
-            name     = warSceneName,
+    for i, item in ipairs(list) do
+        items[i] = {
+            name     = item.name,
             callback = function()
                 -- TODO: get the war scene data from the server.
-                enableConfirmBoxForEnteringSceneWar(self, warSceneName, fileName)
+                enableConfirmBoxForEnteringSceneWar(self, item.name, item.fileName)
             end,
         }
     end
@@ -119,13 +106,28 @@ function ModelContinueGameSelector:setModelMainMenu(model)
     return self
 end
 
+function ModelContinueGameSelector:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelContinueGameSelector:setRootScriptEventDispatcher() the dispatcher has been set.")
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:doActionLogin(action)
     if (action.isSuccessful) then
-        self.m_PlayerAccount = action.account
         self:setEnabled(false)
+    end
+
+    return self
+end
+
+function ModelContinueGameSelector:doActionGetOngoingWarList(action)
+    initWithListItems(self, createListItems(self, action.list))
+    if ((self.m_View) and (self.m_IsEnabled)) then
+        self.m_View:showWarList(self.m_ListItems)
     end
 
     return self
@@ -135,17 +137,18 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:setEnabled(enabled)
+    self.m_IsEnabled = enabled
+
     if (enabled) then
-        initWithListItems(self, createListItems(self))
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name = "EvtPlayerRequestDoAction",
+            actionName = "GetOngoingWarList",
+        })
     end
 
-    local view = self.m_View
-    if (view) then
-        view:setVisible(enabled)
-        if (enabled) then
-            view:removeAllItems()
-                :showWarList(self.m_ListItems)
-        end
+    if (self.m_View) then
+        self.m_View:setVisible(enabled)
+            :removeAllItems()
     end
 
     return self

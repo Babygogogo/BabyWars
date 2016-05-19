@@ -255,7 +255,7 @@ function ModelSceneWar:toStringList(spaces)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on start/stop running and script events.
+-- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
     self.m_ScriptEventDispatcher:dispatchEvent({
@@ -280,6 +280,20 @@ function ModelSceneWar:onEvent(event)
         onEvtPlayerRequestDoAction(self, event)
     elseif (eventName == "EvtSystemRequestDoAction") then
         onEvtSystemRequestDoAction(self, event)
+    end
+
+    return self
+end
+
+function ModelSceneWar:onWebSocketEvent(eventName, param)
+    if (eventName == "open") then
+--        onWebSocketOpen(self, param)
+    elseif (eventName == "message") then
+--        onWebSocketMessage(self, param)
+    elseif (eventName == "close") then
+--        onWebSocketClose(self, param)
+    elseif (eventName == "error") then
+--        onWebSocketError(self, param)
     end
 
     return self

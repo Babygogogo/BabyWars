@@ -54,6 +54,7 @@ local function lazyInitWithActorContinueGameSelector(self, actor)
     actor:getModel():setModelMainMenu(self)
         :setEnabled(false)
         :setModelConfirmBox(self.m_ModelConfirmBox)
+        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
     self.m_ActorContinueGameSelector = actor
 end
@@ -179,8 +180,7 @@ function ModelMainMenu:initView()
     local view = self.m_View
     assert(view, "ModelMainMenu:initView() no view is attached to the actor of the model.")
 
-    view:removeAllItems()
-        :createAndPushBackItem(self.m_ItemLogin)
+    self:updateWithIsPlayerLoggedIn(false)
 
     return self
 end
@@ -204,12 +204,18 @@ end
 --------------------------------------------------------------------------------
 function ModelMainMenu:doActionLogin(action)
     if (action.isSuccessful) then
-        showMenuItems(self, self.m_ItemNewGame, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
-        self:setMenuEnabled(true)
+        self:updateWithIsPlayerLoggedIn(true)
+            :setMenuEnabled(true)
     end
 
     getActorLoginPanel(self)          :getModel():doActionLogin(action)
     getActorContinueGameSelector(self):getModel():doActionLogin(action)
+
+    return self
+end
+
+function ModelMainMenu:doActionGetOngoingWarList(action)
+    getActorContinueGameSelector(self):getModel():doActionGetOngoingWarList(action)
 
     return self
 end
@@ -228,6 +234,18 @@ end
 function ModelMainMenu:setMenuEnabled(enabled)
     if (self.m_View) then
         self.m_View:setMenuVisible(enabled)
+    end
+
+    return self
+end
+
+function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
+    if (self.m_View) then
+        if (isLogged) then
+            showMenuItems(self, self.m_ItemNewGame, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
+        else
+            showMenuItems(self, self.m_ItemLogin)
+        end
     end
 
     return self

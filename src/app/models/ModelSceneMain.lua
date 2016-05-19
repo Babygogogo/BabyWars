@@ -15,7 +15,7 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
-local Actor	                 = require("global.actors.Actor")
+local Actor                  = require("global.actors.Actor")
 local GameConstantFunctions  = require("app.utilities.GameConstantFunctions")
 local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
@@ -27,14 +27,18 @@ local isServer = true -- This is for testing and should be removed.
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
 local function doActionLogin(self, action)
-    if ((action.isSuccessful) and (action.account ~= self.m_PlayerAccount)) then
-        self.m_PlayerAccount = action.account
+    if ((action.isSuccessful) and (action.account ~= WebSocketManager.getLoggedInAccountAndPassword())) then
+        WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
         if (self.m_View) then
             self.m_View:showMessage("Welcome, " .. action.account .. "!")
         end
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
+end
+
+local function doActionGetOngoingWarList(self, action)
+    self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
 end
 
 --------------------------------------------------------------------------------
@@ -44,6 +48,10 @@ local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
     if (actionName == "Login") then
         doActionLogin(self, event)
+    elseif (actionName == "GetOngoingWarList") then
+        doActionGetOngoingWarList(self, event)
+    elseif (actionName == "Error") then
+        error("ModelSceneMain-onEvtSystemRequestDoAction() " .. event.error)
     else
         print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action.")
     end
@@ -53,20 +61,6 @@ local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     WebSocketManager.sendString(SerializationFunctions.serialize(request))
-
---[[
-    if (isServer) then
-        local translatedAction, translateMsg = ActionTranslator.translate(request)
-        if (not translatedAction) then
-            print("ModelSceneMain-onEvtPlayerRequestDoAction() action translation failed: " .. (translateMsg or ""))
-        else
-            onEvtSystemRequestDoAction(self, translatedAction)
-            -- TODO: send the translatedAction to clients.
-        end
-    else
-        -- TODO: send the requestedAction to the server.
-    end
---]]
 end
 
 --------------------------------------------------------------------------------
@@ -74,11 +68,14 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    WebSocketManager.sendString("sending message from game.")
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneMain-onWebSocketMessage() " .. param.message)
+    print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
+
+    local action = assert(loadstring("return " .. param.message))()
+    -- print(SerializationFunctions.serialize(action))
+    onEvtSystemRequestDoAction(self, action)
 end
 
 local function onWebSocketClose(self, param)
@@ -124,13 +121,17 @@ end
 local function initWithActorMainMenu(self, actor)
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
+
     self.m_ActorMainMenu = actor
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelSceneMain:ctor(param)
+function ModelSceneMain:ctor(isPlayerLoggedIn)
+    self.m_IsPlayerLoggedIn = (isPlayerLoggedIn) and (true) or (false)
+
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorConfirmBox(      self, createActorConfirmBox())
     initWithActorMainMenu(        self, createActorMainMenu())

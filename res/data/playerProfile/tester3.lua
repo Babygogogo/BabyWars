@@ -5,9 +5,11 @@ return {
 
     rankScore = 1000,
 
-    gamesWon    = 0,
-    gamesLost   = 0,
-    gamesInDraw = 0,
+    gameRecords = {
+        win  = 0,
+        lose = 0,
+        draw = 0
+    },
 
     skillConfigurations = {
         {
@@ -45,11 +47,21 @@ return {
         },
     },
 
-    gamesEnded = {},
-    gamesInProgress = {
-        ["WarScene_Test1"] = "WarSceneTest1",
-        ["WarScene_Test2"] = "WarSceneTest2",
-        ["WarScene_Test3"] = "WarSceneTest3",
-    },
-    gamesCreated = {},
+    warLists = {
+        created = {},
+        ongoing = {
+            {
+                name = "WarSceneTest1",
+                fileName = "WarScene_Test1",
+            },
+            {
+                name = "WarSceneTest2",
+                fileName = "WarScene_Test2",
+            },
+            {
+                name = "WarSceneTest3",
+                fileName = "WarScene_Test3",
+            },
+        }
+    }
 }

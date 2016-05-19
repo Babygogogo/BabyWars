@@ -1,6 +1,8 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
+local WebSocketManager = require("app.utilities.WebSocketManager")
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -33,11 +35,12 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:doActionLogin(action)
-    if (action.isSuccessful) then
-        self.m_PlayerAccount = action.account
-        self:setEnabled(false)
-    elseif (self.m_View) then
-        self.m_View:showMessage("Invalid account/password.")
+    if (self.m_IsEnabled) then
+        if (action.isSuccessful) then
+            self:setEnabled(false)
+        elseif (self.m_View) then
+            self.m_View:showMessage("Invalid account/password.")
+        end
     end
 
     return self
@@ -47,6 +50,8 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:setEnabled(enabled)
+    self.m_IsEnabled = enabled
+
     if (self.m_View) then
         self.m_View:setEnabled(enabled)
     end
@@ -58,7 +63,7 @@ function ModelLoginPanel:onButtonConfirmTouched(account, password)
     if (self.m_View) then
         if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
             self.m_View:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
-        elseif (account == self.m_PlayerAccount) then
+        elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
             self.m_View:showMessage("You have already logged in as " .. account .. ".")
         else
             self.m_View:disableButtonConfirmForSecs(5)
