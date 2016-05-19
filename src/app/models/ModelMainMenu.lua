@@ -220,6 +220,12 @@ function ModelMainMenu:doActionGetOngoingWarList(action)
     return self
 end
 
+function ModelMainMenu:doActionGetSceneWarData(action)
+    getActorContinueGameSelector(self):getModel():doActionGetSceneWarData(action)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

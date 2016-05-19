@@ -62,6 +62,7 @@ end
 function WebSocketManager.close()
     assert(WebSocketManager.isInitialized(), "WebSocketManager.close() the socket hasn't been initialized.")
     s_Socket:close()
+    s_Socket = nil
 
     return WebSocketManager
 end

@@ -21,8 +21,6 @@ local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
-local isServer = true -- This is for testing and should be removed.
-
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
@@ -41,6 +39,10 @@ local function doActionGetOngoingWarList(self, action)
     self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
 end
 
+local function doActionGetSceneWarData(self, action)
+    self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
+end
+
 --------------------------------------------------------------------------------
 -- The private callback function on script events.
 --------------------------------------------------------------------------------
@@ -50,8 +52,10 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionLogin(self, event)
     elseif (actionName == "GetOngoingWarList") then
         doActionGetOngoingWarList(self, event)
+    elseif (actionName == "GetSceneWarData") then
+        doActionGetSceneWarData(self, event)
     elseif (actionName == "Error") then
-        error("ModelSceneMain-onEvtSystemRequestDoAction() " .. event.error)
+        error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
         print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action.")
     end
@@ -68,6 +72,9 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
+    if (self.m_View) then
+        self.m_View:showMessage("Connection established.")
+    end
 end
 
 local function onWebSocketMessage(self, param)
@@ -80,10 +87,17 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
+    if (self.m_View) then
+        self.m_View:showMessage("Connection lost. Now reconnecting...")
+    end
+
+    WebSocketManager.close()
+        .init()
+        .setOwner(self)
 end
 
 local function onWebSocketError(self, param)
-    print("ModelSceneMain-onWebSocketError")
+    print("ModelSceneMain-onWebSocketError()")
 end
 
 --------------------------------------------------------------------------------

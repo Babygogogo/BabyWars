@@ -29,34 +29,10 @@
 local ModelSceneWar = class("ModelSceneWar")
 
 local isServer = true
-local SCENE_DATA_PATH = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/warScene/"
 
 local Actor            = require("global.actors.Actor")
 local TypeChecker      = require("app.utilities.TypeChecker")
 local ActionTranslator = require("app.utilities.ActionTranslator")
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function requireSceneData(param)
-    if (type(param) ~= "string") then
-        error("ModelSceneWar-requireSceneData() the param is invalid.")
-    else
-        -- TODO: in release version, the data should be downloaded from server and should not be saved locally.
-        local fullName = SCENE_DATA_PATH .. param .. ".lua"
-        local fileUtils = cc.FileUtils:getInstance()
-
-        if (not fileUtils:isFileExist(fullName)) then
-            fileUtils:createDirectory(SCENE_DATA_PATH)
-
-            local saveFile = io.open(fullName, "w")
-            saveFile:write("return " .. require("app.utilities.SerializationFunctions").serialize(require("res.data.warScene." .. param)))
-            saveFile:close()
-        end
-
-        return dofile(fullName), fullName
-    end
-end
 
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
@@ -102,15 +78,6 @@ local function onEvtSystemRequestDoAction(self, event)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
-
----[[ -- These codes are for testing the toStringList() and should be modified to do the real job.
-    local testFile = io.open(self.m_DataFileFullPath, "w")
-    for _, str in ipairs(self:toStringList()) do
-        testFile:write(str)
-    end
-    testFile:close()
---]]
-
 end
 
 local function onEvtPlayerRequestDoAction(self, event)
@@ -208,10 +175,8 @@ end
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function ModelSceneWar:ctor(param)
-    assert(type(param) == "string", "ModelSceneWar:ctor() the param is invalid.")
-    local sceneData
-    sceneData, self.m_DataFileFullPath = requireSceneData(param)
+function ModelSceneWar:ctor(sceneData)
+    assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))

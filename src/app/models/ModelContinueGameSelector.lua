@@ -18,12 +18,14 @@ local WebSocketManager = require("app.utilities.WebSocketManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function enableConfirmBoxForEnteringSceneWar(self, name, data)
+local function enableConfirmBoxForEnteringSceneWar(self, name, fileName)
     self.m_ModelConfirmBox:setConfirmText("You are entering a war:\n" .. name .. ".\nAre you sure?")
         :setOnConfirmYes(function()
-            local actorSceneWar = Actor.createWithModelAndViewName("ModelSceneWar", data, "ViewSceneWar")
-            WebSocketManager.setOwner(actorSceneWar:getModel())
-            ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name = "EvtPlayerRequestDoAction",
+                actionName = "GetSceneWarData",
+                fileName = fileName
+            })
         end)
         :setEnabled(true)
 end
@@ -128,6 +130,16 @@ function ModelContinueGameSelector:doActionGetOngoingWarList(action)
     initWithListItems(self, createListItems(self, action.list))
     if ((self.m_View) and (self.m_IsEnabled)) then
         self.m_View:showWarList(self.m_ListItems)
+    end
+
+    return self
+end
+
+function ModelContinueGameSelector:doActionGetSceneWarData(action)
+    if (self.m_IsEnabled) then
+        local actorSceneWar = Actor.createWithModelAndViewName("ModelSceneWar", action.data, "ViewSceneWar")
+        WebSocketManager.setOwner(actorSceneWar:getModel())
+        ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
 
     return self
