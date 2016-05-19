@@ -13,14 +13,15 @@
 --   - 这个文件用到了游戏引擎的功能，因此服务器上的程序需要另写一个入口函数。
 --]]--------------------------------------------------------------------------------
 
-cc.FileUtils:getInstance():setPopupNotify(false)
-cc.FileUtils:getInstance():addSearchPath("src/")
-cc.FileUtils:getInstance():addSearchPath("res/")
-
 require "config"
 require "cocos.init"
 
 local function main()
+    local fileUtils = cc.FileUtils:getInstance()
+    fileUtils:setPopupNotify(false)
+    fileUtils:addSearchPath("src/")
+    fileUtils:addSearchPath("res/")
+
     display.loadSpriteFrames("BabyWarsTextureTile.plist", "BabyWarsTextureTile.png")
     display.loadSpriteFrames("BabyWarsTextureUnit.plist", "BabyWarsTextureUnit.png")
     display.loadSpriteFrames("BabyWarsTextureUI.plist",   "BabyWarsTextureUI.png")
@@ -32,9 +33,10 @@ local function main()
 
     cc.Director:getInstance():setDisplayStats(true)
 
-    local mainSceneActor = require("global.actors.Actor").createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
-    assert(mainSceneActor, "main() failed to create a main scene actor.")
-    require("global.actors.ActorManager").setAndRunRootActor(mainSceneActor)
+    local actorSceneMain = require("global.actors.Actor").createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
+    require("app.utilities.WebSocketManager").init()
+        .setOwner(actorSceneMain:getModel())
+    require("global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
 end
 
 local status, msg = xpcall(main, __G__TRACKBACK__)

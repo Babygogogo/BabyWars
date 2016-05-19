@@ -15,9 +15,11 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
-local Actor	                = require("global.actors.Actor")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local ActionTranslator      = require("app.utilities.ActionTranslator")
+local Actor	                 = require("global.actors.Actor")
+local GameConstantFunctions  = require("app.utilities.GameConstantFunctions")
+local ActionTranslator       = require("app.utilities.ActionTranslator")
+local WebSocketManager       = require("app.utilities.WebSocketManager")
+local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
 local isServer = true -- This is for testing and should be removed.
 
@@ -49,8 +51,10 @@ end
 
 local function onEvtPlayerRequestDoAction(self, event)
     local request = event
-    request.playerAccount = self.m_PlayerAccount
+    request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
+    WebSocketManager.sendString(SerializationFunctions.serialize(request))
 
+--[[
     if (isServer) then
         local translatedAction, translateMsg = ActionTranslator.translate(request)
         if (not translatedAction) then
@@ -62,6 +66,27 @@ local function onEvtPlayerRequestDoAction(self, event)
     else
         -- TODO: send the requestedAction to the server.
     end
+--]]
+end
+
+--------------------------------------------------------------------------------
+-- The private callback function on web socket events.
+--------------------------------------------------------------------------------
+local function onWebSocketOpen(self, param)
+    print("ModelSceneMain-onWebSocketOpen()")
+    WebSocketManager.sendString("sending message from game.")
+end
+
+local function onWebSocketMessage(self, param)
+    print("ModelSceneMain-onWebSocketMessage() " .. param.message)
+end
+
+local function onWebSocketClose(self, param)
+    print("ModelSceneMain-onWebSocketClose()")
+end
+
+local function onWebSocketError(self, param)
+    print("ModelSceneMain-onWebSocketError")
 end
 
 --------------------------------------------------------------------------------
@@ -129,7 +154,7 @@ function ModelSceneMain:initView()
 end
 
 --------------------------------------------------------------------------------
--- The callback function on script events.
+-- The callback function on script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneMain:onEvent(event)
     local eventName = event.name
@@ -137,6 +162,20 @@ function ModelSceneMain:onEvent(event)
         onEvtPlayerRequestDoAction(self, event)
     elseif (eventName == "EvtSystemRequestDoAction") then
         onEvtSystemRequestDoAction(self, event)
+    end
+
+    return self
+end
+
+function ModelSceneMain:onWebSocketEvent(eventName, param)
+    if (eventName == "open") then
+        onWebSocketOpen(self, param)
+    elseif (eventName == "message") then
+        onWebSocketMessage(self, param)
+    elseif (eventName == "close") then
+        onWebSocketClose(self, param)
+    elseif (eventName == "error") then
+        onWebSocketError(self, param)
     end
 
     return self
