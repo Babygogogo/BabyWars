@@ -30,9 +30,11 @@ local ModelSceneWar = class("ModelSceneWar")
 
 local isServer = true
 
-local Actor            = require("global.actors.Actor")
-local TypeChecker      = require("app.utilities.TypeChecker")
-local ActionTranslator = require("app.utilities.ActionTranslator")
+local Actor                  = require("global.actors.Actor")
+local TypeChecker            = require("app.utilities.TypeChecker")
+local ActionTranslator       = require("app.utilities.ActionTranslator")
+local WebSocketManager       = require("app.utilities.WebSocketManager")
+local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
@@ -75,27 +77,51 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionCapture(self, event)
     elseif (actionName == "ProduceOnTile") then
         doActionProduceOnTile(self, event)
+    elseif (actionName == "Error") then
+        error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
         print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
 end
 
 local function onEvtPlayerRequestDoAction(self, event)
-    local requestedAction = event
-    -- TODO: requestedAction.playerAccount should be assigned with the account of the logged in player.
-    requestedAction.playerAccount = self:getModelPlayerManager():getModelPlayer(self:getModelTurnManager():getPlayerIndex()):getAccount()
+    local request = event
+    request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
+    request.sceneWarFileName = self.m_FileName
+    WebSocketManager.sendString(SerializationFunctions.serialize(request))
+end
 
-    if (isServer) then
-        local translatedAction, translateMsg = ActionTranslator.translate(requestedAction, self)
-        if (not translatedAction) then
-            print("ModelSceneWar-onEvtPlayerRequestDoAction() action translation failed: " .. (translateMsg or ""))
-        else
-            onEvtSystemRequestDoAction(self, translatedAction)
-            -- TODO: send the translatedAction to clients.
-        end
-    else
-        -- TODO: send the requestedAction to the server.
+--------------------------------------------------------------------------------
+-- The private callback function on web socket events.
+--------------------------------------------------------------------------------
+local function onWebSocketOpen(self, param)
+    print("ModelSceneWar-onWebSocketOpen()")
+    if (self.m_View) then
+    --    self.m_View:showMessage("Connection established.")
     end
+end
+
+local function onWebSocketMessage(self, param)
+    print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
+
+    local action = assert(loadstring("return " .. param.message))()
+    -- print(SerializationFunctions.serialize(action))
+    onEvtSystemRequestDoAction(self, action)
+end
+
+local function onWebSocketClose(self, param)
+    print("ModelSceneWar-onWebSocketClose()")
+    if (self.m_View) then
+    --    self.m_View:showMessage("Connection lost. Now reconnecting...")
+    end
+
+    WebSocketManager.close()
+        .init()
+        .setOwner(self)
+end
+
+local function onWebSocketError(self, param)
+    print("ModelSceneWar-onWebSocketError()")
 end
 
 --------------------------------------------------------------------------------
@@ -178,6 +204,7 @@ end
 function ModelSceneWar:ctor(sceneData)
     assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
 
+    self.m_FileName = sceneData.fileName
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
     initWithActorWarField(        self, createActorWarField(sceneData.warField))
     initWithActorWarHud(          self, createActorSceneWarHUD())
@@ -252,13 +279,13 @@ end
 
 function ModelSceneWar:onWebSocketEvent(eventName, param)
     if (eventName == "open") then
---        onWebSocketOpen(self, param)
+        onWebSocketOpen(self, param)
     elseif (eventName == "message") then
---        onWebSocketMessage(self, param)
+        onWebSocketMessage(self, param)
     elseif (eventName == "close") then
---        onWebSocketClose(self, param)
+        onWebSocketClose(self, param)
     elseif (eventName == "error") then
---        onWebSocketError(self, param)
+        onWebSocketError(self, param)
     end
 
     return self
