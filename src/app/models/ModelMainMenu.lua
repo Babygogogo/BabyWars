@@ -203,10 +203,8 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelMainMenu:doActionLogin(action)
-    if (action.isSuccessful) then
-        self:updateWithIsPlayerLoggedIn(true)
-            :setMenuEnabled(true)
-    end
+    self:updateWithIsPlayerLoggedIn(true)
+        :setMenuEnabled(true)
 
     getActorLoginPanel(self)          :getModel():doActionLogin(action)
     getActorContinueGameSelector(self):getModel():doActionLogin(action)

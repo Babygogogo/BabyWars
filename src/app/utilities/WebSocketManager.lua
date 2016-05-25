@@ -1,5 +1,5 @@
 
-local WebSocketManager = class("WebSocketManager")
+local WebSocketManager = {}
 
 local SERVER_URL = "localhost:8080/BabyWars"
 

@@ -36,11 +36,7 @@ end
 --------------------------------------------------------------------------------
 function ModelLoginPanel:doActionLogin(action)
     if (self.m_IsEnabled) then
-        if (action.isSuccessful) then
-            self:setEnabled(false)
-        elseif (self.m_View) then
-            self.m_View:showMessage("Invalid account/password.")
-        end
+        self:setEnabled(false)
     end
 
     return self

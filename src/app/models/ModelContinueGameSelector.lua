@@ -119,9 +119,7 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelContinueGameSelector:doActionLogin(action)
-    if (action.isSuccessful) then
-        self:setEnabled(false)
-    end
+    self:setEnabled(false)
 
     return self
 end

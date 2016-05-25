@@ -16,6 +16,7 @@
 local ModelSceneMain = class("ModelSceneMain")
 
 local Actor                  = require("global.actors.Actor")
+local ActorManager           = require("global.actors.ActorManager")
 local GameConstantFunctions  = require("app.utilities.GameConstantFunctions")
 local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
@@ -25,7 +26,7 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
 local function doActionLogin(self, action)
-    if ((action.isSuccessful) and (action.account ~= WebSocketManager.getLoggedInAccountAndPassword())) then
+    if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
         if (self.m_View) then
             self.m_View:showMessage("Welcome, " .. action.account .. "!")
@@ -33,6 +34,17 @@ local function doActionLogin(self, action)
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
+end
+
+local function doActionLogout(self, event)
+    local modelSceneMain = Actor.createModel("ModelSceneMain", {
+        confirmText = "You are focibly logged out because your account is logged in with another device."
+    })
+    local viewSceneMain  = Actor.createView("ViewSceneMain")
+
+    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
+        .setOwner(modelSceneMain)
+    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
 local function doActionGetOngoingWarList(self, action)
@@ -43,6 +55,12 @@ local function doActionGetSceneWarData(self, action)
     self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
 end
 
+local function doActionMessage(self, action)
+    if (self.m_View) then
+        self.m_View:showMessage(action.message)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The private callback function on script events.
 --------------------------------------------------------------------------------
@@ -50,10 +68,14 @@ local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
     if (actionName == "Login") then
         doActionLogin(self, event)
+    elseif (actionName == "Logout") then
+        doActionLogout(self, event)
     elseif (actionName == "GetOngoingWarList") then
         doActionGetOngoingWarList(self, event)
     elseif (actionName == "GetSceneWarData") then
         doActionGetSceneWarData(self, event)
+    elseif (actionName == "Message") then
+        doActionMessage(self, event)
     elseif (actionName == "Error") then
         error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
@@ -116,12 +138,18 @@ end
 --------------------------------------------------------------------------------
 -- The composition confirm box actor.
 --------------------------------------------------------------------------------
-local function createActorConfirmBox()
-    return Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+local function createActorConfirmBox(confirmText)
+    local actor = Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+    if (not confirmText) then
+        actor:getModel():setEnabled(false)
+    else
+        actor:getModel():setConfirmText(confirmText)
+    end
+
+    return actor
 end
 
 local function initWithActorConfirmBox(self, actor)
-    actor:getModel():setEnabled(false)
     self.m_ActorConfirmBox = actor
 end
 
@@ -143,11 +171,12 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelSceneMain:ctor(isPlayerLoggedIn)
-    self.m_IsPlayerLoggedIn = (isPlayerLoggedIn) and (true) or (false)
+function ModelSceneMain:ctor(param)
+    param = param or {}
+    self.m_IsPlayerLoggedIn = (param.isPlayerLoggedIn) and (true) or (false)
 
     initWithScriptEventDispatcher(self, createScriptEventDispatcher())
-    initWithActorConfirmBox(      self, createActorConfirmBox())
+    initWithActorConfirmBox(      self, createActorConfirmBox(param.confirmText))
     initWithActorMainMenu(        self, createActorMainMenu())
 
     if (self.m_View) then
