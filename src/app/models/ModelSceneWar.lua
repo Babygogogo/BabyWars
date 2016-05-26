@@ -21,16 +21,12 @@
 --    考虑服务器传来“某unit A按某路线移动后对unit B发起攻击”的事件的情况。这种情况下，在model中，unit的新的数值将马上完成结算（如hp，弹药量，消灭与否，等级等都会有更新），
 --    但在view不可能立刻按model的新状态进行呈现（否则，玩家就会看到unit发生了瞬移，或是突然消失了），而必须跨帧逐步更新。
 --    采取model先行结算的方式可以避免很多问题，所以后续开发应该遵守同样的规范。
---
---  - 目前，ModelSceneWar还简单地模拟把玩家操作（也就是EvtPlayerRequestDoAction）传送到服务器，再接收服务器传回的操作（EvtSystemRequestDoAction）的过程（参见ActionTranslator）。
---    这本不应该是ModelSceneWar的工作，等以后实现了网络模块，就应该把相关代码移除。
 --]]--------------------------------------------------------------------------------
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local isServer = true
-
 local Actor                  = require("global.actors.Actor")
+local ActorManager           = require("global.actors.ActorManager")
 local TypeChecker            = require("app.utilities.TypeChecker")
 local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
@@ -39,27 +35,48 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
+local function doActionLogout(self, event)
+    local modelSceneMain = Actor.createModel("ModelSceneMain", {
+        confirmText = event.message
+    })
+    local viewSceneMain  = Actor.createView("ViewSceneMain")
+
+    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
+        .setOwner(modelSceneMain)
+    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
+end
+
 local function doActionEndTurn(self, action)
-    self:getModelTurnManager():endTurn()
+    if (action.fileName == self.m_FileName) then
+        self:getModelTurnManager():endTurn()
+    end
 end
 
 local function doActionWait(self, action)
-    self:getModelWarField():doActionWait(action)
+    if (action.fileName == self.m_FileName) then
+        self:getModelWarField():doActionWait(action)
+    end
 end
 
 local function doActionAttack(self, action)
-    self:getModelWarField():doActionAttack(action)
+    if (action.fileName == self.m_FileName) then
+        self:getModelWarField():doActionAttack(action)
+    end
 end
 
 local function doActionCapture(self, action)
-    self:getModelWarField():doActionCapture(action)
+    if (action.fileName == self.m_FileName) then
+        self:getModelWarField():doActionCapture(action)
+    end
 end
 
 local function doActionProduceOnTile(self, action)
-    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
+    if (action.fileName == self.m_FileName) then
+        action.playerIndex = self:getModelTurnManager():getPlayerIndex()
 
-    self:getModelPlayerManager():doActionProduceOnTile(action)
-    self:getModelWarField():doActionProduceOnTile(action)
+        self:getModelPlayerManager():doActionProduceOnTile(action)
+        self:getModelWarField():doActionProduceOnTile(action)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -67,7 +84,9 @@ end
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
-    if (actionName == "EndTurn") then
+    if (actionName == "Logout") then
+        doActionLogout(self, event)
+    elseif (actionName == "EndTurn") then
         doActionEndTurn(self, event)
     elseif (actionName == "Wait") then
         doActionWait(self, event)
@@ -88,6 +107,7 @@ local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     request.sceneWarFileName = self.m_FileName
+    print(self.m_FileName)
     WebSocketManager.sendString(SerializationFunctions.serialize(request))
 end
 

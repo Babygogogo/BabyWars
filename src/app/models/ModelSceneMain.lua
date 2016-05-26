@@ -38,7 +38,7 @@ end
 
 local function doActionLogout(self, event)
     local modelSceneMain = Actor.createModel("ModelSceneMain", {
-        confirmText = "You are focibly logged out because your account is logged in with another device."
+        confirmText = event.message
     })
     local viewSceneMain  = Actor.createView("ViewSceneMain")
 

@@ -109,7 +109,7 @@ local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, targ
         local defenseBonus = getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
         attackerHP = math.max(attackerHP, 0)
 
-        return math.round(baseAttackDamage * (getNormalizedHP(attackerHP) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100))
+        return math.floor(baseAttackDamage * (getNormalizedHP(attackerHP) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100) + 0.5)
     end
 end
 
@@ -125,7 +125,7 @@ local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, targe
         if (not target:isAffectedByLuck()) then
             return estimatedAttackDamage
         else
-            return math.round(estimatedAttackDamage * (1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 9) / 100))
+            return math.floor(estimatedAttackDamage * (1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 9) / 100) + 0.5)
         end
     end
 end
