@@ -18,7 +18,6 @@ local ModelSceneMain = class("ModelSceneMain")
 local Actor                  = require("global.actors.Actor")
 local ActorManager           = require("global.actors.ActorManager")
 local GameConstantFunctions  = require("app.utilities.GameConstantFunctions")
-local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
@@ -28,9 +27,7 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        if (self.m_View) then
-            self.m_View:showMessage("Welcome, " .. action.account .. "!")
-        end
+        self.m_ActorMessageIndicator:getModel():showMessage("Welcome, " .. action.account .. "!")
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
@@ -56,9 +53,7 @@ local function doActionGetSceneWarData(self, action)
 end
 
 local function doActionMessage(self, action)
-    if (self.m_View) then
-        self.m_View:showMessage(action.message)
-    end
+    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
 end
 
 --------------------------------------------------------------------------------
@@ -94,9 +89,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    if (self.m_View) then
-        self.m_View:showMessage("Connection established.")
-    end
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection established.")
 end
 
 local function onWebSocketMessage(self, param)
@@ -109,9 +102,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
-    if (self.m_View) then
-        self.m_View:showMessage("Connection lost. Now reconnecting...")
-    end
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost. Now reconnecting...")
 
     WebSocketManager.close()
         .init()
@@ -123,49 +114,40 @@ local function onWebSocketError(self, param)
 end
 
 --------------------------------------------------------------------------------
--- The composition script event dispatcher.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createScriptEventDispatcher()
-    return require("global.events.EventDispatcher"):create()
-end
-
-local function initWithScriptEventDispatcher(self, dispatcher)
+local function initScriptEventDispatcher(self)
+    local dispatcher = require("global.events.EventDispatcher"):create()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
+
     self.m_ScriptEventDispatcher = dispatcher
 end
 
---------------------------------------------------------------------------------
--- The composition confirm box actor.
---------------------------------------------------------------------------------
-local function createActorConfirmBox(confirmText)
-    local actor = Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+local function initActorConfirmBox(self, confirmText)
+    local actor = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
     if (not confirmText) then
         actor:getModel():setEnabled(false)
     else
         actor:getModel():setConfirmText(confirmText)
     end
 
-    return actor
-end
-
-local function initWithActorConfirmBox(self, actor)
     self.m_ActorConfirmBox = actor
 end
 
---------------------------------------------------------------------------------
--- The composition main menu actor.
---------------------------------------------------------------------------------
-local function createActorMainMenu()
-    return Actor.createWithModelAndViewName("ModelMainMenu", nil, "ViewMainMenu")
-end
-
-local function initWithActorMainMenu(self, actor)
+local function initActorMainMenu(self)
+    local actor = Actor.createWithModelAndViewName("ModelMainMenu", nil, "ViewMainMenu")
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
 
     self.m_ActorMainMenu = actor
+end
+
+local function initActorMessageIndicator(self)
+    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
+
+    self.m_ActorMessageIndicator = actor
 end
 
 --------------------------------------------------------------------------------
@@ -175,9 +157,10 @@ function ModelSceneMain:ctor(param)
     param = param or {}
     self.m_IsPlayerLoggedIn = (param.isPlayerLoggedIn) and (true) or (false)
 
-    initWithScriptEventDispatcher(self, createScriptEventDispatcher())
-    initWithActorConfirmBox(      self, createActorConfirmBox(param.confirmText))
-    initWithActorMainMenu(        self, createActorMainMenu())
+    initScriptEventDispatcher(self)
+    initActorConfirmBox(      self, param.confirmText)
+    initActorMainMenu(        self)
+    initActorMessageIndicator(self)
 
     if (self.m_View) then
         self:initView()
@@ -190,8 +173,10 @@ function ModelSceneMain:initView()
     local view = self.m_View
     assert(view, "ModelSceneMain:initView() no view is attached to the owner actor of the model.")
 
-    view:setViewConfirmBox(self.m_ActorConfirmBox:getView())
-        :setViewMainMenu(  self.m_ActorMainMenu:getView())
+    view:setViewConfirmBox(      self.m_ActorConfirmBox:getView())
+        :setViewMainMenu(        self.m_ActorMainMenu:getView())
+        :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
+
         :setGameVersion(GameConstantFunctions.getGameVersion())
 
     return self

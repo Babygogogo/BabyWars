@@ -39,7 +39,7 @@ end
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createActorConfirmBox()
-    return Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+    return Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
 end
 
 local function initWithActorConfirmBox(self, actor)
