@@ -28,7 +28,6 @@ local ModelSceneWar = class("ModelSceneWar")
 local Actor                  = require("global.actors.Actor")
 local ActorManager           = require("global.actors.ActorManager")
 local TypeChecker            = require("app.utilities.TypeChecker")
-local ActionTranslator       = require("app.utilities.ActionTranslator")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
@@ -79,6 +78,10 @@ local function doActionProduceOnTile(self, action)
     end
 end
 
+local function doActionMessage(self, action)
+    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -96,6 +99,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionCapture(self, event)
     elseif (actionName == "ProduceOnTile") then
         doActionProduceOnTile(self, event)
+    elseif (actionName == "Message") then
+        doActionMessage(self, event)
     elseif (actionName == "Error") then
         error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
@@ -107,7 +112,6 @@ local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     request.sceneWarFileName = self.m_FileName
-    print(self.m_FileName)
     WebSocketManager.sendString(SerializationFunctions.serialize(request))
 end
 
@@ -116,9 +120,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    if (self.m_View) then
-    --    self.m_View:showMessage("Connection established.")
-    end
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection established.")
 end
 
 local function onWebSocketMessage(self, param)
@@ -131,9 +133,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    if (self.m_View) then
-    --    self.m_View:showMessage("Connection lost. Now reconnecting...")
-    end
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost. Now reconnecting...")
 
     WebSocketManager.close()
         .init()
@@ -142,80 +142,64 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost with error: " .. param.error)
+
+    WebSocketManager.close()
+        .init()
+        .setOwner(self)
 end
 
 --------------------------------------------------------------------------------
--- The script event dispatcher.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createScriptEventDispatcher()
-    return require("global.events.EventDispatcher"):create()
-end
-
-local function initWithScriptEventDispatcher(self, dispatcher)
+local function initScriptEventDispatcher(self)
+    local dispatcher = require("global.events.EventDispatcher"):create()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
+
     self.m_ScriptEventDispatcher = dispatcher
 end
 
---------------------------------------------------------------------------------
--- The composition war field actor.
---------------------------------------------------------------------------------
-local function createActorWarField(warFieldData)
-    return Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField", warFieldData)
-end
-
-local function initWithActorWarField(self, actor)
+local function initActorWarField(self, warFieldData)
+    local actor = Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+
     self.m_ActorWarField = actor
 end
 
---------------------------------------------------------------------------------
--- The composition HUD actor.
---------------------------------------------------------------------------------
-local function createActorSceneWarHUD()
-    return Actor.createWithModelAndViewName("ModelWarHUD", nil, "ViewWarHUD")
-end
-
-local function initWithActorWarHud(self, actor)
+local function initActorWarHud(self)
+    local actor = Actor.createWithModelAndViewName("ModelWarHUD", nil, "ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+
     self.m_ActorWarHud = actor
 end
 
---------------------------------------------------------------------------------
--- The player manager.
---------------------------------------------------------------------------------
-local function createActorPlayerManager(playersData)
-    return Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
-end
-
-local function initWithActorPlayerManager(self, actor)
+local function initActorPlayerManager(self, playersData)
+    local actor = Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+
     self.m_ActorPlayerManager = actor
 end
 
---------------------------------------------------------------------------------
--- The turn manager.
---------------------------------------------------------------------------------
-local function createActorTurnManager(turnData)
-    return Actor.createWithModelAndViewName("ModelTurnManager", turnData)
-end
-
-local function initWithActorTurnManager(self, actor)
+local function initActorTurnManager(self, turnData)
+    local actor = Actor.createWithModelAndViewName("ModelTurnManager", turnData)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setModelWarField(self.m_ActorWarField:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+
     self.m_ActorTurnManager = actor
 end
 
---------------------------------------------------------------------------------
--- The composition weather manager actor.
---------------------------------------------------------------------------------
-local function createActorWeatherManager(weatherData)
-    return Actor.createWithModelAndViewName("ModelWeatherManager", weatherData)
+local function initActorWeatherManager(self, weatherData)
+    local actor = Actor.createWithModelAndViewName("ModelWeatherManager", weatherData)
+
+    self.m_ActorWeatherManager = actor
 end
 
-local function initWithActorWeatherManager(self, actor)
-    self.m_ActorWeatherManager = actor
+local function initActorMessageIndicator(self)
+    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
+
+    self.m_ActorMessageIndicator = actor
 end
 
 --------------------------------------------------------------------------------
@@ -225,12 +209,13 @@ function ModelSceneWar:ctor(sceneData)
     assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
 
     self.m_FileName = sceneData.fileName
-    initWithScriptEventDispatcher(self, createScriptEventDispatcher())
-    initWithActorWarField(        self, createActorWarField(sceneData.warField))
-    initWithActorWarHud(          self, createActorSceneWarHUD())
-    initWithActorPlayerManager(   self, createActorPlayerManager(sceneData.players))
-    initWithActorTurnManager(     self, createActorTurnManager(sceneData.turn))
-    initWithActorWeatherManager(  self, createActorWeatherManager(sceneData.weather))
+    initScriptEventDispatcher(self)
+    initActorWarField(        self, sceneData.warField)
+    initActorWarHud(          self)
+    initActorPlayerManager(   self, sceneData.players)
+    initActorTurnManager(     self, sceneData.turn)
+    initActorWeatherManager(  self, sceneData.weather)
+    initActorMessageIndicator(self)
 
     if (self.m_View) then
         self:initView()
@@ -243,8 +228,9 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setViewWarField(self.m_ActorWarField:getView())
-        :setViewWarHud(self.m_ActorWarHud:getView())
+    view:setViewWarField(        self.m_ActorWarField:getView())
+        :setViewWarHud(          self.m_ActorWarHud:getView())
+        :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
 
     return self
 end

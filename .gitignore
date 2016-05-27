@@ -4,6 +4,7 @@
 /frameworks/cocos2d-x
 /frameworks/runtime-src/proj.win32
 /frameworks/runtime-src/proj.android
+/writablePath
 *.suo
 *.tlog
 *.obj
@@ -19,4 +20,5 @@
 *.tags
 *.tags_sorted_by_file
 *.apk
-/writablePath
+*.msi
+*.zip

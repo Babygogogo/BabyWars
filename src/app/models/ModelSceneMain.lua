@@ -110,7 +110,12 @@ local function onWebSocketClose(self, param)
 end
 
 local function onWebSocketError(self, param)
-    print("ModelSceneMain-onWebSocketError()")
+    print("ModelSceneMain-onWebSocketError() " .. param.error)
+    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost with error: " .. param.error)
+
+    WebSocketManager.close()
+        .init()
+        .setOwner(self)
 end
 
 --------------------------------------------------------------------------------
