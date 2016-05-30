@@ -143,6 +143,7 @@ end
 local function initActorMainMenu(self)
     local actor = Actor.createWithModelAndViewName("ModelMainMenu", nil, "ViewMainMenu")
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+        :setModelMessageIndicator(self.m_ActorMessageIndicator:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
 
@@ -164,8 +165,8 @@ function ModelSceneMain:ctor(param)
 
     initScriptEventDispatcher(self)
     initActorConfirmBox(      self, param.confirmText)
-    initActorMainMenu(        self)
     initActorMessageIndicator(self)
+    initActorMainMenu(        self)
 
     if (self.m_View) then
         self:initView()

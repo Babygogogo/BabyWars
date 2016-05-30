@@ -99,6 +99,10 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toStringList(spaces)
     spaces = spaces or ""
+    if (not self:getAccount()) then
+        return {spaces .. "{}"}
+    end
+
     local subSpaces = spaces .. "    "
     local strList = {spaces .. "{\n"}
     local appendList = TableFunctions.appendList

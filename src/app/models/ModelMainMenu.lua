@@ -17,146 +17,97 @@ local function showMenuItems(self, ...)
 end
 
 --------------------------------------------------------------------------------
--- The composition new game creator actor.
+-- The composition actors.
 --------------------------------------------------------------------------------
-local function createActorNewGameCreator()
-    return Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
-end
-
-local function lazyInitWithActorNewGameCreator(self, actor)
-    assert(self.m_View, "ModelMainMenu-lazyInitWithActorNewGameCreator() no view is attached to the owner actor of the model.")
-    self.m_View:setViewNewGameCreator(actor:getView())
-
-    actor:getModel():setModelMainMenu(self)
-        :setEnabled(false)
-    self.m_ActorNewGameCreator = actor
-end
-
 local function getActorNewGameCreator(self)
     if (not self.m_ActorNewGameCreator) then
-        lazyInitWithActorNewGameCreator(self, createActorNewGameCreator())
+        local actor = Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
+        actor:getModel():setModelMainMenu(self)
+            :setEnabled(false)
+
+        self.m_ActorNewGameCreator = actor
+        self.m_View:setViewNewGameCreator(actor:getView())
     end
 
     return self.m_ActorNewGameCreator
 end
 
---------------------------------------------------------------------------------
--- The composition continue game selector actor.
---------------------------------------------------------------------------------
-local function createActorContinueGameSelector()
-    return Actor.createWithModelAndViewName("ModelContinueGameSelector", nil, "ViewContinueGameSelector")
-end
-
-local function lazyInitWithActorContinueGameSelector(self, actor)
-    assert(self.m_View, "ModelMainMenu-lazyInitWithActorContinueGameSelector() no view is attached to the owner actor of the model.")
-    self.m_View:setViewContinueGameSelector(actor:getView())
-
-    actor:getModel():setModelMainMenu(self)
-        :setEnabled(false)
-        :setModelConfirmBox(self.m_ModelConfirmBox)
-        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
-
-    self.m_ActorContinueGameSelector = actor
-end
-
 local function getActorContinueGameSelector(self)
     if (not self.m_ActorContinueGameSelector) then
-        lazyInitWithActorContinueGameSelector(self, createActorContinueGameSelector())
+        local actor = Actor.createWithModelAndViewName("ModelContinueGameSelector", nil, "ViewContinueGameSelector")
+        actor:getModel():setModelMainMenu(self)
+            :setEnabled(false)
+            :setModelConfirmBox(self.m_ModelConfirmBox)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+
+        self.m_ActorContinueGameSelector = actor
+        self.m_View:setViewContinueGameSelector(actor:getView())
     end
 
     return self.m_ActorContinueGameSelector
 end
 
---------------------------------------------------------------------------------
--- The composition login panel actor.
---------------------------------------------------------------------------------
-local function createActorLoginPanel()
-    return Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
-end
-
-local function lazyInitWithActorLoginPanel(self, actor)
-    assert(self.m_View, "ModelMainMenu-lazyInitWithActorLoginPanel() no view is attached to the owner actor of the model.")
-    self.m_View:setViewLoginPanel(actor:getView())
-
-    actor:getModel():setModelMainMenu(self)
-        :setEnabled(false)
-        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
-
-    self.m_ActorLoginPanel = actor
-end
-
 local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
-        lazyInitWithActorLoginPanel(self, createActorLoginPanel())
+        local actor = Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
+        actor:getModel():setModelMainMenu(self)
+            :setEnabled(false)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+
+        self.m_ActorLoginPanel = actor
+        self.m_View:setViewLoginPanel(actor:getView())
     end
 
     return self.m_ActorLoginPanel
 end
 
 --------------------------------------------------------------------------------
--- The new game item.
+-- The composition menu items.
 --------------------------------------------------------------------------------
-local function createItemNewGame(self)
-    return {
+local function initItemNewGame(self)
+    local item = {
         name = "New Game",
         callback = function()
             self:setMenuEnabled(false)
             getActorNewGameCreator(self):getModel():setEnabled(true)
         end,
     }
-end
 
-local function initWithItemNewGame(self, item)
     self.m_ItemNewGame = item
 end
 
---------------------------------------------------------------------------------
--- The continue item.
---------------------------------------------------------------------------------
-local function createItemContinue(self)
-    return {
+local function initItemContinue(self)
+    local item = {
         name     = "Continue",
         callback = function()
             self:setMenuEnabled(false)
             getActorContinueGameSelector(self):getModel():setEnabled(true)
         end,
     }
-end
 
-local function initWithItemContinue(self, item)
     self.m_ItemContinue = item
 end
 
---------------------------------------------------------------------------------
--- The config skills item.
---------------------------------------------------------------------------------
-local function createItemConfigSkills(self)
-    return {
+local function initItemConfigSkills(self)
+    local item = {
         name = "Config Skills",
         callback = function()
-            print("Config Skills is not implemented.")
+            self.m_ModelMessageIndicator:showMessage("Sorry, the Config Skills feature is not implemented.")
         end,
     }
-end
 
-local function initWithItemConfigSkills(self, item)
     self.m_ItemConfigSkills = item
 end
 
---------------------------------------------------------------------------------
--- The login item.
---------------------------------------------------------------------------------
-local function createItemLogin(self)
-    return {
+local function initItemLogin(self)
+    local item = {
         name = "Login",
         callback = function()
             self:setMenuEnabled(false)
             getActorLoginPanel(self):getModel():setEnabled(true)
         end,
     }
-end
 
-local function initWithItemLogin(self, item)
     self.m_ItemLogin = item
 end
 
@@ -164,10 +115,10 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initWithItemNewGame(     self, createItemNewGame(self))
-    initWithItemContinue(    self, createItemContinue(self))
-    initWithItemConfigSkills(self, createItemConfigSkills(self))
-    initWithItemLogin(       self, createItemLogin(self))
+    initItemNewGame(     self)
+    initItemContinue(    self)
+    initItemConfigSkills(self)
+    initItemLogin(       self)
 
     if (self.m_View) then
         self:initView()
@@ -188,6 +139,13 @@ end
 function ModelMainMenu:setModelConfirmBox(model)
     assert(self.m_ModelConfirmBox == nil, "ModelMainMenu:setModelConfirmBox() the model has been set.")
     self.m_ModelConfirmBox = model
+
+    return self
+end
+
+function ModelMainMenu:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelMainMenu:setModelMessageIndicator() the model has been set.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end
