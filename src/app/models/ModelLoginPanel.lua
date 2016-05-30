@@ -24,6 +24,13 @@ function ModelLoginPanel:setModelMainMenu(model)
     return self
 end
 
+function ModelLoginPanel:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelLoginPanel:setModelMessageIndicator() the model has been set.")
+    self.m_ModelMessageIndicator = model
+
+    return self
+end
+
 function ModelLoginPanel:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelLoginPanel:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
@@ -58,9 +65,9 @@ end
 function ModelLoginPanel:onButtonConfirmTouched(account, password)
     if (self.m_View) then
         if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-            self.m_View:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
+            self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
         elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-            self.m_View:showMessage("You have already logged in as " .. account .. ".")
+            self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
         else
             self.m_View:disableButtonConfirmForSecs(5)
             self.m_RootScriptEventDispatcher:dispatchEvent({

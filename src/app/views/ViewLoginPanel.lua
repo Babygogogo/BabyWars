@@ -1,7 +1,6 @@
 
 local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 
-local MESSAGE_INDICATOR_Z_ORDER = 2
 local LABEL_TITLE_Z_ORDER       = 1
 local LABEL_ACCOUNT_Z_ORDER     = 1
 local LABEL_PASSWORD_Z_ORDER    = 1
@@ -10,11 +9,6 @@ local BUTTON_CANCEL_Z_ORDER     = 1
 local EDIT_BOX_ACCOUNT_Z_ORDER  = 1
 local EDIT_BOX_PASSWORD_Z_ORDER = 1
 local BACKGROUND_Z_ORDER        = 0
-
-local MESSAGE_INDICATOR_WIDTH  = display.width
-local MESSAGE_INDICATOR_HEIGHT = 80
-local MESSAGE_INDICATOR_POS_X  = 0
-local MESSAGE_INDICATOR_POS_Y  = display.height - MESSAGE_INDICATOR_HEIGHT
 
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 local BACKGROUND_WIDTH     = 500
@@ -125,169 +119,94 @@ local function createEditBox(posX, posY)
 end
 
 --------------------------------------------------------------------------------
--- The composition message indicator.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createMessageIndicator()
-    local indicator = createLabel(MESSAGE_INDICATOR_POS_X, MESSAGE_INDICATOR_POS_Y, MESSAGE_INDICATOR_WIDTH, MESSAGE_INDICATOR_HEIGHT)
-    indicator:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
-
-    indicator.showMessage = function(self, msg)
-        self:setVisible(true)
-            :setOpacity(255)
-            :setString(msg)
-
-            :stopAllActions()
-            :runAction(cc.Sequence:create(
-                cc.DelayTime:create(2),
-                cc.FadeOut:create(1),
-                cc.CallFunc:create(function() self:setVisible(false) end)
-            ))
-    end
-
-    return indicator
-end
-
-local function initWithMessageIndicator(self, indicator)
-    self.m_MessageIndicator = indicator
-    self:addChild(indicator, MESSAGE_INDICATOR_Z_ORDER)
-end
-
---------------------------------------------------------------------------------
--- The composition background.
---------------------------------------------------------------------------------
-local function createBackground()
+local function initBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
         :setPosition(BACKGROUND_POS_X, BACKGROUND_POS_Y)
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
         :setOpacity(180)
 
-    return background
-end
-
-local function initWithBackground(self, background)
     self.m_Background = background
     self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition title label.
---------------------------------------------------------------------------------
-local function createLabelTitle()
+local function initLabelTitle(self)
     local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT, "Login")
     label:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
 
-    return label
-end
-
-local function initWithLabelTitle(self, label)
     self.m_LabelTitle = label
     self:addChild(label, LABEL_TITLE_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition account label.
---------------------------------------------------------------------------------
-local function createLabelAccount()
-    return createLabel(LABEL_ACCOUNT_POS_X, LABEL_ACCOUNT_POS_Y, LABEL_ACCOUNT_WIDTH, LABEL_ACCOUNT_HEIGHT, "Account:")
-end
+local function initLabelAccount(self)
+    local label = createLabel(LABEL_ACCOUNT_POS_X, LABEL_ACCOUNT_POS_Y, LABEL_ACCOUNT_WIDTH, LABEL_ACCOUNT_HEIGHT, "Account:")
 
-local function initWithLabelAccount(self, label)
     self.m_LabelAccount = label
     self:addChild(label, LABEL_ACCOUNT_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition password label.
---------------------------------------------------------------------------------
-local function createLabelPassword()
-    return createLabel(LABEL_PASSWORD_POS_X, LABEL_PASSWORD_POS_Y, LABEL_PASSWORD_WIDTH, LABEL_PASSWORD_HEIGHT, "Password:")
-end
+local function initLabelPassword(self)
+    local label = createLabel(LABEL_PASSWORD_POS_X, LABEL_PASSWORD_POS_Y, LABEL_PASSWORD_WIDTH, LABEL_PASSWORD_HEIGHT, "Password:")
 
-local function initWithLabelPassword(self, label)
     self.m_LabelPassword = label
     self:addChild(label, LABEL_PASSWORD_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition confirm button.
---------------------------------------------------------------------------------
-local function createButtonConfirm(self)
-    return createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "Confirm", BUTTON_CONFIRM_TEXT_COLOR, function()
+local function initButtonConfirm(self)
+    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "Confirm", BUTTON_CONFIRM_TEXT_COLOR, function()
         if (self.m_Model) then
             self.m_Model:onButtonConfirmTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
     end)
-end
 
-local function initWithButtonConfirm(self, button)
     self.m_ButtonConfirm = button
     self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition cancel button.
---------------------------------------------------------------------------------
-local function createButtonCancel(self)
-    return createButton(BUTTON_CANCEL_POS_X, BUTTON_CANCEL_POS_Y, "Cancel", BUTTON_CANCEL_TEXT_COLOR, function()
+local function initButtonCancel(self)
+    local button = createButton(BUTTON_CANCEL_POS_X, BUTTON_CANCEL_POS_Y, "Cancel", BUTTON_CANCEL_TEXT_COLOR, function()
         if (self.m_Model) then
             self.m_Model:onButtonCancelTouched()
         end
     end)
-end
 
-local function initWithButtonCancel(self, button)
     self.m_ButtonCancel = button
     self:addChild(button, BUTTON_CANCEL_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition account edit box.
---------------------------------------------------------------------------------
-local function createEditBoxAccount()
+local function initEditBoxAccount(self)
     local editBox = createEditBox(EDIT_BOX_ACCOUNT_POS_X, EDIT_BOX_ACCOUNT_POS_Y)
     editBox:setPlaceHolder("input at least 6 characters")
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
 
-    return editBox
+    self.m_EditBoxAccount = editBox
+    self:addChild(editBox, EDIT_BOX_ACCOUNT_Z_ORDER)
 end
 
-local function initWithEditBoxAccount(self, box)
-    self.m_EditBoxAccount = box
-    self:addChild(box, EDIT_BOX_ACCOUNT_Z_ORDER)
-end
-
---------------------------------------------------------------------------------
--- The composition password edit box.
---------------------------------------------------------------------------------
-local function createEditBoxPassword()
+local function initEditBoxPassword(self)
     local editBox = createEditBox(EDIT_BOX_PASSWORD_POS_X, EDIT_BOX_PASSWORD_POS_Y)
     editBox:setPlaceHolder("input at least 6 characters")
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
 
-    return editBox
-end
-
-local function initWithEditBoxPassword(self, box)
-    self.m_EditBoxPassword = box
-    self:addChild(box, EDIT_BOX_PASSWORD_Z_ORDER)
+    self.m_EditBoxPassword = editBox
+    self:addChild(editBox, EDIT_BOX_PASSWORD_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewLoginPanel:ctor(param)
-    initWithMessageIndicator(self, createMessageIndicator())
-    initWithBackground(      self, createBackground())
-    initWithLabelTitle(      self, createLabelTitle())
-    initWithLabelAccount(    self, createLabelAccount())
-    initWithLabelPassword(   self, createLabelPassword())
-    initWithButtonConfirm(   self, createButtonConfirm(self))
-    initWithButtonCancel(    self, createButtonCancel(self))
-    initWithEditBoxAccount(  self, createEditBoxAccount())
-    initWithEditBoxPassword( self, createEditBoxPassword())
+    initBackground(      self)
+    initLabelTitle(      self)
+    initLabelAccount(    self)
+    initLabelPassword(   self)
+    initButtonConfirm(   self)
+    initButtonCancel(    self)
+    initEditBoxAccount(  self)
+    initEditBoxPassword( self)
 
     return self
 end
@@ -297,12 +216,6 @@ end
 --------------------------------------------------------------------------------
 function ViewLoginPanel:setEnabled(enabled)
     self:setVisible(enabled)
-
-    return self
-end
-
-function ViewLoginPanel:showMessage(msg)
-    self.m_MessageIndicator:showMessage(msg)
 
     return self
 end

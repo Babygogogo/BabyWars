@@ -52,6 +52,7 @@ local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
         actor:getModel():setModelMainMenu(self)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
             :setEnabled(false)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
