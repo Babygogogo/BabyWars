@@ -1,5 +1,5 @@
 
-local ModelNewGameCreator = class("ModelNewGameCreator")
+local ModelNewWarCreator = class("ModelNewWarCreator")
 
 --------------------------------------------------------------------------------
 -- The new game item.
@@ -10,7 +10,14 @@ local function createItemListWarField(self)
         list[#list + 1] = {
             name     = warField.name,
             callback = function()
-                print(string.format("Creating a game with '%s' is not implemented.", warField.name))
+                -- TODO: enable the player to customize the settings of the game.
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name             = "EvtPlayerRequestDoAction",
+                    actionName       = "NewWar",
+                    warFieldFileName = warField.fileName,
+                    playerIndex      = 1,
+                    skillIndex       = 1,
+                })
             end,
         }
     end
@@ -42,7 +49,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelNewGameCreator:ctor(param)
+function ModelNewWarCreator:ctor(param)
     initWithItemListWarField(self, createItemListWarField(self))
     initWithItemBack(        self, createItemBack(self))
 
@@ -53,9 +60,9 @@ function ModelNewGameCreator:ctor(param)
     return self
 end
 
-function ModelNewGameCreator:initView()
+function ModelNewWarCreator:initView()
     local view = self.m_View
-    assert(view, "ModelNewGameCreator:initView() no view is attached to the actor of the model.")
+    assert(view, "ModelNewWarCreator:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
         :setItemBack(self.m_ItemBack)
@@ -64,9 +71,16 @@ function ModelNewGameCreator:initView()
     return self
 end
 
-function ModelNewGameCreator:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelNewGameCreator:setModelMainMenu() the model has been set.")
+function ModelNewWarCreator:setModelMainMenu(model)
+    assert(self.m_ModelMainMenu == nil, "ModelNewWarCreator:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
+
+    return self
+end
+
+function ModelNewWarCreator:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelNewWarCreator:setRootScriptEventDispatcher() the dispatcher has been set.")
+    self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end
@@ -74,7 +88,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelNewGameCreator:setEnabled(enabled)
+function ModelNewWarCreator:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setVisible(enabled)
     end
@@ -82,4 +96,4 @@ function ModelNewGameCreator:setEnabled(enabled)
     return self
 end
 
-return ModelNewGameCreator
+return ModelNewWarCreator

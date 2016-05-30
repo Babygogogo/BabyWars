@@ -138,17 +138,17 @@ function ViewMainMenu:ctor(param)
     return self
 end
 
-function ViewMainMenu:setViewNewGameCreator(view)
-    assert(self.m_ViewNewGameCreator == nil, "ViewMainMenu:setViewNewGameCreator() the view has been set.")
-    self.m_ViewNewGameCreator = view
+function ViewMainMenu:setViewNewWarCreator(view)
+    assert(self.m_ViewNewWarCreator == nil, "ViewMainMenu:setViewNewWarCreator() the view has been set.")
+    self.m_ViewNewWarCreator = view
     self:addChild(view, NEW_GAME_CREATOR_Z_ORDER)
 
     return self
 end
 
-function ViewMainMenu:setViewContinueGameSelector(view)
-    assert(self.m_ViewContinueGameSelector == nil, "ViewMainMenu:setViewContinueGameSelector() the view has been set.")
-    self.m_ViewContinueGameSelector = view
+function ViewMainMenu:setViewContinueWarSelector(view)
+    assert(self.m_ViewContinueWarSelector == nil, "ViewMainMenu:setViewContinueWarSelector() the view has been set.")
+    self.m_ViewContinueWarSelector = view
     self:addChild(view, CONTINUE_GAME_SELECTOR_Z_ORDER)
 
     return self

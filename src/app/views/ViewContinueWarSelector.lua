@@ -1,5 +1,5 @@
 
-local ViewContinueGameSelector = class("ViewContinueGameSelector", cc.Node)
+local ViewContinueWarSelector = class("ViewContinueWarSelector", cc.Node)
 
 local MENU_TITLE_Z_ORDER      = 1
 local MENU_LIST_VIEW_Z_ORDER  = 1
@@ -169,7 +169,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ViewContinueGameSelector:ctor(param)
+function ViewContinueWarSelector:ctor(param)
     initWithMenuBackground(self, createMenuBackground())
     initWithMenuListView(  self, createMenuListView())
     initWithMenuTitle(     self, createMenuTitle())
@@ -178,7 +178,7 @@ function ViewContinueGameSelector:ctor(param)
     return self
 end
 
-function ViewContinueGameSelector:setButtonBack(item)
+function ViewContinueWarSelector:setButtonBack(item)
     self.m_ButtonBack:setTitleText(item.name)
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
@@ -192,13 +192,13 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewContinueGameSelector:removeAllItems()
+function ViewContinueWarSelector:removeAllItems()
     self.m_MenuListView:removeAllItems()
 
     return self
 end
 
-function ViewContinueGameSelector:showWarList(list)
+function ViewContinueWarSelector:showWarList(list)
     for _, listItem in ipairs(list) do
         self.m_MenuListView:pushBackCustomItem(createViewMenuItem(listItem))
     end
@@ -206,10 +206,10 @@ function ViewContinueGameSelector:showWarList(list)
     return self
 end
 
-function ViewContinueGameSelector:createAndPushBackItem(item)
+function ViewContinueWarSelector:createAndPushBackItem(item)
     self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
 
     return self
 end
 
-return ViewContinueGameSelector
+return ViewContinueWarSelector

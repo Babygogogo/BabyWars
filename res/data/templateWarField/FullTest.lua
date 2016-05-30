@@ -1,17 +1,9 @@
 return {
-  version = "1.1",
-  luaversion = "5.1",
-  tiledversion = "0.15.0",
-  orientation = "orthogonal",
-  renderorder = "right-down",
+  warFieldName = "Full Test",
+  playersCount = 4,
+
   width = 25,
   height = 16,
-  tilewidth = 24,
-  tileheight = 24,
-  nextobjectid = 1,
-  properties = {},
-  tilesets = {
-  },
   layers = {
     {
       type = "tilelayer",

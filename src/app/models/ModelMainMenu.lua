@@ -19,32 +19,33 @@ end
 --------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
-local function getActorNewGameCreator(self)
-    if (not self.m_ActorNewGameCreator) then
-        local actor = Actor.createWithModelAndViewName("ModelNewGameCreator", nil, "ViewNewGameCreator")
+local function getActorNewWarCreator(self)
+    if (not self.m_ActorNewWarCreator) then
+        local actor = Actor.createWithModelAndViewName("ModelNewWarCreator", nil, "ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
-        self.m_ActorNewGameCreator = actor
-        self.m_View:setViewNewGameCreator(actor:getView())
+        self.m_ActorNewWarCreator = actor
+        self.m_View:setViewNewWarCreator(actor:getView())
     end
 
-    return self.m_ActorNewGameCreator
+    return self.m_ActorNewWarCreator
 end
 
-local function getActorContinueGameSelector(self)
-    if (not self.m_ActorContinueGameSelector) then
-        local actor = Actor.createWithModelAndViewName("ModelContinueGameSelector", nil, "ViewContinueGameSelector")
+local function getActorContinueWarSelector(self)
+    if (not self.m_ActorContinueWarSelector) then
+        local actor = Actor.createWithModelAndViewName("ModelContinueWarSelector", nil, "ViewContinueWarSelector")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
             :setModelConfirmBox(self.m_ModelConfirmBox)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
-        self.m_ActorContinueGameSelector = actor
-        self.m_View:setViewContinueGameSelector(actor:getView())
+        self.m_ActorContinueWarSelector = actor
+        self.m_View:setViewContinueWarSelector(actor:getView())
     end
 
-    return self.m_ActorContinueGameSelector
+    return self.m_ActorContinueWarSelector
 end
 
 local function getActorLoginPanel(self)
@@ -64,16 +65,16 @@ end
 --------------------------------------------------------------------------------
 -- The composition menu items.
 --------------------------------------------------------------------------------
-local function initItemNewGame(self)
+local function initItemNewWar(self)
     local item = {
         name = "New Game",
         callback = function()
             self:setMenuEnabled(false)
-            getActorNewGameCreator(self):getModel():setEnabled(true)
+            getActorNewWarCreator(self):getModel():setEnabled(true)
         end,
     }
 
-    self.m_ItemNewGame = item
+    self.m_ItemNewWar = item
 end
 
 local function initItemContinue(self)
@@ -81,7 +82,7 @@ local function initItemContinue(self)
         name     = "Continue",
         callback = function()
             self:setMenuEnabled(false)
-            getActorContinueGameSelector(self):getModel():setEnabled(true)
+            getActorContinueWarSelector(self):getModel():setEnabled(true)
         end,
     }
 
@@ -115,7 +116,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initItemNewGame(     self)
+    initItemNewWar(     self)
     initItemContinue(    self)
     initItemConfigSkills(self)
     initItemLogin(       self)
@@ -165,19 +166,26 @@ function ModelMainMenu:doActionLogin(action)
         :setMenuEnabled(true)
 
     getActorLoginPanel(self)          :getModel():doActionLogin(action)
-    getActorContinueGameSelector(self):getModel():doActionLogin(action)
+    getActorContinueWarSelector(self):getModel():doActionLogin(action)
+
+    return self
+end
+
+function ModelMainMenu:doActionNewWar(action)
+    self.m_ActorNewWarCreator:getModel():setEnabled(false)
+    self:setMenuEnabled(true)
 
     return self
 end
 
 function ModelMainMenu:doActionGetOngoingWarList(action)
-    getActorContinueGameSelector(self):getModel():doActionGetOngoingWarList(action)
+    getActorContinueWarSelector(self):getModel():doActionGetOngoingWarList(action)
 
     return self
 end
 
 function ModelMainMenu:doActionGetSceneWarData(action)
-    getActorContinueGameSelector(self):getModel():doActionGetSceneWarData(action)
+    getActorContinueWarSelector(self):getModel():doActionGetSceneWarData(action)
 
     return self
 end
@@ -204,7 +212,7 @@ end
 function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
     if (self.m_View) then
         if (isLogged) then
-            showMenuItems(self, self.m_ItemNewGame, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
+            showMenuItems(self, self.m_ItemNewWar, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
         else
             showMenuItems(self, self.m_ItemLogin)
         end

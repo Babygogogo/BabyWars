@@ -14,10 +14,15 @@ function SerializationFunctions.serialize(o, spaces)
     elseif (type(o) == "table") then
         local strList = {"{\n"}
         for k, v in pairs(o) do
-            strList[#strList + 1] = subSpaces
-            if (type(k) ~= "number") then
-                strList[#strList + 1] = "" .. k .. " = "
+            local keyType = type(k)
+            if (keyType == "number") then
+                strList[#strList + 1] = string.format("%s[%d] = ", subSpaces, k)
+            elseif (keyType == "string") then
+                strList[#strList + 1] = subSpaces .. k .. " = "
+            else
+                error("SerializationFunctions.serialize() cannot serialize a key with " .. keyType)
             end
+
             strList[#strList + 1] = SerializationFunctions.serialize(v, subSpaces)
             strList[#strList + 1] = ",\n"
         end
@@ -25,7 +30,7 @@ function SerializationFunctions.serialize(o, spaces)
 
         return table.concat(strList)
     else
-        error("cannot serialize a " .. type(o))
+        error("SerializationFunctions.serialize() cannot serialize a " .. type(o))
     end
 end
 
