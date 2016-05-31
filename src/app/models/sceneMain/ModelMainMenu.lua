@@ -21,7 +21,7 @@ end
 --------------------------------------------------------------------------------
 local function getActorNewWarCreator(self)
     if (not self.m_ActorNewWarCreator) then
-        local actor = Actor.createWithModelAndViewName("ModelNewWarCreator", nil, "ViewNewWarCreator")
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
@@ -35,7 +35,7 @@ end
 
 local function getActorContinueWarSelector(self)
     if (not self.m_ActorContinueWarSelector) then
-        local actor = Actor.createWithModelAndViewName("ModelContinueWarSelector", nil, "ViewContinueWarSelector")
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelContinueWarSelector", nil, "sceneMain.ViewContinueWarSelector")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
             :setModelConfirmBox(self.m_ModelConfirmBox)
@@ -118,7 +118,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initItemNewWar(     self)
+    initItemNewWar(      self)
     initItemContinue(    self)
     initItemConfigSkills(self)
     initItemLogin(       self)
@@ -167,8 +167,16 @@ function ModelMainMenu:doActionLogin(action)
     self:updateWithIsPlayerLoggedIn(true)
         :setMenuEnabled(true)
 
-    getActorLoginPanel(self)         :getModel():doActionLogin(action)
-    getActorContinueWarSelector(self):getModel():doActionLogin(action)
+    getActorLoginPanel(self):getModel():doActionLogin(action)
+
+    return self
+end
+
+function ModelMainMenu:doActionRegister(action)
+    self:updateWithIsPlayerLoggedIn(true)
+        :setMenuEnabled(true)
+
+    getActorLoginPanel(self):getModel():doActionRegister(action)
 
     return self
 end

@@ -1,5 +1,5 @@
 
-local ViewNewWarCreator = class("ViewNewWarCreator", cc.Node)
+local ViewContinueWarSelector = class("ViewContinueWarSelector", cc.Node)
 
 local MENU_TITLE_Z_ORDER      = 1
 local MENU_LIST_VIEW_Z_ORDER  = 1
@@ -34,6 +34,15 @@ local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 
+local ITEM_WIDTH              = 230
+local ITEM_HEIGHT             = 45
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -49,7 +58,7 @@ local function createViewMenuItem(item)
 
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
-        :setTitleColor(fontColor or ITEM_FONT_COLOR)
+        :setTitleColor(ITEM_FONT_COLOR)
         :setTitleText(item.name)
 
     view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
@@ -64,49 +73,37 @@ local function createViewMenuItem(item)
 end
 
 --------------------------------------------------------------------------------
--- The composition background.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createMenuBackground()
+local function initMenuBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
         :setOpacity(180)
 
-    return background
-end
-
-local function initWithMenuBackground(self, background)
     self.m_MenuBackground = background
     self:addChild(background, MENU_BACKGROUND_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition list view.
---------------------------------------------------------------------------------
-local function createMenuListView()
+local function initMenuListView(self)
     local listView = ccui.ListView:create()
-    listView:setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
+    listView:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
+
         :setItemsMargin(5)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
         :setOpacity(180)
         :setCascadeOpacityEnabled(true)
 
-    return listView
-end
-
-local function initWithMenuListView(self, listView)
     self.m_MenuListView = listView
-    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
+    self:addChild(listView)
 end
 
---------------------------------------------------------------------------------
--- The composition menu title.
---------------------------------------------------------------------------------
-local function createMenuTitle()
-    local title = cc.Label:createWithTTF("New Game..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+local function initMenuTitle(self)
+    local title = cc.Label:createWithTTF("Continue..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -119,18 +116,11 @@ local function createMenuTitle()
 
         :setOpacity(180)
 
-    return title
-end
-
-local function initWithMenuTitle(self, title)
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition back button.
---------------------------------------------------------------------------------
-local function createButtonBack()
+local function initButtonBack(self)
     local button = ccui.Button:create()
     button:ignoreAnchorPointForPosition(true)
         :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
@@ -145,35 +135,26 @@ local function createButtonBack()
         :setTitleColor({r = 240, g = 80, b = 56})
         :setTitleText("back")
 
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonBackTouched()
+            end
+        end)
+
     button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
-    return button
-end
-
-local function initWithButtonBack(self, button)
     self.m_ButtonBack = button
     self:addChild(button, BUTTON_BACK_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
--- The constructor and initializers.
+-- The constructor.
 --------------------------------------------------------------------------------
-function ViewNewWarCreator:ctor(param)
-    initWithMenuBackground(self, createMenuBackground())
-    initWithMenuListView(  self, createMenuListView())
-    initWithMenuTitle(     self, createMenuTitle())
-    initWithButtonBack(    self, createButtonBack(self))
-
-    return self
-end
-
-function ViewNewWarCreator:setItemBack(item)
-    self.m_ButtonBack:setTitleText(item.name)
-        :addTouchEventListener(function(sender, eventType)
-            if (eventType == ccui.TouchEventType.ended) then
-                item.callback()
-            end
-        end)
+function ViewContinueWarSelector:ctor(param)
+    initMenuBackground(self)
+    initMenuListView(  self)
+    initMenuTitle(     self)
+    initButtonBack(    self)
 
     return self
 end
@@ -181,13 +162,13 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewNewWarCreator:removeAllItems()
+function ViewContinueWarSelector:removeAllItems()
     self.m_MenuListView:removeAllItems()
 
     return self
 end
 
-function ViewNewWarCreator:showListWarField(list)
+function ViewContinueWarSelector:showWarList(list)
     for _, listItem in ipairs(list) do
         self.m_MenuListView:pushBackCustomItem(createViewMenuItem(listItem))
     end
@@ -195,10 +176,10 @@ function ViewNewWarCreator:showListWarField(list)
     return self
 end
 
-function ViewNewWarCreator:createAndPushBackItem(item)
+function ViewContinueWarSelector:createAndPushBackItem(item)
     self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
 
     return self
 end
 
-return ViewNewWarCreator
+return ViewContinueWarSelector

@@ -83,6 +83,10 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
         self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
     else
+        if (self.m_View) then
+            self.m_View:disableButtonRegisterForSecs(5)
+        end
+
         self.m_ModelConfirmBox:setConfirmText("Are you sure to register with the following account and password:\n" .. account .. "\n" .. password)
             :setOnConfirmYes(function()
                 self.m_RootScriptEventDispatcher:dispatchEvent({
@@ -91,6 +95,7 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
                     account    = account,
                     password   = password
                 })
+                self.m_ModelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
     end

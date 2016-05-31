@@ -152,9 +152,9 @@ function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
     assert((skillIndex == 1) or (skillIndex == 2), "ModelPlayer:getActiveSkillEnergyRequirement() the param skillIndex is invalid.")
 
     if (skillIndex == 1) then
-        return self.m_ActiveSkill1.energyRequirement
+        return self.m_ActiveSkill1.energyRequirement or 0
     else
-        return self.m_ActiveSkill2.energyRequirement
+        return self.m_ActiveSkill2.energyRequirement or 0
     end
 end
 

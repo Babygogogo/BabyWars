@@ -2,9 +2,9 @@
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
 --------------------------------------------------------------------------------
--- The new game item.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createItemListWarField(self)
+local function initWarFieldList(self, list)
     local list = {}
     for _, warField in ipairs(require("res.data.templateWarField.WarFieldList")) do
         list[#list + 1] = {
@@ -22,36 +22,14 @@ local function createItemListWarField(self)
         }
     end
 
-    return list
-end
-
-local function initWithItemListWarField(self, list)
     self.m_ItemListWarField = list
-end
-
---------------------------------------------------------------------------------
--- The back item.
---------------------------------------------------------------------------------
-local function createItemBack(self)
-    return {
-        name     = "back",
-        callback = function()
-            self:setEnabled(false)
-            self.m_ModelMainMenu:setMenuEnabled(true)
-        end,
-    }
-end
-
-local function initWithItemBack(self, item)
-    self.m_ItemBack = item
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelNewWarCreator:ctor(param)
-    initWithItemListWarField(self, createItemListWarField(self))
-    initWithItemBack(        self, createItemBack(self))
+    initWarFieldList(self)
 
     if (self.m_View) then
         self:initView()
@@ -65,7 +43,6 @@ function ModelNewWarCreator:initView()
     assert(view, "ModelNewWarCreator:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
-        :setItemBack(self.m_ItemBack)
         :showListWarField(self.m_ItemListWarField)
 
     return self
@@ -92,6 +69,13 @@ function ModelNewWarCreator:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setVisible(enabled)
     end
+
+    return self
+end
+
+function ModelNewWarCreator:onButtonBackTouched()
+    self:setEnabled(false)
+    self.m_ModelMainMenu:setMenuEnabled(true)
 
     return self
 end

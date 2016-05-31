@@ -51,26 +51,9 @@ local function initWarList(self, list)
 end
 
 --------------------------------------------------------------------------------
--- The composition menu items.
---------------------------------------------------------------------------------
-local function initItemBack(self, item)
-    local item = {
-        name     = "back",
-        callback = function()
-            self:setEnabled(false)
-            self.m_ModelMainMenu:setMenuEnabled(true)
-        end,
-    }
-
-    self.m_ItemBack = item
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:ctor(param)
-    initItemBack(self)
-
     if (self.m_View) then
         self:initView()
     end
@@ -83,7 +66,6 @@ function ModelContinueWarSelector:initView()
     assert(view, "ModelContinueWarSelector:initView() no view is attached to the actor of the model.")
 
     view:removeAllItems()
-        :setButtonBack(self.m_ItemBack)
 
     return self
 end
@@ -112,12 +94,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelContinueWarSelector:doActionLogin(action)
-    self:setEnabled(false)
-
-    return self
-end
-
 function ModelContinueWarSelector:doActionGetOngoingWarList(action)
     initWarList(self, action.list)
     if ((self.m_View) and (self.m_IsEnabled)) then
@@ -154,6 +130,13 @@ function ModelContinueWarSelector:setEnabled(enabled)
         self.m_View:setVisible(enabled)
             :removeAllItems()
     end
+
+    return self
+end
+
+function ModelContinueWarSelector:onButtonBackTouched()
+    self:setEnabled(false)
+    self.m_ModelMainMenu:setMenuEnabled(true)
 
     return self
 end

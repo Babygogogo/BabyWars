@@ -44,6 +44,13 @@ local function doActionLogout(self, event)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
+local function doActionRegister(self, action)
+    WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
+    self.m_ActorMessageIndicator:getModel():showMessage("Welcome, " .. action.account .. "!\nThank you for registering!")
+
+    self.m_ActorMainMenu:getModel():doActionRegister(action)
+end
+
 local function doActionNewWar(self, action)
     self.m_ActorMainMenu:getModel():doActionNewWar(action)
     self.m_ActorMessageIndicator:getModel():showMessage(action.message)
@@ -70,6 +77,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionLogin(self, event)
     elseif (actionName == "Logout") then
         doActionLogout(self, event)
+    elseif (actionName == "Register") then
+        doActionRegister(self, event)
     elseif (actionName == "NewWar") then
         doActionNewWar(self, event)
     elseif (actionName == "GetOngoingWarList") then
