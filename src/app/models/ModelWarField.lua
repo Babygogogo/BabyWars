@@ -197,6 +197,10 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
+function ModelWarField:getModelActionPlanner()
+    return self.m_ActorActionPlanner:getModel()
+end
+
 function ModelWarField:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "

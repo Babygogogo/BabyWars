@@ -35,10 +35,10 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
 local function doActionLogout(self, event)
-    local modelSceneMain = Actor.createModel("ModelSceneMain", {
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
         confirmText = event.message
     })
-    local viewSceneMain  = Actor.createView("ViewSceneMain")
+    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
     WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
         .setOwner(modelSceneMain)
@@ -160,9 +160,17 @@ local function initScriptEventDispatcher(self)
     self.m_ScriptEventDispatcher = dispatcher
 end
 
+local function initActorPlayerManager(self, playersData)
+    local actor = Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+
+    self.m_ActorPlayerManager = actor
+end
+
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("ModelWarField", warFieldData, "ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :getModelActionPlanner():setModelPlayerManager(self.m_ActorPlayerManager:getModel())
 
     self.m_ActorWarField = actor
 end
@@ -172,13 +180,6 @@ local function initActorWarHud(self)
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
 
     self.m_ActorWarHud = actor
-end
-
-local function initActorPlayerManager(self, playersData)
-    local actor = Actor.createWithModelAndViewName("ModelPlayerManager", playersData)
-    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-
-    self.m_ActorPlayerManager = actor
 end
 
 local function initActorTurnManager(self, turnData)
@@ -210,9 +211,9 @@ function ModelSceneWar:ctor(sceneData)
 
     self.m_FileName = sceneData.fileName
     initScriptEventDispatcher(self)
+    initActorPlayerManager(   self, sceneData.players)
     initActorWarField(        self, sceneData.warField)
     initActorWarHud(          self)
-    initActorPlayerManager(   self, sceneData.players)
     initActorTurnManager(     self, sceneData.turn)
     initActorWeatherManager(  self, sceneData.weather)
     initActorMessageIndicator(self)

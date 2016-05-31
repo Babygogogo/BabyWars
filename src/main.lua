@@ -22,9 +22,10 @@ local function main()
     fileUtils:addSearchPath("src/")
     fileUtils:addSearchPath("res/")
 
-    display.loadSpriteFrames("BabyWarsTextureTile.plist", "BabyWarsTextureTile.png")
-    display.loadSpriteFrames("BabyWarsTextureUnit.plist", "BabyWarsTextureUnit.png")
-    display.loadSpriteFrames("BabyWarsTextureUI.plist",   "BabyWarsTextureUI.png")
+    display.loadSpriteFrames("BabyWarsTextureTile.plist",    "BabyWarsTextureTile.png")
+    display.loadSpriteFrames("BabyWarsTextureUnit.plist",    "BabyWarsTextureUnit.png")
+    display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.png")
+    display.loadSpriteFrames("BabyWarsTextureGallery.plist", "BabyWarsTextureGallery.png")
 
     require("app.utilities.AnimationLoader").load()
     require("app.utilities.GameConstantFunctions").init()
@@ -33,7 +34,7 @@ local function main()
 
     cc.Director:getInstance():setDisplayStats(true)
 
-    local actorSceneMain = require("global.actors.Actor").createWithModelAndViewName("ModelSceneMain", nil, "ViewSceneMain")
+    local actorSceneMain = require("global.actors.Actor").createWithModelAndViewName("sceneMain.ModelSceneMain", nil, "sceneMain.ViewSceneMain")
     require("app.utilities.WebSocketManager").init()
         .setOwner(actorSceneMain:getModel())
     require("global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
