@@ -50,9 +50,10 @@ end
 
 local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
-        local actor = Actor.createWithModelAndViewName("ModelLoginPanel", nil, "ViewLoginPanel")
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
         actor:getModel():setModelMainMenu(self)
             :setModelMessageIndicator(self.m_ModelMessageIndicator)
+            :setModelConfirmBox(self.m_ModelConfirmBox)
             :setEnabled(false)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
@@ -166,7 +167,7 @@ function ModelMainMenu:doActionLogin(action)
     self:updateWithIsPlayerLoggedIn(true)
         :setMenuEnabled(true)
 
-    getActorLoginPanel(self)          :getModel():doActionLogin(action)
+    getActorLoginPanel(self)         :getModel():doActionLogin(action)
     getActorContinueWarSelector(self):getModel():doActionLogin(action)
 
     return self

@@ -4,8 +4,8 @@ local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 local LABEL_TITLE_Z_ORDER       = 1
 local LABEL_ACCOUNT_Z_ORDER     = 1
 local LABEL_PASSWORD_Z_ORDER    = 1
-local BUTTON_CONFIRM_Z_ORDER    = 1
-local BUTTON_CANCEL_Z_ORDER     = 1
+local BUTTON_REGISTER_Z_ORDER   = 1
+local BUTTON_LOGIN_Z_ORDER      = 1
 local EDIT_BOX_ACCOUNT_Z_ORDER  = 1
 local EDIT_BOX_PASSWORD_Z_ORDER = 1
 local BACKGROUND_Z_ORDER        = 0
@@ -37,15 +37,17 @@ local LABEL_PASSWORD_HEIGHT = LABEL_ACCOUNT_HEIGHT
 local LABEL_PASSWORD_POS_X  = BACKGROUND_POS_X + 10
 local LABEL_PASSWORD_POS_Y  = LABEL_ACCOUNT_POS_Y - LABEL_ACCOUNT_HEIGHT
 
-local BUTTON_WIDTH              = 150
-local BUTTON_HEIGHT             = 50
-local BUTTON_CONFIRM_POS_X      = BACKGROUND_POS_X + 60
-local BUTTON_CONFIRM_POS_Y      = BACKGROUND_POS_Y + 25
-local BUTTON_CONFIRM_TEXT_COLOR = {r = 104, g = 248, b = 200}
+local BUTTON_WIDTH               = 150
+local BUTTON_HEIGHT              = 50
+local BUTTON_TEXTURE_NAME        = "c03_t06_s01_f01.png"
+local BUTTON_CAPINSETS           = {x = 1, y = BUTTON_HEIGHT - 7, width = 1, height = 1}
+local BUTTON_REGISTER_POS_X      = BACKGROUND_POS_X + 60
+local BUTTON_REGISTER_POS_Y      = BACKGROUND_POS_Y + 25
+local BUTTON_REGISTER_TEXT_COLOR = {r = 104, g = 248, b = 200}
 
-local BUTTON_CANCEL_POS_X      = BACKGROUND_POS_X + BACKGROUND_WIDTH - BUTTON_WIDTH - 60
-local BUTTON_CANCEL_POS_Y      = BUTTON_CONFIRM_POS_Y
-local BUTTON_CANCEL_TEXT_COLOR = {r = 240, g = 80, b = 56}
+local BUTTON_LOGIN_POS_X      = BACKGROUND_POS_X + BACKGROUND_WIDTH - BUTTON_WIDTH - 60
+local BUTTON_LOGIN_POS_Y      = BUTTON_REGISTER_POS_Y
+local BUTTON_LOGIN_TEXT_COLOR = FONT_COLOR -- red: {r = 240, g = 80, b = 56}
 
 local EDIT_BOX_WIDTH        = 345
 local EDIT_BOX_HEIGHT       = LABEL_ACCOUNT_HEIGHT
@@ -74,13 +76,13 @@ end
 
 local function createButton(posX, posY, text, textColor, callback)
     local button = ccui.Button:create()
-    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    button:loadTextureNormal(BUTTON_TEXTURE_NAME, ccui.TextureResType.plistType)
 
         :ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
 
         :setScale9Enabled(true)
-        :setCapInsets(BACKGROUND_CAPINSETS)
+        :setCapInsets(BUTTON_CAPINSETS)
         :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
         :setZoomScale(-0.05)
@@ -118,6 +120,15 @@ local function createEditBox(posX, posY)
     return editBox
 end
 
+local function disableButtonForSecs(button, secs)
+    button:setEnabled(false)
+        :stopAllActions()
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(secs),
+            cc.CallFunc:create(function() button:setEnabled(true) end)
+        ))
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -133,7 +144,7 @@ local function initBackground(self)
 end
 
 local function initLabelTitle(self)
-    local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT, "Login")
+    local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT, "Register / Login")
     label:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
 
@@ -155,26 +166,26 @@ local function initLabelPassword(self)
     self:addChild(label, LABEL_PASSWORD_Z_ORDER)
 end
 
-local function initButtonConfirm(self)
-    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "Confirm", BUTTON_CONFIRM_TEXT_COLOR, function()
+local function initButtonRegister(self)
+    local button = createButton(BUTTON_REGISTER_POS_X, BUTTON_REGISTER_POS_Y, "Register", BUTTON_REGISTER_TEXT_COLOR, function()
         if (self.m_Model) then
-            self.m_Model:onButtonConfirmTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
+            self.m_Model:onButtonRegisterTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
     end)
 
-    self.m_ButtonConfirm = button
-    self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
+    self.m_ButtonRegister = button
+    self:addChild(button, BUTTON_REGISTER_Z_ORDER)
 end
 
-local function initButtonCancel(self)
-    local button = createButton(BUTTON_CANCEL_POS_X, BUTTON_CANCEL_POS_Y, "Cancel", BUTTON_CANCEL_TEXT_COLOR, function()
+local function initButtonLogin(self)
+    local button = createButton(BUTTON_LOGIN_POS_X, BUTTON_LOGIN_POS_Y, "Login", BUTTON_LOGIN_TEXT_COLOR, function()
         if (self.m_Model) then
-            self.m_Model:onButtonCancelTouched()
+            self.m_Model:onButtonLoginTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
     end)
 
-    self.m_ButtonCancel = button
-    self:addChild(button, BUTTON_CANCEL_Z_ORDER)
+    self.m_ButtonLogin = button
+    self:addChild(button, BUTTON_LOGIN_Z_ORDER)
 end
 
 local function initEditBoxAccount(self)
@@ -195,18 +206,39 @@ local function initEditBoxPassword(self)
     self:addChild(editBox, EDIT_BOX_PASSWORD_Z_ORDER)
 end
 
+local function initTouchListener(self)
+    local listener = cc.EventListenerTouchOneByOne:create()
+    listener:setSwallowTouches(true)
+    local isTouchWithinBackground = false
+
+    listener:registerScriptHandler(function(touch, event)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_Background)
+        return true
+    end, cc.Handler.EVENT_TOUCH_BEGAN)
+
+    listener:registerScriptHandler(function(touch, event)
+        if ((not isTouchWithinBackground) and (self.m_Model)) then
+            self.m_Model:onCancel()
+        end
+    end, cc.Handler.EVENT_TOUCH_ENDED)
+
+    self.m_TouchListener = listener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewLoginPanel:ctor(param)
-    initBackground(      self)
-    initLabelTitle(      self)
-    initLabelAccount(    self)
-    initLabelPassword(   self)
-    initButtonConfirm(   self)
-    initButtonCancel(    self)
-    initEditBoxAccount(  self)
-    initEditBoxPassword( self)
+    initBackground(     self)
+    initLabelTitle(     self)
+    initLabelAccount(   self)
+    initLabelPassword(  self)
+    initButtonRegister( self)
+    initButtonLogin(    self)
+    initEditBoxAccount( self)
+    initEditBoxPassword(self)
+    initTouchListener(  self)
 
     return self
 end
@@ -216,17 +248,19 @@ end
 --------------------------------------------------------------------------------
 function ViewLoginPanel:setEnabled(enabled)
     self:setVisible(enabled)
+    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end
 
-function ViewLoginPanel:disableButtonConfirmForSecs(secs)
-    self.m_ButtonConfirm:setEnabled(false)
-        :stopAllActions()
-        :runAction(cc.Sequence:create(
-            cc.DelayTime:create(secs),
-            cc.CallFunc:create(function() self.m_ButtonConfirm:setEnabled(true) end)
-        ))
+function ViewLoginPanel:disableButtonRegisterForSecs(secs)
+    disableButtonForSecs(self.m_ButtonRegister, secs)
+
+    return self
+end
+
+function ViewLoginPanel:disableButtonLoginForSecs(secs)
+    disableButtonForSecs(self.m_ButtonLogin, secs)
 
     return self
 end

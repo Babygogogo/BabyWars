@@ -148,7 +148,7 @@ local function initActorConfirmBox(self, confirmText)
 end
 
 local function initActorMainMenu(self)
-    local actor = Actor.createWithModelAndViewName("ModelMainMenu", nil, "ViewMainMenu")
+    local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
         :setModelMessageIndicator(self.m_ActorMessageIndicator:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)

@@ -64,27 +64,20 @@ local function createViewItem(item)
 end
 
 --------------------------------------------------------------------------------
--- The composition menu background.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createMenuBackground()
+local function initMenuBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
         :setOpacity(180)
 
-    return background
-end
-
-local function initWithMenuBackground(self, background)
     self.m_MenuBackground = background
     self:addChild(background, MENU_BACKGROUND_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition menu list view.
---------------------------------------------------------------------------------
-local function createMenuListView()
+local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
@@ -94,18 +87,11 @@ local function createMenuListView()
         :setCascadeOpacityEnabled(true)
         :setOpacity(180)
 
-    return listView
-end
-
-local function initWithMenuListView(self, listView)
     self.m_MenuListView = listView
     self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The composition menu title.
---------------------------------------------------------------------------------
-local function createMenuTitle()
+local function initMenuTitle(self)
     local title = cc.Label:createWithTTF("Main Menu", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
@@ -119,10 +105,6 @@ local function createMenuTitle()
 
         :setOpacity(180)
 
-    return title
-end
-
-local function initWithMenuTitle(self, title)
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
 end
@@ -131,9 +113,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewMainMenu:ctor(param)
-    initWithMenuBackground(self, createMenuBackground())
-    initWithMenuListView(  self, createMenuListView())
-    initWithMenuTitle(     self, createMenuTitle())
+    initMenuBackground(self)
+    initMenuListView(  self)
+    initMenuTitle(     self)
 
     return self
 end

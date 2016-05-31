@@ -31,6 +31,13 @@ function ModelLoginPanel:setModelMessageIndicator(model)
     return self
 end
 
+function ModelLoginPanel:setModelConfirmBox(model)
+    assert(self.m_ModelConfirmBox == nil, "ModelLoginPanel:setModelConfirmBox() the model has been set.")
+    self.m_ModelConfirmBox = model
+
+    return self
+end
+
 function ModelLoginPanel:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelLoginPanel:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
@@ -42,6 +49,14 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:doActionLogin(action)
+    if (self.m_IsEnabled) then
+        self:setEnabled(false)
+    end
+
+    return self
+end
+
+function ModelLoginPanel:doActionRegister(action)
     if (self.m_IsEnabled) then
         self:setEnabled(false)
     end
@@ -62,27 +77,49 @@ function ModelLoginPanel:setEnabled(enabled)
     return self
 end
 
-function ModelLoginPanel:onButtonConfirmTouched(account, password)
-    if (self.m_View) then
-        if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-            self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
-        elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-            self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
-        else
-            self.m_View:disableButtonConfirmForSecs(5)
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name       = "EvtPlayerRequestDoAction",
-                actionName = "Login",
-                account    = account,
-                password   = password
-            })
-        end
+function ModelLoginPanel:onButtonRegisterTouched(account, password)
+    if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
+        self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
+    elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
+        self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
+    else
+        self.m_ModelConfirmBox:setConfirmText("Are you sure to register with the following account and password:\n" .. account .. "\n" .. password)
+            :setOnConfirmYes(function()
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name       = "EvtPlayerRequestDoAction",
+                    actionName = "Register",
+                    account    = account,
+                    password   = password
+                })
+            end)
+            :setEnabled(true)
     end
 
     return self
 end
 
-function ModelLoginPanel:onButtonCancelTouched()
+function ModelLoginPanel:onButtonLoginTouched(account, password)
+    if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
+        self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
+    elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
+        self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
+    else
+        if (self.m_View) then
+            self.m_View:disableButtonLoginForSecs(5)
+        end
+
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name       = "EvtPlayerRequestDoAction",
+            actionName = "Login",
+            account    = account,
+            password   = password
+        })
+    end
+
+    return self
+end
+
+function ModelLoginPanel:onCancel()
     if (self.m_View) then
         self.m_View:setEnabled(false)
     end
