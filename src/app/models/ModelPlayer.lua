@@ -22,59 +22,67 @@
 
 local ModelPlayer = class("ModelPlayer")
 
+local TableFunctions = require("app.utilities.TableFunctions")
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function serializeID(self, spaces)
-    return string.format("%sid = %d", spaces, self:getID())
+local function serializeAccountToStringList(self, spaces)
+    return {string.format("%saccount = %q", spaces, self:getAccount())}
 end
 
-local function serializeName(self, spaces)
-    return string.format("%sname = %q", spaces, self:getName())
+local function serializeNicknameToStringList(self, spaces)
+    return {string.format("%snickname = %q", spaces, self:getNickname())}
 end
 
-local function serializeFund(self, spaces)
-    return string.format("%sfund = %d", spaces, self:getFund())
+local function serializeFundToStringList(self, spaces)
+    return {string.format("%sfund = %d", spaces, self:getFund())}
 end
 
-local function serializeIsAlive(self, spaces)
-    return string.format("%sisAlive = %s", spaces, self:isAlive() and "true" or "false")
+local function serializeIsAliveToStringList(self, spaces)
+    return {string.format("%sisAlive = %s", spaces, self:isAlive() and "true" or "false")}
 end
 
-local function serializeCurrentEnergy(self, spaces)
-    return string.format("%scurrentEnergy = %f", spaces, self:getEnergy())
+local function serializeCurrentEnergyToStringList(self, spaces)
+    return {string.format("%scurrentEnergy = %f", spaces, self:getEnergy())}
 end
 
-local function serializePassiveSkill(self, spaces)
-    return string.format("%spassiveSkill = {\n%s}",
-        spaces,
-        spaces
-    )
+local function serializePassiveSkillToStringList(self, spaces)
+    spaces = spaces or ""
+    local strList = {spaces .. "passiveSkill = {\n"}
+
+    -- TODO: add code to do the job.
+    strList[#strList + 1] = spaces .. "}"
+
+    return strList
 end
 
-local function serializeEnergyRequirement(self, spaces, skillIndex)
-    return string.format("%senergyRequirement = %d",
+local function serializeEnergyRequirementToStringList(self, spaces, skillIndex)
+    return {string.format("%senergyRequirement = %d",
         spaces,
         self:getActiveSkillEnergyRequirement(skillIndex)
-    )
+    )}
 end
 
-local function serializeActiveSkill(self, spaces, skillIndex)
+local function serializeActiveSkillToStringList(self, spaces, skillIndex)
+    spaces = spaces or ""
     local subSpaces = spaces .. "    "
+    local appendList = TableFunctions.appendList
+    local strList = {spaces .. "activeSkill" .. skillIndex .. " = {\n"}
 
-    return string.format("%s%s = {\n%s,\n%s}",
-        spaces, "activeSkill" .. skillIndex,
-        serializeEnergyRequirement(self, subSpaces, skillIndex),
-        spaces
-    )
+    appendList(strList, serializeEnergyRequirementToStringList(self, subSpaces, skillIndex), ",\n")
+    -- TODO: add code to serialize the skill effect.
+
+    strList[#strList + 1] = spaces .. "}"
+    return strList
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_ID            = param.id
-    self.m_Name          = param.name
+    self.m_Account       = param.account
+    self.m_Nickname      = param.nickname
     self.m_Fund          = param.fund
     self.m_IsAlive       = param.isAlive
     self.m_CurrentEnergy = param.currentEnergy
@@ -87,14 +95,39 @@ function ModelPlayer:ctor(param)
 end
 
 --------------------------------------------------------------------------------
--- The public functions.
+-- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelPlayer:getID()
-    return self.m_ID
+function ModelPlayer:toStringList(spaces)
+    spaces = spaces or ""
+    if (not self:getAccount()) then
+        return {spaces .. "{}"}
+    end
+
+    local subSpaces = spaces .. "    "
+    local strList = {spaces .. "{\n"}
+    local appendList = TableFunctions.appendList
+
+    appendList(strList, serializeAccountToStringList(      self, subSpaces),    ",\n")
+    appendList(strList, serializeNicknameToStringList(     self, subSpaces),    ",\n")
+    appendList(strList, serializeFundToStringList(         self, subSpaces),    ",\n")
+    appendList(strList, serializeIsAliveToStringList(      self, subSpaces),    ",\n")
+    appendList(strList, serializeCurrentEnergyToStringList(self, subSpaces),    ",\n")
+    appendList(strList, serializePassiveSkillToStringList( self, subSpaces),    ",\n")
+    appendList(strList, serializeActiveSkillToStringList(  self, subSpaces, 1), ",\n")
+    appendList(strList, serializeActiveSkillToStringList(  self, subSpaces, 2), "\n" .. spaces .. "}")
+
+    return strList
 end
 
-function ModelPlayer:getName()
-    return self.m_Name
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelPlayer:getAccount()
+    return self.m_Account
+end
+
+function ModelPlayer:getNickname()
+    return self.m_Nickname
 end
 
 function ModelPlayer:isAlive()
@@ -119,28 +152,10 @@ function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
     assert((skillIndex == 1) or (skillIndex == 2), "ModelPlayer:getActiveSkillEnergyRequirement() the param skillIndex is invalid.")
 
     if (skillIndex == 1) then
-        return self.m_ActiveSkill1.energyRequirement
+        return self.m_ActiveSkill1.energyRequirement or 0
     else
-        return self.m_ActiveSkill2.energyRequirement
+        return self.m_ActiveSkill2.energyRequirement or 0
     end
-end
-
-function ModelPlayer:serialize(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    return string.format("%s{\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s,\n%s}",
-        spaces,
-        serializeID(           self, subSpaces),
-        serializeName(         self, subSpaces),
-        serializeFund(         self, subSpaces),
-        serializeIsAlive(      self, subSpaces),
-        serializeCurrentEnergy(self, subSpaces),
-        serializePassiveSkill( self, subSpaces),
-        serializeActiveSkill(  self, subSpaces, 1),
-        serializeActiveSkill(  self, subSpaces, 2),
-        spaces
-    )
 end
 
 return ModelPlayer

@@ -1,21 +1,36 @@
 
 local SerializationFunctions = {}
 
-function SerializationFunctions.serialize(o)
+function SerializationFunctions.serialize(o, spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. " "
+
     if (type(o) == "number") then
-        io.write(o)
+        return "" .. o
     elseif (type(o) == "string") then
-        io.write(string.format("%q", o))
+        return string.format("%q", o)
+    elseif (type(o) == "boolean") then
+        return (o) and ("true") or ("false")
     elseif (type(o) == "table") then
-        io.write("{\n")
+        local strList = {"{\n"}
         for k, v in pairs(o) do
-            io.write(" ", k, " = ")
-            serialize(v)
-            io.write(",\n")
+            local keyType = type(k)
+            if (keyType == "number") then
+                strList[#strList + 1] = string.format("%s[%d] = ", subSpaces, k)
+            elseif (keyType == "string") then
+                strList[#strList + 1] = subSpaces .. k .. " = "
+            else
+                error("SerializationFunctions.serialize() cannot serialize a key with " .. keyType)
+            end
+
+            strList[#strList + 1] = SerializationFunctions.serialize(v, subSpaces)
+            strList[#strList + 1] = ",\n"
         end
-        io.write("}\n")
+        strList[#strList + 1] = spaces .. "}"
+
+        return table.concat(strList)
     else
-        error("cannot serialize a " .. type(o))
+        error("SerializationFunctions.serialize() cannot serialize a " .. type(o))
     end
 end
 

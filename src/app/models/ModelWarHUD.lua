@@ -27,7 +27,7 @@ local Actor = require("global.actors.Actor")
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseBeginning(self, event)
     if (self.m_View) then
-        self.m_View:showBeginTurnEffect(event.turnIndex, event.modelPlayer:getName(), event.callbackOnBeginTurnEffectDisappear)
+        self.m_View:showBeginTurnEffect(event.turnIndex, event.modelPlayer:getNickname(), event.callbackOnBeginTurnEffectDisappear)
     else
         event.callbackOnBeginTurnEffect()
     end
@@ -39,7 +39,7 @@ end
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createActorConfirmBox()
-    return Actor.createWithModelAndViewName("ModelConfirmBox", nil, "ViewConfirmBox")
+    return Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
 end
 
 local function initWithActorConfirmBox(self, actor)

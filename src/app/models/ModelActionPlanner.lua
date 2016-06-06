@@ -19,6 +19,7 @@ local GridIndexFunctions          = require("app.utilities.GridIndexFunctions")
 local ReachableAreaFunctions      = require("app.utilities.ReachableAreaFunctions")
 local MovePathFunctions           = require("app.utilities.MovePathFunctions")
 local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
+local WebSocketManager            = require("app.utilities.WebSocketManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -290,12 +291,13 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseBeginning(self, event)
+    self.m_CurrentPlayerIndex = event.playerIndex
     setStateIdle(self)
 end
 
 local function onEvtTurnPhaseMain(self, event)
-    self.m_PlayerIndex = event.playerIndex
-    self.m_ModelPlayer = event.modelPlayer
+    self.m_CurrentPlayerIndex = event.playerIndex
+    setStateIdle(self)
 end
 
 local function onEvtModelWeatherUpdated(self, event)
@@ -307,6 +309,10 @@ local function onEvtPlayerRequestDoAction(self, event)
 end
 
 local function onEvtPlayerMovedCursor(self, event)
+    if (self.m_CurrentPlayerIndex ~= self.m_PlayerIndex) then
+        return
+    end
+
     local state     = self.m_State
     local gridIndex = event.gridIndex
 
@@ -337,6 +343,10 @@ local function onEvtPlayerMovedCursor(self, event)
 end
 
 local function onEvtPlayerSelectedGrid(self, event)
+    if (self.m_CurrentPlayerIndex ~= self.m_PlayerIndex) then
+        return
+    end
+
     local state     = self.m_State
     local gridIndex = event.gridIndex
 
@@ -400,6 +410,20 @@ end
 function ModelActionPlanner:setModelTileMap(model)
     assert(self.m_ModelTileMap == nil, "ModelActionPlanner:setModelTileMap() the model has been set already.")
     self.m_ModelTileMap = model
+
+    return self
+end
+
+function ModelActionPlanner:setModelPlayerManager(modelPlayerManager)
+    local playerAccount = WebSocketManager.getLoggedInAccountAndPassword()
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:getAccount() == playerAccount) then
+            self.m_ModelPlayer = modelPlayer
+            self.m_PlayerIndex = playerIndex
+        end
+    end)
+
+    self.m_ModelPlayerManager = modelPlayerManager
 
     return self
 end

@@ -59,12 +59,12 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function CaptureTaker:serialize(spaces)
+function CaptureTaker:toStringList(spaces)
     local currentCapturePoint = self:getCurrentCapturePoint()
     if (currentCapturePoint == self:getMaxCapturePoint()) then
         return nil
     else
-        return string.format("%sCaptureTaker = {currentCapturePoint = %d}", spaces or "", currentCapturePoint)
+        return {string.format("%sCaptureTaker = {currentCapturePoint = %d}", spaces or "", currentCapturePoint)}
     end
 end
 

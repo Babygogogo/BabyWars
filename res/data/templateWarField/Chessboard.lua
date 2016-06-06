@@ -1,17 +1,9 @@
 return {
-  version = "1.1",
-  luaversion = "5.1",
-  tiledversion = "0.15.0",
-  orientation = "orthogonal",
-  renderorder = "right-down",
+  warFieldName = "Chessboard",
+  playersCount = 2,
+
   width = 11,
   height = 11,
-  tilewidth = 24,
-  tileheight = 24,
-  nextobjectid = 1,
-  properties = {},
-  tilesets = {
-  },
   layers = {
     {
       type = "tilelayer",

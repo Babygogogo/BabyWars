@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>c04_t01_s01_f01.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,2},{960,768}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{960,768}}</string>
+                <key>sourceSize</key>
+                <string>{960,768}</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>2</integer>
+            <key>realTextureFileName</key>
+            <string>BabyWarsTextureGallery.png</string>
+            <key>size</key>
+            <string>{772,964}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:7e1f145224206dfb51ba6542e5f88582:6c2b3397ea6b58c984ebebaa3bbd3ac8:328cc6d43f0dccb40d4f6711c5485469$</string>
+            <key>textureFileName</key>
+            <string>BabyWarsTextureGallery.png</string>
+        </dict>
+    </dict>
+</plist>

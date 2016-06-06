@@ -54,6 +54,7 @@ local ModelTile = class("ModelTile")
 local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TableFunctions        = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -92,32 +93,38 @@ local function loadInstantialData(self, param)
     end
 end
 
-local function serializeObjectID(self, spaces)
+local function serializeObjectIdToStringList(self, spaces)
     if (self.m_InitialObjectID == self.m_ObjectID) then
         return nil
     else
-        return string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)
+        return {string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)}
     end
 end
 
-local function serializeBaseID(self, spaces)
+local function serializeBaseIdToStringList(self, spaces)
     if (self.m_InitialBaseID == self.m_BaseID) then
         return nil
     else
-        return string.format("%sbaseID = %d", spaces or "", self.m_BaseID)
+        return {string.format("%sbaseID = %d", spaces or "", self.m_BaseID)}
     end
 end
 
-local function serializeComponents(self, spaces)
+local function serializeComponentsToStringList(self, spaces)
     spaces = spaces or ""
-    local strList = {}
+    local strList, componentsCount = {}, 0
+    local appendList = TableFunctions.appendList
+
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.serialize) then
-            strList[#strList + 1] = component:serialize(spaces)
+        if (component.toStringList) then
+            local componentStrList = component:toStringList(spaces)
+            if (componentStrList) then
+                appendList(strList, component:toStringList(spaces), ",\n")
+                componentsCount = componentsCount + 1
+            end
         end
     end
 
-    return table.concat(strList, ",\n"), #strList
+    return strList, componentsCount
 end
 
 --------------------------------------------------------------------------------
@@ -176,23 +183,21 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTile:serialize(spaces)
+function ModelTile:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
-    local strList = {}
-    local componentsCount
-    strList[#strList + 1] = serializeObjectID(  self, subSpaces)
-    strList[#strList + 1] = serializeBaseID(    self, subSpaces)
-    strList[#strList + 1], componentsCount = serializeComponents(self, subSpaces)
 
-    if ((#strList <= 1) and (componentsCount <= 1)) then
+    local componentStrList, componentsCount = serializeComponentsToStringList(self, subSpaces)
+    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        return string.format("%s{\n%s\n%s}",
-            spaces,
-            table.concat(strList, ",\n"),
-            spaces
-        )
+        local strList = {spaces .. "{\n"}
+        local appendList = TableFunctions.appendList
+        appendList(strList, serializeObjectIdToStringList(self, subSpaces), ",\n")
+        appendList(strList, serializeBaseIdToStringList(  self, subSpaces), ",\n")
+        appendList(strList, componentStrList,                               spaces .. "}")
+
+        return strList
     end
 end
 

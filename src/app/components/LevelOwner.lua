@@ -64,10 +64,10 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function LevelOwner:serialize(spaces)
+function LevelOwner:toStringList(spaces)
     local level = self:getLevel()
     if (level ~= 0) then
-        return string.format("%sLevelOwner = {level = %d}", spaces, level)
+        return {string.format("%sLevelOwner = {level = %d}", spaces, level)}
     else
         return nil
     end

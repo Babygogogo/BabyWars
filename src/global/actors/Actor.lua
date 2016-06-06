@@ -10,13 +10,13 @@
 -- 其他：
 --   - actor实例举例：
 --     刚进游戏所看到的主场景是一个actor实例，它所包含的model和view分别是ModelSceneMain和ViewSceneMain类的实例。
---     主场景中的战局列表也是一个actor实例，它所包含的model和view分别是ModelWarList和ViewWarList类的实例。
+--     主场景中的战局列表也是一个actor实例，它所包含的model和view分别是ModelContinueGameSelector和ViewContinueGameSelector类的实例。
 --
 --   - actor间的树状层级关系：
 --     继续以主场景和战局列表为例。在逻辑上，可以认为主场景是父节点，战局列表是子节点（并非继承关系，而是类似于cocos2d-x中的父显示节点和子显示节点的关系）。
 --     但actor本身并没有体现父子关系的代码（这是因为一个父actor可能有很多作用迥异的子actor，强行在actor里写通用的处理函数没有太多意义），因此要手动在model里添加相应代码。
 --     也就是说，以主场景和战局列表为例，我们需要在ModelSceneMain里创建和维护战局列表的actor。
---     同时，为了使得战局列表能够显示出来，我们还需要调用cc.Node:addChild()，把战局列表的view添加到主场景的view中（具体参看ViewWarList）。
+--     同时，为了使得战局列表能够显示出来，我们还需要调用cc.Node:addChild()，把战局列表的view添加到主场景的view中（具体参看ViewContinueGameSelector）。
 --
 --     场景的actor是最顶级的父节点，也就是根节点，因此又称为rootActor。
 --     rootActor的view必须继承cc.Scene，而为了显示它，需要通过ActorManager的相关函数（参看ActorManager）。

@@ -33,6 +33,7 @@ local ModelTileMap = class("ModelTileMap")
 local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TableFunctions     = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -99,24 +100,22 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
     end
 end
 
-local function serializeTemplateName(self, spaces)
-    return string.format("%stemplate = %q", spaces or "", self.m_TemplateName)
+local function serializeTemplateNameToStringList(self, spaces)
+    return {string.format("%stemplate = %q", spaces or "", self.m_TemplateName)}
 end
 
-local function serializeModelTiles(self, spaces)
+local function serializeModelTilesToStringList(self, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
-    local strList = {}
+    local strList = {spaces .. "grids = {\n"}
+    local appendList = TableFunctions.appendList
 
     self:forEachModelTile(function(modelTile)
-        strList[#strList + 1] = modelTile:serialize(subSpaces)
+        appendList(strList, modelTile:toStringList(subSpaces), ",\n")
     end)
+    strList[#strList + 1] = spaces .. "}"
 
-    return string.format("%sgrids = {\n%s\n%s}",
-        spaces,
-        table.concat(strList, ",\n"),
-        spaces
-    )
+    return strList
 end
 
 --------------------------------------------------------------------------------
@@ -238,16 +237,16 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTileMap:serialize(spaces)
+function ModelTileMap:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
+    local strList = {spaces .. "tileMap = {\n"}
+    local appendList = TableFunctions.appendList
 
-    return string.format("%stileMap = {\n%s,\n%s,\n%s}",
-        spaces,
-        serializeTemplateName(self, subSpaces),
-        serializeModelTiles(  self, subSpaces),
-        spaces
-    )
+    appendList(strList, serializeTemplateNameToStringList(self, subSpaces), ",\n")
+    appendList(strList, serializeModelTilesToStringList(  self, subSpaces), "\n" .. spaces .. "}")
+
+    return strList
 end
 
 --------------------------------------------------------------------------------
