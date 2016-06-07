@@ -112,7 +112,7 @@ local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     request.sceneWarFileName = self.m_FileName
-    WebSocketManager.sendString(SerializationFunctions.serialize(request))
+    WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
 
 --------------------------------------------------------------------------------
@@ -251,6 +251,16 @@ function ModelSceneWar:toStringList(spaces)
     appendList(strList, self:getModelWeatherManager():toStringList(subSpaces), "\n" .. spaces .. "}")
 
     return strList
+end
+
+function ModelSceneWar:toSerializableTable()
+    return {
+        fileName = self.m_FileName,
+        warField = self.m_ActorWarField:getModel():toSerializableTable(),
+        turn     = self.m_ActorTurnManager:getModel():toSerializableTable(),
+        players  = self.m_ActorPlayerManager:getModel():toSerializableTable(),
+        weather  = self.m_ActorWeatherManager:getModel():toSerializableTable(),
+    }
 end
 
 --------------------------------------------------------------------------------

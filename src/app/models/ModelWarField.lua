@@ -18,7 +18,6 @@ local ModelWarField = class("ModelWarField")
 
 local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
-local GameConstant       = require("res.data.GameConstant")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 local function requireFieldData(param)
@@ -55,47 +54,37 @@ local function onEvtPlayerZoomFieldWithTouches(self, event)
 end
 
 --------------------------------------------------------------------------------
--- The comsition actors.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createActorTileMap(tileMapData)
-    return Actor.createWithModelAndViewName("ModelTileMap", tileMapData, "ViewTileMap")
-end
+local function initActorTileMap(self, tileMapData)
+    local actor = Actor.createWithModelAndViewName("ModelTileMap", tileMapData, "ViewTileMap")
 
-local function initWithActorTileMap(self, actor)
     self.m_ActorTileMap = actor
 end
 
-local function createActorUnitMap(unitMapData)
-    return Actor.createWithModelAndViewName("ModelUnitMap", unitMapData, "ViewUnitMap")
-end
+local function initActorUnitMap(self, unitMapData)
+    local actor = Actor.createWithModelAndViewName("ModelUnitMap", unitMapData, "ViewUnitMap")
 
-local function initWithActorUnitMap(self, actor)
     self.m_ActorUnitMap = actor
 end
 
-local function createActorActionPlanner()
-    return Actor.createWithModelAndViewName("ModelActionPlanner", nil, "ViewActionPlanner")
-end
+local function initActorActionPlanner(self)
+    local actor = Actor.createWithModelAndViewName("ModelActionPlanner", nil, "ViewActionPlanner")
 
-local function initWithActorActionPlanner(self, actor)
-    self.m_ActorActionPlanner = actor
     actor:getModel():setModelTileMap(self:getModelTileMap())
         :setModelUnitMap(self:getModelUnitMap())
+    self.m_ActorActionPlanner = actor
 end
 
-local function createActorCursor(param)
-    return Actor.createWithModelAndViewName("ModelMapCursor", param, "ViewMapCursor")
-end
+local function initActorMapCursor(self, param)
+    local actor = Actor.createWithModelAndViewName("ModelMapCursor", param, "ViewMapCursor")
 
-local function initWithActorCursor(self, actor)
     self.m_ActorMapCursor = actor
 end
 
-local function createActorGridExplosion()
-    return Actor.createWithModelAndViewName("ModelGridExplosion", nil, "ViewGridExplosion")
-end
+local function initActorGridExplosion(self)
+    local actor = Actor.createWithModelAndViewName("ModelGridExplosion", nil, "ViewGridExplosion")
 
-local function initWithActorGridExplosion(self, actor)
     self.m_ActorGridExplosion = actor
 end
 
@@ -106,11 +95,11 @@ function ModelWarField:ctor(param)
     local warFieldData = requireFieldData(param)
     assert(TypeChecker.isWarFieldData(warFieldData))
 
-    initWithActorTileMap(      self, createActorTileMap(warFieldData.tileMap))
-    initWithActorUnitMap(      self, createActorUnitMap(warFieldData.unitMap))
-    initWithActorActionPlanner(self, createActorActionPlanner())
-    initWithActorCursor(       self, createActorCursor({mapSize = self:getModelTileMap():getMapSize()}))
-    initWithActorGridExplosion(self, createActorGridExplosion())
+    initActorTileMap(      self, warFieldData.tileMap)
+    initActorUnitMap(      self, warFieldData.unitMap)
+    initActorActionPlanner(self)
+    initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
+    initActorGridExplosion(self)
 
     assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
 
@@ -171,6 +160,28 @@ function ModelWarField:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for serialization.
+--------------------------------------------------------------------------------
+function ModelWarField:toStringList(spaces)
+    spaces = spaces or ""
+    local subSpaces = spaces .. "    "
+    local strList = {spaces .. "warField = {\n"}
+
+    local appendList = require("app.utilities.TableFunctions").appendList
+    appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
+    appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
+
+    return strList
+end
+
+function ModelWarField:toSerializableTable()
+    return {
+        tileMap = self:getModelTileMap():toSerializableTable(),
+        unitMap = self:getModelUnitMap():toSerializableTable(),
+    }
+end
+
+--------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onEvent(event)
@@ -184,33 +195,6 @@ function ModelWarField:onEvent(event)
     end
 
     return self
-end
-
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelWarField:getModelUnitMap()
-    return self.m_ActorUnitMap:getModel()
-end
-
-function ModelWarField:getModelTileMap()
-    return self.m_ActorTileMap:getModel()
-end
-
-function ModelWarField:getModelActionPlanner()
-    return self.m_ActorActionPlanner:getModel()
-end
-
-function ModelWarField:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "warField = {\n"}
-
-    local appendList = require("app.utilities.TableFunctions").appendList
-    appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
-
-    return strList
 end
 
 --------------------------------------------------------------------------------
@@ -266,6 +250,21 @@ function ModelWarField:doActionProduceOnTile(action)
     self:getModelUnitMap():doActionProduceOnTile(action)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelWarField:getModelUnitMap()
+    return self.m_ActorUnitMap:getModel()
+end
+
+function ModelWarField:getModelTileMap()
+    return self.m_ActorTileMap:getModel()
+end
+
+function ModelWarField:getModelActionPlanner()
+    return self.m_ActorActionPlanner:getModel()
 end
 
 return ModelWarField

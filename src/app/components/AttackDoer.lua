@@ -199,6 +199,18 @@ function AttackDoer:toStringList(spaces)
     end
 end
 
+function AttackDoer:toSerializableTable()
+    if ((not self:hasPrimaryWeapon()) or (self:getPrimaryWeaponCurrentAmmo() == self:getPrimaryWeaponMaxAmmo())) then
+        return nil
+    else
+        return {
+            primaryWeapon = {
+                currentAmmo = self:getPrimaryWeaponCurrentAmmo(),
+            }
+        }
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

@@ -87,6 +87,17 @@ function AttackTaker:toStringList(spaces)
     end
 end
 
+function AttackTaker:toSerializableTable()
+    local currentHP = self:getCurrentHP()
+    if (currentHP == self:getMaxHP()) then
+        return nil
+    else
+        return {
+            currentHP = currentHP,
+        }
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

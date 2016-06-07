@@ -137,7 +137,7 @@ function ModelPlayerManager:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
--- The function for serialization.
+-- The functions for serialization.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:toStringList(spaces)
     spaces = spaces or ""
@@ -147,6 +147,15 @@ function ModelPlayerManager:toStringList(spaces)
     TableFunctions.appendList(strList, serializeModelPlayersToStringList(self, subSpaces), spaces .. "}")
 
     return strList
+end
+
+function ModelPlayerManager:toSerializableTable()
+    local t = {}
+    self:forEachModelPlayer(function(modelPlayer, playerIndex)
+        t[playerIndex] = modelPlayer:toSerializableTable()
+    end)
+
+    return t
 end
 
 --------------------------------------------------------------------------------
@@ -159,6 +168,19 @@ function ModelPlayerManager:onEvent(event)
     elseif (eventName == "EvtTurnPhaseRepairUnit") then
         onEvtTurnPhaseRepairUnit(self, event)
     end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelPlayerManager:doActionProduceOnTile(action)
+    local playerIndex = action.playerIndex
+    local modelPlayer = self:getModelPlayer(action.playerIndex)
+
+    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
+    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
 
     return self
 end
@@ -178,19 +200,6 @@ function ModelPlayerManager:forEachModelPlayer(func)
     for playerIndex, modelPlayer in ipairs(self.m_Players) do
         func(modelPlayer, playerIndex)
     end
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelPlayerManager:doActionProduceOnTile(action)
-    local playerIndex = action.playerIndex
-    local modelPlayer = self:getModelPlayer(action.playerIndex)
-
-    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
-    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
 
     return self
 end

@@ -18,6 +18,7 @@
 --]]--------------------------------------------------------------------------------
 
 local ModelTurnManager = class("ModelTurnManager")
+local TableFunctions   = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -155,12 +156,12 @@ function ModelTurnManager:unsetRootScriptEventDispatcher()
 end
 
 --------------------------------------------------------------------------------
--- The function for serialization.
+-- The functions for serialization.
 --------------------------------------------------------------------------------
 function ModelTurnManager:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
-    local appendList = require("app.utilities.TableFunctions").appendList
+    local appendList = TableFunctions.appendList
 
     local strList = {spaces .. "turn = {\n"}
     appendList(strList, serializeTurnIndexToStringList(  self, subSpaces), ",\n")
@@ -168,6 +169,14 @@ function ModelTurnManager:toStringList(spaces)
     appendList(strList, serializeTurnPhaseToStringList(  self, subSpaces), "\n" .. spaces .. "}")
 
     return strList
+end
+
+function ModelTurnManager:toSerializableTable()
+    return {
+        turnIndex   = self:getTurnIndex(),
+        playerIndex = self:getPlayerIndex(),
+        phase       = self:getTurnPhase(),
+    }
 end
 
 --------------------------------------------------------------------------------
@@ -211,7 +220,7 @@ function ModelTurnManager:runTurn(nextWeather)
         runTurnPhaseMain(self)
     end
 
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function.")
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function. Now: " .. self.m_TurnPhase)
 
     return self
 end

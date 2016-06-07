@@ -97,7 +97,7 @@ end
 local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
-    WebSocketManager.sendString(SerializationFunctions.serialize(request))
+    WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
 
 --------------------------------------------------------------------------------

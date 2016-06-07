@@ -49,6 +49,15 @@ function GridIndexable:toStringList(spaces)
     return {string.format("%sGridIndexable = {gridIndex = {x = %d, y = %d}}", spaces or "", self.m_GridIndex.x, self.m_GridIndex.y)}
 end
 
+function GridIndexable:toSerializableTable()
+    return {
+        gridIndex = {
+            x = self.m_GridIndex.x,
+            y = self.m_GridIndex.y,
+        },
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

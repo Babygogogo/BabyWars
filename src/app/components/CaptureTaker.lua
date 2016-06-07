@@ -68,6 +68,17 @@ function CaptureTaker:toStringList(spaces)
     end
 end
 
+function CaptureTaker:toSerializableTable()
+    local currentCapturePoint = self:getCurrentCapturePoint()
+    if (currentCapturePoint == self:getMaxCapturePoint()) then
+        return nil
+    else
+        return {
+            currentCapturePoint = currentCapturePoint,
+        }
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

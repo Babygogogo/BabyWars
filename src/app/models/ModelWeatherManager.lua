@@ -15,6 +15,8 @@
 
 local ModelWeatherManager = class("ModelWeatherManager")
 
+local TableFunctions = require("app.utilities.TableFunctions")
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -30,12 +32,12 @@ function ModelWeatherManager:ctor(param)
 end
 
 --------------------------------------------------------------------------------
--- The function for serialization.
+-- The functions for serialization.
 --------------------------------------------------------------------------------
 function ModelWeatherManager:toStringList(spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
-    local appendList = require("app.utilities.TableFunctions").appendList
+    local appendList = TableFunctions.appendList
     local strList = {spaces .. "weather = {\n"}
 
     appendList(strList, serializeCurrentWeatherToStringList(self, subSpaces), ",\n")
@@ -43,6 +45,12 @@ function ModelWeatherManager:toStringList(spaces)
 
     strList[#strList + 1] = spaces .. "}"
     return strList
+end
+
+function ModelWeatherManager:toSerializableTable()
+    return {
+        current = self:getCurrentWeather(),
+    }
 end
 
 --------------------------------------------------------------------------------
