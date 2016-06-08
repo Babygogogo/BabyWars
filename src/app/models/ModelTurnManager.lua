@@ -56,14 +56,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
-local function runTurnPhaseResetUnitState(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtTurnPhaseResetUnitState", playerIndex = self.m_PlayerIndex, turnIndex = self.m_TurnIndex})
-
-    -- TODO: Change state for units, vision, weather and so on.
-    self.m_TurnPhase = "beginning"
-    self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
-end
-
 local function runTurnPhaseBeginning(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnPhaseBeginning",
@@ -114,6 +106,27 @@ local function runTurnPhaseMain(self)
         playerIndex = self.m_PlayerIndex,
         modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
     })
+end
+
+local function runTurnPhaseResetUnitState(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name        = "EvtTurnPhaseResetUnitState",
+        playerIndex = self.m_PlayerIndex,
+        turnIndex   = self.m_TurnIndex
+    })
+    self.m_TurnPhase = "tickTurnAndPlayerIndex"
+end
+
+local function runTurnPhaseTickTurnAndPlayerIndex(self)
+    self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name        = "EvtTurnPhaseTickTurnAndPlayerIndex",
+        playerIndex = self.m_PlayerIndex,
+        turnIndex   = self.m_TurnIndex,
+    })
+
+    -- TODO: Change the vision, weather and so on.
+    self.m_TurnPhase = "beginning"
 end
 
 --------------------------------------------------------------------------------
@@ -180,6 +193,26 @@ function ModelTurnManager:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelTurnManager:doActionBeginTurn(action)
+    assert(self.m_TurnPhase == "beginning", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'beginning'.")
+
+    runTurnPhaseBeginning(self)
+
+    return self
+end
+
+function ModelTurnManager:doActionEndTurn(action)
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurn() the turn phase is expected to be 'main'.")
+
+    self.m_TurnPhase = "resetUnitState"
+    self:runTurn()
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTurnManager:getTurnIndex()
@@ -194,13 +227,12 @@ function ModelTurnManager:getPlayerIndex()
     return self.m_PlayerIndex
 end
 
-function ModelTurnManager:runTurn(nextWeather)
-    if (self.m_TurnPhase == "resetUnitState") then
-        runTurnPhaseResetUnitState(self)
-    end
-
+function ModelTurnManager:runTurn()
     if (self.m_TurnPhase == "beginning") then
-        runTurnPhaseBeginning(self)
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name       = "EvtPlayerRequestDoAction",
+            actionName = "BeginTurn",
+        })
         return self
     end
 
@@ -220,16 +252,13 @@ function ModelTurnManager:runTurn(nextWeather)
         runTurnPhaseMain(self)
     end
 
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:runTurn() the turn phase is expected to be 'main' after the function. Now: " .. self.m_TurnPhase)
+    if (self.m_TurnPhase == "resetUnitState") then
+        runTurnPhaseResetUnitState(self)
+    end
 
-    return self
-end
-
-function ModelTurnManager:endTurn(nextWeather)
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurn() the turn phase is expected to be 'main'.")
-
-    self.m_TurnPhase = "resetUnitState"
-    self:runTurn(nextWeather)
+    if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then
+        runTurnPhaseTickTurnAndPlayerIndex(self)
+    end
 
     return self
 end

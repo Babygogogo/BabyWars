@@ -54,8 +54,32 @@ function ViewMessageIndicator:showMessage(msg, duration)
         :runAction(cc.Sequence:create(
             cc.DelayTime:create(duration or DEFAULT_DURATION),
             cc.FadeOut:create(1),
-            cc.CallFunc:create(function() self.m_Label:setVisible(false) end)
+            cc.CallFunc:create(function()
+                if (self.m_PersistentMessage) then
+                    self.m_Label:setOpacity(255)
+                        :setString(self.m_PersistentMessage)
+                else
+                    self.m_Label:setVisible(false)
+                end
+            end)
         ))
+
+    return self
+end
+
+function ViewMessageIndicator:showPersistentMessage(msg)
+    self.m_PersistentMessage = msg or ""
+    self.m_Label:stopAllActions()
+        :setOpacity(255)
+        :setString(msg)
+        :setVisible(true)
+
+    return self
+end
+
+function ViewMessageIndicator:hidePersistentMessage()
+    self.m_PersistentMessage = nil
+    self.m_Label:setVisible(false)
 
     return self
 end

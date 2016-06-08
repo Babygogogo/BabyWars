@@ -32,6 +32,24 @@ local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isPlayerInTurn(self)
+    local playerIndex = self:getModelTurnManager():getPlayerIndex()
+    local modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex)
+
+    return modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+end
+
+local function updateMessageIndicatorWithIsPlayerInTurn(modelMessageIndicator, isInTurn)
+    if (isInTurn) then
+        modelMessageIndicator:hidePersistentMessage()
+    else
+        modelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
 local function doActionLogout(self, event)
@@ -45,9 +63,23 @@ local function doActionLogout(self, event)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
+local function doActionBeginTurn(self, action)
+    if (action.fileName == self.m_FileName) then
+        self:getModelTurnManager():doActionBeginTurn()
+        updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn(self))
+    end
+end
+
 local function doActionEndTurn(self, action)
     if (action.fileName == self.m_FileName) then
-        self:getModelTurnManager():endTurn()
+        local modelTurnManager = self:getModelTurnManager()
+        modelTurnManager:doActionEndTurn()
+
+        local isPlayerInTurn = isPlayerInTurn(self)
+        if (isPlayerInTurn) then
+            modelTurnManager:runTurn()
+        end
+        updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn)
     end
 end
 
@@ -79,7 +111,7 @@ local function doActionProduceOnTile(self, action)
 end
 
 local function doActionMessage(self, action)
-    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
 end
 
 --------------------------------------------------------------------------------
@@ -89,6 +121,8 @@ local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
     if (actionName == "Logout") then
         doActionLogout(self, event)
+    elseif (actionName == "BeginTurn") then
+        doActionBeginTurn(self, event)
     elseif (actionName == "EndTurn") then
         doActionEndTurn(self, event)
     elseif (actionName == "Wait") then
@@ -120,7 +154,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection established.")
+    self:getModelMessageIndicator():showMessage("Connection established.")
 end
 
 local function onWebSocketMessage(self, param)
@@ -133,7 +167,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost. Now reconnecting...")
+    self:getModelMessageIndicator():showMessage("Connection lost. Now reconnecting...")
 
     WebSocketManager.close()
         .init()
@@ -142,7 +176,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost with error: " .. param.error)
+    self:getModelMessageIndicator():showMessage("Connection lost with error: " .. param.error)
 
     WebSocketManager.close()
         .init()
@@ -274,7 +308,12 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name = "EvtSceneWarStarted",
         })
-    self:getModelTurnManager():runTurn()
+
+    local isPlayerInTurn = isPlayerInTurn(self)
+    if (isPlayerInTurn) then
+        self:getModelTurnManager():runTurn()
+    end
+    updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn)
 
     return self
 end
@@ -329,6 +368,10 @@ end
 
 function ModelSceneWar:getModelWarField()
     return self.m_ActorWarField:getModel()
+end
+
+function ModelSceneWar:getModelMessageIndicator()
+    return self.m_ActorMessageIndicator:getModel()
 end
 
 return ModelSceneWar

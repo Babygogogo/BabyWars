@@ -290,12 +290,12 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseBeginning(self, event)
+local function onEvtTurnPhaseMain(self, event)
     self.m_CurrentPlayerIndex = event.playerIndex
     setStateIdle(self)
 end
 
-local function onEvtTurnPhaseMain(self, event)
+local function onEvtTurnPhaseTickTurnAndPlayerIndex(self, event)
     self.m_CurrentPlayerIndex = event.playerIndex
     setStateIdle(self)
 end
@@ -432,12 +432,12 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerSelectedGrid", self)
-        :addEventListener("EvtPlayerMovedCursor",        self)
-        :addEventListener("EvtTurnPhaseBeginning",       self)
-        :addEventListener("EvtTurnPhaseMain",            self)
-        :addEventListener("EvtModelWeatherUpdated",      self)
-        :addEventListener("EvtPlayerRequestDoAction",    self)
+    dispatcher:addEventListener("EvtPlayerSelectedGrid",        self)
+        :addEventListener("EvtPlayerMovedCursor",               self)
+        :addEventListener("EvtTurnPhaseMain",                   self)
+        :addEventListener("EvtTurnPhaseTickTurnAndPlayerIndex", self)
+        :addEventListener("EvtModelWeatherUpdated",             self)
+        :addEventListener("EvtPlayerRequestDoAction",           self)
 
     return self
 end
@@ -446,11 +446,11 @@ function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
-        :removeEventListener("EvtModelWeatherUpdated", self)
-        :removeEventListener("EvtTurnPhaseMain",       self)
-        :removeEventListener("EvtTurnPhaseBeginning",  self)
-        :removeEventListener("EvtPlayerMovedCursor",   self)
-        :removeEventListener("EvtPlayerSelectedGrid",  self)
+        :removeEventListener("EvtModelWeatherUpdated",             self)
+        :removeEventListener("EvtTurnPhaseTickTurnAndPlayerIndex", self)
+        :removeEventListener("EvtTurnPhaseMain",                   self)
+        :removeEventListener("EvtPlayerMovedCursor",               self)
+        :removeEventListener("EvtPlayerSelectedGrid",              self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -463,10 +463,10 @@ function ModelActionPlanner:onEvent(event)
     local name = event.name
     if (name == "EvtPlayerSelectedGrid") then
         onEvtPlayerSelectedGrid(self, event)
-    elseif (name == "EvtTurnPhaseBeginning") then
-        onEvtTurnPhaseBeginning(self, event)
     elseif (name == "EvtTurnPhaseMain") then
         onEvtTurnPhaseMain(self, event)
+    elseif (name == "EvtTurnPhaseTickTurnAndPlayerIndex") then
+        onEvtTurnPhaseTickTurnAndPlayerIndex(self, event)
     elseif (name == "EvtModelWeatherUpdated") then
         onEvtModelWeatherUpdated(self, event)
     elseif (name == "EvtPlayerMovedCursor") then
