@@ -1,7 +1,8 @@
 
 local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
-local MESSAGE_INDICATOR_Z_ORDER = 2
+local MESSAGE_INDICATOR_Z_ORDER = 3
+local TURN_MANAGER_Z_ORDER      = 2
 local WAR_HUD_Z_ORDER           = 1
 local WAR_FIELD_Z_ORDER         = 0
 local BACKGROUND_Z_ORDER        = -1
@@ -43,6 +44,15 @@ function ViewSceneWar:setViewWarHud(view)
 
     self.m_ViewWarHud = view
     self:addChild(view, WAR_HUD_Z_ORDER)
+
+    return self
+end
+
+function ViewSceneWar:setViewTurnManager(view)
+    assert(self.m_ViewTurnManager == nil, "ViewSceneWar:setViewTurnManager() the view has been set.")
+
+    self.m_ViewTurnManager = view
+    self:addChild(view, TURN_MANAGER_Z_ORDER)
 
     return self
 end

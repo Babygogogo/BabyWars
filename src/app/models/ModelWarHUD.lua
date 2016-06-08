@@ -23,19 +23,6 @@ local ModelWarHUD = class("ModelWarHUD")
 local Actor = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
--- The callback function on EvtTurnPhaseBeginning.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseBeginning(self, event)
-    if (self.m_View) then
-        self.m_View:showBeginTurnEffect(event.turnIndex, event.modelPlayer:getNickname(), event.callbackOnBeginTurnEffectDisappear)
-    else
-        event.callbackOnBeginTurnEffect()
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function createActorConfirmBox()
@@ -115,7 +102,7 @@ local function initWithActorBattleInfo(self, actor)
 end
 
 --------------------------------------------------------------------------------
--- The contructor.
+-- The contructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarHUD:ctor(param)
     initWithActorConfirmBox(     self, createActorConfirmBox())
@@ -163,7 +150,6 @@ function ModelWarHUD:setRootScriptEventDispatcher(dispatcher)
     self.m_ActorBattleInfo     :getModel():setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
-    self.m_RootScriptEventDispatcher:addEventListener("EvtTurnPhaseBeginning", self)
 
     return self
 end
@@ -171,7 +157,6 @@ end
 function ModelWarHUD:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarHUD:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseBeginning", self)
     self.m_RootScriptEventDispatcher = nil
 
     self.m_ActorActionMenu     :getModel():unsetRootScriptEventDispatcher()
@@ -180,17 +165,6 @@ function ModelWarHUD:unsetRootScriptEventDispatcher()
     self.m_ActorTileInfo       :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorUnitInfo       :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorBattleInfo     :getModel():unsetRootScriptEventDispatcher()
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
-function ModelWarHUD:onEvent(event)
-    if (event.name == "EvtTurnPhaseBeginning") then
-        onEvtTurnPhaseBeginning(self, event)
-    end
 
     return self
 end

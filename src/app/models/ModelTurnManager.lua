@@ -57,18 +57,23 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
+    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name        = "EvtTurnPhaseBeginning",
-        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
+        modelPlayer = modelPlayer,
         playerIndex = self.m_PlayerIndex,
         turnIndex   = self.m_TurnIndex,
-
-        -- Basically, this is to show the begin turn effect and set the turn phase affer that. There should be a better way to do it.
-        callbackOnBeginTurnEffectDisappear = function()
-            self.m_TurnPhase = "getFund"
-            self:runTurn()
-        end,
     })
+
+    local callbackOnBeginTurnEffectDisappear = function()
+        self.m_TurnPhase = "getFund"
+        self:runTurn()
+    end
+    if (self.m_View) then
+        self.m_View:showBeginTurnEffect(self.m_TurnIndex, modelPlayer:getNickname(), callbackOnBeginTurnEffectDisappear)
+    else
+        callbackOnBeginTurnEffectDisappear()
+    end
 end
 
 local function runTurnPhaseGetFund(self)

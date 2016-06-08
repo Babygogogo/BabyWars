@@ -217,7 +217,7 @@ local function initActorWarHud(self)
 end
 
 local function initActorTurnManager(self, turnData)
-    local actor = Actor.createWithModelAndViewName("ModelTurnManager", turnData)
+    local actor = Actor.createWithModelAndViewName("ModelTurnManager", turnData, "ViewTurnManager")
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setModelWarField(self.m_ActorWarField:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
@@ -265,6 +265,7 @@ function ModelSceneWar:initView()
 
     view:setViewWarField(        self.m_ActorWarField:getView())
         :setViewWarHud(          self.m_ActorWarHud:getView())
+        :setViewTurnManager(     self.m_ActorTurnManager:getView())
         :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
 
     return self
