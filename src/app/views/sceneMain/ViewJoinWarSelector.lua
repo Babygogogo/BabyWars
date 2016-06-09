@@ -1,27 +1,26 @@
 
-local ViewMainMenu = class("ViewMainMenu", cc.Node)
+local ViewJoinWarSelector = class("ViewJoinWarSelector", cc.Node)
 
-local NEW_GAME_CREATOR_Z_ORDER       = 3
-local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
-local JOIN_WAR_SELECTOR_Z_ORDER      = 3
-local LOGIN_PANEL_Z_ORDER            = 3
-local MENU_TITLE_Z_ORDER             = 2
-local MENU_LIST_VIEW_Z_ORDER         = 1
-local MENU_BACKGROUND_Z_ORDER        = 0
+local MENU_TITLE_Z_ORDER      = 1
+local MENU_LIST_VIEW_Z_ORDER  = 1
+local BUTTON_BACK_Z_ORDER     = 1
+local MENU_BACKGROUND_Z_ORDER = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
 local MENU_BACKGROUND_HEIGHT = display.height - 60
 local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50
+local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50 - 40
 local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
 local MENU_TITLE_HEIGHT      = 40
 
 local MENU_BACKGROUND_POS_X = 30
 local MENU_BACKGROUND_POS_Y = 30
 local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6
+local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 40
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
 local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
+local BUTTON_BACK_POS_X     = MENU_LIST_VIEW_POS_X
+local BUTTON_BACK_POS_Y     = MENU_BACKGROUND_POS_Y + 6
 
 local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 28
@@ -35,10 +34,19 @@ local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 
+local ITEM_WIDTH              = 230
+local ITEM_HEIGHT             = 45
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createViewItem(item)
+local function createViewMenuItem(item)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -83,17 +91,19 @@ local function initMenuListView(self)
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
-        :setItemsMargin(15)
+
+        :setItemsMargin(5)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
-        :setCascadeOpacityEnabled(true)
+
         :setOpacity(180)
+        :setCascadeOpacityEnabled(true)
 
     self.m_MenuListView = listView
-    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
+    self:addChild(listView)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Main Menu", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF("Join..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -110,45 +120,41 @@ local function initMenuTitle(self)
     self:addChild(title, MENU_TITLE_Z_ORDER)
 end
 
+local function initButtonBack(self)
+    local button = ccui.Button:create()
+    button:ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
+
+        :setScale9Enabled(true)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor({r = 240, g = 80, b = 56})
+        :setTitleText("back")
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonBackTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonBack = button
+    self:addChild(button, BUTTON_BACK_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
--- The constructor and initializers.
+-- The constructor.
 --------------------------------------------------------------------------------
-function ViewMainMenu:ctor(param)
+function ViewJoinWarSelector:ctor(param)
     initMenuBackground(self)
     initMenuListView(  self)
     initMenuTitle(     self)
-
-    return self
-end
-
-function ViewMainMenu:setViewNewWarCreator(view)
-    assert(self.m_ViewNewWarCreator == nil, "ViewMainMenu:setViewNewWarCreator() the view has been set.")
-    self.m_ViewNewWarCreator = view
-    self:addChild(view, NEW_GAME_CREATOR_Z_ORDER)
-
-    return self
-end
-
-function ViewMainMenu:setViewContinueWarSelector(view)
-    assert(self.m_ViewContinueWarSelector == nil, "ViewMainMenu:setViewContinueWarSelector() the view has been set.")
-    self.m_ViewContinueWarSelector = view
-    self:addChild(view, CONTINUE_GAME_SELECTOR_Z_ORDER)
-
-    return self
-end
-
-function ViewMainMenu:setViewJoinWarSelector(view)
-    assert(self.m_ViewJoinWarSelector == nil, "ViewMainMenu:setViewJoinWarSelector() the view has been set.")
-    self.m_ViewJoinWarSelector = view
-    self:addChild(view, JOIN_WAR_SELECTOR_Z_ORDER)
-
-    return self
-end
-
-function ViewMainMenu:setViewLoginPanel(view)
-    assert(self.m_ViewLoginPanel == nil, "ViewMainMenu:setViewLoginPanel() the view has been set.")
-    self.m_ViewLoginPanel = view
-    self:addChild(view, LOGIN_PANEL_Z_ORDER)
+    initButtonBack(    self)
 
     return self
 end
@@ -156,24 +162,24 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewMainMenu:removeAllItems()
+function ViewJoinWarSelector:removeAllItems()
     self.m_MenuListView:removeAllItems()
 
     return self
 end
 
-function ViewMainMenu:createAndPushBackItem(item)
-    self.m_MenuListView:pushBackCustomItem(createViewItem(item))
+function ViewJoinWarSelector:showWarList(list)
+    for _, listItem in ipairs(list) do
+        self.m_MenuListView:pushBackCustomItem(createViewMenuItem(listItem))
+    end
 
     return self
 end
 
-function ViewMainMenu:setMenuVisible(visible)
-    self.m_MenuBackground:setVisible(visible)
-    self.m_MenuListView  :setVisible(visible)
-    self.m_MenuTitle     :setVisible(visible)
+function ViewJoinWarSelector:createAndPushBackItem(item)
+    self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
 
     return self
 end
 
-return ViewMainMenu
+return ViewJoinWarSelector

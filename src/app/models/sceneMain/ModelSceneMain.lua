@@ -56,6 +56,10 @@ local function doActionNewWar(self, action)
     self.m_ActorMessageIndicator:getModel():showMessage(action.message)
 end
 
+local function doActionGetJoinableWarList(self, action)
+    self.m_ActorMainMenu:getModel():doActionGetJoinableWarList(action)
+end
+
 local function doActionGetOngoingWarList(self, action)
     self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
 end
@@ -81,6 +85,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionRegister(self, event)
     elseif (actionName == "NewWar") then
         doActionNewWar(self, event)
+    elseif (actionName == "GetJoinableWarList") then
+        doActionGetJoinableWarList(self, event)
     elseif (actionName == "GetOngoingWarList") then
         doActionGetOngoingWarList(self, event)
     elseif (actionName == "GetSceneWarData") then
