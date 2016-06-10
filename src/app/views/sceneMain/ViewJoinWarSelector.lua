@@ -1,10 +1,11 @@
 
 local ViewJoinWarSelector = class("ViewJoinWarSelector", cc.Node)
 
-local MENU_TITLE_Z_ORDER      = 1
-local MENU_LIST_VIEW_Z_ORDER  = 1
-local BUTTON_BACK_Z_ORDER     = 1
-local MENU_BACKGROUND_Z_ORDER = 0
+local WAR_FIELD_PREVIEWER_Z_ORDER = 1
+local MENU_TITLE_Z_ORDER          = 1
+local MENU_LIST_VIEW_Z_ORDER      = 1
+local BUTTON_BACK_Z_ORDER         = 1
+local MENU_BACKGROUND_Z_ORDER     = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
 local MENU_BACKGROUND_HEIGHT = display.height - 60
@@ -148,13 +149,21 @@ local function initButtonBack(self)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewJoinWarSelector:ctor(param)
     initMenuBackground(self)
     initMenuListView(  self)
     initMenuTitle(     self)
     initButtonBack(    self)
+
+    return self
+end
+
+function ViewJoinWarSelector:setViewWarFieldPreviewer(view)
+    assert(self.m_ViewWarFieldPreviewer == nil, "ViewJoinWarSelector:setViewWarFieldPreviewer() the view has been set.")
+    self.m_ViewWarFieldPreviewer = view
+    self:addChild(view, WAR_FIELD_PREVIEWER_Z_ORDER)
 
     return self
 end

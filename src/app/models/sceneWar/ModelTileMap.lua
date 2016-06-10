@@ -159,13 +159,6 @@ local function createTileActorsMap(param)
     -- The data for a tile map that contains no template is too large, so it's forbidden.
     assert(mapData.template, "ModelTileMap-createTileActorsMap() the param contains no template.")
     return createTileActorsMapWithTemplate(mapData)
---[[
-    if (mapData.template) then
-        return createTileActorsMapWithTemplate(mapData)
-    else
-        return createTileActorsMapWithoutTemplate(mapData)
-    end
---]]
 end
 
 local function initWithTileActorsMap(self, map, mapSize, templateName)
@@ -247,6 +240,18 @@ function ModelTileMap:toStringList(spaces)
     appendList(strList, serializeModelTilesToStringList(  self, subSpaces), "\n" .. spaces .. "}")
 
     return strList
+end
+
+function ModelTileMap:toSerializableTable()
+    local grids = {}
+    self:forEachModelTile(function(modelTile)
+        grids[#grids + 1] = modelTile:toSerializableTable()
+    end)
+
+    return {
+        template = self.m_TemplateName,
+        grids    = grids,
+    }
 end
 
 --------------------------------------------------------------------------------

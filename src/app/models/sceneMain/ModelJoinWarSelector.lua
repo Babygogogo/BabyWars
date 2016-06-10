@@ -20,6 +20,19 @@ local function enableConfirmBoxForJoiningSceneWar(self, warFieldName, fileName)
         :setEnabled(true)
 end
 
+local function getActorWarFieldPreviewer(self)
+    if (not self.m_ActorWarFieldPreviewer) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
+
+        self.m_ActorWarFieldPreviewer = actor
+        if (self.m_View) then
+            self.m_View:setViewWarFieldPreviewer(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarFieldPreviewer
+end
+
 --------------------------------------------------------------------------------
 -- The composition war list.
 --------------------------------------------------------------------------------
@@ -27,11 +40,12 @@ local function initWarList(self, list)
     assert(type(list) == "table", "ModelJoinWarSelector-initWarList() failed to require list data from the server.")
 
     local warList = {}
-    for fileName, warFieldName in pairs(list) do
+    for sceneWarFileName, warFieldFileName in pairs(list) do
         warList[#warList + 1] = {
-            name     = warFieldName,
+            name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             callback = function()
-                enableConfirmBoxForJoiningSceneWar(self, warFieldName, fileName)
+                -- enableConfirmBoxForJoiningSceneWar(self, warFieldName, sceneWarFileName)
+                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
             end,
         }
     end
@@ -124,6 +138,7 @@ end
 
 function ModelJoinWarSelector:onButtonBackTouched()
     self:setEnabled(false)
+    getActorWarFieldPreviewer(self):getModel():hideWarField()
     self.m_ModelMainMenu:setMenuEnabled(true)
 
     return self
