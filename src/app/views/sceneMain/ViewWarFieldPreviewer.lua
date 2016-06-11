@@ -4,7 +4,7 @@ local ViewWarFieldPreviewer = class("ViewWarFieldPreviewer", cc.Node)
 local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 
 local BACKGROUND_POS_X  = 30 + 250 + 30 -- These numbers are the width/posX of the menu of the JoinWarSelector.
-local BACKGROUND_POS_Y  = 130
+local BACKGROUND_POS_Y  = 30 + 60 + 30
 local BACKGROUND_WIDTH  = display.width  - 30 - BACKGROUND_POS_X
 local BACKGROUND_HEIGHT = display.height - 30 - BACKGROUND_POS_Y
 

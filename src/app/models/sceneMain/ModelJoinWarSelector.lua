@@ -20,6 +20,9 @@ local function enableConfirmBoxForJoiningSceneWar(self, warFieldName, fileName)
         :setEnabled(true)
 end
 
+--------------------------------------------------------------------------------
+-- The composition elements.
+--------------------------------------------------------------------------------
 local function getActorWarFieldPreviewer(self)
     if (not self.m_ActorWarFieldPreviewer) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
@@ -33,9 +36,6 @@ local function getActorWarFieldPreviewer(self)
     return self.m_ActorWarFieldPreviewer
 end
 
---------------------------------------------------------------------------------
--- The composition war list.
---------------------------------------------------------------------------------
 local function initWarList(self, list)
     assert(type(list) == "table", "ModelJoinWarSelector-initWarList() failed to require list data from the server.")
 
@@ -46,6 +46,10 @@ local function initWarList(self, list)
             callback = function()
                 -- enableConfirmBoxForJoiningSceneWar(self, warFieldName, sceneWarFileName)
                 getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
+                self.m_View:setButtonNextVisible(true)
+                self.m_OnButtonNextTouched = function()
+                    print("join: " .. sceneWarFileName)
+                end
             end,
         }
     end
@@ -131,6 +135,7 @@ function ModelJoinWarSelector:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setVisible(enabled)
             :removeAllItems()
+            :setButtonNextVisible(false)
     end
 
     return self
@@ -140,6 +145,12 @@ function ModelJoinWarSelector:onButtonBackTouched()
     self:setEnabled(false)
     getActorWarFieldPreviewer(self):getModel():hideWarField()
     self.m_ModelMainMenu:setMenuEnabled(true)
+
+    return self
+end
+
+function ModelJoinWarSelector:onButtonNextTouched()
+    self.m_OnButtonNextTouched()
 
     return self
 end

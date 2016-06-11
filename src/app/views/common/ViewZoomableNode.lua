@@ -48,20 +48,11 @@ local function isViewSmallerThanBoundaryRect(scale, contentSize, boundaryRect)
     return (width <= boundaryRect.width) and (height <= boundaryRect.height)
 end
 
-local function shouldZoom(self, focusPosInNode, scaleModifier)
-    if ((focusPosInNode.x < 0) or (focusPosInNode.x > self.m_ContentSize.width) or
-        (focusPosInNode.y < 0) or (focusPosInNode.y > self.m_ContentSize.height)) then
-        return false
-    end
-
+local function shouldZoom(self, scaleModifier)
     local currentScale = self:getScale()
-    if (((scaleModifier < 1) and (isViewSmallerThanBoundaryRect(currentScale, self.m_ContentSize, self.m_BoundaryRect))) or
+    return not (((scaleModifier < 1) and (isViewSmallerThanBoundaryRect(currentScale, self.m_ContentSize, self.m_BoundaryRect))) or
         ((scaleModifier > 1) and (currentScale >= self.m_MaxScale)) or
-        (scaleModifier == 1)) then
-        return false
-    else
-        return true
-    end
+        (scaleModifier == 1))
 end
 
 local function setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
@@ -159,7 +150,7 @@ end
 function ViewZoomableNode:setZoomWithScroll(focusPosInWorld, scrollValue)
     local focusPosInNode = self:convertToNodeSpace(focusPosInWorld)
     local scaleModifier  = getScaleModifierWithScrollValue(scrollValue)
-    if (shouldZoom(self, focusPosInNode, scaleModifier)) then
+    if (shouldZoom(self, scaleModifier)) then
         setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
     end
 
@@ -188,7 +179,7 @@ function ViewZoomableNode:setZoomWithTouches(touches)
     local focusPosInWorld = getMiddlePointForTouches(touches)
     local focusPosInNode  = self:convertToNodeSpace(focusPosInWorld)
     local scaleModifier   = getScaleModifierWithTouches(touches)
-    if (shouldZoom(self, focusPosInNode, scaleModifier)) then
+    if (shouldZoom(self, scaleModifier)) then
         setZoom(self, focusPosInWorld, focusPosInNode, scaleModifier)
     end
 

@@ -1,23 +1,43 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
+local Actor        = require("global.actors.Actor")
+local WarFieldList = require("res.data.templateWarField.WarFieldList")
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function getActorWarFieldPreviewer(self)
+    if (not self.m_ActorWarFieldPreviewer) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
+
+        self.m_ActorWarFieldPreviewer = actor
+        if (self.m_View) then
+            self.m_View:setViewWarFieldPreviewer(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarFieldPreviewer
+end
+
 local function initWarFieldList(self, list)
     local list = {}
-    for _, warField in ipairs(require("res.data.templateWarField.WarFieldList")) do
+    for _, warField in ipairs(WarFieldList) do
         list[#list + 1] = {
             name     = warField.name,
             callback = function()
-                -- TODO: enable the player to customize the settings of the game.
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name             = "EvtPlayerRequestDoAction",
-                    actionName       = "NewWar",
-                    warFieldFileName = warField.fileName,
-                    playerIndex      = 1,
-                    skillIndex       = 1,
-                })
+                getActorWarFieldPreviewer(self):getModel():showWarField(warField.fileName)
+                self.m_View:setButtonNextVisible(true)
+                self.m_OnButtonNextTouched = function()
+                    -- TODO: enable the player to customize the settings of the game.
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name             = "EvtPlayerRequestDoAction",
+                        actionName       = "NewWar",
+                        warFieldFileName = warField.fileName,
+                        playerIndex      = 1,
+                        skillIndex       = 1,
+                    })
+                end
             end,
         }
     end
@@ -66,8 +86,10 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelNewWarCreator:setEnabled(enabled)
+    getActorWarFieldPreviewer(self):getModel():hideWarField()
     if (self.m_View) then
         self.m_View:setVisible(enabled)
+            :setButtonNextVisible(false)
     end
 
     return self
@@ -76,6 +98,12 @@ end
 function ModelNewWarCreator:onButtonBackTouched()
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
+
+    return self
+end
+
+function ModelNewWarCreator:onButtonNextTouched()
+    self.m_OnButtonNextTouched()
 
     return self
 end

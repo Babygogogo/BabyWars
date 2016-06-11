@@ -5,6 +5,7 @@ local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local BUTTON_BACK_Z_ORDER         = 1
+local BUTTON_NEXT_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
@@ -13,6 +14,8 @@ local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
 local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50 - 40
 local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
 local MENU_TITLE_HEIGHT      = 40
+local BUTTON_NEXT_WIDTH      = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_NEXT_HEIGHT     = 60
 
 local MENU_BACKGROUND_POS_X = 30
 local MENU_BACKGROUND_POS_Y = 30
@@ -22,18 +25,12 @@ local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
 local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
 local BUTTON_BACK_POS_X     = MENU_LIST_VIEW_POS_X
 local BUTTON_BACK_POS_Y     = MENU_BACKGROUND_POS_Y + 6
+local BUTTON_NEXT_POS_X     = display.width - BUTTON_NEXT_WIDTH - 30
+local BUTTON_NEXT_POS_Y     = MENU_BACKGROUND_POS_Y
 
-local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
-local MENU_TITLE_FONT_SIZE  = 28
-
-local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
-local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
-local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 28
-local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
-local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
-local ITEM_FONT_OUTLINE_WIDTH = 2
+local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+local MENU_TITLE_FONT_COLOR     = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE      = 28
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 45
@@ -77,7 +74,7 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initMenuBackground(self)
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", MENU_BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
@@ -148,6 +145,37 @@ local function initButtonBack(self)
     self:addChild(button, BUTTON_BACK_Z_ORDER)
 end
 
+local function initButtonNext(self)
+    local button = ccui.Button:create()
+    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(MENU_BACKGROUND_CAPINSETS)
+        :setContentSize(BUTTON_NEXT_WIDTH, BUTTON_NEXT_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(180)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_NEXT_POS_X, BUTTON_NEXT_POS_Y)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor(ITEM_FONT_COLOR)
+        :setTitleText("Next...")
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonNextTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonNext = button
+    self:addChild(button, BUTTON_NEXT_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -156,6 +184,7 @@ function ViewJoinWarSelector:ctor(param)
     initMenuListView(  self)
     initMenuTitle(     self)
     initButtonBack(    self)
+    initButtonNext(    self)
 
     return self
 end
@@ -187,6 +216,12 @@ end
 
 function ViewJoinWarSelector:createAndPushBackItem(item)
     self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
+
+    return self
+end
+
+function ViewJoinWarSelector:setButtonNextVisible(visible)
+    self.m_ButtonNext:setVisible(visible)
 
     return self
 end
