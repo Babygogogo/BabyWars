@@ -90,14 +90,23 @@ end
 -- The touch/mouse event listener.
 --------------------------------------------------------------------------------
 local function initTouchListener(self)
+    local areTouchesWithinNode
     local function onTouchesBegan(touches, event)
+        local touchPos = self:convertToNodeSpace(touches[1]:getLocation())
+        local scale = self:getScale()
+        local posXInRect, posYInRect = touchPos.x * scale + self:getPositionX(), touchPos.y * scale + self:getPositionY()
+        local boundaryRect = self.m_BoundaryRect
+        areTouchesWithinNode = ((posXInRect >= boundaryRect.lowerLeftX) and (posXInRect <= boundaryRect.upperRightX) and
+                                (posYInRect >= boundaryRect.lowerLeftY) and (posYInRect <= boundaryRect.upperRightY))
     end
 
     local function onTouchesMoved(touches, event)
-        if (#touches >= 2) then
-            self:setZoomWithTouches(touches)
-        else
-            self:setPositionOnDrag(touches[1]:getPreviousLocation(), touches[1]:getLocation())
+        if (areTouchesWithinNode) then
+            if (#touches >= 2) then
+                self:setZoomWithTouches(touches)
+            else
+                self:setPositionOnDrag(touches[1]:getPreviousLocation(), touches[1]:getLocation())
+            end
         end
     end
 
@@ -111,7 +120,14 @@ end
 
 local function initMouseListener(self)
     local function onMouseScroll(event)
-        self:setZoomWithScroll(cc.Director:getInstance():convertToGL(event:getLocation()), event:getScrollY())
+        local mousePos = self:convertToNodeSpace(cc.Director:getInstance():convertToGL(event:getLocation()))
+        local scale = self:getScale()
+        local posXInRect, posYInRect = mousePos.x * scale + self:getPositionX(), mousePos.y * scale + self:getPositionY()
+        local boundaryRect = self.m_BoundaryRect
+        if ((posXInRect >= boundaryRect.lowerLeftX) and (posXInRect <= boundaryRect.upperRightX) and
+            (posYInRect >= boundaryRect.lowerLeftY) and (posYInRect <= boundaryRect.upperRightY)) then
+            self:setZoomWithScroll(cc.Director:getInstance():convertToGL(event:getLocation()), event:getScrollY())
+        end
     end
 
     local mouseListener = cc.EventListenerMouse:create()
