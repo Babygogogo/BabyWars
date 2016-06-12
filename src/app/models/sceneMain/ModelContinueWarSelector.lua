@@ -57,7 +57,8 @@ local function initWarList(self, list)
         warList[#warList + 1] = {
             name     = warFieldName,
             callback = function()
-                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setEnabled(true)
                 self.m_OnButtonNextTouched = function()
                     enableConfirmBoxForEnteringSceneWar(self, warFieldName, sceneWarFileName)
                 end
@@ -153,7 +154,7 @@ function ModelContinueWarSelector:setEnabled(enabled)
             :setButtonNextVisible(false)
     end
 
-    getActorWarFieldPreviewer(self):getModel():hideWarField()
+    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     return self
 end
 

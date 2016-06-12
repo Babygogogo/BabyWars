@@ -20,23 +20,59 @@ local function getActorWarFieldPreviewer(self)
     return self.m_ActorWarFieldPreviewer
 end
 
+local function getActorWarConfigurator(self)
+    if (not self.m_ActorWarConfigurator) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
+        actor:getModel():setEnabled(false)
+            :setOnButtonBackTouched(function()
+                getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                getActorWarConfigurator(self):getModel():setEnabled(false)
+                if (self.m_View) then
+                    self.m_View:setMenuVisible(true)
+                        :setButtonNextVisible(false)
+                end
+            end)
+            :setOnButtonConfirmTouched(function()
+                local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name             = "EvtPlayerRequestDoAction",
+                    actionName       = "NewWar",
+                    warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
+                    playerIndex      = 1,
+                    skillIndex       = 1,
+                })
+            end)
+
+        self.m_ActorWarConfigurator = actor
+        if (self.m_View) then
+            self.m_View:setViewWarConfigurator(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarConfigurator
+end
+
 local function initWarFieldList(self, list)
     local list = {}
     for warFieldFileName, warFieldName in pairs(WarFieldList) do
         list[#list + 1] = {
             name     = warFieldName,
             callback = function()
-                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
-                self.m_View:setButtonNextVisible(true)
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setEnabled(true)
+                if (self.m_View) then
+                    self.m_View:setButtonNextVisible(true)
+                end
                 self.m_OnButtonNextTouched = function()
-                    -- TODO: enable the player to customize the settings of the game.
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name             = "EvtPlayerRequestDoAction",
-                        actionName       = "NewWar",
-                        warFieldFileName = warFieldFileName,
-                        playerIndex      = 1,
-                        skillIndex       = 1,
-                    })
+                    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                    -- TODO: config the configurator
+                    getActorWarConfigurator(self):getModel():setWarFieldFileName(warFieldFileName)
+                        :setEnabled(true)
+
+                    if (self.m_View) then
+                        self.m_View:setMenuVisible(false)
+                            :setButtonNextVisible(false)
+                    end
                 end
             end,
         }
@@ -86,10 +122,13 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelNewWarCreator:setEnabled(enabled)
-    getActorWarFieldPreviewer(self):getModel():hideWarField()
+    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+    getActorWarConfigurator(self):getModel():setEnabled(false)
+
     if (self.m_View) then
         self.m_View:setVisible(enabled)
             :setButtonNextVisible(false)
+            :setMenuVisible(true)
     end
 
     return self

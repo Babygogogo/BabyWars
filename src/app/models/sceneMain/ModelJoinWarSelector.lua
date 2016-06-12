@@ -45,7 +45,8 @@ local function initWarList(self, list)
             name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             callback = function()
                 -- enableConfirmBoxForJoiningSceneWar(self, warFieldName, sceneWarFileName)
-                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setEnabled(true)
                 self.m_View:setButtonNextVisible(true)
                 self.m_OnButtonNextTouched = function()
                     print("join: " .. sceneWarFileName)
@@ -138,7 +139,7 @@ function ModelJoinWarSelector:setEnabled(enabled)
             :setButtonNextVisible(false)
     end
 
-    getActorWarFieldPreviewer(self):getModel():hideWarField()
+    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     return self
 end
 

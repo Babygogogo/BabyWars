@@ -1,6 +1,7 @@
 
 local ViewNewWarCreator = class("ViewNewWarCreator", cc.Node)
 
+local WAR_CONFIGURATOR_Z_ORDER    = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local BUTTON_BACK_Z_ORDER         = 1
@@ -195,6 +196,14 @@ function ViewNewWarCreator:setViewWarFieldPreviewer(view)
     return self
 end
 
+function ViewNewWarCreator:setViewWarConfigurator(view)
+    assert(self.m_ViewWarConfigurator == nil, "ViewNewWarCreator:setViewWarConfigurator() the view has been set.")
+    self.m_ViewWarConfigurator = view
+    self:addChild(view, WAR_CONFIGURATOR_Z_ORDER)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -220,6 +229,15 @@ end
 
 function ViewNewWarCreator:setButtonNextVisible(visible)
     self.m_ButtonNext:setVisible(visible)
+
+    return self
+end
+
+function ViewNewWarCreator:setMenuVisible(visible)
+    self.m_MenuBackground:setVisible(visible)
+    self.m_ButtonBack:setVisible(visible)
+    self.m_MenuListView:setVisible(visible)
+    self.m_MenuTitle:setVisible(visible)
 
     return self
 end
