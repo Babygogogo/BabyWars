@@ -14,6 +14,7 @@ local ModelContinueWarSelector = class("ModelContinueWarSelector")
 local Actor            = require("global.actors.Actor")
 local ActorManager     = require("global.actors.ActorManager")
 local WebSocketManager = require("app.utilities.WebSocketManager")
+local WarFieldList     = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -31,18 +32,38 @@ local function enableConfirmBoxForEnteringSceneWar(self, name, fileName)
 end
 
 --------------------------------------------------------------------------------
--- The composition war list.
+-- The composition elements.
 --------------------------------------------------------------------------------
+local function getActorWarFieldPreviewer(self)
+    if (not self.m_ActorWarFieldPreviewer) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
+
+        self.m_ActorWarFieldPreviewer = actor
+        if (self.m_View) then
+            self.m_View:setViewWarFieldPreviewer(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarFieldPreviewer
+end
+
 local function initWarList(self, list)
     assert(type(list) == "table", "ModelContinueWarSelector-initWarList() failed to require list data from the server.")
 
     local warList = {}
-    for i, item in ipairs(list) do
-        warList[i] = {
-            name     = item.name,
+    for sceneWarFileName, item in pairs(list) do
+        local warFieldFileName = item.warFieldFileName
+        local warFieldName = WarFieldList[warFieldFileName]
+        warList[#warList + 1] = {
+            name     = warFieldName,
             callback = function()
-                -- TODO: get the war scene data from the server.
-                enableConfirmBoxForEnteringSceneWar(self, item.name, item.fileName)
+                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
+                self.m_OnButtonNextTouched = function()
+                    enableConfirmBoxForEnteringSceneWar(self, warFieldName, sceneWarFileName)
+                end
+                if (self.m_View) then
+                    self.m_View:setButtonNextVisible(true)
+                end
             end,
         }
     end
@@ -129,14 +150,22 @@ function ModelContinueWarSelector:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setVisible(enabled)
             :removeAllItems()
+            :setButtonNextVisible(false)
     end
 
+    getActorWarFieldPreviewer(self):getModel():hideWarField()
     return self
 end
 
 function ModelContinueWarSelector:onButtonBackTouched()
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
+
+    return self
+end
+
+function ModelContinueWarSelector:onButtonNextTouched()
+    self.m_OnButtonNextTouched()
 
     return self
 end

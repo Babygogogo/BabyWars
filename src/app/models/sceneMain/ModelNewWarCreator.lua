@@ -22,18 +22,18 @@ end
 
 local function initWarFieldList(self, list)
     local list = {}
-    for _, warField in ipairs(WarFieldList) do
+    for warFieldFileName, warFieldName in pairs(WarFieldList) do
         list[#list + 1] = {
-            name     = warField.name,
+            name     = warFieldName,
             callback = function()
-                getActorWarFieldPreviewer(self):getModel():showWarField(warField.fileName)
+                getActorWarFieldPreviewer(self):getModel():showWarField(warFieldFileName)
                 self.m_View:setButtonNextVisible(true)
                 self.m_OnButtonNextTouched = function()
                     -- TODO: enable the player to customize the settings of the game.
                     self.m_RootScriptEventDispatcher:dispatchEvent({
                         name             = "EvtPlayerRequestDoAction",
                         actionName       = "NewWar",
-                        warFieldFileName = warField.fileName,
+                        warFieldFileName = warFieldFileName,
                         playerIndex      = 1,
                         skillIndex       = 1,
                     })

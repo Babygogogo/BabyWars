@@ -138,12 +138,12 @@ function ModelJoinWarSelector:setEnabled(enabled)
             :setButtonNextVisible(false)
     end
 
+    getActorWarFieldPreviewer(self):getModel():hideWarField()
     return self
 end
 
 function ModelJoinWarSelector:onButtonBackTouched()
     self:setEnabled(false)
-    getActorWarFieldPreviewer(self):getModel():hideWarField()
     self.m_ModelMainMenu:setMenuEnabled(true)
 
     return self
