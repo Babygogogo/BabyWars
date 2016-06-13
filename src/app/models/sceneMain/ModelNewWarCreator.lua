@@ -5,6 +5,34 @@ local Actor        = require("global.actors.Actor")
 local WarFieldList = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function configModelWarConfigurator(model, warFieldFileName)
+    local warField = require("res.data.templateWarField." .. warFieldFileName)
+    model:setWarFieldFileName(warFieldFileName)
+        :setEnabled(true)
+
+    local availablePlayerIndexes = {}
+    for i = 1, warField.playersCount do
+        availablePlayerIndexes[i] = i
+    end
+    model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
+        :setOptions(availablePlayerIndexes)
+
+    model:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
+        :setOptions({"off"})
+
+    model:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
+        :setOptions({"clear"})
+
+    model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
+        :setOptions({"Unavailable"})
+
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
+        :setOptions({"Unavailable"})
+end
+
+--------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function getActorWarFieldPreviewer(self)
@@ -38,7 +66,7 @@ local function getActorWarConfigurator(self)
                     name             = "EvtPlayerRequestDoAction",
                     actionName       = "NewWar",
                     warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
-                    playerIndex      = 1,
+                    playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
                     skillIndex       = 1,
                 })
             end)
@@ -63,12 +91,10 @@ local function initWarFieldList(self, list)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)
                 end
+
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    -- TODO: config the configurator
-                    getActorWarConfigurator(self):getModel():setWarFieldFileName(warFieldFileName)
-                        :setEnabled(true)
-
+                    configModelWarConfigurator(getActorWarConfigurator(self):getModel(), warFieldFileName)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)
