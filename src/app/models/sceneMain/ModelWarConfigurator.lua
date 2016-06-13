@@ -108,6 +108,16 @@ function ModelWarConfigurator:getWarFieldFileName()
     return self.m_WarFieldFileName
 end
 
+function ModelWarConfigurator:setSceneWarFileName(name)
+    self.m_SceneWarFileName = name
+
+    return self
+end
+
+function ModelWarConfigurator:getSceneWarFileName()
+    return self.m_SceneWarFileName
+end
+
 function ModelWarConfigurator:onButtonBackTouched()
     if (self.m_OnButtonBackTouched) then
         self.m_OnButtonBackTouched()

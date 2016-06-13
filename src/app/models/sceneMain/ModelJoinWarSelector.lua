@@ -20,6 +20,33 @@ local function enableConfirmBoxForJoiningSceneWar(self, warFieldName, fileName)
         :setEnabled(true)
 end
 
+local function configModelWarConfigurator(model, sceneWarFileName, configuration)
+    model:setSceneWarFileName(sceneWarFileName)
+        :setEnabled(true)
+
+    local availablePlayerIndexes = {}
+    local warField = require("res.data.templateWarField." .. configuration.warFieldFileName)
+    for i = 1, warField.playersCount do
+        if (not configuration.players[i]) then
+            availablePlayerIndexes[#availablePlayerIndexes + 1] = i
+        end
+    end
+    model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
+        :setOptions(availablePlayerIndexes)
+
+    model:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
+        :setOptions({configuration.fog})
+
+    model:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
+        :setOptions({configuration.weather})
+
+    model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
+        :setOptions({"Unavailable"})
+
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
+        :setOptions({configuration.maxSkillPoints})
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -36,26 +63,70 @@ local function getActorWarFieldPreviewer(self)
     return self.m_ActorWarFieldPreviewer
 end
 
-local function initWarList(self, list)
-    assert(type(list) == "table", "ModelJoinWarSelector-initWarList() failed to require list data from the server.")
+local function getActorWarConfigurator(self)
+    if (not self.m_ActorWarConfigurator) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
+        actor:getModel():setEnabled(false)
+            :setOnButtonBackTouched(function()
+                getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                getActorWarConfigurator(self):getModel():setEnabled(false)
+                if (self.m_View) then
+                    self.m_View:setMenuVisible(true)
+                        :setButtonNextVisible(false)
+                end
+            end)
+            :setOnButtonConfirmTouched(function()
+                local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+                print("Join War: " .. modelWarConfigurator:getSceneWarFileName())
+                -- TODO: join the war.
+                --[[
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name             = "EvtPlayerRequestDoAction",
+                    actionName       = "NewWar",
+                    warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
+                    playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
+                    skillIndex       = 1,
+                })
+                --]]
+            end)
+
+        self.m_ActorWarConfigurator = actor
+        if (self.m_View) then
+            self.m_View:setViewWarConfigurator(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarConfigurator
+end
+
+local function createJoinableWarList(self, list)
+    assert(type(list) == "table", "ModelJoinWarSelector-createJoinableWarList() failed to require list data from the server.")
 
     local warList = {}
-    for sceneWarFileName, warFieldFileName in pairs(list) do
+    for sceneWarFileName, configuration in pairs(list) do
+        local warFieldFileName = configuration.warFieldFileName
         warList[#warList + 1] = {
             name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             callback = function()
-                -- enableConfirmBoxForJoiningSceneWar(self, warFieldName, sceneWarFileName)
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
-                self.m_View:setButtonNextVisible(true)
+                if (self.m_View) then
+                    self.m_View:setButtonNextVisible(true)
+                end
+
                 self.m_OnButtonNextTouched = function()
-                    print("join: " .. sceneWarFileName)
+                    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                    configModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, configuration)
+                    if (self.m_View) then
+                        self.m_View:setMenuVisible(false)
+                            :setButtonNextVisible(false)
+                    end
                 end
             end,
         }
     end
 
-    self.m_WarList = warList
+    return warList
 end
 
 --------------------------------------------------------------------------------
@@ -110,11 +181,13 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:doActionGetJoinableWarList(action)
-    initWarList(self, action.list)
-    if (#self.m_WarList == 0) then
-        self.m_ModelMessageIndicator:showMessage("Sorry, but no war is currently joinable. Please wait for or create a new war.")
-    elseif ((self.m_View) and (self.m_IsEnabled)) then
-        self.m_View:showWarList(self.m_WarList)
+    self.m_WarList = createJoinableWarList(self, action.list)
+    if (self.m_IsEnabled) then
+        if (#self.m_WarList == 0) then
+            self.m_ModelMessageIndicator:showMessage("Sorry, but no war is currently joinable. Please wait for or create a new war.")
+        elseif (self.m_View) then
+            self.m_View:showWarList(self.m_WarList)
+        end
     end
 
     return self

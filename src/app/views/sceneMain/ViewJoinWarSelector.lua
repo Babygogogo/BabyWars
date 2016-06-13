@@ -1,6 +1,7 @@
 
 local ViewJoinWarSelector = class("ViewJoinWarSelector", cc.Node)
 
+local WAR_CONFIGURATOR_Z_ORDER    = 1
 local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
@@ -197,6 +198,14 @@ function ViewJoinWarSelector:setViewWarFieldPreviewer(view)
     return self
 end
 
+function ViewJoinWarSelector:setViewWarConfigurator(view)
+    assert(self.m_ViewWarConfigurator == nil, "ViewJoinWarSelector:setViewWarConfigurator() the view has been set.")
+    self.m_ViewWarConfigurator = view
+    self:addChild(view, WAR_CONFIGURATOR_Z_ORDER)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -216,6 +225,15 @@ end
 
 function ViewJoinWarSelector:createAndPushBackItem(item)
     self.m_MenuListView:pushBackCustomItem(createViewMenuItem(item))
+
+    return self
+end
+
+function ViewJoinWarSelector:setMenuVisible(visible)
+    self.m_MenuBackground:setVisible(visible)
+    self.m_ButtonBack:setVisible(visible)
+    self.m_MenuListView:setVisible(visible)
+    self.m_MenuTitle:setVisible(visible)
 
     return self
 end
