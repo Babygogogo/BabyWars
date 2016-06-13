@@ -221,6 +221,10 @@ function ModelMainMenu:doActionGetJoinableWarList(action)
     getActorJoinWarSelector(self):getModel():doActionGetJoinableWarList(action)
 end
 
+function ModelMainMenu:doActionJoinWar(action)
+    getActorJoinWarSelector(self):getModel():doActionJoinWar(action)
+end
+
 function ModelMainMenu:doActionGetOngoingWarList(action)
     getActorContinueWarSelector(self):getModel():doActionGetOngoingWarList(action)
 

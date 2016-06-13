@@ -1,6 +1,7 @@
 
 local ViewContinueWarSelector = class("ViewContinueWarSelector", cc.Node)
 
+local WAR_CONFIGURATOR_Z_ORDER    = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local BUTTON_BACK_Z_ORDER         = 1
@@ -208,6 +209,14 @@ function ViewContinueWarSelector:setViewWarFieldPreviewer(view)
     return self
 end
 
+function ViewContinueWarSelector:setViewWarConfigurator(view)
+    assert(self.m_ViewWarConfigurator == nil, "ViewContinueWarSelector:setViewWarConfigurator() the view has been set.")
+    self.m_ViewWarConfigurator = view
+    self:addChild(view, WAR_CONFIGURATOR_Z_ORDER)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -233,6 +242,15 @@ end
 
 function ViewContinueWarSelector:setButtonNextVisible(visible)
     self.m_ButtonNext:setVisible(visible)
+
+    return self
+end
+
+function ViewContinueWarSelector:setMenuVisible(visible)
+    self.m_MenuBackground:setVisible(visible)
+    self.m_ButtonBack:setVisible(visible)
+    self.m_MenuListView:setVisible(visible)
+    self.m_MenuTitle:setVisible(visible)
 
     return self
 end

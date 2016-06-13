@@ -77,17 +77,13 @@ local function getActorWarConfigurator(self)
             end)
             :setOnButtonConfirmTouched(function()
                 local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-                print("Join War: " .. modelWarConfigurator:getSceneWarFileName())
-                -- TODO: join the war.
-                --[[
                 self.m_RootScriptEventDispatcher:dispatchEvent({
                     name             = "EvtPlayerRequestDoAction",
-                    actionName       = "NewWar",
-                    warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
+                    actionName       = "JoinWar",
+                    sceneWarFileName = modelWarConfigurator:getSceneWarFileName(),
                     playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
                     skillIndex       = 1,
                 })
-                --]]
             end)
 
         self.m_ActorWarConfigurator = actor
@@ -193,6 +189,14 @@ function ModelJoinWarSelector:doActionGetJoinableWarList(action)
     return self
 end
 
+function ModelJoinWarSelector:doActionJoinWar(action)
+    self:setEnabled(false)
+    self.m_ModelMainMenu:setMenuEnabled(true)
+    self.m_ModelMessageIndicator:showMessage(action.message)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -208,11 +212,14 @@ function ModelJoinWarSelector:setEnabled(enabled)
 
     if (self.m_View) then
         self.m_View:setVisible(enabled)
+            :setMenuVisible(true)
             :removeAllItems()
             :setButtonNextVisible(false)
     end
 
     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+    getActorWarConfigurator(self):getModel():setEnabled(false)
+
     return self
 end
 

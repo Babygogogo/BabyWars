@@ -60,6 +60,10 @@ local function doActionGetJoinableWarList(self, action)
     self.m_ActorMainMenu:getModel():doActionGetJoinableWarList(action)
 end
 
+local function doActionJoinWar(self, action)
+    self.m_ActorMainMenu:getModel():doActionJoinWar(action)
+end
+
 local function doActionGetOngoingWarList(self, action)
     self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
 end
@@ -87,6 +91,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionNewWar(self, event)
     elseif (actionName == "GetJoinableWarList") then
         doActionGetJoinableWarList(self, event)
+    elseif (actionName == "JoinWar") then
+        doActionJoinWar(self, event)
     elseif (actionName == "GetOngoingWarList") then
         doActionGetOngoingWarList(self, event)
     elseif (actionName == "GetSceneWarData") then
