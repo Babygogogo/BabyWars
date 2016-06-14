@@ -19,18 +19,6 @@ local WarFieldList     = require("res.data.templateWarField.WarFieldList")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function enableConfirmBoxForEnteringSceneWar(self, name, fileName)
-    self.m_ModelConfirmBox:setConfirmText("You are entering a war:\n" .. name .. ".\nAre you sure?")
-        :setOnConfirmYes(function()
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name       = "EvtPlayerRequestDoAction",
-                actionName = "GetSceneWarData",
-                fileName   = fileName,
-            })
-        end)
-        :setEnabled(true)
-end
-
 local function configModelWarConfigurator(model, sceneWarFileName, configuration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
@@ -109,12 +97,14 @@ local function createOngoingWarList(self, list)
     assert(type(list) == "table", "ModelContinueWarSelector-createOngoingWarList() failed to require list data from the server.")
 
     local warList = {}
-    for sceneWarFileName, configuration in pairs(list) do
+    for sceneWarFileName, item in pairs(list) do
+        local configuration    = item.configuration
         local warFieldFileName = configuration.warFieldFileName
-        local warFieldName = WarFieldList[warFieldFileName]
         warList[#warList + 1] = {
-            name     = warFieldName,
-            callback = function()
+            sceneWarFileName = sceneWarFileName,
+            warFieldFileName = WarFieldList[warFieldFileName],
+            isInTurn         = item.isInTurn,
+            callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
                 if (self.m_View) then
@@ -207,7 +197,7 @@ function ModelContinueWarSelector:setEnabled(enabled)
 
     if (enabled) then
         self.m_RootScriptEventDispatcher:dispatchEvent({
-            name = "EvtPlayerRequestDoAction",
+            name       = "EvtPlayerRequestDoAction",
             actionName = "GetOngoingWarList",
         })
     end

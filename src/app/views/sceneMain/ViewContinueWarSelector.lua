@@ -9,14 +9,15 @@ local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local BUTTON_NEXT_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
 
-local MENU_BACKGROUND_WIDTH  = 250
-local MENU_BACKGROUND_HEIGHT = display.height - 60
-local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50 - 30
-local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT      = 40
-local BUTTON_NEXT_WIDTH      = display.width - MENU_BACKGROUND_WIDTH - 90
-local BUTTON_NEXT_HEIGHT     = 60
+local MENU_BACKGROUND_WIDTH       = 250
+local MENU_BACKGROUND_HEIGHT      = display.height - 60
+local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
+local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - 50 - 30
+local MENU_LIST_VIEW_ITEMS_MARGIN = 15
+local MENU_TITLE_WIDTH            = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT           = 40
+local BUTTON_NEXT_WIDTH           = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_NEXT_HEIGHT          = 60
 
 local MENU_BACKGROUND_POS_X = 30
 local MENU_BACKGROUND_POS_Y = 30
@@ -34,7 +35,7 @@ local MENU_TITLE_FONT_COLOR     = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE      = 28
 
 local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
+local ITEM_HEIGHT             = 55
 local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local ITEM_FONT_SIZE          = 28
@@ -42,18 +43,47 @@ local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 
-local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
-local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
-local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 28
-local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
-local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
-local ITEM_FONT_OUTLINE_WIDTH = 2
+local WAR_NAME_INDICATOR_FONT_SIZE     = 15
+local WAR_NAME_INDICATOR_FONT_COLOR    = {r = 240, g = 80, b = 56}
+local WAR_NAME_INDICATOR_OUTLINE_WIDTH = 1
+
+local IN_TURN_INDICATOR_FONT_SIZE     = 15
+local IN_TURN_INDICATOR_FONT_COLOR    = {r = 96,  g = 224, b = 88}
+local IN_TURN_INDICATOR_OUTLINE_WIDTH = 1
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function createSceneWarFileNameIndicator(sceneWarFileName)
+    local indicator = cc.Label:createWithTTF(string.sub(sceneWarFileName, 13), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
+    indicator:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+        :setTextColor(WAR_NAME_INDICATOR_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, WAR_NAME_INDICATOR_OUTLINE_WIDTH)
+
+    return indicator
+end
+
+local function createIsInTurnIndicator()
+    local indicator = cc.Label:createWithTTF("In turn", ITEM_FONT_NAME, IN_TURN_INDICATOR_FONT_SIZE)
+    indicator:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+        :setTextColor(IN_TURN_INDICATOR_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, IN_TURN_INDICATOR_OUTLINE_WIDTH)
+
+        :setOpacity(180)
+
+    return indicator
+end
+
 local function createViewMenuItem(item)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
@@ -67,15 +97,23 @@ local function createViewMenuItem(item)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText(item.name)
+        :setTitleText(item.warFieldFileName)
 
-    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+    local titleRenderer = view:getTitleRenderer()
+    titleRenderer:enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+        :setPosition(titleRenderer:getPositionX(), titleRenderer:getPositionY() - 8)
 
     view:addTouchEventListener(function(sender, eventType)
         if (eventType == ccui.TouchEventType.ended) then
             item.callback()
         end
     end)
+
+    local backgroundRenderer = view:getRendererNormal()
+    backgroundRenderer:addChild(createSceneWarFileNameIndicator(item.sceneWarFileName))
+    if (item.isInTurn) then
+        backgroundRenderer:addChild(createIsInTurnIndicator())
+    end
 
     return view
 end
@@ -100,7 +138,7 @@ local function initMenuListView(self)
         :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
 
-        :setItemsMargin(5)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
         :setOpacity(180)
@@ -111,7 +149,7 @@ local function initMenuListView(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Continue..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF("Continue..", ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 

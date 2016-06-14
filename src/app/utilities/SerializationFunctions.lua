@@ -46,7 +46,7 @@ function SerializationFunctions.appendToFile(o, spaces, file)
     elseif (t == "string") then
         file:write(string.format("%q", o))
     elseif (t == "boolean") then
-        file:write(t and "true" or "false")
+        file:write(o and "true" or "false")
     elseif (t == "table") then
         file:write("{\n")
 
