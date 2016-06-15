@@ -32,7 +32,7 @@ __G__TRACKBACK__ = function(msg)
 
     local scene = display.getRunningScene()
     if (scene ~= nil) then
-        scene:addChild(require("app.views.ViewErrorIndicator"):create(msg), 999)
+        scene:addChild(require("app.views.common.ViewErrorIndicator"):create(msg), 999)
     end
 
     return msg
