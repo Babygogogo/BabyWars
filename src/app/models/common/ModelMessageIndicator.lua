@@ -19,4 +19,20 @@ function ModelMessageIndicator:showMessage(msg, duration)
     return self
 end
 
+function ModelMessageIndicator:showPersistentMessage(msg)
+    if (self.m_View) then
+        self.m_View:showPersistentMessage(msg)
+    end
+
+    return self
+end
+
+function ModelMessageIndicator:hidePersistentMessage()
+    if (self.m_View) then
+        self.m_View:hidePersistentMessage()
+    end
+
+    return self
+end
+
 return ModelMessageIndicator

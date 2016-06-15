@@ -1,14 +1,5 @@
 return {
-    {
-        name     = "Chessboard",
-        fileName = "Chessboard",
-    },
-    {
-        name     = "Equal Island",
-        fileName = "EqualIsland",
-    },
-    {
-        name     = "Full Test",
-        fileName = "FullTest",
-    },
+    Chessboard = "Chessboard",
+    EqualIsland = "Equal Island",
+    FullTest = "Full Test",
 }

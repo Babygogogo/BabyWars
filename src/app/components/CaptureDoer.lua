@@ -63,6 +63,16 @@ function CaptureDoer:toStringList(spaces)
     end
 end
 
+function CaptureDoer:toSerializableTable()
+    if (not self:isCapturing()) then
+        return nil
+    else
+        return {
+            isCapturing = true,
+        }
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

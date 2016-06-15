@@ -24,6 +24,7 @@ local function getActorNewWarCreator(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorNewWarCreator = actor
@@ -46,6 +47,22 @@ local function getActorContinueWarSelector(self)
     end
 
     return self.m_ActorContinueWarSelector
+end
+
+local function getActorJoinWarSelector(self)
+    if (not self.m_ActorJoinWarSelector) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
+        actor:getModel():setModelMainMenu(self)
+            :setModelConfirmBox(self.m_ModelConfirmBox)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
+            :setEnabled(false)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+
+        self.m_ActorJoinWarSelector = actor
+        self.m_View:setViewJoinWarSelector(actor:getView())
+    end
+
+    return self.m_ActorJoinWarSelector
 end
 
 local function getActorLoginPanel(self)
@@ -91,6 +108,18 @@ local function initItemContinue(self)
     self.m_ItemContinue = item
 end
 
+local function initItemJoinWar(self)
+    local item = {
+        name     = "Join",
+        callback = function()
+            self:setMenuEnabled(false)
+            getActorJoinWarSelector(self):getModel():setEnabled(true)
+        end,
+    }
+
+    self.m_ItemJoinWar = item
+end
+
 local function initItemConfigSkills(self)
     local item = {
         name = "Config Skills",
@@ -120,6 +149,7 @@ end
 function ModelMainMenu:ctor(param)
     initItemNewWar(      self)
     initItemContinue(    self)
+    initItemJoinWar(     self)
     initItemConfigSkills(self)
     initItemLogin(       self)
 
@@ -188,6 +218,14 @@ function ModelMainMenu:doActionNewWar(action)
     return self
 end
 
+function ModelMainMenu:doActionGetJoinableWarList(action)
+    getActorJoinWarSelector(self):getModel():doActionGetJoinableWarList(action)
+end
+
+function ModelMainMenu:doActionJoinWar(action)
+    getActorJoinWarSelector(self):getModel():doActionJoinWar(action)
+end
+
 function ModelMainMenu:doActionGetOngoingWarList(action)
     getActorContinueWarSelector(self):getModel():doActionGetOngoingWarList(action)
 
@@ -222,7 +260,13 @@ end
 function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
     if (self.m_View) then
         if (isLogged) then
-            showMenuItems(self, self.m_ItemNewWar, self.m_ItemContinue, self.m_ItemConfigSkills, self.m_ItemLogin)
+            showMenuItems(self,
+                self.m_ItemNewWar,
+                self.m_ItemContinue,
+                self.m_ItemJoinWar,
+                self.m_ItemConfigSkills,
+                self.m_ItemLogin
+            )
         else
             showMenuItems(self, self.m_ItemLogin)
         end

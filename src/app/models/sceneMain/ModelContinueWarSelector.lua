@@ -14,40 +14,119 @@ local ModelContinueWarSelector = class("ModelContinueWarSelector")
 local Actor            = require("global.actors.Actor")
 local ActorManager     = require("global.actors.ActorManager")
 local WebSocketManager = require("app.utilities.WebSocketManager")
+local WarFieldList     = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function enableConfirmBoxForEnteringSceneWar(self, name, fileName)
-    self.m_ModelConfirmBox:setConfirmText("You are entering a war:\n" .. name .. ".\nAre you sure?")
-        :setOnConfirmYes(function()
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name       = "EvtPlayerRequestDoAction",
-                actionName = "GetSceneWarData",
-                fileName   = fileName,
-            })
-        end)
+local function configModelWarConfigurator(model, sceneWarFileName, configuration)
+    model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
+
+    local availablePlayerIndexes = {}
+    local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
+    for playerIndex, player in pairs(configuration.players) do
+        if (player.account == loggedInAccount) then
+            availablePlayerIndexes[1] = playerIndex
+            break
+        end
+    end
+    model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(false)
+        :setOptions(availablePlayerIndexes)
+
+    model:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
+        :setOptions({configuration.fog})
+
+    model:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
+        :setOptions({configuration.weather})
+
+    model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
+        :setOptions({"Unavailable"})
+
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
+        :setOptions({configuration.maxSkillPoints})
 end
 
 --------------------------------------------------------------------------------
--- The composition war list.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function initWarList(self, list)
-    assert(type(list) == "table", "ModelContinueWarSelector-initWarList() failed to require list data from the server.")
+local function getActorWarFieldPreviewer(self)
+    if (not self.m_ActorWarFieldPreviewer) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
+
+        self.m_ActorWarFieldPreviewer = actor
+        if (self.m_View) then
+            self.m_View:setViewWarFieldPreviewer(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarFieldPreviewer
+end
+
+local function getActorWarConfigurator(self)
+    if (not self.m_ActorWarConfigurator) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
+        actor:getModel():setEnabled(false)
+            :setPasswordEnabled(false)
+
+            :setOnButtonBackTouched(function()
+                getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                getActorWarConfigurator(self):getModel():setEnabled(false)
+                if (self.m_View) then
+                    self.m_View:setMenuVisible(true)
+                        :setButtonNextVisible(false)
+                end
+            end)
+
+            :setOnButtonConfirmTouched(function()
+                local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name       = "EvtPlayerRequestDoAction",
+                    actionName = "GetSceneWarData",
+                    fileName   = modelWarConfigurator:getSceneWarFileName(),
+                })
+            end)
+
+        self.m_ActorWarConfigurator = actor
+        if (self.m_View) then
+            self.m_View:setViewWarConfigurator(actor:getView())
+        end
+    end
+
+    return self.m_ActorWarConfigurator
+end
+
+local function createOngoingWarList(self, list)
+    assert(type(list) == "table", "ModelContinueWarSelector-createOngoingWarList() failed to require list data from the server.")
 
     local warList = {}
-    for i, item in ipairs(list) do
-        warList[i] = {
-            name     = item.name,
-            callback = function()
-                -- TODO: get the war scene data from the server.
-                enableConfirmBoxForEnteringSceneWar(self, item.name, item.fileName)
+    for sceneWarFileName, item in pairs(list) do
+        local configuration    = item.configuration
+        local warFieldFileName = configuration.warFieldFileName
+        warList[#warList + 1] = {
+            sceneWarFileName = sceneWarFileName,
+            warFieldFileName = WarFieldList[warFieldFileName],
+            isInTurn         = item.isInTurn,
+            callback         = function()
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setEnabled(true)
+                if (self.m_View) then
+                    self.m_View:setButtonNextVisible(true)
+                end
+
+                self.m_OnButtonNextTouched = function()
+                    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                    configModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, configuration)
+                    if (self.m_View) then
+                        self.m_View:setMenuVisible(false)
+                            :setButtonNextVisible(false)
+                    end
+                end
             end,
         }
     end
 
-    self.m_WarList = warList
+    return warList
 end
 
 --------------------------------------------------------------------------------
@@ -95,7 +174,7 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:doActionGetOngoingWarList(action)
-    initWarList(self, action.list)
+    self.m_WarList = createOngoingWarList(self, action.list)
     if ((self.m_View) and (self.m_IsEnabled)) then
         self.m_View:showWarList(self.m_WarList)
     end
@@ -105,7 +184,7 @@ end
 
 function ModelContinueWarSelector:doActionGetSceneWarData(action)
     if (self.m_IsEnabled) then
-        local actorSceneWar = Actor.createWithModelAndViewName("ModelSceneWar", action.data, "ViewSceneWar")
+        local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
         WebSocketManager.setOwner(actorSceneWar:getModel())
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
@@ -121,15 +200,20 @@ function ModelContinueWarSelector:setEnabled(enabled)
 
     if (enabled) then
         self.m_RootScriptEventDispatcher:dispatchEvent({
-            name = "EvtPlayerRequestDoAction",
+            name       = "EvtPlayerRequestDoAction",
             actionName = "GetOngoingWarList",
         })
     end
 
     if (self.m_View) then
         self.m_View:setVisible(enabled)
+            :setMenuVisible(true)
             :removeAllItems()
+            :setButtonNextVisible(false)
     end
+
+    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+    getActorWarConfigurator(self):getModel():setEnabled(false)
 
     return self
 end
@@ -137,6 +221,12 @@ end
 function ModelContinueWarSelector:onButtonBackTouched()
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
+
+    return self
+end
+
+function ModelContinueWarSelector:onButtonNextTouched()
+    self.m_OnButtonNextTouched()
 
     return self
 end

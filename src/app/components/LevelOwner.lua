@@ -73,6 +73,17 @@ function LevelOwner:toStringList(spaces)
     end
 end
 
+function LevelOwner:toSerializableTable()
+    local level = self:getLevel()
+    if (level == 0) then
+        return nil
+    else
+        return {
+            level = level,
+        }
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------

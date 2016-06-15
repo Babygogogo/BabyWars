@@ -2,8 +2,9 @@
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
 local NEW_GAME_CREATOR_Z_ORDER       = 3
-local LOGIN_PANEL_Z_ORDER            = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
+local JOIN_WAR_SELECTOR_Z_ORDER      = 3
+local LOGIN_PANEL_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
 local MENU_LIST_VIEW_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER        = 0
@@ -132,6 +133,14 @@ function ViewMainMenu:setViewContinueWarSelector(view)
     assert(self.m_ViewContinueWarSelector == nil, "ViewMainMenu:setViewContinueWarSelector() the view has been set.")
     self.m_ViewContinueWarSelector = view
     self:addChild(view, CONTINUE_GAME_SELECTOR_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewJoinWarSelector(view)
+    assert(self.m_ViewJoinWarSelector == nil, "ViewMainMenu:setViewJoinWarSelector() the view has been set.")
+    self.m_ViewJoinWarSelector = view
+    self:addChild(view, JOIN_WAR_SELECTOR_Z_ORDER)
 
     return self
 end
