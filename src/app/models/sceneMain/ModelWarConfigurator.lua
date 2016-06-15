@@ -98,6 +98,30 @@ function ModelWarConfigurator:getModelOptionSelectorWithName(name)
     return self["m_ActorSelector" .. name]:getModel()
 end
 
+function ModelWarConfigurator:getPassword()
+    if (not self.m_View) then
+        return nil
+    else
+        return self.m_View:getEditBoxPassword():getText()
+    end
+end
+
+function ModelWarConfigurator:setPassword(password)
+    if (self.m_View) then
+        self.m_View:getEditBoxPassword():setText(password)
+    end
+
+    return self
+end
+
+function ModelWarConfigurator:setPasswordEnabled(enabled)
+    if (self.m_View) then
+        self.m_View:getEditBoxPassword():setVisible(enabled)
+    end
+
+    return self
+end
+
 function ModelWarConfigurator:setWarFieldFileName(name)
     self.m_WarFieldFileName = name
 

@@ -1,8 +1,10 @@
 
 local ViewWarConfigurator = class("ViewWarConfigurator", cc.Node)
 
-local BUTTON_WIDTH            = 300
-local BUTTON_HEIGHT           = 80
+local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
+local EDIT_BOX_PASSWORD_HEIGHT = 60  -- The same as the height of the indicator of ViewOptionSelector
+local BUTTON_WIDTH             = 300
+local BUTTON_HEIGHT            = 80
 
 local SELECTOR_PLAYER_INDEX_POS_X     = 60
 local SELECTOR_PLAYER_INDEX_POS_Y     = 60 + (display.height - 60) / 4 * 3
@@ -14,29 +16,34 @@ local SELECTOR_SKILL_POS_X            = display.width - 60 - (54 + 8 + 250 + 8 +
 local SELECTOR_SKILL_POS_Y            = SELECTOR_PLAYER_INDEX_POS_Y
 local SELECTOR_MAX_SKILL_POINTS_POS_X = SELECTOR_SKILL_POS_X
 local SELECTOR_MAX_SKILL_POINTS_POS_Y = SELECTOR_FOG_POS_Y
-local EDIT_BOX_PASSWORD_POS_X         = SELECTOR_SKILL_POS_X
+local EDIT_BOX_PASSWORD_POS_X         = SELECTOR_SKILL_POS_X + 54 + 8
 local EDIT_BOX_PASSWORD_POS_Y         = SELECTOR_WEATHER_POS_Y
 local BUTTON_BACK_POS_X               = 120
 local BUTTON_BACK_POS_Y               = 45
 local BUTTON_CONFIRM_POS_X            = display.width - 120 - BUTTON_WIDTH
 local BUTTON_CONFIRM_POS_Y            = BUTTON_BACK_POS_Y
 
-local FONT_NAME           = "res/fonts/msyhbd.ttc"
-local FONT_COLOR          = {r = 255, g = 255, b = 255}
-local FONT_OUTLINE_COLOR  = {r = 0,   g = 0,   b = 0}
-local FONT_OUTLINE_WIDTH  = 2
-local BUTTON_FONT_SIZE    = 35
+local EDIT_BOX_PASSWORD_CAPINSETS = {x = 1, y = EDIT_BOX_PASSWORD_HEIGHT - 7, width = 1, height = 1}
 
-local OPTION_INDICATOR_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+local FONT_NAME                         = "res/fonts/msyhbd.ttc"
+local FONT_COLOR                        = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR                = {r = 0,   g = 0,   b = 0}
+local FONT_OUTLINE_WIDTH                = 2
+local BUTTON_FONT_SIZE                  = 35
+local EDIT_BOX_PASSWORD_TITLE_FONT_SIZE = 20
+local EDIT_BOX_PASSWORD_FONT_SIZE       = 28
+
+local BUTTON_SPRITE_FRAME_NAME    = "c03_t01_s01_f01.png"
+local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createButton(posX, posY, text)
     local button = ccui.Button:create()
-    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    button:loadTextureNormal(BUTTON_SPRITE_FRAME_NAME, ccui.TextureResType.plistType)
         :setScale9Enabled(true)
-        :setCapInsets(OPTION_INDICATOR_CAPINSETS)
+        :setCapInsets(BUTTON_BACKGROUND_CAPINSETS)
         :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
         :setCascadeOpacityEnabled(true)
@@ -61,7 +68,35 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initEditBoxPassword(self)
-    -- TODO: add code to do the job.
+    local titleLabel = cc.Label:createWithTTF("Password (optional)", FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
+    titleLabel:ignoreAnchorPointForPosition(true)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+        :setOpacity(180)
+
+        :setDimensions(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT + 30)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_SPRITE_FRAME_NAME, BUTTON_BACKGROUND_CAPINSETS)
+    background:setOpacity(180)
+
+    local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT), background, background, background)
+    editBox:ignoreAnchorPointForPosition(true)
+        :setPosition(EDIT_BOX_PASSWORD_POS_X, EDIT_BOX_PASSWORD_POS_Y)
+        :setFontSize(EDIT_BOX_PASSWORD_FONT_SIZE)
+        :setFontColor({r = 0, g = 0, b = 0})
+
+        :setPlaceholderFontSize(EDIT_BOX_PASSWORD_FONT_SIZE)
+        :setPlaceHolder("input 0 or 4 digits")
+
+        :setMaxLength(4)
+        :setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+
+        :addChild(titleLabel)
+
+    self:addChild(editBox)
+    self.m_EditBoxPassword = editBox
 end
 
 local function initButtonBack(self)

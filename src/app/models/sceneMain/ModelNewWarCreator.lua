@@ -52,6 +52,7 @@ local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
         actor:getModel():setEnabled(false)
+
             :setOnButtonBackTouched(function()
                 getActorWarFieldPreviewer(self):getModel():setEnabled(false)
                 getActorWarConfigurator(self):getModel():setEnabled(false)
@@ -60,15 +61,22 @@ local function getActorWarConfigurator(self)
                         :setButtonNextVisible(false)
                 end
             end)
+
             :setOnButtonConfirmTouched(function()
                 local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name             = "EvtPlayerRequestDoAction",
-                    actionName       = "NewWar",
-                    warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
-                    playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
-                    skillIndex       = 1,
-                })
+                local password             = modelWarConfigurator:getPassword()
+                if ((#password ~= 0) and (#password ~= 4)) then
+                    self.m_ModelMessageIndicator:showMessage("The password is invalid. Please try again.")
+                else
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name             = "EvtPlayerRequestDoAction",
+                        actionName       = "NewWar",
+                        warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
+                        playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
+                        skillIndex       = 1,
+                        warPassword      = password,
+                    })
+                end
             end)
 
         self.m_ActorWarConfigurator = actor
@@ -133,6 +141,13 @@ end
 function ModelNewWarCreator:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelNewWarCreator:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
+
+    return self
+end
+
+function ModelNewWarCreator:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelNewWarCreator:setModelMessageIndicator() the model has been set.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end

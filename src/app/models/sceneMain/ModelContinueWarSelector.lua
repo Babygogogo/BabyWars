@@ -67,6 +67,8 @@ local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
         actor:getModel():setEnabled(false)
+            :setPasswordEnabled(false)
+
             :setOnButtonBackTouched(function()
                 getActorWarFieldPreviewer(self):getModel():setEnabled(false)
                 getActorWarConfigurator(self):getModel():setEnabled(false)
@@ -75,6 +77,7 @@ local function getActorWarConfigurator(self)
                         :setButtonNextVisible(false)
                 end
             end)
+
             :setOnButtonConfirmTouched(function()
                 local modelWarConfigurator = getActorWarConfigurator(self):getModel()
                 self.m_RootScriptEventDispatcher:dispatchEvent({

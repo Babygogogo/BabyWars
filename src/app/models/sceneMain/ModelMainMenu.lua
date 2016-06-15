@@ -24,6 +24,7 @@ local function getActorNewWarCreator(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorNewWarCreator = actor
