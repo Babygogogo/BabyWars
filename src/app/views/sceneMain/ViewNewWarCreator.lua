@@ -218,6 +218,8 @@ function ViewNewWarCreator:showListWarField(list)
         self.m_MenuListView:pushBackCustomItem(createViewMenuItem(listItem))
     end
 
+    self.m_MenuListView:jumpToTop()
+
     return self
 end
 
@@ -237,6 +239,7 @@ function ViewNewWarCreator:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
     self.m_ButtonBack:setVisible(visible)
     self.m_MenuListView:setVisible(visible)
+        :jumpToTop()
     self.m_MenuTitle:setVisible(visible)
 
     return self

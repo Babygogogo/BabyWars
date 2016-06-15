@@ -8,18 +8,6 @@ local WebSocketManager = require("app.utilities.WebSocketManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function enableConfirmBoxForJoiningSceneWar(self, warFieldName, fileName)
-    self.m_ModelConfirmBox:setConfirmText("You are joining a war:\n" .. warFieldName .. ".\nAre you sure?")
-        :setOnConfirmYes(function()
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name       = "EvtPlayerRequestDoAction",
-                actionName = "JoinWar",
-                fileName   = fileName,
-            })
-        end)
-        :setEnabled(true)
-end
-
 local function configModelWarConfigurator(model, sceneWarFileName, configuration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
@@ -102,8 +90,10 @@ local function createJoinableWarList(self, list)
     for sceneWarFileName, configuration in pairs(list) do
         local warFieldFileName = configuration.warFieldFileName
         warList[#warList + 1] = {
-            name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
-            callback = function()
+            warFieldName     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            sceneWarFileName = sceneWarFileName,
+
+            callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
                 if (self.m_View) then

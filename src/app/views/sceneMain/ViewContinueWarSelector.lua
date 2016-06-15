@@ -12,7 +12,7 @@ local MENU_BACKGROUND_Z_ORDER     = 0
 local MENU_BACKGROUND_WIDTH       = 250
 local MENU_BACKGROUND_HEIGHT      = display.height - 60
 local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - 50 - 30
+local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - 50 - 50
 local MENU_LIST_VIEW_ITEMS_MARGIN = 15
 local MENU_TITLE_WIDTH            = MENU_BACKGROUND_WIDTH
 local MENU_TITLE_HEIGHT           = 40
@@ -21,8 +21,8 @@ local BUTTON_NEXT_HEIGHT          = 60
 
 local MENU_BACKGROUND_POS_X = 30
 local MENU_BACKGROUND_POS_Y = 30
-local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 30
+local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 10
+local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 50
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
 local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
 local BUTTON_BACK_POS_X     = MENU_LIST_VIEW_POS_X
@@ -139,7 +139,6 @@ local function initMenuListView(self)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
 
         :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
-        :setGravity(ccui.ListViewGravity.centerHorizontal)
 
         :setOpacity(180)
         :setCascadeOpacityEnabled(true)
@@ -269,6 +268,8 @@ function ViewContinueWarSelector:showWarList(list)
         self.m_MenuListView:pushBackCustomItem(createViewMenuItem(listItem))
     end
 
+    self.m_MenuListView:jumpToTop()
+
     return self
 end
 
@@ -288,6 +289,7 @@ function ViewContinueWarSelector:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
     self.m_ButtonBack:setVisible(visible)
     self.m_MenuListView:setVisible(visible)
+        :jumpToTop()
     self.m_MenuTitle:setVisible(visible)
 
     return self
