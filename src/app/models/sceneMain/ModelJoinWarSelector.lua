@@ -203,7 +203,7 @@ function ModelJoinWarSelector:setEnabled(enabled)
 
     if (enabled) then
         self.m_RootScriptEventDispatcher:dispatchEvent({
-            name = "EvtPlayerRequestDoAction",
+            name       = "EvtPlayerRequestDoAction",
             actionName = "GetJoinableWarList",
         })
     end
@@ -217,6 +217,26 @@ function ModelJoinWarSelector:setEnabled(enabled)
 
     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     getActorWarConfigurator(self):getModel():setEnabled(false)
+
+    return self
+end
+
+function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
+    if (#editBoxText ~= 4) then
+        self.m_ModelMessageIndicator:showMessage("The War ID is invalid. Please try again.")
+    else
+        getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+        if (self.m_View) then
+            self.m_View:removeAllItems()
+                :setButtonNextVisible(false)
+        end
+
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name              = "EvtPlayerRequestDoAction",
+            actionName        = "GetJoinableWarList",
+            sceneWarShortName = editBoxText:lower(),
+        })
+    end
 
     return self
 end
