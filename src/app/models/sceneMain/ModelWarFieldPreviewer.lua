@@ -29,6 +29,7 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
         initActorTileMap(self, {template = warFieldFileName})
         if (self.m_View) then
             self.m_View:setViewTileMap(self.m_ActorTileMap:getView(), self.m_ActorTileMap:getModel():getMapSize())
+                :setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)
         end
     end
 

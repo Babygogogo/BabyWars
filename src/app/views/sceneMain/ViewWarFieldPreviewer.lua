@@ -13,6 +13,17 @@ local CLIPPING_NODE_POS_Y  = BACKGROUND_POS_Y + 7
 local CLIPPING_NODE_WIDTH  = BACKGROUND_POS_X + BACKGROUND_WIDTH  - 5 - CLIPPING_NODE_POS_X
 local CLIPPING_NODE_HEIGHT = BACKGROUND_POS_Y + BACKGROUND_HEIGHT - 6 - CLIPPING_NODE_POS_Y
 
+local AUTHOR_NAME_LABEL_Z_ORDER       = 1
+local AUTHOR_NAME_LABEL_POS_X         = CLIPPING_NODE_POS_X
+local AUTHOR_NAME_LABEL_POS_Y         = CLIPPING_NODE_POS_Y
+local AUTHOR_NAME_LABEL_WIDTH         = CLIPPING_NODE_WIDTH
+local AUTHOR_NAME_LABEL_HEIGHT        = CLIPPING_NODE_HEIGHT
+local AUTHOR_NAME_LABEL_FONT_NAME     = "res/fonts/msyhbd.ttc"
+local AUTHOR_NAME_LABEL_FONT_SIZE     = 25
+local AUTHOR_NAME_LABEL_FONT_COLOR    = {r = 255, g = 255, b = 255}
+local AUTHOR_NAME_LABEL_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local AUTHOR_NAME_LABEL_OUTLINE_WIDTH = 2
+
 local CLIPPING_RECT = {
     x      = 0,
     y      = 0,
@@ -56,12 +67,28 @@ local function initClippingNode(self)
     self:addChild(clippingNode, CLIPPING_NODE_Z_ORDER)
 end
 
+local function initAuthorNameLabel(self)
+    local label = cc.Label:createWithTTF("", AUTHOR_NAME_LABEL_FONT_NAME, AUTHOR_NAME_LABEL_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(AUTHOR_NAME_LABEL_POS_X, AUTHOR_NAME_LABEL_POS_Y)
+
+        :enableOutline(AUTHOR_NAME_LABEL_OUTLINE_COLOR, AUTHOR_NAME_LABEL_OUTLINE_WIDTH)
+
+        :setDimensions(AUTHOR_NAME_LABEL_WIDTH, AUTHOR_NAME_LABEL_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+    self.m_LabelAuthorName = label
+    self:addChild(label, AUTHOR_NAME_LABEL_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewWarFieldPreviewer:ctor(param)
-    initBackground(self)
-    initClippingNode(self)
+    initBackground(     self)
+    initClippingNode(   self)
+    initAuthorNameLabel(self)
 
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
@@ -82,6 +109,12 @@ function ViewWarFieldPreviewer:setViewTileMap(view, mapSize)
         width  = mapSize.width  * GRID_SIZE.width,
         height = mapSize.height * GRID_SIZE.height,
     })
+
+    return self
+end
+
+function ViewWarFieldPreviewer:setAuthorName(name)
+    self.m_LabelAuthorName:setString("Author: " .. name)
 
     return self
 end

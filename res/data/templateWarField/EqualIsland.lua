@@ -1,5 +1,6 @@
 return {
   warFieldName = "Equal Island",
+  authorName   = "Intelligent Systems",
   playersCount = 2,
 
   width = 19,

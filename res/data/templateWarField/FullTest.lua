@@ -1,5 +1,6 @@
 return {
   warFieldName = "Full Test",
+  authorName   = "Babygogogo",
   playersCount = 4,
 
   width = 25,

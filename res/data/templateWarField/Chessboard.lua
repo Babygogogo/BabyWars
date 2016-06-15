@@ -1,5 +1,6 @@
 return {
   warFieldName = "Chessboard",
+  authorName   = "Intelligent Systems",
   playersCount = 2,
 
   width = 11,
