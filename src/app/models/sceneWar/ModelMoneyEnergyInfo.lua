@@ -18,15 +18,13 @@ local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndex = event.playerIndex
 
     if (self.m_View) then
-        self.m_View:setFund(event.modelPlayer:getFund())
-            :setEnergy(event.modelPlayer:getEnergy())
+        self.m_View:updateWithModelPlayer(event.modelPlayer)
     end
 end
 
 local function onEvtModelPlayerUpdated(self, event)
     if ((self.m_PlayerIndex == event.playerIndex) and (self.m_View)) then
-        self.m_View:setFund(event.modelPlayer:getFund())
-            :setEnergy(event.modelPlayer:getEnergy())
+        self.m_View:updateWithModelPlayer(event.modelPlayer)
     end
 end
 

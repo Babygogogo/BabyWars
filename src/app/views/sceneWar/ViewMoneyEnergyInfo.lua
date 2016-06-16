@@ -1,22 +1,27 @@
 
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 
-local FONT_SIZE   = 25
+local FONT_SIZE   = 20
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH     = FONT_SIZE / 5 * 36
-local BACKGROUND_HEIGHT    = LINE_HEIGHT * 2 + 8
+local BACKGROUND_WIDTH     = FONT_SIZE / 5 * 54
+local BACKGROUND_HEIGHT    = LINE_HEIGHT * 3 + 8
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
-local FUND_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local FUND_INFO_HEIGHT     = LINE_HEIGHT
-local FUND_INFO_POSITION_X = 7
-local FUND_INFO_POSITION_Y = BACKGROUND_HEIGHT - FUND_INFO_HEIGHT - 5
+local LABEL_ENERGY_WIDTH  = display.width
+local LABEL_ENERGY_HEIGHT = LINE_HEIGHT
+local LABEL_ENERGY_POS_X  = 7
+local LABEL_ENERGY_POS_Y  = 5
 
-local ENERGY_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local ENERGY_INFO_HEIGHT     = LINE_HEIGHT
-local ENERGY_INFO_POSITION_X = 7
-local ENERGY_INFO_POSITION_Y = FUND_INFO_POSITION_Y - ENERGY_INFO_HEIGHT
+local LABEL_FUND_WIDTH  = display.width
+local LABEL_FUND_HEIGHT = LINE_HEIGHT
+local LABEL_FUND_POS_X  = LABEL_ENERGY_POS_X
+local LABEL_FUND_POS_Y  = LABEL_ENERGY_POS_Y + LABEL_ENERGY_HEIGHT
+
+local LABEL_PLAYER_WIDTH  = display.width
+local LABEL_PLAYER_HEIGHT = LINE_HEIGHT
+local LABEL_PLAYER_POS_X  = LABEL_ENERGY_POS_X
+local LABEL_PLAYER_POS_Y  = LABEL_FUND_POS_Y + LABEL_FUND_HEIGHT
 
 local FONT_NAME          = "res/fonts/msyhbd.ttc"
 local FONT_COLOR         = {r = 255, g = 255, b = 255}
@@ -31,11 +36,13 @@ local RIGHT_POSITION_Y = LEFT_POSITION_Y
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createLabel(posX, posY, width, height, text)
-    local label = cc.Label:createWithTTF(text or "", FONT_NAME, FONT_SIZE)
+local function createLabel(posX, posY, width, height)
+    local label = cc.Label:createWithTTF("", FONT_NAME, FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
+
         :setDimensions(width, height)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
 
         :setTextColor(FONT_COLOR)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
@@ -55,12 +62,11 @@ local function moveToRightSide(self)
 end
 
 --------------------------------------------------------------------------------
--- The button background.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createBackground(self)
+local function initBackground(self)
     local background = ccui.Button:create()
     background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
@@ -68,59 +74,47 @@ local function createBackground(self)
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
         :setZoomScale(-0.05)
-        :setOpacity(200)
+        :setOpacity(180)
 
         :addTouchEventListener(function(sender, eventType)
-            if (eventType == ccui.TouchEventType.ended) then
-                if (self.m_Model) then
-                    self.m_Model:onPlayerTouch()
-                end
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onPlayerTouch()
             end
         end)
 
-    return background
-end
-
-local function initWithBackground(self, background)
     self.m_Background = background
     self:addChild(background)
 end
 
---------------------------------------------------------------------------------
--- The fund label.
---------------------------------------------------------------------------------
-local function createFundLabel()
-    return createLabel(FUND_INFO_POSITION_X, FUND_INFO_POSITION_Y,
-                       FUND_INFO_WIDTH, FUND_INFO_HEIGHT,
-                       "F:")
+local function initLabelPlayer(self)
+    local label = createLabel(LABEL_PLAYER_POS_X, LABEL_PLAYER_POS_Y, LABEL_PLAYER_WIDTH, LABEL_PLAYER_HEIGHT)
+
+    self.m_LabelPlayer = label
+    self.m_Background:getRendererNormal():addChild(label)
 end
 
-local function initWithFundLabel(self, label)
-    self.m_FundLabel = label
-    self:addChild(label)
+local function initLabelFund(self)
+    local label = createLabel(LABEL_FUND_POS_X, LABEL_FUND_POS_Y, LABEL_FUND_WIDTH, LABEL_FUND_HEIGHT)
+
+    self.m_LabelFund = label
+    self.m_Background:getRendererNormal():addChild(label)
 end
 
---------------------------------------------------------------------------------
--- The energy label.
---------------------------------------------------------------------------------
-local function createEnergyLabel()
-    return createLabel(ENERGY_INFO_POSITION_X, ENERGY_INFO_POSITION_Y,
-                       ENERGY_INFO_WIDTH, ENERGY_INFO_HEIGHT,
-                       "EN:")
-end
+local function initLabelEnergy(self)
+    local label = createLabel(LABEL_ENERGY_POS_X, LABEL_ENERGY_POS_Y, LABEL_ENERGY_WIDTH, LABEL_ENERGY_HEIGHT)
 
-local function initWithEnergyLabel(self, label)
-    self.m_EnergyLabel = label
-    self:addChild(label)
+    self.m_LabelEnergy = label
+    self.m_Background:getRendererNormal():addChild(label)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewMoneyEnergyInfo:ctor(param)
-    initWithBackground( self, createBackground(self))
-    initWithFundLabel(  self, createFundLabel())
-    initWithEnergyLabel(self, createEnergyLabel())
+    initBackground( self)
+    initLabelPlayer(self)
+    initLabelFund(  self)
+    initLabelEnergy(self)
 
     self:ignoreAnchorPointForPosition(true)
     moveToRightSide(self)
@@ -144,14 +138,10 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
     return self
 end
 
-function ViewMoneyEnergyInfo:setFund(fund)
-    self.m_FundLabel:setString("F:     " .. fund)
-
-    return self
-end
-
-function ViewMoneyEnergyInfo:setEnergy(current, requirement1, requirement2)
-    self.m_EnergyLabel:setString(string.format("EN:  %.1f/%d/%d", current, requirement1, requirement2))
+function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
+    self.m_LabelPlayer:setString("Player:  " .. modelPlayer:getNickname())
+    self.m_LabelFund:setString("Fund:     " .. modelPlayer:getFund())
+    self.m_LabelEnergy:setString(string.format("Energy:  %.2f/%d/%d", modelPlayer:getEnergy()))
 
     return self
 end
