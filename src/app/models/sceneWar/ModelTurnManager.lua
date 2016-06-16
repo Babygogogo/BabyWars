@@ -58,17 +58,11 @@ end
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
     local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name        = "EvtTurnPhaseBeginning",
-        modelPlayer = modelPlayer,
-        playerIndex = self.m_PlayerIndex,
-        turnIndex   = self.m_TurnIndex,
-    })
-
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhase = "getFund"
         self:runTurn()
     end
+
     if (self.m_View) then
         self.m_View:showBeginTurnEffect(self.m_TurnIndex, modelPlayer:getNickname(), callbackOnBeginTurnEffectDisappear)
     else
@@ -127,6 +121,7 @@ local function runTurnPhaseTickTurnAndPlayerIndex(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name        = "EvtPlayerIndexUpdated",
         playerIndex = self.m_PlayerIndex,
+        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
     })
 
     -- TODO: Change the vision, weather and so on.
@@ -154,6 +149,13 @@ end
 function ModelTurnManager:setModelWarField(warField)
     assert(self.m_ModelWarField == nil, "ModelTurnManager:setModelWarField() the model has been set.")
     self.m_ModelWarField = warField
+
+    return self
+end
+
+function ModelTurnManager:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelTurnManager:setModelMessageIndicator() the model has been set.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end

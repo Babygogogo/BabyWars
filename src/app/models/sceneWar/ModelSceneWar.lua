@@ -194,6 +194,12 @@ local function initScriptEventDispatcher(self)
     self.m_ScriptEventDispatcher = dispatcher
 end
 
+local function initActorMessageIndicator(self)
+    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
+
+    self.m_ActorMessageIndicator = actor
+end
+
 local function initActorPlayerManager(self, playersData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
@@ -221,6 +227,7 @@ local function initActorTurnManager(self, turnData)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setModelWarField(self.m_ActorWarField:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelMessageIndicator(self:getModelMessageIndicator())
 
     self.m_ActorTurnManager = actor
 end
@@ -231,12 +238,6 @@ local function initActorWeatherManager(self, weatherData)
     self.m_ActorWeatherManager = actor
 end
 
-local function initActorMessageIndicator(self)
-    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
-
-    self.m_ActorMessageIndicator = actor
-end
-
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -245,12 +246,12 @@ function ModelSceneWar:ctor(sceneData)
 
     self.m_FileName = sceneData.fileName
     initScriptEventDispatcher(self)
+    initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
     initActorWarField(        self, sceneData.warField)
     initActorWarHud(          self)
     initActorTurnManager(     self, sceneData.turn)
     initActorWeatherManager(  self, sceneData.weather)
-    initActorMessageIndicator(self)
 
     if (self.m_View) then
         self:initView()
@@ -302,8 +303,9 @@ end
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
+    local playerIndex = self:getModelTurnManager():getPlayerIndex()
     self.m_ScriptEventDispatcher:dispatchEvent({
-            name = "EvtModelWeatherUpdated",
+            name         = "EvtModelWeatherUpdated",
             modelWeather = self:getModelWeatherManager():getCurrentWeather()
         })
         :dispatchEvent({
@@ -311,7 +313,8 @@ function ModelSceneWar:onStartRunning()
         })
         :dispatchEvent({
             name        = "EvtPlayerIndexUpdated",
-            playerIndex = self:getModelTurnManager():getPlayerIndex()
+            playerIndex = playerIndex,
+            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
         })
 
     local isPlayerInTurn = isPlayerInTurn(self)
