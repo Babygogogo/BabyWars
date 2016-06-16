@@ -74,7 +74,7 @@ local function initBackground(self)
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
         :setZoomScale(-0.05)
-        :setOpacity(180)
+        :setOpacity(200)
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then

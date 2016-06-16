@@ -18,11 +18,17 @@
 --]]--------------------------------------------------------------------------------
 
 local ModelTurnManager = class("ModelTurnManager")
+local WebSocketManager = require("app.utilities.WebSocketManager")
 local TableFunctions   = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function isLoggedInPlayerInTurn(self)
+    local modelPlayerInTurn = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+    return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+end
+
 local function getNextTurnAndPlayerIndex(self, playerManager)
     local nextTurnIndex   = self.m_TurnIndex
     local nextPlayerIndex = self.m_PlayerIndex + 1
@@ -125,7 +131,16 @@ local function runTurnPhaseTickTurnAndPlayerIndex(self)
     })
 
     -- TODO: Change the vision, weather and so on.
-    self.m_TurnPhase = "beginning"
+    self.m_TurnPhase = "requestToBegin"
+end
+
+local function runTurnPhaseRequestToBegin(self)
+    if (isLoggedInPlayerInTurn(self)) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name       = "EvtPlayerRequestDoAction",
+            actionName = "BeginTurn",
+        })
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -202,9 +217,10 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelTurnManager:doActionBeginTurn(action)
-    assert(self.m_TurnPhase == "beginning", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'beginning'.")
+    assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'requestToBegin'.")
 
-    runTurnPhaseBeginning(self)
+    self.m_TurnPhase = "beginning"
+    self:runTurn()
 
     return self
 end
@@ -235,11 +251,7 @@ end
 
 function ModelTurnManager:runTurn()
     if (self.m_TurnPhase == "beginning") then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
-            actionName = "BeginTurn",
-        })
-        return self
+        runTurnPhaseBeginning(self)
     end
 
     if (self.m_TurnPhase == "getFund") then
@@ -264,6 +276,16 @@ function ModelTurnManager:runTurn()
 
     if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then
         runTurnPhaseTickTurnAndPlayerIndex(self)
+    end
+
+    if (self.m_TurnPhase == "requestToBegin") then
+        runTurnPhaseRequestToBegin(self)
+    end
+
+    if (isLoggedInPlayerInTurn(self)) then
+        self.m_ModelMessageIndicator:hidePersistentMessage()
+    else
+        self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
     end
 
     return self
