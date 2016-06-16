@@ -30,7 +30,7 @@ local function onEvtPlayerMovedCursor(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
-local function onEvtPlayerSelectedGrid(self, event)
+local function onEvtGridSelected(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
@@ -66,7 +66,7 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerTouchTile", self)
         :addEventListener("EvtPlayerMovedCursor",  self)
-        :addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtGridSelected",       self)
         :addEventListener("EvtModelTileUpdated",   self)
         :addEventListener("EvtTurnPhaseMain",      self)
 
@@ -78,7 +78,7 @@ function ModelTileInfo:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
         :removeEventListener("EvtModelTileUpdated",   self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtGridSelected",       self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerTouchTile",    self)
     self.m_RootScriptEventDispatcher = nil
@@ -95,8 +95,8 @@ function ModelTileInfo:onEvent(event)
         onEvtPlayerTouchTile(self, event)
     elseif (eventName == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event)
-    elseif (eventName == "EvtPlayerSelectedGrid") then
-        onEvtPlayerSelectedGrid(self, event)
+    elseif (eventName == "EvtGridSelected") then
+        onEvtGridSelected(self, event)
     elseif (eventName == "EvtModelTileUpdated") then
         onEvtModelTileUpdated(self, event)
     elseif (eventName == "EvtTurnPhaseMain") then

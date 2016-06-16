@@ -53,8 +53,8 @@ end
 -- The functions for MovePath.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_ModelPlayer, self.m_ModelWeather)
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
+    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_ModelPlayerLoggedIn, self.m_ModelWeather)
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayerLoggedIn)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex)) and
         (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
@@ -81,9 +81,9 @@ local function resetReachableArea(self, focusModelUnit)
     if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
         self.m_ReachableArea = ReachableAreaFunctions.createArea(
             focusModelUnit:getGridIndex(),
-            getMoveRange(focusModelUnit, self.m_ModelPlayer, self.m_ModelWeather),
+            getMoveRange(focusModelUnit, self.m_ModelPlayerLoggedIn, self.m_ModelWeather),
             function(gridIndex)
-                return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayer)
+                return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayerLoggedIn)
             end)
 
         if (self.m_View) then
@@ -227,7 +227,7 @@ end
 
 setStateChoosingProductionTarget = function(self, modelTile)
     self.m_State = "choosingProductionTarget"
-    local productionList = modelTile:getProductionList(self.m_ModelPlayer)
+    local productionList = modelTile:getProductionList(self.m_ModelPlayerLoggedIn)
     local gridIndex      = modelTile:getGridIndex()
 
     for _, listItem in ipairs(productionList) do
@@ -290,13 +290,8 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseMain(self, event)
-    self.m_CurrentPlayerIndex = event.playerIndex
-    setStateIdle(self)
-end
-
-local function onEvtTurnPhaseTickTurnAndPlayerIndex(self, event)
-    self.m_CurrentPlayerIndex = event.playerIndex
+local function onEvtPlayerIndexUpdated(self, event)
+    self.m_PlayerIndexInTurn = event.playerIndex
     setStateIdle(self)
 end
 
@@ -309,7 +304,7 @@ local function onEvtPlayerRequestDoAction(self, event)
 end
 
 local function onEvtPlayerMovedCursor(self, event)
-    if (self.m_CurrentPlayerIndex ~= self.m_PlayerIndex) then
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return
     end
 
@@ -342,8 +337,8 @@ local function onEvtPlayerMovedCursor(self, event)
     end
 end
 
-local function onEvtPlayerSelectedGrid(self, event)
-    if (self.m_CurrentPlayerIndex ~= self.m_PlayerIndex) then
+local function onEvtGridSelected(self, event)
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return
     end
 
@@ -353,13 +348,13 @@ local function onEvtPlayerSelectedGrid(self, event)
     if (state == "idle") then
         local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
         if (modelUnit) then
-            if (modelUnit:canDoAction(self.m_PlayerIndex)) then
+            if (modelUnit:canDoAction(self.m_PlayerIndexLoggedIn)) then
                 modelUnit:showMovingAnimation()
                 setStateMakingMovePath(self, modelUnit)
             end
         else
             local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
-            if ((modelTile:getPlayerIndex() == self.m_PlayerIndex) and (modelTile.getProductionList)) then
+            if ((modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and (modelTile.getProductionList)) then
                 setStateChoosingProductionTarget(self, modelTile)
             end
         end
@@ -381,7 +376,7 @@ local function onEvtPlayerSelectedGrid(self, event)
             setStateChoosingAction(self, self.m_Destination)
         end
     else
-        error("ModelActionPlanner-onEvtPlayerSelectedGrid() the state of the planner is invalid.")
+        error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
 end
 
@@ -418,8 +413,8 @@ function ModelActionPlanner:setModelPlayerManager(modelPlayerManager)
     local playerAccount = WebSocketManager.getLoggedInAccountAndPassword()
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:getAccount() == playerAccount) then
-            self.m_ModelPlayer = modelPlayer
-            self.m_PlayerIndex = playerIndex
+            self.m_ModelPlayerLoggedIn = modelPlayer
+            self.m_PlayerIndexLoggedIn = playerIndex
         end
     end)
 
@@ -432,12 +427,11 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerSelectedGrid",        self)
-        :addEventListener("EvtPlayerMovedCursor",               self)
-        :addEventListener("EvtTurnPhaseMain",                   self)
-        :addEventListener("EvtTurnPhaseTickTurnAndPlayerIndex", self)
-        :addEventListener("EvtModelWeatherUpdated",             self)
-        :addEventListener("EvtPlayerRequestDoAction",           self)
+    dispatcher:addEventListener("EvtGridSelected",    self)
+        :addEventListener("EvtPlayerMovedCursor",     self)
+        :addEventListener("EvtPlayerIndexUpdated",    self)
+        :addEventListener("EvtModelWeatherUpdated",   self)
+        :addEventListener("EvtPlayerRequestDoAction", self)
 
     return self
 end
@@ -446,11 +440,10 @@ function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
-        :removeEventListener("EvtModelWeatherUpdated",             self)
-        :removeEventListener("EvtTurnPhaseTickTurnAndPlayerIndex", self)
-        :removeEventListener("EvtTurnPhaseMain",                   self)
-        :removeEventListener("EvtPlayerMovedCursor",               self)
-        :removeEventListener("EvtPlayerSelectedGrid",              self)
+        :removeEventListener("EvtModelWeatherUpdated", self)
+        :removeEventListener("EvtPlayerIndexUpdated",  self)
+        :removeEventListener("EvtPlayerMovedCursor",   self)
+        :removeEventListener("EvtGridSelected",        self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -461,12 +454,10 @@ end
 --------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
-    if (name == "EvtPlayerSelectedGrid") then
-        onEvtPlayerSelectedGrid(self, event)
-    elseif (name == "EvtTurnPhaseMain") then
-        onEvtTurnPhaseMain(self, event)
-    elseif (name == "EvtTurnPhaseTickTurnAndPlayerIndex") then
-        onEvtTurnPhaseTickTurnAndPlayerIndex(self, event)
+    if (name == "EvtGridSelected") then
+        onEvtGridSelected(self, event)
+    elseif (name == "EvtPlayerIndexUpdated") then
+        onEvtPlayerIndexUpdated(self, event)
     elseif (name == "EvtModelWeatherUpdated") then
         onEvtModelWeatherUpdated(self, event)
     elseif (name == "EvtPlayerMovedCursor") then

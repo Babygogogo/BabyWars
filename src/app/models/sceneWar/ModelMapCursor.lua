@@ -17,7 +17,7 @@
 --     - 触摸点数量达到2个或以上
 --       发送EvtPlayerZoomFieldWithTouches，光标本身不移动
 --     - 触摸点只有1个
---       - 如果触摸没有移动过，那么把光标移动到相应位置，发送事件EvtPlayerSelectedGrid
+--       - 如果触摸没有移动过，那么把光标移动到相应位置，发送事件EvtGridSelected
 --       - 如果触摸有移动过
 --         - 如果触摸是在光标外的，发送事件EvtPlayerDragField，光标本身不移动。
 --         - 如果触摸是在光标内的，发送事件EvtPlayerMovedCursor，光标跟着触摸移动。
@@ -42,10 +42,10 @@ local function dispatchEventPlayerMovedCursor(self, gridIndex)
     })
 end
 
-local function dispatchEventPlayerSelectedGrid(self, gridIndex)
+local function dispatchEvtGridSelected(self, gridIndex)
     self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name = "EvtPlayerSelectedGrid",
+        name      = "EvtGridSelected",
         gridIndex = gridIndex
     })
 end
@@ -133,7 +133,7 @@ local function createTouchListener(self)
         local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
         if (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) then
             if (not isTouchMoved) then
-                dispatchEventPlayerSelectedGrid(self, gridIndex)
+                dispatchEvtGridSelected(self, gridIndex)
             elseif ((isTouchingCursor) and (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
                 dispatchEventPlayerMovedCursor(self, gridIndex)
             end

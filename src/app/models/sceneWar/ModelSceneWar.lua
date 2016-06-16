@@ -309,6 +309,10 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name = "EvtSceneWarStarted",
         })
+        :dispatchEvent({
+            name        = "EvtPlayerIndexUpdated",
+            playerIndex = self:getModelTurnManager():getPlayerIndex()
+        })
 
     local isPlayerInTurn = isPlayerInTurn(self)
     if (isPlayerInTurn) then

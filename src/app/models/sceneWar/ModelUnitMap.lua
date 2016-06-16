@@ -105,7 +105,7 @@ local function serializeLoadedModelUnitsToStringList(self, spaces)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor/EvtPlayerSelectedGrid.
+-- The callback functions on EvtPlayerMovedCursor/EvtGridSelected.
 --------------------------------------------------------------------------------
 local function onEvtPlayerMovedCursor(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
@@ -239,7 +239,7 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerMovedCursor", self)
-        :addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtGridSelected",       self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
@@ -255,7 +255,7 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
         :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtGridSelected",       self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -288,7 +288,7 @@ end
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if ((name == "EvtPlayerMovedCursor") or
-        (name == "EvtPlayerSelectedGrid")) then
+        (name == "EvtGridSelected")) then
         onEvtPlayerMovedCursor(self, event)
     elseif (name == "EvtDestroyModelUnit") then
         onEvtDestroyModelUnit(self, event)

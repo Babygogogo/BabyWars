@@ -45,7 +45,7 @@ local function onEvtPlayerMovedCursor(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
-local function onEvtPlayerSelectedGrid(self, event)
+local function onEvtGridSelected(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
@@ -109,7 +109,7 @@ function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
     dispatcher:addEventListener("EvtPlayerTouchUnit", self)
         :addEventListener("EvtPlayerTouchNoUnit",     self)
         :addEventListener("EvtPlayerMovedCursor",     self)
-        :addEventListener("EvtPlayerSelectedGrid",    self)
+        :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtDestroyModelUnit",      self)
         :addEventListener("EvtModelUnitMoved",        self)
         :addEventListener("EvtModelUnitUpdated",      self)
@@ -129,7 +129,7 @@ function ModelUnitInfo:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtModelUnitUpdated",   self)
         :removeEventListener("EvtModelUnitMoved",     self)
         :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtPlayerSelectedGrid", self)
+        :removeEventListener("EvtGridSelected",       self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtPlayerTouchUnit",    self)
         :removeEventListener("EvtPlayerTouchNoUnit",  self)
@@ -149,8 +149,8 @@ function ModelUnitInfo:onEvent(event)
         onEvtPlayerTouchUnit(self, event)
     elseif (eventName == "EvtPlayerMovedCursor") then
         onEvtPlayerMovedCursor(self, event)
-    elseif (eventName == "EvtPlayerSelectedGrid") then
-        onEvtPlayerSelectedGrid(self, event)
+    elseif (eventName == "EvtGridSelected") then
+        onEvtGridSelected(self, event)
     elseif (eventName == "EvtDestroyModelUnit") then
         onEvtDestroyModelUnit(self, event)
     elseif (eventName == "EvtModelUnitMoved") then

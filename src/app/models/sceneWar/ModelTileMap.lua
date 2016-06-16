@@ -202,7 +202,7 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
     dispatcher:addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",    self)
         :addEventListener("EvtPlayerMovedCursor",  self)
-        :addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtGridSelected", self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -214,7 +214,7 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtGridSelected", self)
         :removeEventListener("EvtPlayerMovedCursor",  self)
         :removeEventListener("EvtDestroyViewTile",    self)
         :removeEventListener("EvtDestroyModelTile",   self)
@@ -260,7 +260,7 @@ end
 function ModelTileMap:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtPlayerMovedCursor") or
-        (eventName == "EvtPlayerSelectedGrid")) then
+        (eventName == "EvtGridSelected")) then
         onEvtPlayerMovedCursor(self, event)
     elseif (eventName == "EvtDestroyModelTile") then
         onEvtDestroyModelTile(self, event)

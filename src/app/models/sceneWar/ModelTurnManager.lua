@@ -125,9 +125,8 @@ end
 local function runTurnPhaseTickTurnAndPlayerIndex(self)
     self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name        = "EvtTurnPhaseTickTurnAndPlayerIndex",
+        name        = "EvtPlayerIndexUpdated",
         playerIndex = self.m_PlayerIndex,
-        turnIndex   = self.m_TurnIndex,
     })
 
     -- TODO: Change the vision, weather and so on.
