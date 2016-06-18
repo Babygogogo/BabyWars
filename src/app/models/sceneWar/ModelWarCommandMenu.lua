@@ -50,6 +50,26 @@ local function initItemQuit(self)
     self.m_ItemQuit = item
 end
 
+local function initItemSurrender(self)
+    local item = {
+        name     = "Surrender",
+        callback = function()
+            self.m_ModelConfirmBox:setConfirmText("You will lose the game by surrendering!\nAre you sure?")
+                :setOnConfirmYes(function()
+                    self.m_ModelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name       = "EvtPlayerRequestDoAction",
+                        actionName = "Surrender",
+                    })
+                end)
+                :setEnabled(true)
+        end,
+    }
+
+    self.m_ItemSurrender = item
+end
+
 local function initItemEndTurn(self)
     local item = {
         name     = "End Turn",
@@ -73,6 +93,7 @@ end
 local function generateItems(self)
     local items = {self.m_ItemQuit}
     if (self.m_IsPlayerInTurn) then
+        items[#items + 1] = self.m_ItemSurrender
         items[#items + 1] = self.m_ItemEndTurn
     end
 
@@ -83,8 +104,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
-    initItemQuit(   self)
-    initItemEndTurn(self)
+    initItemQuit(     self)
+    initItemSurrender(self)
+    initItemEndTurn(  self)
 
     if (self.m_View) then
         self:initView()
