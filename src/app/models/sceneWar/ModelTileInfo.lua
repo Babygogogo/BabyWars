@@ -17,7 +17,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerTouchTile(self, event)
+local function onEvtPreviewModelTile(self, event)
     self.m_ModelTile = event.modelTile
 
     if (self.m_View) then
@@ -26,7 +26,7 @@ local function onEvtPlayerTouchTile(self, event)
     end
 end
 
-local function onEvtPlayerMovedCursor(self, event)
+local function onEvtMapCursorMoved(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
@@ -64,11 +64,11 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelTileInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerTouchTile", self)
-        :addEventListener("EvtPlayerMovedCursor",  self)
-        :addEventListener("EvtGridSelected",       self)
-        :addEventListener("EvtModelTileUpdated",   self)
-        :addEventListener("EvtTurnPhaseMain",      self)
+    dispatcher:addEventListener("EvtPreviewModelTile", self)
+        :addEventListener("EvtMapCursorMoved",   self)
+        :addEventListener("EvtGridSelected",     self)
+        :addEventListener("EvtModelTileUpdated", self)
+        :addEventListener("EvtTurnPhaseMain",    self)
 
     return self
 end
@@ -77,10 +77,10 @@ function ModelTileInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
-        :removeEventListener("EvtModelTileUpdated",   self)
-        :removeEventListener("EvtGridSelected",       self)
-        :removeEventListener("EvtPlayerMovedCursor",  self)
-        :removeEventListener("EvtPlayerTouchTile",    self)
+        :removeEventListener("EvtModelTileUpdated", self)
+        :removeEventListener("EvtGridSelected",     self)
+        :removeEventListener("EvtMapCursorMoved",   self)
+        :removeEventListener("EvtPreviewModelTile", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -91,10 +91,10 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerTouchTile") then
-        onEvtPlayerTouchTile(self, event)
-    elseif (eventName == "EvtPlayerMovedCursor") then
-        onEvtPlayerMovedCursor(self, event)
+    if (eventName == "EvtPreviewModelTile") then
+        onEvtPreviewModelTile(self, event)
+    elseif (eventName == "EvtMapCursorMoved") then
+        onEvtMapCursorMoved(self, event)
     elseif (eventName == "EvtGridSelected") then
         onEvtGridSelected(self, event)
     elseif (eventName == "EvtModelTileUpdated") then

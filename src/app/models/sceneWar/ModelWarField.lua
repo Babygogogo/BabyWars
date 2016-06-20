@@ -34,20 +34,20 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerDragField(self, event)
+local function onEvtDragField(self, event)
     if (self.m_View) then
         self.m_View:setPositionOnDrag(event.previousPosition, event.currentPosition)
     end
 end
 
-local function onEvtPlayerZoomField(self, event)
+local function onEvtZoomFieldWithScroll(self, event)
     if (self.m_View) then
         local scrollEvent = event.scrollEvent
         self.m_View:setZoomWithScroll(cc.Director:getInstance():convertToGL(scrollEvent:getLocation()), scrollEvent:getScrollY())
     end
 end
 
-local function onEvtPlayerZoomFieldWithTouches(self, event)
+local function onEvtZoomFieldWithTouches(self, event)
     if (self.m_View) then
         self.m_View:setZoomWithTouches(event.touches)
     end
@@ -135,9 +135,9 @@ function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerDragField",      self)
-        :addEventListener("EvtPlayerZoomField",            self)
-        :addEventListener("EvtPlayerZoomFieldWithTouches", self)
+    dispatcher:addEventListener("EvtDragField",      self)
+        :addEventListener("EvtZoomFieldWithScroll",  self)
+        :addEventListener("EvtZoomFieldWithTouches", self)
 
     return self
 end
@@ -151,9 +151,9 @@ function ModelWarField:unsetRootScriptEventDispatcher()
     self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
     self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerZoomFieldWithTouches", self)
-        :removeEventListener("EvtPlayerZoomField", self)
-        :removeEventListener("EvtPlayerDragField", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
+        :removeEventListener("EvtZoomFieldWithScroll", self)
+        :removeEventListener("EvtDragField",           self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -186,12 +186,12 @@ end
 --------------------------------------------------------------------------------
 function ModelWarField:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerDragField") then
-        onEvtPlayerDragField(self, event)
-    elseif (eventName == "EvtPlayerZoomField") then
-        onEvtPlayerZoomField(self, event)
-    elseif (eventName == "EvtPlayerZoomFieldWithTouches") then
-        onEvtPlayerZoomFieldWithTouches(self, event)
+    if (eventName == "EvtDragField") then
+        onEvtDragField(self, event)
+    elseif (eventName == "EvtZoomFieldWithScroll") then
+        onEvtZoomFieldWithScroll(self, event)
+    elseif (eventName == "EvtZoomFieldWithTouches") then
+        onEvtZoomFieldWithTouches(self, event)
     end
 
     return self
@@ -201,6 +201,10 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelWarField:doActionSurrender(action)
+    self:getModelUnitMap():doActionSurrender(action)
+    self:getModelTileMap():doActionSurrender(action)
+
+    return self
 end
 
 function ModelWarField:doActionWait(action)

@@ -29,19 +29,19 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerTouchUnit(self, event)
+local function onEvtPreviewModelUnit(self, event)
     local modelUnit = event.modelUnit
     self.m_CursorGridIndex = GridIndexFunctions.clone(modelUnit:getGridIndex())
     updateWithModelUnit(self, modelUnit)
 end
 
-local function onEvtPlayerTouchNoUnit(self, event)
+local function onEvtPreviewNoModelUnit(self, event)
     if (self.m_View) then
         self.m_View:setVisible(false)
     end
 end
 
-local function onEvtPlayerMovedCursor(self, event)
+local function onEvtMapCursorMoved(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
 end
 
@@ -106,9 +106,9 @@ function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerTouchUnit", self)
-        :addEventListener("EvtPlayerTouchNoUnit",     self)
-        :addEventListener("EvtPlayerMovedCursor",     self)
+    dispatcher:addEventListener("EvtPreviewModelUnit", self)
+        :addEventListener("EvtPreviewNoModelUnit",     self)
+        :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtDestroyModelUnit",      self)
         :addEventListener("EvtModelUnitMoved",        self)
@@ -130,9 +130,9 @@ function ModelUnitInfo:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtModelUnitMoved",     self)
         :removeEventListener("EvtDestroyModelUnit",   self)
         :removeEventListener("EvtGridSelected",       self)
-        :removeEventListener("EvtPlayerMovedCursor",  self)
-        :removeEventListener("EvtPlayerTouchUnit",    self)
-        :removeEventListener("EvtPlayerTouchNoUnit",  self)
+        :removeEventListener("EvtMapCursorMoved",     self)
+        :removeEventListener("EvtPreviewModelUnit",    self)
+        :removeEventListener("EvtPreviewNoModelUnit",  self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -143,12 +143,12 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerTouchNoUnit") then
-        onEvtPlayerTouchNoUnit(self, event)
-    elseif (eventName == "EvtPlayerTouchUnit") then
-        onEvtPlayerTouchUnit(self, event)
-    elseif (eventName == "EvtPlayerMovedCursor") then
-        onEvtPlayerMovedCursor(self, event)
+    if (eventName == "EvtPreviewNoModelUnit") then
+        onEvtPreviewNoModelUnit(self, event)
+    elseif (eventName == "EvtPreviewModelUnit") then
+        onEvtPreviewModelUnit(self, event)
+    elseif (eventName == "EvtMapCursorMoved") then
+        onEvtMapCursorMoved(self, event)
     elseif (eventName == "EvtGridSelected") then
         onEvtGridSelected(self, event)
     elseif (eventName == "EvtDestroyModelUnit") then

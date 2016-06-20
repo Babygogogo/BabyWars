@@ -105,14 +105,17 @@ local function serializeLoadedModelUnitsToStringList(self, spaces)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtPlayerMovedCursor/EvtGridSelected.
+-- The callback functions on EvtMapCursorMoved/EvtGridSelected.
 --------------------------------------------------------------------------------
-local function onEvtPlayerMovedCursor(self, event)
+local function onEvtMapCursorMoved(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
     if (unitModel) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchUnit", modelUnit = unitModel})
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name      = "EvtPreviewModelUnit",
+            modelUnit = unitModel
+        })
     else
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchNoUnit"})
+        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoModelUnit"})
     end
 end
 
@@ -238,7 +241,7 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitMap:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerMovedCursor", self)
+    dispatcher:addEventListener("EvtMapCursorMoved", self)
         :addEventListener("EvtGridSelected",       self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
@@ -254,9 +257,9 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
-        :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtGridSelected",       self)
-        :removeEventListener("EvtPlayerMovedCursor",  self)
+        :removeEventListener("EvtDestroyModelUnit", self)
+        :removeEventListener("EvtGridSelected",     self)
+        :removeEventListener("EvtMapCursorMoved",   self)
     self.m_RootScriptEventDispatcher = nil
 
     self:forEachModelUnit(function(modelUnit)
@@ -287,9 +290,9 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if ((name == "EvtPlayerMovedCursor") or
+    if ((name == "EvtMapCursorMoved") or
         (name == "EvtGridSelected")) then
-        onEvtPlayerMovedCursor(self, event)
+        onEvtMapCursorMoved(self, event)
     elseif (name == "EvtDestroyModelUnit") then
         onEvtDestroyModelUnit(self, event)
     elseif (name == "EvtDestroyViewUnit") then
@@ -336,6 +339,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelUnitMap:doActionSurrender(action)
+end
+
 function ModelUnitMap:doActionWait(action)
     local path = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
