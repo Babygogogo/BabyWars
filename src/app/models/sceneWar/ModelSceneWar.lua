@@ -32,17 +32,22 @@ local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
+    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
+
+    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
+        .setOwner(modelSceneMain)
+    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
+end
+
+--------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
 local function doActionLogout(self, event)
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
-        confirmText = event.message
-    })
-    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
-
-    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-        .setOwner(modelSceneMain)
-    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
+    runSceneMain({confirmText = event.message})
 end
 
 local function doActionBeginTurn(self, action)
@@ -54,6 +59,32 @@ end
 local function doActionEndTurn(self, action)
     if (action.fileName == self.m_FileName) then
         self:getModelTurnManager():doActionEndTurn(action)
+    end
+end
+
+local function doActionSurrender(self, action)
+    if (action.fileName == self.m_FileName) then
+        local modelPlayerManager = self:getModelPlayerManager()
+        local modelTurnManager   = self:getModelTurnManager()
+        modelPlayerManager:doActionSurrender(action)
+        modelTurnManager:doActionSurrender(action)
+        self:getModelWarField():doActionSurrender(action)
+
+        local callbackOnEffectDisappear = function()
+            runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
+        end
+        local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
+        if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+            self.m_View:showEffectSurrender(callbackOnEffectDisappear)
+        else
+            self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " has surrendered!")
+
+            if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                self.m_View:showEffectWin(callbackOnEffectDisappear)
+            else
+                modelTurnManager:runTurn()
+            end
+        end
     end
 end
 
@@ -99,6 +130,8 @@ local function onEvtSystemRequestDoAction(self, event)
         doActionBeginTurn(self, event)
     elseif (actionName == "EndTurn") then
         doActionEndTurn(self, event)
+    elseif (actionName == "Surrender") then
+        doActionSurrender(self, event)
     elseif (actionName == "Wait") then
         doActionWait(self, event)
     elseif (actionName == "Attack") then

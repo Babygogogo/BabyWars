@@ -234,6 +234,12 @@ function ModelTurnManager:doActionEndTurn(action)
     return self
 end
 
+function ModelTurnManager:doActionSurrender(action)
+    runTurnPhaseTickTurnAndPlayerIndex(self)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

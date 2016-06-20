@@ -200,6 +200,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelWarField:doActionSurrender(action)
+end
+
 function ModelWarField:doActionWait(action)
     self:getModelUnitMap():doActionWait(action)
     self:getModelTileMap():doActionWait(action)
