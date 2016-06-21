@@ -37,6 +37,14 @@ local function requireMapData(param)
     end
 end
 
+local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name              = "EvtModelUnitUpdated",
+        modelUnit         = modelUnit,
+        previousGridIndex = previousGridIndex,
+    })
+end
+
 local function getTiledUnitLayer(tiledData)
     return tiledData.layers[3]
 end
@@ -112,10 +120,13 @@ local function onEvtMapCursorMoved(self, event)
     if (unitModel) then
         self.m_RootScriptEventDispatcher:dispatchEvent({
             name      = "EvtPreviewModelUnit",
-            modelUnit = unitModel
+            modelUnit = unitModel,
         })
     else
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoModelUnit"})
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name      = "EvtPreviewNoModelUnit",
+            gridIndex = event.gridIndex,
+        })
     end
 end
 
@@ -349,9 +360,7 @@ function ModelUnitMap:doActionWait(action)
 
     local modelUnit = self:getModelUnit(endingGridIndex)
     modelUnit:doActionWait(action)
-    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
-    end
+    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
 
     return self
 end
@@ -361,8 +370,11 @@ function ModelUnitMap:doActionAttack(action)
     swapActorUnit(self, path[1], path[#path])
 
     action.attacker:doActionAttack(action, true)
+    dispatchEvtModelUnitUpdated(self, action.attacker, path[1])
+
     if (action.targetType == "unit") then
         action.target:doActionAttack(action, false)
+        dispatchEvtModelUnitUpdated(self, action.target)
     end
 
     return self
@@ -375,9 +387,7 @@ function ModelUnitMap:doActionCapture(action)
 
     local modelUnit = self:getModelUnit(endingGridIndex)
     modelUnit:doActionCapture(action)
-    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMoved", modelUnit = modelUnit})
-    end
+    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
 
     return self
 end
@@ -395,7 +405,10 @@ function ModelUnitMap:doActionProduceOnTile(action)
         self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitProduced", modelUnit = actorUnit:getModel()})
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtModelUnitProduced",
+        modelUnit = actorUnit:getModel()
+    })
 
     return self
 end

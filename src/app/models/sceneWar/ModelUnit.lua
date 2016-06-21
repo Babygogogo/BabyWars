@@ -272,8 +272,6 @@ function ModelUnit:doActionWait(action)
         end
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
-
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
@@ -298,8 +296,6 @@ function ModelUnit:doActionAttack(action, isAttacker)
             component:doActionAttack(action, isAttacker)
         end
     end
-
-    rootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
 
     if ((self.m_View) and (isAttacker)) then
         self.m_View:moveAlongPath(action.path, function()
