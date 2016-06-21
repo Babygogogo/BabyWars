@@ -201,6 +201,17 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelWarField:doActionSurrender(action)
+    local modelUnitMap        = self:getModelUnitMap()
+    local lostPlayerIndex     = action.lostPlayerIndex
+    local lostUnitGridIndexes = {}
+
+    modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
+        if (modelUnit:getPlayerIndex() == lostPlayerIndex) then
+            lostUnitGridIndexes[#lostUnitGridIndexes + 1] = modelUnit:getGridIndex()
+        end
+    end)
+    action.lostUnitGridIndexes = lostUnitGridIndexes
+
     self:getModelUnitMap():doActionSurrender(action)
     self:getModelTileMap():doActionSurrender(action)
 

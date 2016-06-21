@@ -50,73 +50,61 @@ local function doActionLogout(self, event)
     runSceneMain({confirmText = event.message})
 end
 
+local function doActionMessage(self, action)
+    self:getModelMessageIndicator():showMessage(action.message)
+end
+
 local function doActionBeginTurn(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelTurnManager():doActionBeginTurn(action)
-    end
+    self:getModelTurnManager():doActionBeginTurn(action)
 end
 
 local function doActionEndTurn(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelTurnManager():doActionEndTurn(action)
-    end
+    self:getModelTurnManager():doActionEndTurn(action)
 end
 
 local function doActionSurrender(self, action)
-    if (action.fileName == self.m_FileName) then
-        local modelPlayerManager = self:getModelPlayerManager()
-        local modelTurnManager   = self:getModelTurnManager()
-        modelPlayerManager:doActionSurrender(action)
-        modelTurnManager:doActionSurrender(action)
-        self:getModelWarField():doActionSurrender(action)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
+    modelPlayerManager:doActionSurrender(action)
+    modelTurnManager:doActionSurrender(action)
+    self:getModelWarField():doActionSurrender(action)
 
-        local callbackOnEffectDisappear = function()
-            runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
-        end
-        local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
-        if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-            self.m_View:showEffectSurrender(callbackOnEffectDisappear)
+    local callbackOnEffectDisappear = function()
+        runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
+    end
+    local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
+    if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+        self.m_IsWarEnded = true
+        self.m_View:showEffectSurrender(callbackOnEffectDisappear)
+    else
+        self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " has surrendered!")
+
+        if (modelPlayerManager:getAlivePlayersCount() == 1) then
+            self.m_IsWarEnded = true
+            self.m_View:showEffectWin(callbackOnEffectDisappear)
         else
-            self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " has surrendered!")
-
-            if (modelPlayerManager:getAlivePlayersCount() == 1) then
-                self.m_View:showEffectWin(callbackOnEffectDisappear)
-            else
-                modelTurnManager:runTurn()
-            end
+            modelTurnManager:runTurn()
         end
     end
 end
 
 local function doActionWait(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionWait(action)
-    end
+    self:getModelWarField():doActionWait(action)
 end
 
 local function doActionAttack(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionAttack(action)
-    end
+    self:getModelWarField():doActionAttack(action)
 end
 
 local function doActionCapture(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionCapture(action)
-    end
+    self:getModelWarField():doActionCapture(action)
 end
 
 local function doActionProduceOnTile(self, action)
-    if (action.fileName == self.m_FileName) then
-        action.playerIndex = self:getModelTurnManager():getPlayerIndex()
+    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
 
-        self:getModelPlayerManager():doActionProduceOnTile(action)
-        self:getModelWarField():doActionProduceOnTile(action)
-    end
-end
-
-local function doActionMessage(self, action)
-    self:getModelMessageIndicator():showMessage(action.message)
+    self:getModelPlayerManager():doActionProduceOnTile(action)
+    self:getModelWarField():doActionProduceOnTile(action)
 end
 
 --------------------------------------------------------------------------------
@@ -125,27 +113,31 @@ end
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
     if (actionName == "Logout") then
-        doActionLogout(self, event)
-    elseif (actionName == "BeginTurn") then
-        doActionBeginTurn(self, event)
-    elseif (actionName == "EndTurn") then
-        doActionEndTurn(self, event)
-    elseif (actionName == "Surrender") then
-        doActionSurrender(self, event)
-    elseif (actionName == "Wait") then
-        doActionWait(self, event)
-    elseif (actionName == "Attack") then
-        doActionAttack(self, event)
-    elseif (actionName == "Capture") then
-        doActionCapture(self, event)
-    elseif (actionName == "ProduceOnTile") then
-        doActionProduceOnTile(self, event)
+        return doActionLogout(self, event)
     elseif (actionName == "Message") then
-        doActionMessage(self, event)
+        return doActionMessage(self, event)
     elseif (actionName == "Error") then
-        error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
+        return error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
+    end
+
+    if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
+        return
+    elseif (actionName == "BeginTurn") then
+        return doActionBeginTurn(self, event)
+    elseif (actionName == "EndTurn") then
+        return doActionEndTurn(self, event)
+    elseif (actionName == "Surrender") then
+        return doActionSurrender(self, event)
+    elseif (actionName == "Wait") then
+        return doActionWait(self, event)
+    elseif (actionName == "Attack") then
+        return doActionAttack(self, event)
+    elseif (actionName == "Capture") then
+        return doActionCapture(self, event)
+    elseif (actionName == "ProduceOnTile") then
+        return doActionProduceOnTile(self, event)
     else
-        print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
+        return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
 end
 

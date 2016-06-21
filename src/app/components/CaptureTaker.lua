@@ -103,6 +103,12 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function CaptureTaker:doActionSurrender(action)
+    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+
+    return self
+end
+
 function CaptureTaker:doActionCapture(action)
     local modelTile       = self.m_Target
     local maxCapturePoint = self:getMaxCapturePoint()

@@ -93,13 +93,17 @@ local function serializeMapSizeToStringList(mapSize, spaces)
     return {string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)}
 end
 
+local function serializeAvailableUnitIdToStringList(self, spaces)
+    return {string.format("%savailableUnitId = %d", spaces, self.m_AvailableUnitID)}
+end
+
 local function serializeModelUnitsOnMapToStringList(self, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. "    "
     local strList = {spaces .. "grids = {\n"}
     local appendList = TableFunctions.appendList
 
-    self:forEachModelUnit(function(modelUnit)
+    self:forEachModelUnitOnMap(function(modelUnit)
         appendList(strList, modelUnit:toStringList(subSpaces), ",\n")
     end)
     strList[#strList + 1] = spaces .. "}"
@@ -113,7 +117,7 @@ local function serializeLoadedModelUnitsToStringList(self, spaces)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on EvtMapCursorMoved/EvtGridSelected.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtMapCursorMoved(self, event)
     local unitModel = self:getModelUnit(event.gridIndex)
@@ -130,9 +134,6 @@ local function onEvtMapCursorMoved(self, event)
     end
 end
 
---------------------------------------------------------------------------------
--- The callback functions on EvtDestroyModelUnit/EvtDestroyViewUnit.
---------------------------------------------------------------------------------
 local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
     local actorUnit = self:getActorUnit(gridIndex)
@@ -171,17 +172,15 @@ end
 
 local function createUnitActorsMapWithGridsData(gridsData, mapSize)
     local map = createEmptyMap(mapSize.width)
-    local maxUsedUnitID = 0
 
     for _, gridData in ipairs(gridsData) do
         local gridIndex = gridData.GridIndexable.gridIndex
         assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
 
-        maxUsedUnitID = math.max(gridData.unitID, maxUsedUnitID)
         map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
     end
 
-    return map, mapSize, maxUsedUnitID + 1
+    return map
 end
 
 local function createUnitActorsMapWithTemplate(mapData)
@@ -194,9 +193,9 @@ end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
     -- If the map is created without template, then we build the map with mapData.grids only.
-    local map, mapSize, avaliableUnitID = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
+    local map = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
 
-    return map, mapSize, avaliableUnitID
+    return map, mapData.mapSize, mapData.avaliableUnitId
 end
 
 local function createUnitActorsMap(param)
@@ -257,9 +256,11 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
 
-    self:forEachModelUnit(function(modelUnit)
+    self:forEachModelUnitOnMap(function(modelUnit)
         modelUnit:setRootScriptEventDispatcher(dispatcher)
     end)
+
+    -- TODO: set dispatcher for the loaded units.
 
     return self
 end
@@ -273,9 +274,11 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtMapCursorMoved",   self)
     self.m_RootScriptEventDispatcher = nil
 
-    self:forEachModelUnit(function(modelUnit)
+    self:forEachModelUnitOnMap(function(modelUnit)
         modelUnit:unsetRootScriptEventDispatcher()
     end)
+
+    -- TODO: unset dispatcher for the loaded units.
 
     return self
 end
@@ -290,6 +293,7 @@ function ModelUnitMap:toStringList(spaces)
     local appendList = TableFunctions.appendList
 
     appendList(strList, serializeMapSizeToStringList(self:getMapSize(), subSpaces), ",\n")
+    appendList(strList, serializeAvailableUnitIdToStringList(self, subSpaces),      ",\n")
     appendList(strList, serializeModelUnitsOnMapToStringList(self, subSpaces),      ",\n")
     appendList(strList, serializeLoadedModelUnitsToStringList(self, subSpaces),     "\n" .. spaces .. "}")
 
@@ -314,43 +318,22 @@ function ModelUnitMap:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelUnitMap:getMapSize()
-    return self.m_MapSize
-end
-
-function ModelUnitMap:getActorUnit(gridIndex)
-    if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
-        return nil
-    else
-        return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
-    end
-end
-
-function ModelUnitMap:getModelUnit(gridIndex)
-    local unitActor = self:getActorUnit(gridIndex)
-    return unitActor and unitActor:getModel() or nil
-end
-
-function ModelUnitMap:forEachModelUnit(func)
-    local mapSize = self:getMapSize()
-    for x = 1, mapSize.width do
-        for y = 1, mapSize.height do
-            local actorUnit = self.m_UnitActorsMap[x][y]
-            if (actorUnit) then
-                func(actorUnit:getModel())
-            end
-        end
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelUnitMap:doActionSurrender(action)
+    local eventDispatcher = self.m_RootScriptEventDispatcher
+    for _, gridIndex in ipairs(action.lostUnitGridIndexes) do
+        eventDispatcher:dispatchEvent({
+            name      = "EvtDestroyModelUnit",
+            gridIndex = gridIndex,
+        })
+        eventDispatcher:dispatchEvent({
+            name      = "EvtDestroyViewUnit",
+            gridIndex = gridIndex,
+        })
+    end
+
+    return self
 end
 
 function ModelUnitMap:doActionWait(action)
@@ -409,6 +392,40 @@ function ModelUnitMap:doActionProduceOnTile(action)
         name      = "EvtModelUnitProduced",
         modelUnit = actorUnit:getModel()
     })
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelUnitMap:getMapSize()
+    return self.m_MapSize
+end
+
+function ModelUnitMap:getActorUnit(gridIndex)
+    if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
+        return nil
+    else
+        return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
+    end
+end
+
+function ModelUnitMap:getModelUnit(gridIndex)
+    local unitActor = self:getActorUnit(gridIndex)
+    return unitActor and unitActor:getModel() or nil
+end
+
+function ModelUnitMap:forEachModelUnitOnMap(func)
+    local mapSize = self:getMapSize()
+    for x = 1, mapSize.width do
+        for y = 1, mapSize.height do
+            local actorUnit = self.m_UnitActorsMap[x][y]
+            if (actorUnit) then
+                func(actorUnit:getModel())
+            end
+        end
+    end
 
     return self
 end

@@ -20,7 +20,7 @@ local END_WAR_EFFECT_MIDDLE_X = (display.width  - END_WAR_EFFECT_WIDTH) / 2
 local END_WAR_EFFECT_MIDDLE_Y = END_WAR_EFFECT_START_Y
 
 local END_WAR_EFFECT_MOVEIN_DURATION  = 0.5
-local END_WAR_EFFECT_STAY_DURATION    = 2
+local END_WAR_EFFECT_STAY_DURATION    = 3
 
 local END_WAR_EFFECT_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local END_WAR_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}

@@ -26,9 +26,8 @@ local EXPORTED_METHODS = {
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateIsCapturingWithPath(self, path)
-    if ((self.m_IsCapturing) and
-        ((#path ~= 1) and (not GridIndexFunctions.isEqual(path[1], path[#path])))) then
-            self.m_IsCapturing = false
+    if (#path ~= 1) then
+        self.m_IsCapturing = false
     end
 end
 

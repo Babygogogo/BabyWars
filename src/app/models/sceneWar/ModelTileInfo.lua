@@ -15,15 +15,24 @@ local ModelTileInfo = class("ModelTileInfo")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function updateWithModelTile(self, modelTile)
+    self.m_ModelTile = modelTile
+
+    if (self.m_View) then
+        self.m_View:updateWithModelTile(modelTile)
+            :setVisible(true)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPreviewModelTile(self, event)
-    self.m_ModelTile = event.modelTile
-
-    if (self.m_View) then
-        self.m_View:updateWithModelTile(event.modelTile)
-            :setVisible(true)
-    end
+    local modelTile = event.modelTile
+    self.m_CursorGridIndex = GridIndexFunctions.clone(modelTile:getGridIndex())
+    updateWithModelTile(self, modelTile)
 end
 
 local function onEvtMapCursorMoved(self, event)
@@ -35,8 +44,9 @@ local function onEvtGridSelected(self, event)
 end
 
 local function onEvtModelTileUpdated(self, event)
-    if ((GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelTile:getGridIndex())) and (self.m_View)) then
-        self.m_View:updateWithModelTile(self.m_ModelTile)
+    local modelTile = event.modelTile
+    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, modelTile:getGridIndex())) then
+        updateWithModelTile(self, modelTile)
     end
 end
 
@@ -54,8 +64,8 @@ function ModelTileInfo:ctor(param)
 end
 
 function ModelTileInfo:setModelTileDetail(model)
-    assert(self.m_TileDetailModel == nil, "ModelTileInfo:setModelTileDetail() the model has been set.")
-    self.m_TileDetailModel = model
+    assert(self.m_ModelTileDetail == nil, "ModelTileInfo:setModelTileDetail() the model has been set.")
+    self.m_ModelTileDetail = model
 
     return self
 end
@@ -110,8 +120,8 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
-    if (self.m_TileDetailModel) then
-        self.m_TileDetailModel:updateWithModelTile(self.m_ModelTile, self.m_ModelPlayer)
+    if (self.m_ModelTileDetail) then
+        self.m_ModelTileDetail:updateWithModelTile(self.m_ModelTile, self.m_ModelPlayer)
             :setEnabled(true)
     end
 

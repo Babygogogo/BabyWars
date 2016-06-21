@@ -25,7 +25,7 @@ local TableFunctions = require("app.utilities.TableFunctions")
 --------------------------------------------------------------------------------
 local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
     local units = {}
-    modelUnitMap:forEachModelUnit(function(modelUnit)
+    modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
             if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
