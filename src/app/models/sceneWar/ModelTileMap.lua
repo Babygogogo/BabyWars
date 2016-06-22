@@ -35,13 +35,15 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local TableFunctions     = require("app.utilities.TableFunctions")
 
+local TEMPLATE_WAR_FIELD_PATH = "data.templateWarField."
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.templateWarField." .. param)
+        return require(TEMPLATE_WAR_FIELD_PATH .. param)
     elseif (t == "table") then
         return param
     else

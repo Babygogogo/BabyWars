@@ -214,7 +214,7 @@ function ModelPlayerManager:getAlivePlayersCount()
 end
 
 function ModelPlayerManager:getModelPlayerWithAccount(account)
-    for playerIndex, modelPlayer in ipairs(self.m_Players) do
+    for playerIndex, modelPlayer in ipairs(self.m_ModelPlayers) do
         if (modelPlayer:getAccount() == account) then
             return modelPlayer, playerIndex
         end

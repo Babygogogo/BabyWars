@@ -179,6 +179,24 @@ function ModelUnit:toStringList(spaces)
     return strList
 end
 
+function ModelUnit:toSerializableTable()
+    local t = {}
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.toSerializableTable) then
+            t[name] = component:toSerializableTable()
+        end
+    end
+
+    t.tiledID = self:getTiledID()
+    t.unitID  = self:getUnitId()
+    local state = self:getState()
+    if (state ~= "idle") then
+        t.state = state
+    end
+
+    return t
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
@@ -189,75 +207,6 @@ function ModelUnit:onEvent(event)
     end
 
     return self
-end
-
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelUnit:updateView()
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(self)
-    end
-
-    return self
-end
-
-function ModelUnit:getTiledID()
-    return self.m_TiledID
-end
-
-function ModelUnit:getUnitId()
-    return self.m_UnitID
-end
-
-function ModelUnit:getPlayerIndex()
-    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
-end
-
-function ModelUnit:getState()
-    return self.m_State
-end
-
-function ModelUnit:setStateActioned()
-    self.m_State = "actioned"
-
-    return self
-end
-
-function ModelUnit:showNormalAnimation()
-    if (self.m_View) then
-        self.m_View:showNormalAnimation()
-    end
-
-    return self
-end
-
-function ModelUnit:showMovingAnimation()
-    if (self.m_View) then
-        self.m_View:showMovingAnimation()
-    end
-
-    return self
-end
-
-function ModelUnit:getDescription()
-    return self.m_Template.description
-end
-
-function ModelUnit:getVision()
-    return self.m_Template.vision
-end
-
-function ModelUnit:getProductionCost()
-    return self.m_Template.cost
-end
-
-function ModelUnit:canJoin(rhsUnitModel)
-    return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
-end
-
-function ModelUnit:canDoAction(playerIndex)
-    return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end
 
 --------------------------------------------------------------------------------
@@ -349,6 +298,75 @@ function ModelUnit:doActionCapture(action)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelUnit:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
+function ModelUnit:getTiledID()
+    return self.m_TiledID
+end
+
+function ModelUnit:getUnitId()
+    return self.m_UnitID
+end
+
+function ModelUnit:getPlayerIndex()
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
+end
+
+function ModelUnit:getState()
+    return self.m_State
+end
+
+function ModelUnit:setStateActioned()
+    self.m_State = "actioned"
+
+    return self
+end
+
+function ModelUnit:showNormalAnimation()
+    if (self.m_View) then
+        self.m_View:showNormalAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:showMovingAnimation()
+    if (self.m_View) then
+        self.m_View:showMovingAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:getDescription()
+    return self.m_Template.description
+end
+
+function ModelUnit:getVision()
+    return self.m_Template.vision
+end
+
+function ModelUnit:getProductionCost()
+    return self.m_Template.cost
+end
+
+function ModelUnit:canJoin(rhsUnitModel)
+    return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
+end
+
+function ModelUnit:canDoAction(playerIndex)
+    return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end
 
 return ModelUnit

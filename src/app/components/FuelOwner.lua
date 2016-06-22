@@ -16,7 +16,6 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local ComponentManager   = require("global.components.ComponentManager")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
-local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {
     "getCurrentFuel",
     "getMaxFuel",

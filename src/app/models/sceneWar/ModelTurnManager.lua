@@ -25,8 +25,12 @@ local TableFunctions   = require("app.utilities.TableFunctions")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function isLoggedInPlayerInTurn(self)
-    local modelPlayerInTurn = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
-    return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+    if (not WebSocketManager) then
+        return false
+    else
+        local modelPlayerInTurn = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+    end
 end
 
 local function getNextTurnAndPlayerIndex(self, playerManager)
@@ -288,10 +292,12 @@ function ModelTurnManager:runTurn()
         runTurnPhaseRequestToBegin(self)
     end
 
-    if (isLoggedInPlayerInTurn(self)) then
-        self.m_ModelMessageIndicator:hidePersistentMessage()
-    else
-        self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
+    if (self.m_ModelMessageIndicator) then
+        if (isLoggedInPlayerInTurn(self)) then
+            self.m_ModelMessageIndicator:hidePersistentMessage()
+        else
+            self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
+        end
     end
 
     return self

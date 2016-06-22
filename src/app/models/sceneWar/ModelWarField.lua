@@ -19,7 +19,13 @@ local ModelWarField = class("ModelWarField")
 local Actor              = require("global.actors.Actor")
 local TypeChecker        = require("app.utilities.TypeChecker")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TableFunctions     = require("app.utilities.TableFunctions")
 
+local IS_SERVER = false
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function requireFieldData(param)
     local t = type(param)
     if (t == "table") then
@@ -95,11 +101,13 @@ function ModelWarField:ctor(param)
     local warFieldData = requireFieldData(param)
     assert(TypeChecker.isWarFieldData(warFieldData))
 
-    initActorTileMap(      self, warFieldData.tileMap)
-    initActorUnitMap(      self, warFieldData.unitMap)
-    initActorActionPlanner(self)
-    initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
-    initActorGridExplosion(self)
+    initActorTileMap(self, warFieldData.tileMap)
+    initActorUnitMap(self, warFieldData.unitMap)
+    if (not IS_SERVER) then
+        initActorActionPlanner(self)
+        initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
+        initActorGridExplosion(self)
+    end
 
     assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
 
@@ -128,11 +136,13 @@ end
 function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
-    self.m_ActorTileMap      :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorUnitMap      :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorTileMap:getModel():setRootScriptEventDispatcher(dispatcher)
+    self.m_ActorUnitMap:getModel():setRootScriptEventDispatcher(dispatcher)
+    if (not IS_SERVER) then
+        self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
+        self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
+        self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
+    end
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDragField",      self)
@@ -145,11 +155,13 @@ end
 function ModelWarField:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_ActorTileMap      :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorUnitMap      :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorTileMap:getModel():unsetRootScriptEventDispatcher()
+    self.m_ActorUnitMap:getModel():unsetRootScriptEventDispatcher()
+    if (not IS_SERVER) then
+        self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
+        self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
+        self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
+    end
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
         :removeEventListener("EvtZoomFieldWithScroll", self)
@@ -167,7 +179,7 @@ function ModelWarField:toStringList(spaces)
     local subSpaces = spaces .. "    "
     local strList = {spaces .. "warField = {\n"}
 
-    local appendList = require("app.utilities.TableFunctions").appendList
+    local appendList = TableFunctions.appendList
     appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
     appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
 

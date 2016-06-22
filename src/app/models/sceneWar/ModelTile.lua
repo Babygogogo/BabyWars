@@ -208,6 +208,30 @@ function ModelTile:toStringList(spaces)
     end
 end
 
+function ModelTile:toSerializableTable()
+    local t = {}
+
+    local componentsCount = 0
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.toSerializableTable) then
+            local componentTable = component:toSerializableTable()
+            if (componentTable) then
+                t[name]         = componentTable
+                componentsCount = componentsCount + 1
+            end
+        end
+    end
+
+    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+        return nil
+    else
+        t.objectID = (self.m_ObjectID ~= self.m_InitialObjectID) and (self.m_ObjectID) or (nil)
+        t.baseID   = (self.m_BaseID   ~= self.m_InitialBaseID)   and (self.m_BaseID)   or (nil)
+
+        return t
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------

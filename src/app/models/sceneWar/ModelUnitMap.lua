@@ -23,13 +23,15 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local TableFunctions     = require("app.utilities.TableFunctions")
 local Actor              = require("global.actors.Actor")
 
+local TEMPLATE_WAR_FIELD_PATH = "data.templateWarField."
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.templateWarField." .. param)
+        return require(TEMPLATE_WAR_FIELD_PATH .. param)
     elseif (t == "table") then
         return param
     else
@@ -298,6 +300,26 @@ function ModelUnitMap:toStringList(spaces)
     appendList(strList, serializeLoadedModelUnitsToStringList(self, subSpaces),     "\n" .. spaces .. "}")
 
     return strList
+end
+
+function ModelUnitMap:toSerializableTable()
+    local grids = {}
+    self:forEachModelUnitOnMap(function(modelUnit)
+        grids[#grids + 1] = modelUnit:toSerializableTable()
+    end)
+
+    -- TODO: serialize the loaded units.
+    local loaded = {}
+
+    return {
+        mapSize        = {
+            width  = self.m_MapSize.width,
+            height = self.m_MapSize.height,
+        },
+        avaliableUnitId = self.m_AvailableUnitID,
+        grids           = grids,
+        loaded          = loaded,
+    }
 end
 
 --------------------------------------------------------------------------------
