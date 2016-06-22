@@ -36,9 +36,10 @@ end
 local function getNextTurnAndPlayerIndex(self, playerManager)
     local nextTurnIndex   = self.m_TurnIndex
     local nextPlayerIndex = self.m_PlayerIndex + 1
+    local playersCount    = playerManager:getPlayersCount()
 
     while (true) do
-        if (nextPlayerIndex > playerManager:getPlayersCount()) then
+        if (nextPlayerIndex > playersCount) then
             nextPlayerIndex = 1
             nextTurnIndex   = nextTurnIndex + 1
         end
@@ -47,6 +48,8 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
 
         if (playerManager:getModelPlayer(nextPlayerIndex):isAlive()) then
             return nextTurnIndex, nextPlayerIndex
+        else
+            nextPlayerIndex = nextPlayerIndex + 1
         end
     end
 end

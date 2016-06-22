@@ -243,7 +243,9 @@ end
 function ModelSceneWar:ctor(sceneData)
     assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
 
-    self.m_FileName = sceneData.fileName
+    self.m_FileName   = sceneData.fileName
+    self.m_IsWarEnded = sceneData.isEnded
+
     initScriptEventDispatcher(self)
     initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
