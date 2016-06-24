@@ -1,6 +1,6 @@
 return {
   warFieldName = "Plug Mountain",
-  authorName   = "Intelligent Systems",
+  authorName   = "Babygogogo",
   playersCount = 2,
 
   version = "1.1",
@@ -9,7 +9,7 @@ return {
   orientation = "orthogonal",
   renderorder = "right-down",
   width = 8,
-  height = 6,
+  height = 7,
   tilewidth = 24,
   tileheight = 24,
   nextobjectid = 1,
@@ -22,7 +22,7 @@ return {
       x = 0,
       y = 0,
       width = 8,
-      height = 6,
+      height = 7,
       visible = true,
       opacity = 1,
       offsetx = 0,
@@ -30,6 +30,7 @@ return {
       properties = {},
       encoding = "lua",
       data = {
+        1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1,
@@ -44,7 +45,7 @@ return {
       x = 0,
       y = 0,
       width = 8,
-      height = 6,
+      height = 7,
       visible = true,
       opacity = 1,
       offsetx = 0,
@@ -52,12 +53,13 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        111, 116, 0, 0, 0, 0, 0, 99,
+        111, 131, 0, 0, 0, 0, 0, 99,
         131, 0, 99, 0, 0, 99, 0, 0,
-        0, 0, 100, 115, 99, 100, 0, 0,
-        0, 0, 100, 99, 115, 100, 0, 0,
+        0, 0, 100, 115, 99, 100, 115, 0,
+        99, 0, 100, 0, 0, 100, 0, 99,
+        0, 115, 100, 99, 115, 100, 0, 0,
         0, 0, 99, 0, 0, 99, 0, 132,
-        99, 0, 0, 0, 0, 0, 117, 112
+        99, 0, 0, 0, 0, 0, 132, 112
       }
     },
     {
@@ -66,7 +68,7 @@ return {
       x = 0,
       y = 0,
       width = 8,
-      height = 6,
+      height = 7,
       visible = true,
       opacity = 1,
       offsetx = 0,
@@ -74,6 +76,7 @@ return {
       properties = {},
       encoding = "lua",
       data = {
+        0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
