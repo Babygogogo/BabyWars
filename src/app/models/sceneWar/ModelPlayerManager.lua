@@ -175,6 +175,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelPlayerManager:doActionAttack(action)
+    if (action.lostPlayerIndex) then
+        self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
+    end
+
+    return self
+end
+
 function ModelPlayerManager:doActionProduceOnTile(action)
     local playerIndex = action.playerIndex
     local modelPlayer = self:getModelPlayer(action.playerIndex)

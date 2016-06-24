@@ -177,4 +177,12 @@ function ViewSceneWar:showEffectWin(callback)
     return self
 end
 
+function ViewSceneWar:showEffectLose(callback)
+    local effect = createEndWarEffect("You lose...", callback)
+    self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
+    effect:runAction(createEndWarEffectMoveInAction(effect))
+
+    return self
+end
+
 return ViewSceneWar

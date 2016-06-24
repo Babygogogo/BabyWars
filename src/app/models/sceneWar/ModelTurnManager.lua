@@ -241,6 +241,14 @@ function ModelTurnManager:doActionEndTurn(action)
     return self
 end
 
+function ModelTurnManager:doActionAttack(action)
+    if (action.lostPlayerIndex == self:getPlayerIndex()) then
+        runTurnPhaseTickTurnAndPlayerIndex(self)
+    end
+
+    return self
+end
+
 function ModelTurnManager:doActionSurrender(action)
     runTurnPhaseTickTurnAndPlayerIndex(self)
 

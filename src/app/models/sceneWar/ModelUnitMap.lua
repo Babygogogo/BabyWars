@@ -157,19 +157,19 @@ end
 local function createUnitActorsMapWithTiledLayer(layer)
     local width, height = layer.width, layer.height
     local map    = createEmptyMap(width)
-    local avaliableUnitID = 1
+    local availableUnitId = 1
 
     for x = 1, width do
         for y = 1, height do
             local tiledID = layer.data[x + (height - y) * width]
             if (tiledID > 0) then
-                map[x][y] = createActorUnit(tiledID, avaliableUnitID, {x = x, y = y})
-                avaliableUnitID = avaliableUnitID + 1
+                map[x][y] = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
+                availableUnitId = availableUnitId + 1
             end
         end
     end
 
-    return map, {width = width, height = height}, avaliableUnitID
+    return map, {width = width, height = height}, availableUnitId
 end
 
 local function createUnitActorsMapWithGridsData(gridsData, mapSize)
@@ -188,16 +188,16 @@ end
 local function createUnitActorsMapWithTemplate(mapData)
     -- If the map is created with template, then the mapData.grids is ignored.
     local templateMapData = requireMapData(mapData.template)
-    local map, mapSize, avaliableUnitID = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
+    local map, mapSize, availableUnitId = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
 
-    return map, mapSize, avaliableUnitID
+    return map, mapSize, availableUnitId
 end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
     -- If the map is created without template, then we build the map with mapData.grids only.
     local map = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
 
-    return map, mapData.mapSize, mapData.avaliableUnitId
+    return map, mapData.mapSize, mapData.availableUnitId
 end
 
 local function createUnitActorsMap(param)
@@ -316,7 +316,7 @@ function ModelUnitMap:toSerializableTable()
             width  = self.m_MapSize.width,
             height = self.m_MapSize.height,
         },
-        avaliableUnitId = self.m_AvailableUnitID,
+        availableUnitId = self.m_AvailableUnitID,
         grids           = grids,
         loaded          = loaded,
     }

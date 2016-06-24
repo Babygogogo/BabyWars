@@ -43,6 +43,10 @@ local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
+local function callbackOnWarEnded()
+    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
+end
+
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
@@ -69,19 +73,16 @@ local function doActionSurrender(self, action)
     modelTurnManager:doActionSurrender(action)
     self:getModelWarField():doActionSurrender(action)
 
-    local callbackOnEffectDisappear = function()
-        runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
-    end
     local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
     if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
         self.m_IsWarEnded = true
-        self.m_View:showEffectSurrender(callbackOnEffectDisappear)
+        self.m_View:showEffectSurrender(callbackOnWarEnded)
     else
-        self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " has surrendered!")
+        self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " surrendered!")
 
         if (modelPlayerManager:getAlivePlayersCount() == 1) then
             self.m_IsWarEnded = true
-            self.m_View:showEffectWin(callbackOnEffectDisappear)
+            self.m_View:showEffectWin(callbackOnWarEnded)
         else
             modelTurnManager:runTurn()
         end
@@ -93,7 +94,37 @@ local function doActionWait(self, action)
 end
 
 local function doActionAttack(self, action)
-    self:getModelWarField():doActionAttack(action)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
+    local modelWarField      = self:getModelWarField()
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (lostPlayerIndex) then
+        local currentPlayerIndex = modelTurnManager:getPlayerIndex()
+        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnAttackAnimationEnded = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                elseif (lostPlayerIndex == currentPlayerIndex) then
+                    modelTurnManager:runTurn()
+                end
+            end
+        end
+    end
+
+    modelWarField:doActionAttack(action)
+    modelPlayerManager:doActionAttack(action)
+    modelTurnManager:doActionAttack(action)
 end
 
 local function doActionCapture(self, action)

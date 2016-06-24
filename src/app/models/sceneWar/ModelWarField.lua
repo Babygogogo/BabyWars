@@ -297,4 +297,12 @@ function ModelWarField:getModelActionPlanner()
     return self.m_ActorActionPlanner:getModel()
 end
 
+function ModelWarField:clearPlayerForce(playerIndex)
+    self:doActionSurrender({
+        lostPlayerIndex = playerIndex,
+    })
+
+    return self
+end
+
 return ModelWarField

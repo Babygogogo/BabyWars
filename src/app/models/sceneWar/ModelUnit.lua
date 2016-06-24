@@ -274,6 +274,10 @@ function ModelUnit:doActionAttack(action, isAttacker)
                     rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
                 end
             end
+
+            if (action.callbackOnAttackAnimationEnded) then
+                action.callbackOnAttackAnimationEnded()
+            end
         end)
     end
 
