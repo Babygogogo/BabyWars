@@ -59,7 +59,36 @@ local function doActionMessage(self, action)
 end
 
 local function doActionBeginTurn(self, action)
-    self:getModelTurnManager():doActionBeginTurn(action)
+    local modelTurnManager = self:getModelTurnManager()
+    local lostPlayerIndex  = action.lostPlayerIndex
+
+    if (lostPlayerIndex) then
+        local modelWarField      = self:getModelWarField()
+        local modelPlayerManager = self:getModelPlayerManager()
+        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnEnterTurnPhaseMain = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+            lostModelPlayer:setAlive(false)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                else
+                    modelTurnManager:endTurn()
+                        :runTurn()
+                end
+            end
+        end
+    end
+
+    modelTurnManager:doActionBeginTurn(action)
 end
 
 local function doActionEndTurn(self, action)

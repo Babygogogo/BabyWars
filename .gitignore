@@ -5,6 +5,7 @@
 /frameworks/runtime-src/proj.win32
 /frameworks/runtime-src/proj.android
 /writablePath
+/external/Releases
 *.suo
 *.tlog
 *.obj

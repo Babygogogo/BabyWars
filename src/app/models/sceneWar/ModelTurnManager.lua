@@ -226,14 +226,19 @@ end
 function ModelTurnManager:doActionBeginTurn(action)
     assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'requestToBegin'.")
 
-    self.m_TurnPhase = "beginning"
-    self:runTurn()
+    if (action.lostPlayerIndex) then
+        self.m_CallbackOnEnterTurnPhaseMain = action.callbackOnEnterTurnPhaseMain
+    else
+        self.m_CallbackOnEnterTurnPhaseMain = nil
+    end
+
+    runTurnPhaseBeginning(self)
 
     return self
 end
 
 function ModelTurnManager:doActionEndTurn(action)
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurn() the turn phase is expected to be 'main'.")
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:doActionEndTurn() the turn phase is expected to be 'main'.")
 
     self.m_TurnPhase = "resetUnitState"
     self:runTurn()
@@ -243,14 +248,14 @@ end
 
 function ModelTurnManager:doActionAttack(action)
     if (action.lostPlayerIndex == self:getPlayerIndex()) then
-        runTurnPhaseTickTurnAndPlayerIndex(self)
+        self:endTurn()
     end
 
     return self
 end
 
 function ModelTurnManager:doActionSurrender(action)
-    runTurnPhaseTickTurnAndPlayerIndex(self)
+    self:endTurn()
 
     return self
 end
@@ -303,6 +308,11 @@ function ModelTurnManager:runTurn()
         runTurnPhaseRequestToBegin(self)
     end
 
+    if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMain)) then
+        self.m_CallbackOnEnterTurnPhaseMain()
+        self.m_CallbackOnEnterTurnPhaseMain = nil
+    end
+
     if (self.m_ModelMessageIndicator) then
         if (isLoggedInPlayerInTurn(self)) then
             self.m_ModelMessageIndicator:hidePersistentMessage()
@@ -310,6 +320,12 @@ function ModelTurnManager:runTurn()
             self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
         end
     end
+
+    return self
+end
+
+function ModelTurnManager:endTurn()
+    runTurnPhaseTickTurnAndPlayerIndex(self)
 
     return self
 end
