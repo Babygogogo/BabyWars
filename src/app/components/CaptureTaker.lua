@@ -17,6 +17,7 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local EXPORTED_METHODS = {
     "getCurrentCapturePoint",
     "getMaxCapturePoint",
+    "isDefeatOnCapture",
 }
 
 --------------------------------------------------------------------------------
@@ -156,6 +157,10 @@ end
 
 function CaptureTaker:getMaxCapturePoint()
     return self.m_Template.maxCapturePoint
+end
+
+function CaptureTaker:isDefeatOnCapture()
+    return self.m_Template.defeatOnCapture
 end
 
 return CaptureTaker

@@ -298,6 +298,10 @@ function ModelUnit:doActionCapture(action)
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
             action.nextTarget:updateView()
+
+            if (action.callbackOnCaptureAnimationEnded) then
+                action.callbackOnCaptureAnimationEnded()
+            end
         end)
     end
 

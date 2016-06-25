@@ -128,7 +128,31 @@ local function doActionAttack(self, action)
 end
 
 local function doActionCapture(self, action)
-    self:getModelWarField():doActionCapture(action)
+    local modelWarField      = self:getModelWarField()
+    local modelPlayerManager = self:getModelPlayerManager()
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (lostPlayerIndex) then
+        local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnCaptureAnimationEnded = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                end
+            end
+        end
+    end
+
+    modelWarField:doActionCapture(action)
+    modelPlayerManager:doActionCapture(action)
 end
 
 local function doActionProduceOnTile(self, action)
