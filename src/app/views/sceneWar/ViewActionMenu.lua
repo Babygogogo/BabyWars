@@ -4,7 +4,7 @@ local ViewActionMenu = class("ViewActionMenu", cc.Node)
 local AnimationLoader = require("app.utilities.AnimationLoader")
 
 local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 180
-local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 88 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 104 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
 local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 240
 local MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM = MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM
 

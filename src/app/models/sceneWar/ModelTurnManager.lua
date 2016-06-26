@@ -18,17 +18,28 @@
 --]]--------------------------------------------------------------------------------
 
 local ModelTurnManager = class("ModelTurnManager")
+local WebSocketManager = require("app.utilities.WebSocketManager")
 local TableFunctions   = require("app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function isLoggedInPlayerInTurn(self)
+    if (not WebSocketManager) then
+        return false
+    else
+        local modelPlayerInTurn = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+    end
+end
+
 local function getNextTurnAndPlayerIndex(self, playerManager)
     local nextTurnIndex   = self.m_TurnIndex
     local nextPlayerIndex = self.m_PlayerIndex + 1
+    local playersCount    = playerManager:getPlayersCount()
 
     while (true) do
-        if (nextPlayerIndex > playerManager:getPlayersCount()) then
+        if (nextPlayerIndex > playersCount) then
             nextPlayerIndex = 1
             nextTurnIndex   = nextTurnIndex + 1
         end
@@ -37,6 +48,8 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
 
         if (playerManager:getModelPlayer(nextPlayerIndex):isAlive()) then
             return nextTurnIndex, nextPlayerIndex
+        else
+            nextPlayerIndex = nextPlayerIndex + 1
         end
     end
 end
@@ -58,17 +71,11 @@ end
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
     local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name        = "EvtTurnPhaseBeginning",
-        modelPlayer = modelPlayer,
-        playerIndex = self.m_PlayerIndex,
-        turnIndex   = self.m_TurnIndex,
-    })
-
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhase = "getFund"
         self:runTurn()
     end
+
     if (self.m_View) then
         self.m_View:showBeginTurnEffect(self.m_TurnIndex, modelPlayer:getNickname(), callbackOnBeginTurnEffectDisappear)
     else
@@ -125,13 +132,22 @@ end
 local function runTurnPhaseTickTurnAndPlayerIndex(self)
     self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name        = "EvtTurnPhaseTickTurnAndPlayerIndex",
+        name        = "EvtPlayerIndexUpdated",
         playerIndex = self.m_PlayerIndex,
-        turnIndex   = self.m_TurnIndex,
+        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
     })
 
     -- TODO: Change the vision, weather and so on.
-    self.m_TurnPhase = "beginning"
+    self.m_TurnPhase = "requestToBegin"
+end
+
+local function runTurnPhaseRequestToBegin(self)
+    if (isLoggedInPlayerInTurn(self)) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name       = "EvtPlayerRequestDoAction",
+            actionName = "BeginTurn",
+        })
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -155,6 +171,13 @@ end
 function ModelTurnManager:setModelWarField(warField)
     assert(self.m_ModelWarField == nil, "ModelTurnManager:setModelWarField() the model has been set.")
     self.m_ModelWarField = warField
+
+    return self
+end
+
+function ModelTurnManager:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelTurnManager:setModelMessageIndicator() the model has been set.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end
@@ -201,7 +224,13 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelTurnManager:doActionBeginTurn(action)
-    assert(self.m_TurnPhase == "beginning", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'beginning'.")
+    assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'requestToBegin'.")
+
+    if (action.lostPlayerIndex) then
+        self.m_CallbackOnEnterTurnPhaseMain = action.callbackOnEnterTurnPhaseMain
+    else
+        self.m_CallbackOnEnterTurnPhaseMain = nil
+    end
 
     runTurnPhaseBeginning(self)
 
@@ -209,10 +238,24 @@ function ModelTurnManager:doActionBeginTurn(action)
 end
 
 function ModelTurnManager:doActionEndTurn(action)
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurn() the turn phase is expected to be 'main'.")
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:doActionEndTurn() the turn phase is expected to be 'main'.")
 
     self.m_TurnPhase = "resetUnitState"
     self:runTurn()
+
+    return self
+end
+
+function ModelTurnManager:doActionAttack(action)
+    if (action.lostPlayerIndex == self:getPlayerIndex()) then
+        self:endTurn()
+    end
+
+    return self
+end
+
+function ModelTurnManager:doActionSurrender(action)
+    self:endTurn()
 
     return self
 end
@@ -234,11 +277,7 @@ end
 
 function ModelTurnManager:runTurn()
     if (self.m_TurnPhase == "beginning") then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
-            actionName = "BeginTurn",
-        })
-        return self
+        runTurnPhaseBeginning(self)
     end
 
     if (self.m_TurnPhase == "getFund") then
@@ -264,6 +303,29 @@ function ModelTurnManager:runTurn()
     if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then
         runTurnPhaseTickTurnAndPlayerIndex(self)
     end
+
+    if (self.m_TurnPhase == "requestToBegin") then
+        runTurnPhaseRequestToBegin(self)
+    end
+
+    if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMain)) then
+        self.m_CallbackOnEnterTurnPhaseMain()
+        self.m_CallbackOnEnterTurnPhaseMain = nil
+    end
+
+    if (self.m_ModelMessageIndicator) then
+        if (isLoggedInPlayerInTurn(self)) then
+            self.m_ModelMessageIndicator:hidePersistentMessage()
+        else
+            self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
+        end
+    end
+
+    return self
+end
+
+function ModelTurnManager:endTurn()
+    runTurnPhaseTickTurnAndPlayerIndex(self)
 
     return self
 end

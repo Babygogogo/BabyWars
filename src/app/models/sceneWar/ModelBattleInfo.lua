@@ -17,14 +17,14 @@ local ModelBattleInfo = class("ModelBattleInfo")
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerPreviewAttackTarget(self, event)
+local function onEvtPreviewBattleDamage(self, event)
     if (self.m_View) then
         self.m_View:setVisible(true)
             :updateWithAttackAndCounterDamage(event.attackDamage, event.counterDamage)
     end
 end
 
-local function onEvtPlayerPreviewNoAttackTarget(self, event)
+local function onEvtPreviewNoBattleDamage(self, event)
     if (self.m_View) then
         self.m_View:setVisible(false)
     end
@@ -50,8 +50,8 @@ function ModelBattleInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelBattleInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
-        :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
+    dispatcher:addEventListener("EvtPreviewBattleDamage",   self)
+        :addEventListener("EvtPreviewNoBattleDamage",       self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
@@ -65,8 +65,8 @@ function ModelBattleInfo:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
-        :removeEventListener("EvtPlayerPreviewNoAttackTarget", self)
-        :removeEventListener("EvtPlayerPreviewAttackTarget",   self)
+        :removeEventListener("EvtPreviewNoBattleDamage",       self)
+        :removeEventListener("EvtPreviewBattleDamage",         self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -80,10 +80,10 @@ function ModelBattleInfo:onEvent(event)
     if ((eventName == "EvtActionPlannerIdle") or
         (eventName == "EvtActionPlannerMakingMovePath") or
         (eventName == "EvtActionPlannerChoosingAction") or
-        (eventName == "EvtPlayerPreviewNoAttackTarget")) then
-        onEvtPlayerPreviewNoAttackTarget(self, event)
-    elseif (eventName == "EvtPlayerPreviewAttackTarget") then
-        onEvtPlayerPreviewAttackTarget(self, event)
+        (eventName == "EvtPreviewNoBattleDamage")) then
+        onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtPreviewBattleDamage") then
+        onEvtPreviewBattleDamage(self, event)
     end
 
     return self

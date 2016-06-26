@@ -15,12 +15,12 @@
 --
 --   - 光标如何解读玩家的触摸操作
 --     - 触摸点数量达到2个或以上
---       发送EvtPlayerZoomFieldWithTouches，光标本身不移动
+--       发送EvtZoomFieldWithTouches，光标本身不移动
 --     - 触摸点只有1个
---       - 如果触摸没有移动过，那么把光标移动到相应位置，发送事件EvtPlayerSelectedGrid
+--       - 如果触摸没有移动过，那么把光标移动到相应位置，发送事件EvtGridSelected
 --       - 如果触摸有移动过
---         - 如果触摸是在光标外的，发送事件EvtPlayerDragField，光标本身不移动。
---         - 如果触摸是在光标内的，发送事件EvtPlayerMovedCursor，光标跟着触摸移动。
+--         - 如果触摸是在光标外的，发送事件EvtDragField，光标本身不移动。
+--         - 如果触摸是在光标内的，发送事件EvtMapCursorMoved，光标跟着触摸移动。
 --     实际实现请看代码。
 --]]--------------------------------------------------------------------------------
 
@@ -37,30 +37,30 @@ local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 local function dispatchEventPlayerMovedCursor(self, gridIndex)
     self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name = "EvtPlayerMovedCursor",
-        gridIndex = gridIndex
+        name      = "EvtMapCursorMoved",
+        gridIndex = gridIndex,
     })
 end
 
-local function dispatchEventPlayerSelectedGrid(self, gridIndex)
+local function dispatchEvtGridSelected(self, gridIndex)
     self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name = "EvtPlayerSelectedGrid",
-        gridIndex = gridIndex
+        name      = "EvtGridSelected",
+        gridIndex = gridIndex,
     })
 end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerPreviewAttackTarget(self, event)
+local function onEvtPreviewBattleDamage(self, event)
     if (self.m_View) then
         self.m_View:setNormalCursorVisible(false)
             :setTargetCursorVisible(true)
     end
 end
 
-local function onEvtPlayerPreviewNoAttackTarget(self, event)
+local function onEvtPreviewNoBattleDamage(self, event)
     if (self.m_View) then
         self.m_View:setNormalCursorVisible(true)
             :setTargetCursorVisible(false)
@@ -99,7 +99,7 @@ local function createTouchListener(self)
 
         if (touchesCount >= 2) then
             self.m_RootScriptEventDispatcher:dispatchEvent({
-                name    = "EvtPlayerZoomFieldWithTouches",
+                name    = "EvtZoomFieldWithTouches",
                 touches = touches,
             })
         else
@@ -113,7 +113,7 @@ local function createTouchListener(self)
             else
                 if (isTouchMoved) then
                     self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name             = "EvtPlayerDragField",
+                        name             = "EvtDragField",
                         previousPosition = touches[1]:getPreviousLocation(),
                         currentPosition  = touches[1]:getLocation()
                     })
@@ -133,7 +133,7 @@ local function createTouchListener(self)
         local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
         if (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) then
             if (not isTouchMoved) then
-                dispatchEventPlayerSelectedGrid(self, gridIndex)
+                dispatchEvtGridSelected(self, gridIndex)
             elseif ((isTouchingCursor) and (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
                 dispatchEventPlayerMovedCursor(self, gridIndex)
             end
@@ -150,7 +150,10 @@ end
 
 local function createMouseListener(model)
     local function onMouseScroll(event)
-        model.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerZoomField", scrollEvent = event})
+        model.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtZoomFieldWithScroll",
+            scrollEvent = event
+        })
     end
 
     local mouseListener = cc.EventListenerMouse:create()
@@ -203,8 +206,8 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerPreviewAttackTarget", self)
-        :addEventListener("EvtPlayerPreviewNoAttackTarget", self)
+    dispatcher:addEventListener("EvtPreviewBattleDamage",   self)
+        :addEventListener("EvtPreviewNoBattleDamage",       self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
@@ -220,8 +223,8 @@ function ModelMapCursor:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
-        :removeEventListener("EvtPlayerPreviewNoAttackTarget", self)
-        :removeEventListener("EvtPlayerPreviewAttackTarget",   self)
+        :removeEventListener("EvtPreviewNoBattleDamage",       self)
+        :removeEventListener("EvtPreviewBattleDamage",         self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -235,10 +238,10 @@ function ModelMapCursor:onEvent(event)
     if ((eventName == "EvtActionPlannerIdle") or
         (eventName == "EvtActionPlannerMakingMovePath") or
         (eventName == "EvtActionPlannerChoosingAction") or
-        (eventName == "EvtPlayerPreviewNoAttackTarget")) then
-        onEvtPlayerPreviewNoAttackTarget(self, event)
-    elseif (eventName == "EvtPlayerPreviewAttackTarget") then
-        onEvtPlayerPreviewAttackTarget(self, event)
+        (eventName == "EvtPreviewNoBattleDamage")) then
+        onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtPreviewBattleDamage") then
+        onEvtPreviewBattleDamage(self, event)
     elseif (eventName == "EvtSceneWarStarted") then
         onEvtSceneWarStarted(self, event)
     end

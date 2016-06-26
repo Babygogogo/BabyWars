@@ -19,58 +19,94 @@
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
 local Actor            = require("global.actors.Actor")
+local ActorManager     = require("global.actors.ActorManager")
+local WebSocketManager = require("app.utilities.WebSocketManager")
 local TypeChecker      = require("app.utilities.TypeChecker")
 
 --------------------------------------------------------------------------------
--- The quit war menu item.
+-- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function createItemQuitWar(self)
-    return {
+local function onEvtPlayerIndexUpdated(self, event)
+    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+end
+
+--------------------------------------------------------------------------------
+-- The composition items.
+--------------------------------------------------------------------------------
+local function initItemQuit(self)
+    local item = {
         name     = "Quit",
         callback = function()
             self.m_ModelConfirmBox:setConfirmText("You are quitting the war (you may reenter it later).\nAre you sure?")
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
-                    require("app.utilities.WebSocketManager").setOwner(actorSceneMain:getModel())
-                    require("global.actors.ActorManager").setAndRunRootActor(actorSceneMain, "FADE", 1)
+                    WebSocketManager.setOwner(actorSceneMain:getModel())
+                    ActorManager.setAndRunRootActor(actorSceneMain, "FADE", 1)
                 end)
                 :setEnabled(true)
         end,
     }
+
+    self.m_ItemQuit = item
 end
 
-local function initWithItemQuitWar(model, item)
-    model.m_ItemQuitWar = item
+local function initItemSurrender(self)
+    local item = {
+        name     = "Surrender",
+        callback = function()
+            self.m_ModelConfirmBox:setConfirmText("You will lose the game by surrendering!\nAre you sure?")
+                :setOnConfirmYes(function()
+                    self.m_ModelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name       = "EvtPlayerRequestDoAction",
+                        actionName = "Surrender",
+                    })
+                end)
+                :setEnabled(true)
+        end,
+    }
+
+    self.m_ItemSurrender = item
 end
 
---------------------------------------------------------------------------------
--- The end turn menu item.
---------------------------------------------------------------------------------
-local function createItemEndTurn(self)
-    return {
+local function initItemEndTurn(self)
+    local item = {
         name     = "End Turn",
         callback = function()
             self.m_ModelConfirmBox:setConfirmText("You are ending your turn, with some units unactioned.\nAre you sure?")
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerRequestDoAction", actionName = "EndTurn"})
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name       = "EvtPlayerRequestDoAction",
+                        actionName = "EndTurn"
+                    })
                 end)
                 :setEnabled(true)
         end,
     }
+
+    self.m_ItemEndTurn = item
 end
 
-local function initWithItemEndTurn(model, item)
-    model.m_ItemEndTurn = item
+local function generateItems(self)
+    local items = {self.m_ItemQuit}
+    if (self.m_IsPlayerInTurn) then
+        items[#items + 1] = self.m_ItemSurrender
+        items[#items + 1] = self.m_ItemEndTurn
+    end
+
+    return items
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
-    initWithItemQuitWar(self, createItemQuitWar(self))
-    initWithItemEndTurn(self, createItemEndTurn(self))
+    initItemQuit(     self)
+    initItemSurrender(self)
+    initItemEndTurn(  self)
 
     if (self.m_View) then
         self:initView()
@@ -83,9 +119,7 @@ function ModelWarCommandMenu:initView()
     local view = self.m_View
     assert(view, "ModelWarCommandMenu:initView() no view is attached to the actor of the model.")
 
-    view:removeAllItems()
-        :createAndPushBackViewItem(self.m_ItemQuitWar)
-        :createAndPushBackViewItem(self.m_ItemEndTurn)
+    view:setItems(self.m_ItemQuit, self.m_ItemEndTurn)
 
     return self
 end
@@ -100,14 +134,30 @@ end
 
 function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarCommandMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
+
     self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtPlayerIndexUpdated", self)
 
     return self
 end
 
 function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
     self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public callback function on script events.
+--------------------------------------------------------------------------------
+function ModelWarCommandMenu:onEvent(event)
+    local eventName = event.name
+    if (eventName == "EvtPlayerIndexUpdated") then
+        onEvtPlayerIndexUpdated(self, event)
+    end
 
     return self
 end
@@ -117,6 +167,10 @@ end
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:setEnabled(enabled)
     if (self.m_View) then
+        if (enabled) then
+            self.m_View:setItems(generateItems(self))
+        end
+
         self.m_View:setEnabled(enabled)
     end
 

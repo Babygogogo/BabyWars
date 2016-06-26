@@ -34,84 +34,161 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function isPlayerInTurn(self)
-    local playerIndex = self:getModelTurnManager():getPlayerIndex()
-    local modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex)
+local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
+    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
-    return modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
+        .setOwner(modelSceneMain)
+    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
-local function updateMessageIndicatorWithIsPlayerInTurn(modelMessageIndicator, isInTurn)
-    if (isInTurn) then
-        modelMessageIndicator:hidePersistentMessage()
-    else
-        modelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
-    end
+local function callbackOnWarEnded()
+    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
 end
 
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
 local function doActionLogout(self, event)
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
-        confirmText = event.message
-    })
-    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
-
-    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-        .setOwner(modelSceneMain)
-    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
-end
-
-local function doActionBeginTurn(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelTurnManager():doActionBeginTurn()
-        updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn(self))
-    end
-end
-
-local function doActionEndTurn(self, action)
-    if (action.fileName == self.m_FileName) then
-        local modelTurnManager = self:getModelTurnManager()
-        modelTurnManager:doActionEndTurn()
-
-        local isPlayerInTurn = isPlayerInTurn(self)
-        if (isPlayerInTurn) then
-            modelTurnManager:runTurn()
-        end
-        updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn)
-    end
-end
-
-local function doActionWait(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionWait(action)
-    end
-end
-
-local function doActionAttack(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionAttack(action)
-    end
-end
-
-local function doActionCapture(self, action)
-    if (action.fileName == self.m_FileName) then
-        self:getModelWarField():doActionCapture(action)
-    end
-end
-
-local function doActionProduceOnTile(self, action)
-    if (action.fileName == self.m_FileName) then
-        action.playerIndex = self:getModelTurnManager():getPlayerIndex()
-
-        self:getModelPlayerManager():doActionProduceOnTile(action)
-        self:getModelWarField():doActionProduceOnTile(action)
-    end
+    runSceneMain({confirmText = event.message})
 end
 
 local function doActionMessage(self, action)
     self:getModelMessageIndicator():showMessage(action.message)
+end
+
+local function doActionBeginTurn(self, action)
+    local modelTurnManager = self:getModelTurnManager()
+    local lostPlayerIndex  = action.lostPlayerIndex
+
+    if (lostPlayerIndex) then
+        local modelWarField      = self:getModelWarField()
+        local modelPlayerManager = self:getModelPlayerManager()
+        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnEnterTurnPhaseMain = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+            lostModelPlayer:setAlive(false)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                else
+                    modelTurnManager:endTurn()
+                        :runTurn()
+                end
+            end
+        end
+    end
+
+    modelTurnManager:doActionBeginTurn(action)
+end
+
+local function doActionEndTurn(self, action)
+    self:getModelTurnManager():doActionEndTurn(action)
+end
+
+local function doActionSurrender(self, action)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
+    modelPlayerManager:doActionSurrender(action)
+    modelTurnManager:doActionSurrender(action)
+    self:getModelWarField():doActionSurrender(action)
+
+    local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
+    if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+        self.m_IsWarEnded = true
+        self.m_View:showEffectSurrender(callbackOnWarEnded)
+    else
+        self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " surrendered!")
+
+        if (modelPlayerManager:getAlivePlayersCount() == 1) then
+            self.m_IsWarEnded = true
+            self.m_View:showEffectWin(callbackOnWarEnded)
+        else
+            modelTurnManager:runTurn()
+        end
+    end
+end
+
+local function doActionWait(self, action)
+    self:getModelWarField():doActionWait(action)
+end
+
+local function doActionAttack(self, action)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
+    local modelWarField      = self:getModelWarField()
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (lostPlayerIndex) then
+        local currentPlayerIndex = modelTurnManager:getPlayerIndex()
+        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnAttackAnimationEnded = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                elseif (lostPlayerIndex == currentPlayerIndex) then
+                    modelTurnManager:runTurn()
+                end
+            end
+        end
+    end
+
+    modelWarField:doActionAttack(action)
+    modelPlayerManager:doActionAttack(action)
+    modelTurnManager:doActionAttack(action)
+end
+
+local function doActionCapture(self, action)
+    local modelWarField      = self:getModelWarField()
+    local modelPlayerManager = self:getModelPlayerManager()
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (lostPlayerIndex) then
+        local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        action.callbackOnCaptureAnimationEnded = function()
+            modelWarField:clearPlayerForce(lostPlayerIndex)
+
+            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+                self.m_IsWarEnded = true
+                self.m_View:showEffectLose(callbackOnWarEnded)
+            else
+                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+                if (modelPlayerManager:getAlivePlayersCount() == 1) then
+                    self.m_IsWarEnded = true
+                    self.m_View:showEffectWin(callbackOnWarEnded)
+                end
+            end
+        end
+    end
+
+    modelWarField:doActionCapture(action)
+    modelPlayerManager:doActionCapture(action)
+end
+
+local function doActionProduceOnTile(self, action)
+    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
+
+    self:getModelPlayerManager():doActionProduceOnTile(action)
+    self:getModelWarField():doActionProduceOnTile(action)
 end
 
 --------------------------------------------------------------------------------
@@ -120,25 +197,31 @@ end
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
     if (actionName == "Logout") then
-        doActionLogout(self, event)
-    elseif (actionName == "BeginTurn") then
-        doActionBeginTurn(self, event)
-    elseif (actionName == "EndTurn") then
-        doActionEndTurn(self, event)
-    elseif (actionName == "Wait") then
-        doActionWait(self, event)
-    elseif (actionName == "Attack") then
-        doActionAttack(self, event)
-    elseif (actionName == "Capture") then
-        doActionCapture(self, event)
-    elseif (actionName == "ProduceOnTile") then
-        doActionProduceOnTile(self, event)
+        return doActionLogout(self, event)
     elseif (actionName == "Message") then
-        doActionMessage(self, event)
+        return doActionMessage(self, event)
     elseif (actionName == "Error") then
-        error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
+        return error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
+    end
+
+    if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
+        return
+    elseif (actionName == "BeginTurn") then
+        return doActionBeginTurn(self, event)
+    elseif (actionName == "EndTurn") then
+        return doActionEndTurn(self, event)
+    elseif (actionName == "Surrender") then
+        return doActionSurrender(self, event)
+    elseif (actionName == "Wait") then
+        return doActionWait(self, event)
+    elseif (actionName == "Attack") then
+        return doActionAttack(self, event)
+    elseif (actionName == "Capture") then
+        return doActionCapture(self, event)
+    elseif (actionName == "ProduceOnTile") then
+        return doActionProduceOnTile(self, event)
     else
-        print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
+        return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
 end
 
@@ -194,6 +277,12 @@ local function initScriptEventDispatcher(self)
     self.m_ScriptEventDispatcher = dispatcher
 end
 
+local function initActorMessageIndicator(self)
+    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
+
+    self.m_ActorMessageIndicator = actor
+end
+
 local function initActorPlayerManager(self, playersData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
@@ -221,6 +310,7 @@ local function initActorTurnManager(self, turnData)
     actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
         :setModelWarField(self.m_ActorWarField:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelMessageIndicator(self:getModelMessageIndicator())
 
     self.m_ActorTurnManager = actor
 end
@@ -231,26 +321,22 @@ local function initActorWeatherManager(self, weatherData)
     self.m_ActorWeatherManager = actor
 end
 
-local function initActorMessageIndicator(self)
-    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
-
-    self.m_ActorMessageIndicator = actor
-end
-
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
 
-    self.m_FileName = sceneData.fileName
+    self.m_FileName   = sceneData.fileName
+    self.m_IsWarEnded = sceneData.isEnded
+
     initScriptEventDispatcher(self)
+    initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
     initActorWarField(        self, sceneData.warField)
     initActorWarHud(          self)
     initActorTurnManager(     self, sceneData.turn)
     initActorWeatherManager(  self, sceneData.weather)
-    initActorMessageIndicator(self)
 
     if (self.m_View) then
         self:initView()
@@ -302,19 +388,21 @@ end
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
+    local playerIndex = self:getModelTurnManager():getPlayerIndex()
     self.m_ScriptEventDispatcher:dispatchEvent({
-            name = "EvtModelWeatherUpdated",
+            name         = "EvtModelWeatherUpdated",
             modelWeather = self:getModelWeatherManager():getCurrentWeather()
         })
         :dispatchEvent({
             name = "EvtSceneWarStarted",
         })
+        :dispatchEvent({
+            name        = "EvtPlayerIndexUpdated",
+            playerIndex = playerIndex,
+            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
+        })
 
-    local isPlayerInTurn = isPlayerInTurn(self)
-    if (isPlayerInTurn) then
-        self:getModelTurnManager():runTurn()
-    end
-    updateMessageIndicatorWithIsPlayerInTurn(self:getModelMessageIndicator(), isPlayerInTurn)
+    self:getModelTurnManager():runTurn()
 
     return self
 end

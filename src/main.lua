@@ -13,15 +13,15 @@
 --   - 这个文件用到了游戏引擎的功能，因此服务器上的程序需要另写一个入口函数。
 --]]--------------------------------------------------------------------------------
 
+local fileUtils = cc.FileUtils:getInstance()
+fileUtils:setPopupNotify(false)
+fileUtils:addSearchPath("src/")
+fileUtils:addSearchPath("res/")
+
 require "config"
 require "cocos.init"
 
 local function main()
-    local fileUtils = cc.FileUtils:getInstance()
-    fileUtils:setPopupNotify(false)
-    fileUtils:addSearchPath("src/")
-    fileUtils:addSearchPath("res/")
-
     display.loadSpriteFrames("BabyWarsTextureTile.plist",    "BabyWarsTextureTile.png")
     display.loadSpriteFrames("BabyWarsTextureUnit.plist",    "BabyWarsTextureUnit.png")
     display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.png")

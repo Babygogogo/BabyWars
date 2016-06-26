@@ -14,19 +14,17 @@ local ModelMoneyEnergyInfo = class("ModelMoneyEnergyInfo")
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseBeginning(self, event)
+local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndex = event.playerIndex
 
     if (self.m_View) then
-        self.m_View:setFund(event.modelPlayer:getFund())
-            :setEnergy(event.modelPlayer:getEnergy())
+        self.m_View:updateWithModelPlayer(event.modelPlayer)
     end
 end
 
 local function onEvtModelPlayerUpdated(self, event)
     if ((self.m_PlayerIndex == event.playerIndex) and (self.m_View)) then
-        self.m_View:setFund(event.modelPlayer:getFund())
-            :setEnergy(event.modelPlayer:getEnergy())
+        self.m_View:updateWithModelPlayer(event.modelPlayer)
     end
 end
 
@@ -61,8 +59,7 @@ function ModelMoneyEnergyInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelMoneyEnergyInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseBeginning", self)
-        :addEventListener("EvtTurnPhaseMain",      self)
+    dispatcher:addEventListener("EvtPlayerIndexUpdated", self)
         :addEventListener("EvtModelPlayerUpdated", self)
 
     return self
@@ -72,8 +69,7 @@ function ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtModelPlayerUpdated", self)
-        :removeEventListener("EvtTurnPhaseMain",      self)
-        :removeEventListener("EvtTurnPhaseBeginning", self)
+        :removeEventListener("EvtPlayerIndexUpdated", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -84,9 +80,8 @@ end
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtTurnPhaseBeginning") or
-        (eventName == "EvtTurnPhaseMain")) then
-        onEvtTurnPhaseBeginning(self, event)
+    if (eventName == "EvtPlayerIndexUpdated") then
+        onEvtPlayerIndexUpdated(self, event)
     elseif (eventName == "EvtModelPlayerUpdated") then
         onEvtModelPlayerUpdated(self, event)
     end

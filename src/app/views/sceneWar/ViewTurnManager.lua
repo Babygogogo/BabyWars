@@ -89,11 +89,13 @@ local function createBeginTurnEffectTouchListener(effect)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
+    --[[
     listener:registerScriptHandler(function(touch, event)
         if ((effect.m_IsMoveInFinished) and (not effect.m_IsMoveOutStarted)) then
             effect:runAction(createBeginTurnEffectMoveOutAction(effect))
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
+    --]]
 
     return listener
 end

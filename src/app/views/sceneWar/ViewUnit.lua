@@ -254,7 +254,8 @@ function ViewUnit:showMovingAnimation()
 end
 
 function ViewUnit:moveAlongPath(path, callbackOnFinish)
-    self:runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
+    self:showMovingAnimation()
+        :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
 
     return self
 end

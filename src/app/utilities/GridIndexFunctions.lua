@@ -40,7 +40,7 @@ function GridIndexFunctions.worldPosToGridIndexInNode(worldPos, node)
 end
 
 function GridIndexFunctions.isEqual(index1, index2)
-    return (index1.x == index2.x) and (index1.y == index2.y)
+    return (index1) and (index2) and (index1.x == index2.x) and (index1.y == index2.y)
 end
 
 function GridIndexFunctions.isAdjacent(index1, index2)

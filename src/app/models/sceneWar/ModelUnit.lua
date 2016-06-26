@@ -179,6 +179,24 @@ function ModelUnit:toStringList(spaces)
     return strList
 end
 
+function ModelUnit:toSerializableTable()
+    local t = {}
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.toSerializableTable) then
+            t[name] = component:toSerializableTable()
+        end
+    end
+
+    t.tiledID = self:getTiledID()
+    t.unitID  = self:getUnitId()
+    local state = self:getState()
+    if (state ~= "idle") then
+        t.state = state
+    end
+
+    return t
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
@@ -186,6 +204,105 @@ function ModelUnit:onEvent(event)
     local name = event.name
     if (name == "EvtTurnPhaseResetUnitState") then
         onEvtTurnPhaseResetUnitState(self, event)
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelUnit:doActionWait(action)
+    self:setStateActioned()
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionWait) then
+            component:doActionWait(action)
+        end
+    end
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionAttack(action, isAttacker)
+    if (isAttacker) then
+        self:setStateActioned()
+    end
+
+    local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
+    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionAttack) then
+            component:doActionAttack(action, isAttacker)
+        end
+    end
+
+    if ((self.m_View) and (isAttacker)) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            if (action.target.updateView) then
+                action.target:updateView()
+            end
+
+            if (shouldDestroyAttacker) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+            elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
+                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
+            end
+
+            if (shouldDestroyTarget) then
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                end
+            else
+                if (action.targetType == "unit") then
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
+                else
+                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
+                end
+            end
+
+            if (action.callbackOnAttackAnimationEnded) then
+                action.callbackOnAttackAnimationEnded()
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionCapture(action)
+    self:setStateActioned()
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionCapture) then
+            component:doActionCapture(action)
+        end
+    end
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            action.nextTarget:updateView()
+
+            if (action.callbackOnCaptureAnimationEnded) then
+                action.callbackOnCaptureAnimationEnded()
+            end
+        end)
     end
 
     return self
@@ -258,101 +375,6 @@ end
 
 function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
-end
-
---------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelUnit:doActionWait(action)
-    self:setStateActioned()
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionWait) then
-            component:doActionWait(action)
-        end
-    end
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionAttack(action, isAttacker)
-    if (isAttacker) then
-        self:setStateActioned()
-    end
-
-    local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionAttack) then
-            component:doActionAttack(action, isAttacker)
-        end
-    end
-
-    rootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = self})
-
-    if ((self.m_View) and (isAttacker)) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-
-            if (action.target.updateView) then
-                action.target:updateView()
-            end
-
-            if (shouldDestroyAttacker) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
-            elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
-            end
-
-            if (shouldDestroyTarget) then
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
-                else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
-                end
-            else
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
-                else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
-                end
-            end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionCapture(action)
-    self:setStateActioned()
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionCapture) then
-            component:doActionCapture(action)
-        end
-    end
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            action.nextTarget:updateView()
-        end)
-    end
-
-    return self
 end
 
 return ModelUnit

@@ -51,6 +51,8 @@ local TILE_UNIT_INDEXES    = {}
 local FATAL_DAMAGE     = 90
 local EFFECTIVE_DAMAGE = 50
 
+local s_IsInitialized = false
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -137,8 +139,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function GameConstantFunctions.init()
-    initTileUnitIndexes()
-    initUnitAttackAndDefenseList()
+    if (not s_IsInitialized) then
+        s_IsInitialized = true
+
+        initTileUnitIndexes()
+        initUnitAttackAndDefenseList()
+    end
 end
 
 function GameConstantFunctions.getGameVersion()

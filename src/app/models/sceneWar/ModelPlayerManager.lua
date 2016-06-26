@@ -25,7 +25,7 @@ local TableFunctions = require("app.utilities.TableFunctions")
 --------------------------------------------------------------------------------
 local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
     local units = {}
-    modelUnitMap:forEachModelUnit(function(modelUnit)
+    modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
             if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
@@ -55,7 +55,7 @@ local function serializeModelPlayersToStringList(self, spaces)
     local strList = {}
     local appendList = TableFunctions.appendList
 
-    for _, modelPlayer in ipairs(self.m_Players) do
+    for _, modelPlayer in ipairs(self.m_ModelPlayers) do
         appendList(strList, modelPlayer:toStringList(spaces), ",\n")
     end
 
@@ -85,7 +85,7 @@ end
 local function onEvtTurnPhaseRepairUnit(self, event)
     local modelTileMap    = event.modelTileMap
     local playerIndex     = event.playerIndex
-    local modelPlayer     = self.m_Players[playerIndex]
+    local modelPlayer     = self.m_ModelPlayers[playerIndex]
     local eventDispatcher = self.m_RootScriptEventDispatcher
     for _, unit in ipairs(getRepairableModelUnits(event.modelUnitMap, modelTileMap, playerIndex)) do
         local repairAmount, repairCost = modelTileMap:getModelTile(unit:getGridIndex()):getRepairAmountAndCost(unit, modelPlayer)
@@ -108,9 +108,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:ctor(param)
-    self.m_Players = {}
+    self.m_ModelPlayers = {}
     for i, player in ipairs(param) do
-        self.m_Players[i] = ModelPlayer:create(player)
+        self.m_ModelPlayers[i] = ModelPlayer:create(player)
     end
 
     return self
@@ -175,6 +175,22 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelPlayerManager:doActionAttack(action)
+    if (action.lostPlayerIndex) then
+        self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
+    end
+
+    return self
+end
+
+function ModelPlayerManager:doActionCapture(action)
+    if (action.lostPlayerIndex) then
+        self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
+    end
+
+    return self
+end
+
 function ModelPlayerManager:doActionProduceOnTile(action)
     local playerIndex = action.playerIndex
     local modelPlayer = self:getModelPlayer(action.playerIndex)
@@ -185,19 +201,46 @@ function ModelPlayerManager:doActionProduceOnTile(action)
     return self
 end
 
+function ModelPlayerManager:doActionSurrender(action)
+    self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:getModelPlayer(playerIndex)
-    return self.m_Players[playerIndex]
+    return self.m_ModelPlayers[playerIndex]
 end
 
 function ModelPlayerManager:getPlayersCount()
-    return #self.m_Players
+    return #self.m_ModelPlayers
+end
+
+function ModelPlayerManager:getAlivePlayersCount()
+    local count = 0
+    for _, modelPlayer in ipairs(self.m_ModelPlayers) do
+        if (modelPlayer:isAlive()) then
+            count = count + 1
+        end
+    end
+
+    return count
+end
+
+function ModelPlayerManager:getModelPlayerWithAccount(account)
+    for playerIndex, modelPlayer in ipairs(self.m_ModelPlayers) do
+        if (modelPlayer:getAccount() == account) then
+            return modelPlayer, playerIndex
+        end
+    end
+
+    return nil, nil
 end
 
 function ModelPlayerManager:forEachModelPlayer(func)
-    for playerIndex, modelPlayer in ipairs(self.m_Players) do
+    for playerIndex, modelPlayer in ipairs(self.m_ModelPlayers) do
         func(modelPlayer, playerIndex)
     end
 

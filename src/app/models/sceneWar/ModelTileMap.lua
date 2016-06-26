@@ -35,13 +35,15 @@ local TypeChecker        = require("app.utilities.TypeChecker")
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local TableFunctions     = require("app.utilities.TableFunctions")
 
+local TEMPLATE_WAR_FIELD_PATH = "data.templateWarField."
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function requireMapData(param)
     local t = type(param)
     if (t == "string") then
-        return require("data.templateWarField." .. param)
+        return require(TEMPLATE_WAR_FIELD_PATH .. param)
     elseif (t == "table") then
         return param
     else
@@ -121,11 +123,14 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerMovedCursor(self, event)
+local function onEvtMapCursorMoved(self, event)
     local modelTile = self:getModelTile(event.gridIndex)
-    assert(modelTile, "ModelTileMap-onEvtPlayerMovedCursor() failed to get the tile model with event.gridIndex.")
+    assert(modelTile, "ModelTileMap-onEvtMapCursorMoved() failed to get the tile model with event.gridIndex.")
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPlayerTouchTile", modelTile = modelTile})
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtPreviewModelTile",
+        modelTile = modelTile
+    })
 end
 
 local function onEvtDestroyModelTile(self, event)
@@ -200,9 +205,9 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelTile", self)
-        :addEventListener("EvtDestroyViewTile",    self)
-        :addEventListener("EvtPlayerMovedCursor",  self)
-        :addEventListener("EvtPlayerSelectedGrid", self)
+        :addEventListener("EvtDestroyViewTile", self)
+        :addEventListener("EvtMapCursorMoved",  self)
+        :addEventListener("EvtGridSelected",    self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -214,10 +219,10 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerSelectedGrid", self)
-        :removeEventListener("EvtPlayerMovedCursor",  self)
-        :removeEventListener("EvtDestroyViewTile",    self)
-        :removeEventListener("EvtDestroyModelTile",   self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtGridSelected", self)
+        :removeEventListener("EvtMapCursorMoved",   self)
+        :removeEventListener("EvtDestroyViewTile",  self)
+        :removeEventListener("EvtDestroyModelTile", self)
     self.m_RootScriptEventDispatcher = nil
 
     self:forEachModelTile(function(modelTile)
@@ -259,14 +264,54 @@ end
 --------------------------------------------------------------------------------
 function ModelTileMap:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtPlayerMovedCursor") or
-        (eventName == "EvtPlayerSelectedGrid")) then
-        onEvtPlayerMovedCursor(self, event)
+    if ((eventName == "EvtMapCursorMoved") or
+        (eventName == "EvtGridSelected")) then
+        onEvtMapCursorMoved(self, event)
     elseif (eventName == "EvtDestroyModelTile") then
         onEvtDestroyModelTile(self, event)
     elseif (eventName == "EvtDestroyViewTile") then
         onEvtDestroyViewTile(self, event)
     end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelTileMap:doActionSurrender(action)
+    local lostPlayerIndex = action.lostPlayerIndex
+    self:forEachModelTile(function(modelTile)
+        if (modelTile:getPlayerIndex() == lostPlayerIndex) then
+            modelTile:doActionSurrender(action)
+        end
+    end)
+
+    for _, gridIndex in ipairs(action.lostUnitGridIndexes) do
+        self:getModelTile(gridIndex):doActionSurrender(action)
+    end
+
+    return self
+end
+
+function ModelTileMap:doActionAttack(action)
+    self:getModelTile(action.path[1]):doActionAttack(action, false)
+    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
+
+    return self
+end
+
+function ModelTileMap:doActionCapture(action)
+    if (action.prevTarget) then
+        action.prevTarget:doActionCapture(action)
+    end
+    action.nextTarget:doActionCapture(action)
+
+    return self
+end
+
+function ModelTileMap:doActionWait(action)
+    self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
 end
@@ -298,28 +343,6 @@ function ModelTileMap:forEachModelTile(func)
             func(self.m_ActorTilesMap[x][y]:getModel())
         end
     end
-
-    return self
-end
-
-function ModelTileMap:doActionAttack(action)
-    self:getModelTile(action.path[1]):doActionAttack(action, false)
-    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
-
-    return self
-end
-
-function ModelTileMap:doActionCapture(action)
-    if (action.prevTarget) then
-        action.prevTarget:doActionCapture(action)
-    end
-    action.nextTarget:doActionCapture(action)
-
-    return self
-end
-
-function ModelTileMap:doActionWait(action)
-    self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
 end

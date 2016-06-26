@@ -34,10 +34,10 @@ local function doActionLogin(self, action)
 end
 
 local function doActionLogout(self, event)
-    local modelSceneMain = Actor.createModel("ModelSceneMain", {
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
         confirmText = event.message
     })
-    local viewSceneMain  = Actor.createView("ViewSceneMain")
+    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
     WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
         .setOwner(modelSceneMain)
