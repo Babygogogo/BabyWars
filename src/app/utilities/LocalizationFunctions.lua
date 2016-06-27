@@ -10,7 +10,7 @@ local s_LongText1_1 = [[
 首先，您需要通过主菜单的“注册/登陆”功能连接到游戏（若您曾经成功登陆过，则游戏会尝试自动登陆--暂未完成）。成功后，主菜单将出现新的选项，您可以通过它们来进入战局。
 
 自行建立战局-开战的流程：
-1. 通过“新战局”选项创建新的战局。在里面，您可以随意选择模式（天梯或自由战斗）、地图、回合顺序、密码等多种设定。
+1. 通过“新建战局”选项创建新的战局。在里面，您可以随意选择模式（天梯或自由战斗）、地图、回合顺序、密码等多种设定。
 2. 耐心等待他人加入您所创建的战局（满员前，您无法进入战局）。
 3. 当战局满员后，您可以进入“继续”选项，里面将出现该战局（未满员时，该战局将*不会*出现！）。点击相应选项即可进入战局。
 
@@ -64,7 +64,7 @@ local s_Texts = {
         [2] = function(...) return "Main Menu" end,
     },
     [2] = {
-        [1] = function(...) return "新 战 局"  end,
+        [1] = function(...) return "新 建 战 局"  end,
         [2] = function(...) return "New Game" end,
     },
     [3] = {
@@ -190,6 +190,70 @@ local s_Texts = {
     [32] = {
         [1] = function(err) return "与服务器的连接出现错误：" .. err .. "\n正在尝试重新连接…"                end,
         [2] = function(err) return "Connection lost with error: " .. param.error .. "Now reconnecting..." end,
+    },
+    [33] = {
+        [1] = function() return "下 一 步" end,
+        [2] = function() return "Next"  end,
+    },
+    [34] = {
+        [1] = function() return "行 动 次 序"  end,
+        [2] = function() return "Player Index" end,
+    },
+    [35] = {
+        [1] = function() return "战 争 迷 雾" end,
+        [2] = function() return "Fog of War" end,
+    },
+    [36] = {
+        [1] = function() return "天 气"   end,
+        [2] = function() return "Weather" end,
+    },
+    [37] = {
+        [1] = function() return "技 能 配 置" end,
+        [2] = function() return "Skills"     end,
+    },
+    [38] = {
+        [1] = function() return "技 能 点 上 限"    end,
+        [2] = function() return "Max Skill Points" end,
+    },
+    [39] = {
+        [1] = function() return "密 码（可 选）"       end,
+        [2] = function() return "Password (optional)" end,
+    },
+    [40] = {
+        [1] = function() return "正 常" end,
+        [2] = function() return "Clear" end,
+    },
+    [41] = {
+        [1] = function() return "随 机"  end,
+        [2] = function() return "Random" end,
+    },
+    [42] = {
+        [1] = function() return "雨 天" end,
+        [2] = function() return "Rainy" end,
+    },
+    [43] = {
+        [1] = function() return "雪 天" end,
+        [2] = function() return "Snowy" end,
+    },
+    [44] = {
+        [1] = function() return "沙 尘 暴" end,
+        [2] = function() return "Sandy"    end,
+    },
+    [45] = {
+        [1] = function() return "暂 不 可 用"  end,
+        [2] = function() return "Unavailable" end,
+    },
+    [46] = {
+        [1] = function() return "确 认"   end,
+        [2] = function() return "Confirm" end,
+    },
+    [47] = {
+        [1] = function() return "留空或4位数字"        end,
+        [2] = function() return "input 0 or 4 digits" end,
+    },
+    [48] = {
+        [1] = function() return "作者："   end,
+        [2] = function() return "Author: " end,
     },
 }
 

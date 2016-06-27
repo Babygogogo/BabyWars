@@ -24,7 +24,7 @@ local FONT_COLOR          = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR  = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH  = 2
 local TITLE_FONT_SIZE     = 20
-local INDICATOR_FONT_SIZE = 28
+local INDICATOR_FONT_SIZE = 32
 
 local OPTION_INDICATOR_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
@@ -97,6 +97,7 @@ local function initOptionIndicator(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(OPTION_INDICATOR_POS_X, OPTION_INDICATOR_POS_Y)
 
+        :setOpacity(180)
         :setZoomScale(0)
 
         :setTitleFontName(FONT_NAME)
@@ -115,9 +116,6 @@ end
 function ViewOptionSelector:ctor()
     self:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-
-        :setOpacity(180)
-        :setCascadeOpacityEnabled(true)
 
     initArrowLeft(self)
     initArrowRight(self)

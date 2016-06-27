@@ -40,20 +40,18 @@ function ModelOptionSelector:setButtonsEnabled(enabled)
 end
 
 function ModelOptionSelector:setOptions(options)
-    assert(#options > 0, "ModelOptionSelector:setOptions() the param is expected to be a non-empty array of strings.")
-
     self.m_OptionIndex = 1
     self.m_Options     = options
 
     if (self.m_View) then
-        self.m_View:setOptionText(options[1])
+        self.m_View:setOptionText(options[1].text)
     end
 
     return self
 end
 
 function ModelOptionSelector:getCurrentOption()
-    return (self.m_Options) and (self.m_Options[self.m_OptionIndex]) or nil
+    return (self.m_Options) and (self.m_Options[self.m_OptionIndex].data) or nil
 end
 
 function ModelOptionSelector:onButtonPrevTouched()
@@ -61,7 +59,7 @@ function ModelOptionSelector:onButtonPrevTouched()
         self.m_OptionIndex = getPrevOptionIndex(self.m_Options, self.m_OptionIndex)
 
         if (self.m_View) then
-            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex])
+            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex].text)
         end
     end
 
@@ -73,7 +71,7 @@ function ModelOptionSelector:onButtonNextTouched()
         self.m_OptionIndex = getNextOptionIndex(self.m_Options, self.m_OptionIndex)
 
         if (self.m_View) then
-            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex])
+            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex].text)
         end
     end
 

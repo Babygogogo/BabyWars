@@ -1,5 +1,5 @@
 return {
-  warFieldName = "Equal Island",
+  warFieldName = "对 称 岛 屿",
   authorName   = "Intelligent Systems",
   playersCount = 2,
 

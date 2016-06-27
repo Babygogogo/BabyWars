@@ -1,8 +1,9 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
-local Actor        = require("global.actors.Actor")
-local WarFieldList = require("res.data.templateWarField.WarFieldList")
+local Actor                 = require("global.actors.Actor")
+local WarFieldList          = require("res.data.templateWarField.WarFieldList")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -12,24 +13,32 @@ local function configModelWarConfigurator(model, warFieldFileName)
     model:setWarFieldFileName(warFieldFileName)
         :setEnabled(true)
 
-    local availablePlayerIndexes = {}
+    local playerIndexOptions = {}
     for i = 1, warField.playersCount do
-        availablePlayerIndexes[i] = i
+        playerIndexOptions[i] = {data = i, text = "" .. i}
     end
     model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
-        :setOptions(availablePlayerIndexes)
+        :setOptions(playerIndexOptions)
 
     model:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
-        :setOptions({"off"})
+        :setOptions({
+            {data = false, text = LocalizationFunctions.getLocalizedText(29),},
+        })
 
     model:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
-        :setOptions({"clear"})
+        :setOptions({
+            {data = "clear", text = LocalizationFunctions.getLocalizedText(40),},
+        })
 
     model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
-        :setOptions({"Unavailable"})
+        :setOptions({
+            {data = 1, text = LocalizationFunctions.getLocalizedText(45),},
+        })
 
     model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
-        :setOptions({"Unavailable"})
+        :setOptions({
+            {data = 100, text = LocalizationFunctions.getLocalizedText(45),},
+        })
 end
 
 --------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 return {
-  warFieldName = "Plug Mountain",
+  warFieldName = "插 座 山 脉",
   authorName   = "Babygogogo",
   playersCount = 2,
 

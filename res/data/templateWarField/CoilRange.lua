@@ -1,5 +1,5 @@
 return {
-  warFieldName = "Coil Range",
+  warFieldName = "线 圈 山 脉",
   authorName   = "Babygogogo",
   playersCount = 4,
 

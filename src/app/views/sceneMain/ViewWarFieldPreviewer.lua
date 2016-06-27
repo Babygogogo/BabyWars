@@ -1,6 +1,8 @@
 
 local ViewWarFieldPreviewer = class("ViewWarFieldPreviewer", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
 
 local BACKGROUND_POS_X  = 30 + 250 + 30 -- These numbers are the width/posX of the menu of the JoinWarSelector.
@@ -114,7 +116,7 @@ function ViewWarFieldPreviewer:setViewTileMap(view, mapSize)
 end
 
 function ViewWarFieldPreviewer:setAuthorName(name)
-    self.m_LabelAuthorName:setString("Author: " .. name)
+    self.m_LabelAuthorName:setString(LocalizationFunctions.getLocalizedText(48) .. name)
 
     return self
 end
