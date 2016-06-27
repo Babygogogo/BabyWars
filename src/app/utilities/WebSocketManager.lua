@@ -2,9 +2,9 @@
 local WebSocketManager = {}
 
 --[[
-local SERVER_URL = "localhost:19297/BabyWars"
---]]
 local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
+--]]
+local SERVER_URL = "localhost:19297/BabyWars"
 
 local s_Socket ,s_Owner
 local s_Account, s_Password

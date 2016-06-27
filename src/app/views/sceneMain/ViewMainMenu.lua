@@ -1,30 +1,33 @@
 
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
 local LOGIN_PANEL_Z_ORDER            = 3
+local GAME_HELPER_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
 local MENU_LIST_VIEW_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER        = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
 local MENU_BACKGROUND_HEIGHT = display.height - 60
-local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50
-local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT      = 40
+local MENU_BACKGROUND_POS_X  = 30
+local MENU_BACKGROUND_POS_Y  = 30
 
-local MENU_BACKGROUND_POS_X = 30
-local MENU_BACKGROUND_POS_Y = 30
+local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT     = 45
+local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - 7
+local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE  = 35
+
+local MENU_LIST_VIEW_WIDTH  = MENU_BACKGROUND_WIDTH - 10
+local MENU_LIST_VIEW_HEIGHT = MENU_BACKGROUND_HEIGHT - 14 - 50
 local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
 local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6
-local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
-
-local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
-local MENU_TITLE_FONT_SIZE  = 28
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 45
@@ -85,15 +88,13 @@ local function initMenuListView(self)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
         :setItemsMargin(15)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
-        :setCascadeOpacityEnabled(true)
-        :setOpacity(180)
 
     self.m_MenuListView = listView
     self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Main Menu", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -103,8 +104,6 @@ local function initMenuTitle(self)
 
         :setTextColor(MENU_TITLE_FONT_COLOR)
         :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
-
-        :setOpacity(180)
 
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
@@ -149,6 +148,14 @@ function ViewMainMenu:setViewLoginPanel(view)
     assert(self.m_ViewLoginPanel == nil, "ViewMainMenu:setViewLoginPanel() the view has been set.")
     self.m_ViewLoginPanel = view
     self:addChild(view, LOGIN_PANEL_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewGameHelper(view)
+    assert(self.m_ViewGameHelper == nil, "ViewMainMenu:setViewGameHelper() the view has been set.")
+    self.m_ViewGameHelper = view
+    self:addChild(view, GAME_HELPER_Z_ORDER)
 
     return self
 end

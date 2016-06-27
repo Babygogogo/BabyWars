@@ -1,7 +1,8 @@
 
 local ModelMainMenu = class("ModelMainMenu")
 
-local Actor = require("global.actors.Actor")
+local Actor                 = require("global.actors.Actor")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -81,12 +82,24 @@ local function getActorLoginPanel(self)
     return self.m_ActorLoginPanel
 end
 
+local function getActorGameHelper(self)
+    if (not self.m_ActorGameHelper) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelGameHelper", nil, "sceneMain.ViewGameHelper")
+        actor:getModel():setModelMainMenu(self)
+
+        self.m_ActorGameHelper = actor
+        self.m_View:setViewGameHelper(actor:getView())
+    end
+
+    return self.m_ActorGameHelper
+end
+
 --------------------------------------------------------------------------------
 -- The composition menu items.
 --------------------------------------------------------------------------------
 local function initItemNewWar(self)
     local item = {
-        name = "New Game",
+        name = LocalizationFunctions.getLocalizedText(2),
         callback = function()
             self:setMenuEnabled(false)
             getActorNewWarCreator(self):getModel():setEnabled(true)
@@ -98,7 +111,7 @@ end
 
 local function initItemContinue(self)
     local item = {
-        name     = "Continue",
+        name     = LocalizationFunctions.getLocalizedText(3),
         callback = function()
             self:setMenuEnabled(false)
             getActorContinueWarSelector(self):getModel():setEnabled(true)
@@ -110,7 +123,7 @@ end
 
 local function initItemJoinWar(self)
     local item = {
-        name     = "Join",
+        name     = LocalizationFunctions.getLocalizedText(4),
         callback = function()
             self:setMenuEnabled(false)
             getActorJoinWarSelector(self):getModel():setEnabled(true)
@@ -122,7 +135,7 @@ end
 
 local function initItemConfigSkills(self)
     local item = {
-        name = "Config Skills",
+        name     = LocalizationFunctions.getLocalizedText(5),
         callback = function()
             self.m_ModelMessageIndicator:showMessage("Sorry, the Config Skills feature is not implemented.")
         end,
@@ -133,7 +146,7 @@ end
 
 local function initItemLogin(self)
     local item = {
-        name = "Login",
+        name     = LocalizationFunctions.getLocalizedText(6),
         callback = function()
             self:setMenuEnabled(false)
             getActorLoginPanel(self):getModel():setEnabled(true)
@@ -143,6 +156,18 @@ local function initItemLogin(self)
     self.m_ItemLogin = item
 end
 
+local function initItemHelp(self)
+    local item = {
+        name     = LocalizationFunctions.getLocalizedText(7),
+        callback = function()
+            self:setMenuEnabled(false)
+            getActorGameHelper(self):getModel():setEnabled(true)
+        end,
+    }
+
+    self.m_ItemHelp = item
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -150,8 +175,9 @@ function ModelMainMenu:ctor(param)
     initItemNewWar(      self)
     initItemContinue(    self)
     initItemJoinWar(     self)
-    initItemConfigSkills(self)
+    -- initItemConfigSkills(self)
     initItemLogin(       self)
+    initItemHelp(        self)
 
     if (self.m_View) then
         self:initView()
@@ -264,11 +290,15 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemNewWar,
                 self.m_ItemContinue,
                 self.m_ItemJoinWar,
-                self.m_ItemConfigSkills,
-                self.m_ItemLogin
+                -- self.m_ItemConfigSkills,
+                self.m_ItemLogin,
+                self.m_ItemHelp
             )
         else
-            showMenuItems(self, self.m_ItemLogin)
+            showMenuItems(self,
+                self.m_ItemLogin,
+                self.m_ItemHelp
+            )
         end
     end
 
