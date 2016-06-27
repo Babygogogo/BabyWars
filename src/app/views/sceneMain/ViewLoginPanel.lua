@@ -1,6 +1,8 @@
 
 local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local LABEL_TITLE_Z_ORDER       = 1
 local LABEL_ACCOUNT_Z_ORDER     = 1
 local LABEL_PASSWORD_Z_ORDER    = 1
@@ -43,7 +45,7 @@ local BUTTON_TEXTURE_NAME        = "c03_t06_s01_f01.png"
 local BUTTON_CAPINSETS           = {x = 1, y = BUTTON_HEIGHT - 7, width = 1, height = 1}
 local BUTTON_REGISTER_POS_X      = BACKGROUND_POS_X + 60
 local BUTTON_REGISTER_POS_Y      = BACKGROUND_POS_Y + 25
-local BUTTON_REGISTER_TEXT_COLOR = {r = 104, g = 248, b = 200}
+local BUTTON_REGISTER_TEXT_COLOR = {r = 96,  g = 224, b = 88}
 
 local BUTTON_LOGIN_POS_X      = BACKGROUND_POS_X + BACKGROUND_WIDTH - BUTTON_WIDTH - 60
 local BUTTON_LOGIN_POS_Y      = BUTTON_REGISTER_POS_Y
@@ -92,8 +94,6 @@ local function createButton(posX, posY, text, textColor, callback)
         :setTitleColor(textColor)
         :setTitleText(text)
 
-        :setOpacity(200)
-
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 callback()
@@ -114,6 +114,7 @@ local function createEditBox(posX, posY)
         :setFontColor({r = 0, g = 0, b = 0})
         :setPlaceholderFontSize(FONT_SIZE)
         :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(LocalizationFunctions.getLocalizedText(20))
 
         :setMaxLength(16)
         :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
@@ -145,7 +146,8 @@ local function initBackground(self)
 end
 
 local function initLabelTitle(self)
-    local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT, "Register / Login")
+    local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT,
+        LocalizationFunctions.getLocalizedText(6))
     label:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
 
@@ -154,21 +156,23 @@ local function initLabelTitle(self)
 end
 
 local function initLabelAccount(self)
-    local label = createLabel(LABEL_ACCOUNT_POS_X, LABEL_ACCOUNT_POS_Y, LABEL_ACCOUNT_WIDTH, LABEL_ACCOUNT_HEIGHT, "Account:")
+    local label = createLabel(LABEL_ACCOUNT_POS_X, LABEL_ACCOUNT_POS_Y, LABEL_ACCOUNT_WIDTH, LABEL_ACCOUNT_HEIGHT,
+        LocalizationFunctions.getLocalizedText(15))
 
     self.m_LabelAccount = label
     self:addChild(label, LABEL_ACCOUNT_Z_ORDER)
 end
 
 local function initLabelPassword(self)
-    local label = createLabel(LABEL_PASSWORD_POS_X, LABEL_PASSWORD_POS_Y, LABEL_PASSWORD_WIDTH, LABEL_PASSWORD_HEIGHT, "Password:")
+    local label = createLabel(LABEL_PASSWORD_POS_X, LABEL_PASSWORD_POS_Y, LABEL_PASSWORD_WIDTH, LABEL_PASSWORD_HEIGHT,
+        LocalizationFunctions.getLocalizedText(16))
 
     self.m_LabelPassword = label
     self:addChild(label, LABEL_PASSWORD_Z_ORDER)
 end
 
 local function initButtonRegister(self)
-    local button = createButton(BUTTON_REGISTER_POS_X, BUTTON_REGISTER_POS_Y, "Register", BUTTON_REGISTER_TEXT_COLOR, function()
+    local button = createButton(BUTTON_REGISTER_POS_X, BUTTON_REGISTER_POS_Y, LocalizationFunctions.getLocalizedText(17), BUTTON_REGISTER_TEXT_COLOR, function()
         if (self.m_Model) then
             self.m_Model:onButtonRegisterTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
@@ -179,7 +183,7 @@ local function initButtonRegister(self)
 end
 
 local function initButtonLogin(self)
-    local button = createButton(BUTTON_LOGIN_POS_X, BUTTON_LOGIN_POS_Y, "Login", BUTTON_LOGIN_TEXT_COLOR, function()
+    local button = createButton(BUTTON_LOGIN_POS_X, BUTTON_LOGIN_POS_Y, LocalizationFunctions.getLocalizedText(18), BUTTON_LOGIN_TEXT_COLOR, function()
         if (self.m_Model) then
             self.m_Model:onButtonLoginTouched(self.m_EditBoxAccount:getText(), self.m_EditBoxPassword:getText())
         end
@@ -191,8 +195,7 @@ end
 
 local function initEditBoxAccount(self)
     local editBox = createEditBox(EDIT_BOX_ACCOUNT_POS_X, EDIT_BOX_ACCOUNT_POS_Y)
-    editBox:setPlaceHolder("input at least 6 characters")
-        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+    editBox:setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
 
     self.m_EditBoxAccount = editBox
     self:addChild(editBox, EDIT_BOX_ACCOUNT_Z_ORDER)
@@ -200,8 +203,7 @@ end
 
 local function initEditBoxPassword(self)
     local editBox = createEditBox(EDIT_BOX_PASSWORD_POS_X, EDIT_BOX_PASSWORD_POS_Y)
-    editBox:setPlaceHolder("input at least 6 characters")
-        :setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
+    editBox:setInputFlag(cc.EDITBOX_INPUT_FLAG_PASSWORD)
 
     self.m_EditBoxPassword = editBox
     self:addChild(editBox, EDIT_BOX_PASSWORD_Z_ORDER)

@@ -1,6 +1,8 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local BACKGROUND_WIDTH  = 600
 local BACKGROUND_HEIGHT = display.height * 0.5
 local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH)  / 2
@@ -16,10 +18,14 @@ local BUTTON_WIDTH        = 200
 local BUTTON_HEIGHT       = display.height * 0.1
 local BUTTON_TEXTURE_NAME = "c03_t06_s01_f01.png"
 local BUTTON_CAPINSETS    = {x = 1, y = BUTTON_HEIGHT - 7, width = 1, height = 1}
-local BUTTON_YES_POSITION_X = (display.width  - BUTTON_WIDTH)  / 2 - BUTTON_WIDTH  * 0.66
-local BUTTON_YES_POSITION_Y = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
-local BUTTON_NO_POSITION_X  = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH  * 0.66
-local BUTTON_NO_POSITION_Y  = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+
+local BUTTON_YES_POS_X      = (display.width  - BUTTON_WIDTH)  / 2 - BUTTON_WIDTH  * 0.66
+local BUTTON_YES_POS_Y      = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_YES_FONT_COLOR = {r = 96,  g = 224, b = 88}
+
+local BUTTON_NO_POS_X      = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH  * 0.66
+local BUTTON_NO_POS_Y      = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_NO_FONT_COLOR = {r = 240, g = 80, b = 56}
 
 local TEXT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local TEXT_OUTLINE_WIDTH = 2
@@ -87,7 +93,8 @@ local function initConfirmTextLabel(self)
 end
 
 local function initButtonYes(self)
-    local button = createConfirmButton(BUTTON_YES_POSITION_X, BUTTON_YES_POSITION_Y, {r = 104, g = 248, b = 200}, "Yes",
+    local button = createConfirmButton(BUTTON_YES_POS_X, BUTTON_YES_POS_Y, BUTTON_YES_FONT_COLOR,
+        LocalizationFunctions.getLocalizedText(28),
         function()
             if (self.m_Model) then
                 self.m_Model:onConfirmYes()
@@ -99,7 +106,8 @@ local function initButtonYes(self)
 end
 
 local function initButtonNo(self)
-    local button = createConfirmButton(BUTTON_NO_POSITION_X, BUTTON_NO_POSITION_Y, {r = 240, g = 80, b = 56}, "No",
+    local button = createConfirmButton(BUTTON_NO_POS_X, BUTTON_NO_POS_Y, BUTTON_NO_FONT_COLOR,
+        LocalizationFunctions.getLocalizedText(29),
         function()
             if (self.m_Model) then
                 self.m_Model:onConfirmNo()

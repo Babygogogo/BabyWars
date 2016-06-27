@@ -1,7 +1,8 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
-local WebSocketManager = require("app.utilities.WebSocketManager")
+local WebSocketManager      = require("app.utilities.WebSocketManager")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -79,15 +80,15 @@ end
 
 function ModelLoginPanel:onButtonRegisterTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
+        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
+        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonRegisterForSecs(5)
         end
 
-        self.m_ModelConfirmBox:setConfirmText("Are you sure to register with the following account and password:\n" .. account .. "\n" .. password)
+        self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 self.m_RootScriptEventDispatcher:dispatchEvent({
                     name       = "EvtPlayerRequestDoAction",
@@ -105,9 +106,9 @@ end
 
 function ModelLoginPanel:onButtonLoginTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        self.m_ModelMessageIndicator:showMessage("Only alphanumeric characters and/or underscores are allowed for account and password.")
+        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        self.m_ModelMessageIndicator:showMessage("You have already logged in as " .. account .. ".")
+        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)
