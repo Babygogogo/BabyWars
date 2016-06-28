@@ -11,10 +11,11 @@
 
 local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
-local Actor            = require("global.actors.Actor")
-local ActorManager     = require("global.actors.ActorManager")
-local WebSocketManager = require("app.utilities.WebSocketManager")
-local WarFieldList     = require("res.data.templateWarField.WarFieldList")
+local Actor                 = require("global.actors.Actor")
+local ActorManager          = require("global.actors.ActorManager")
+local WebSocketManager      = require("app.utilities.WebSocketManager")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local WarFieldList          = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -27,7 +28,7 @@ local function configModelWarConfigurator(model, sceneWarFileName, configuration
     local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
     for playerIndex, player in pairs(configuration.players) do
         if (player.account == loggedInAccount) then
-            availablePlayerIndexes[1] = playerIndex
+            availablePlayerIndexes[1] = {data = playerIndex, text = "" .. playerIndex,}
             break
         end
     end
@@ -41,7 +42,9 @@ local function configModelWarConfigurator(model, sceneWarFileName, configuration
         :setOptions({configuration.weather})
 
     model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
-        :setOptions({"Unavailable"})
+        :setOptions({
+            {data = "Unavailable", text = LocalizationFunctions.getLocalizedText(45),}
+        })
 
     model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
         :setOptions({configuration.maxSkillPoints})

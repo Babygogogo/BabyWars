@@ -1,6 +1,8 @@
 
 local ViewContinueWarSelector = class("ViewContinueWarSelector", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local WAR_CONFIGURATOR_Z_ORDER    = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
@@ -9,30 +11,34 @@ local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local BUTTON_NEXT_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
 
-local MENU_BACKGROUND_WIDTH       = 250
-local MENU_BACKGROUND_HEIGHT      = display.height - 60
+local MENU_BACKGROUND_WIDTH     = 250
+local MENU_BACKGROUND_HEIGHT    = display.height - 60
+local MENU_BACKGROUND_POS_X     = 30
+local MENU_BACKGROUND_POS_Y     = 30
+local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+
 local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
 local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - 50 - 50
+local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X + 10
+local MENU_LIST_VIEW_POS_Y        = MENU_BACKGROUND_POS_Y + 6 + 50
 local MENU_LIST_VIEW_ITEMS_MARGIN = 15
-local MENU_TITLE_WIDTH            = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT           = 40
-local BUTTON_NEXT_WIDTH           = display.width - MENU_BACKGROUND_WIDTH - 90
-local BUTTON_NEXT_HEIGHT          = 60
 
-local MENU_BACKGROUND_POS_X = 30
-local MENU_BACKGROUND_POS_Y = 30
-local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 10
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 50
+local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT     = 45
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
-local BUTTON_BACK_POS_X     = MENU_LIST_VIEW_POS_X
-local BUTTON_BACK_POS_Y     = MENU_BACKGROUND_POS_Y + 6
-local BUTTON_NEXT_POS_X     = display.width - BUTTON_NEXT_WIDTH - 30
-local BUTTON_NEXT_POS_Y     = MENU_BACKGROUND_POS_Y
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - 7
+local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE  = 35
 
-local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
-local MENU_TITLE_FONT_COLOR     = {r = 96,  g = 224, b = 88}
-local MENU_TITLE_FONT_SIZE      = 28
+local BUTTON_NEXT_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_NEXT_HEIGHT = 60
+local BUTTON_NEXT_POS_X  = display.width - BUTTON_NEXT_WIDTH - 30
+local BUTTON_NEXT_POS_Y  = MENU_BACKGROUND_POS_Y
+
+local BUTTON_BACK_WIDTH  = 230
+local BUTTON_BACK_HEIGHT = 45
+local BUTTON_BACK_POS_X  = MENU_LIST_VIEW_POS_X
+local BUTTON_BACK_POS_Y  = MENU_BACKGROUND_POS_Y + 6
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 55
@@ -69,7 +75,7 @@ local function createSceneWarFileNameIndicator(sceneWarFileName)
 end
 
 local function createIsInTurnIndicator()
-    local indicator = cc.Label:createWithTTF("In turn", ITEM_FONT_NAME, IN_TURN_INDICATOR_FONT_SIZE)
+    local indicator = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(49), ITEM_FONT_NAME, IN_TURN_INDICATOR_FONT_SIZE)
     indicator:ignoreAnchorPointForPosition(true)
 
         :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
@@ -78,8 +84,6 @@ local function createIsInTurnIndicator()
 
         :setTextColor(IN_TURN_INDICATOR_FONT_COLOR)
         :enableOutline(ITEM_FONT_OUTLINE_COLOR, IN_TURN_INDICATOR_OUTLINE_WIDTH)
-
-        :setOpacity(180)
 
     return indicator
 end
@@ -140,15 +144,12 @@ local function initMenuListView(self)
 
         :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
 
-        :setOpacity(180)
-        :setCascadeOpacityEnabled(true)
-
     self.m_MenuListView = listView
     self:addChild(listView)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Continue..", ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(3), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -158,8 +159,6 @@ local function initMenuTitle(self)
 
         :setTextColor(MENU_TITLE_FONT_COLOR)
         :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
-
-        :setOpacity(180)
 
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
@@ -171,14 +170,14 @@ local function initButtonBack(self)
         :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
 
         :setScale9Enabled(true)
-        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+        :setContentSize(BUTTON_BACK_WIDTH, BUTTON_BACK_HEIGHT)
 
         :setZoomScale(-0.05)
 
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor({r = 240, g = 80, b = 56})
-        :setTitleText("back")
+        :setTitleText(LocalizationFunctions.getLocalizedText(8))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -209,7 +208,7 @@ local function initButtonNext(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText("Next...")
+        :setTitleText(LocalizationFunctions.getLocalizedText(33))
 
         :setVisible(false)
 
