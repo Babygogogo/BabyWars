@@ -30,6 +30,7 @@ local ActorManager           = require("global.actors.ActorManager")
 local TypeChecker            = require("app.utilities.TypeChecker")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
+local LocalizationFunctions  = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -75,7 +76,7 @@ local function doActionBeginTurn(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -107,7 +108,7 @@ local function doActionSurrender(self, action)
         self.m_IsWarEnded = true
         self.m_View:showEffectSurrender(callbackOnWarEnded)
     else
-        self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " surrendered!")
+        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
 
         if (modelPlayerManager:getAlivePlayersCount() == 1) then
             self.m_IsWarEnded = true
@@ -139,7 +140,7 @@ local function doActionAttack(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -171,7 +172,7 @@ local function doActionCapture(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage("Player " .. lostModelPlayer:getNickname() .. " is defeated!")
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
                     self.m_View:showEffectWin(callbackOnWarEnded)
@@ -237,7 +238,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    self:getModelMessageIndicator():showMessage("Connection established.")
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
@@ -250,7 +251,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    self:getModelMessageIndicator():showMessage("Connection lost. Now reconnecting...")
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(31))
 
     WebSocketManager.close()
         .init()
@@ -259,7 +260,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
-    self:getModelMessageIndicator():showMessage("Connection lost with error: " .. param.error)
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
 
     WebSocketManager.close()
         .init()

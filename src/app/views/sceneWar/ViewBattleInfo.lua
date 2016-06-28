@@ -1,26 +1,13 @@
 
 local ViewBattleInfo = class("ViewBattleInfo", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local BACKGROUND_WIDTH, BACKGROUND_HEIGHT = 160, 70
 local LEFT_POSITION_X = 10
 local LEFT_POSITION_Y = 10 + 140 -- This is the height of ViewTileInfo/ViewUnitInfo
 local RIGHT_POSITION_X = display.width - BACKGROUND_WIDTH - 10
 local RIGHT_POSITION_Y = LEFT_POSITION_Y
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function toDamageText(damage)
-    if (not damage) then
-        return "  --"
-    elseif (damage < 10) then
-        return "    "   .. damage .. "%"
-    elseif (damage < 100) then
-        return "  "     .. damage .. "%"
-    else
-        return ""       .. damage .. "%"
-    end
-end
 
 --------------------------------------------------------------------------------
 -- The functions that adjust the position of the view.
@@ -102,7 +89,7 @@ function ViewBattleInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewBattleInfo:updateWithAttackAndCounterDamage(attack, counter)
-    self.m_Label:setString("Atk:      " .. toDamageText(attack) .. "\nDef:      " .. toDamageText(counter))
+    self.m_Label:setString(LocalizationFunctions.getLocalizedText(90, attack, counter))
 
     return self
 end

@@ -17,9 +17,11 @@
 --     - 更换weather（EvtTurnPhaseChangeWeather，目前未实现。具体切换与否，由ModelWeatherManager决定）
 --]]--------------------------------------------------------------------------------
 
-local ModelTurnManager = class("ModelTurnManager")
-local WebSocketManager = require("app.utilities.WebSocketManager")
-local TableFunctions   = require("app.utilities.TableFunctions")
+local ModelTurnManager      = class("ModelTurnManager")
+
+local WebSocketManager      = require("app.utilities.WebSocketManager")
+local TableFunctions        = require("app.utilities.TableFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -317,7 +319,7 @@ function ModelTurnManager:runTurn()
         if (isLoggedInPlayerInTurn(self)) then
             self.m_ModelMessageIndicator:hidePersistentMessage()
         else
-            self.m_ModelMessageIndicator:showPersistentMessage("It's your opponent's turn. Please wait.")
+            self.m_ModelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(71))
         end
     end
 

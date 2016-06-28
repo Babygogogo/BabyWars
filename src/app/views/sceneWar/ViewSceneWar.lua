@@ -1,6 +1,8 @@
 
 local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local MESSAGE_INDICATOR_Z_ORDER = 3
 local END_WAR_EFFECT_Z_ORDER    = 3
 local TURN_MANAGER_Z_ORDER      = 2
@@ -162,7 +164,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewSceneWar:showEffectSurrender(callback)
-    local effect = createEndWarEffect("You surrender...", callback)
+    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(73), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 
@@ -170,7 +172,7 @@ function ViewSceneWar:showEffectSurrender(callback)
 end
 
 function ViewSceneWar:showEffectWin(callback)
-    local effect = createEndWarEffect("You win!", callback)
+    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(74), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 
@@ -178,7 +180,7 @@ function ViewSceneWar:showEffectWin(callback)
 end
 
 function ViewSceneWar:showEffectLose(callback)
-    local effect = createEndWarEffect("You lose...", callback)
+    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(75), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 

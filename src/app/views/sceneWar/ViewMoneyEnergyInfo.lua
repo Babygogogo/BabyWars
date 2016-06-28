@@ -6,7 +6,7 @@ local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 local FONT_SIZE   = 20
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH     = FONT_SIZE / 5 * 54
+local BACKGROUND_WIDTH     = 210
 local BACKGROUND_HEIGHT    = LINE_HEIGHT * 3 + 8
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
