@@ -301,6 +301,7 @@ end
 local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelWarField(self:getModelWarField())
 
     self.m_ActorWarHud = actor
 end

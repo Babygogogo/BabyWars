@@ -14,7 +14,7 @@ local LIST_VIEW_POS_Y        = BACKGROUND_POS_Y + 6
 local LIST_VIEW_ITEMS_MARGIN = 10
 
 local ITEM_WIDTH         = BACKGROUND_WIDTH - 20
-local ITEM_HEIGHT        = 45
+local ITEM_HEIGHT        = 55
 local ITEM_CAPINSETS     = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_COLOR    = {r = 255, g = 255, b = 255}
 local ITEM_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
@@ -34,7 +34,7 @@ local function createViewItem(item)
         :setZoomScale(-0.05)
 
         :setTitleFontName("res/fonts/msyhbd.ttc")
-        :setTitleFontSize(28)
+        :setTitleFontSize(30)
         :setTitleColor(ITEM_FONT_COLOR)
         :setTitleText(item.name)
 

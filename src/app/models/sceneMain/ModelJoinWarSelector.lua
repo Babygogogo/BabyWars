@@ -1,9 +1,10 @@
 
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
-local Actor            = require("global.actors.Actor")
-local ActorManager     = require("global.actors.ActorManager")
-local WebSocketManager = require("app.utilities.WebSocketManager")
+local Actor                 = require("global.actors.Actor")
+local ActorManager          = require("global.actors.ActorManager")
+local WebSocketManager      = require("app.utilities.WebSocketManager")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -16,7 +17,7 @@ local function configModelWarConfigurator(model, sceneWarFileName, configuration
     local warField = require("res.data.templateWarField." .. configuration.warFieldFileName)
     for i = 1, warField.playersCount do
         if (not configuration.players[i]) then
-            availablePlayerIndexes[#availablePlayerIndexes + 1] = i
+            availablePlayerIndexes[#availablePlayerIndexes + 1] = {data = i, text = "" .. i}
         end
     end
     model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
@@ -29,7 +30,10 @@ local function configModelWarConfigurator(model, sceneWarFileName, configuration
         :setOptions({configuration.weather})
 
     model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
-        :setOptions({"Unavailable"})
+        :setOptions({
+            -- TODO: load the options from the configuration.
+            {data = "Unavailable", text = LocalizationFunctions.getLocalizedText(45),}
+        })
 
     model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
         :setOptions({configuration.maxSkillPoints})
@@ -69,7 +73,7 @@ local function getActorWarConfigurator(self)
                 local modelWarConfigurator = getActorWarConfigurator(self):getModel()
                 local password             = modelWarConfigurator:getPassword()
                 if ((#password ~= 0) and (#password ~= 4)) then
-                    self.m_ModelMessageIndicator:showMessage("The password is invalid. Please try again.")
+                    self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(61))
                 else
                     self.m_RootScriptEventDispatcher:dispatchEvent({
                         name             = "EvtPlayerRequestDoAction",
@@ -178,7 +182,7 @@ function ModelJoinWarSelector:doActionGetJoinableWarList(action)
     self.m_WarList = createJoinableWarList(self, action.list)
     if (self.m_IsEnabled) then
         if (#self.m_WarList == 0) then
-            self.m_ModelMessageIndicator:showMessage("Sorry, but no war is currently joinable. Please wait for or create a new war.")
+            self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(60))
         elseif (self.m_View) then
             self.m_View:showWarList(self.m_WarList)
         end
@@ -223,7 +227,7 @@ end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
     if (#editBoxText ~= 4) then
-        self.m_ModelMessageIndicator:showMessage("The War ID is invalid. Please try again.")
+        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(59))
     else
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
         if (self.m_View) then

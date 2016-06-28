@@ -1,6 +1,8 @@
 
 local ViewJoinWarSelector = class("ViewJoinWarSelector", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local WAR_CONFIGURATOR_Z_ORDER    = 1
 local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local MENU_TITLE_Z_ORDER          = 1
@@ -11,56 +13,60 @@ local BUTTON_BACK_Z_ORDER         = 1
 local BUTTON_NEXT_Z_ORDER         = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
 
-local MENU_BACKGROUND_WIDTH       = 250
-local MENU_BACKGROUND_HEIGHT      = display.height - 60
-local MENU_TITLE_WIDTH            = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT           = 40
-local BUTTON_BACK_WIDTH           = 230
-local BUTTON_BACK_HEIGHT          = 45
-local BUTTON_FIND_WIDTH           = 110
-local BUTTON_FIND_HEIGHT          = BUTTON_BACK_HEIGHT
-local EDIT_BOX_WAR_NAME_WIDTH     = 110
-local EDIT_BOX_WAR_NAME_HEIGHT    = BUTTON_FIND_HEIGHT
+local MENU_BACKGROUND_WIDTH     = 250
+local MENU_BACKGROUND_HEIGHT    = display.height - 60
+local MENU_BACKGROUND_POS_X     = 30
+local MENU_BACKGROUND_POS_Y     = 30
+local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+
+local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT     = 45
+local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - 7
+local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE  = 35
+
+local BUTTON_BACK_WIDTH  = 230
+local BUTTON_BACK_HEIGHT = 45
+local BUTTON_BACK_POS_X  = MENU_BACKGROUND_POS_X + 10
+local BUTTON_BACK_POS_Y  = MENU_BACKGROUND_POS_Y + 6
+
+local BUTTON_FIND_WIDTH  = 110
+local BUTTON_FIND_HEIGHT = BUTTON_BACK_HEIGHT
+local BUTTON_FIND_POS_X  = BUTTON_BACK_POS_X
+local BUTTON_FIND_POS_Y  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+
+local EDIT_BOX_WAR_NAME_WIDTH  = 110
+local EDIT_BOX_WAR_NAME_HEIGHT = BUTTON_FIND_HEIGHT
+local EDIT_BOX_WAR_NAME_POS_X  = BUTTON_FIND_POS_X + BUTTON_FIND_WIDTH
+local EDIT_BOX_WAR_NAME_POS_Y  = BUTTON_FIND_POS_Y
+
 local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
 local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - MENU_TITLE_HEIGHT - 5 - BUTTON_BACK_HEIGHT - BUTTON_FIND_HEIGHT
-local BUTTON_NEXT_WIDTH           = display.width - MENU_BACKGROUND_WIDTH - 90
-local BUTTON_NEXT_HEIGHT          = 60
-
-local MENU_BACKGROUND_POS_X   = 30
-local MENU_BACKGROUND_POS_Y   = 30
-local MENU_TITLE_POS_X        = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y        = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
-local BUTTON_BACK_POS_X       = MENU_BACKGROUND_POS_X + 10
-local BUTTON_BACK_POS_Y       = MENU_BACKGROUND_POS_Y + 6
-local BUTTON_FIND_POS_X       = BUTTON_BACK_POS_X
-local BUTTON_FIND_POS_Y       = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local EDIT_BOX_WAR_NAME_POS_X = BUTTON_FIND_POS_X + BUTTON_FIND_WIDTH
-local EDIT_BOX_WAR_NAME_POS_Y = BUTTON_FIND_POS_Y
-local MENU_LIST_VIEW_POS_X    = BUTTON_BACK_POS_X
-local MENU_LIST_VIEW_POS_Y    = BUTTON_FIND_POS_Y + BUTTON_FIND_HEIGHT
-local BUTTON_NEXT_POS_X       = display.width - BUTTON_NEXT_WIDTH - 30
-local BUTTON_NEXT_POS_Y       = MENU_BACKGROUND_POS_Y
-
-local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
-local MENU_TITLE_FONT_COLOR     = {r = 96,  g = 224, b = 88}
-local MENU_TITLE_FONT_SIZE      = 28
-
+local MENU_LIST_VIEW_POS_X        = BUTTON_BACK_POS_X
+local MENU_LIST_VIEW_POS_Y        = BUTTON_FIND_POS_Y + BUTTON_FIND_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN = 15
-local ITEM_WIDTH                  = 230
-local ITEM_HEIGHT                 = 55
-local ITEM_CAPINSETS              = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
-local ITEM_FONT_NAME              = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE              = 28
-local ITEM_FONT_COLOR             = {r = 255, g = 255, b = 255}
-local ITEM_FONT_OUTLINE_COLOR     = {r = 0, g = 0, b = 0}
-local ITEM_FONT_OUTLINE_WIDTH     = 2
+
+local BUTTON_NEXT_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_NEXT_HEIGHT = 60
+local BUTTON_NEXT_POS_X  = display.width - BUTTON_NEXT_WIDTH - 30
+local BUTTON_NEXT_POS_Y  = MENU_BACKGROUND_POS_Y
+
+local ITEM_WIDTH              = 230
+local ITEM_HEIGHT             = 55
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
 
 local WAR_NAME_INDICATOR_FONT_SIZE     = 15
 local WAR_NAME_INDICATOR_FONT_COLOR    = {r = 240, g = 80, b = 56}
 local WAR_NAME_INDICATOR_OUTLINE_WIDTH = 1
 
 local EDIT_BOX_TEXTURE_NAME = "c03_t06_s01_f01.png"
-local EDIT_BOX_CAPINSETS    = {x = 1, y = EDIT_BOX_WAR_NAME_HEIGHT - 7, width = 1, height = 1}
+local EDIT_BOX_CAPINSETS    = {x = 1, y = EDIT_BOX_WAR_NAME_HEIGHT - 2, width = 1, height = 1}
 local EDIT_BOX_FONT_SIZE    = 28
 
 --------------------------------------------------------------------------------
@@ -137,7 +143,7 @@ local function initMenuListView(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Join..", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(4), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -165,7 +171,7 @@ local function initButtonFind(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(MENU_TITLE_FONT_COLOR)
-        :setTitleText("find:")
+        :setTitleText(LocalizationFunctions.getLocalizedText(57))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -192,7 +198,7 @@ local function initButtonBack(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor({r = 240, g = 80, b = 56})
-        :setTitleText("back")
+        :setTitleText(LocalizationFunctions.getLocalizedText(8))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -215,7 +221,8 @@ local function initEditBoxWarName(self)
         :setFontColor({r = 0, g = 0, b = 0})
 
         :setPlaceholderFontSize(EDIT_BOX_FONT_SIZE)
-        :setPlaceHolder("War ID")
+        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(LocalizationFunctions.getLocalizedText(58))
 
         :setMaxLength(4)
         :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
@@ -242,7 +249,7 @@ local function initButtonNext(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText("Next...")
+        :setTitleText(LocalizationFunctions.getLocalizedText(33))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -319,7 +326,6 @@ function ViewJoinWarSelector:setMenuVisible(visible)
     self.m_MenuTitle:setVisible(visible)
     self.m_ButtonFind:setVisible(visible)
     self.m_EditBoxWarName:setVisible(visible)
-        :setText("")
 
     return self
 end

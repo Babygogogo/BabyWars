@@ -75,7 +75,7 @@ local function getActorWarConfigurator(self)
                 local modelWarConfigurator = getActorWarConfigurator(self):getModel()
                 local password             = modelWarConfigurator:getPassword()
                 if ((#password ~= 0) and (#password ~= 4)) then
-                    self.m_ModelMessageIndicator:showMessage("The password is invalid. Please try again.")
+                    self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(61))
                 else
                     self.m_RootScriptEventDispatcher:dispatchEvent({
                         name             = "EvtPlayerRequestDoAction",

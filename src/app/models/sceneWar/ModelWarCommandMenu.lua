@@ -18,16 +18,46 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local Actor            = require("global.actors.Actor")
-local ActorManager     = require("global.actors.ActorManager")
-local WebSocketManager = require("app.utilities.WebSocketManager")
-local TypeChecker      = require("app.utilities.TypeChecker")
+local Actor                 = require("global.actors.Actor")
+local ActorManager          = require("global.actors.ActorManager")
+local WebSocketManager      = require("app.utilities.WebSocketManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerIndexUpdated(self, event)
+    self.m_PlayerIndex    = event.playerIndex
     self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+end
+
+local function getEmptyProducersCount(self)
+    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
+    local count        = 0
+    local playerIndex  = self.m_PlayerIndex
+
+    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+        if ((modelTile.getProductionList) and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
+            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function getIdleUnitsCount(self)
+    local count       = 0
+    local playerIndex = self.m_PlayerIndex
+    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
+            count = count + 1
+        end
+    end)
+
+    return count
 end
 
 --------------------------------------------------------------------------------
@@ -35,9 +65,9 @@ end
 --------------------------------------------------------------------------------
 local function initItemQuit(self)
     local item = {
-        name     = "Quit",
+        name     = LocalizationFunctions.getLocalizedText(65),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText("You are quitting the war (you may reenter it later).\nAre you sure?")
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66))
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
                     WebSocketManager.setOwner(actorSceneMain:getModel())
@@ -52,9 +82,9 @@ end
 
 local function initItemSurrender(self)
     local item = {
-        name     = "Surrender",
+        name     = LocalizationFunctions.getLocalizedText(67),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText("You will lose the game by surrendering!\nAre you sure?")
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(68))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -72,9 +102,9 @@ end
 
 local function initItemEndTurn(self)
     local item = {
-        name     = "End Turn",
+        name     = LocalizationFunctions.getLocalizedText(69),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText("You are ending your turn, with some units unactioned.\nAre you sure?")
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -128,6 +158,13 @@ function ModelWarCommandMenu:setModelConfirmBox(model)
     assert(self.m_ModelConfirmBox == nil, "ModelWarCommandMenu:setModelConfirmBox() the model has been set.")
     self.m_ModelConfirmBox = model
     model:setEnabled(false)
+
+    return self
+end
+
+function ModelWarCommandMenu:setModelWarField(model)
+    assert(self.m_ModelWarField == nil, "ModelWarCommandMenu:setModelWarField() the model has been set.")
+    self.m_ModelWarField = model
 
     return self
 end

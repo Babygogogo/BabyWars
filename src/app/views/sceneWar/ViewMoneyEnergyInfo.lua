@@ -1,6 +1,8 @@
 
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local FONT_SIZE   = 20
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
@@ -139,9 +141,9 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
-    self.m_LabelPlayer:setString("Player:  " .. modelPlayer:getNickname())
-    self.m_LabelFund:setString("Fund:     " .. modelPlayer:getFund())
-    self.m_LabelEnergy:setString(string.format("Energy:  %.2f/%d/%d", modelPlayer:getEnergy()))
+    self.m_LabelPlayer:setString(LocalizationFunctions.getLocalizedText(62, modelPlayer:getNickname()))
+    self.m_LabelFund:setString(LocalizationFunctions.getLocalizedText(63, modelPlayer:getFund()))
+    self.m_LabelEnergy:setString(LocalizationFunctions.getLocalizedText(64, string.format("%.2f/%d/%d", modelPlayer:getEnergy())))
 
     return self
 end
