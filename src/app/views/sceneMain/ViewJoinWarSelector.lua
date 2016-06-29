@@ -38,8 +38,8 @@ local BUTTON_FIND_POS_Y  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
 
 local EDIT_BOX_WAR_NAME_WIDTH  = 110
 local EDIT_BOX_WAR_NAME_HEIGHT = BUTTON_FIND_HEIGHT
-local EDIT_BOX_WAR_NAME_POS_X  = BUTTON_FIND_POS_X + BUTTON_FIND_WIDTH
-local EDIT_BOX_WAR_NAME_POS_Y  = BUTTON_FIND_POS_Y
+local EDIT_BOX_WAR_NAME_POS_X  = BUTTON_FIND_POS_X + BUTTON_FIND_WIDTH - MENU_BACKGROUND_POS_X
+local EDIT_BOX_WAR_NAME_POS_Y  = BUTTON_FIND_POS_Y - MENU_BACKGROUND_POS_Y
 
 local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
 local MENU_LIST_VIEW_HEIGHT       = MENU_BACKGROUND_HEIGHT - 14 - MENU_TITLE_HEIGHT - 5 - BUTTON_BACK_HEIGHT - BUTTON_FIND_HEIGHT
@@ -229,7 +229,7 @@ local function initEditBoxWarName(self)
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
 
     self.m_EditBoxWarName = editBox
-    self:addChild(editBox, EDIT_BOX_WAR_NAME_Z_ORDER)
+    self.m_MenuBackground:addChild(editBox, EDIT_BOX_WAR_NAME_Z_ORDER)
 end
 
 local function initButtonNext(self)
@@ -325,7 +325,6 @@ function ViewJoinWarSelector:setMenuVisible(visible)
         :jumpToTop()
     self.m_MenuTitle:setVisible(visible)
     self.m_ButtonFind:setVisible(visible)
-    self.m_EditBoxWarName:setVisible(visible)
 
     return self
 end
