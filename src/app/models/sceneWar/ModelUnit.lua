@@ -16,6 +16,7 @@ local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local TableFunctions        = require("app.utilities.TableFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The set state functions.
@@ -358,7 +359,11 @@ function ModelUnit:showMovingAnimation()
 end
 
 function ModelUnit:getDescription()
-    return self.m_Template.description
+    return self.m_Template.description[LocalizationFunctions.getLanguageCode()]
+end
+
+function ModelUnit:getFullName()
+    return self.m_Template.fullName[LocalizationFunctions.getLanguageCode()]
 end
 
 function ModelUnit:getVision()

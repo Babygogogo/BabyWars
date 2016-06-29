@@ -436,11 +436,15 @@ local s_Texts = {
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function LocalizationFunctions.setLanguage(languageCode)
-    assert((languageCode == 1) or (languageCode == 2), "LocalizationFunctions.setLanguage() the param is invalid.")
+function LocalizationFunctions.setLanguageCode(languageCode)
+    assert((languageCode == 1) or (languageCode == 2), "LocalizationFunctions.setLanguageCode() the param is invalid.")
     s_LanguageCode = languageCode
 
     return LocalizationFunctions
+end
+
+function LocalizationFunctions.getLanguageCode()
+    return s_LanguageCode
 end
 
 function LocalizationFunctions.getLocalizedText(textCode, ...)

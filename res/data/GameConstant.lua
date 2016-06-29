@@ -1600,8 +1600,15 @@ GameConstant.templateModelUnits = {
         cost        = 1500,
         vision      = 2,
 
-        fullName    = "Infantry",
-        description = "Infantry units are cheap. They can capture bases but have low firepower.",
+        fullName = {
+            [1] = "步兵",
+            [2] = "Infantry",
+        },
+
+        description = {
+            [1] = "步兵：最便宜的部队。能占领建筑和发射导弹，但攻防较弱。",
+            [2] = "Infantry units are cheap. They can capture bases but have low firepower.",
+        },
     },
 
     mech       = {
@@ -1711,8 +1718,15 @@ GameConstant.templateModelUnits = {
         cost        = 2500,
         vision      = 2,
 
-        fullName    = "Mech",
-        description = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
+        fullName = {
+            [1] = "炮兵",
+            [2] = "Mech",
+        },
+
+        description = {
+            [1] = "炮兵：能占领建筑和发射导弹。火力不错，但移动力和防御较弱。",
+            [2] = "Mech units can capture bases, traverse most terrain types, and have superior firepower.",
+        },
     },
 
     bike       = {
@@ -1789,8 +1803,15 @@ GameConstant.templateModelUnits = {
         cost        = 2500,
         vision      = 2,
 
-        fullName    = "Bike",
-        description = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
+        fullName = {
+            [1] = "摩托兵",
+            [2] = "Bike",
+        },
+
+        description = {
+            [1] = "摩托兵：能占领建筑和发射导弹。在平坦地形上移动力不错，但攻防较弱。",
+            [2] = "Bikes are infantry units with high mobility. They can capture bases but have low firepower.",
+        },
     },
 
     recon      = {
@@ -1863,9 +1884,16 @@ GameConstant.templateModelUnits = {
         cost        = 4000,
         vision      = 5,
 
-        fullName    = "Recon",
-        description = "Recon units have high movement range and are strong against infantry units.",
-    },
+        fullName = {
+            [1] = "侦察车",
+            [2] = "Recon",
+        },
+
+        description = {
+            [1] = "侦察车：移动力优秀，视野广。能有效打击步兵系，但对其他部队的攻防较差。",
+            [2] = "Recon units have high movement range and are strong against infantry units.",
+        },
+},
 
     flare      = {
         GridIndexable = {},
@@ -1937,8 +1965,15 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 2,
 
-        fullName    = "Flare",
-        description = "Flares fire bright rockets that reveal a 13-square area in Fog of War.",
+        fullName = {
+            [1] = "照明车",
+            [2] = "Flare",
+        },
+
+        description = {
+            [1] = "照明车：能够远程投射大范围的照明弹，攻防能力一般。",
+            [2] = "Flares fire bright rockets that reveal a 13-square area in Fog of War.",
+        },
     },
 
     antiair    = {
@@ -2014,8 +2049,15 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
-        fullName    = "Anti-Air",
-        description = "Anti-Air units work well against infantry and air units. They're weak against tanks.",
+        fullName = {
+            [1] = "对空战车",
+            [2] = "Anti-Air",
+        },
+
+        description = {
+            [1] = "对空战车：能够有效打击空军和步兵系，但对坦克系较弱。",
+            [2] = "Anti-Air units work well against infantry and air units. They're weak against tanks.",
+        },
     },
 
     tank       = {
@@ -2121,8 +2163,15 @@ GameConstant.templateModelUnits = {
         cost        = 7000,
         vision      = 3,
 
-        fullName    = "Tank",
-        description = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
+        fullName = {
+            [1] = "轻型坦克",
+            [2] = "Tank",
+        },
+
+        description = {
+            [1] = "轻型坦克：各属性均衡，是陆军的中流砥柱。",
+            [2] = "Tank units have high movement range and are inexpensive, so they're easy to deploy.",
+        },
     },
 
     mdtank     = {
@@ -2228,8 +2277,15 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 2,
 
-        fullName    = "Md Tank",
-        description = "Md(Medium) tank units' defensive and offensive ratings are the second best among ground units.",
+        fullName = {
+            [1] = "中型坦克",
+            [2] = "Md Tank",
+        },
+
+        description = {
+            [1] = "中型坦克：攻防比普通坦克更强，但移动力稍弱。",
+            [2] = "Md(Medium) tank units' defensive and offensive ratings are the second best among ground units.",
+        },
     },
 
     wartank    = {
@@ -2335,8 +2391,15 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 2,
 
-        fullName    = "War Tank",
-        description = "War Tank units are the strongest tanks in terms of both attack and defense.",
+        fullName = {
+            [1] = "战争坦克",
+            [2] = "War Tank",
+        },
+
+        description = {
+            [1] = "战争坦克：攻防最强的坦克。移动力较差。",
+            [2] = "War Tank units are the strongest tanks in terms of both attack and defense.",
+        },
     },
 
     artillery  = {
@@ -2411,8 +2474,15 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 3,
 
-        fullName    = "Artillery",
-        description = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
+        fullName = {
+            [1] = "自走炮",
+            [2] = "Artillery",
+        },
+
+        description = {
+            [1] = "自走炮：最便宜的远程部队，能够有效打击陆军和海军。防御较弱。",
+            [2] = "Artillery units are an inexpensive way to gain indirect offensive attack capabilities.",
+        },
     },
 
     antitank   = {
@@ -2487,8 +2557,15 @@ GameConstant.templateModelUnits = {
         cost        = 11000,
         vision      = 3,
 
-        fullName    = "Anti-Tank",
-        description = "Anti-Tanks can counter-attack when under direct fire.",
+        fullName = {
+            [1] = "反坦克炮",
+            [2] = "Anti-Tank",
+        },
+
+        description = {
+            [1] = "反坦克炮：对近身攻击能够作出反击的远程部队。对坦克系尤其有效。防御力优秀。",
+            [2] = "Anti-Tanks can counter-attack when under direct fire.",
+        },
     },
 
     rockets    = {
@@ -2564,8 +2641,15 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 3,
 
-        fullName    = "Rockets",
-        description = "Rockets units are valuable, because they can fire on both land and naval units.",
+        fullName = {
+            [1] = "火箭炮",
+            [2] = "Rockets",
+        },
+
+        description = {
+            [1] = "火箭炮：攻击力和射程都比自走炮优秀的远程部队。防御力很差。",
+            [2] = "Rockets units are valuable, because they can fire on both land and naval units.",
+        },
     },
 
     missiles   = {
@@ -2640,8 +2724,15 @@ GameConstant.templateModelUnits = {
         cost        = 12000,
         vision      = 5,
 
-        fullName    = "Missiles",
-        description = "Missiles units are essential in defending against air units. Their vision range is large.",
+        fullName = {
+            [1] = "对空导弹",
+            [2] = "Missiles",
+        },
+
+        description = {
+            [1] = "对空导弹：射程很远，能秒杀任何空军的远程部队。无法打击陆军和海军，且防御很差。",
+            [2] = "Missiles units are essential in defending against air units. Their vision range is large.",
+        },
     },
 
     rig        = {
@@ -2670,8 +2761,15 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
-        fullName    = "Rig",
-        description = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
+        fullName = {
+            [1] = "后勤车",
+            [2] = "Rig",
+        },
+
+        description = {
+            [1] = "后勤车：能够装载一个步兵或炮兵。能够建造临时机场或海港、补给临近的部队。不能攻击。",
+            [2] = "Rig units can carry 1 foot soldier and build temp airports/seaports.",
+        },
     },
 
     fighter    = {
@@ -2746,8 +2844,15 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
-        fullName    = "Fighter",
-        description = "Fighter units are strong vs. other air units. They also have the highest movements.",
+        fullName = {
+            [1] = "战斗机",
+            [2] = "Fighter",
+        },
+
+        description = {
+            [1] = "战斗机：拥有最高的移动力，对空军的战斗力很优秀。无法攻击陆军和海军。",
+            [2] = "Fighter units are strong vs. other air units. They also have the highest movements.",
+        },
     },
 
     bomber     = {
@@ -2822,8 +2927,15 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 3,
 
-        fullName    = "Bomber",
-        description = "Bomber units can fire on ground and naval units with a high destructive force.",
+        fullName = {
+            [1] = "轰炸机",
+            [2] = "Bomber",
+        },
+
+        description = {
+            [1] = "轰炸机：能对陆军和海军造成致命打击。无法攻击空军。",
+            [2] = "Bomber units can fire on ground and naval units with a high destructive force.",
+        },
     },
 
     duster     = {
@@ -2898,8 +3010,15 @@ GameConstant.templateModelUnits = {
         cost        = 13000,
         vision      = 4,
 
-        fullName    = "Duster",
-        description = "Dusters are somewhat powerful planes that can attack both ground and air units.",
+        fullName = {
+            [1] = "攻击机",
+            [2] = "Duster",
+        },
+
+        description = {
+            [1] = "攻击机：移动力优秀，能对空军造成有效打击，也能对陆军造成一定损伤。",
+            [2] = "Dusters are somewhat powerful planes that can attack both ground and air units.",
+        },
     },
 
     bcopter    = {
@@ -3005,8 +3124,15 @@ GameConstant.templateModelUnits = {
         cost        = 9000,
         vision      = 2,
 
-        fullName    = "B Copter",
-        description = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
+        fullName = {
+            [1] = "武装直升机",
+            [2] = "B Copter",
+        },
+
+        description = {
+            [1] = "武装直升机：能对陆军和直升机系造成有效打击，也能一定程度打击海军。",
+            [2] = "B(Battle) copter units can fire on many unit types, so they're quite valuable.",
+        },
     },
 
     tcopter    = {
@@ -3035,8 +3161,15 @@ GameConstant.templateModelUnits = {
         cost        = 5000,
         vision      = 1,
 
-        fullName    = "T Copter",
-        description = "T(transport) copters can transport both infantry and mech units.",
+        fullName = {
+            [1] = "运输直升机",
+            [2] = "T Copter",
+        },
+
+        description = {
+            [1] = "运输直升机：能够装载一个步兵或炮兵。不能攻击。",
+            [2] = "T(transport) copters can transport both infantry and mech units.",
+        },
     },
 
     seaplane   = {
@@ -3111,8 +3244,15 @@ GameConstant.templateModelUnits = {
         cost        = 15000,
         vision      = 4,
 
-        fullName    = "Seaplane",
-        description = "Seaplanes are produced at sea by carriers. They can attack any unit.",
+        fullName = {
+            [1] = "舰载机",
+            [2] = "Seaplane",
+        },
+
+        description = {
+            [1] = "舰载机：能够对任何部队都造成有效打击。只能用航母生产。燃料和弹药都很少。",
+            [2] = "Seaplanes are produced at sea by carriers. They can attack any unit.",
+        },
     },
 
     battleship = {
@@ -3187,8 +3327,15 @@ GameConstant.templateModelUnits = {
         cost        = 25000,
         vision      = 3,
 
-        fullName    = "Battleship",
-        description = "B(Battle) ships can launch indirect attack after moving.",
+        fullName = {
+            [1] = "战列舰",
+            [2] = "Battleship",
+        },
+
+        description = {
+            [1] = "战列舰：攻防优秀，而且能移动后立刻进行攻击的远程部队。不能攻击空军。",
+            [2] = "Battleships can launch indirect attack after moving.",
+        },
     },
 
     carrier    = {
@@ -3261,8 +3408,15 @@ GameConstant.templateModelUnits = {
         cost        = 28000,
         vision      = 4,
 
-        fullName    = "Carrier",
-        description = "Carriers can carrier 2 air units and produce seaplanes.",
+        fullName = {
+            [1] = "航空母舰",
+            [2] = "Carrier",
+        },
+
+        description = {
+            [1] = "航空母舰：能够生产舰载机，以及装载两个空军单位。自身只能对空军造成少量伤害，防御力较差。",
+            [2] = "Carriers can carrier 2 air units and produce seaplanes.",
+        },
     },
 
     submarine  = {
@@ -3337,8 +3491,15 @@ GameConstant.templateModelUnits = {
         cost        = 20000,
         vision      = 5,
 
-        fullName    = "Submarine",
-        description = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
+        fullName = {
+            [1] = "潜艇",
+            [2] = "Submarine",
+        },
+
+        description = {
+            [1] = "潜艇：能够下潜使得敌军难以发现，且下潜后只能被潜艇和巡洋舰攻击。能有效打击巡洋舰以外的海军，无法攻击空军和陆军。",
+            [2] = "Submerged submarines are difficult to find, and only cruisers and subs can fire on them.",
+        },
     },
 
     cruiser    = {
@@ -3444,8 +3605,15 @@ GameConstant.templateModelUnits = {
         cost        = 16000,
         vision      = 5,
 
-        fullName    = "Cruiser",
-        description = "Cruisers are strong against subs and air units, and they can carry two copter units.",
+        fullName = {
+            [1] = "巡洋舰",
+            [2] = "Cruiser",
+        },
+
+        description = {
+            [1] = "巡洋舰：能够对潜艇和空军造成毁灭性打击，对其他海军也有一定打击能力。能够装载两个直升机部队。不能攻击陆军。",
+            [2] = "Cruisers are strong against subs and air units, and they can carry two copter units.",
+        },
     },
 
     lander     = {
@@ -3474,8 +3642,15 @@ GameConstant.templateModelUnits = {
         cost        = 10000,
         vision      = 1,
 
-        fullName    = "Lander",
-        description = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+        fullName = {
+            [1] = "登陆舰",
+            [2] = "Lander",
+        },
+
+        description = {
+            [1] = "登陆舰：能够在沙滩地形装载和卸载最多两个陆军部队。不能攻击。",
+            [2] = "Landers can transport two ground units. If the lander sinks, the units vanish.",
+        },
     },
 
     gunboat    = {
@@ -3550,8 +3725,15 @@ GameConstant.templateModelUnits = {
         cost        = 6000,
         vision      = 2,
 
-        fullName    = "Gunboat",
-        description = "Gunboats can carry 1 foot soldier and attack other naval units.",
+        fullName = {
+            [1] = "炮船",
+            [2] = "Gunboat",
+        },
+
+        description = {
+            [1] = "炮船：能够装载一个步兵或炮兵。能够有效打击海军，但只有一枚弹药，防御力较差。",
+            [2] = "Gunboats can carry 1 foot soldier and attack other naval units.",
+        },
     },
 }
 

@@ -39,9 +39,17 @@ local ITEM_PRODUCTION_WIDTH     = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 15
 local ITEM_PRODUCTION_HEIGHT    = 62
 local ITEM_PRODUCTION_CAPINSETS = {x = 1, y = ITEM_PRODUCTION_HEIGHT, width = 1, height = 1}
 
+local BUTTON_CONFIRM_FONT_COLOR = {r = 96,  g = 224, b = 88}
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function setAllButtomConfirmEnabled(self, enabled)
+    for _, item in pairs(self.m_ListView:getItems()) do
+        item:setButtonConfirmEnabled(enabled)
+    end
+end
+
 local function createViewAction(itemModel)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
@@ -89,10 +97,7 @@ end
 
 local function createProductionConfirmButton(callback)
     local button = ccui.Button:create()
-    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-
-        :setScale9Enabled(true)
-        :setCapInsets(MENU_BACKGROUND_CAPINSETS)
+    button:setScale9Enabled(true)
         :setContentSize(60, ITEM_PRODUCTION_HEIGHT - 10)
 
         :ignoreAnchorPointForPosition(true)
@@ -104,13 +109,13 @@ local function createProductionConfirmButton(callback)
         :setZoomScale(-0.05)
 
         :setTitleFontName(ITEM_FONT_NAME)
-        :setTitleFontSize(20)
-        :setTitleColor(ITEM_FONT_COLOR)
+        :setTitleFontSize(25)
+        :setTitleColor(BUTTON_CONFIRM_FONT_COLOR)
         :setTitleText(LocalizationFunctions.getLocalizedText(86))
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
-                print("confirm button clicked.")
+                callback()
             end
         end)
 
@@ -119,7 +124,7 @@ local function createProductionConfirmButton(callback)
     return button
 end
 
-local function createViewProduction(itemModel)
+local function createViewProduction(self, modelItem)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -132,23 +137,24 @@ local function createViewProduction(itemModel)
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
-                view:setConfirmButtonEnabled(true)
+                setAllButtomConfirmEnabled(self, false)
+                view:setButtonConfirmEnabled(true)
             end
         end)
 
-    view:getRendererNormal():addChild(createProductionIcon(itemModel.tiledID))
-        :addChild(createProductionLabel(itemModel.fullName, itemModel.cost))
+    view:getRendererNormal():addChild(createProductionIcon(modelItem.tiledID))
+        :addChild(createProductionLabel(modelItem.modelUnit:getFullName(), modelItem.cost))
 
         :setCascadeColorEnabled(true)
 
-    view.m_ConfirmButton = createProductionConfirmButton(itemModel.callback)
-    view:addChild(view.m_ConfirmButton)
+    view.m_ButtonConfirm = createProductionConfirmButton(modelItem.callback)
+    view:addChild(view.m_ButtonConfirm)
 
-    view.setConfirmButtonEnabled = function(self, enabled)
-        self.m_ConfirmButton:setVisible(enabled)
+    view.setButtonConfirmEnabled = function(self, enabled)
+        self.m_ButtonConfirm:setVisible(enabled)
     end
 
-    if (not itemModel.isAvaliable) then
+    if (not modelItem.isAvaliable) then
         view:setEnabled(false)
             :setColor(ITEM_DISABLED_COLOR)
     end
@@ -260,7 +266,7 @@ function ViewActionMenu:showProductionList(list)
     adjustPositionOnShowingList(self, false)
 
     for _, listItem in ipairs(list) do
-        self.m_ListView:pushBackCustomItem(createViewProduction(listItem))
+        self.m_ListView:pushBackCustomItem(createViewProduction(self, listItem))
     end
 
     return self
