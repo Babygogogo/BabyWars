@@ -53,12 +53,6 @@ local s_LongText3_1 = [[
 -- The private functions.
 --------------------------------------------------------------------------------
 local s_Texts = {
-    --[[
-    [0] = {
-        [1] = function(...) return "" end,
-        [2] = function(...) return "" end,
-    },
-    --]]
     [1] = {
         [1] = function(...) return "主  菜  单" end,
         [2] = function(...) return "Main Menu" end,
@@ -430,6 +424,73 @@ local s_Texts = {
     [90] = {
         [1] = function(attack, counter) return string.format("攻：    %d%%\n防：    %s%%", attack, counter or "--") end,
         [2] = function(attack, counter) return string.format("Atk:   %d%%\nDef:   %s%%", attack, counter or "--") end,
+    },
+    [91] = {
+        [1] = function(moveRange, moveTypeName) return "移动力：" .. moveRange .. "（" .. moveTypeName .. "）"       end,
+        [2] = function(moveRange, moveTypeName) return "Movement Range:  " .. moveRange .. "(" .. moveTypeName .. ")" end,
+    },
+    [92] = {
+        [1] = function(vision) return "视野：" .. vision    end,
+        [2] = function(vision) return "Vision:  " .. vision end,
+    },
+    [93] = {
+        [1] = function(currentFuel, maxFuel, consumption, destroyOnRunOut)
+            return string.format("燃料存量：%d / %d     每回合消耗：%d     耗尽后消灭：%s", currentFuel, maxFuel, consumption, (destroyOnRunOut) and ("是") or ("否"))
+        end,
+        [2] = function(currentFuel, maxFuel, consumption, destroyOnRunOut)
+            return "Fuel:    Amount:  " .. currentFuel .. " / " .. maxFuel .. "    ConsumptionPerTurn:  " .. consumption ..
+                "\n            " .. ((destroyOnRunOut) and ("This unit is destroyed when out of fuel.") or ("This unit can't move when out of fuel."))
+        end,
+    },
+    [94] = {
+        [1] = function(weaponName, currentAmmo, maxAmmo, minRange, maxRange)
+            return "主武器：" .. weaponName ..
+                "      弹药量：" .. currentAmmo .. " / " .. maxAmmo ..
+                "      射程：" .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
+        end,
+        [2] = function(weaponName, currentAmmo, maxAmmo, minRange, maxRange)
+            return "Primary Weapon: " .. weaponName ..
+                "    Ammo:  "      .. currentAmmo .. " / " .. maxAmmo ..
+                "    Range:  "     .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
+        end,
+    },
+    [95] = {
+        [1] = function() return "主武器：无"                    end,
+        [2] = function() return "Primary Weapon: Not equipped." end,
+    },
+    [96] = {
+        [1] = function() return "极强："   end,
+        [2] = function() return "Fatal:" end,
+    },
+    [97] = {
+        [1] = function() return "较强："   end,
+        [2] = function() return "Strong:" end,
+    },
+    [98] = {
+        [1] = function(weaponName, minRange, maxRange)
+            return "副武器：" .. weaponName ..
+                "      射程：" .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
+        end,
+        [2] = function(weaponName, minRange, maxRange)
+            return "Secondary Weapon: " .. weaponName ..
+                "    Range:  "     .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
+        end,
+    },
+    [99] = {
+        [1] = function() return "副武器：无"                       end,
+        [2] = function() return "Secondary Weapon: Not equipped." end,
+    },
+    [100] = {
+        [1] = function() return "防御："   end,
+        [2] = function() return "Defense:" end,
+    },
+    [101] = {
+        [1] = function() return "极弱：" end,
+        [2] = function() return "Fatal:" end,
+    },
+    [102] = {
+        [1] = function() return "较弱：" end,
+        [2] = function() return "Weak:" end,
     },
 }
 

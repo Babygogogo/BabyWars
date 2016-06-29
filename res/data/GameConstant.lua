@@ -1536,7 +1536,10 @@ GameConstant.templateModelUnits = {
 
             primaryWeapon   = nil,
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 55,
                     mech       = 45,
@@ -1577,8 +1580,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 3,
-            type  = "infantry",
+            range    = 3,
+            type     = "infantry",
+            typeName = {
+                [1] = "步兵",
+                [2] = "infantry",
+            },
         },
 
         FuelOwner = {
@@ -1620,7 +1627,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name = "Barzooka",
+                name        = {
+                    [1] = "反坦克火箭筒",
+                    [2] = "Barzooka",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -1654,7 +1664,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 3,
             },
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 65,
                     mech       = 55,
@@ -1695,8 +1708,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 2,
-            type  = "mech",
+            range    = 2,
+            type     = "mech",
+            typeName = {
+                [1] = "炮兵",
+                [2] = "mech",
+            },
         },
 
         FuelOwner = {
@@ -1739,7 +1756,10 @@ GameConstant.templateModelUnits = {
 
             primaryWeapon   = nil,
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 65,
                     mech       = 55,
@@ -1780,8 +1800,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tireB",
+            range    = 5,
+            type     = "tireB",
+            typeName = {
+                [1] = "轻型轮胎",
+                [2] = "tireB",
+            },
         },
 
         FuelOwner = {
@@ -1824,7 +1848,10 @@ GameConstant.templateModelUnits = {
 
             primaryWeapon   = nil,
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 75,
                     mech       = 65,
@@ -1865,8 +1892,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 8,
-            type  = "tireA",
+            range    = 8,
+            type     = "tireA",
+            typeName = {
+                [1] = "重型轮胎",
+                [2] = "tireA",
+            },
         },
 
         FuelOwner = {
@@ -1893,7 +1924,7 @@ GameConstant.templateModelUnits = {
             [1] = "侦察车：移动力优秀，视野广。能有效打击步兵系，但对其他部队的攻防较差。",
             [2] = "Recon units have high movement range and are strong against infantry units.",
         },
-},
+    },
 
     flare      = {
         GridIndexable = {},
@@ -1905,7 +1936,10 @@ GameConstant.templateModelUnits = {
 
             primaryWeapon   = nil,
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 80,
                     mech       = 70,
@@ -1946,8 +1980,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tank",
+            range    = 5,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -1986,7 +2024,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Cannon",
+                name        = {
+                    [1] = "机关炮",
+                    [2] = "Cannon",
+                },
                 baseDamage  = {
                     infantry   = 105,
                     mech       = 105,
@@ -2030,8 +2071,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "tank",
+            range    = 6,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2069,7 +2114,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Tank Gun",
+                name        = {
+                    [1] = "坦克炮",
+                    [2] = "Tank Gun",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -2103,7 +2151,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 6,
             },
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine gun",
+                },
                 baseDamage  = {
                     infantry   = 75,
                     mech       = 70,
@@ -2144,8 +2195,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "tank",
+            range    = 6,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2183,7 +2238,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Heavy Tank Gun",
+                name        = {
+                    [1] = "重型坦克炮",
+                    [2] = "Heavy Tank Gun",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -2217,7 +2275,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 5,
             },
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine Gun",
+                },
                 baseDamage  = {
                     infantry   = 90,
                     mech       = 80,
@@ -2258,8 +2319,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tank",
+            range    = 5,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2283,7 +2348,7 @@ GameConstant.templateModelUnits = {
         },
 
         description = {
-            [1] = "中型坦克：攻防比普通坦克更强，但移动力稍弱。",
+            [1] = "中型坦克：攻防比轻型坦克更强，但移动力稍弱。",
             [2] = "Md(Medium) tank units' defensive and offensive ratings are the second best among ground units.",
         },
     },
@@ -2297,7 +2362,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Mega Gun",
+                name        = {
+                    [1] = "弩级主炮",
+                    [2] = "Mega Gun",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -2331,7 +2399,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 5,
             },
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine Gun",
+                },
                 baseDamage  = {
                     infantry   = 105,
                     mech       = 95,
@@ -2372,8 +2443,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 4,
-            type  = "tank",
+            range    = 4,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2411,7 +2486,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = false,
 
             primaryWeapon = {
-                name       = "Cannon",
+                name        = {
+                    [1] = "加农炮",
+                    [2] = "Cannon",
+                },
                 baseDamage = {
                     infantry   = 90,
                     mech       = 85,
@@ -2455,8 +2533,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tank",
+            range    = 5,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2494,7 +2576,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = false,
 
             primaryWeapon = {
-                name       = "Cannon",
+                name        = {
+                    [1] = "加农炮",
+                    [2] = "Cannon",
+                },
                 baseDamage = {
                     infantry   = 75,
                     mech       = 65,
@@ -2538,8 +2623,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 4,
-            type  = "tireB",
+            range    = 4,
+            type     = "tireB",
+            typeName = {
+                [1] = "轻型轮胎",
+                [2] = "tireB",
+            },
         },
 
         FuelOwner = {
@@ -2563,7 +2652,7 @@ GameConstant.templateModelUnits = {
         },
 
         description = {
-            [1] = "反坦克炮：对近身攻击能够作出反击的远程部队。对坦克系尤其有效。防御力优秀。",
+            [1] = "反坦克炮：对近身攻击能够作出反击的远程部队。对坦克系尤其有效。防御力优秀，但移动力差。",
             [2] = "Anti-Tanks can counter-attack when under direct fire.",
         },
     },
@@ -2578,7 +2667,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = false,
 
             primaryWeapon = {
-                name        = "Rockets",
+                name        = {
+                    [1] = "火箭炮",
+                    [2] = "Rockets",
+                },
                 baseDamage  = {
                     infantry   = 95,
                     mech       = 90,
@@ -2622,8 +2714,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tireA",
+            range    = 5,
+            type     = "tireA",
+            typeName = {
+                [1] = "重型轮胎",
+                [2] = "tireA",
+            },
         },
 
         FuelOwner = {
@@ -2661,7 +2757,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = false,
 
             primaryWeapon = {
-                name        = "AA Missiles",
+                name        = {
+                    [1] = "对空导弹",
+                    [2] = "AA Missiles",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -2705,8 +2804,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "tireA",
+            range    = 5,
+            type     = "tireA",
+            typeName = {
+                [1] = "重型轮胎",
+                [2] = "tireA",
+            },
         },
 
         FuelOwner = {
@@ -2746,8 +2849,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "tank",
+            range    = 6,
+            type     = "tank",
+            typeName = {
+                [1] = "履带",
+                [2] = "tank",
+            },
         },
 
         FuelOwner = {
@@ -2781,7 +2888,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "AA Missiles",
+                name        = {
+                    [1] = "空空导弹",
+                    [2] = "AA Missiles",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -2825,8 +2935,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 9,
-            type  = "air",
+            range    = 9,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -2864,7 +2978,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Bombs",
+                name        = {
+                    [1] = "炸弹",
+                    [2] = "Bombs",
+                },
                 baseDamage  = {
                     infantry   = 115,
                     mech       = 110,
@@ -2908,8 +3025,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 7,
-            type  = "air",
+            range    = 7,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -2947,7 +3068,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Machine Gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine Gun",
+                },
                 baseDamage  = {
                     infantry   = 55,
                     mech       = 45,
@@ -2991,8 +3115,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 8,
-            type  = "air",
+            range    = 8,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -3030,7 +3158,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Missiles",
+                name        = {
+                    [1] = "导弹",
+                    [2] = "Missiles",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3064,7 +3195,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 6,
             },
             secondaryWeapon = {
-                name        = "Machine gun",
+                name        = {
+                    [1] = "机关枪",
+                    [2] = "Machine Gun",
+                },
                 baseDamage  = {
                     infantry   = 75,
                     mech       = 65,
@@ -3105,8 +3239,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "air",
+            range    = 6,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -3146,8 +3284,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "air",
+            range    = 6,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -3181,7 +3323,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Missiles",
+                name        = {
+                    [1] = "导弹",
+                    [2] = "Missiles",
+                },
                 baseDamage  = {
                     infantry   = 90,
                     mech       = 85,
@@ -3225,8 +3370,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 7,
-            type  = "air",
+            range    = 7,
+            type     = "air",
+            typeName = {
+                [1] = "飞行",
+                [2] = "air",
+            },
         },
 
         FuelOwner = {
@@ -3264,7 +3413,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Cannon",
+                name        = {
+                    [1] = "加农炮",
+                    [2] = "Cannon",
+                },
                 baseDamage  = {
                     infantry   = 75,
                     mech       = 70,
@@ -3308,8 +3460,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "ship",
+            range    = 5,
+            type     = "ship",
+            typeName = {
+                [1] = "航行",
+                [2] = "ship",
+            },
         },
 
         FuelOwner = {
@@ -3348,7 +3504,10 @@ GameConstant.templateModelUnits = {
 
             primaryWeapon = nil,
             secondaryWeapon = {
-                name        = "AA Gun",
+                name        = {
+                    [1] = "防空炮",
+                    [2] = "AA Gun",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3389,8 +3548,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "ship",
+            range    = 5,
+            type     = "ship",
+            typeName = {
+                [1] = "航行",
+                [2] = "ship",
+            },
         },
 
         FuelOwner = {
@@ -3428,7 +3591,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Torpedoes",
+                name        = {
+                    [1] = "鱼雷",
+                    [2] = "Torpedoes",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3472,8 +3638,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 5,
-            type  = "ship",
+            range    = 5,
+            type     = "ship",
+            typeName = {
+                [1] = "航行",
+                [2] = "ship",
+            },
         },
 
         FuelOwner = {
@@ -3511,7 +3681,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Anti-Ship Missiles",
+                name        = {
+                    [1] = "反舰导弹",
+                    [2] = "Anti-Ship Missiles",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3545,7 +3718,10 @@ GameConstant.templateModelUnits = {
                 currentAmmo = 9,
             },
             secondaryWeapon = {
-                name        = "AA gun",
+                name        = {
+                    [1] = "防空炮",
+                    [2] = "AA Gun",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3586,8 +3762,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "ship",
+            range    = 6,
+            type     = "ship",
+            typeName = {
+                [1] = "航行",
+                [2] = "ship",
+            },
         },
 
         FuelOwner = {
@@ -3627,8 +3807,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 6,
-            type  = "transport",
+            range    = 6,
+            type     = "transport",
+            typeName = {
+                [1] = "运输",
+                [2] = "transport",
+            },
         },
 
         FuelOwner = {
@@ -3662,7 +3846,10 @@ GameConstant.templateModelUnits = {
             canAttackAfterMove = true,
 
             primaryWeapon = {
-                name        = "Anti-Ship Missiles",
+                name        = {
+                    [1] = "反舰导弹",
+                    [2] = "Anti-Ship Missiles",
+                },
                 baseDamage  = {
                     infantry   = nil,
                     mech       = nil,
@@ -3706,8 +3893,12 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range = 7,
-            type  = "transport",
+            range    = 7,
+            type     = "transport",
+            typeName = {
+                [1] = "运输",
+                [2] = "transport",
+            },
         },
 
         FuelOwner = {
@@ -3726,12 +3917,12 @@ GameConstant.templateModelUnits = {
         vision      = 2,
 
         fullName = {
-            [1] = "炮船",
+            [1] = "炮艇",
             [2] = "Gunboat",
         },
 
         description = {
-            [1] = "炮船：能够装载一个步兵或炮兵。能够有效打击海军，但只有一枚弹药，防御力较差。",
+            [1] = "炮艇：能够装载一个步兵或炮兵。能够有效打击海军，但只有一枚弹药。防御力较差。",
             [2] = "Gunboats can carry 1 foot soldier and attack other naval units.",
         },
     },

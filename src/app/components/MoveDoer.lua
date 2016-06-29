@@ -13,14 +13,16 @@
 
 local MoveDoer = class("MoveDoer")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {
     "getMoveRange",
     "getMoveType",
+    "getMoveTypeName",
 }
 
 MoveDoer.DEPENDS = {}
@@ -90,6 +92,10 @@ end
 
 function MoveDoer:getMoveType()
     return self.m_Template.type
+end
+
+function MoveDoer:getMoveTypeName()
+    return self.m_Template.typeName[LocalizationFunctions.getLanguageCode()]
 end
 
 return MoveDoer

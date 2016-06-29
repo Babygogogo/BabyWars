@@ -1,6 +1,9 @@
 
 local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
@@ -46,8 +49,6 @@ local DEFENSE_INFO_POSITION_Y = SECONDARY_WEAPON_INFO_POSITION_Y - DEFENSE_INFO_
 
 local ICON_SCALE = FONT_SIZE * 0.016
 local GRID_WIDTH = require("app.utilities.GameConstantFunctions").getGridSize().width
-
-local AnimationLoader = require("app.utilities.AnimationLoader")
 
 --------------------------------------------------------------------------------
 -- Util functions.
@@ -114,6 +115,8 @@ local function createScreenBackground()
     background:setContentSize(display.width, display.height)
         :ignoreAnchorPointForPosition(true)
 
+        :setOpacity(180)
+
     return background
 end
 
@@ -131,6 +134,7 @@ local function createDetailBackground()
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        :setOpacity(180)
 
     return background
 end
@@ -211,9 +215,7 @@ local function initWithMovementInfo(self, info)
 end
 
 local function updateMovementInfoWithModelUnit(info, unit, modelPlayer, modelWeather)
-    info.m_Label:setString("Movement Range:  " ..
-        unit:getMoveRange(modelPlayer, modelWeather) ..
-        "(" .. unit:getMoveType() .. ")")
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeName()))
 end
 
 --------------------------------------------------------------------------------
@@ -242,7 +244,7 @@ local function initWithVisionInfo(self, info)
 end
 
 local function updateVisionInfoWithModelUnit(info, unit)
-    info.m_Label:setString("Vision:  " .. unit:getVision())
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(92, unit:getVision()))
 end
 
 --------------------------------------------------------------------------------
@@ -279,9 +281,8 @@ local function initWithFuelInfo(self, info)
 end
 
 local function updateFuelInfoWithModelUnit(info, unit)
-    info.m_Label:setString("Fuel:    Amount:  " .. unit:getCurrentFuel() .. " / " .. unit:getMaxFuel() ..
-                        "    ConsumptionPerTurn:  " .. unit:getFuelConsumptionPerTurn() ..
-                        "\n            " .. unit:getDescriptionOnOutOfFuel())
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(93,
+        unit:getCurrentFuel(), unit:getMaxFuel(), unit:getFuelConsumptionPerTurn(), unit:shouldDestroyOnOutOfFuel()))
 end
 
 --------------------------------------------------------------------------------
@@ -299,7 +300,7 @@ end
 
 local function createPrimaryWeaponInfoFatalLabel()
     return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
-                        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
+        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
 end
 
 local function createPrimaryWeaponInfoFatalIcons()
@@ -308,7 +309,7 @@ end
 
 local function createPrimaryWeaponInfoStrongLabel()
     return createLabel(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y,
-                    PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
+        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
 end
 
 local function createPrimaryWeaponInfoStrongIcons()
@@ -350,13 +351,9 @@ end
 local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
     if (hasPrimaryWeapon) then
         local minRange, maxRange = unit:getAttackRangeMinMax()
-        label:setString(
-            "Primary Weapon: " .. unit:getPrimaryWeaponName() ..
-            "    Ammo:  "      .. unit:getPrimaryWeaponCurrentAmmo() .. " / " .. unit:getPrimaryWeaponMaxAmmo() ..
-            "    Range:  "     .. ((minRange == maxRange) and (minRange) or (minRange .. " - " .. maxRange))
-        )
+        label:setString(LocalizationFunctions.getLocalizedText(94, unit:getPrimaryWeaponName(), unit:getPrimaryWeaponCurrentAmmo(), unit:getPrimaryWeaponMaxAmmo(), minRange, maxRange))
     else
-        label:setString("Primary Weapon: Not equipped.")
+        label:setString(LocalizationFunctions.getLocalizedText(95))
     end
 end
 
@@ -413,7 +410,7 @@ end
 
 local function createSecondaryWeaponInfoFatalLabel()
     return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
-                    SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Fatal:")
+        SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
 end
 
 local function createSecondaryWeaponInfoFatalIcons()
@@ -422,7 +419,7 @@ end
 
 local function createSecondaryWeaponInfoStrongLabel()
     return createLabel(SECONDARY_WEAPON_INFO_POSITION_X + 300, SECONDARY_WEAPON_INFO_POSITION_Y,
-                    SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, "Strong:")
+        SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
 end
 
 local function createSecondaryWeaponInfoStrongIcons()
@@ -463,9 +460,9 @@ end
 
 local function updateSecondaryWeaponInfoBriefLabel(label, unit, hasSecondaryWeapon)
     if (hasSecondaryWeapon) then
-        label:setString("Secondary Weapon: " .. unit:getSecondaryWeaponName())
+        label:setString(LocalizationFunctions.getLocalizedText(98, unit:getSecondaryWeaponName(), unit:getAttackRangeMinMax()))
     else
-        label:setString("Secondary Weapon: Not equipped.")
+        label:setString(LocalizationFunctions.getLocalizedText(99))
     end
 end
 
@@ -515,12 +512,12 @@ end
 --------------------------------------------------------------------------------
 local function createDefenseInfoBriefLabel()
     return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-                    DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, "Defense:")
+        DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, LocalizationFunctions.getLocalizedText(100))
 end
 
 local function createDefenseInfoFatalLabel()
     return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-                    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Fatal:")
+        DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(101))
 end
 
 local function createDefenseInfoFatalIcons()
@@ -529,7 +526,7 @@ end
 
 local function createDefenseInfoWeakLabel()
     return createLabel(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y,
-                    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, "Weak:")
+        DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(102))
 end
 
 local function createDefenseInfoWeakIcons()
@@ -630,9 +627,6 @@ function ViewUnitDetail:ctor(param)
     initWithSecondaryWeaponInfo(self, createSecondaryWeaponInfo())
     initWithDefenseInfo(        self, createDefenseInfo())
     initWithTouchListener(      self, createTouchListener(self))
-
-    self:setCascadeOpacityEnabled(true)
-        :setOpacity(180)
 
     return self
 end
