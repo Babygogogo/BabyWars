@@ -91,7 +91,7 @@ function AnimationLoader.getTileAnimation(tileName, shapeIndex)
 end
 
 function AnimationLoader.getTileAnimationWithTiledId(tiledID)
-    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileNameWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
+    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileTypeWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
 end
 
 return AnimationLoader

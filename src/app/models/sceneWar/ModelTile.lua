@@ -75,7 +75,7 @@ local function initWithTiledID(self, objectID, baseID)
     self.m_BaseID   = baseID   or self.m_BaseID
     assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
 
-    local template = GameConstantFunctions.getTemplateModelTileWithTiledId(self.m_ObjectID, self.m_BaseID)
+    local template = GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(self.m_ObjectID, self.m_BaseID)
     assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
     if (self.m_Template ~= template) then
@@ -306,12 +306,24 @@ function ModelTile:getTiledID()
     return (self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
 end
 
+function ModelTile:getObjectAndBaseId()
+    return self.m_ObjectID, self.m_BaseID
+end
+
 function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
 end
 
+function ModelTile:getTileType()
+    return GameConstantFunctions.getTileTypeWithObjectAndBaseId(self:getObjectAndBaseId())
+end
+
+function ModelTile:getTileTypeFullName()
+    return LocalizationFunctions.getLocalizedText(116, self:getTileType())
+end
+
 function ModelTile:getDescription()
-    return self.m_Template.description[LocalizationFunctions.getLanguageCode()]
+    return LocalizationFunctions.getLocalizedText(117, self:getTileType())
 end
 
 function ModelTile:destroyModelTileObject()
@@ -337,7 +349,7 @@ end
 function ModelTile:updateWithPlayerIndex(playerIndex)
     assert(self:getPlayerIndex() ~= playerIndex, "ModelTile:updateWithPlayerIndex() the param playerIndex is the same as the one of self.")
 
-    local tileName = GameConstantFunctions.getTileNameWithTiledId(self:getTiledID())
+    local tileName = self:getTileType()
     if (tileName ~= "hq") then
         self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileName, playerIndex)
     else

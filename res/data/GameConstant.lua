@@ -731,11 +731,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "平原：允许空军和陆军通过。",
-            [2] = "Plains are easily traveled but offer little defense.",
-        },
     },
 
     river = {
@@ -759,11 +754,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "河流：只允许空军、步兵和炮兵通过。",
-            [2] = "Rivers can be passed by foot soldiers only.",
         },
     },
 
@@ -789,11 +779,6 @@ GameConstant.templateModelTiles = {
             ship      = 1,
             transport = 1,
         },
-
-        description = {
-            [1] = "海洋：允许空军和海军快速通过。",
-            [2] = "Seas provide good mobility for air and naval units.",
-        },
     },
 
     beach = {
@@ -817,11 +802,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = 1,
-        },
-
-        description = {
-            [1] = "海滩：登陆舰和炮艇可以在这里装载和卸载部队。允许大多数部队通过。",
-            [2] = "Beaches provide places for landers and gunboats to load and unload units.",
         },
     },
 
@@ -847,11 +827,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "道路：允许空军和陆军快速通过。",
-            [2] = "Roads provide optimum mobility but little defensive cover.",
-        },
     },
 
     bridge = {
@@ -876,8 +851,6 @@ GameConstant.templateModelTiles = {
             ship      = 1,
             transport = 1,
         },
-
-        description = "A bridge allows units to traverse rivers, but offers no terrain benefits.",
     },
 
     bridgeOnRiver = {
@@ -901,11 +874,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "桥梁：河流及陆地上的桥梁允许空军和陆军快速通过。",
-            [2] = "Naval units can't pass under river/land bridges.",
         },
     },
 
@@ -931,11 +899,6 @@ GameConstant.templateModelTiles = {
             ship      = 1,
             transport = 1,
         },
-
-        description = {
-            [1] = "桥梁：海洋上的桥梁允许空军和陆军快速通过，海军也能经过和停留。",
-            [2] = "Naval units can pass under sea bridges.",
-        },
     },
 
     wood = {
@@ -959,11 +922,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "森林：允许空军和陆军通过。在雾战时，为陆军提供隐蔽场所。",
-            [2] = "Woods provide hiding places for ground units in Fog of War.",
         },
     },
 
@@ -989,11 +947,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "山地：允许空军、步兵和炮兵。在雾战时，为步兵和炮兵提供额外视野。",
-            [2] = "Mountains add 3 vision for foot soldiers in Fog of War.",
-        },
     },
 
     wasteland = {
@@ -1017,11 +970,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "荒野：允许空军和陆军通过，但会减缓步兵和炮兵以外的陆军的移动。",
-            [2] = "Wastelands impair mobility for all but air units and foot soldiers.",
         },
     },
 
@@ -1047,11 +995,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "废墟：允许空军和陆军通过。雾战时，为陆军提供隐蔽场所。",
-            [2] = "Ruins provide hiding places for ground units in Fog of War.",
-        },
     },
 
     fire = {
@@ -1075,11 +1018,6 @@ GameConstant.templateModelTiles = {
             air       = false,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "火焰：不允许任何部队通过。在雾战时无条件照明周围5格内的区域。",
-            [2] = "Fires prevent unit movement and illuminate a 5-square area in Fog of War.",
         },
     },
 
@@ -1105,11 +1043,6 @@ GameConstant.templateModelTiles = {
             ship      = 2,
             transport = 2,
         },
-
-        description = {
-            [1] = "激流：允许空军和海军通过，但会减缓海军的移动。",
-            [2] = "Rough seas slow the movement of naval units.",
-        },
     },
 
     mist = {
@@ -1133,11 +1066,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = 1,
             transport = 1,
-        },
-
-        description = {
-            [1] = "迷雾：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。",
-            [2] = "Mists provide hiding places for naval units in Fog of War.",
         },
     },
 
@@ -1163,11 +1091,6 @@ GameConstant.templateModelTiles = {
             ship      = 2,
             transport = 2,
         },
-
-        description = {
-            [1] = "礁石：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。",
-            [2] = "Reefs provide hiding places for naval units in Fog of War.",
-        },
     },
 
     plasma = {
@@ -1191,11 +1114,6 @@ GameConstant.templateModelTiles = {
             air       = false,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "等离子体：不允许任何部队通过。",
-            [2] = "Plasma is impassable.",
         },
     },
 
@@ -1228,11 +1146,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "陨石：不允许任何部队通过。可以被部队攻击和破坏。",
-            [2] = "Meteors are impassable but can be destroyed.",
-        },
     },
 
     silo = {
@@ -1256,11 +1169,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "导弹发射井：步兵系可以在这里发射一次导弹，用来打击任意位置的13个格子的部队。",
-            [2] = "Silos can be launched by infantry units and damage a 13-square area.",
         },
     },
 
@@ -1305,11 +1213,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "总部：可以提供资金和维修陆军。若我方总部被占领，则我方战败。",
-            [2] = "HQs provide resupply for ground units. Battle ends if it's captured.",
-        },
     },
 
     city = {
@@ -1353,11 +1256,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "城市：可以提供资金和维修陆军。",
-            [2] = "Cities provide resupply for ground units.",
-        },
     },
 
     comtower = {
@@ -1392,11 +1290,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "指挥塔：可以提供资金，且为我方全体部队提供攻击加成。",
-            [2] = "Command towers boosts your attack once captured.",
-        },
     },
 
     radar = {
@@ -1430,11 +1323,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = false,
             transport = false,
-        },
-
-        description = {
-            [1] = "雷达：可以提供资金，且在雾战时照明5格范围内的区域。",
-            [2] = "Radars reveal a 5-square area in Fog of War once captured.",
         },
     },
 
@@ -1498,11 +1386,6 @@ GameConstant.templateModelTiles = {
                 "rig",
             },
         },
-
-        description = {
-            [1] = "工厂：可以提供资金、生产和维修陆军。",
-            [2] = "Factories can be used to resupply and produce ground units once captured.",
-        },
     },
 
     airport = {
@@ -1555,11 +1438,6 @@ GameConstant.templateModelTiles = {
                 "bcopter",
                 "tcopter",
             },
-        },
-
-        description = {
-            [1] = "机场：可以提供资金、生产和维修空军。",
-            [2] = "Airports can be used to resupply and produce air units once captured.",
         },
     },
 
@@ -1615,11 +1493,6 @@ GameConstant.templateModelTiles = {
                 "gunboat",
             },
         },
-
-        description = {
-            [1] = "海港：可以提供资金、生产和维修海军。",
-            [2] = "Seaports can be used to resupply and produce naval units once captured.",
-        },
     },
 
     tempairport = {
@@ -1659,11 +1532,6 @@ GameConstant.templateModelTiles = {
             ship      = false,
             transport = false,
         },
-
-        description = {
-            [1] = "临时机场：可以维修空军。不提供资金，也不能生产部队。",
-            [2] = "Temp airports provide resupply for air units.",
-        },
     },
 
     tempseaport = {
@@ -1702,11 +1570,6 @@ GameConstant.templateModelTiles = {
             air       = 1,
             ship      = 1,
             transport = 1,
-        },
-
-        description = {
-            [1] = "临时海港：可以维修海军。不提供资金，也不能生产部队。",
-            [2] = "Temp seaports provide resupply for naval units.",
         },
     },
 }
