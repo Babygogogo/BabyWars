@@ -22,7 +22,7 @@ local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {
     "getMoveRange",
     "getMoveType",
-    "getMoveTypeName",
+    "getMoveTypeFullName",
 }
 
 MoveDoer.DEPENDS = {}
@@ -94,8 +94,8 @@ function MoveDoer:getMoveType()
     return self.m_Template.type
 end
 
-function MoveDoer:getMoveTypeName()
-    return self.m_Template.typeName[LocalizationFunctions.getLanguageCode()]
+function MoveDoer:getMoveTypeFullName()
+    return LocalizationFunctions.getLocalizedText(110, self:getMoveType())
 end
 
 return MoveDoer

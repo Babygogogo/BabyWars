@@ -92,7 +92,7 @@ function RepairDoer:canRepairTarget(target)
         return false
     end
 
-    local targetName = GameConstantFunctions.getUnitTypeNameWithTiledId(targetTiledID)
+    local targetName = GameConstantFunctions.getUnitTypeWithTiledId(targetTiledID)
     for _, name in ipairs(self:getRepairTargetList()) do
         if (targetName == name) then
             return true

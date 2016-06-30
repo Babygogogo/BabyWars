@@ -533,7 +533,7 @@ local s_Texts = {
             else                                  return "未知"
             end
         end,
-        [2] = function()
+        [2] = function(moveType)
             if     (moveType == "infantry")  then return "infantry"
             elseif (moveType == "mech")      then return "mech"
             elseif (moveType == "tireA")     then return "tireA"
@@ -579,13 +579,13 @@ local s_Texts = {
             elseif (unitType == "battleship") then return "战列舰"
             elseif (unitType == "carrier")    then return "航空母舰"
             elseif (unitType == "submarine")  then return "潜艇"
-            elseif (unitType == "curiser")    then return "巡洋舰"
+            elseif (unitType == "cruiser")    then return "巡洋舰"
             elseif (unitType == "lander")     then return "登陆舰"
             elseif (unitType == "gunboat")    then return "炮舰"
             else                                   return "未知"
             end
         end,
-        [2] = function()
+        [2] = function(unitType)
             if     (unitType == "infantry")   then return "Inf"
             elseif (unitType == "mech")       then return "Mech"
             elseif (unitType == "bike")       then return "Bike"
@@ -609,7 +609,7 @@ local s_Texts = {
             elseif (unitType == "battleship") then return "BShip"
             elseif (unitType == "carrier")    then return "Carrier"
             elseif (unitType == "submarine")  then return "Sub"
-            elseif (unitType == "curiser")    then return "Cruiser"
+            elseif (unitType == "cruiser")    then return "Cruiser"
             elseif (unitType == "lander")     then return "Lander"
             elseif (unitType == "gunboat")    then return "GBoat"
             else                                   return "Unknown"
@@ -641,13 +641,13 @@ local s_Texts = {
             elseif (unitType == "battleship") then return "战列舰：攻防优秀，而且能移动后立刻进行攻击的远程部队。不能攻击空军。"
             elseif (unitType == "carrier")    then return "航空母舰：能够生产舰载机，以及装载两个空军单位。自身只能对空军造成少量伤害，防御力较差。"
             elseif (unitType == "submarine")  then return "潜艇：能够下潜使得敌军难以发现，且下潜后只能被潜艇和巡洋舰攻击。能有效打击巡洋舰以外的海军，无法攻击空军和陆军。"
-            elseif (unitType == "curiser")    then return "巡洋舰：能够对潜艇和空军造成毁灭性打击，对其他海军也有一定打击能力。能够装载两个直升机部队。不能攻击陆军。"
+            elseif (unitType == "cruiser")    then return "巡洋舰：能够对潜艇和空军造成毁灭性打击，对其他海军也有一定打击能力。能够装载两个直升机部队。不能攻击陆军。"
             elseif (unitType == "lander")     then return "登陆舰：能够在海滩地形装载和卸载最多两个陆军部队。不能攻击。"
             elseif (unitType == "gunboat")    then return "炮舰：能够装载一个步兵或炮兵。能够有效打击海军，但只有一枚弹药。防御力较差。"
             else                                   return "未知"
             end
         end,
-        [2] = function()
+        [2] = function(unitType)
             if     (unitType == "infantry")   then return "Infantry units are cheap. They can capture bases but have low firepower."
             elseif (unitType == "mech")       then return "Mech units can capture bases, traverse most terrain types, and have superior firepower."
             elseif (unitType == "bike")       then return "Bikes are infantry units with high mobility. They can capture bases but have low firepower."
@@ -671,10 +671,46 @@ local s_Texts = {
             elseif (unitType == "battleship") then return "Battleships can launch indirect attack after moving."
             elseif (unitType == "carrier")    then return "Carriers can carrier 2 air units and produce seaplanes."
             elseif (unitType == "submarine")  then return "Submerged submarines are difficult to find, and only cruisers and subs can fire on them."
-            elseif (unitType == "curiser")    then return "Cruisers are strong against subs and air units, and they can carry two copter units."
+            elseif (unitType == "cruiser")    then return "Cruisers are strong against subs and air units, and they can carry two copter units."
             elseif (unitType == "lander")     then return "Landers can transport two ground units. If the lander sinks, the units vanish."
             elseif (unitType == "gunboat")    then return "Gunboats can carry 1 foot soldier and attack other naval units."
             else                                   return "Unknown"
+            end
+        end,
+    },
+    [115] = {
+        [1] = function(weaponType)
+            if     (weaponType == "MachineGun")   then return "机关枪"
+            elseif (weaponType == "Barzooka")     then return "反坦克火箭筒"
+            elseif (weaponType == "Cannon")       then return "加农炮"
+            elseif (weaponType == "TankGun")      then return "坦克炮"
+            elseif (weaponType == "HeavyTankGun") then return "重型坦克炮"
+            elseif (weaponType == "MegaGun")      then return "弩级主炮"
+            elseif (weaponType == "Rockets")      then return "火箭炮"
+            elseif (weaponType == "AAMissiles")   then return "对空导弹"
+            elseif (weaponType == "Bombs")        then return "炸弹"
+            elseif (weaponType == "Missiles")     then return "导弹"
+            elseif (weaponType == "AAGun")        then return "防空炮"
+            elseif (weaponType == "Torpedoes")    then return "鱼雷"
+            elseif (weaponType == "ASMissiles")   then return "反舰导弹"
+            else                                       return "未知"
+            end
+        end,
+        [2] = function(weaponType)
+            if     (weaponType == "MachineGun")   then return "Machine Gun"
+            elseif (weaponType == "Barzooka")     then return "Barzooka"
+            elseif (weaponType == "Cannon")       then return "Cannon"
+            elseif (weaponType == "TankGun")      then return "Tank Gun"
+            elseif (weaponType == "HeavyTankGun") then return "Heavy Tank Gun"
+            elseif (weaponType == "MegaGun")      then return "Mega Gun"
+            elseif (weaponType == "Rockets")      then return "Rockets"
+            elseif (weaponType == "AAMissiles")   then return "AA Missiles"
+            elseif (weaponType == "Bombs")        then return "Bombs"
+            elseif (weaponType == "Missiles")     then return "Missiles"
+            elseif (weaponType == "AAGun")        then return "AA Gun"
+            elseif (weaponType == "Torpedoes")    then return "Torpedoes"
+            elseif (weaponType == "ASMissiles")   then return "AS Missiles"
+            else                                       return "unrecognized"
             end
         end,
     },

@@ -215,7 +215,7 @@ local function initWithMovementInfo(self, info)
 end
 
 local function updateMovementInfoWithModelUnit(info, unit, modelPlayer, modelWeather)
-    info.m_Label:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeName()))
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeFullName()))
 end
 
 --------------------------------------------------------------------------------
@@ -351,7 +351,7 @@ end
 local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
     if (hasPrimaryWeapon) then
         local minRange, maxRange = unit:getAttackRangeMinMax()
-        label:setString(LocalizationFunctions.getLocalizedText(94, unit:getPrimaryWeaponName(), unit:getPrimaryWeaponCurrentAmmo(), unit:getPrimaryWeaponMaxAmmo(), minRange, maxRange))
+        label:setString(LocalizationFunctions.getLocalizedText(94, unit:getPrimaryWeaponFullName(), unit:getPrimaryWeaponCurrentAmmo(), unit:getPrimaryWeaponMaxAmmo(), minRange, maxRange))
     else
         label:setString(LocalizationFunctions.getLocalizedText(95))
     end
@@ -460,7 +460,7 @@ end
 
 local function updateSecondaryWeaponInfoBriefLabel(label, unit, hasSecondaryWeapon)
     if (hasSecondaryWeapon) then
-        label:setString(LocalizationFunctions.getLocalizedText(98, unit:getSecondaryWeaponName(), unit:getAttackRangeMinMax()))
+        label:setString(LocalizationFunctions.getLocalizedText(98, unit:getSecondaryWeaponFullName(), unit:getAttackRangeMinMax()))
     else
         label:setString(LocalizationFunctions.getLocalizedText(99))
     end

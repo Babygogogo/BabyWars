@@ -143,7 +143,7 @@ local function createViewProduction(self, modelItem)
         end)
 
     view:getRendererNormal():addChild(createProductionIcon(modelItem.tiledID))
-        :addChild(createProductionLabel(modelItem.modelUnit:getFullName(), modelItem.cost))
+        :addChild(createProductionLabel(modelItem.modelUnit:getUnitTypeFullName(), modelItem.cost))
 
         :setCascadeColorEnabled(true)
 
