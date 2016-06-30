@@ -51,10 +51,11 @@
 
 local ModelTile = class("ModelTile")
 
-local ComponentManager      = require("global.components.ComponentManager")
 local TypeChecker           = require("app.utilities.TypeChecker")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local TableFunctions        = require("app.utilities.TableFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -310,7 +311,7 @@ function ModelTile:getPlayerIndex()
 end
 
 function ModelTile:getDescription()
-    return self.m_Template.description
+    return self.m_Template.description[LocalizationFunctions.getLanguageCode()]
 end
 
 function ModelTile:destroyModelTileObject()

@@ -464,7 +464,7 @@ local s_Texts = {
     },
     [97] = {
         [1] = function() return "较强："   end,
-        [2] = function() return "Strong:" end,
+        [2] = function() return "Good:" end,
     },
     [98] = {
         [1] = function(weaponName, minRange, maxRange)
@@ -491,6 +491,68 @@ local s_Texts = {
     [102] = {
         [1] = function() return "较弱：" end,
         [2] = function() return "Weak:" end,
+    },
+    [103] = {
+        [1] = function(bonus, catagory) return "防御加成：" .. bonus .. "%（" .. catagory .. "）"     end,
+        [2] = function(bonus, catagory) return "DefenseBonus: " .. bonus .. "% (" .. catagory .. ")" end,
+    },
+    [104] = {
+        [1] = function(amount, catagory) return "维修：+" .. amount .. "HP（" .. catagory .. "）"   end,
+        [2] = function(amount, catagory) return "Repair:  +" .. amount .. "HP (" .. catagory .. ")" end,
+    },
+    [105] = {
+        [1] = function() return "维修：无"      end,
+        [2] = function() return "Repair:  None" end,
+    },
+    [106] = {
+        [1] = function(currentPoint, maxPoint) return "占领点数：" .. currentPoint .. " / " .. maxPoint      end,
+        [2] = function(currentPoint, maxPoint) return "CapturePoint:  " .. currentPoint .. " / " .. maxPoint end,
+    },
+    [107] = {
+        [1] = function() return "占领点数：无"         end,
+        [2] = function() return "CapturePoint:  None" end,
+    },
+    [108] = {
+        [1] = function(income) return "收入：" .. income    end,
+        [2] = function(income) return "Income:  " .. income end,
+    },
+    [109] = {
+        [1] = function() return "收入：无"      end,
+        [2] = function() return "Income:  None" end,
+    },
+    [110] = {
+        [1] = function(moveType)
+            if     (moveType == "infantry")  then return "步兵"
+            elseif (moveType == "mech")      then return "炮兵"
+            elseif (moveType == "tireA")     then return "重型轮胎"
+            elseif (moveType == "tireB")     then return "轻型轮胎"
+            elseif (moveType == "tank")      then return "履带"
+            elseif (moveType == "air")       then return "飞行"
+            elseif (moveType == "ship")      then return "航行"
+            elseif (moveType == "transport") then return "运输"
+            else                                  return "未知"
+            end
+        end,
+        [2] = function()
+            if     (moveType == "infantry")  then return "infantry"
+            elseif (moveType == "mech")      then return "mech"
+            elseif (moveType == "tireA")     then return "tireA"
+            elseif (moveType == "tireB")     then return "tireB"
+            elseif (moveType == "tank")      then return "tank"
+            elseif (moveType == "air")       then return "air"
+            elseif (moveType == "ship")      then return "ship"
+            elseif (moveType == "transport") then return "transport"
+            else                                  return "unrecognized"
+            end
+        end,
+    },
+    [111] = {
+        [1] = function(moveType, moveCost) return LocalizationFunctions.getLocalizedText(110, moveType) .. "：" .. (moveCost or "--") end,
+        [2] = function(moveType, moveCost) return LocalizationFunctions.getLocalizedText(110, moveType) .. ":  " .. (moveCost or "--") end,
+    },
+    [112] = {
+        [1] = function() return "移动力消耗："  end,
+        [2] = function() return "Move Cost:  " end,
     },
 }
 

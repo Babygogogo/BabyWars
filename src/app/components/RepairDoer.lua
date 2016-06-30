@@ -18,8 +18,9 @@
 local RepairDoer = class("RepairDoer")
 
 local TypeChecker           = require("app.utilities.TypeChecker")
-local ComponentManager      = require("global.components.ComponentManager")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getRepairTargetCatagory",
@@ -78,7 +79,7 @@ end
 -- Exported methods.
 --------------------------------------------------------------------------------
 function RepairDoer:getRepairTargetCatagory()
-    return self.m_Template.targetCatagory
+    return self.m_Template.targetCatagory[LocalizationFunctions.getLanguageCode()]
 end
 
 function RepairDoer:getRepairTargetList()

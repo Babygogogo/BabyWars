@@ -714,7 +714,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -729,7 +732,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Plains are easily traveled but offer little defense.",
+        description = {
+            [1] = "平原：允许空军和陆军通过。",
+            [2] = "Plains are easily traveled but offer little defense.",
+        },
     },
 
     river = {
@@ -737,7 +743,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -752,7 +761,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Rivers can be passed by foot soldiers only.",
+        description = {
+            [1] = "河流：只允许空军、步兵和炮兵通过。",
+            [2] = "Rivers can be passed by foot soldiers only.",
+        },
     },
 
     sea = {
@@ -760,7 +772,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -775,7 +790,10 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        description = "Seas provide good mobility for air and naval units.",
+        description = {
+            [1] = "海洋：允许空军和海军快速通过。",
+            [2] = "Seas provide good mobility for air and naval units.",
+        },
     },
 
     beach = {
@@ -783,7 +801,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -798,7 +819,10 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        description = "Beaches provide places for landers and gunboats to load and unload units.",
+        description = {
+            [1] = "海滩：登陆舰和炮艇可以在这里装载和卸载部队。允许大多数部队通过。",
+            [2] = "Beaches provide places for landers and gunboats to load and unload units.",
+        },
     },
 
     road = {
@@ -806,7 +830,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -821,7 +848,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Roads provide optimum mobility but little defensive cover.",
+        description = {
+            [1] = "道路：允许空军和陆军快速通过。",
+            [2] = "Roads provide optimum mobility but little defensive cover.",
+        },
     },
 
     bridge = {
@@ -829,7 +859,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -852,7 +885,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -867,7 +903,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Naval units can't pass under river/land bridges.",
+        description = {
+            [1] = "桥梁：河流及陆地上的桥梁允许空军和陆军快速通过。",
+            [2] = "Naval units can't pass under river/land bridges.",
+        },
     },
 
     bridgeOnSea = {
@@ -875,7 +914,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -890,7 +932,10 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        description = "Naval units can pass under sea bridges.",
+        description = {
+            [1] = "桥梁：海洋上的桥梁允许空军和陆军快速通过，海军也能经过和停留。",
+            [2] = "Naval units can pass under sea bridges.",
+        },
     },
 
     wood = {
@@ -898,7 +943,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -913,7 +961,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Woods provide hiding places for ground units in Fog of War.",
+        description = {
+            [1] = "森林：允许空军和陆军通过。在雾战时，为陆军提供隐蔽场所。",
+            [2] = "Woods provide hiding places for ground units in Fog of War.",
+        },
     },
 
     mountain = {
@@ -921,7 +972,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = "Foot units",
+            targetCatagory = {
+                [1] = "步兵/炮兵",
+                [2] = "Foot Units",
+            },
             targetList     = GameConstant.unitCatagory.footUnits,
         },
 
@@ -936,7 +990,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Mountains add 3 vision for foot soldiers in Fog of War.",
+        description = {
+            [1] = "山地：允许空军、步兵和炮兵。在雾战时，为步兵和炮兵提供额外视野。",
+            [2] = "Mountains add 3 vision for foot soldiers in Fog of War.",
+        },
     },
 
     wasteland = {
@@ -944,7 +1001,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -959,7 +1019,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Wastelands impair mobility for all but air units and foot soldiers.",
+        description = {
+            [1] = "荒野：允许空军和陆军通过，但会减缓步兵和炮兵以外的陆军的移动。",
+            [2] = "Wastelands impair mobility for all but air units and foot soldiers.",
+        },
     },
 
     ruins = {
@@ -967,7 +1030,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -982,7 +1048,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Ruins provide hiding places for ground units in Fog of War.",
+        description = {
+            [1] = "废墟：允许空军和陆军通过。雾战时，为陆军提供隐蔽场所。",
+            [2] = "Ruins provide hiding places for ground units in Fog of War.",
+        },
     },
 
     fire = {
@@ -990,7 +1059,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1005,7 +1077,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Fires prevent unit movement and illuminate a 5-square area in Fog of War.",
+        description = {
+            [1] = "火焰：不允许任何部队通过。在雾战时无条件照明周围5格内的区域。",
+            [2] = "Fires prevent unit movement and illuminate a 5-square area in Fog of War.",
+        },
     },
 
     rough = {
@@ -1013,7 +1088,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "Naval units",
+            targetCatagory = {
+                [1] = "海军",
+                [2] = "Naval Units",
+            },
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1028,7 +1106,10 @@ GameConstant.templateModelTiles = {
             transport = 2,
         },
 
-        description = "Rough seas slow the movement of naval units.",
+        description = {
+            [1] = "激流：允许空军和海军通过，但会减缓海军的移动。",
+            [2] = "Rough seas slow the movement of naval units.",
+        },
     },
 
     mist = {
@@ -1036,7 +1117,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Naval units",
+            targetCatagory = {
+                [1] = "海军",
+                [2] = "Naval Units",
+            },
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1051,7 +1135,10 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        description = "Mists provide hiding places for naval units in Fog of War.",
+        description = {
+            [1] = "迷雾：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。",
+            [2] = "Mists provide hiding places for naval units in Fog of War.",
+        },
     },
 
     reef = {
@@ -1059,7 +1146,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "Naval units",
+            targetCatagory = {
+                [1] = "海军",
+                [2] = "Naval Units",
+            },
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1074,7 +1164,10 @@ GameConstant.templateModelTiles = {
             transport = 2,
         },
 
-        description = "Reefs provide hiding places for naval units in Fog of War.",
+        description = {
+            [1] = "礁石：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。",
+            [2] = "Reefs provide hiding places for naval units in Fog of War.",
+        },
     },
 
     plasma = {
@@ -1082,7 +1175,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1097,7 +1193,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Plasma is impassable.",
+        description = {
+            [1] = "等离子体：不允许任何部队通过。",
+            [2] = "Plasma is impassable.",
+        },
     },
 
     meteor = {
@@ -1112,7 +1211,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
+            targetCatagory = {
+                [1] = "无",
+                [2] = "None",
+            },
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1127,7 +1229,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Meteors are impassable but can be destroyed.",
+        description = {
+            [1] = "陨石：不允许任何部队通过。可以被部队攻击和破坏。",
+            [2] = "Meteors are impassable but can be destroyed.",
+        },
     },
 
     silo = {
@@ -1135,7 +1240,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1150,7 +1258,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Silos can be launched by infantry units and damage a 13-square area.",
+        description = {
+            [1] = "导弹发射井：步兵系可以在这里发射一次导弹，用来打击任意位置的13个格子的部队。",
+            [2] = "Silos can be launched by infantry units and damage a 13-square area.",
+        },
     },
 
     hq = {
@@ -1163,7 +1274,10 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1174,7 +1288,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1189,7 +1306,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "HQs provide resupply for ground units. Battle ends if it's captured.",
+        description = {
+            [1] = "总部：可以提供资金和维修陆军。若我方总部被占领，则我方战败。",
+            [2] = "HQs provide resupply for ground units. Battle ends if it's captured.",
+        },
     },
 
     city = {
@@ -1202,7 +1322,10 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1213,7 +1336,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1228,7 +1354,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Cities provide resupply for ground units.",
+        description = {
+            [1] = "城市：可以提供资金和维修陆军。",
+            [2] = "Cities provide resupply for ground units.",
+        },
     },
 
     comtower = {
@@ -1246,7 +1375,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1261,7 +1393,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Command towers boosts your attack and defense once captured.",
+        description = {
+            [1] = "指挥塔：可以提供资金，且为我方全体部队提供攻击加成。",
+            [2] = "Command towers boosts your attack once captured.",
+        },
     },
 
     radar = {
@@ -1279,7 +1414,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1294,7 +1432,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Radars reveal a 5-square area in Fog of War once captured.",
+        description = {
+            [1] = "雷达：可以提供资金，且在雾战时照明5格范围内的区域。",
+            [2] = "Radars reveal a 5-square area in Fog of War once captured.",
+        },
     },
 
     factory = {
@@ -1307,7 +1448,10 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1318,7 +1462,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1352,7 +1499,10 @@ GameConstant.templateModelTiles = {
             },
         },
 
-        description = "Factories can be used to resupply and produce ground units once captured.",
+        description = {
+            [1] = "工厂：可以提供资金、生产和维修陆军。",
+            [2] = "Factories can be used to resupply and produce ground units once captured.",
+        },
     },
 
     airport = {
@@ -1365,7 +1515,10 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Air units",
+            targetCatagory = {
+                [1] = "空军",
+                [2] = "Air units",
+            },
             targetList     = GameConstant.unitCatagory.airUnits,
             amount         = 2,
         },
@@ -1376,7 +1529,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1401,7 +1557,10 @@ GameConstant.templateModelTiles = {
             },
         },
 
-        description = "Airports can be used to resupply and produce air units once captured.",
+        description = {
+            [1] = "机场：可以提供资金、生产和维修空军。",
+            [2] = "Airports can be used to resupply and produce air units once captured.",
+        },
     },
 
     seaport = {
@@ -1414,7 +1573,10 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Naval units",
+            targetCatagory = {
+                [1] = "海军",
+                [2] = "Naval units",
+            },
             targetList     = GameConstant.unitCatagory.navalUnits,
             amount         = 2,
         },
@@ -1425,7 +1587,10 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground/naval units",
+            targetCatagory = {
+                [1] = "陆军/海军",
+                [2] = "Ground/Naval Units",
+            },
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 
@@ -1451,7 +1616,10 @@ GameConstant.templateModelTiles = {
             },
         },
 
-        description = "Seaports can be used to resupply and produce naval units once captured.",
+        description = {
+            [1] = "海港：可以提供资金、生产和维修海军。",
+            [2] = "Seaports can be used to resupply and produce naval units once captured.",
+        },
     },
 
     tempairport = {
@@ -1464,14 +1632,20 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Air units",
+            targetCatagory = {
+                [1] = "空军",
+                [2] = "Air units",
+            },
             targetList     = GameConstant.unitCatagory.airUnits,
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Ground units",
+            targetCatagory = {
+                [1] = "陆军",
+                [2] = "Ground units",
+            },
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1486,7 +1660,10 @@ GameConstant.templateModelTiles = {
             transport = false,
         },
 
-        description = "Temp airports provide resupply for air units.",
+        description = {
+            [1] = "临时机场：可以维修空军。不提供资金，也不能生产部队。",
+            [2] = "Temp airports provide resupply for air units.",
+        },
     },
 
     tempseaport = {
@@ -1499,14 +1676,20 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "Naval units",
+            targetCatagory = {
+                [1] = "海军",
+                [2] = "Naval units",
+            },
             targetList     = GameConstant.unitCatagory.navalUnits,
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Ground/naval units",
+            targetCatagory = {
+                [1] = "陆军/海军",
+                [2] = "Ground/Naval Units",
+            },
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 
@@ -1521,7 +1704,10 @@ GameConstant.templateModelTiles = {
             transport = 1,
         },
 
-        description = "Temp seaports provide resupply for naval units.",
+        description = {
+            [1] = "临时海港：可以维修海军。不提供资金，也不能生产部队。",
+            [2] = "Temp seaports provide resupply for naval units.",
+        },
     },
 }
 
@@ -3832,7 +4018,7 @@ GameConstant.templateModelUnits = {
         },
 
         description = {
-            [1] = "登陆舰：能够在沙滩地形装载和卸载最多两个陆军部队。不能攻击。",
+            [1] = "登陆舰：能够在海滩地形装载和卸载最多两个陆军部队。不能攻击。",
             [2] = "Landers can transport two ground units. If the lander sinks, the units vanish.",
         },
     },

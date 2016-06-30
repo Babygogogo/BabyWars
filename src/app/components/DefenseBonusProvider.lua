@@ -12,8 +12,9 @@
 
 local DefenseBonusProvider = class("DefenseBonusProvider")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getDefenseBonusAmount",
@@ -21,6 +22,7 @@ local EXPORTED_METHODS = {
     "getDefenseBonusTargetCatagory",
     "getDefenseBonusTargetList",
 }
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -95,7 +97,7 @@ function DefenseBonusProvider:getNormalizedDefenseBonusAmount()
 end
 
 function DefenseBonusProvider:getDefenseBonusTargetCatagory()
-    return self.m_Template.targetCatagory
+    return self.m_Template.targetCatagory[LocalizationFunctions.getLanguageCode()]
 end
 
 function DefenseBonusProvider:getDefenseBonusTargetList()

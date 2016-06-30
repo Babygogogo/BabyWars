@@ -1,6 +1,8 @@
 
 local ViewTileDetail = class("ViewTileDetail", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local FONT_SIZE   = 25
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
@@ -91,6 +93,7 @@ local function createDetailBackground()
         :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
 
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        :setOpacity(180)
 
     return background
 end
@@ -171,7 +174,7 @@ local function initWithDefenseInfo(self, info)
 end
 
 local function updateDefenseInfoWithModelTile(info, tile)
-    info.m_Label:setString("DefenseBonus:  " .. tile:getDefenseBonusAmount() .. "% (" .. tile:getDefenseBonusTargetCatagory() .. ")")
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(103, tile:getDefenseBonusAmount(), tile:getDefenseBonusTargetCatagory()))
 end
 
 --------------------------------------------------------------------------------
@@ -211,9 +214,9 @@ local function updateRepairInfoWithModelTile(info, tile)
     if (tile.getRepairTargetCatagory) then
         local catagory = tile:getRepairTargetCatagory()
         local amount   = tile:getNormalizedRepairAmount()
-        info.m_Label:setString("Repair:  +" .. amount .. "HP (" .. catagory .. ")")
+        info.m_Label:setString(LocalizationFunctions.getLocalizedText(104, amount, catagory))
     else
-        info.m_Label:setString("Repair: None")
+        info.m_Label:setString(LocalizationFunctions.getLocalizedText(105))
     end
 end
 
@@ -262,17 +265,17 @@ local function updateCaptureAndIncomeInfoCaptureLabel(label, tile)
     if (tile.getCurrentCapturePoint) then
         local currentPoint = tile:getCurrentCapturePoint()
         local maxPoint     = tile:getMaxCapturePoint()
-        label:setString("CapturePoint:  " .. currentPoint .. " / " .. maxPoint)
+        label:setString(LocalizationFunctions.getLocalizedText(106, currentPoint, maxPoint))
     else
-        label:setString("CapturePoint: None")
+        label:setString(LocalizationFunctions.getLocalizedText(107))
     end
 end
 
 local function updateCaptureAndIncomeInfoIncomeLabel(label, tile)
     if (tile.getIncomeAmount) then
-        label:setString("Income:  " .. tile:getIncomeAmount())
+        label:setString(LocalizationFunctions.getLocalizedText(108, tile:getIncomeAmount()))
     else
-        label:setString("Income: None")
+        label:setString(LocalizationFunctions.getLocalizedText(109))
     end
 end
 
@@ -286,8 +289,7 @@ end
 --------------------------------------------------------------------------------
 local function createMoveCostInfoMoveCostLabel()
     return createLabel(MOVE_COST_INFO_POSITION_X, MOVE_COST_INFO_POSITION_Y + LINE_HEIGHT * 3,
-                    MOVE_COST_INFO_WIDTH, LINE_HEIGHT,
-                    "Move Cost:")
+        MOVE_COST_INFO_WIDTH, LINE_HEIGHT, LocalizationFunctions.getLocalizedText(112))
 end
 
 local function createMoveCostInfoDetailLabels()
@@ -330,7 +332,7 @@ end
 
 local function updateMoveCostInfoDetailLabels(labels, tile, modelPlayer)
     for key, label in pairs(labels) do
-        label:setString(key .. ": " .. (tile:getMoveCost(key, modelPlayer) or "-"))
+        label:setString(LocalizationFunctions.getLocalizedText(111, key, tile:getMoveCost(key, modelPlayer)))
     end
 end
 
@@ -377,9 +379,6 @@ function ViewTileDetail:ctor(param)
     initWithCaptureAndIncomeInfo(self, createCaptureAndIncomeInfo())
     initWithMoveCostInfo(        self, createMoveCostInfo())
     initWithTouchListener(       self, createTouchListener(self))
-
-    self:setCascadeOpacityEnabled(true)
-        :setOpacity(180)
 
     return self
 end
