@@ -358,12 +358,16 @@ function ModelUnit:showMovingAnimation()
     return self
 end
 
+function ModelUnit:getTypeName()
+    return GameConstantFunctions.getUnitTypeNameWithTiledId(self:getTiledID())
+end
+
 function ModelUnit:getDescription()
-    return self.m_Template.description[LocalizationFunctions.getLanguageCode()]
+    return LocalizationFunctions.getLocalizedText(114, self:getTypeName())
 end
 
 function ModelUnit:getFullName()
-    return self.m_Template.fullName[LocalizationFunctions.getLanguageCode()]
+    return LocalizationFunctions.getLocalizedText(113, self:getTypeName())
 end
 
 function ModelUnit:getVision()

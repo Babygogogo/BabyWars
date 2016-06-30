@@ -88,7 +88,7 @@ local function getAttackBonus(attacker, attackerTile, target, targetTile, modelP
 end
 
 local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    local targetTypeName = GameConstantFunctions.getUnitNameWithTiledId(target:getTiledID())
+    local targetTypeName = GameConstantFunctions.getUnitTypeNameWithTiledId(target:getTiledID())
     local bonus = 0
     bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
     bonus = bonus + ((target.getLevelDefenseBonus) and (target:getLevelDefenseBonus()) or 0)

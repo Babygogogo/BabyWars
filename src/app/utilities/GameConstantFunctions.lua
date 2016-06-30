@@ -186,7 +186,7 @@ function GameConstantFunctions.getTileNameWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].name
 end
 
-function GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+function GameConstantFunctions.getUnitTypeNameWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].name
 end
 

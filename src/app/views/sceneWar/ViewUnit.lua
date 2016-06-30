@@ -99,7 +99,7 @@ local function playSpriteAnimation(sprite, tiledID, state)
         sprite:setPosition(0, 0)
     end
 
-    local unitName       = GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+    local unitName       = GameConstantFunctions.getUnitTypeNameWithTiledId(tiledID)
     local playerIndex    = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
     sprite:stopAllActions()
         :playAnimationForever(AnimationLoader.getUnitAnimation(unitName, playerIndex, state))
