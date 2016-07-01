@@ -192,13 +192,13 @@ function GameConstantFunctions.getTileTypeWithObjectAndBaseId(objectID, baseID)
         return baseType
     else
         local objectType = GameConstantFunctions.getTileTypeWithTiledId(objectID)
-        if (objectType ~= "bridge") then
+        if (objectType ~= "Bridge") then
             return objectType
         else
-            if (baseType == "sea") then
-                return "bridgeOnSea"
+            if (baseType == "Sea") then
+                return "BridgeOnSea"
             else
-                return "bridgeOnRiver"
+                return "BridgeOnRiver"
             end
         end
     end

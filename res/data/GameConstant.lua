@@ -8,92 +8,92 @@ GameConstant.gridSize = {
 }
 
 GameConstant.indexesForTileOrUnit = {
-    {name = "plain",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "river",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 16, },
-    {name = "sea",         firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 47, },
-    {name = "beach",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 12, },
-    {name = "road",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
-    {name = "bridge",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
-    {name = "wood",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "mountain",    firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "wasteland",   firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "ruins",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "fire",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "rough",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "mist",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "reef",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "plasma",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "meteor",      firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "silo",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 2,  },
-    {name = "hq",          firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "city",        firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "comtower",    firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "radar",       firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "factory",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "airport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "seaport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "tempairport", firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "tempseaport", firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "Plain",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "River",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 16, },
+    {name = "Sea",             firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 47, },
+    {name = "Beach",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 12, },
+    {name = "Road",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
+    {name = "Bridge",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 11, },
+    {name = "Wood",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Mountain",        firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Wasteland",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Ruins",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Fire",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Rough",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Mist",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Reef",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Plasma",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Meteor",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Silo",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 2,  },
+    {name = "Headquarters",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "City",            firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "CommandTower",    firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "Radar",           firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "Factory",         firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "Airport",         firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "Seaport",         firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "TempAirport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "TempSeaport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
 
-    {name = "infantry",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "mech",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "bike",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "recon",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "flare",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "antiair",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "tank",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "mdtank",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "wartank",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "artillery",   firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "antitank",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "rockets",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "missiles",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "rig",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "fighter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "bomber",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "duster",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "bcopter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "tcopter",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "seaplane",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "battleship",  firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "carrier",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "submarine",   firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "cruiser",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "lander",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
-    {name = "gunboat",     firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Infantry",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Mech",            firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Bike",            firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Recon",           firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Flare",           firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "AntiAir",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Tank",            firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "MediumTank",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "WarTank",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Artillery",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "AntiTank",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Rockets",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Missiles",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Rig",             firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Fighter",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Bomber",          firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Duster",          firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "BattleCopter",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "TransportCopter", firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Seaplane",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Battleship",      firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Carrier",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Submarine",       firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Cruiser",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Lander",          firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
+    {name = "Gunboat",         firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
 }
 
 GameConstant.tileAnimations = {
-    plain       = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    river       = {typeIndex = 2,  shapesCount = 16, framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    sea         = {typeIndex = 3,  shapesCount = 47, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    beach       = {typeIndex = 4,  shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    road        = {typeIndex = 5,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    bridge      = {typeIndex = 6,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    wood        = {typeIndex = 7,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    mountain    = {typeIndex = 8,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    wasteland   = {typeIndex = 9,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    ruins       = {typeIndex = 10, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    fire        = {typeIndex = 11, shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,    fillsGrid = true,  },
-    rough       = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    mist        = {typeIndex = 13, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    reef        = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    plasma      = {typeIndex = 15, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
-    meteor      = {typeIndex = 16, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    silo        = {typeIndex = 17, shapesCount = 2,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    hq          = {typeIndex = 18, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    city        = {typeIndex = 19, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    comtower    = {typeIndex = 20, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    radar       = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    factory     = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    airport     = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    seaport     = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
-    tempairport = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    tempseaport = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    Plain        = {typeIndex = 1,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    River        = {typeIndex = 2,  shapesCount = 16, framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Sea          = {typeIndex = 3,  shapesCount = 47, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    Beach        = {typeIndex = 4,  shapesCount = 12, framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    Road         = {typeIndex = 5,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    Bridge       = {typeIndex = 6,  shapesCount = 11, framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    Wood         = {typeIndex = 7,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Mountain     = {typeIndex = 8,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Wasteland    = {typeIndex = 9,  shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Ruins        = {typeIndex = 10, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Fire         = {typeIndex = 11, shapesCount = 1,  framesCount = 5, durationPerFrame = 0.1,    fillsGrid = true,  },
+    Rough        = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    Mist         = {typeIndex = 13, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    Reef         = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
+    Plasma       = {typeIndex = 15, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
+    Meteor       = {typeIndex = 16, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    Silo         = {typeIndex = 17, shapesCount = 2,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Headquarters = {typeIndex = 18, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    City         = {typeIndex = 19, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    CommandTower = {typeIndex = 20, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Radar        = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Factory      = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Airport      = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Seaport      = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
+    TempAirport  = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    TempSeaport  = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
 }
 
 GameConstant.unitAnimations = {
-    infantry = {
+    Infantry = {
         {
             normal = {pattern = "c02_t01_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t01_s05_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
@@ -112,7 +112,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    mech = {
+    Mech = {
         {
             normal = {pattern = "c02_t02_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t02_s05_f%02d.png", framesCount = 4, durationPerFrame = 0.11},
@@ -131,7 +131,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    bike = {
+    Bike = {
         {
             normal = {pattern = "c02_t03_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t03_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -150,7 +150,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    recon = {
+    Recon = {
         {
             normal = {pattern = "c02_t04_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t04_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -169,7 +169,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    flare = {
+    Flare = {
         {
             normal = {pattern = "c02_t05_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t05_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -188,7 +188,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    antiair = {
+    AntiAir = {
         {
             normal = {pattern = "c02_t06_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t06_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -207,7 +207,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    tank = {
+    Tank = {
         {
             normal = {pattern = "c02_t07_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t07_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -226,7 +226,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    mdtank = {
+    MediumTank = {
         {
             normal = {pattern = "c02_t08_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t08_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -245,7 +245,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    wartank = {
+    WarTank = {
         {
             normal = {pattern = "c02_t09_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t09_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -264,7 +264,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    artillery = {
+    Artillery = {
         {
             normal = {pattern = "c02_t10_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t10_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -283,7 +283,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    antitank = {
+    AntiTank = {
         {
             normal = {pattern = "c02_t11_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t11_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -302,7 +302,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    rockets = {
+    Rockets = {
         {
             normal = {pattern = "c02_t12_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t12_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -321,7 +321,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    missiles = {
+    Missiles = {
         {
             normal = {pattern = "c02_t13_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t13_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -340,7 +340,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    rig = {
+    Rig = {
         {
             normal = {pattern = "c02_t14_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t14_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -359,7 +359,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    fighter = {
+    Fighter = {
         {
             normal = {pattern = "c02_t15_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t15_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -378,7 +378,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    bomber = {
+    Bomber = {
         {
             normal = {pattern = "c02_t16_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t16_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -397,7 +397,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    duster = {
+    Duster = {
         {
             normal = {pattern = "c02_t17_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t17_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -416,7 +416,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    bcopter = {
+    BattleCopter = {
         {
             normal = {pattern = "c02_t18_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t18_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -435,7 +435,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    tcopter = {
+    TransportCopter = {
         {
             normal = {pattern = "c02_t19_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t19_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -454,7 +454,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    seaplane = {
+    Seaplane = {
         {
             normal = {pattern = "c02_t20_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t20_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -473,7 +473,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    battleship = {
+    Battleship = {
         {
             normal = {pattern = "c02_t21_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t21_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -492,7 +492,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    carrier = {
+    Carrier = {
         {
             normal = {pattern = "c02_t22_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t22_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -511,7 +511,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    submarine = {
+    Submarine = {
         {
             normal = {pattern = "c02_t23_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t23_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -530,7 +530,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    cruiser = {
+    Cruiser = {
         {
             normal = {pattern = "c02_t24_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t24_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -549,7 +549,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    lander = {
+    Lander = {
         {
             normal = {pattern = "c02_t25_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t25_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -568,7 +568,7 @@ GameConstant.unitAnimations = {
         },
     },
 
-    gunboat = {
+    Gunboat = {
         {
             normal = {pattern = "c02_t26_s01_f%02d.png", framesCount = 4, durationPerFrame = 0.3},
             moving = {pattern = "c02_t26_s05_f%02d.png", framesCount = 3, durationPerFrame = 0.11},
@@ -590,98 +590,98 @@ GameConstant.unitAnimations = {
 
 GameConstant.unitCatagory = {
     allUnits = {
-        "infantry",
-        "mech",
-        "bike",
-        "recon",
-        "flare",
-        "antiair",
-        "tank",
-        "mdtank",
-        "wartank",
-        "artillery",
-        "antitank",
-        "rockets",
-        "missiles",
-        "rig",
-        "fighter",
-        "bomber",
-        "duster",
-        "bcopter",
-        "tcopter",
-        "seaplane",
-        "battleship",
-        "carrier",
-        "submarine",
-        "cruiser",
-        "lander",
-        "gunboat",
+        "Infantry",
+        "Mech",
+        "Bike",
+        "Recon",
+        "Flare",
+        "AntiAir",
+        "Tank",
+        "MediumTank",
+        "WarTank",
+        "Artillery",
+        "AntiTank",
+        "Rockets",
+        "Missiles",
+        "Rig",
+        "Fighter",
+        "Bomber",
+        "Duster",
+        "BattleCopter",
+        "TransportCopter",
+        "Seaplane",
+        "Battleship",
+        "Carrier",
+        "Submarine",
+        "Cruiser",
+        "Lander",
+        "Gunboat",
     },
 
     groundUnits = {
-        "infantry",
-        "mech",
-        "bike",
-        "recon",
-        "flare",
-        "antiair",
-        "tank",
-        "mdtank",
-        "wartank",
-        "artillery",
-        "antitank",
-        "rockets",
-        "missiles",
-        "rig",
+        "Infantry",
+        "Mech",
+        "Bike",
+        "Recon",
+        "Flare",
+        "AntiAir",
+        "Tank",
+        "MediumTank",
+        "WarTank",
+        "Artillery",
+        "AntiTank",
+        "Rockets",
+        "Missiles",
+        "Rig",
     },
 
     navalUnits = {
-        "battleship",
-        "carrier",
-        "submarine",
-        "cruiser",
-        "lander",
-        "gunboat",
+        "Battleship",
+        "Carrier",
+        "Submarine",
+        "Cruiser",
+        "Lander",
+        "Gunboat",
     },
 
     airUnits = {
-        "fighter",
-        "bomber",
-        "duster",
-        "bcopter",
-        "tcopter",
-        "seaplane",
+        "Fighter",
+        "Bomber",
+        "Duster",
+        "BattleCopter",
+        "TransportCopter",
+        "Seaplane",
     },
 
     groundOrNavalUnits = {
-        "infantry",
-        "mech",
-        "bike",
-        "recon",
-        "flare",
-        "antiair",
-        "tank",
-        "mdtank",
-        "wartank",
-        "artillery",
-        "antitank",
-        "rockets",
-        "missiles",
-        "rig",
-        "battleship",
-        "carrier",
-        "submarine",
-        "cruiser",
-        "lander",
-        "gunboat",
+        "Infantry",
+        "Mech",
+        "Bike",
+        "Recon",
+        "Flare",
+        "AntiAir",
+        "Tank",
+        "MediumTank",
+        "WarTank",
+        "Artillery",
+        "AntiTank",
+        "Rockets",
+        "Missiles",
+        "Rig",
+        "Battleship",
+        "Carrier",
+        "Submarine",
+        "Cruiser",
+        "Lander",
+        "Gunboat",
     },
 
     none = {
     },
 
     footUnits = {
-        "infantry",
-        "mech"
+        "Infantry",
+        "Mech"
     },
 }
 
@@ -698,18 +698,18 @@ GameConstant.levelBonus = {
 }
 
 GameConstant.moveTypes = {
-    "infantry",
-    "mech",
-    "tireA",
-    "tireB",
-    "tank",
-    "air",
-    "ship",
-    "transport",
+    "Infantry",
+    "Mech",
+    "TireA",
+    "TireB",
+    "Tank",
+    "Air",
+    "Ship",
+    "Transport",
 }
 
 GameConstant.templateModelTiles = {
-    plain = {
+    Plain = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -722,18 +722,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 2,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 2,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    river = {
+    River = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -746,18 +746,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 2,
-            mech      = 1,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 2,
+            Mech      = 1,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    sea = {
+    Sea = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -770,18 +770,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
     },
 
-    beach = {
+    Beach = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -794,18 +794,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 2,
-            tireB     = 2,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = 1,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 2,
+            TireB     = 2,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = 1,
         },
     },
 
-    road = {
+    Road = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -818,18 +818,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    bridge = {
+    Bridge = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -842,18 +842,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
     },
 
-    bridgeOnRiver = {
+    BridgeOnRiver = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -866,18 +866,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    bridgeOnSea = {
+    BridgeOnSea = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -890,18 +890,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
     },
 
-    wood = {
+    Wood = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -914,18 +914,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 3,
-            tireB     = 3,
-            tank      = 2,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 3,
+            TireB     = 3,
+            Tank      = 2,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    mountain = {
+    Mountain = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -938,18 +938,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 2,
-            mech      = 1,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 2,
+            Mech      = 1,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    wasteland = {
+    Wasteland = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -962,18 +962,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 3,
-            tireB     = 3,
-            tank      = 2,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 3,
+            TireB     = 3,
+            Tank      = 2,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    ruins = {
+    Ruins = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -986,18 +986,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 2,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 2,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    fire = {
+    Fire = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1010,18 +1010,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = false,
-            ship      = false,
-            transport = false,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = false,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    rough = {
+    Rough = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1034,18 +1034,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 2,
-            transport = 2,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = 2,
+            Transport = 2,
         },
     },
 
-    mist = {
+    Mist = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1058,18 +1058,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
     },
 
-    reef = {
+    Reef = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1082,18 +1082,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = 1,
-            ship      = 2,
-            transport = 2,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = 1,
+            Ship      = 2,
+            Transport = 2,
         },
     },
 
-    plasma = {
+    Plasma = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1106,24 +1106,24 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = false,
-            ship      = false,
-            transport = false,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = false,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    meteor = {
+    Meteor = {
         GridIndexable = {},
 
         AttackTaker = {
             maxHP            = GameConstant.tileMaxHP,
             currentHP        = GameConstant.tileMaxHP,
-            defenseType      = "meteor",
+            defenseType      = "Meteor",
             isAffectedByLuck = false,
         },
 
@@ -1137,18 +1137,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = false,
-            mech      = false,
-            tireA     = false,
-            tireB     = false,
-            tank      = false,
-            air       = false,
-            ship      = false,
-            transport = false,
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = false,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    silo = {
+    Silo = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
@@ -1161,18 +1161,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    hq = {
+    Headquarters = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1204,18 +1204,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    city = {
+    City = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1247,18 +1247,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    comtower = {
+    CommandTower = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1281,18 +1281,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    radar = {
+    Radar = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1315,18 +1315,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    factory = {
+    Factory = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1358,37 +1358,37 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
 
         UnitProducer = {
             productionList = {
-                "infantry",
-                "mech",
-                "bike",
-                "recon",
-                "flare",
-                "antiair",
-                "tank",
-                "mdtank",
-                "wartank",
-                "artillery",
-                "antitank",
-                "rockets",
-                "missiles",
-                "rig",
+                "Infantry",
+                "Mech",
+                "Bike",
+                "Recon",
+                "Flare",
+                "AntiAir",
+                "Tank",
+                "MediumTank",
+                "WarTank",
+                "Artillery",
+                "AntiTank",
+                "Rockets",
+                "Missiles",
+                "Rig",
             },
         },
     },
 
-    airport = {
+    Airport = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1420,28 +1420,28 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
 
         UnitProducer = {
             productionList = {
-                "fighter",
-                "bomber",
-                "duster",
-                "bcopter",
-                "tcopter",
+                "Fighter",
+                "Bomber",
+                "Duster",
+                "BattleCopter",
+                "TransportCopter",
             },
         },
     },
 
-    seaport = {
+    Seaport = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1473,29 +1473,29 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
 
         UnitProducer = {
             productionList = {
-                "battleship",
-                "carrier",
-                "submarine",
-                "cruiser",
-                "lander",
-                "gunboat",
+                "Battleship",
+                "Carrier",
+                "Submarine",
+                "Cruiser",
+                "Lander",
+                "Gunboat",
             },
         },
     },
 
-    tempairport = {
+    TempAirport = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1523,18 +1523,18 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = false,
-            transport = false,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
         },
     },
 
-    tempseaport = {
+    TempSeaport = {
         GridIndexable = {},
 
         CaptureTaker = {
@@ -1562,20 +1562,20 @@ GameConstant.templateModelTiles = {
         },
 
         MoveCostOwner = {
-            infantry  = 1,
-            mech      = 1,
-            tireA     = 1,
-            tireB     = 1,
-            tank      = 1,
-            air       = 1,
-            ship      = 1,
-            transport = 1,
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = 1,
+            Transport = 1,
         },
     },
 }
 
 GameConstant.templateModelUnits = {
-    infantry   = {
+    Infantry   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1587,33 +1587,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 55,
-                    mech       = 45,
-                    bike       = 45,
-                    recon      = 12,
-                    flare      = 10,
-                    antiair    = 3,
-                    tank       = 5,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 10,
-                    antitank   = 30,
-                    rockets    = 20,
-                    missiles   = 20,
-                    rig        = 14,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 8,
-                    tcopter    = 30,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 55,
+                    Mech            = 45,
+                    Bike            = 45,
+                    Recon           = 12,
+                    Flare           = 10,
+                    AntiAir         = 3,
+                    Tank            = 5,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 10,
+                    AntiTank        = 30,
+                    Rockets         = 20,
+                    Missiles        = 20,
+                    Rig             = 14,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 8,
+                    TransportCopter = 30,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -1621,13 +1621,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "infantry",
+            defenseType      = "Infantry",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 3,
-            type     = "infantry",
+            type     = "Infantry",
         },
 
         FuelOwner = {
@@ -1649,7 +1649,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    mech       = {
+    Mech       = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1660,33 +1660,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Barzooka",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = 85,
-                    flare      = 80,
-                    antiair    = 55,
-                    tank       = 55,
-                    mdtank     = 25,
-                    wartank    = 15,
-                    artillery  = 70,
-                    antitank   = 55,
-                    rockets    = 85,
-                    missiles   = 85,
-                    rig        = 75,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 15,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = 85,
+                    Flare           = 80,
+                    AntiAir         = 55,
+                    Tank            = 55,
+                    MediumTank      = 25,
+                    WarTank         = 15,
+                    Artillery       = 70,
+                    AntiTank        = 55,
+                    Rockets         = 85,
+                    Missiles        = 85,
+                    Rig             = 75,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 15,
                 },
                 maxAmmo     = 3,
                 currentAmmo = 3,
@@ -1694,33 +1694,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 65,
-                    mech       = 55,
-                    bike       = 55,
-                    recon      = 18,
-                    flare      = 15,
-                    antiair    = 5,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 15,
-                    antitank   = 35,
-                    rockets    = 35,
-                    missiles   = 35,
-                    rig        = 20,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 12,
-                    tcopter    = 35,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 65,
+                    Mech            = 55,
+                    Bike            = 55,
+                    Recon           = 18,
+                    Flare           = 15,
+                    AntiAir         = 5,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 15,
+                    AntiTank        = 35,
+                    Rockets         = 35,
+                    Missiles        = 35,
+                    Rig             = 20,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 12,
+                    TransportCopter = 35,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -1728,13 +1728,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "mech",
+            defenseType      = "Mech",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 2,
-            type     = "mech",
+            type     = "Mech",
         },
 
         FuelOwner = {
@@ -1756,7 +1756,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    bike       = {
+    Bike       = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1768,33 +1768,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 65,
-                    mech       = 55,
-                    bike       = 55,
-                    recon      = 18,
-                    flare      = 15,
-                    antiair    = 5,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 15,
-                    antitank   = 35,
-                    rockets    = 35,
-                    missiles   = 35,
-                    rig        = 20,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 12,
-                    tcopter    = 35,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 65,
+                    Mech            = 55,
+                    Bike            = 55,
+                    Recon           = 18,
+                    Flare           = 15,
+                    AntiAir         = 5,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 15,
+                    AntiTank        = 35,
+                    Rockets         = 35,
+                    Missiles        = 35,
+                    Rig             = 20,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 12,
+                    TransportCopter = 35,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -1802,13 +1802,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "bike",
+            defenseType      = "Bike",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tireB",
+            type     = "TireB",
         },
 
         FuelOwner = {
@@ -1830,7 +1830,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    recon      = {
+    Recon      = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1842,33 +1842,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 75,
-                    mech       = 65,
-                    bike       = 65,
-                    recon      = 35,
-                    flare      = 30,
-                    antiair    = 8,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 45,
-                    antitank   = 25,
-                    rockets    = 55,
-                    missiles   = 55,
-                    rig        = 45,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 18,
-                    tcopter    = 35,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 75,
+                    Mech            = 65,
+                    Bike            = 65,
+                    Recon           = 35,
+                    Flare           = 30,
+                    AntiAir         = 8,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 45,
+                    AntiTank        = 25,
+                    Rockets         = 55,
+                    Missiles        = 55,
+                    Rig             = 45,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 18,
+                    TransportCopter = 35,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -1876,13 +1876,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "recon",
+            defenseType      = "Recon",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 8,
-            type     = "tireA",
+            type     = "TireA",
         },
 
         FuelOwner = {
@@ -1900,7 +1900,7 @@ GameConstant.templateModelUnits = {
         vision      = 5,
     },
 
-    flare      = {
+    Flare      = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1912,33 +1912,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 80,
-                    mech       = 70,
-                    bike       = 70,
-                    recon      = 60,
-                    flare      = 50,
-                    antiair    = 45,
-                    tank       = 10,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 45,
-                    antitank   = 25,
-                    rockets    = 55,
-                    missiles   = 55,
-                    rig        = 45,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 18,
-                    tcopter    = 35,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 5,
+                    Infantry        = 80,
+                    Mech            = 70,
+                    Bike            = 70,
+                    Recon           = 60,
+                    Flare           = 50,
+                    AntiAir         = 45,
+                    Tank            = 10,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 45,
+                    AntiTank        = 25,
+                    Rockets         = 55,
+                    Missiles        = 55,
+                    Rig             = 45,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 18,
+                    TransportCopter = 35,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 5,
                 },
             },
         },
@@ -1946,13 +1946,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "flare",
+            defenseType      = "Flare",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -1970,7 +1970,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    antiair    = {
+    AntiAir    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -1982,33 +1982,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Cannon",
                 baseDamage  = {
-                    infantry   = 105,
-                    mech       = 105,
-                    bike       = 105,
-                    recon      = 60,
-                    flare      = 50,
-                    antiair    = 45,
-                    tank       = 15,
-                    mdtank     = 10,
-                    wartank    = 5,
-                    artillery  = 50,
-                    antitank   = 25,
-                    rockets    = 55,
-                    missiles   = 55,
-                    rig        = 50,
-                    fighter    = 70,
-                    bomber     = 70,
-                    duster     = 75,
-                    bcopter    = 105,
-                    tcopter    = 120,
-                    seaplane   = 75,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 10,
+                    Infantry        = 105,
+                    Mech            = 105,
+                    Bike            = 105,
+                    Recon           = 60,
+                    Flare           = 50,
+                    AntiAir         = 45,
+                    Tank            = 15,
+                    MediumTank      = 10,
+                    WarTank         = 5,
+                    Artillery       = 50,
+                    AntiTank        = 25,
+                    Rockets         = 55,
+                    Missiles        = 55,
+                    Rig             = 50,
+                    Fighter         = 70,
+                    Bomber          = 70,
+                    Duster          = 75,
+                    BattleCopter    = 105,
+                    TransportCopter = 120,
+                    Seaplane        = 75,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 10,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2019,13 +2019,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "antiair",
+            defenseType      = "AntiAir",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2043,7 +2043,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    tank       = {
+    Tank       = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2054,33 +2054,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "TankGun",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = 85,
-                    flare      = 80,
-                    antiair    = 75,
-                    tank       = 55,
-                    mdtank     = 35,
-                    wartank    = 20,
-                    artillery  = 70,
-                    antitank   = 30,
-                    rockets    = 85,
-                    missiles   = 85,
-                    rig        = 75,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 8,
-                    carrier    = 8,
-                    submarine  = 9,
-                    cruiser    = 9,
-                    lander     = 18,
-                    gunboat    = 55,
-                    meteor     = 20,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = 85,
+                    Flare           = 80,
+                    AntiAir         = 75,
+                    Tank            = 55,
+                    MediumTank      = 35,
+                    WarTank         = 20,
+                    Artillery       = 70,
+                    AntiTank        = 30,
+                    Rockets         = 85,
+                    Missiles        = 85,
+                    Rig             = 75,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 8,
+                    Carrier         = 8,
+                    Submarine       = 9,
+                    Cruiser         = 9,
+                    Lander          = 18,
+                    Gunboat         = 55,
+                    Meteor          = 20,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2088,33 +2088,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 75,
-                    mech       = 70,
-                    bike       = 70,
-                    recon      = 40,
-                    flare      = 35,
-                    antiair    = 8,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 45,
-                    antitank   = 1,
-                    rockets    = 55,
-                    missiles   = 55,
-                    rig        = 45,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 18,
-                    tcopter    = 35,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 75,
+                    Mech            = 70,
+                    Bike            = 70,
+                    Recon           = 40,
+                    Flare           = 35,
+                    AntiAir         = 8,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 45,
+                    AntiTank        = 1,
+                    Rockets         = 55,
+                    Missiles        = 55,
+                    Rig             = 45,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 18,
+                    TransportCopter = 35,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -2122,13 +2122,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "tank",
+            defenseType      = "Tank",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2146,7 +2146,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    mdtank     = {
+    MediumTank     = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2157,33 +2157,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "HeavyTankGun",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = 95,
-                    flare      = 90,
-                    antiair    = 90,
-                    tank       = 70,
-                    mdtank     = 55,
-                    wartank    = 35,
-                    artillery  = 85,
-                    antitank   = 35,
-                    rockets    = 90,
-                    missiles   = 90,
-                    rig        = 90,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 10,
-                    carrier    = 10,
-                    submarine  = 12,
-                    cruiser    = 12,
-                    lander     = 22,
-                    gunboat    = 55,
-                    meteor     = 35,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = 95,
+                    Flare           = 90,
+                    AntiAir         = 90,
+                    Tank            = 70,
+                    MediumTank      = 55,
+                    WarTank         = 35,
+                    Artillery       = 85,
+                    AntiTank        = 35,
+                    Rockets         = 90,
+                    Missiles        = 90,
+                    Rig             = 90,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 10,
+                    Carrier         = 10,
+                    Submarine       = 12,
+                    Cruiser         = 12,
+                    Lander          = 22,
+                    Gunboat         = 55,
+                    Meteor          = 35,
                 },
                 maxAmmo     = 5,
                 currentAmmo = 5,
@@ -2191,33 +2191,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 90,
-                    mech       = 80,
-                    bike       = 80,
-                    recon      = 40,
-                    flare      = 35,
-                    antiair    = 8,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 45,
-                    antitank   = 1,
-                    rockets    = 60,
-                    missiles   = 60,
-                    rig        = 45,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 24,
-                    tcopter    = 40,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 90,
+                    Mech            = 80,
+                    Bike            = 80,
+                    Recon           = 40,
+                    Flare           = 35,
+                    AntiAir         = 8,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 45,
+                    AntiTank        = 1,
+                    Rockets         = 60,
+                    Missiles        = 60,
+                    Rig             = 45,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 24,
+                    TransportCopter = 40,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -2225,13 +2225,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "mdtank",
+            defenseType      = "MediumTank",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2249,7 +2249,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    wartank    = {
+    WarTank    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2260,33 +2260,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "MegaGun",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = 105,
-                    flare      = 105,
-                    antiair    = 105,
-                    tank       = 85,
-                    mdtank     = 75,
-                    wartank    = 55,
-                    artillery  = 105,
-                    antitank   = 40,
-                    rockets    = 105,
-                    missiles   = 105,
-                    rig        = 105,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 12,
-                    carrier    = 12,
-                    submarine  = 14,
-                    cruiser    = 14,
-                    lander     = 28,
-                    gunboat    = 65,
-                    meteor     = 55,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = 105,
+                    Flare           = 105,
+                    AntiAir         = 105,
+                    Tank            = 85,
+                    MediumTank      = 75,
+                    WarTank         = 55,
+                    Artillery       = 105,
+                    AntiTank        = 40,
+                    Rockets         = 105,
+                    Missiles        = 105,
+                    Rig             = 105,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 12,
+                    Carrier         = 12,
+                    Submarine       = 14,
+                    Cruiser         = 14,
+                    Lander          = 28,
+                    Gunboat         = 65,
+                    Meteor          = 55,
                 },
                 maxAmmo     = 5,
                 currentAmmo = 5,
@@ -2294,33 +2294,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 105,
-                    mech       = 95,
-                    bike       = 95,
-                    recon      = 45,
-                    flare      = 40,
-                    antiair    = 10,
-                    tank       = 10,
-                    mdtank     = 10,
-                    wartank    = 1,
-                    artillery  = 45,
-                    antitank   = 1,
-                    rockets    = 65,
-                    missiles   = 65,
-                    rig        = 45,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 35,
-                    tcopter    = 45,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 105,
+                    Mech            = 95,
+                    Bike            = 95,
+                    Recon           = 45,
+                    Flare           = 40,
+                    AntiAir         = 10,
+                    Tank            = 10,
+                    MediumTank      = 10,
+                    WarTank         = 1,
+                    Artillery       = 45,
+                    AntiTank        = 1,
+                    Rockets         = 65,
+                    Missiles        = 65,
+                    Rig             = 45,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 35,
+                    TransportCopter = 45,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -2328,13 +2328,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "wartank",
+            defenseType      = "WarTank",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 4,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2352,7 +2352,7 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    artillery  = {
+    Artillery  = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2363,33 +2363,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type       = "Cannon",
                 baseDamage = {
-                    infantry   = 90,
-                    mech       = 85,
-                    bike       = 85,
-                    recon      = 80,
-                    flare      = 75,
-                    antiair    = 65,
-                    tank       = 60,
-                    mdtank     = 45,
-                    wartank    = 35,
-                    artillery  = 75,
-                    antitank   = 55,
-                    rockets    = 80,
-                    missiles   = 80,
-                    rig        = 70,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 45,
-                    carrier    = 45,
-                    submarine  = 55,
-                    cruiser    = 55,
-                    lander     = 65,
-                    gunboat    = 100,
-                    meteor     = 45,
+                    Infantry        = 90,
+                    Mech            = 85,
+                    Bike            = 85,
+                    Recon           = 80,
+                    Flare           = 75,
+                    AntiAir         = 65,
+                    Tank            = 60,
+                    MediumTank      = 45,
+                    WarTank         = 35,
+                    Artillery       = 75,
+                    AntiTank        = 55,
+                    Rockets         = 80,
+                    Missiles        = 80,
+                    Rig             = 70,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 45,
+                    Carrier         = 45,
+                    Submarine       = 55,
+                    Cruiser         = 55,
+                    Lander          = 65,
+                    Gunboat         = 100,
+                    Meteor          = 45,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2400,13 +2400,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "artillery",
+            defenseType      = "Artillery",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2424,7 +2424,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    antitank   = {
+    AntiTank   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2435,33 +2435,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type       = "Cannon",
                 baseDamage = {
-                    infantry   = 75,
-                    mech       = 65,
-                    bike       = 65,
-                    recon      = 75,
-                    flare      = 75,
-                    antiair    = 75,
-                    tank       = 75,
-                    mdtank     = 65,
-                    wartank    = 55,
-                    artillery  = 65,
-                    antitank   = 55,
-                    rockets    = 70,
-                    missiles   = 70,
-                    rig        = 65,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 45,
-                    tcopter    = 55,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 55,
+                    Infantry        = 75,
+                    Mech            = 65,
+                    Bike            = 65,
+                    Recon           = 75,
+                    Flare           = 75,
+                    AntiAir         = 75,
+                    Tank            = 75,
+                    MediumTank      = 65,
+                    WarTank         = 55,
+                    Artillery       = 65,
+                    AntiTank        = 55,
+                    Rockets         = 70,
+                    Missiles        = 70,
+                    Rig             = 65,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 45,
+                    TransportCopter = 55,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 55,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2472,13 +2472,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "antitank",
+            defenseType      = "AntiTank",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 4,
-            type     = "tireB",
+            type     = "TireB",
         },
 
         FuelOwner = {
@@ -2496,7 +2496,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    rockets    = {
+    Rockets    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2508,33 +2508,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Rockets",
                 baseDamage  = {
-                    infantry   = 95,
-                    mech       = 90,
-                    bike       = 90,
-                    recon      = 90,
-                    flare      = 85,
-                    antiair    = 75,
-                    tank       = 70,
-                    mdtank     = 55,
-                    wartank    = 45,
-                    artillery  = 80,
-                    antitank   = 65,
-                    rockets    = 85,
-                    missiles   = 85,
-                    rig        = 80,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 55,
-                    carrier    = 55,
-                    submarine  = 65,
-                    cruiser    = 65,
-                    lander     = 75,
-                    gunboat    = 105,
-                    meteor     = 55,
+                    Infantry        = 95,
+                    Mech            = 90,
+                    Bike            = 90,
+                    Recon           = 90,
+                    Flare           = 85,
+                    AntiAir         = 75,
+                    Tank            = 70,
+                    MediumTank      = 55,
+                    WarTank         = 45,
+                    Artillery       = 80,
+                    AntiTank        = 65,
+                    Rockets         = 85,
+                    Missiles        = 85,
+                    Rig             = 80,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 55,
+                    Carrier         = 55,
+                    Submarine       = 65,
+                    Cruiser         = 65,
+                    Lander          = 75,
+                    Gunboat         = 105,
+                    Meteor          = 55,
                 },
                 maxAmmo     = 5,
                 currentAmmo = 5,
@@ -2545,13 +2545,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "rockets",
+            defenseType      = "Rockets",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tireA",
+            type     = "TireA",
         },
 
         FuelOwner = {
@@ -2569,7 +2569,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    missiles   = {
+    Missiles   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2580,33 +2580,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "AAMissiles",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = 100,
-                    bomber     = 100,
-                    duster     = 100,
-                    bcopter    = 120,
-                    tcopter    = 120,
-                    seaplane   = 100,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = 100,
+                    Bomber          = 100,
+                    Duster          = 100,
+                    BattleCopter    = 120,
+                    TransportCopter = 120,
+                    Seaplane        = 100,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = nil,
                 },
                 maxAmmo     = 5,
                 currentAmmo = 5,
@@ -2617,13 +2617,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "missiles",
+            defenseType      = "Missiles",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "tireA",
+            type     = "TireA",
         },
 
         FuelOwner = {
@@ -2641,19 +2641,19 @@ GameConstant.templateModelUnits = {
         vision      = 5,
     },
 
-    rig        = {
+    Rig        = {
         GridIndexable = {},
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "rig",
+            defenseType      = "Rig",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "tank",
+            type     = "Tank",
         },
 
         FuelOwner = {
@@ -2667,7 +2667,7 @@ GameConstant.templateModelUnits = {
         vision      = 1,
     },
 
-    fighter    = {
+    Fighter    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2678,33 +2678,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "AAMissiles",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = 55,
-                    bomber     = 65,
-                    duster     = 80,
-                    bcopter    = 120,
-                    tcopter    = 120,
-                    seaplane   = 65,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = 55,
+                    Bomber          = 65,
+                    Duster          = 80,
+                    BattleCopter    = 120,
+                    TransportCopter = 120,
+                    Seaplane        = 65,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = nil,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2715,13 +2715,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "fighter",
+            defenseType      = "Fighter",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 9,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -2739,7 +2739,7 @@ GameConstant.templateModelUnits = {
         vision      = 5,
     },
 
-    bomber     = {
+    Bomber     = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2750,33 +2750,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Bombs",
                 baseDamage  = {
-                    infantry   = 115,
-                    mech       = 110,
-                    bike       = 110,
-                    recon      = 105,
-                    flare      = 105,
-                    antiair    = 85,
-                    tank       = 105,
-                    mdtank     = 95,
-                    wartank    = 75,
-                    artillery  = 105,
-                    antitank   = 80,
-                    rockets    = 105,
-                    missiles   = 95,
-                    rig        = 105,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 85,
-                    carrier    = 85,
-                    submarine  = 95,
-                    cruiser    = 50,
-                    lander     = 95,
-                    gunboat    = 120,
-                    meteor     = 90,
+                    Infantry        = 115,
+                    Mech            = 110,
+                    Bike            = 110,
+                    Recon           = 105,
+                    Flare           = 105,
+                    AntiAir         = 85,
+                    Tank            = 105,
+                    MediumTank      = 95,
+                    WarTank         = 75,
+                    Artillery       = 105,
+                    AntiTank        = 80,
+                    Rockets         = 105,
+                    Missiles        = 95,
+                    Rig             = 105,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 85,
+                    Carrier         = 85,
+                    Submarine       = 95,
+                    Cruiser         = 50,
+                    Lander          = 95,
+                    Gunboat         = 120,
+                    Meteor          = 90,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2787,13 +2787,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "bomber",
+            defenseType      = "Bomber",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 7,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -2811,7 +2811,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    duster     = {
+    Duster     = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2822,33 +2822,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 55,
-                    mech       = 45,
-                    bike       = 45,
-                    recon      = 18,
-                    flare      = 15,
-                    antiair    = 5,
-                    tank       = 8,
-                    mdtank     = 5,
-                    wartank    = 1,
-                    artillery  = 15,
-                    antitank   = 5,
-                    rockets    = 20,
-                    missiles   = 20,
-                    rig        = 15,
-                    fighter    = 40,
-                    bomber     = 45,
-                    duster     = 55,
-                    bcopter    = 75,
-                    tcopter    = 90,
-                    seaplane   = 45,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 55,
+                    Mech            = 45,
+                    Bike            = 45,
+                    Recon           = 18,
+                    Flare           = 15,
+                    AntiAir         = 5,
+                    Tank            = 8,
+                    MediumTank      = 5,
+                    WarTank         = 1,
+                    Artillery       = 15,
+                    AntiTank        = 5,
+                    Rockets         = 20,
+                    Missiles        = 20,
+                    Rig             = 15,
+                    Fighter         = 40,
+                    Bomber          = 45,
+                    Duster          = 55,
+                    BattleCopter    = 75,
+                    TransportCopter = 90,
+                    Seaplane        = 45,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
                 maxAmmo     = 9,
                 currentAmmo = 9,
@@ -2859,13 +2859,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "duster",
+            defenseType      = "Duster",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 8,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -2883,7 +2883,7 @@ GameConstant.templateModelUnits = {
         vision      = 4,
     },
 
-    bcopter    = {
+    BattleCopter    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -2894,33 +2894,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Missiles",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = 75,
-                    flare      = 75,
-                    antiair    = 10,
-                    tank       = 70,
-                    mdtank     = 45,
-                    wartank    = 35,
-                    artillery  = 65,
-                    antitank   = 20,
-                    rockets    = 75,
-                    missiles   = 55,
-                    rig        = 70,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 25,
-                    carrier    = 25,
-                    submarine  = 25,
-                    cruiser    = 5,
-                    lander     = 25,
-                    gunboat    = 85,
-                    meteor     = 20,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = 75,
+                    Flare           = 75,
+                    AntiAir         = 10,
+                    Tank            = 70,
+                    MediumTank      = 45,
+                    WarTank         = 35,
+                    Artillery       = 65,
+                    AntiTank        = 20,
+                    Rockets         = 75,
+                    Missiles        = 55,
+                    Rig             = 70,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 25,
+                    Carrier         = 25,
+                    Submarine       = 25,
+                    Cruiser         = 5,
+                    Lander          = 25,
+                    Gunboat         = 85,
+                    Meteor          = 20,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -2928,33 +2928,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "MachineGun",
                 baseDamage  = {
-                    infantry   = 75,
-                    mech       = 65,
-                    bike       = 65,
-                    recon      = 30,
-                    flare      = 30,
-                    antiair    = 1,
-                    tank       = 8,
-                    mdtank     = 8,
-                    wartank    = 1,
-                    artillery  = 25,
-                    antitank   = 1,
-                    rockets    = 35,
-                    missiles   = 25,
-                    rig        = 20,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = 65,
-                    tcopter    = 85,
-                    seaplane   = nil,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = 1,
+                    Infantry        = 75,
+                    Mech            = 65,
+                    Bike            = 65,
+                    Recon           = 30,
+                    Flare           = 30,
+                    AntiAir         = 1,
+                    Tank            = 8,
+                    MediumTank      = 8,
+                    WarTank         = 1,
+                    Artillery       = 25,
+                    AntiTank        = 1,
+                    Rockets         = 35,
+                    Missiles        = 25,
+                    Rig             = 20,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = 65,
+                    TransportCopter = 85,
+                    Seaplane        = nil,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = 1,
                 },
             },
         },
@@ -2962,13 +2962,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "bcopter",
+            defenseType      = "BattleCopter",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -2986,19 +2986,19 @@ GameConstant.templateModelUnits = {
         vision      = 2,
     },
 
-    tcopter    = {
+    TransportCopter    = {
         GridIndexable = {},
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "tcopter",
+            defenseType      = "TransportCopter",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -3012,7 +3012,7 @@ GameConstant.templateModelUnits = {
         vision      = 1,
     },
 
-    seaplane   = {
+    Seaplane   = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3023,33 +3023,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Missiles",
                 baseDamage  = {
-                    infantry   = 90,
-                    mech       = 85,
-                    bike       = 85,
-                    recon      = 80,
-                    flare      = 80,
-                    antiair    = 45,
-                    tank       = 75,
-                    mdtank     = 65,
-                    wartank    = 55,
-                    artillery  = 70,
-                    antitank   = 50,
-                    rockets    = 80,
-                    missiles   = 70,
-                    rig        = 75,
-                    fighter    = 45,
-                    bomber     = 55,
-                    duster     = 65,
-                    bcopter    = 85,
-                    tcopter    = 95,
-                    seaplane   = 55,
-                    battleship = 45,
-                    carrier    = 65,
-                    submarine  = 55,
-                    cruiser    = 40,
-                    lander     = 85,
-                    gunboat    = 105,
-                    meteor     = 55,
+                    Infantry        = 90,
+                    Mech            = 85,
+                    Bike            = 85,
+                    Recon           = 80,
+                    Flare           = 80,
+                    AntiAir         = 45,
+                    Tank            = 75,
+                    MediumTank      = 65,
+                    WarTank         = 55,
+                    Artillery       = 70,
+                    AntiTank        = 50,
+                    Rockets         = 80,
+                    Missiles        = 70,
+                    Rig             = 75,
+                    Fighter         = 45,
+                    Bomber          = 55,
+                    Duster          = 65,
+                    BattleCopter    = 85,
+                    TransportCopter = 95,
+                    Seaplane        = 55,
+                    Battleship      = 45,
+                    Carrier         = 65,
+                    Submarine       = 55,
+                    Cruiser         = 40,
+                    Lander          = 85,
+                    Gunboat         = 105,
+                    Meteor          = 55,
                 },
                 maxAmmo     = 3,
                 currentAmmo = 3,
@@ -3060,13 +3060,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "seaplane",
+            defenseType      = "Seaplane",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 7,
-            type     = "air",
+            type     = "Air",
         },
 
         FuelOwner = {
@@ -3084,7 +3084,7 @@ GameConstant.templateModelUnits = {
         vision      = 4,
     },
 
-    battleship = {
+    Battleship = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3095,33 +3095,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Cannon",
                 baseDamage  = {
-                    infantry   = 75,
-                    mech       = 70,
-                    bike       = 70,
-                    recon      = 70,
-                    flare      = 70,
-                    antiair    = 65,
-                    tank       = 65,
-                    mdtank     = 50,
-                    wartank    = 40,
-                    artillery  = 70,
-                    antitank   = 55,
-                    rockets    = 75,
-                    missiles   = 75,
-                    rig        = 65,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 45,
-                    carrier    = 50,
-                    submarine  = 65,
-                    cruiser    = 65,
-                    lander     = 75,
-                    gunboat    = 95,
-                    meteor     = 55,
+                    Infantry        = 75,
+                    Mech            = 70,
+                    Bike            = 70,
+                    Recon           = 70,
+                    Flare           = 70,
+                    AntiAir         = 65,
+                    Tank            = 65,
+                    MediumTank      = 50,
+                    WarTank         = 40,
+                    Artillery       = 70,
+                    AntiTank        = 55,
+                    Rockets         = 75,
+                    Missiles        = 75,
+                    Rig             = 65,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 45,
+                    Carrier         = 50,
+                    Submarine       = 65,
+                    Cruiser         = 65,
+                    Lander          = 75,
+                    Gunboat         = 95,
+                    Meteor          = 55,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -3132,13 +3132,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "battleship",
+            defenseType      = "Battleship",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "ship",
+            type     = "Ship",
         },
 
         FuelOwner = {
@@ -3156,7 +3156,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    carrier    = {
+    Carrier    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3168,33 +3168,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "AAGun",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = 35,
-                    bomber     = 35,
-                    duster     = 40,
-                    bcopter    = 45,
-                    tcopter    = 55,
-                    seaplane   = 40,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = 35,
+                    Bomber          = 35,
+                    Duster          = 40,
+                    BattleCopter    = 45,
+                    TransportCopter = 55,
+                    Seaplane        = 40,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = nil,
                 },
             },
         },
@@ -3202,13 +3202,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "carrier",
+            defenseType      = "Carrier",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "ship",
+            type     = "Ship",
         },
 
         FuelOwner = {
@@ -3226,7 +3226,7 @@ GameConstant.templateModelUnits = {
         vision      = 4,
     },
 
-    submarine  = {
+    Submarine  = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3237,33 +3237,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "Torpedoes",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 80,
-                    carrier    = 110,
-                    submarine  = 55,
-                    cruiser    = 20,
-                    lander     = 85,
-                    gunboat    = 120,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 80,
+                    Carrier         = 110,
+                    Submarine       = 55,
+                    Cruiser         = 20,
+                    Lander          = 85,
+                    Gunboat         = 120,
+                    Meteor          = nil,
                 },
                 maxAmmo     = 6,
                 currentAmmo = 6,
@@ -3274,13 +3274,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "submarine",
+            defenseType      = "Submarine",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 5,
-            type     = "ship",
+            type     = "Ship",
         },
 
         FuelOwner = {
@@ -3298,7 +3298,7 @@ GameConstant.templateModelUnits = {
         vision      = 5,
     },
 
-    cruiser    = {
+    Cruiser    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3309,33 +3309,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "ASMissiles",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 38,
-                    carrier    = 38,
-                    submarine  = 95,
-                    cruiser    = 28,
-                    lander     = 40,
-                    gunboat    = 85,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 38,
+                    Carrier         = 38,
+                    Submarine       = 95,
+                    Cruiser         = 28,
+                    Lander          = 40,
+                    Gunboat         = 85,
+                    Meteor          = nil,
                 },
                 maxAmmo     = 9,
                 currentAmmo = 9,
@@ -3343,33 +3343,33 @@ GameConstant.templateModelUnits = {
             secondaryWeapon = {
                 type        = "AAGun",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = 105,
-                    bomber     = 105,
-                    duster     = 105,
-                    bcopter    = 120,
-                    tcopter    = 120,
-                    seaplane   = 105,
-                    battleship = nil,
-                    carrier    = nil,
-                    submarine  = nil,
-                    cruiser    = nil,
-                    lander     = nil,
-                    gunboat    = nil,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = 105,
+                    Bomber          = 105,
+                    Duster          = 105,
+                    BattleCopter    = 120,
+                    TransportCopter = 120,
+                    Seaplane        = 105,
+                    Battleship      = nil,
+                    Carrier         = nil,
+                    Submarine       = nil,
+                    Cruiser         = nil,
+                    Lander          = nil,
+                    Gunboat         = nil,
+                    Meteor          = nil,
                 },
             },
         },
@@ -3377,13 +3377,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "cruiser",
+            defenseType      = "Cruiser",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "ship",
+            type     = "Ship",
         },
 
         FuelOwner = {
@@ -3401,19 +3401,19 @@ GameConstant.templateModelUnits = {
         vision      = 5,
     },
 
-    lander     = {
+    Lander     = {
         GridIndexable = {},
 
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "lander",
+            defenseType      = "Lander",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 6,
-            type     = "transport",
+            type     = "Transport",
         },
 
         FuelOwner = {
@@ -3427,7 +3427,7 @@ GameConstant.templateModelUnits = {
         vision      = 1,
     },
 
-    gunboat    = {
+    Gunboat    = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3438,33 +3438,33 @@ GameConstant.templateModelUnits = {
             primaryWeapon = {
                 type        = "ASMissiles",
                 baseDamage  = {
-                    infantry   = nil,
-                    mech       = nil,
-                    bike       = nil,
-                    recon      = nil,
-                    flare      = nil,
-                    antiair    = nil,
-                    tank       = nil,
-                    mdtank     = nil,
-                    wartank    = nil,
-                    artillery  = nil,
-                    antitank   = nil,
-                    rockets    = nil,
-                    missiles   = nil,
-                    rig        = nil,
-                    fighter    = nil,
-                    bomber     = nil,
-                    duster     = nil,
-                    bcopter    = nil,
-                    tcopter    = nil,
-                    seaplane   = nil,
-                    battleship = 40,
-                    carrier    = 40,
-                    submarine  = 40,
-                    cruiser    = 40,
-                    lander     = 55,
-                    gunboat    = 75,
-                    meteor     = nil,
+                    Infantry        = nil,
+                    Mech            = nil,
+                    Bike            = nil,
+                    Recon           = nil,
+                    Flare           = nil,
+                    AntiAir         = nil,
+                    Tank            = nil,
+                    MediumTank      = nil,
+                    WarTank         = nil,
+                    Artillery       = nil,
+                    AntiTank        = nil,
+                    Rockets         = nil,
+                    Missiles        = nil,
+                    Rig             = nil,
+                    Fighter         = nil,
+                    Bomber          = nil,
+                    Duster          = nil,
+                    BattleCopter    = nil,
+                    TransportCopter = nil,
+                    Seaplane        = nil,
+                    Battleship      = 40,
+                    Carrier         = 40,
+                    Submarine       = 40,
+                    Cruiser         = 40,
+                    Lander          = 55,
+                    Gunboat         = 75,
+                    Meteor          = nil,
                 },
                 maxAmmo     = 1,
                 currentAmmo = 1,
@@ -3475,13 +3475,13 @@ GameConstant.templateModelUnits = {
         AttackTaker = {
             maxHP            = GameConstant.unitMaxHP,
             currentHP        = GameConstant.unitMaxHP,
-            defenseType      = "gunboat",
+            defenseType      = "Gunboat",
             isAffectedByLuck = true,
         },
 
         MoveDoer = {
             range    = 7,
-            type     = "transport",
+            type     = "Transport",
         },
 
         FuelOwner = {

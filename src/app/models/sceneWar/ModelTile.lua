@@ -350,14 +350,14 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
     assert(self:getPlayerIndex() ~= playerIndex, "ModelTile:updateWithPlayerIndex() the param playerIndex is the same as the one of self.")
 
     local tileName = self:getTileType()
-    if (tileName ~= "hq") then
+    if (tileName ~= "Headquarters") then
         self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileName, playerIndex)
     else
         local gridIndex, currentCapturePoint = self:getGridIndex(), self:getCurrentCapturePoint()
         local dispatcher = self.m_RootScriptEventDispatcher
 
         self:unsetRootScriptEventDispatcher()
-        initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("city", playerIndex), self.m_BaseID)
+        initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
             CaptureTaker  = {currentCapturePoint = currentCapturePoint},
