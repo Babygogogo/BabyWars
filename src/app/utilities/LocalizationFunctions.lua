@@ -558,7 +558,7 @@ local s_Texts = {
         [1] = function(unitType)
             if     (unitType == "Infantry")        then return "步兵"
             elseif (unitType == "Mech")            then return "炮兵"
-            elseif (unitType == "Bike")            then return "轮胎兵"
+            elseif (unitType == "Bike")            then return "摩托兵"
             elseif (unitType == "Recon")           then return "侦察车"
             elseif (unitType == "Flare")           then return "照明车"
             elseif (unitType == "AntiAir")         then return "对空战车"

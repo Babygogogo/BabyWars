@@ -1,29 +1,45 @@
 
 local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
-local AnimationLoader  = require("app.utilities.AnimationLoader")
-local ComponentManager = require("global.components.ComponentManager")
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 140
-local LEFT_POSITION_X = 10
-local LEFT_POSITION_Y = 10
-local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH - 10
-local RIGHT_POSITION_Y = LEFT_POSITION_Y
+local GRID_SIZE = GameConstantFunctions.getGridSize()
 
-local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
-local ICON_SCALE      = 0.5
-local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
-local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * 2 * ICON_SCALE
+local BACKGROUND_WIDTH  = 75
+local BACKGROUND_HEIGHT = 130
 
-local DEFENSE_INFO_POSITION_X = 10
-local DEFENSE_INFO_POSITION_Y = 40
-local CAPTURE_INFO_POSITION_X = DEFENSE_INFO_POSITION_X
-local CAPTURE_INFO_POSITION_Y = 10
-local HP_INFO_POSITION_X      = DEFENSE_INFO_POSITION_X
-local HP_INFO_POSITION_Y      = 10
+local LEFT_POS_X  = 10
+local LEFT_POS_Y  = 10
+local RIGHT_POS_X = display.width - BACKGROUND_WIDTH - 10
+local RIGHT_POS_Y = LEFT_POS_Y
+
+local TILE_ICON_SCALE = 0.5
+local TILE_ICON_POS_X = (BACKGROUND_WIDTH - GRID_SIZE.width * TILE_ICON_SCALE) / 2
+local TILE_ICON_POS_Y = BACKGROUND_HEIGHT - GRID_SIZE.height * 2 * TILE_ICON_SCALE
+
+local TILE_LABEL_POS_X     = 0
+local TILE_LABEL_POS_Y     = BACKGROUND_HEIGHT - 23
+local TILE_LABEL_FONT_SIZE = 13
+local TILE_LABEL_WIDTH     = BACKGROUND_WIDTH
+local TILE_LABEL_HEIGHT    = 30
+
+local DEFENSE_INFO_POS_X = 10
+local DEFENSE_INFO_POS_Y = 35
+
+local CAPTURE_INFO_POS_X = DEFENSE_INFO_POS_X
+local CAPTURE_INFO_POS_Y = 10
+
+local HP_INFO_POS_X = DEFENSE_INFO_POS_X
+local HP_INFO_POS_Y = 10
+
+local INFO_ICON_SCALE    = 0.4
+local INFO_LABEL_WIDTH   = BACKGROUND_WIDTH - DEFENSE_INFO_POS_X * 2
+local INFO_LABEL_HEIGHT  = 30
 
 local FONT_NAME          = "res/fonts/msyhbd.ttc"
-local FONT_SIZE          = 22
+local FONT_SIZE          = 20
 local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local FONT_OUTLINE_WIDTH = 2
@@ -31,10 +47,14 @@ local FONT_OUTLINE_WIDTH = 2
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createLabel(posX, posY)
-    local label = cc.Label:createWithTTF("0", FONT_NAME, FONT_SIZE)
+local function createInfoLabel(posX, posY)
+    local label = cc.Label:createWithTTF("", FONT_NAME, FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
+        :setDimensions(INFO_LABEL_WIDTH, INFO_LABEL_HEIGHT)
+
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
 
         :setTextColor(FONT_COLOR)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
@@ -42,220 +62,153 @@ local function createLabel(posX, posY)
     return label
 end
 
---------------------------------------------------------------------------------
--- The functions that adjust the position of the view.
---------------------------------------------------------------------------------
 local function moveToLeftSide(self)
-    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+    self:setPosition(LEFT_POS_X, LEFT_POS_Y)
 end
 
 local function moveToRightSide(self)
-    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+    self:setPosition(RIGHT_POS_X, RIGHT_POS_Y)
 end
 
 --------------------------------------------------------------------------------
--- The button.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createButton(self)
-    local button = ccui.Button:create()
-    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-
-        :ignoreAnchorPointForPosition(true)
+local function initBackground(self)
+    local background = ccui.Button:create()
+    background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 6, width = 1, height = 1})
-        :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
         :setZoomScale(-0.05)
+        :setOpacity(200)
+        :ignoreAnchorPointForPosition(true)
 
         :addTouchEventListener(function(sender, eventType)
-            if eventType == ccui.TouchEventType.ended then
+            if (eventType == ccui.TouchEventType.ended) then
                 if (self.m_Model) then
                     self.m_Model:onPlayerTouch()
                 end
             end
         end)
 
-    return button
+    self.m_Background = background
+    self:addChild(background)
 end
 
-local function initWithButton(self, button)
-    self.m_Button = button
-    self:addChild(button)
-end
-
---------------------------------------------------------------------------------
--- The tile icon.
---------------------------------------------------------------------------------
-local function createIcon()
+local function initTileIcon(self)
     local icon = cc.Sprite:create()
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(ICON_POSITION_X, ICON_POSITION_Y)
+        :setPosition(TILE_ICON_POS_X, TILE_ICON_POS_Y)
 
-        :setScale(ICON_SCALE)
+        :setScale(TILE_ICON_SCALE)
 
-    return icon
+    self.m_TileIcon = icon
+    self.m_Background:getRendererNormal():addChild(icon)
 end
 
-local function initWithIcon(self, icon)
-    self.m_Icon = icon
-    self:addChild(icon)
+local function initTileLabel(self)
+    local label = cc.Label:createWithTTF("", FONT_NAME, TILE_LABEL_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(TILE_LABEL_POS_X, TILE_LABEL_POS_Y)
+        :setDimensions(TILE_LABEL_WIDTH, TILE_LABEL_HEIGHT)
+
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, 1)
+
+    self.m_TileLabel = label
+    self.m_Background:getRendererNormal():addChild(label)
 end
 
-local function updateIconWithModelTile(icon, tile)
-    icon:stopAllActions()
+local function initDefenseInfo(self)
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :setScale(INFO_ICON_SCALE)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y)
+
+    local label = createInfoLabel(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y - 4)
+
+    self.m_DefenseIcon  = icon
+    self.m_DefenseLabel = label
+    self.m_Background:getRendererNormal():addChild(icon)
+        :addChild(label)
+end
+
+local function initCaptureInfo(self)
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :setScale(INFO_ICON_SCALE)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y)
+
+    local label = createInfoLabel(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y - 4)
+
+    self.m_CaptureIcon  = icon
+    self.m_CaptureLabel = label
+    self.m_Background:getRendererNormal():addChild(icon)
+        :addChild(label)
+end
+
+local function initHPInfo(self)
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :setScale(INFO_ICON_SCALE)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(HP_INFO_POS_X + 2, HP_INFO_POS_Y + 2)
+
+    local label = createInfoLabel(HP_INFO_POS_X, HP_INFO_POS_Y - 4)
+
+    self.m_HPIcon  = icon
+    self.m_HPLabel = label
+    self.m_Background:getRendererNormal():addChild(icon)
+        :addChild(label)
+end
+
+--------------------------------------------------------------------------------
+-- The private functions for updating the composition elements.
+--------------------------------------------------------------------------------
+local function updateTileIconWithModelTile(self, tile)
+    self.m_TileIcon:stopAllActions()
         :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tile:getTiledID()))
 end
 
---------------------------------------------------------------------------------
--- The defense bonus info.
---------------------------------------------------------------------------------
-local function createDefenseInfoIcon()
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
-    icon:setAnchorPoint(0, 0)
-        :ignoreAnchorPointForPosition(true)
-
-        :setScale(ICON_SCALE)
-
-    return icon
+local function updateTileLabelWithModelTile(self, tile)
+    self.m_TileLabel:setString(tile:getTileTypeFullName())
 end
 
-local function createDefenseInfo()
-    local icon  = createDefenseInfoIcon()
-    local label = createLabel(30, -5)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Icon  = icon
-    info.m_Label = label
-
-    return info
+local function updateDefenseInfoWithModelTile(self, tile)
+    self.m_DefenseLabel:setString(tile:getNormalizedDefenseBonusAmount())
 end
 
-local function initWithDefenseInfo(self, info)
-    self.m_DefenseInfo = info
-    self:addChild(info)
-end
-
-local function updateDefenseInfoLabel(label, defenseBonus)
-    if (defenseBonus < 10) then
-        label:setString("  " .. defenseBonus)
-    else
-        label:setString(""   .. defenseBonus)
-    end
-end
-
-local function updateDefenseInfoWithModelTile(info, tile)
-    updateDefenseInfoLabel(info.m_Label, tile:getNormalizedDefenseBonusAmount())
-end
-
---------------------------------------------------------------------------------
--- The capture info.
---------------------------------------------------------------------------------
-local function createCaptureInfoIcon()
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
-    icon:setAnchorPoint(0, 0)
-        :ignoreAnchorPointForPosition(true)
-
-        :setScale(ICON_SCALE)
-
-    return icon
-end
-
-local function createCaptureInfo()
-    local icon  = createCaptureInfoIcon()
-    local label = createLabel(30, -4)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(CAPTURE_INFO_POSITION_X, CAPTURE_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Icon  = icon
-    info.m_Label = label
-
-    return info
-end
-
-local function initWithCaptureInfo(self, info)
-    self.m_CaptureInfo = info
-    self:addChild(info)
-end
-
-local function updateCaptureInfoLabel(label, capturePoint)
-    if (capturePoint < 10) then
-        label:setString("  " .. capturePoint)
-    else
-        label:setString(""  .. capturePoint)
-    end
-end
-
-local function updateCaptureInfoWithModelTile(info, tile)
+local function updateCaptureInfoWithModelTile(self, tile)
     local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
-    if (captureTaker) then
-        updateCaptureInfoLabel(info.m_Label, captureTaker:getCurrentCapturePoint())
-        info:setVisible(true)
+    if (not captureTaker) then
+        self.m_CaptureIcon:setVisible(false)
+        self.m_CaptureLabel:setVisible(false)
     else
-        info:setVisible(false)
+        self.m_CaptureIcon:setVisible(true)
+        self.m_CaptureLabel:setVisible(true)
+            :setString(captureTaker:getCurrentCapturePoint())
     end
 end
 
---------------------------------------------------------------------------------
--- The HP infomation.
---------------------------------------------------------------------------------
-local function createHPInfoIcon()
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
-    icon:setAnchorPoint(0, 0)
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(2, 2)
-
-        :setScale(ICON_SCALE)
-
-    return icon
-end
-
-local function createHPInfo()
-    local icon  = createHPInfoIcon()
-    local label = createLabel(31, -4)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(HP_INFO_POSITION_X, HP_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Inco  = icon
-    info.m_Label = label
-
-    return info
-end
-
-local function initWithHPInfo(self, info)
-    self.m_HPInfo = info
-    self:addChild(info)
-end
-
-local function updateHPInfoWithModelTile(info, tile)
+local function updateHPInfoWithModelTile(self, tile)
     if (not tile.getCurrentHP) then
-        info:setVisible(false)
+        self.m_HPIcon:setVisible(false)
+        self.m_HPLabel:setVisible(false)
     else
-        local hp = tile:getCurrentHP()
-        if (hp < 10) then
-            info.m_Label:setString("  " .. hp)
-        else
-            info.m_Label:setString(""   .. hp)
-        end
-
-        info:setVisible(true)
+        self.m_HPIcon:setVisible(true)
+        self.m_HPLabel:setVisible(true)
+            :setString(tile:getCurrentHP())
     end
 end
 
@@ -263,16 +216,14 @@ end
 -- The contructor.
 --------------------------------------------------------------------------------
 function ViewTileInfo:ctor(param)
-    initWithButton(     self, createButton(self))
-    initWithIcon(       self, createIcon())
-    initWithDefenseInfo(self, createDefenseInfo())
-    initWithCaptureInfo(self, createCaptureInfo())
-    initWithHPInfo(     self, createHPInfo())
+    initBackground( self)
+    initTileIcon(   self)
+    initTileLabel(  self)
+    initDefenseInfo(self)
+    initCaptureInfo(self)
+    initHPInfo(     self)
 
     self:ignoreAnchorPointForPosition(true)
-
-        :setOpacity(220)
-        :setCascadeOpacityEnabled(true)
 
     moveToRightSide(self)
 
@@ -295,11 +246,12 @@ function ViewTileInfo:adjustPositionOnTouch(touch)
     return self
 end
 
-function ViewTileInfo:updateWithModelTile(model)
-    updateIconWithModelTile(       self.m_Icon,        model)
-    updateCaptureInfoWithModelTile(self.m_CaptureInfo, model)
-    updateDefenseInfoWithModelTile(self.m_DefenseInfo, model)
-    updateHPInfoWithModelTile(     self.m_HPInfo,      model)
+function ViewTileInfo:updateWithModelTile(modelTile)
+    updateTileIconWithModelTile(   self, modelTile)
+    updateTileLabelWithModelTile(  self, modelTile)
+    updateDefenseInfoWithModelTile(self, modelTile)
+    updateCaptureInfoWithModelTile(self, modelTile)
+    updateHPInfoWithModelTile(     self, modelTile)
 
     return self
 end
