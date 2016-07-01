@@ -493,12 +493,12 @@ local s_Texts = {
         [2] = function() return "Weak:" end,
     },
     [103] = {
-        [1] = function(bonus, catagory) return "防御加成：" .. bonus .. "%（" .. catagory .. "）"     end,
-        [2] = function(bonus, catagory) return "DefenseBonus: " .. bonus .. "% (" .. catagory .. ")" end,
+        [1] = function(bonus, category) return "防御加成：" .. bonus .. "%（" .. category .. "）"     end,
+        [2] = function(bonus, category) return "DefenseBonus: " .. bonus .. "% (" .. category .. ")" end,
     },
     [104] = {
-        [1] = function(amount, catagory) return "维修：+" .. amount .. "HP（" .. catagory .. "）"   end,
-        [2] = function(amount, catagory) return "Repair:  +" .. amount .. "HP (" .. catagory .. ")" end,
+        [1] = function(amount, category) return "维修：+" .. amount .. "HP（" .. category .. "）"   end,
+        [2] = function(amount, category) return "Repair:  +" .. amount .. "HP (" .. category .. ")" end,
     },
     [105] = {
         [1] = function() return "维修：无"      end,
@@ -843,23 +843,23 @@ local s_Texts = {
         end,
     },
     [118] = {
-        [1] = function(unitCatagory)
-            if     (unitCatagory == "GroundUnits")       then return "陆军"
-            elseif (unitCatagory == "NavalUnits")        then return "海军"
-            elseif (unitCatagory == "AirUnits")          then return "空军"
-            elseif (unitCatagory == "Ground/NavalUnits") then return "陆军/海军"
-            elseif (unitCatagory == "FootUnits")         then return "步兵/炮兵"
-            elseif (unitCatagory == "None")              then return "无"
+        [1] = function(categoryType)
+            if     (categoryType == "GroundUnits")       then return "陆军"
+            elseif (categoryType == "NavalUnits")        then return "海军"
+            elseif (categoryType == "AirUnits")          then return "空军"
+            elseif (categoryType == "Ground/NavalUnits") then return "陆军/海军"
+            elseif (categoryType == "FootUnits")         then return "步兵/炮兵"
+            elseif (categoryType == "None")              then return "无"
             else                                              return "未知"
             end
         end,
-        [2] = function(unitCatagory)
-            if     (unitCatagory == "GroundUnits")       then return "Ground Units"
-            elseif (unitCatagory == "NavalUnits")        then return "Naval Units"
-            elseif (unitCatagory == "AirUnits")          then return "Air Units"
-            elseif (unitCatagory == "Ground/NavalUnits") then return "Ground/Naval Units"
-            elseif (unitCatagory == "FootUnits")         then return "Foot Units"
-            elseif (unitCatagory == "None")              then return "None"
+        [2] = function(categoryType)
+            if     (categoryType == "GroundUnits")       then return "Ground Units"
+            elseif (categoryType == "NavalUnits")        then return "Naval Units"
+            elseif (categoryType == "AirUnits")          then return "Air Units"
+            elseif (categoryType == "Ground/NavalUnits") then return "Ground/Naval Units"
+            elseif (categoryType == "FootUnits")         then return "Foot Units"
+            elseif (categoryType == "None")              then return "None"
             else                                              return "Unknown"
             end
         end,

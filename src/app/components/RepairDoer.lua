@@ -23,8 +23,8 @@ local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
-    "getRepairTargetCatagoryFullName",
-    "getRepairTargetCatagory",
+    "getRepairTargetCategoryFullName",
+    "getRepairTargetCategory",
     "canRepairTarget",
     "getRepairAmountAndCost",
     "getNormalizedRepairAmount",
@@ -41,9 +41,8 @@ function RepairDoer:ctor(param)
 end
 
 function RepairDoer:loadTemplate(template)
-    assert(template.targetCatagory, "RepairDoer:loadTemplate() the param template.targetCatagory is invalid.")
-    assert(template.targetList,     "RepairDoer:loadTemplate() the param template.targetList is invalid.")
-    assert(template.amount,         "RepairDoer:loadTemplate() the param template.amount is invalid.")
+    assert(template.amount,             "RepairDoer:loadTemplate() the param template.amount is invalid.")
+    assert(template.targetCategoryType, "RepairDoer:loadTemplate() the param template.targetCategoryType is invalid.")
 
     self.m_Template = template
 
@@ -78,12 +77,12 @@ end
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------
-function RepairDoer:getRepairTargetCatagoryFullName()
-    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCatagory)
+function RepairDoer:getRepairTargetCategoryFullName()
+    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCategoryType)
 end
 
-function RepairDoer:getRepairTargetCatagory()
-    return self.m_Template.targetList
+function RepairDoer:getRepairTargetCategory()
+    return GameConstantFunctions.getCategory(self.m_Template.targetCategoryType)
 end
 
 function RepairDoer:canRepairTarget(target)
@@ -93,7 +92,7 @@ function RepairDoer:canRepairTarget(target)
     end
 
     local targetName = GameConstantFunctions.getUnitTypeWithTiledId(targetTiledID)
-    for _, name in ipairs(self:getRepairTargetCatagory()) do
+    for _, name in ipairs(self:getRepairTargetCategory()) do
         if (targetName == name) then
             return true
         end

@@ -14,20 +14,21 @@ local DefenseBonusProvider = class("DefenseBonusProvider")
 
 local TypeChecker           = require("app.utilities.TypeChecker")
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getDefenseBonusAmount",
     "getNormalizedDefenseBonusAmount",
-    "getDefenseBonusTargetCatagoryFullName",
-    "getDefenseBonusTargetCatagory",
+    "getDefenseBonusTargetCategoryFullName",
+    "getDefenseBonusTargetCategory",
 }
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function isDefenseBonusTarget(self, targetName)
-    for _, name in ipairs(self:getDefenseBonusTargetCatagory()) do
+    for _, name in ipairs(self:getDefenseBonusTargetCategory()) do
         if (targetName == name) then
             return true
         end
@@ -47,9 +48,8 @@ function DefenseBonusProvider:ctor(param)
 end
 
 function DefenseBonusProvider:loadTemplate(template)
-    assert(template.amount,         "DefenseBonusProvider:loadTemplate() the param template.amount is invalid.")
-    assert(template.targetCatagory, "DefenseBonusProvider:loadTemplate() the param template.targetCatagory is invalid.")
-    assert(template.targetList,     "DefenseBonusProvider:loadTemplate() the param template.targetList is invalid.")
+    assert(template.amount,             "DefenseBonusProvider:loadTemplate() the param template.amount is invalid.")
+    assert(template.targetCategoryType, "DefenseBonusProvider:loadTemplate() the param template.targetCategoryType is invalid.")
 
     self.m_Template = template
 
@@ -96,12 +96,12 @@ function DefenseBonusProvider:getNormalizedDefenseBonusAmount()
     return math.floor(self:getDefenseBonusAmount() / 10)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetCatagoryFullName()
-    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCatagory)
+function DefenseBonusProvider:getDefenseBonusTargetCategoryFullName()
+    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCategoryType)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetCatagory()
-    return self.m_Template.targetList
+function DefenseBonusProvider:getDefenseBonusTargetCategory()
+    return GameConstantFunctions.getCategory(self.m_Template.targetCategoryType)
 end
 
 return DefenseBonusProvider

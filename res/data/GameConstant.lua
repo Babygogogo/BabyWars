@@ -588,8 +588,8 @@ GameConstant.unitAnimations = {
     },
 }
 
-GameConstant.unitCatagory = {
-    allUnits = {
+GameConstant.categories = {
+    ["AllUnits"] = {
         "Infantry",
         "Mech",
         "Bike",
@@ -618,7 +618,7 @@ GameConstant.unitCatagory = {
         "Gunboat",
     },
 
-    groundUnits = {
+    ["GroundUnits"] = {
         "Infantry",
         "Mech",
         "Bike",
@@ -635,7 +635,7 @@ GameConstant.unitCatagory = {
         "Rig",
     },
 
-    navalUnits = {
+    ["NavalUnits"] = {
         "Battleship",
         "Carrier",
         "Submarine",
@@ -644,7 +644,7 @@ GameConstant.unitCatagory = {
         "Gunboat",
     },
 
-    airUnits = {
+    ["AirUnits"] = {
         "Fighter",
         "Bomber",
         "Duster",
@@ -653,7 +653,7 @@ GameConstant.unitCatagory = {
         "Seaplane",
     },
 
-    groundOrNavalUnits = {
+    ["Ground/NavalUnits"] = {
         "Infantry",
         "Mech",
         "Bike",
@@ -676,10 +676,10 @@ GameConstant.unitCatagory = {
         "Gunboat",
     },
 
-    none = {
+    ["None"] = {
     },
 
-    footUnits = {
+    ["FootUnits"] = {
         "Infantry",
         "Mech"
     },
@@ -714,8 +714,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -735,8 +734,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -756,8 +754,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -777,8 +774,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -798,8 +794,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -819,8 +814,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -840,8 +834,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -861,8 +854,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -882,8 +874,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = "FootUnits",
-            targetList     = GameConstant.unitCatagory.footUnits,
+            targetCategoryType = "FootUnits",
         },
 
         MoveCostOwner = {
@@ -903,8 +894,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -924,8 +914,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -945,8 +934,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -966,8 +954,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "NavalUnits",
-            targetList     = GameConstant.unitCatagory.navalUnits,
+            targetCategoryType = "NavalUnits",
         },
 
         MoveCostOwner = {
@@ -987,8 +974,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "NavalUnits",
-            targetList     = GameConstant.unitCatagory.navalUnits,
+            targetCategoryType = "NavalUnits",
         },
 
         MoveCostOwner = {
@@ -1008,8 +994,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "NavalUnits",
-            targetList     = GameConstant.unitCatagory.navalUnits,
+            targetCategoryType = "NavalUnits",
         },
 
         MoveCostOwner = {
@@ -1029,8 +1014,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -1057,8 +1041,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = "None",
-            targetList     = GameConstant.unitCatagory.none,
+            targetCategoryType = "None",
         },
 
         MoveCostOwner = {
@@ -1078,8 +1061,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1104,8 +1086,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
             amount         = 2,
         },
 
@@ -1115,8 +1096,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1141,8 +1121,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
             amount         = 2,
         },
 
@@ -1152,8 +1131,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1183,8 +1161,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1214,8 +1191,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1240,8 +1216,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
             amount         = 2,
         },
 
@@ -1251,8 +1226,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1296,8 +1270,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "AirUnits",
-            targetList     = GameConstant.unitCatagory.airUnits,
+            targetCategoryType = "AirUnits",
             amount         = 2,
         },
 
@@ -1307,8 +1280,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1343,8 +1315,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "NavalUnits",
-            targetList     = GameConstant.unitCatagory.navalUnits,
+            targetCategoryType = "NavalUnits",
             amount         = 2,
         },
 
@@ -1354,8 +1325,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = "Ground/NavalUnits",
-            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
+            targetCategoryType = "Ground/NavalUnits",
         },
 
         MoveCostOwner = {
@@ -1391,15 +1361,13 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "AirUnits",
-            targetList     = GameConstant.unitCatagory.airUnits,
+            targetCategoryType = "AirUnits",
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "GroundUnits",
-            targetList     = GameConstant.unitCatagory.groundUnits,
+            targetCategoryType = "GroundUnits",
         },
 
         MoveCostOwner = {
@@ -1424,15 +1392,13 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = "NavalUnits",
-            targetList     = GameConstant.unitCatagory.navalUnits,
+            targetCategoryType = "NavalUnits",
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = "Ground/NavalUnits",
-            targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
+            targetCategoryType = "Ground/NavalUnits",
         },
 
         MoveCostOwner = {

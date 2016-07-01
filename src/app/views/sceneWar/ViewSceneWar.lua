@@ -50,7 +50,10 @@ local function createEndWarEffectMoveInAction(effect)
     end)
     local delay = cc.DelayTime:create(END_WAR_EFFECT_STAY_DURATION)
     local callbackAfterDelay = cc.CallFunc:create(function()
-        effect.m_Callback()
+        if (effect.m_Callback) then
+            effect.m_Callback()
+            effect.m_Callback = nil
+        end
     end)
 
     return cc.Sequence:create(moveIn, callbackAfterMoveIn, delay, callbackAfterDelay)
@@ -90,8 +93,9 @@ local function createEndWarEffectTouchListener(effect)
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     listener:registerScriptHandler(function(touch, event)
-        if (effect.m_IsMoveInFinished) then
+        if ((effect.m_IsMoveInFinished) and (effect.m_Callback)) then
             effect.m_Callback()
+            effect.m_Callback = nil
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 

@@ -42,7 +42,7 @@ local GameConstantFunctions = {}
 
 local GAME_CONSTANT        = require("res.data.GameConstant")
 local GRID_SIZE            = GAME_CONSTANT.gridSize
-local UNIT_NAMES           = GAME_CONSTANT.unitCatagory.allUnits
+local UNIT_NAMES           = GAME_CONSTANT.categories.AllUnits
 local TEMPLATE_MODEL_TILES = GAME_CONSTANT.templateModelTiles
 local TEMPLATE_MODEL_UNITS = GAME_CONSTANT.templateModelUnits
 local TILE_ANIMATIONS      = GAME_CONSTANT.tileAnimations
@@ -234,6 +234,10 @@ function GameConstantFunctions.doesViewTileFillGrid(tiledID)
     else
         return TILE_ANIMATIONS[GameConstantFunctions.getTileTypeWithTiledId(tiledID)].fillsGrid
     end
+end
+
+function GameConstantFunctions.getCategory(categoryType)
+    return GAME_CONSTANT.categories[categoryType]
 end
 
 return GameConstantFunctions
