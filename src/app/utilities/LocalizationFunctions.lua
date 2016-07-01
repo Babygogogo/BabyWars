@@ -842,6 +842,28 @@ local s_Texts = {
             end
         end,
     },
+    [118] = {
+        [1] = function(unitCatagory)
+            if     (unitCatagory == "GroundUnits")       then return "陆军"
+            elseif (unitCatagory == "NavalUnits")        then return "海军"
+            elseif (unitCatagory == "AirUnits")          then return "空军"
+            elseif (unitCatagory == "Ground/NavalUnits") then return "陆军/海军"
+            elseif (unitCatagory == "FootUnits")         then return "步兵/炮兵"
+            elseif (unitCatagory == "None")              then return "无"
+            else                                              return "未知"
+            end
+        end,
+        [2] = function(unitCatagory)
+            if     (unitCatagory == "GroundUnits")       then return "Ground Units"
+            elseif (unitCatagory == "NavalUnits")        then return "Naval Units"
+            elseif (unitCatagory == "AirUnits")          then return "Air Units"
+            elseif (unitCatagory == "Ground/NavalUnits") then return "Ground/Naval Units"
+            elseif (unitCatagory == "FootUnits")         then return "Foot Units"
+            elseif (unitCatagory == "None")              then return "None"
+            else                                              return "Unknown"
+            end
+        end,
+    },
 }
 
 --------------------------------------------------------------------------------

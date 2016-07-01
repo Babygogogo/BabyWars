@@ -714,10 +714,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -738,10 +735,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -762,10 +756,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -786,10 +777,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -810,10 +798,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -829,39 +814,12 @@ GameConstant.templateModelTiles = {
         },
     },
 
-    Bridge = {
-        GridIndexable = {},
-
-        DefenseBonusProvider = {
-            amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
-            targetList     = GameConstant.unitCatagory.none,
-        },
-
-        MoveCostOwner = {
-            Infantry  = 1,
-            Mech      = 1,
-            TireA     = 1,
-            TireB     = 1,
-            Tank      = 1,
-            Air       = 1,
-            Ship      = 1,
-            Transport = 1,
-        },
-    },
-
     BridgeOnRiver = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -882,10 +840,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -906,10 +861,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -930,10 +882,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = {
-                [1] = "步兵/炮兵",
-                [2] = "Foot Units",
-            },
+            targetCatagory = "FootUnits",
             targetList     = GameConstant.unitCatagory.footUnits,
         },
 
@@ -954,10 +903,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -978,10 +924,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1002,10 +945,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1026,10 +966,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = {
-                [1] = "海军",
-                [2] = "Naval Units",
-            },
+            targetCatagory = "NavalUnits",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1050,10 +987,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = {
-                [1] = "海军",
-                [2] = "Naval Units",
-            },
+            targetCatagory = "NavalUnits",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1074,10 +1008,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = {
-                [1] = "海军",
-                [2] = "Naval Units",
-            },
+            targetCatagory = "NavalUnits",
             targetList     = GameConstant.unitCatagory.navalUnits,
         },
 
@@ -1098,10 +1029,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1129,10 +1057,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 0,
-            targetCatagory = {
-                [1] = "无",
-                [2] = "None",
-            },
+            targetCatagory = "None",
             targetList     = GameConstant.unitCatagory.none,
         },
 
@@ -1153,10 +1078,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1182,10 +1104,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1196,10 +1115,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 40,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1225,10 +1141,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1239,10 +1152,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 20,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1273,10 +1183,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1307,10 +1214,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1336,10 +1240,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
             amount         = 2,
         },
@@ -1350,10 +1251,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1398,10 +1296,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "空军",
-                [2] = "Air units",
-            },
+            targetCatagory = "AirUnits",
             targetList     = GameConstant.unitCatagory.airUnits,
             amount         = 2,
         },
@@ -1412,10 +1307,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1451,10 +1343,7 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "海军",
-                [2] = "Naval units",
-            },
+            targetCatagory = "NavalUnits",
             targetList     = GameConstant.unitCatagory.navalUnits,
             amount         = 2,
         },
@@ -1465,10 +1354,7 @@ GameConstant.templateModelTiles = {
 
         DefenseBonusProvider = {
             amount         = 30,
-            targetCatagory = {
-                [1] = "陆军/海军",
-                [2] = "Ground/Naval Units",
-            },
+            targetCatagory = "Ground/NavalUnits",
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 
@@ -1505,20 +1391,14 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "空军",
-                [2] = "Air units",
-            },
+            targetCatagory = "AirUnits",
             targetList     = GameConstant.unitCatagory.airUnits,
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = {
-                [1] = "陆军",
-                [2] = "Ground units",
-            },
+            targetCatagory = "GroundUnits",
             targetList     = GameConstant.unitCatagory.groundUnits,
         },
 
@@ -1544,20 +1424,14 @@ GameConstant.templateModelTiles = {
         },
 
         RepairDoer = {
-            targetCatagory = {
-                [1] = "海军",
-                [2] = "Naval units",
-            },
+            targetCatagory = "NavalUnits",
             targetList     = GameConstant.unitCatagory.navalUnits,
             amount         = 2,
         },
 
         DefenseBonusProvider = {
             amount         = 10,
-            targetCatagory = {
-                [1] = "陆军/海军",
-                [2] = "Ground/Naval Units",
-            },
+            targetCatagory = "Ground/NavalUnits",
             targetList     = GameConstant.unitCatagory.groundOrNavalUnits,
         },
 

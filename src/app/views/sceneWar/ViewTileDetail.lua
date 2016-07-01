@@ -174,7 +174,7 @@ local function initWithDefenseInfo(self, info)
 end
 
 local function updateDefenseInfoWithModelTile(info, tile)
-    info.m_Label:setString(LocalizationFunctions.getLocalizedText(103, tile:getDefenseBonusAmount(), tile:getDefenseBonusTargetCatagory()))
+    info.m_Label:setString(LocalizationFunctions.getLocalizedText(103, tile:getDefenseBonusAmount(), tile:getDefenseBonusTargetCatagoryFullName()))
 end
 
 --------------------------------------------------------------------------------
@@ -211,8 +211,8 @@ local function initWithRepairInfo(self, info)
 end
 
 local function updateRepairInfoWithModelTile(info, tile)
-    if (tile.getRepairTargetCatagory) then
-        local catagory = tile:getRepairTargetCatagory()
+    if (tile.getRepairTargetCatagoryFullName) then
+        local catagory = tile:getRepairTargetCatagoryFullName()
         local amount   = tile:getNormalizedRepairAmount()
         info.m_Label:setString(LocalizationFunctions.getLocalizedText(104, amount, catagory))
     else

@@ -19,15 +19,15 @@ local ComponentManager      = require("global.components.ComponentManager")
 local EXPORTED_METHODS = {
     "getDefenseBonusAmount",
     "getNormalizedDefenseBonusAmount",
+    "getDefenseBonusTargetCatagoryFullName",
     "getDefenseBonusTargetCatagory",
-    "getDefenseBonusTargetList",
 }
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function isDefenseBonusTarget(self, targetName)
-    for _, name in ipairs(self:getDefenseBonusTargetList()) do
+    for _, name in ipairs(self:getDefenseBonusTargetCatagory()) do
         if (targetName == name) then
             return true
         end
@@ -84,8 +84,8 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function DefenseBonusProvider:getDefenseBonusAmount(targetName)
-    if (not targetName) or (isDefenseBonusTarget(self, targetName)) then
+function DefenseBonusProvider:getDefenseBonusAmount(targetType)
+    if ((not targetType) or (isDefenseBonusTarget(self, targetType))) then
         return self.m_Template.amount
     else
         return 0
@@ -96,11 +96,11 @@ function DefenseBonusProvider:getNormalizedDefenseBonusAmount()
     return math.floor(self:getDefenseBonusAmount() / 10)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetCatagory()
-    return self.m_Template.targetCatagory[LocalizationFunctions.getLanguageCode()]
+function DefenseBonusProvider:getDefenseBonusTargetCatagoryFullName()
+    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCatagory)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetList()
+function DefenseBonusProvider:getDefenseBonusTargetCatagory()
     return self.m_Template.targetList
 end
 

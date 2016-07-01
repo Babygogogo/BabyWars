@@ -23,8 +23,8 @@ local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
+    "getRepairTargetCatagoryFullName",
     "getRepairTargetCatagory",
-    "getRepairTargetList",
     "canRepairTarget",
     "getRepairAmountAndCost",
     "getNormalizedRepairAmount",
@@ -78,11 +78,11 @@ end
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------
-function RepairDoer:getRepairTargetCatagory()
-    return self.m_Template.targetCatagory[LocalizationFunctions.getLanguageCode()]
+function RepairDoer:getRepairTargetCatagoryFullName()
+    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCatagory)
 end
 
-function RepairDoer:getRepairTargetList()
+function RepairDoer:getRepairTargetCatagory()
     return self.m_Template.targetList
 end
 
@@ -93,7 +93,7 @@ function RepairDoer:canRepairTarget(target)
     end
 
     local targetName = GameConstantFunctions.getUnitTypeWithTiledId(targetTiledID)
-    for _, name in ipairs(self:getRepairTargetList()) do
+    for _, name in ipairs(self:getRepairTargetCatagory()) do
         if (targetName == name) then
             return true
         end
