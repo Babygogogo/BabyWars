@@ -18,26 +18,29 @@ local MENU_BACKGROUND_TEXTURE_NAME = "c03_t01_s01_f01.png"
 local MENU_BACKGROUND_CAPINSETS    = {x = 4, y = 6, width = 1, height = 1}
 
 local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT     = 45
+local MENU_TITLE_HEIGHT     = 60
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - 7
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT
 local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 35
 
-local MENU_LIST_VIEW_WIDTH  = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT = MENU_BACKGROUND_HEIGHT - 14 - 50 - 30
-local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 30
-
-local BUTTON_BACK_POS_X      = MENU_LIST_VIEW_POS_X
-local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y + 6
+local BUTTON_BACK_WIDTH      = MENU_BACKGROUND_WIDTH
+local BUTTON_BACK_HEIGHT     = 50
+local BUTTON_BACK_POS_X      = MENU_BACKGROUND_POS_X
+local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y
 local BUTTON_BACK_FONT_COLOR = {r = 240, g = 80, b = 56}
 
+local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH
+local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
+local MENU_LIST_VIEW_POS_Y        = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_ITEMS_MARGIN = 10
+
 local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
+local ITEM_HEIGHT             = 50
 local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_SIZE          = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
@@ -61,6 +64,16 @@ local HELP_TEXT_LINE_HEIGHT = HELP_TEXT_FONT_SIZE / 5 * 8
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createViewMenuItem(item)
+    local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -70,18 +83,12 @@ local function createViewMenuItem(item)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName(ITEM_FONT_NAME)
-        :setTitleFontSize(ITEM_FONT_SIZE)
-        :setTitleColor(fontColor or ITEM_FONT_COLOR)
-        :setTitleText(item.name)
-
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 item.callback()
             end
         end)
-
-    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+    view:getRendererNormal():addChild(label)
 
     return view
 end
@@ -104,7 +111,7 @@ local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
-        :setItemsMargin(5)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
     self.m_MenuListView = listView
@@ -133,7 +140,7 @@ local function initButtonBack(self)
         :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
 
         :setScale9Enabled(true)
-        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+        :setContentSize(BUTTON_BACK_WIDTH, BUTTON_BACK_HEIGHT)
 
         :setZoomScale(-0.05)
 

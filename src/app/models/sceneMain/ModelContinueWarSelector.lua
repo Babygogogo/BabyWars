@@ -108,7 +108,7 @@ local function createOngoingWarList(self, list)
         local warFieldFileName = configuration.warFieldFileName
         warList[#warList + 1] = {
             sceneWarFileName = sceneWarFileName,
-            warFieldFileName = WarFieldList[warFieldFileName],
+            warFieldName     = WarFieldList[warFieldFileName],
             isInTurn         = item.isInTurn,
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)

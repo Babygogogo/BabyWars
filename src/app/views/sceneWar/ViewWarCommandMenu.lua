@@ -7,9 +7,9 @@ local BACKGROUND_POS_X     = (display.width - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POS_Y     = (display.height - BACKGROUND_HEIGHT) / 2
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
-local LIST_VIEW_WIDTH        = BACKGROUND_WIDTH - 10
+local LIST_VIEW_WIDTH        = BACKGROUND_WIDTH
 local LIST_VIEW_HEIGHT       = BACKGROUND_HEIGHT - 14
-local LIST_VIEW_POS_X        = BACKGROUND_POS_X + 10
+local LIST_VIEW_POS_X        = BACKGROUND_POS_X
 local LIST_VIEW_POS_Y        = BACKGROUND_POS_Y + 6
 local LIST_VIEW_ITEMS_MARGIN = 10
 
