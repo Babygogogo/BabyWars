@@ -19,27 +19,28 @@ local MENU_BACKGROUND_POS_X  = 30
 local MENU_BACKGROUND_POS_Y  = 30
 
 local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT     = 45
+local MENU_TITLE_HEIGHT     = 60
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - 7
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT
 local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 35
 
 local BUTTON_EXIT_WIDTH  = MENU_BACKGROUND_WIDTH
-local BUTTON_EXIT_HEIGHT = 35
+local BUTTON_EXIT_HEIGHT = 40
 local BUTTON_EXIT_POS_X  = MENU_BACKGROUND_POS_X
 local BUTTON_EXIT_POS_Y  = MENU_BACKGROUND_POS_Y + 10
 
-local MENU_LIST_VIEW_WIDTH  = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT = MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT - BUTTON_EXIT_HEIGHT - 20
-local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = BUTTON_EXIT_POS_Y + BUTTON_EXIT_HEIGHT
+local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH - 10
+local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_EXIT_POS_Y - BUTTON_EXIT_HEIGHT
+local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X + 5
+local MENU_LIST_VIEW_POS_Y        = BUTTON_EXIT_POS_Y + BUTTON_EXIT_HEIGHT
+local MENU_LIST_VIEW_ITEMS_MARGIN = 10
 
 local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
+local ITEM_HEIGHT             = 40
 local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_SIZE          = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
@@ -48,6 +49,16 @@ local ITEM_FONT_OUTLINE_WIDTH = 2
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createViewItem(item)
+    local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -57,18 +68,12 @@ local function createViewItem(item)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName(ITEM_FONT_NAME)
-        :setTitleFontSize(ITEM_FONT_SIZE)
-        :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText(item.name)
-
-    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
-
-    view:addTouchEventListener(function(sender, eventType)
-        if (eventType == ccui.TouchEventType.ended) then
-            item.callback()
-        end
-    end)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
 
     return view
 end
@@ -92,7 +97,7 @@ local function initMenuListView(self)
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
-        :setItemsMargin(15)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
     self.m_MenuListView = listView

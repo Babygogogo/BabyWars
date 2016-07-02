@@ -5,6 +5,12 @@ local AnimationLoader       = require("app.utilities.AnimationLoader")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 local ComponentManager      = require("global.components.ComponentManager")
 
+local TILE_LABEL_Z_ORDER = 3
+local INFO_LABEL_Z_ORDER = 2
+local TILE_ICON_Z_ORDER  = 1
+local INFO_ICON_Z_ORDER  = 0
+local BACKGROUND_Z_ORDER = 0
+
 local GRID_SIZE = GameConstantFunctions.getGridSize()
 
 local BACKGROUND_WIDTH  = 75
@@ -94,7 +100,7 @@ local function initBackground(self)
         end)
 
     self.m_Background = background
-    self:addChild(background)
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 local function initTileIcon(self)
@@ -106,7 +112,7 @@ local function initTileIcon(self)
         :setScale(TILE_ICON_SCALE)
 
     self.m_TileIcon = icon
-    self.m_Background:getRendererNormal():addChild(icon)
+    self.m_Background:getRendererNormal():addChild(icon, TILE_ICON_Z_ORDER)
 end
 
 local function initTileLabel(self)
@@ -122,7 +128,7 @@ local function initTileLabel(self)
         :enableOutline(FONT_OUTLINE_COLOR, 1)
 
     self.m_TileLabel = label
-    self.m_Background:getRendererNormal():addChild(label)
+    self.m_Background:getRendererNormal():addChild(label, TILE_LABEL_Z_ORDER)
 end
 
 local function initDefenseInfo(self)
@@ -137,8 +143,8 @@ local function initDefenseInfo(self)
 
     self.m_DefenseIcon  = icon
     self.m_DefenseLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 local function initCaptureInfo(self)
@@ -153,8 +159,8 @@ local function initCaptureInfo(self)
 
     self.m_CaptureIcon  = icon
     self.m_CaptureLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 local function initHPInfo(self)
@@ -169,8 +175,8 @@ local function initHPInfo(self)
 
     self.m_HPIcon  = icon
     self.m_HPLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------

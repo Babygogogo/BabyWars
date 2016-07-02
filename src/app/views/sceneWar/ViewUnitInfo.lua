@@ -4,6 +4,12 @@ local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 local AnimationLoader       = require("app.utilities.AnimationLoader")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
+local UNIT_LABEL_Z_ORDER = 3
+local INFO_LABEL_Z_ORDER = 2
+local UNIT_ICON_Z_ORDER  = 1
+local INFO_ICON_Z_ORDER  = 0
+local BACKGROUND_Z_ORDER = 0
+
 local BACKGROUND_WIDTH  = 75
 local BACKGROUND_HEIGHT = 130
 
@@ -85,7 +91,7 @@ local function initBackground(self)
         end)
 
     self.m_Background = background
-    self:addChild(background)
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 local function initUnitIcon(self)
@@ -97,7 +103,7 @@ local function initUnitIcon(self)
         :setScale(UNIT_ICON_SCALE)
 
     self.m_UnitIcon = icon
-    self.m_Background:getRendererNormal():addChild(icon)
+    self.m_Background:getRendererNormal():addChild(icon, UNIT_ICON_Z_ORDER)
 end
 
 local function initUnitLabel(self)
@@ -113,7 +119,7 @@ local function initUnitLabel(self)
         :enableOutline(FONT_OUTLINE_COLOR, 1)
 
     self.m_UnitLabel = label
-    self.m_Background:getRendererNormal():addChild(label)
+    self.m_Background:getRendererNormal():addChild(label, UNIT_LABEL_Z_ORDER)
 end
 
 local function initHPInfo(self)
@@ -128,8 +134,8 @@ local function initHPInfo(self)
 
     self.m_HPIcon  = icon
     self.m_HPLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 local function initFuelInfo(self)
@@ -144,8 +150,8 @@ local function initFuelInfo(self)
 
     self.m_FuelIcon = icon
     self.m_FuelLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 local function initAmmoInfo(self)
@@ -160,8 +166,8 @@ local function initAmmoInfo(self)
 
     self.m_AmmoIcon = icon
     self.m_AmmoLabel = label
-    self.m_Background:getRendererNormal():addChild(icon)
-        :addChild(label)
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
