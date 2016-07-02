@@ -130,7 +130,7 @@ local function initButtonBack(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor({r = 240, g = 80, b = 56})
-        :setTitleText(LocalizationFunctions.getLocalizedText(8))
+        :setTitleText(LocalizationFunctions.getLocalizedText(8, "Back"))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then

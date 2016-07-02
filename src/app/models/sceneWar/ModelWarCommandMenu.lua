@@ -67,7 +67,7 @@ local function initItemQuit(self)
     local item = {
         name     = LocalizationFunctions.getLocalizedText(65),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66))
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "QuitWar"))
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
                     WebSocketManager.setOwner(actorSceneMain:getModel())

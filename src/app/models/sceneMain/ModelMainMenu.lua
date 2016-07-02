@@ -305,4 +305,12 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
     return self
 end
 
+function ModelMainMenu:onButtonExitTouched()
+    self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "ExitGame"))
+        :setOnConfirmYes(function()
+            cc.Director:getInstance():endToLua()
+        end)
+        :setEnabled(true)
+end
+
 return ModelMainMenu

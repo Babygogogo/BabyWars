@@ -101,7 +101,7 @@ local function initEditBoxPassword(self)
 end
 
 local function initButtonBack(self)
-    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, LocalizationFunctions.getLocalizedText(8))
+    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, LocalizationFunctions.getLocalizedText(8, "Back"))
     button:addTouchEventListener(function(sender, eventType)
         if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
             self.m_Model:onButtonBackTouched()

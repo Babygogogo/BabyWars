@@ -82,8 +82,18 @@ local s_Texts = {
         [2] = function(...) return "Help" end,
     },
     [8] = {
-        [1] = function(...) return "返 回" end,
-        [2] = function(...) return "Back" end,
+        [1] = function(commandType)
+            if     (commandType == "Back") then return "返 回"
+            elseif (commandType == "Exit") then return "退 出"
+            else                                return "未识别"
+            end
+        end,
+        [2] = function(commandType)
+            if     (commandType == "Back") then return "Back"
+            elseif (commandType == "Exit") then return "Exit"
+            else                                return "Unrecognized"
+            end
+        end,
     },
     [9] = {
         [1] = function(...) return "游 戏 流 程" end,
@@ -318,8 +328,18 @@ local s_Texts = {
         [2] = function() return "Quit" end,
     },
     [66] = {
-        [1] = function() return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？" end,
-        [2] = function() return "You are quitting the war (you may reenter it later).\nAre you sure?" end,
+        [1] = function(confirmType)
+            if     (confirmType == "QuitWar")  then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (confirmType == "ExitGame") then return "是否确定退出游戏？"
+            else                                    return "未识别：[66]" .. confirmType
+            end
+        end,
+        [2] = function(confirmType)
+            if     (confirmType == "QuitWar")  then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (confirmType == "ExitGame") then return "Are you sure to exit the game?"
+            else                                    return "Unrecognized:[66]" .. confirmType
+            end
+        end,
     },
     [67] = {
         [1] = function() return "投 降" end,

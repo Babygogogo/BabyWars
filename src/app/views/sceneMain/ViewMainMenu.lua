@@ -10,6 +10,7 @@ local LOGIN_PANEL_Z_ORDER            = 3
 local GAME_HELPER_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
 local MENU_LIST_VIEW_Z_ORDER         = 1
+local BUTTON_EXIT_Z_ORDER            = 1
 local MENU_BACKGROUND_Z_ORDER        = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
@@ -25,9 +26,12 @@ local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 35
 
 local MENU_LIST_VIEW_WIDTH  = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT = MENU_BACKGROUND_HEIGHT - 14 - 50
+local MENU_LIST_VIEW_HEIGHT = MENU_BACKGROUND_HEIGHT - 14 - 50 - 30
 local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6
+local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6 + 30
+
+local BUTTON_EXIT_POS_X = MENU_LIST_VIEW_POS_X
+local BUTTON_EXIT_POS_Y = MENU_BACKGROUND_POS_Y + 6
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 45
@@ -109,6 +113,33 @@ local function initMenuTitle(self)
     self:addChild(title, MENU_TITLE_Z_ORDER)
 end
 
+local function initButtonExit(self)
+    local button = ccui.Button:create()
+    button:ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_EXIT_POS_X, BUTTON_EXIT_POS_Y)
+
+        :setScale9Enabled(true)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor({r = 240, g = 80, b = 56})
+        :setTitleText(LocalizationFunctions.getLocalizedText(8, "Exit"))
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonExitTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonExit = button
+    self:addChild(button, BUTTON_EXIT_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -116,6 +147,7 @@ function ViewMainMenu:ctor(param)
     initMenuBackground(self)
     initMenuListView(  self)
     initMenuTitle(     self)
+    initButtonExit(    self)
 
     return self
 end
@@ -179,6 +211,7 @@ function ViewMainMenu:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
     self.m_MenuListView  :setVisible(visible)
     self.m_MenuTitle     :setVisible(visible)
+    self.m_ButtonExit    :setVisible(visible)
 
     return self
 end
