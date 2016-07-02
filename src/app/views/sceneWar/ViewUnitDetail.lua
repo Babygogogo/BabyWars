@@ -4,48 +4,70 @@ local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 local AnimationLoader       = require("app.utilities.AnimationLoader")
 
-local FONT_SIZE   = 25
-local LINE_HEIGHT = FONT_SIZE / 5 * 8
+local PRIMARY_WEAPON_ICONS_Z_ORDER   = 2
+local SECONDARY_WEAPON_ICONS_Z_ORDER = 2
+local DEFENSE_ICONS_Z_ORDER          = 2
+local DESCRIPTION_LABEL_Z_ORDER      = 1
+local MOVEMENT_LABEL_Z_ORDER         = 1
+local VISION_LABEL_Z_ORDER           = 1
+local FUEL_LABEL_Z_ORDER             = 1
+local PRIMARY_WEAPON_LABEL_Z_ORDER   = 1
+local SECONDARY_WEAPON_LABEL_Z_ORDER = 1
+local DEFENSE_LABEL_Z_ORDER          = 1
+local DESCRIPTION_LINE_Z_ORDER       = 0
+local MOVEMENT_LINE_Z_ORDER          = 0
+local FUEL_LINE_Z_ORDER              = 0
+local PRIMARY_WEAPON_LINE_Z_ORDER    = 0
+local SECONDARY_WEAPON_LINE_Z_ORDER  = 0
+local BACKGROUND_Z_ORDER             = 0
+local GREY_MASK_Z_ORDER              = -1
 
-local BACKGROUND_WIDTH      = display.width * 0.86
-local BACKGROUND_HEIGHT     = math.min(LINE_HEIGHT * 11 + 10, display.height * 0.95)
-local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH) / 2
-local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
+local FONT_SIZE          = 25
+local LINE_HEIGHT        = FONT_SIZE / 5 * 8
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
+local FONT_OUTLINE_WIDTH = 2
 
-local DESCRIPTION_WIDTH      = BACKGROUND_WIDTH - 10
-local DESCRIPTION_HEIGHT     = LINE_HEIGHT * 2
-local DESCRIPTION_POSITION_X = BACKGROUND_POSITION_X + 5
-local DESCRIPTION_POSITION_Y = BACKGROUND_POSITION_Y + BACKGROUND_HEIGHT - DESCRIPTION_HEIGHT - 8
+local BACKGROUND_WIDTH  = display.width * 0.86
+local BACKGROUND_HEIGHT = math.min(LINE_HEIGHT * 11 + 10, display.height * 0.95)
+local BACKGROUND_POS_X  = (display.width  - BACKGROUND_WIDTH) / 2
+local BACKGROUND_POS_Y  = (display.height - BACKGROUND_HEIGHT) / 2
 
-local MOVEMENT_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local MOVEMENT_INFO_HEIGHT     = LINE_HEIGHT
-local MOVEMENT_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
-local MOVEMENT_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
+local DESCRIPTION_WIDTH  = BACKGROUND_WIDTH - 10
+local DESCRIPTION_HEIGHT = LINE_HEIGHT * 2
+local DESCRIPTION_POS_X  = BACKGROUND_POS_X + 5
+local DESCRIPTION_POS_Y  = BACKGROUND_POS_Y + BACKGROUND_HEIGHT - DESCRIPTION_HEIGHT - 8
 
-local VISION_INFO_WIDTH      = 300
-local VISION_INFO_HEIGHT     = LINE_HEIGHT
-local VISION_INFO_POSITION_X = BACKGROUND_POSITION_X + BACKGROUND_WIDTH - VISION_INFO_WIDTH
-local VISION_INFO_POSITION_Y = DESCRIPTION_POSITION_Y - MOVEMENT_INFO_HEIGHT
+local MOVEMENT_INFO_WIDTH  = BACKGROUND_WIDTH - 10
+local MOVEMENT_INFO_HEIGHT = LINE_HEIGHT
+local MOVEMENT_INFO_POS_X  = BACKGROUND_POS_X + 5
+local MOVEMENT_INFO_POS_Y  = DESCRIPTION_POS_Y - MOVEMENT_INFO_HEIGHT
 
-local FUEL_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local FUEL_INFO_HEIGHT     = LINE_HEIGHT * 2
-local FUEL_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
-local FUEL_INFO_POSITION_Y = MOVEMENT_INFO_POSITION_Y - FUEL_INFO_HEIGHT
+local VISION_INFO_WIDTH  = 300
+local VISION_INFO_HEIGHT = LINE_HEIGHT
+local VISION_INFO_POS_X  = BACKGROUND_POS_X + BACKGROUND_WIDTH - VISION_INFO_WIDTH
+local VISION_INFO_POS_Y  = DESCRIPTION_POS_Y - MOVEMENT_INFO_HEIGHT
 
-local PRIMARY_WEAPON_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local PRIMARY_WEAPON_INFO_HEIGHT     = LINE_HEIGHT * 2
-local PRIMARY_WEAPON_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
-local PRIMARY_WEAPON_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - PRIMARY_WEAPON_INFO_HEIGHT
+local FUEL_INFO_WIDTH  = BACKGROUND_WIDTH - 10
+local FUEL_INFO_HEIGHT = LINE_HEIGHT * 2
+local FUEL_INFO_POS_X  = BACKGROUND_POS_X + 5
+local FUEL_INFO_POS_Y  = MOVEMENT_INFO_POS_Y - FUEL_INFO_HEIGHT
 
-local SECONDARY_WEAPON_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local SECONDARY_WEAPON_INFO_HEIGHT     = LINE_HEIGHT * 2
-local SECONDARY_WEAPON_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
-local SECONDARY_WEAPON_INFO_POSITION_Y = PRIMARY_WEAPON_INFO_POSITION_Y - SECONDARY_WEAPON_INFO_HEIGHT
+local PRIMARY_WEAPON_INFO_WIDTH  = BACKGROUND_WIDTH - 10
+local PRIMARY_WEAPON_INFO_HEIGHT = LINE_HEIGHT * 2
+local PRIMARY_WEAPON_INFO_POS_X  = BACKGROUND_POS_X + 5
+local PRIMARY_WEAPON_INFO_POS_Y  = FUEL_INFO_POS_Y - PRIMARY_WEAPON_INFO_HEIGHT
 
-local DEFENSE_INFO_WIDTH      = BACKGROUND_WIDTH - 10
-local DEFENSE_INFO_HEIGHT     = LINE_HEIGHT * 2
-local DEFENSE_INFO_POSITION_X = BACKGROUND_POSITION_X + 5
-local DEFENSE_INFO_POSITION_Y = SECONDARY_WEAPON_INFO_POSITION_Y - DEFENSE_INFO_HEIGHT
+local SECONDARY_WEAPON_INFO_WIDTH  = BACKGROUND_WIDTH - 10
+local SECONDARY_WEAPON_INFO_HEIGHT = LINE_HEIGHT * 2
+local SECONDARY_WEAPON_INFO_POS_X  = BACKGROUND_POS_X + 5
+local SECONDARY_WEAPON_INFO_POS_Y  = PRIMARY_WEAPON_INFO_POS_Y - SECONDARY_WEAPON_INFO_HEIGHT
+
+local DEFENSE_INFO_WIDTH  = BACKGROUND_WIDTH - 10
+local DEFENSE_INFO_HEIGHT = LINE_HEIGHT * 2
+local DEFENSE_INFO_POS_X  = BACKGROUND_POS_X + 5
+local DEFENSE_INFO_POS_Y  = SECONDARY_WEAPON_INFO_POS_Y - DEFENSE_INFO_HEIGHT
 
 local ICON_SCALE = FONT_SIZE * 0.016
 local GRID_WIDTH = require("app.utilities.GameConstantFunctions").getGridSize().width
@@ -64,11 +86,6 @@ local function createBottomLine(posX, poxY, width, height)
 
     return line
 end
-
-local FONT_NAME          = "res/fonts/msyhbd.ttc"
-local FONT_COLOR         = {r = 255, g = 255, b = 255}
-local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
-local FONT_OUTLINE_WIDTH = 2
 
 local function createLabel(posX, posY, width, height, text)
     local label = cc.Label:createWithTTF(text or "", FONT_NAME, FONT_SIZE)
@@ -108,494 +125,136 @@ local function resetIconsWithTypeNames(icons, typeNames)
 end
 
 --------------------------------------------------------------------------------
--- The screen background (the grey transparent mask).
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createScreenBackground()
-    local background = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
-    background:setContentSize(display.width, display.height)
+local function initGreyMask(self)
+    local mask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
+    mask:setContentSize(display.width, display.height)
         :ignoreAnchorPointForPosition(true)
 
-        :setOpacity(180)
-
-    return background
+    self.m_GreyMask = mask
+    self:addChild(mask, GREY_MASK_Z_ORDER)
 end
 
-local function initWithScreenBackground(self, background)
-    self.m_ScreenBackground = background
-    self:addChild(background)
-end
-
---------------------------------------------------------------------------------
--- The detail panel background.
---------------------------------------------------------------------------------
-local function createDetailBackground()
+local function initBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
-        :setPosition(BACKGROUND_POSITION_X, BACKGROUND_POSITION_Y)
+        :setPosition(BACKGROUND_POS_X, BACKGROUND_POS_Y)
 
         :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
         :setOpacity(180)
 
-    return background
+    self.m_Background = background
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
-local function initWithDetailBackground(self, background)
-    self.m_DetailBackground = background
-    self:addChild(background)
+local function initDescription(self)
+    local label      = createLabel(DESCRIPTION_POS_X, DESCRIPTION_POS_Y, DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
+    local bottomLine = createBottomLine(DESCRIPTION_POS_X + 5, DESCRIPTION_POS_Y, DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
+
+    self.m_DescriptionLabel = label
+    self.m_DescriptionLine  = bottomLine
+    self:addChild(label,      DESCRIPTION_LABEL_Z_ORDER)
+        :addChild(bottomLine, DESCRIPTION_LINE_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The brief description for the unit.
---------------------------------------------------------------------------------
-local function createDescriptionBottomLine()
-    return createBottomLine(DESCRIPTION_POSITION_X + 5, DESCRIPTION_POSITION_Y,
-                            DESCRIPTION_WIDTH - 10, DESCRIPTION_HEIGHT)
+local function initMovementInfo(self)
+    local label      = createLabel(MOVEMENT_INFO_POS_X, MOVEMENT_INFO_POS_Y, MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
+    local bottomLine = createBottomLine(MOVEMENT_INFO_POS_X + 5, MOVEMENT_INFO_POS_Y, MOVEMENT_INFO_WIDTH - 10, MOVEMENT_INFO_HEIGHT)
+
+    self.m_MovementLabel = label
+    self.m_MovementLine  = bottomLine
+    self:addChild(label,      MOVEMENT_LABEL_Z_ORDER)
+        :addChild(bottomLine, MOVEMENT_LINE_Z_ORDER)
 end
 
-local function createDescriptionLabel()
-    return createLabel(DESCRIPTION_POSITION_X, DESCRIPTION_POSITION_Y,
-                        DESCRIPTION_WIDTH, DESCRIPTION_HEIGHT)
+local function initVisionInfo(self)
+    local label = createLabel(VISION_INFO_POS_X, VISION_INFO_POS_Y, VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
+
+    self.m_VisionLabel = label
+    self:addChild(label, VISION_LABEL_Z_ORDER)
 end
 
-local function createDescription()
-    local bottomLine = createDescriptionBottomLine()
-    local label = createDescriptionLabel()
+local function initFuelInfo(self)
+    local label = createLabel(FUEL_INFO_POS_X, FUEL_INFO_POS_Y, FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
+    local bottomLine = createBottomLine(FUEL_INFO_POS_X + 5, FUEL_INFO_POS_Y, FUEL_INFO_WIDTH - 10, FUEL_INFO_HEIGHT)
 
-    local description = cc.Node:create()
-    description:ignoreAnchorPointForPosition(true)
-        :addChild(bottomLine)
-        :addChild(label)
-
-    description.m_BottomLine   = bottomLine
-    description.m_Label        = label
-
-    return description
+    self.m_FuelLabel = label
+    self.m_FuelLine  = bottomLine
+    self:addChild(label,      FUEL_LABEL_Z_ORDER)
+        :addChild(bottomLine, FUEL_LINE_Z_ORDER)
 end
 
-local function initWithDescription(self, description)
-    self.m_Description = description
-    self:addChild(description)
+local function initPrimaryWeaponInfo(self)
+    local briefLabel  = createLabel(     PRIMARY_WEAPON_INFO_POS_X,       PRIMARY_WEAPON_INFO_POS_Y,    PRIMARY_WEAPON_INFO_WIDTH,      PRIMARY_WEAPON_INFO_HEIGHT)
+    local fatalLabel  = createLabel(     PRIMARY_WEAPON_INFO_POS_X,       PRIMARY_WEAPON_INFO_POS_Y,    PRIMARY_WEAPON_INFO_WIDTH / 2,  PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
+    local fatalIcons  = createUnitIcons( PRIMARY_WEAPON_INFO_POS_X + 80,  PRIMARY_WEAPON_INFO_POS_Y + 6)
+    local strongLabel = createLabel(     PRIMARY_WEAPON_INFO_POS_X + 300, PRIMARY_WEAPON_INFO_POS_Y,    PRIMARY_WEAPON_INFO_WIDTH / 2,  PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
+    local strongIcons = createUnitIcons( PRIMARY_WEAPON_INFO_POS_X,       PRIMARY_WEAPON_INFO_POS_Y + 6)
+    local bottomLine  = createBottomLine(PRIMARY_WEAPON_INFO_POS_X + 5,   PRIMARY_WEAPON_INFO_POS_Y,    PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
+
+    self.m_PrimaryWeaponBriefLabel  = briefLabel
+    self.m_PrimaryWeaponFatalLabel  = fatalLabel
+    self.m_PrimaryWeaponFatalIcons  = fatalIcons
+    self.m_PrimaryWeaponStrongLabel = strongLabel
+    self.m_PrimaryWeaponStrongIcons = strongIcons
+    self.m_PrimaryWeaponLine        = bottomLine
+    self:addChild(briefLabel,  PRIMARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(fatalLabel,  PRIMARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(strongLabel, PRIMARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(fatalIcons,  PRIMARY_WEAPON_ICONS_Z_ORDER)
+        :addChild(strongIcons, PRIMARY_WEAPON_ICONS_Z_ORDER)
+        :addChild(bottomLine,  PRIMARY_WEAPON_LINE_Z_ORDER)
 end
 
-local function updateDescriptionWithModelUnit(description, unit)
-    description.m_Label:setString(unit:getDescription())
+local function initSecondaryWeaponInfo(self)
+    local briefLabel  = createLabel(     SECONDARY_WEAPON_INFO_POS_X,       SECONDARY_WEAPON_INFO_POS_Y,    SECONDARY_WEAPON_INFO_WIDTH,      SECONDARY_WEAPON_INFO_HEIGHT)
+    local fatalLabel  = createLabel(     SECONDARY_WEAPON_INFO_POS_X,       SECONDARY_WEAPON_INFO_POS_Y,    SECONDARY_WEAPON_INFO_WIDTH / 2,  SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
+    local fatalIcons  = createUnitIcons( SECONDARY_WEAPON_INFO_POS_X + 80,  SECONDARY_WEAPON_INFO_POS_Y + 6)
+    local strongLabel = createLabel(     SECONDARY_WEAPON_INFO_POS_X + 300, SECONDARY_WEAPON_INFO_POS_Y,    SECONDARY_WEAPON_INFO_WIDTH / 2,  SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
+    local strongIcons = createUnitIcons( SECONDARY_WEAPON_INFO_POS_X,       SECONDARY_WEAPON_INFO_POS_Y + 6)
+    local bottomLine  = createBottomLine(SECONDARY_WEAPON_INFO_POS_X + 5,   SECONDARY_WEAPON_INFO_POS_Y,    SECONDARY_WEAPON_INFO_WIDTH - 10, SECONDARY_WEAPON_INFO_HEIGHT)
+
+    self.m_SecondaryWeaponBriefLabel  = briefLabel
+    self.m_SecondaryWeaponFatalLabel  = fatalLabel
+    self.m_SecondaryWeaponFatalIcons  = fatalIcons
+    self.m_SecondaryWeaponStrongLabel = strongLabel
+    self.m_SecondaryWeaponStrongIcons = strongIcons
+    self.m_SecondaryWeaponLine        = bottomLine
+    self:addChild(briefLabel,  SECONDARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(fatalLabel,  SECONDARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(strongLabel, SECONDARY_WEAPON_LABEL_Z_ORDER)
+        :addChild(fatalIcons,  SECONDARY_WEAPON_ICONS_Z_ORDER)
+        :addChild(strongIcons, SECONDARY_WEAPON_ICONS_Z_ORDER)
+        :addChild(bottomLine,  SECONDARY_WEAPON_LINE_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The movement information for the unit.
---------------------------------------------------------------------------------
-local function createMovementInfoButtomLine()
-    return createBottomLine(MOVEMENT_INFO_POSITION_X + 5, MOVEMENT_INFO_POSITION_Y,
-                            MOVEMENT_INFO_WIDTH - 10, MOVEMENT_INFO_HEIGHT)
+local function initDefenseInfo(self)
+    local briefLabel = createLabel(    DEFENSE_INFO_POS_X,       DEFENSE_INFO_POS_Y,    DEFENSE_INFO_WIDTH,     DEFENSE_INFO_HEIGHT,     LocalizationFunctions.getLocalizedText(100))
+    local fatalLabel = createLabel(    DEFENSE_INFO_POS_X,       DEFENSE_INFO_POS_Y,    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(101))
+    local fatalIcons = createUnitIcons(DEFENSE_INFO_POS_X + 80,  DEFENSE_INFO_POS_Y + 6)
+    local weakLabel  = createLabel(    DEFENSE_INFO_POS_X + 300, DEFENSE_INFO_POS_Y,    DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(102))
+    local weakIcons  = createUnitIcons(DEFENSE_INFO_POS_X,       DEFENSE_INFO_POS_Y + 6)
+
+    self.m_DefenseBriefLabel = briefLabel
+    self.m_DefenseFatalLabel = fatalLabel
+    self.m_DefenseFatalIcons = fatalIcons
+    self.m_DefenseWeakLabel  = weakLabel
+    self.m_DefenseWeakIcons  = weakIcons
+    self:addChild(briefLabel, DEFENSE_LABEL_Z_ORDER)
+        :addChild(fatalLabel, DEFENSE_LABEL_Z_ORDER)
+        :addChild(weakLabel,  DEFENSE_LABEL_Z_ORDER)
+        :addChild(fatalIcons, DEFENSE_ICONS_Z_ORDER)
+        :addChild(weakIcons,  DEFENSE_ICONS_Z_ORDER)
 end
 
-local function createMovementInfoLabel()
-    return createLabel(MOVEMENT_INFO_POSITION_X, MOVEMENT_INFO_POSITION_Y,
-                    MOVEMENT_INFO_WIDTH, MOVEMENT_INFO_HEIGHT)
-end
-
-local function createMovementInfo()
-    local bottomLine = createMovementInfoButtomLine()
-    local label = createMovementInfoLabel()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(bottomLine)
-        :addChild(label)
-
-    info.m_BottomLine = bottomLine
-    info.m_Label      = label
-
-    return info
-end
-
-local function initWithMovementInfo(self, info)
-    self.m_MovementInfo = info
-    self:addChild(info)
-end
-
-local function updateMovementInfoWithModelUnit(info, unit, modelPlayer, modelWeather)
-    info.m_Label:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeFullName()))
-end
-
---------------------------------------------------------------------------------
--- The vision information for the unit.
---------------------------------------------------------------------------------
-local function createVisionInfoLabel()
-    return createLabel(VISION_INFO_POSITION_X, VISION_INFO_POSITION_Y,
-                    VISION_INFO_WIDTH, VISION_INFO_HEIGHT)
-end
-
-local function createVisionInfo()
-    local label = createVisionInfoLabel()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(label)
-
-    info.m_Label = label
-
-    return info
-end
-
-local function initWithVisionInfo(self, info)
-    self.m_VisionInfo = info
-    self:addChild(info)
-end
-
-local function updateVisionInfoWithModelUnit(info, unit)
-    info.m_Label:setString(LocalizationFunctions.getLocalizedText(92, unit:getVision()))
-end
-
---------------------------------------------------------------------------------
--- The fuel information for the unit.
---------------------------------------------------------------------------------
-local function createFuelInfoBottomLine()
-    return createBottomLine(FUEL_INFO_POSITION_X + 5, FUEL_INFO_POSITION_Y,
-                            FUEL_INFO_WIDTH - 10, FUEL_INFO_HEIGHT)
-end
-
-local function createFuelInfoLabel()
-    return createLabel(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y,
-                    FUEL_INFO_WIDTH, FUEL_INFO_HEIGHT)
-end
-
-local function createFuelInfo()
-    local bottomLine = createFuelInfoBottomLine()
-    local label      = createFuelInfoLabel()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(bottomLine)
-        :addChild(label)
-
-    info.m_BottomLine = bottomLine
-    info.m_Label      = label
-
-    return info
-end
-
-local function initWithFuelInfo(self, info)
-    self.m_FuelInfo = info
-    self:addChild(info)
-end
-
-local function updateFuelInfoWithModelUnit(info, unit)
-    info.m_Label:setString(LocalizationFunctions.getLocalizedText(93,
-        unit:getCurrentFuel(), unit:getMaxFuel(), unit:getFuelConsumptionPerTurn(), unit:shouldDestroyOnOutOfFuel()))
-end
-
---------------------------------------------------------------------------------
--- The primary weapon information for the unit.
---------------------------------------------------------------------------------
-local function createPrimaryWeaponInfoBottomLine()
-    return createBottomLine(PRIMARY_WEAPON_INFO_POSITION_X + 5, PRIMARY_WEAPON_INFO_POSITION_Y,
-                            PRIMARY_WEAPON_INFO_WIDTH - 10, PRIMARY_WEAPON_INFO_HEIGHT)
-end
-
-local function createPrimaryWeaponInfoBriefLabel()
-    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
-                    PRIMARY_WEAPON_INFO_WIDTH, PRIMARY_WEAPON_INFO_HEIGHT)
-end
-
-local function createPrimaryWeaponInfoFatalLabel()
-    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y,
-        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
-end
-
-local function createPrimaryWeaponInfoFatalIcons()
-    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X + 72, PRIMARY_WEAPON_INFO_POSITION_Y + 6)
-end
-
-local function createPrimaryWeaponInfoStrongLabel()
-    return createLabel(PRIMARY_WEAPON_INFO_POSITION_X + 300, PRIMARY_WEAPON_INFO_POSITION_Y,
-        PRIMARY_WEAPON_INFO_WIDTH / 2, PRIMARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
-end
-
-local function createPrimaryWeaponInfoStrongIcons()
-    return createUnitIcons(PRIMARY_WEAPON_INFO_POSITION_X, PRIMARY_WEAPON_INFO_POSITION_Y + 6)
-end
-
-local function createPrimaryWeaponInfo()
-    local bottomLine  = createPrimaryWeaponInfoBottomLine()
-    local briefLabel  = createPrimaryWeaponInfoBriefLabel()
-    local fatalLabel  = createPrimaryWeaponInfoFatalLabel()
-    local fatalIcons  = createPrimaryWeaponInfoFatalIcons()
-    local strongLabel = createPrimaryWeaponInfoStrongLabel()
-    local strongIcons = createPrimaryWeaponInfoStrongIcons()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(bottomLine)
-        :addChild(briefLabel)
-        :addChild(fatalLabel)
-        :addChild(fatalIcons)
-        :addChild(strongLabel)
-        :addChild(strongIcons)
-
-    info.m_BottomLine   = bottomLine
-    info.m_BriefLabel   = briefLabel
-    info.m_FatalLabel   = fatalLabel
-    info.m_FatalIcons   = fatalIcons
-    info.m_StrongLabel  = strongLabel
-    info.m_StrongIcons  = strongIcons
-
-    return info
-end
-
-local function initWithPrimaryWeaponInfo(self, info)
-    self.m_PrimaryWeaponInfo = info
-    self:addChild(info)
-end
-
-local function updatePrimaryWeaponInfoBriefLabel(label, unit, hasPrimaryWeapon)
-    if (hasPrimaryWeapon) then
-        local minRange, maxRange = unit:getAttackRangeMinMax()
-        label:setString(LocalizationFunctions.getLocalizedText(94, unit:getPrimaryWeaponFullName(), unit:getPrimaryWeaponCurrentAmmo(), unit:getPrimaryWeaponMaxAmmo(), minRange, maxRange))
-    else
-        label:setString(LocalizationFunctions.getLocalizedText(95))
-    end
-end
-
-local function updatePrimaryWeaponInfoFatalLabel(label, unit, hasPrimaryWeapon)
-    label:setVisible(hasPrimaryWeapon)
-end
-
-local function updatePrimaryWeaponInfoFatalIcons(icons, unit, hasPrimaryWeapon)
-    icons:setVisible(hasPrimaryWeapon)
-    if (hasPrimaryWeapon) then
-        resetIconsWithTypeNames(icons, unit:getPrimaryWeaponFatalList())
-    end
-end
-
-local function updatePrimaryWeaponInfoStrongLabel(label, unit, hasPrimaryWeapon, fatalIcons)
-    label:setVisible(hasPrimaryWeapon)
-
-    if (hasPrimaryWeapon) then
-        local fatalInfoWidth = math.max(85 + fatalIcons.m_Width, 120)
-
-        label:setPosition(PRIMARY_WEAPON_INFO_POSITION_X + fatalInfoWidth, PRIMARY_WEAPON_INFO_POSITION_Y)
-    end
-end
-
-local function updatePrimaryWeaponInfoStrongIcons(icons, unit, hasPrimaryWeapon, strongLabel)
-    icons:setVisible(hasPrimaryWeapon)
-    if (hasPrimaryWeapon) then
-        resetIconsWithTypeNames(icons, unit:getPrimaryWeaponStrongList())
-        icons:setPosition(strongLabel:getPositionX() + 98, icons:getPositionY())
-    end
-end
-
-local function updatePrimaryWeaponInfoWithModelUnit(info, unit)
-    local hasPrimaryWeapon = unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()
-    updatePrimaryWeaponInfoBriefLabel(info.m_BriefLabel, unit, hasPrimaryWeapon)
-    updatePrimaryWeaponInfoFatalLabel(info.m_FatalLabel, unit, hasPrimaryWeapon)
-    updatePrimaryWeaponInfoFatalIcons(info.m_FatalIcons, unit, hasPrimaryWeapon)
-    updatePrimaryWeaponInfoStrongLabel(info.m_StrongLabel, unit, hasPrimaryWeapon, info.m_FatalIcons)
-    updatePrimaryWeaponInfoStrongIcons(info.m_StrongIcons, unit, hasPrimaryWeapon, info.m_StrongLabel)
-end
-
---------------------------------------------------------------------------------
--- The secondary weapon information for the unit.
---------------------------------------------------------------------------------
-local function createSecondaryWeaponInfoBottomLine()
-    return createBottomLine(SECONDARY_WEAPON_INFO_POSITION_X + 5, SECONDARY_WEAPON_INFO_POSITION_Y,
-                            SECONDARY_WEAPON_INFO_WIDTH - 10, SECONDARY_WEAPON_INFO_HEIGHT)
-end
-
-local function createSecondaryWeaponInfoBriefLabel()
-    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
-                    SECONDARY_WEAPON_INFO_WIDTH, SECONDARY_WEAPON_INFO_HEIGHT)
-end
-
-local function createSecondaryWeaponInfoFatalLabel()
-    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y,
-        SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(96))
-end
-
-local function createSecondaryWeaponInfoFatalIcons()
-    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X + 72, SECONDARY_WEAPON_INFO_POSITION_Y + 6)
-end
-
-local function createSecondaryWeaponInfoStrongLabel()
-    return createLabel(SECONDARY_WEAPON_INFO_POSITION_X + 300, SECONDARY_WEAPON_INFO_POSITION_Y,
-        SECONDARY_WEAPON_INFO_WIDTH / 2, SECONDARY_WEAPON_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(97))
-end
-
-local function createSecondaryWeaponInfoStrongIcons()
-    return createUnitIcons(SECONDARY_WEAPON_INFO_POSITION_X, SECONDARY_WEAPON_INFO_POSITION_Y + 6)
-end
-
-local function createSecondaryWeaponInfo()
-    local bottomLine  = createSecondaryWeaponInfoBottomLine()
-    local briefLabel  = createSecondaryWeaponInfoBriefLabel()
-    local fatalLabel  = createSecondaryWeaponInfoFatalLabel()
-    local fatalIcons  = createSecondaryWeaponInfoFatalIcons()
-    local strongLabel = createSecondaryWeaponInfoStrongLabel()
-    local strongIcons = createSecondaryWeaponInfoStrongIcons()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(bottomLine)
-        :addChild(briefLabel)
-        :addChild(fatalLabel)
-        :addChild(fatalIcons)
-        :addChild(strongLabel)
-        :addChild(strongIcons)
-
-    info.m_BottomLine   = bottomLine
-    info.m_BriefLabel   = briefLabel
-    info.m_FatalLabel   = fatalLabel
-    info.m_FatalIcons   = fatalIcons
-    info.m_StrongLabel  = strongLabel
-    info.m_StrongIcons  = strongIcons
-
-    return info
-end
-
-local function initWithSecondaryWeaponInfo(self, info)
-    self.m_SecondaryWeaponInfo = info
-    self:addChild(info)
-end
-
-local function updateSecondaryWeaponInfoBriefLabel(label, unit, hasSecondaryWeapon)
-    if (hasSecondaryWeapon) then
-        label:setString(LocalizationFunctions.getLocalizedText(98, unit:getSecondaryWeaponFullName(), unit:getAttackRangeMinMax()))
-    else
-        label:setString(LocalizationFunctions.getLocalizedText(99))
-    end
-end
-
-local function updateSecondaryWeaponInfoFatalLabel(label, unit, hasSecondaryWeapon)
-    label:setVisible(hasSecondaryWeapon)
-end
-
-local function updateSecondaryWeaponInfoFatalIcons(icons, unit, hasSecondaryWeapon)
-    icons:setVisible(hasSecondaryWeapon)
-    if (hasSecondaryWeapon) then
-        resetIconsWithTypeNames(icons, unit:getSecondaryWeaponFatalList())
-    end
-end
-
-local function updateSecondaryWeaponInfoStrongLabel(label, unit, hasSecondaryWeapon, fatalIcons)
-    label:setVisible(hasSecondaryWeapon)
-
-    if (hasSecondaryWeapon) then
-        local fatalInfoWidth = 85 + fatalIcons.m_Width
-        if (fatalInfoWidth < 300) then
-            fatalInfoWidth = 300
-        end
-
-        label:setPosition(SECONDARY_WEAPON_INFO_POSITION_X + fatalInfoWidth, SECONDARY_WEAPON_INFO_POSITION_Y)
-    end
-end
-
-local function updateSecondaryWeaponInfoStrongIcons(icons, unit, hasSecondaryWeapon, strongLabel)
-    icons:setVisible(hasSecondaryWeapon)
-    if (hasSecondaryWeapon) then
-        resetIconsWithTypeNames(icons, unit:getSecondaryWeaponStrongList())
-        icons:setPosition(strongLabel:getPositionX() + 98, icons:getPositionY())
-    end
-end
-
-local function updateSecondaryWeaponInfoWithModelUnit(info, unit)
-    local hasSecondaryWeapon = unit.hasSecondaryWeapon and unit:hasSecondaryWeapon()
-    updateSecondaryWeaponInfoBriefLabel(info.m_BriefLabel, unit, hasSecondaryWeapon)
-    updateSecondaryWeaponInfoFatalLabel(info.m_FatalLabel, unit, hasSecondaryWeapon)
-    updateSecondaryWeaponInfoFatalIcons(info.m_FatalIcons, unit, hasSecondaryWeapon)
-    updateSecondaryWeaponInfoStrongLabel(info.m_StrongLabel, unit, hasSecondaryWeapon, info.m_FatalIcons)
-    updateSecondaryWeaponInfoStrongIcons(info.m_StrongIcons, unit, hasSecondaryWeapon, info.m_StrongLabel)
-end
-
---------------------------------------------------------------------------------
--- The defense information for the unit.
---------------------------------------------------------------------------------
-local function createDefenseInfoBriefLabel()
-    return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-        DEFENSE_INFO_WIDTH, DEFENSE_INFO_HEIGHT, LocalizationFunctions.getLocalizedText(100))
-end
-
-local function createDefenseInfoFatalLabel()
-    return createLabel(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y,
-        DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(101))
-end
-
-local function createDefenseInfoFatalIcons()
-    return createUnitIcons(DEFENSE_INFO_POSITION_X + 72, DEFENSE_INFO_POSITION_Y + 6)
-end
-
-local function createDefenseInfoWeakLabel()
-    return createLabel(DEFENSE_INFO_POSITION_X + 300, DEFENSE_INFO_POSITION_Y,
-        DEFENSE_INFO_WIDTH / 2, DEFENSE_INFO_HEIGHT / 2, LocalizationFunctions.getLocalizedText(102))
-end
-
-local function createDefenseInfoWeakIcons()
-    return createUnitIcons(DEFENSE_INFO_POSITION_X, DEFENSE_INFO_POSITION_Y + 6)
-end
-
-local function createDefenseInfo()
-    local briefLabel  = createDefenseInfoBriefLabel()
-    local fatalLabel  = createDefenseInfoFatalLabel()
-    local fatalIcons  = createDefenseInfoFatalIcons()
-    local weakLabel = createDefenseInfoWeakLabel()
-    local weakIcons = createDefenseInfoWeakIcons()
-
-    local info = cc.Node:create()
-    info:ignoreAnchorPointForPosition(true)
-        :addChild(briefLabel)
-        :addChild(fatalLabel)
-        :addChild(fatalIcons)
-        :addChild(weakLabel)
-        :addChild(weakIcons)
-
-    info.m_BriefLabel = briefLabel
-    info.m_FatalLabel = fatalLabel
-    info.m_FatalIcons = fatalIcons
-    info.m_WeakLabel  = weakLabel
-    info.m_WeakIcons  = weakIcons
-
-    return info
-end
-
-local function initWithDefenseInfo(self, info)
-    self.m_DefenseInfo = info
-    self:addChild(info)
-end
-
-local function updateDefenseInfoFatalIcons(icons, unit)
-    resetIconsWithTypeNames(icons, unit:getDefenseFatalList())
-end
-
-local function updateDefenseInfoWeakLabel(label, unit, fatalIcons)
-    local fatalInfoWidth = 85 + fatalIcons.m_Width
-    if (fatalInfoWidth < 300) then
-        fatalInfoWidth = 300
-    end
-
-    label:setPosition(DEFENSE_INFO_POSITION_X + fatalInfoWidth, DEFENSE_INFO_POSITION_Y)
-end
-
-local function updateDefenseInfoWeakIcons(icons, unit, weakLabel)
-    resetIconsWithTypeNames(icons, unit:getDefenseWeakList())
-    icons:setPosition(weakLabel:getPositionX() + 86, icons:getPositionY())
-end
-
-local function updateDefenseInfoWithModelUnit(info, unit)
-    updateDefenseInfoFatalIcons(info.m_FatalIcons, unit)
-    updateDefenseInfoWeakLabel(info.m_WeakLabel, unit, info.m_FatalIcons)
-    updateDefenseInfoWeakIcons(info.m_WeakIcons, unit, info.m_WeakLabel)
-end
-
---------------------------------------------------------------------------------
--- The touch listener.
---------------------------------------------------------------------------------
-local function createTouchListener(self)
+local function initWithTouchListener(self)
     local touchListener = cc.EventListenerTouchOneByOne:create()
     touchListener:setSwallowTouches(true)
     local isTouchWithinBackground
 
     touchListener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_DetailBackground)
+        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_Background)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
@@ -605,28 +264,93 @@ local function createTouchListener(self)
         end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
-    return touchListener
-end
-
-local function initWithTouchListener(self, touchListener)
     self.m_TouchListener = touchListener
     self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
+end
+
+--------------------------------------------------------------------------------
+-- The private functions for updating the composition elements.
+--------------------------------------------------------------------------------
+local function updateDescriptionWithModelUnit(self, unit)
+    self.m_DescriptionLabel:setString(unit:getDescription())
+end
+
+local function updateMovementInfoWithModelUnit(self, unit, modelPlayer, modelWeather)
+    self.m_MovementLabel:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeFullName()))
+end
+
+local function updateVisionInfoWithModelUnit(self, unit)
+    self.m_VisionLabel:setString(LocalizationFunctions.getLocalizedText(92, unit:getVision()))
+end
+
+local function updateFuelInfoWithModelUnit(self, unit)
+    self.m_FuelLabel:setString(LocalizationFunctions.getLocalizedText(93, unit:getCurrentFuel(), unit:getMaxFuel(), unit:getFuelConsumptionPerTurn(), unit:shouldDestroyOnOutOfFuel()))
+end
+
+local function updatePrimaryWeaponInfoWithModelUnit(self, unit)
+    if (not ((unit.hasPrimaryWeapon) and (unit:hasPrimaryWeapon()))) then
+        self.m_PrimaryWeaponBriefLabel :setString(LocalizationFunctions.getLocalizedText(95))
+        self.m_PrimaryWeaponFatalLabel :setVisible(false)
+        self.m_PrimaryWeaponFatalIcons :setVisible(false)
+        self.m_PrimaryWeaponStrongLabel:setVisible(false)
+        self.m_PrimaryWeaponStrongIcons:setVisible(false)
+    else
+        resetIconsWithTypeNames(self.m_PrimaryWeaponFatalIcons,  unit:getPrimaryWeaponFatalList())
+        resetIconsWithTypeNames(self.m_PrimaryWeaponStrongIcons, unit:getPrimaryWeaponStrongList())
+
+        self.m_PrimaryWeaponBriefLabel :setString(LocalizationFunctions.getLocalizedText(94, unit:getPrimaryWeaponFullName(), unit:getPrimaryWeaponCurrentAmmo(), unit:getPrimaryWeaponMaxAmmo(), unit:getAttackRangeMinMax()))
+        self.m_PrimaryWeaponFatalLabel :setVisible(true)
+        self.m_PrimaryWeaponFatalIcons :setVisible(true)
+        self.m_PrimaryWeaponStrongLabel:setVisible(true)
+            :setPosition(PRIMARY_WEAPON_INFO_POS_X + math.max(85 + self.m_PrimaryWeaponFatalIcons.m_Width, 120), PRIMARY_WEAPON_INFO_POS_Y)
+        self.m_PrimaryWeaponStrongIcons:setVisible(true)
+            :setPosition(self.m_PrimaryWeaponStrongLabel:getPositionX() + 80, self.m_PrimaryWeaponStrongIcons:getPositionY())
+    end
+end
+
+local function updateSecondaryWeaponInfoWithModelUnit(self, unit)
+    if (not ((unit.hasSecondaryWeapon) and (unit:hasSecondaryWeapon()))) then
+        self.m_SecondaryWeaponBriefLabel :setString(LocalizationFunctions.getLocalizedText(99))
+        self.m_SecondaryWeaponFatalLabel :setVisible(false)
+        self.m_SecondaryWeaponFatalIcons :setVisible(false)
+        self.m_SecondaryWeaponStrongLabel:setVisible(false)
+        self.m_SecondaryWeaponStrongIcons:setVisible(false)
+    else
+        resetIconsWithTypeNames(self.m_SecondaryWeaponFatalIcons,  unit:getSecondaryWeaponFatalList())
+        resetIconsWithTypeNames(self.m_SecondaryWeaponStrongIcons, unit:getSecondaryWeaponStrongList())
+
+        self.m_SecondaryWeaponBriefLabel :setString(LocalizationFunctions.getLocalizedText(98, unit:getSecondaryWeaponFullName(), unit:getAttackRangeMinMax()))
+        self.m_SecondaryWeaponFatalLabel :setVisible(true)
+        self.m_SecondaryWeaponFatalIcons :setVisible(true)
+        self.m_SecondaryWeaponStrongLabel:setVisible(true)
+            :setPosition(SECONDARY_WEAPON_INFO_POS_X + math.max(85 + self.m_SecondaryWeaponFatalIcons.m_Width, 120), SECONDARY_WEAPON_INFO_POS_Y)
+        self.m_SecondaryWeaponStrongIcons:setVisible(true)
+            :setPosition(self.m_SecondaryWeaponStrongLabel:getPositionX() + 80, self.m_SecondaryWeaponStrongIcons:getPositionY())
+    end
+end
+
+local function updateDefenseInfoWithModelUnit(self, unit)
+    resetIconsWithTypeNames(self.m_DefenseFatalIcons, unit:getDefenseFatalList())
+    resetIconsWithTypeNames(self.m_DefenseWeakIcons,  unit:getDefenseWeakList())
+
+    self.m_DefenseWeakLabel:setPositionX(DEFENSE_INFO_POS_X + math.max(85 + self.m_DefenseFatalIcons.m_Width, 120))
+    self.m_DefenseWeakIcons:setPositionX(self.m_DefenseWeakLabel:getPositionX() + 80)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and public functions.
 --------------------------------------------------------------------------------
 function ViewUnitDetail:ctor(param)
-    initWithScreenBackground(   self, createScreenBackground())
-    initWithDetailBackground(   self, createDetailBackground())
-    initWithDescription(        self, createDescription())
-    initWithMovementInfo(       self, createMovementInfo())
-    initWithVisionInfo(         self, createVisionInfo())
-    initWithFuelInfo(           self, createFuelInfo())
-    initWithPrimaryWeaponInfo(  self, createPrimaryWeaponInfo())
-    initWithSecondaryWeaponInfo(self, createSecondaryWeaponInfo())
-    initWithDefenseInfo(        self, createDefenseInfo())
-    initWithTouchListener(      self, createTouchListener(self))
+    initGreyMask(           self)
+    initBackground(         self)
+    initDescription(        self)
+    initMovementInfo(       self)
+    initVisionInfo(         self)
+    initFuelInfo(           self)
+    initPrimaryWeaponInfo(  self)
+    initSecondaryWeaponInfo(self)
+    initDefenseInfo(        self)
+    initWithTouchListener(  self)
 
     return self
 end
@@ -635,13 +359,13 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnitDetail:updateWithModelUnit(modelUnit, modelPlayer, modelWeather)
-    updateDescriptionWithModelUnit(        self.m_Description,         modelUnit)
-    updateMovementInfoWithModelUnit(       self.m_MovementInfo,        modelUnit, modelPlayer, modelWeather)
-    updateVisionInfoWithModelUnit(         self.m_VisionInfo,          modelUnit)
-    updateFuelInfoWithModelUnit(           self.m_FuelInfo,            modelUnit)
-    updatePrimaryWeaponInfoWithModelUnit(  self.m_PrimaryWeaponInfo,   modelUnit)
-    updateSecondaryWeaponInfoWithModelUnit(self.m_SecondaryWeaponInfo, modelUnit)
-    updateDefenseInfoWithModelUnit(        self.m_DefenseInfo,         modelUnit)
+    updateDescriptionWithModelUnit(        self, modelUnit)
+    updateMovementInfoWithModelUnit(       self, modelUnit, modelPlayer, modelWeather)
+    updateVisionInfoWithModelUnit(         self, modelUnit)
+    updateFuelInfoWithModelUnit(           self, modelUnit)
+    updatePrimaryWeaponInfoWithModelUnit(  self, modelUnit)
+    updateSecondaryWeaponInfoWithModelUnit(self, modelUnit)
+    updateDefenseInfoWithModelUnit(        self, modelUnit)
 
     return self
 end
