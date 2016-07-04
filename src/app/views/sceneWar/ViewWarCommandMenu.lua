@@ -7,23 +7,35 @@ local BACKGROUND_POS_X     = (display.width - BACKGROUND_WIDTH) / 2
 local BACKGROUND_POS_Y     = (display.height - BACKGROUND_HEIGHT) / 2
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
-local LIST_VIEW_WIDTH        = BACKGROUND_WIDTH - 10
+local LIST_VIEW_WIDTH        = BACKGROUND_WIDTH
 local LIST_VIEW_HEIGHT       = BACKGROUND_HEIGHT - 14
-local LIST_VIEW_POS_X        = BACKGROUND_POS_X + 10
+local LIST_VIEW_POS_X        = BACKGROUND_POS_X
 local LIST_VIEW_POS_Y        = BACKGROUND_POS_Y + 6
 local LIST_VIEW_ITEMS_MARGIN = 10
 
-local ITEM_WIDTH         = BACKGROUND_WIDTH - 20
-local ITEM_HEIGHT        = 45
-local ITEM_CAPINSETS     = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
-local ITEM_FONT_COLOR    = {r = 255, g = 255, b = 255}
-local ITEM_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
-local ITEM_OUTLINE_WIDTH = 2
+local ITEM_WIDTH              = BACKGROUND_WIDTH - 20
+local ITEM_HEIGHT             = 50
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 25
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createViewItem(item)
+    local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -33,18 +45,12 @@ local function createViewItem(item)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName("res/fonts/msyhbd.ttc")
-        :setTitleFontSize(28)
-        :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText(item.name)
-
-    view:getTitleRenderer():enableOutline(ITEM_OUTLINE_COLOR, ITEM_OUTLINE_WIDTH)
-
-    view:addTouchEventListener(function(sender, eventType)
-        if (eventType == ccui.TouchEventType.ended) then
-            item.callback()
-        end
-    end)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
 
     return view
 end
@@ -53,7 +59,7 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initGreyMask(self)
-    local greyMask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 160})
+    local greyMask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
     greyMask:setContentSize(display.width, display.height)
         :ignoreAnchorPointForPosition(true)
 
@@ -82,6 +88,7 @@ local function initListView(self)
         :setContentSize(LIST_VIEW_WIDTH, LIST_VIEW_HEIGHT)
 
         :setItemsMargin(LIST_VIEW_ITEMS_MARGIN)
+        :setGravity(ccui.ListViewGravity.centerHorizontal)
 
     self.m_ListView = listView
     self:addChild(listView)

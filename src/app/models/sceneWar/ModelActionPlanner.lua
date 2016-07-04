@@ -20,6 +20,7 @@ local ReachableAreaFunctions      = require("app.utilities.ReachableAreaFunction
 local MovePathFunctions           = require("app.utilities.MovePathFunctions")
 local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
 local WebSocketManager            = require("app.utilities.WebSocketManager")
+local LocalizationFunctions       = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -143,7 +144,7 @@ local function getActionJoin(self, destination)
         local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
         if (existingUnitModel and existingUnitModel:canJoin(self.m_FocusModelUnit)) then
             return {
-                name     = "Join",
+                name     = LocalizationFunctions.getLocalizedText(81),
                 callback = function()
                     dispatchEventJoin(self)
                 end
@@ -157,7 +158,7 @@ end
 local function getActionAttack(self, destination)
     if (#self.m_AttackableGridList > 0) then
         return {
-            name     = "Attack",
+            name     = LocalizationFunctions.getLocalizedText(78),
             callback = function()
                 setStateChoosingAttackTarget(self, destination)
             end
@@ -169,7 +170,7 @@ local function getActionCapture(self, destination)
     local modelTile = self.m_ModelTileMap:getModelTile(destination)
     if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
         return {
-            name     = "Capture",
+            name     = LocalizationFunctions.getLocalizedText(79),
             callback = function()
                 dispatchEventCapture(self)
             end,
@@ -183,7 +184,7 @@ local function getActionWait(self, destination)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
-            name = "Wait",
+            name     = LocalizationFunctions.getLocalizedText(80),
             callback = function()
                 dispatchEventWait(self)
             end

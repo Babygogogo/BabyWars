@@ -42,7 +42,7 @@ local GameConstantFunctions = {}
 
 local GAME_CONSTANT        = require("res.data.GameConstant")
 local GRID_SIZE            = GAME_CONSTANT.gridSize
-local UNIT_NAMES           = GAME_CONSTANT.unitCatagory.allUnits
+local UNIT_NAMES           = GAME_CONSTANT.categories.AllUnits
 local TEMPLATE_MODEL_TILES = GAME_CONSTANT.templateModelTiles
 local TEMPLATE_MODEL_UNITS = GAME_CONSTANT.templateModelUnits
 local TILE_ANIMATIONS      = GAME_CONSTANT.tileAnimations
@@ -182,11 +182,29 @@ function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     error("GameConstantFunctions.getTiledIdWithTileOrUnitName() failed to find the Tiled ID.")
 end
 
-function GameConstantFunctions.getTileNameWithTiledId(tiledID)
+function GameConstantFunctions.getTileTypeWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].name
 end
 
-function GameConstantFunctions.getUnitNameWithTiledId(tiledID)
+function GameConstantFunctions.getTileTypeWithObjectAndBaseId(objectID, baseID)
+    local baseType = GameConstantFunctions.getTileTypeWithTiledId(baseID)
+    if ((objectID == nil) or (objectID == 0)) then
+        return baseType
+    else
+        local objectType = GameConstantFunctions.getTileTypeWithTiledId(objectID)
+        if (objectType ~= "Bridge") then
+            return objectType
+        else
+            if (baseType == "Sea") then
+                return "BridgeOnSea"
+            else
+                return "BridgeOnRiver"
+            end
+        end
+    end
+end
+
+function GameConstantFunctions.getUnitTypeWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].name
 end
 
@@ -198,23 +216,8 @@ function GameConstantFunctions.getShapeIndexWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].shapeIndex
 end
 
-function GameConstantFunctions.getTemplateModelTileWithTiledId(objectID, baseID)
-    assert(baseID > 0, "GameConstantFunctions.getTemplateModelTileWithTiledId() the param baseID is invalid.")
-    local baseName = GameConstantFunctions.getTileNameWithTiledId(baseID)
-    if ((objectID == 0) or (not objectID)) then
-        return TEMPLATE_MODEL_TILES[baseName]
-    else
-        local objectName = GameConstantFunctions.getTileNameWithTiledId(objectID)
-        if (objectName ~= "bridge") then
-            return TEMPLATE_MODEL_TILES[objectName]
-        else
-            if (baseName == "sea") then
-                return TEMPLATE_MODEL_TILES["bridgeOnSea"]
-            else
-                return TEMPLATE_MODEL_TILES["bridgeOnRiver"]
-            end
-        end
-    end
+function GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(objectID, baseID)
+    return TEMPLATE_MODEL_TILES[GameConstantFunctions.getTileTypeWithObjectAndBaseId(objectID, baseID)]
 end
 
 function GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
@@ -229,8 +232,12 @@ function GameConstantFunctions.doesViewTileFillGrid(tiledID)
     if ((not tiledID) or (tiledID == 0)) then
         return false
     else
-        return TILE_ANIMATIONS[GameConstantFunctions.getTileNameWithTiledId(tiledID)].fillsGrid
+        return TILE_ANIMATIONS[GameConstantFunctions.getTileTypeWithTiledId(tiledID)].fillsGrid
     end
+end
+
+function GameConstantFunctions.getCategory(categoryType)
+    return GAME_CONSTANT.categories[categoryType]
 end
 
 return GameConstantFunctions

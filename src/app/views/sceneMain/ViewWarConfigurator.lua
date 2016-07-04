@@ -1,6 +1,8 @@
 
 local ViewWarConfigurator = class("ViewWarConfigurator", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
 local EDIT_BOX_PASSWORD_HEIGHT = 60  -- The same as the height of the indicator of ViewOptionSelector
 local BUTTON_WIDTH             = 300
@@ -46,7 +48,6 @@ local function createButton(posX, posY, text)
         :setCapInsets(BUTTON_BACKGROUND_CAPINSETS)
         :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 
-        :setCascadeOpacityEnabled(true)
         :setOpacity(180)
 
         :ignoreAnchorPointForPosition(true)
@@ -68,10 +69,9 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initEditBoxPassword(self)
-    local titleLabel = cc.Label:createWithTTF("Password (optional)", FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
+    local titleLabel = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(39), FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
     titleLabel:ignoreAnchorPointForPosition(true)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
-        :setOpacity(180)
 
         :setDimensions(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT + 30)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
@@ -87,7 +87,8 @@ local function initEditBoxPassword(self)
         :setFontColor({r = 0, g = 0, b = 0})
 
         :setPlaceholderFontSize(EDIT_BOX_PASSWORD_FONT_SIZE)
-        :setPlaceHolder("input 0 or 4 digits")
+        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(LocalizationFunctions.getLocalizedText(47))
 
         :setMaxLength(4)
         :setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
@@ -100,7 +101,7 @@ local function initEditBoxPassword(self)
 end
 
 local function initButtonBack(self)
-    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, "back")
+    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, LocalizationFunctions.getLocalizedText(8, "Back"))
     button:addTouchEventListener(function(sender, eventType)
         if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
             self.m_Model:onButtonBackTouched()
@@ -112,7 +113,7 @@ local function initButtonBack(self)
 end
 
 local function initButtonConfirm(self)
-    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, "confirm")
+    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, LocalizationFunctions.getLocalizedText(46))
     button:addTouchEventListener(function(sender, eventType)
         if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
             self.m_Model:onButtonConfirmTouched()

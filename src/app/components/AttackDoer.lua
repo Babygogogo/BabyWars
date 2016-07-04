@@ -16,20 +16,21 @@
 local AttackDoer = class("AttackDoer")
 
 local TypeChecker           = require("app.utilities.TypeChecker")
-local ComponentManager      = require("global.components.ComponentManager")
 local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",
-    "getPrimaryWeaponName",
+    "getPrimaryWeaponFullName",
     "getPrimaryWeaponMaxAmmo",
     "getPrimaryWeaponCurrentAmmo",
     "getPrimaryWeaponFatalList",
     "getPrimaryWeaponStrongList",
 
     "hasSecondaryWeapon",
-    "getSecondaryWeaponName",
+    "getSecondaryWeaponFullName",
     "getSecondaryWeaponFatalList",
     "getSecondaryWeaponStrongList",
 
@@ -87,7 +88,7 @@ local function getAttackBonus(attacker, attackerTile, target, targetTile, modelP
 end
 
 local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    local targetTypeName = GameConstantFunctions.getUnitNameWithTiledId(target:getTiledID())
+    local targetTypeName = GameConstantFunctions.getUnitTypeWithTiledId(target:getTiledID())
     local bonus = 0
     bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
     bonus = bonus + ((target.getLevelDefenseBonus) and (target:getLevelDefenseBonus()) or 0)
@@ -261,9 +262,9 @@ function AttackDoer:getPrimaryWeaponCurrentAmmo()
     return self.m_PrimaryWeaponCurrentAmmo
 end
 
-function AttackDoer:getPrimaryWeaponName()
-    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponName() the attack doer has no primary weapon.")
-    return self.m_Template.primaryWeapon.name
+function AttackDoer:getPrimaryWeaponFullName()
+    assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponFullName() the attack doer has no primary weapon.")
+    return LocalizationFunctions.getLocalizedText(115, self.m_Template.primaryWeapon.type)
 end
 
 function AttackDoer:getPrimaryWeaponFatalList()
@@ -280,9 +281,9 @@ function AttackDoer:hasSecondaryWeapon()
     return self.m_Template.secondaryWeapon ~= nil
 end
 
-function AttackDoer:getSecondaryWeaponName()
-    assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponName() the attack doer has no secondary weapon.")
-    return self.m_Template.secondaryWeapon.name
+function AttackDoer:getSecondaryWeaponFullName()
+    assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponFullName() the attack doer has no secondary weapon.")
+    return LocalizationFunctions.getLocalizedText(115, self.m_Template.secondaryWeapon.type)
 end
 
 function AttackDoer:getSecondaryWeaponFatalList()

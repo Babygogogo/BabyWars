@@ -1,31 +1,52 @@
 
 local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
-local AnimationLoader = require("app.utilities.AnimationLoader")
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
 
-local FONT_SIZE          = 22
+local UNIT_LABEL_Z_ORDER = 3
+local INFO_LABEL_Z_ORDER = 2
+local UNIT_ICON_Z_ORDER  = 1
+local INFO_ICON_Z_ORDER  = 0
+local BACKGROUND_Z_ORDER = 0
+
+local BACKGROUND_WIDTH  = 75
+local BACKGROUND_HEIGHT = 130
+
+local LEFT_POS_X  = 10 + BACKGROUND_WIDTH
+local LEFT_POS_Y  = 10
+local RIGHT_POS_X = display.width - BACKGROUND_WIDTH * 2 - 10
+local RIGHT_POS_Y = LEFT_POS_Y
+
+local GRID_SIZE       = GameConstantFunctions.getGridSize()
+local UNIT_ICON_SCALE = 0.5
+local UNIT_ICON_POS_X = (BACKGROUND_WIDTH - GRID_SIZE.width * UNIT_ICON_SCALE) / 2
+local UNIT_ICON_POS_Y = BACKGROUND_HEIGHT - GRID_SIZE.height * UNIT_ICON_SCALE - 20
+
+local TILE_LABEL_POS_X     = 0
+local TILE_LABEL_POS_Y     = BACKGROUND_HEIGHT - 23
+local TILE_LABEL_FONT_SIZE = 13
+local TILE_LABEL_WIDTH     = BACKGROUND_WIDTH
+local TILE_LABEL_HEIGHT    = 30
+
+local HP_INFO_POS_X = 10
+local HP_INFO_POS_Y = 54
+
+local FUEL_INFO_POS_X = HP_INFO_POS_X
+local FUEL_INFO_POS_Y = HP_INFO_POS_Y - 22
+
+local AMMO_INFO_POS_X = HP_INFO_POS_X
+local AMMO_INFO_POS_Y = FUEL_INFO_POS_Y - 22
+
+local INFO_ICON_SCALE    = 0.5
+local INFO_LABEL_WIDTH   = BACKGROUND_WIDTH - HP_INFO_POS_X * 2
+local INFO_LABEL_HEIGHT  = 30
+
 local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_SIZE          = 20
 local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH = 2
-
-local CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT = 80, 140
-local LEFT_POSITION_X = 10 + CONTENT_SIZE_WIDTH
-local LEFT_POSITION_Y = 10
-local RIGHT_POSITION_X = display.width - CONTENT_SIZE_WIDTH * 2 - 10
-local RIGHT_POSITION_Y = LEFT_POSITION_Y
-
-local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
-local ICON_SCALE = 0.5
-local ICON_POSITION_X = (CONTENT_SIZE_WIDTH - GRID_SIZE.width * ICON_SCALE) / 2
-local ICON_POSITION_Y = CONTENT_SIZE_HEIGHT - GRID_SIZE.height * ICON_SCALE - 20
-
-local HP_INFO_POSITION_X = 10
-local HP_INFO_POSITION_Y = 60
-local FUEL_INFO_POSITION_X = HP_INFO_POSITION_X
-local FUEL_INFO_POSITION_Y = HP_INFO_POSITION_Y - 25
-local AMMO_INFO_POSITION_X = HP_INFO_POSITION_X
-local AMMO_INFO_POSITION_Y = FUEL_INFO_POSITION_Y - 25
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -34,6 +55,10 @@ local function createLabel(posX, posY)
     local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
+        :setDimensions(INFO_LABEL_WIDTH, INFO_LABEL_HEIGHT)
+
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
 
         :setTextColor(FONT_COLOR)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
@@ -42,18 +67,19 @@ local function createLabel(posX, posY)
 end
 
 --------------------------------------------------------------------------------
--- The button background.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createButton(self)
-    local button = ccui.Button:create()
-    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+local function initBackground(self)
+    local background = ccui.Button:create()
+    background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
 
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
         :setCapInsets({x = 4, y = 6, width = 1, height = 1})
-        :setContentSize(CONTENT_SIZE_WIDTH, CONTENT_SIZE_HEIGHT)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
+        :setOpacity(200)
         :setZoomScale(-0.05)
 
         :addTouchEventListener(function(sender, eventType)
@@ -64,176 +90,114 @@ local function createButton(self)
             end
         end)
 
-    return button
+    self.m_Background = background
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
-local function initWithButton(self, button)
-    self.m_Button = button
-    self:addChild(button)
-end
-
---------------------------------------------------------------------------------
--- The unit icon.
---------------------------------------------------------------------------------
-local function createIcon()
+local function initUnitIcon(self)
     local icon = cc.Sprite:create()
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(ICON_POSITION_X, ICON_POSITION_Y)
+        :setPosition(UNIT_ICON_POS_X, UNIT_ICON_POS_Y)
 
-        :setScale(ICON_SCALE)
+        :setScale(UNIT_ICON_SCALE)
 
-    return icon
+    self.m_UnitIcon = icon
+    self.m_Background:getRendererNormal():addChild(icon, UNIT_ICON_Z_ORDER)
 end
 
-local function initWithIcon(self, icon)
-    self.m_Icon = icon
-    self:addChild(icon)
+local function initUnitLabel(self)
+    local label = cc.Label:createWithTTF("", FONT_NAME, TILE_LABEL_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(TILE_LABEL_POS_X, TILE_LABEL_POS_Y)
+        :setDimensions(TILE_LABEL_WIDTH, TILE_LABEL_HEIGHT)
+
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, 1)
+
+    self.m_UnitLabel = label
+    self.m_Background:getRendererNormal():addChild(label, UNIT_LABEL_Z_ORDER)
 end
 
-local function updateIconWithModelUnit(icon, unit)
-    icon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(unit:getTiledID()))
-end
-
---------------------------------------------------------------------------------
--- The HP infomation for the unit.
---------------------------------------------------------------------------------
-local function createHPInfoIcon()
+local function initHPInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(2, 2)
+        :setPosition(HP_INFO_POS_X + 2, HP_INFO_POS_Y + 2)
 
-        :setScale(ICON_SCALE)
+        :setScale(INFO_ICON_SCALE)
 
-    return icon
+    local label = createLabel(HP_INFO_POS_X, HP_INFO_POS_Y - 4)
+
+    self.m_HPIcon  = icon
+    self.m_HPLabel = label
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
-local function createHPInfo()
-    local icon  = createHPInfoIcon()
-    local label = createLabel(28, -5)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(HP_INFO_POSITION_X, HP_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Inco  = icon
-    info.m_Label = label
-
-    return info
-end
-
-local function initWithHPInfo(self, info)
-    self.m_HPInfo = info
-    self:addChild(info)
-end
-
-local function updateHPInfoWithModelUnit(info, unit)
-    local hp = unit:getNormalizedCurrentHP()
-    if (hp < 10) then
-        info.m_Label:setString("  " .. hp)
-    else
-        info.m_Label:setString(""   .. hp)
-    end
-end
-
---------------------------------------------------------------------------------
--- The fuel infomation for the unit.
---------------------------------------------------------------------------------
-local function createFuelInfoIcon()
+local function initFuelInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(2, 0)
+        :setPosition(FUEL_INFO_POS_X + 2, FUEL_INFO_POS_Y + 0)
 
-        :setScale(ICON_SCALE)
+        :setScale(INFO_ICON_SCALE)
 
-    return icon
+    local label = createLabel(FUEL_INFO_POS_X, FUEL_INFO_POS_Y - 4)
+
+    self.m_FuelIcon = icon
+    self.m_FuelLabel = label
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
-local function createFuelInfo()
-    local icon  = createFuelInfoIcon()
-    local label = createLabel(28, -5)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(FUEL_INFO_POSITION_X, FUEL_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Icon  = icon
-    info.m_Label = label
-
-    return info
-end
-
-local function initWithFuelInfo(self, info)
-    self.m_FuelInfo = info
-    self:addChild(info)
-end
-
-local function updateFuelInfoWithModelUnit(info, unit)
-    local fuel = unit:getCurrentFuel()
-    if (fuel < 10) then
-        info.m_Label:setString("  " .. fuel)
-    else
-        info.m_Label:setString(""   .. fuel)
-    end
-end
-
---------------------------------------------------------------------------------
--- The primary weapon ammo infomation for the unit.
---------------------------------------------------------------------------------
-local function createAmmoInfoIcon()
+local function initAmmoInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(2, 5)
+        :setPosition(AMMO_INFO_POS_X + 2, AMMO_INFO_POS_Y + 5)
 
-        :setScale(ICON_SCALE)
+        :setScale(INFO_ICON_SCALE)
 
-    return icon
+    local label = createLabel(AMMO_INFO_POS_X, AMMO_INFO_POS_Y - 4)
+
+    self.m_AmmoIcon = icon
+    self.m_AmmoLabel = label
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
-local function createAmmoInfo()
-    local icon  = createAmmoInfoIcon()
-    local label = createLabel(28, -5)
-
-    local info = cc.Node:create()
-    info:setCascadeOpacityEnabled(true)
-        :setPosition(AMMO_INFO_POSITION_X, AMMO_INFO_POSITION_Y)
-
-        :addChild(icon)
-        :addChild(label)
-
-    info.m_Icon  = icon
-    info.m_Label = label
-
-    return info
+--------------------------------------------------------------------------------
+-- The private functions for updating the composition elements.
+--------------------------------------------------------------------------------
+local function updateUnitIconWithModelUnit(self, unit)
+    self.m_UnitIcon:stopAllActions()
+        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(unit:getTiledID()))
 end
 
-local function initWithAmmoInfo(self, info)
-    self.m_AmmoInfo = info
-    self:addChild(info)
+local function updateUnitLabelWithModelUnit(self, unit)
+    self.m_UnitLabel:setString(unit:getUnitTypeFullName())
 end
 
-local function updateAmmoInfoWithModelUnit(info, unit)
-    if (unit.hasPrimaryWeapon and unit:hasPrimaryWeapon()) then
-        local ammo = unit:getPrimaryWeaponCurrentAmmo()
-        if (ammo < 10) then
-            info.m_Label:setString("  " .. ammo)
-        else
-            info.m_Label:setString(""   .. ammo)
-        end
+local function updateHPInfoWithModelUnit(self, unit)
+    self.m_HPLabel:setString(unit:getNormalizedCurrentHP())
+end
 
-        info:setVisible(true)
+local function updateFuelInfoWithModelUnit(self, unit)
+    self.m_FuelLabel:setString(unit:getCurrentFuel())
+end
+
+local function updateAmmoInfoWithModelUnit(self, unit)
+    if (not ((unit.hasPrimaryWeapon) and (unit:hasPrimaryWeapon()))) then
+        self.m_AmmoIcon:setVisible(false)
+        self.m_AmmoLabel:setVisible(false)
     else
-        info:setVisible(false)
+        self.m_AmmoIcon:setVisible(true)
+        self.m_AmmoLabel:setVisible(true)
+            :setString(unit:getPrimaryWeaponCurrentAmmo())
     end
 end
 
@@ -241,29 +205,26 @@ end
 -- The functions that adjust the position of the view.
 --------------------------------------------------------------------------------
 local function moveToLeftSide(self)
-    self:setPosition(LEFT_POSITION_X, LEFT_POSITION_Y)
+    self:setPosition(LEFT_POS_X, LEFT_POS_Y)
 end
 
 local function moveToRightSide(self)
-    self:setPosition(RIGHT_POSITION_X, RIGHT_POSITION_Y)
+    self:setPosition(RIGHT_POS_X, RIGHT_POS_Y)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewUnitInfo:ctor(param)
-    initWithButton(  self, createButton(self))
-    initWithIcon(    self, createIcon())
-    initWithHPInfo(  self, createHPInfo())
-    initWithFuelInfo(self, createFuelInfo())
-    initWithAmmoInfo(self, createAmmoInfo())
+    initBackground(self)
+    initUnitIcon(  self)
+    initUnitLabel( self)
+    initHPInfo(    self)
+    initFuelInfo(  self)
+    initAmmoInfo(  self)
 
     self:ignoreAnchorPointForPosition(true)
-
         :setVisible(false)
-
-        :setOpacity(220)
-        :setCascadeOpacityEnabled(true)
 
     moveToRightSide(self)
 
@@ -286,11 +247,12 @@ function ViewUnitInfo:adjustPositionOnTouch(touch)
     return self
 end
 
-function ViewUnitInfo:updateWithModelUnit(model)
-    updateIconWithModelUnit(    self.m_Icon,     model)
-    updateHPInfoWithModelUnit(  self.m_HPInfo,   model)
-    updateFuelInfoWithModelUnit(self.m_FuelInfo, model)
-    updateAmmoInfoWithModelUnit(self.m_AmmoInfo, model)
+function ViewUnitInfo:updateWithModelUnit(modelUnit)
+    updateUnitIconWithModelUnit( self, modelUnit)
+    updateUnitLabelWithModelUnit(self, modelUnit)
+    updateHPInfoWithModelUnit(   self, modelUnit)
+    updateFuelInfoWithModelUnit( self, modelUnit)
+    updateAmmoInfoWithModelUnit( self, modelUnit)
 
     return self
 end

@@ -12,9 +12,10 @@
 
 local UnitProducer = class("UnitProducer")
 
+local ModelUnit             = require("app.models.sceneWar.ModelUnit")
 local TypeChecker           = require("app.utilities.TypeChecker")
-local ComponentManager      = require("global.components.ComponentManager")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getProductionCostWithTiledId",
@@ -82,14 +83,16 @@ function UnitProducer:getProductionList(modelPlayer)
     local playerIndex = self.m_Target:getPlayerIndex()
 
     for i, unitName in ipairs(self.m_Template.productionList) do
-        list[i]            = {}
-        local tiledID      = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
-        local cost         = self:getProductionCostWithTiledId(tiledID, modelPlayer)
+        local tiledID = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
+        local cost    = self:getProductionCostWithTiledId(tiledID, modelPlayer)
 
-        list[i].fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName
-        list[i].cost        = cost
-        list[i].isAvaliable = cost <= fund
-        list[i].tiledID     = tiledID
+        list[i] = {
+            modelUnit   = ModelUnit:create({tiledID = tiledID}),
+            fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName,
+            cost        = cost,
+            isAvaliable = cost <= fund,
+            tiledID     = tiledID,
+        }
     end
 
     return list

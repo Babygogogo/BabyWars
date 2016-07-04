@@ -1,117 +1,185 @@
 
 local ViewActionMenu = class("ViewActionMenu", cc.Node)
 
-local AnimationLoader = require("app.utilities.AnimationLoader")
+local AnimationLoader       = require("app.utilities.AnimationLoader")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
-local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 180
-local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 104 - 140 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
-local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 240
+local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 150
+local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 104 - 130 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 210
 local MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM = MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM
+local MENU_BACKGROUND_CAPINSETS                  = {x = 4, y = 6, width = 1, height = 1}
 
-local LEFT_POSITION_X_FOR_ACTION_ITEM     = 10
-local LEFT_POSITION_Y_FOR_ACTION_ITEM     = 10 + 140
-local LEFT_POSITION_X_FOR_PRODUCTION_ITEM = LEFT_POSITION_X_FOR_ACTION_ITEM
-local LEFT_POSITION_Y_FOR_PRODUCTION_ITEM = LEFT_POSITION_Y_FOR_ACTION_ITEM
+local LEFT_POS_X_FOR_ACTION_ITEM     = 10
+local LEFT_POS_Y_FOR_ACTION_ITEM     = 10 + 130
+local LEFT_POS_X_FOR_PRODUCTION_ITEM = LEFT_POS_X_FOR_ACTION_ITEM
+local LEFT_POS_Y_FOR_PRODUCTION_ITEM = LEFT_POS_Y_FOR_ACTION_ITEM
 
-local RIGHT_POSITION_X_FOR_ACTION_ITEM     = display.width - MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 10
-local RIGHT_POSITION_Y_FOR_ACTION_ITEM     = LEFT_POSITION_Y_FOR_ACTION_ITEM
-local RIGHT_POSITION_X_FOR_PRODUCTION_ITEM = display.width - MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 10
-local RIGHT_POSITION_Y_FOR_PRODUCTION_ITEM = RIGHT_POSITION_Y_FOR_ACTION_ITEM
+local RIGHT_POS_X_FOR_ACTION_ITEM     = display.width - MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 10
+local RIGHT_POS_Y_FOR_ACTION_ITEM     = LEFT_POS_Y_FOR_ACTION_ITEM
+local RIGHT_POS_X_FOR_PRODUCTION_ITEM = display.width - MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 10
+local RIGHT_POS_Y_FOR_PRODUCTION_ITEM = RIGHT_POS_Y_FOR_ACTION_ITEM
 
-local LIST_POSITION_X = 5
-local LIST_POSITION_Y = 6
+local LIST_VIEW_POS_X        = 0
+local LIST_VIEW_POS_Y        = 6
+local LIST_VIEW_ITEMS_MARGIN = 10
 
-local TITLE_FONT_SIZE                   = 25
-local TITLE_COLOR                       = {r = 255, g = 255, b = 255}
-local TITLE_OUTLINE_COLOR               = {r = 0,   g = 0,   b = 0}
-local TITLE_OUTLINE_WIDTH               = 2
-local TITLE_FONT_NAME                   = "res/fonts/msyhbd.ttc"
-local BUTTON_WIDTH_FOR_ACTION_ITEM      = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 15
-local BUTTON_HEIGHT_FOR_ACTION_ITEM     = TITLE_FONT_SIZE / 5 * 8
-local BUTTON_WIDTH_FOR_PRODUCTION_ITEM  = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 15
-local BUTTON_HEIGHT_FOR_PRODUCTION_ITEM = BUTTON_HEIGHT_FOR_ACTION_ITEM
-local BUTTON_DISABLED_COLOR             = {r = 180, g = 180, b = 180}
-local BUTTON_CAPINSETS                  = {x = 1, y = BUTTON_HEIGHT_FOR_ACTION_ITEM, width = 1, height = 1}
+local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
+local ITEM_FONT_SIZE          = 25
+local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
+local ITEM_FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local ITEM_FONT_OUTLINE_WIDTH = 2
+local ITEM_DISABLED_COLOR     = {r = 180, g = 180, b = 180}
+
+local ITEM_ACTION_WIDTH     = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 20
+local ITEM_ACTION_HEIGHT    = 50
+local ITEM_ACTION_CAPINSETS = {x = 1, y = ITEM_ACTION_HEIGHT, width = 1, height = 1}
+
+local ITEM_PRODUCTION_WIDTH     = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 20
+local ITEM_PRODUCTION_HEIGHT    = 60
+local ITEM_PRODUCTION_CAPINSETS = {x = 1, y = ITEM_PRODUCTION_HEIGHT, width = 1, height = 1}
+
+local BUTTON_CONFIRM_FONT_COLOR = {r = 96,  g = 224, b = 88}
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function setAllButtomConfirmEnabled(self, enabled)
+    for _, item in pairs(self.m_ListView:getItems()) do
+        item:setButtonConfirmEnabled(enabled)
+    end
+end
+
 local function createViewAction(itemModel)
+    local label = cc.Label:createWithTTF(itemModel.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_ACTION_WIDTH, ITEM_ACTION_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets(BUTTON_CAPINSETS)
-        :setContentSize(BUTTON_WIDTH_FOR_ACTION_ITEM, BUTTON_HEIGHT_FOR_ACTION_ITEM)
+        :setCapInsets(ITEM_ACTION_CAPINSETS)
+        :setContentSize(ITEM_ACTION_WIDTH, ITEM_ACTION_HEIGHT)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName(TITLE_FONT_NAME)
-        :setTitleFontSize(TITLE_FONT_SIZE)
-        :setTitleColor(TITLE_COLOR)
-        :setTitleText(itemModel.name)
-
-    view:getTitleRenderer():enableOutline(TITLE_OUTLINE_COLOR, TITLE_OUTLINE_WIDTH)
-
-    view:addTouchEventListener(function(sender, eventType)
-        if eventType == ccui.TouchEventType.ended then
-            itemModel.callback()
-        end
-    end)
+        :addTouchEventListener(function(sender, eventType)
+            if eventType == ccui.TouchEventType.ended then
+                itemModel.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
 
     return view
 end
 
-local function createViewProduction(itemModel)
+local function createProductionIcon(tiledID)
+    local icon = cc.Sprite:create()
+    icon:setScale(0.5)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(-18, -13)
+        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(tiledID))
+
+    return icon
+end
+
+local function createProductionLabel(name, cost)
+    local label = cc.Label:createWithTTF(name .. "\n" .. cost, ITEM_FONT_NAME, 20)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(38, 0)
+
+        :setDimensions(ITEM_PRODUCTION_WIDTH - 38, ITEM_PRODUCTION_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    return label
+end
+
+local function createProductionConfirmButton(callback)
+    local button = ccui.Button:create()
+    button:setScale9Enabled(true)
+        :setContentSize(60, ITEM_PRODUCTION_HEIGHT)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(ITEM_PRODUCTION_WIDTH - 60, 0)
+
+        :setVisible(false)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(25)
+        :setTitleColor(BUTTON_CONFIRM_FONT_COLOR)
+        :setTitleText(LocalizationFunctions.getLocalizedText(86))
+
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                callback()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    return button
+end
+
+local function createViewProduction(self, modelItem)
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
         :setScale9Enabled(true)
-        :setCapInsets(BUTTON_CAPINSETS)
-        :setContentSize(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
+        :setCapInsets(ITEM_PRODUCTION_CAPINSETS)
+        :setContentSize(ITEM_PRODUCTION_WIDTH, ITEM_PRODUCTION_HEIGHT)
 
+        :setCascadeColorEnabled(true)
         :setZoomScale(-0.05)
 
-        :setTitleFontName(TITLE_FONT_NAME)
-        :setTitleFontSize(20)
-        :setTitleColor(TITLE_COLOR)
-        :setTitleText("     " .. itemModel.fullName .. "   " .. itemModel.cost)
-        :setTitleAlignment(cc.TEXT_ALIGNMENT_LEFT)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                setAllButtomConfirmEnabled(self, false)
+                view:setButtonConfirmEnabled(true)
+            end
+        end)
 
-    view:getTitleRenderer():setDimensions(BUTTON_WIDTH_FOR_PRODUCTION_ITEM, BUTTON_HEIGHT_FOR_PRODUCTION_ITEM)
-        :enableOutline(TITLE_OUTLINE_COLOR, TITLE_OUTLINE_WIDTH)
+    view:getRendererNormal():addChild(createProductionIcon(modelItem.tiledID))
+        :addChild(createProductionLabel(modelItem.modelUnit:getUnitTypeFullName(), modelItem.cost))
 
-    local icon = cc.Sprite:create()
-    icon:setScale(0.4)
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(-22, -13)
-        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(itemModel.tiledID))
-    view:addChild(icon)
+        :setCascadeColorEnabled(true)
 
-    if (not itemModel.isAvaliable) then
-        view:setEnabled(false)
-            :setColor(BUTTON_DISABLED_COLOR)
+    view.m_ButtonConfirm = createProductionConfirmButton(modelItem.callback)
+    view:addChild(view.m_ButtonConfirm)
+
+    view.setButtonConfirmEnabled = function(self, enabled)
+        self.m_ButtonConfirm:setVisible(enabled)
     end
 
-    view:addTouchEventListener(function(sender, eventType)
-        if (eventType == ccui.TouchEventType.ended) then
-            itemModel.callback()
-        end
-    end)
+    if (not modelItem.isAvaliable) then
+        view:setEnabled(false)
+            :setColor(ITEM_DISABLED_COLOR)
+    end
 
     return view
 end
 
 local function setContentSize(self, width, height)
     self.m_MenuBackground:setContentSize(width, height)
-    self.m_ListView:setContentSize(width - 10, height - 14)
+    self.m_ListView:setContentSize(width, height - 14)
 end
 
 local function moveToLeftSide(self)
     if (self.m_IsShowingActionList) then
-        self:setPosition(LEFT_POSITION_X_FOR_ACTION_ITEM, LEFT_POSITION_Y_FOR_ACTION_ITEM)
+        self:setPosition(LEFT_POS_X_FOR_ACTION_ITEM, LEFT_POS_Y_FOR_ACTION_ITEM)
     else
-        self:setPosition(LEFT_POSITION_X_FOR_PRODUCTION_ITEM, LEFT_POSITION_Y_FOR_PRODUCTION_ITEM)
+        self:setPosition(LEFT_POS_X_FOR_PRODUCTION_ITEM, LEFT_POS_Y_FOR_PRODUCTION_ITEM)
     end
 
     self.m_IsInLeftSide = true
@@ -119,9 +187,9 @@ end
 
 local function moveToRightSide(self)
     if (self.m_IsShowingActionList) then
-        self:setPosition(RIGHT_POSITION_X_FOR_ACTION_ITEM, RIGHT_POSITION_Y_FOR_ACTION_ITEM)
+        self:setPosition(RIGHT_POS_X_FOR_ACTION_ITEM, RIGHT_POS_Y_FOR_ACTION_ITEM)
     else
-        self:setPosition(RIGHT_POSITION_X_FOR_PRODUCTION_ITEM, RIGHT_POSITION_Y_FOR_PRODUCTION_ITEM)
+        self:setPosition(RIGHT_POS_X_FOR_PRODUCTION_ITEM, RIGHT_POS_Y_FOR_PRODUCTION_ITEM)
     end
 
     self.m_IsInLeftSide = false
@@ -138,52 +206,39 @@ local function adjustPositionOnShowingList(self, isShowingActionList)
 end
 
 --------------------------------------------------------------------------------
--- The menu background.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createMenuBackground()
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
+local function initMenuBackground(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", MENU_BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
         :setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
 
         :setOpacity(200)
 
-    return background
+    self.m_MenuBackground = background
+    self:addChild(background)
 end
 
-local function initWithMenuBackground(view, background)
-    view.m_MenuBackground = background
-    view:addChild(background)
-end
-
---------------------------------------------------------------------------------
--- The list view.
---------------------------------------------------------------------------------
-local function createListView()
+local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(LIST_POSITION_X, LIST_POSITION_Y)
+        :setPosition(LIST_VIEW_POS_X, LIST_VIEW_POS_Y)
 
-        :setItemsMargin(20)
+        :setItemsMargin(LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
-        :setCascadeOpacityEnabled(true)
 
-    return listView
-end
-
-local function initWithListView(view, listView)
-    view.m_ListView = listView
-    view:addChild(listView)
+    self.m_ListView = listView
+    self:addChild(listView)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewActionMenu:ctor(param)
-    initWithMenuBackground(  self, createMenuBackground())
-    initWithListView(        self, createListView())
+    initMenuBackground(self)
+    initMenuListView(  self)
 
     self:ignoreAnchorPointForPosition(true)
-        :setOpacity(200)
         :setVisible(false)
 
     adjustPositionOnShowingList(self, true)
@@ -208,7 +263,7 @@ function ViewActionMenu:showProductionList(list)
     adjustPositionOnShowingList(self, false)
 
     for _, listItem in ipairs(list) do
-        self.m_ListView:pushBackCustomItem(createViewProduction(listItem))
+        self.m_ListView:pushBackCustomItem(createViewProduction(self, listItem))
     end
 
     return self

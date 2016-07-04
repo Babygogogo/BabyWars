@@ -83,7 +83,7 @@ function AnimationLoader.getUnitAnimation(unitName, playerIndex, animationState)
 end
 
 function AnimationLoader.getUnitAnimationWithTiledId(tiledID)
-    return AnimationLoader.getUnitAnimation(GameConstantFunctions.getUnitNameWithTiledId(tiledID), GameConstantFunctions.getPlayerIndexWithTiledId(tiledID), "normal")
+    return AnimationLoader.getUnitAnimation(GameConstantFunctions.getUnitTypeWithTiledId(tiledID), GameConstantFunctions.getPlayerIndexWithTiledId(tiledID), "normal")
 end
 
 function AnimationLoader.getTileAnimation(tileName, shapeIndex)
@@ -91,7 +91,7 @@ function AnimationLoader.getTileAnimation(tileName, shapeIndex)
 end
 
 function AnimationLoader.getTileAnimationWithTiledId(tiledID)
-    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileNameWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
+    return AnimationLoader.getTileAnimation(GameConstantFunctions.getTileTypeWithTiledId(tiledID), GameConstantFunctions.getShapeIndexWithTiledId(tiledID))
 end
 
 return AnimationLoader

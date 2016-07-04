@@ -20,6 +20,7 @@ local ActorManager           = require("global.actors.ActorManager")
 local GameConstantFunctions  = require("app.utilities.GameConstantFunctions")
 local WebSocketManager       = require("app.utilities.WebSocketManager")
 local SerializationFunctions = require("app.utilities.SerializationFunctions")
+local LocalizationFunctions  = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
@@ -27,7 +28,7 @@ local SerializationFunctions = require("app.utilities.SerializationFunctions")
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        self.m_ActorMessageIndicator:getModel():showMessage("Welcome, " .. action.account .. "!")
+        self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(26, action.account))
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
@@ -46,7 +47,7 @@ end
 
 local function doActionRegister(self, action)
     WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-    self.m_ActorMessageIndicator:getModel():showMessage("Welcome, " .. action.account .. "!\nThank you for registering!")
+    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(27, action.account))
 
     self.m_ActorMainMenu:getModel():doActionRegister(action)
 end
@@ -117,7 +118,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection established.")
+    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
@@ -130,7 +131,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost. Now reconnecting...")
+    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(31))
 
     WebSocketManager.close()
         .init()
@@ -139,7 +140,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
-    self.m_ActorMessageIndicator:getModel():showMessage("Connection lost with error: " .. param.error)
+    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
 
     WebSocketManager.close()
         .init()

@@ -1,10 +1,15 @@
 
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
+local LABEL_Z_ORDER      = 1
+local BACKGROUND_Z_ORDER = 0
+
 local FONT_SIZE   = 20
 local LINE_HEIGHT = FONT_SIZE / 5 * 8
 
-local BACKGROUND_WIDTH     = FONT_SIZE / 5 * 54
+local BACKGROUND_WIDTH     = 210
 local BACKGROUND_HEIGHT    = LINE_HEIGHT * 3 + 8
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
@@ -83,28 +88,28 @@ local function initBackground(self)
         end)
 
     self.m_Background = background
-    self:addChild(background)
+    self:addChild(background, BACKGROUND_Z_ORDER)
 end
 
 local function initLabelPlayer(self)
     local label = createLabel(LABEL_PLAYER_POS_X, LABEL_PLAYER_POS_Y, LABEL_PLAYER_WIDTH, LABEL_PLAYER_HEIGHT)
 
     self.m_LabelPlayer = label
-    self.m_Background:getRendererNormal():addChild(label)
+    self.m_Background:getRendererNormal():addChild(label, LABEL_Z_ORDER)
 end
 
 local function initLabelFund(self)
     local label = createLabel(LABEL_FUND_POS_X, LABEL_FUND_POS_Y, LABEL_FUND_WIDTH, LABEL_FUND_HEIGHT)
 
     self.m_LabelFund = label
-    self.m_Background:getRendererNormal():addChild(label)
+    self.m_Background:getRendererNormal():addChild(label, LABEL_Z_ORDER)
 end
 
 local function initLabelEnergy(self)
     local label = createLabel(LABEL_ENERGY_POS_X, LABEL_ENERGY_POS_Y, LABEL_ENERGY_WIDTH, LABEL_ENERGY_HEIGHT)
 
     self.m_LabelEnergy = label
-    self.m_Background:getRendererNormal():addChild(label)
+    self.m_Background:getRendererNormal():addChild(label, LABEL_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -139,9 +144,9 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
-    self.m_LabelPlayer:setString("Player:  " .. modelPlayer:getNickname())
-    self.m_LabelFund:setString("Fund:     " .. modelPlayer:getFund())
-    self.m_LabelEnergy:setString(string.format("Energy:  %.2f/%d/%d", modelPlayer:getEnergy()))
+    self.m_LabelPlayer:setString(LocalizationFunctions.getLocalizedText(62, modelPlayer:getNickname()))
+    self.m_LabelFund:setString(LocalizationFunctions.getLocalizedText(63, modelPlayer:getFund()))
+    self.m_LabelEnergy:setString(LocalizationFunctions.getLocalizedText(64, string.format("%.2f/%d/%d", modelPlayer:getEnergy())))
 
     return self
 end

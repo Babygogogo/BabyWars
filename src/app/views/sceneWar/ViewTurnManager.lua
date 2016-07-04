@@ -1,6 +1,8 @@
 
 local ViewTurnManager = class("ViewTurnManager", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local BEGIN_TURN_EFFECT_Z_ORDER = 1
 
 local BEGIN_TURN_EFFECT_FONT_SIZE   = 40
@@ -65,6 +67,7 @@ local function createBeginTurnEffectBackground()
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
     background:ignoreAnchorPointForPosition(true)
         :setContentSize(BEGIN_TURN_EFFECT_WIDTH, BEGIN_TURN_EFFECT_HEIGHT)
+        :setOpacity(200)
 
     return background
 end
@@ -109,10 +112,7 @@ local function createBeginTurnEffect()
     local label         = createBeginTurnEffectLabel()
     local touchListener = createBeginTurnEffectTouchListener(effect)
 
-    effect:setOpacity(200)
-        :setCascadeOpacityEnabled(true)
-
-        :addChild(background)
+    effect:addChild(background)
         :addChild(label)
         :getEventDispatcher():addEventListenerWithSceneGraphPriority(touchListener, effect)
 
@@ -131,10 +131,8 @@ local function initBeginTurnEffect(self)
     self:addChild(effect, BEGIN_TURN_EFFECT_Z_ORDER)
 end
 
-local function setBeginTurnEffectLabel(effect, turnIndex, playerName)
-    effect.m_Label:setString("Turn:     "  .. turnIndex ..
-                             "\nPlayer:  " .. playerName ..
-                             "\nFight!")
+local function setBeginTurnEffectLabel(effect, turnIndex, nickname)
+    effect.m_Label:setString(LocalizationFunctions.getLocalizedText(72, turnIndex, nickname))
 end
 
 --------------------------------------------------------------------------------

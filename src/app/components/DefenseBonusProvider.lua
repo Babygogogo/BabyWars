@@ -12,20 +12,23 @@
 
 local DefenseBonusProvider = class("DefenseBonusProvider")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local TypeChecker           = require("app.utilities.TypeChecker")
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local ComponentManager      = require("global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getDefenseBonusAmount",
     "getNormalizedDefenseBonusAmount",
-    "getDefenseBonusTargetCatagory",
-    "getDefenseBonusTargetList",
+    "getDefenseBonusTargetCategoryFullName",
+    "getDefenseBonusTargetCategory",
 }
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function isDefenseBonusTarget(self, targetName)
-    for _, name in ipairs(self:getDefenseBonusTargetList()) do
+    for _, name in ipairs(self:getDefenseBonusTargetCategory()) do
         if (targetName == name) then
             return true
         end
@@ -45,9 +48,8 @@ function DefenseBonusProvider:ctor(param)
 end
 
 function DefenseBonusProvider:loadTemplate(template)
-    assert(template.amount,         "DefenseBonusProvider:loadTemplate() the param template.amount is invalid.")
-    assert(template.targetCatagory, "DefenseBonusProvider:loadTemplate() the param template.targetCatagory is invalid.")
-    assert(template.targetList,     "DefenseBonusProvider:loadTemplate() the param template.targetList is invalid.")
+    assert(template.amount,             "DefenseBonusProvider:loadTemplate() the param template.amount is invalid.")
+    assert(template.targetCategoryType, "DefenseBonusProvider:loadTemplate() the param template.targetCategoryType is invalid.")
 
     self.m_Template = template
 
@@ -82,8 +84,8 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function DefenseBonusProvider:getDefenseBonusAmount(targetName)
-    if (not targetName) or (isDefenseBonusTarget(self, targetName)) then
+function DefenseBonusProvider:getDefenseBonusAmount(targetType)
+    if ((not targetType) or (isDefenseBonusTarget(self, targetType))) then
         return self.m_Template.amount
     else
         return 0
@@ -94,12 +96,12 @@ function DefenseBonusProvider:getNormalizedDefenseBonusAmount()
     return math.floor(self:getDefenseBonusAmount() / 10)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetCatagory()
-    return self.m_Template.targetCatagory
+function DefenseBonusProvider:getDefenseBonusTargetCategoryFullName()
+    return LocalizationFunctions.getLocalizedText(118, self.m_Template.targetCategoryType)
 end
 
-function DefenseBonusProvider:getDefenseBonusTargetList()
-    return self.m_Template.targetList
+function DefenseBonusProvider:getDefenseBonusTargetCategory()
+    return GameConstantFunctions.getCategory(self.m_Template.targetCategoryType)
 end
 
 return DefenseBonusProvider

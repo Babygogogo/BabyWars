@@ -1,36 +1,46 @@
 
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
+local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
 local LOGIN_PANEL_Z_ORDER            = 3
+local GAME_HELPER_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
 local MENU_LIST_VIEW_Z_ORDER         = 1
+local BUTTON_EXIT_Z_ORDER            = 1
 local MENU_BACKGROUND_Z_ORDER        = 0
 
 local MENU_BACKGROUND_WIDTH  = 250
 local MENU_BACKGROUND_HEIGHT = display.height - 60
-local MENU_LIST_VIEW_WIDTH   = MENU_BACKGROUND_WIDTH - 10
-local MENU_LIST_VIEW_HEIGHT  = MENU_BACKGROUND_HEIGHT - 14 - 50
-local MENU_TITLE_WIDTH       = MENU_BACKGROUND_WIDTH
-local MENU_TITLE_HEIGHT      = 40
+local MENU_BACKGROUND_POS_X  = 30
+local MENU_BACKGROUND_POS_Y  = 30
 
-local MENU_BACKGROUND_POS_X = 30
-local MENU_BACKGROUND_POS_Y = 30
-local MENU_LIST_VIEW_POS_X  = MENU_BACKGROUND_POS_X + 5
-local MENU_LIST_VIEW_POS_Y  = MENU_BACKGROUND_POS_Y + 6
+local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT     = 60
 local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
-local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - 50
-
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT
 local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
-local MENU_TITLE_FONT_SIZE  = 28
+local MENU_TITLE_FONT_SIZE  = 35
+
+local BUTTON_EXIT_WIDTH  = MENU_BACKGROUND_WIDTH
+local BUTTON_EXIT_HEIGHT = 50
+local BUTTON_EXIT_POS_X  = MENU_BACKGROUND_POS_X
+local BUTTON_EXIT_POS_Y  = MENU_BACKGROUND_POS_Y
+
+local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH
+local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_EXIT_POS_Y - BUTTON_EXIT_HEIGHT
+local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
+local MENU_LIST_VIEW_POS_Y        = BUTTON_EXIT_POS_Y + BUTTON_EXIT_HEIGHT
+local MENU_LIST_VIEW_ITEMS_MARGIN = 10
 
 local ITEM_WIDTH              = 230
-local ITEM_HEIGHT             = 45
+local ITEM_HEIGHT             = 50
 local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 28
+local ITEM_FONT_SIZE          = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
@@ -39,6 +49,16 @@ local ITEM_FONT_OUTLINE_WIDTH = 2
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createViewItem(item)
+    local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
     local view = ccui.Button:create()
     view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
 
@@ -48,18 +68,12 @@ local function createViewItem(item)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName(ITEM_FONT_NAME)
-        :setTitleFontSize(ITEM_FONT_SIZE)
-        :setTitleColor(ITEM_FONT_COLOR)
-        :setTitleText(item.name)
-
-    view:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
-
-    view:addTouchEventListener(function(sender, eventType)
-        if (eventType == ccui.TouchEventType.ended) then
-            item.callback()
-        end
-    end)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
 
     return view
 end
@@ -83,17 +97,15 @@ local function initMenuListView(self)
     listView:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
         :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
-        :setItemsMargin(15)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
-        :setCascadeOpacityEnabled(true)
-        :setOpacity(180)
 
     self.m_MenuListView = listView
     self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF("Main Menu", "res/fonts/msyhbd.ttc", MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -104,10 +116,35 @@ local function initMenuTitle(self)
         :setTextColor(MENU_TITLE_FONT_COLOR)
         :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
-        :setOpacity(180)
-
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
+end
+
+local function initButtonExit(self)
+    local button = ccui.Button:create()
+    button:ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_EXIT_POS_X, BUTTON_EXIT_POS_Y)
+
+        :setScale9Enabled(true)
+        :setContentSize(BUTTON_EXIT_WIDTH, BUTTON_EXIT_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor({r = 240, g = 80, b = 56})
+        :setTitleText(LocalizationFunctions.getLocalizedText(8, "Exit"))
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonExitTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonExit = button
+    self:addChild(button, BUTTON_EXIT_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -117,6 +154,7 @@ function ViewMainMenu:ctor(param)
     initMenuBackground(self)
     initMenuListView(  self)
     initMenuTitle(     self)
+    initButtonExit(    self)
 
     return self
 end
@@ -153,6 +191,14 @@ function ViewMainMenu:setViewLoginPanel(view)
     return self
 end
 
+function ViewMainMenu:setViewGameHelper(view)
+    assert(self.m_ViewGameHelper == nil, "ViewMainMenu:setViewGameHelper() the view has been set.")
+    self.m_ViewGameHelper = view
+    self:addChild(view, GAME_HELPER_Z_ORDER)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -172,6 +218,7 @@ function ViewMainMenu:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
     self.m_MenuListView  :setVisible(visible)
     self.m_MenuTitle     :setVisible(visible)
+    self.m_ButtonExit    :setVisible(visible)
 
     return self
 end

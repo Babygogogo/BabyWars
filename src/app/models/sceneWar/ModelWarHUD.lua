@@ -139,6 +139,13 @@ function ModelWarHUD:initView()
     return self
 end
 
+function ModelWarHUD:setModelWarField(model)
+    assert(self.m_ModelWarField == nil, "ModelWarHUD:setModelWarField() the model has been set.")
+    self.m_ActorWarCommandMenu:getModel():setModelWarField(model)
+
+    return self
+end
+
 function ModelWarHUD:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
 
