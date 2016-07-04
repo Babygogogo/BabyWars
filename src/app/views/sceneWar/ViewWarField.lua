@@ -46,13 +46,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions that deals with zooming/dragging.
 --------------------------------------------------------------------------------
-local function isViewSmallerThanBoundaryRect(scale, contentSize)
-    local width  = contentSize.width * scale
-    local height = contentSize.height * scale
-
-    return (width <= BOUNDARY_RECT.width) and (height <= BOUNDARY_RECT.height)
-end
-
 local function shouldZoom(self, focusPosInNode, scaleModifier)
     if ((focusPosInNode.x < 0) or (focusPosInNode.x > self.m_ContentSize.width) or
         (focusPosInNode.y < 0) or (focusPosInNode.y > self.m_ContentSize.height)) then
@@ -60,7 +53,7 @@ local function shouldZoom(self, focusPosInNode, scaleModifier)
     end
 
     local currentScale = self:getScale()
-    if (((scaleModifier < 1) and (isViewSmallerThanBoundaryRect(currentScale, self.m_ContentSize))) or
+    if (((scaleModifier < 1) and (currentScale <= self.m_MinScale)) or
         ((scaleModifier > 1) and (currentScale >= self.m_MaxScale)) or
         (scaleModifier == 1)) then
         return false
@@ -152,9 +145,11 @@ function ViewWarField:setContentSizeWithMapSize(mapSize)
     self.m_ContentSize.height = mapSize.height * GRID_SIZE.height
     self.m_MaxScale = 2
     self.m_MinScale = math.min(BOUNDARY_RECT.width  / self.m_ContentSize.width,
-                               BOUNDARY_RECT.height / self.m_ContentSize.height)
+                               BOUNDARY_RECT.height / self.m_ContentSize.height,
+                               self.m_MaxScale)
 
     self:setContentSize(self.m_ContentSize.width, self.m_ContentSize.height)
+        :setScale(self.m_MinScale)
         :placeInDragBoundary()
 
     return self

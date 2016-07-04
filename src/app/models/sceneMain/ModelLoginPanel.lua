@@ -4,11 +4,19 @@ local ModelLoginPanel = class("ModelLoginPanel")
 local WebSocketManager      = require("app.utilities.WebSocketManager")
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
+local ACCOUNT_FILE_PATH = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/LoggedInAccount.lua"
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function validateAccountOrPassword(str)
     return (#str >= 6) and (not string.find(str, "[^%w_]"))
+end
+
+local function serializeAccountAndPassword(account, password)
+    local file = io.open(ACCOUNT_FILE_PATH, "w")
+    file:write(string.format("return %q, %q", account, password))
+    file:close()
 end
 
 --------------------------------------------------------------------------------
@@ -50,6 +58,8 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:doActionLogin(action)
+    serializeAccountAndPassword(action.account, action.password)
+
     if (self.m_IsEnabled) then
         self:setEnabled(false)
     end
@@ -58,6 +68,8 @@ function ModelLoginPanel:doActionLogin(action)
 end
 
 function ModelLoginPanel:doActionRegister(action)
+    serializeAccountAndPassword(action.account, action.password)
+
     if (self.m_IsEnabled) then
         self:setEnabled(false)
     end
@@ -71,8 +83,16 @@ end
 function ModelLoginPanel:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
-    if (self.m_View) then
-        self.m_View:setEnabled(enabled)
+    local view = self.m_View
+    if (view) then
+        view:setEnabled(enabled)
+        if (enabled) then
+            local file = io.open(ACCOUNT_FILE_PATH, "r")
+            if (file) then
+                file:close()
+                view:setAccountAndPassword(dofile(ACCOUNT_FILE_PATH))
+            end
+        end
     end
 
     return self

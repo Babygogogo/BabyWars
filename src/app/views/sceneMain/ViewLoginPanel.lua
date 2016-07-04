@@ -268,4 +268,11 @@ function ViewLoginPanel:disableButtonLoginForSecs(secs)
     return self
 end
 
+function ViewLoginPanel:setAccountAndPassword(account, password)
+    self.m_EditBoxAccount:setText(account)
+    self.m_EditBoxPassword:setText(password)
+
+    return self
+end
+
 return ViewLoginPanel

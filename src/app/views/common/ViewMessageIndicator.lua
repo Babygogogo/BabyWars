@@ -48,6 +48,7 @@ end
 local function initPersistentLabel(self)
     local label = createLabel(LABEL_PERSISTENT_FONT_SIZE)
     label:setPosition(LABEL_POS_X, LABEL_POS_Y)
+        :setVisible(false)
 
     self.m_PersistentLabel = label
     self:addChild(label, LABEL_Z_ORDER)
@@ -121,6 +122,7 @@ end
 function ViewMessageIndicator:showPersistentMessage(msg)
     local label = self.m_PersistentLabel
     label:setString(msg)
+        :setVisible(true)
     self.m_LabelsList:setPositionY(label:getPositionY() - getHeight(label))
 
     return self
