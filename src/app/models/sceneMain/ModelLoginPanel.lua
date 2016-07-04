@@ -4,7 +4,8 @@ local ModelLoginPanel = class("ModelLoginPanel")
 local WebSocketManager      = require("app.utilities.WebSocketManager")
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
-local ACCOUNT_FILE_PATH = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/LoggedInAccount.lua"
+local WRITABLE_PATH     = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/"
+local ACCOUNT_FILE_PATH = WRITABLE_PATH  .. "LoggedInAccount.lua"
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -15,6 +16,11 @@ end
 
 local function serializeAccountAndPassword(account, password)
     local file = io.open(ACCOUNT_FILE_PATH, "w")
+    if (not file) then
+        cc.FileUtils:getInstance():createDirectory(WRITABLE_PATH)
+        file = io.open(ACCOUNT_FILE_PATH, "w")
+    end
+
     file:write(string.format("return %q, %q", account, password))
     file:close()
 end
