@@ -378,8 +378,8 @@ function ModelUnit:getProductionCost()
     return self.m_Template.cost
 end
 
-function ModelUnit:canJoin(rhsUnitModel)
-    return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
+function ModelUnit:canJoinModelUnit(rhsUnitModel)
+    return ((self:getTiledID() == rhsUnitModel:getTiledID()) and (rhsUnitModel:getCurrentHP() <= 90))
 end
 
 function ModelUnit:canDoAction(playerIndex)

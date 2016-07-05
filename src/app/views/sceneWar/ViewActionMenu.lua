@@ -119,7 +119,7 @@ local function createProductionConfirmButton(callback)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(25)
         :setTitleColor(BUTTON_CONFIRM_FONT_COLOR)
-        :setTitleText(LocalizationFunctions.getLocalizedText(86))
+        :setTitleText(LocalizationFunctions.getLocalizedText(79))
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then

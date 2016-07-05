@@ -683,6 +683,11 @@ GameConstant.categories = {
         "Infantry",
         "Mech"
     },
+
+    ["CopterUnits"] = {
+        "BattleCopter",
+        "TransportCopter",
+    }
 }
 
 GameConstant.maxCapturePoint = 20
@@ -2503,6 +2508,14 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
+        UnitLoader = {
+            maxLoadCount       = 1,
+            targetCategoryType = "FootUnits",
+            canLaunch          = false,
+            canDrop            = true,
+            canSupply          = false,
+        },
+
         cost        = 5000,
         vision      = 1,
     },
@@ -2848,6 +2861,14 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        UnitLoader = {
+            maxLoadCount       = 1,
+            targetCategoryType = "FootUnits",
+            canLaunch          = false,
+            canDrop            = true,
+            canSupply          = false,
+        },
+
         cost        = 5000,
         vision      = 1,
     },
@@ -3058,6 +3079,14 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
+        UnitLoader = {
+            maxLoadCount       = 2,
+            targetCategoryType = "AirUnits",
+            canLaunch          = true,
+            canDrop            = false,
+            canSupply          = true,
+        },
+
         LevelOwner = {
             level = 0,
         },
@@ -3237,6 +3266,14 @@ GameConstant.templateModelUnits = {
             level = 0,
         },
 
+        UnitLoader = {
+            maxLoadCount       = 2,
+            targetCategoryType = "CopterUnits",
+            canLaunch          = true,
+            canDrop            = false,
+            canSupply          = true,
+        },
+
         cost        = 16000,
         vision      = 5,
     },
@@ -3261,6 +3298,14 @@ GameConstant.templateModelUnits = {
             current                = 99,
             consumptionPerTurn     = 1,
             destroyOnOutOfFuel     = true,
+        },
+
+        UnitLoader = {
+            maxLoadCount       = 2,
+            targetCategoryType = "GroundUnits",
+            canLaunch          = false,
+            canDrop            = true,
+            canSupply          = false,
         },
 
         cost        = 10000,
@@ -3329,6 +3374,14 @@ GameConstant.templateModelUnits = {
             current                = 99,
             consumptionPerTurn     = 1,
             destroyOnOutOfFuel     = true,
+        },
+
+        UnitLoader = {
+            maxLoadCount       = 1,
+            targetCategoryType = "FootUnits",
+            canLaunch          = false,
+            canDrop            = true,
+            canSupply          = false,
         },
 
         LevelOwner = {

@@ -394,13 +394,28 @@ local s_Texts = {
         [2] = function(nickname) return "Player [" .. nickname .. "] surrendered!" end,
     },
     [78] = {
-        [1] = function() return "攻 击"  end,
-        [2] = function() return "Attack" end,
+        [1] = function(actionType)
+            if     (actionType == "Wait")          then return "待 机"
+            elseif (actionType == "Attack")        then return "攻 击"
+            elseif (actionType == "Capture")       then return "占 领"
+            elseif (actionType == "LoadModelUnit") then return "装 载"
+            elseif (actionType == "JoinModelUnit") then return "合 流"
+            end
+        end,
+        [2] = function(actionType)
+            if     (actionType == "Wait")          then return "Wait"
+            elseif (actionType == "Attack")        then return "Attack"
+            elseif (actionType == "Capture")       then return "Capture"
+            elseif (actionType == "LoadModelUnit") then return "Load"
+            elseif (actionType == "JoinModelUnit") then return "Join"
+            end
+        end,
     },
     [79] = {
-        [1] = function() return "占 领"   end,
-        [2] = function() return "Capture" end,
+        [1] = function() return "生 产"   end,
+        [2] = function() return "Produce" end,
     },
+    --[[
     [80] = {
         [1] = function() return "待 机" end,
         [2] = function() return "Wait" end,
@@ -441,6 +456,7 @@ local s_Texts = {
         [1] = function() return "上 浮"   end,
         [2] = function() return "Surface" end,
     },
+    --]]
     [90] = {
         [1] = function(attack, counter) return string.format("攻：    %d%%\n防：    %s%%", attack, counter or "--") end,
         [2] = function(attack, counter) return string.format("Atk:   %d%%\nDef:   %s%%", attack, counter or "--") end,

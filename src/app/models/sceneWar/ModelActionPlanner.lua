@@ -44,9 +44,10 @@ local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
         return true
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        return (not existingModelUnit) or
-               (existingModelUnit:canJoin(modelUnit)) or
-               (existingModelUnit.canLoad and existingModelUnit:canLoad(modelUnit))
+        return ((not existingModelUnit) or
+                -- TODO: enable to join the model unit.
+                -- (modelUnit:canJoinModelUnit(existingModelUnit)) or
+                (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit)))
     end
 end
 
@@ -96,8 +97,12 @@ end
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
-local function dispatchEventJoin(self)
-    print("The Join action is selected, but not implemented.")
+local function dispatchEventJoinModelUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "JoinModelUnit",
+        path       = self.m_MovePath,
+    })
 end
 
 local function dispatchEventAttack(self, targetGridIndex)
@@ -134,31 +139,55 @@ local function dispatchEventProduceOnTile(self, gridIndex, tiledID)
     })
 end
 
+local function dispatchEventLoadModelUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "LoadModelUnit",
+        path       = self.m_MovePath,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The functions for avaliable action list.
 --------------------------------------------------------------------------------
 local setStateIdle, setStateChoosingProductionTarget, setStateMakingMovePath, setStateChoosingAction, setStateChoosingAttackTarget
 
 local function getActionJoin(self, destination)
-    if (not GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
-        local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
-        if (existingUnitModel and existingUnitModel:canJoin(self.m_FocusModelUnit)) then
+    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
+        return nil
+    else
+        local existingModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
+        if ((existingModelUnit) and (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
             return {
-                name     = LocalizationFunctions.getLocalizedText(81),
+                name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
                 callback = function()
-                    dispatchEventJoin(self)
+                    dispatchEventJoinModelUnit(self)
                 end
             }
         end
-    else
+    end
+end
+
+local function getActionLoadModelUnit(self, destination)
+    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
+    else
+        local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
+        if ((loaderModelUnit) and (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+            return {
+                name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
+                callback = function()
+                    dispatchEventLoadModelUnit(self)
+                end
+            }
+        end
     end
 end
 
 local function getActionAttack(self, destination)
     if (#self.m_AttackableGridList > 0) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78),
+            name     = LocalizationFunctions.getLocalizedText(78, "Attack"),
             callback = function()
                 setStateChoosingAttackTarget(self, destination)
             end
@@ -170,7 +199,7 @@ local function getActionCapture(self, destination)
     local modelTile = self.m_ModelTileMap:getModelTile(destination)
     if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(79),
+            name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
             callback = function()
                 dispatchEventCapture(self)
             end,
@@ -184,7 +213,7 @@ local function getActionWait(self, destination)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(80),
+            name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
             callback = function()
                 dispatchEventWait(self)
             end
@@ -198,6 +227,10 @@ local function getAvaliableActionList(self, destination)
     local actionJoin = getActionJoin(self, destination)
     if (actionJoin) then
         return {actionJoin}
+    end
+    local actionLoad = getActionLoadModelUnit(self, destination)
+    if (actionLoad) then
+        return {actionLoad}
     end
 
     local list = {}
@@ -274,7 +307,10 @@ setStateChoosingAction = function(self, destination)
             :setMovePathDestinationVisible(true)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAction", list = getAvaliableActionList(self, destination)})
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name = "EvtActionPlannerChoosingAction",
+        list = getAvaliableActionList(self, destination)
+    })
 end
 
 setStateChoosingAttackTarget = function(self, destination)

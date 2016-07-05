@@ -240,4 +240,14 @@ function GameConstantFunctions.getCategory(categoryType)
     return GAME_CONSTANT.categories[categoryType]
 end
 
+function GameConstantFunctions.isTypeInCategory(type, categoryType)
+    for _, t in pairs(GameConstantFunctions.getCategory(categoryType) or {}) do
+        if (type == t) then
+            return true
+        end
+    end
+
+    return false
+end
+
 return GameConstantFunctions
