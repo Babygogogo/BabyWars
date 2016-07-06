@@ -75,7 +75,12 @@ local function createViewAction(itemModel)
                 itemModel.callback()
             end
         end)
-    view:getRendererNormal():addChild(label)
+
+    local renderer = view:getRendererNormal()
+    renderer:addChild(label)
+    if (itemModel.icon) then
+        renderer:addChild(itemModel.icon)
+    end
 
     return view
 end

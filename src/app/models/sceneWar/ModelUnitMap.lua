@@ -481,6 +481,11 @@ function ModelUnitMap:getModelUnit(gridIndex)
     return unitActor and unitActor:getModel() or nil
 end
 
+function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    local actorUnit = self.m_LoadedActorUnits[unitID]
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
 function ModelUnitMap:forEachModelUnitOnMap(func)
     local mapSize = self:getMapSize()
     for x = 1, mapSize.width do

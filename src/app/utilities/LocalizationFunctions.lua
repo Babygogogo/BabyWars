@@ -399,6 +399,7 @@ local s_Texts = {
             elseif (actionType == "Attack")        then return "攻 击"
             elseif (actionType == "Capture")       then return "占 领"
             elseif (actionType == "LoadModelUnit") then return "装 载"
+            elseif (actionType == "DropModelUnit") then return "卸 载"
             elseif (actionType == "JoinModelUnit") then return "合 流"
             end
         end,
@@ -407,6 +408,7 @@ local s_Texts = {
             elseif (actionType == "Attack")        then return "Attack"
             elseif (actionType == "Capture")       then return "Capture"
             elseif (actionType == "LoadModelUnit") then return "Load"
+            elseif (actionType == "DropModelUnit") then return "Drop"
             elseif (actionType == "JoinModelUnit") then return "Join"
             end
         end,

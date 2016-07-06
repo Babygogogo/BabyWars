@@ -21,6 +21,7 @@ local MovePathFunctions           = require("app.utilities.MovePathFunctions")
 local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
 local WebSocketManager            = require("app.utilities.WebSocketManager")
 local LocalizationFunctions       = require("app.utilities.LocalizationFunctions")
+local Actor                       = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -49,6 +50,26 @@ local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
                 -- (modelUnit:canJoinModelUnit(existingModelUnit)) or
                 (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit)))
     end
+end
+
+local function canDropModelUnit(modelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap)
+    local moveType = modelUnit:getMoveType()
+    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCost(moveType)) then
+        return false
+    end
+
+    local mapSize = modelTileMap:getMapSize()
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(loaderEndingGridIndex)) do
+        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize)) and
+            (modelTileMap:getModelTile(gridIndex):getMoveCost(moveType))) then
+            if ((not modelUnitMap:getModelUnit(gridIndex)) or
+                (GridIndexFunctions.isEqual(gridIndex, loaderBeginningGridIndex))) then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 --------------------------------------------------------------------------------
@@ -151,8 +172,10 @@ end
 -- The functions for avaliable action list.
 --------------------------------------------------------------------------------
 local setStateIdle, setStateChoosingProductionTarget, setStateMakingMovePath, setStateChoosingAction, setStateChoosingAttackTarget
+local setStateChoosingDropDestination
 
-local function getActionJoin(self, destination)
+local function getActionJoin(self)
+    local destination = self.m_Destination
     if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
     else
@@ -168,7 +191,8 @@ local function getActionJoin(self, destination)
     end
 end
 
-local function getActionLoadModelUnit(self, destination)
+local function getActionLoadModelUnit(self)
+    local destination = self.m_Destination
     if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
     else
@@ -184,19 +208,19 @@ local function getActionLoadModelUnit(self, destination)
     end
 end
 
-local function getActionAttack(self, destination)
+local function getActionAttack(self)
     if (#self.m_AttackableGridList > 0) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Attack"),
             callback = function()
-                setStateChoosingAttackTarget(self, destination)
+                setStateChoosingAttackTarget(self, self.m_Destination)
             end
         }
     end
 end
 
-local function getActionCapture(self, destination)
-    local modelTile = self.m_ModelTileMap:getModelTile(destination)
+local function getActionCapture(self)
+    local modelTile = self.m_ModelTileMap:getModelTile(self.m_Destination)
     if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
@@ -209,8 +233,8 @@ local function getActionCapture(self, destination)
     end
 end
 
-local function getActionWait(self, destination)
-    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
+local function getActionWait(self)
+    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(self.m_Destination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
@@ -223,20 +247,61 @@ local function getActionWait(self, destination)
     end
 end
 
-local function getAvaliableActionList(self, destination)
-    local actionJoin = getActionJoin(self, destination)
+local function getSingleActionDropModelUnit(self, unitID)
+    local icon = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID))
+    icon:ignoreAnchorPointForPosition(true)
+        :setScale(0.5)
+
+    return {
+        name     = LocalizationFunctions.getLocalizedText(78, "DropModelUnit"),
+        icon     = icon,
+        callback = function()
+            setStateChoosingDropDestination(self, unitID)
+        end,
+    }
+end
+
+local function getActionsDropModelUnit(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((not focusModelUnit.getCurrentLoadCount) or
+        (focusModelUnit:getCurrentLoadCount() <= 0) or
+        (not focusModelUnit:canDropModelUnit())) then
+        return {}
+    end
+
+    local actions = {}
+    local loaderBeginningGridIndex = self.m_FocusModelUnit:getGridIndex()
+    local loaderEndingGridIndex    = self.m_Destination
+    local modelUnitMap             = self.m_ModelUnitMap
+    local modelTileMap             = self.m_ModelTileMap
+
+    for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
+        local droppingModelUnit = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+        if (canDropModelUnit(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap)) then
+            actions[#actions + 1] = getSingleActionDropModelUnit(self, unitID)
+        end
+    end
+
+    return actions
+end
+
+local function getAvaliableActionList(self)
+    local actionJoin = getActionJoin(self)
     if (actionJoin) then
         return {actionJoin}
     end
-    local actionLoad = getActionLoadModelUnit(self, destination)
+    local actionLoad = getActionLoadModelUnit(self)
     if (actionLoad) then
         return {actionLoad}
     end
 
     local list = {}
-    list[#list + 1] = getActionAttack( self, destination)
-    list[#list + 1] = getActionCapture(self, destination)
-    list[#list + 1] = getActionWait(   self, destination)
+    list[#list + 1] = getActionAttack( self)
+    list[#list + 1] = getActionCapture(self)
+    for _, action in ipairs(getActionsDropModelUnit(self)) do
+        list[#list + 1] = action
+    end
+    list[#list + 1] = getActionWait(   self)
 
     assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
     return list
@@ -309,7 +374,7 @@ setStateChoosingAction = function(self, destination)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name = "EvtActionPlannerChoosingAction",
-        list = getAvaliableActionList(self, destination)
+        list = getAvaliableActionList(self)
     })
 end
 
@@ -322,6 +387,9 @@ setStateChoosingAttackTarget = function(self, destination)
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAttackTarget"})
+end
+
+setStateChoosingDropDestination = function(self, unitID)
 end
 
 --------------------------------------------------------------------------------

@@ -7,6 +7,7 @@ local ComponentManager      = require("global.components.ComponentManager")
 local EXPORTED_METHODS = {
     "getMaxLoadCount",
     "getCurrentLoadCount",
+    "getLoadUnitIdList",
     "canLoadModelUnit",
     "canDropModelUnit",
     "canLaunchModelUnit",
@@ -87,6 +88,10 @@ function UnitLoader:getCurrentLoadCount()
     return #self.m_LoadedUnitIds
 end
 
+function UnitLoader:getLoadUnitIdList()
+    return self.m_LoadedUnitIds
+end
+
 function UnitLoader:canLoadModelUnit(modelUnit)
     return ((self:getCurrentLoadCount() < self:getMaxLoadCount()) and
         (self.m_Owner:getPlayerIndex() == modelUnit:getPlayerIndex()) and
@@ -94,11 +99,11 @@ function UnitLoader:canLoadModelUnit(modelUnit)
 end
 
 function UnitLoader:canDropModelUnit()
-    return false
+    return self.m_Template.canDrop
 end
 
 function UnitLoader:canLaunchModelUnit()
-    return false
+    return self.m_Template.canLaunch
 end
 
 return UnitLoader
