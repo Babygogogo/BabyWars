@@ -285,6 +285,29 @@ function ModelUnit:doActionAttack(action, isAttacker)
     return self
 end
 
+function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    if (self:getUnitId() == focusUnitID) then
+        self:setStateActioned()
+    end
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionLoadModelUnit) then
+            component:doActionLoadModelUnit(action, focusUnitID)
+        end
+    end
+
+    if ((self:getUnitId() == focusUnitID) and (self.m_View)) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+                :setVisible(false)
+            loaderModelUnit:updateView()
+        end)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionCapture(action)
     self:setStateActioned()
 

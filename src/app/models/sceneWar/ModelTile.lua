@@ -290,6 +290,18 @@ function ModelTile:doActionWait(action)
     return self
 end
 
+function ModelTile:doActionLoadModelUnit(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionLoadModelUnit) then
+            component:doActionLoadModelUnit(action)
+        end
+    end
+
+    dispatchEvtModelTileUpdated(self)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

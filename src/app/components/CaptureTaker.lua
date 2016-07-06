@@ -84,19 +84,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function CaptureTaker:onBind(target)
-    assert(self.m_Target == nil, "CaptureTaker:onBind() the component has already bound a target.")
+    assert(self.m_Owner == nil, "CaptureTaker:onBind() the component has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function CaptureTaker:onUnbind()
-    assert(self.m_Target ~= nil, "CaptureTaker:onUnbind() the component has not bound a target.")
+    assert(self.m_Owner ~= nil, "CaptureTaker:onUnbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -111,7 +111,7 @@ function CaptureTaker:doActionSurrender(action)
 end
 
 function CaptureTaker:doActionCapture(action)
-    local modelTile       = self.m_Target
+    local modelTile       = self.m_Owner
     local maxCapturePoint = self:getMaxCapturePoint()
     if ((action.prevTarget) and (modelTile == action.prevTarget)) then
         self.m_CurrentCapturePoint = maxCapturePoint
@@ -128,7 +128,7 @@ end
 
 function CaptureTaker:doActionAttack(action, isAttacker)
     local path = action.path
-    local selfGridIndex = self.m_Target:getGridIndex()
+    local selfGridIndex = self.m_Owner:getGridIndex()
 
     if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
         (isCapturerDestroyed(selfGridIndex, action.attacker)) or
@@ -141,9 +141,15 @@ end
 
 function CaptureTaker:doActionWait(action)
     local path = action.path
-    if (isCapturerMovedAway(self.m_Target:getGridIndex(), path[1], path[#path])) then
+    if (isCapturerMovedAway(self.m_Owner:getGridIndex(), path[1], path[#path])) then
         self.m_CurrentCapturePoint = self:getMaxCapturePoint()
     end
+
+    return self
+end
+
+function CaptureTaker:doActionLoadModelUnit(action)
+    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
 
     return self
 end

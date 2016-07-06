@@ -92,6 +92,14 @@ local function getCaptureIndicatorFrame(unit)
     end
 end
 
+local function getLoadIndicatorFrame(unit)
+    if ((unit.getCurrentLoadCount) and (unit:getCurrentLoadCount() ~= 0)) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
+    else
+        return nil
+    end
+end
+
 local function playSpriteAnimation(sprite, tiledID, state)
     if (state == "moving") then
         sprite:setPosition(-18, 0)
@@ -189,6 +197,7 @@ local function updateStateIndicator(indicator, unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
     frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
     frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
+    frames[#frames + 1] = getLoadIndicatorFrame(     unit)
 
     indicator:stopAllActions()
     if (#frames == 0) then

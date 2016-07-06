@@ -38,7 +38,7 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    local modelUnit = self.m_Target
+    local modelUnit = self.m_Owner
     if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
         self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
         modelUnit:updateView()
@@ -128,19 +128,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function FuelOwner:onBind(target)
-    assert(self.m_Target == nil, "FuelOwner:onBind() the FuelOwner has already bound a target.")
+    assert(self.m_Owner == nil, "FuelOwner:onBind() the FuelOwner has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function FuelOwner:onUnbind()
-    assert(self.m_Target, "FuelOwner:unbind() the component has not bound a target.")
+    assert(self.m_Owner, "FuelOwner:unbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -175,6 +175,14 @@ end
 
 function FuelOwner:doActionCapture(action)
     self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+
+    return self
+end
+
+function FuelOwner:doActionLoadModelUnit(action, focusUnitID)
+    if (self.m_Owner:getUnitId() == focusUnitID) then
+        self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
+    end
 
     return self
 end

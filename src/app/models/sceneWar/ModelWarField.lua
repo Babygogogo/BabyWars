@@ -276,6 +276,13 @@ function ModelWarField:doActionCapture(action)
     return self
 end
 
+function ModelWarField:doActionLoadModelUnit(action)
+    self:getModelUnitMap():doActionLoadModelUnit(action)
+    self:getModelTileMap():doActionLoadModelUnit(action)
+
+    return self
+end
+
 function ModelWarField:doActionProduceOnTile(action)
     self:getModelUnitMap():doActionProduceOnTile(action)
 

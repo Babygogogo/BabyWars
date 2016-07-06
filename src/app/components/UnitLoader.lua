@@ -69,8 +69,8 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function UnitLoader:doActionLoadUnit(action)
-    self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = action.unitID
+function UnitLoader:doActionLoadModelUnit(action, unitID)
+    self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
 
     return self.m_Owner
 end
