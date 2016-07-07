@@ -1,12 +1,18 @@
 
 local ViewActionPlanner = class("ViewActionPlanner", cc.Node)
 
+local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local Actor              = require("global.actors.Actor")
+
 local MOVE_PATH_Z_ORDER                = 1
 local PREVIEW_DROP_DESTINATION_Z_ORDER = 1
+local DROP_DESTIONATIONS_Z_ORDER       = 1
 local REACHABLE_GRIDS_Z_ORDER          = 0
 local ATTACKABLE_GRIDS_Z_ORDER         = 0
 local MOVE_PATH_DESTINATION_Z_ORDER    = 0
-local DROP_DESTIONATIONS_Z_ORDER       = 0
+local DROPPABLE_GRIDS_Z_ORDER          = 0
+
+local DROP_DESTIONATIONS_UNIT_Z_ORDER = 0
 
 local SPRITE_FRAME_NAME_EMPTY             = nil
 local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c03_t02_s01_f01.png"
@@ -19,8 +25,6 @@ local SPRITE_FRAME_NAME_CORNER_DOWN_LEFT  = "c03_t02_s07_f01.png"
 local SPRITE_FRAME_NAME_CORNER_DOWN_RIGHT = "c03_t02_s08_f01.png"
 local SPRITE_FRAME_NAME_CORNER_UP_LEFT    = "c03_t02_s09_f01.png"
 local SPRITE_FRAME_NAME_CORNER_UP_RIGHT   = "c03_t02_s10_f01.png"
-
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -149,12 +153,24 @@ local function initViewMovePath(self)
 end
 
 local function initViewPreviewDropDestination(self)
-    local view = cc.Sprite:create()
-    view:ignoreAnchorPointForPosition(true)
-        :setVisible(false)
+    local view = Actor.createView("sceneWar.ViewUnit")
+    view:setVisible(false)
+        :setOpacity(150)
+        :setCascadeOpacityEnabled(true)
 
     self.m_ViewPreviewDropDestination = view
     self:addChild(view, PREVIEW_DROP_DESTINATION_Z_ORDER)
+end
+
+local function initViewDropDestinations(self)
+    local view = cc.Node:create()
+    view:ignoreAnchorPointForPosition(true)
+        :setVisible(false)
+        :setOpacity(150)
+        :setCascadeOpacityEnabled(true)
+
+    self.m_ViewDropDestinations = view
+    self:addChild(view, DROP_DESTIONATIONS_Z_ORDER)
 end
 
 local function initViewDroppableGrids(self)
@@ -163,7 +179,7 @@ local function initViewDroppableGrids(self)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewDroppableGrids = view
-    self:addChild(view, DROP_DESTIONATIONS_Z_ORDER)
+    self:addChild(view, DROPPABLE_GRIDS_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -175,6 +191,7 @@ function ViewActionPlanner:ctor(param)
     initViewMovePathDestination(   self)
     initViewMovePath(              self)
     initViewPreviewDropDestination(self)
+    initViewDropDestinations(      self)
     initViewDroppableGrids(        self)
 
     return self
@@ -269,9 +286,8 @@ function ViewActionPlanner:setDroppableGridsVisible(visible)
     return self
 end
 
-function ViewActionPlanner:setPreviewDropDestination(gridIndex, prevGridIndex)
-    local direction = GridIndexFunctions.getAdjacentDirection(prevGridIndex, gridIndex)
-    self.m_ViewPreviewDropDestination:setSpriteFrame(getSpriteFrameName(direction, "invalid"))
+function ViewActionPlanner:setPreviewDropDestination(gridIndex, modelUnit)
+    self.m_ViewPreviewDropDestination:updateWithModelUnit(modelUnit)
         :setPosition(GridIndexFunctions.toPosition(gridIndex))
 
     return self
@@ -279,6 +295,26 @@ end
 
 function ViewActionPlanner:setPreviewDropDestinationVisible(visible)
     self.m_ViewPreviewDropDestination:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setDropDestinations(destinations)
+    local viewDropDestinations = self.m_ViewDropDestinations
+    viewDropDestinations:removeAllChildren()
+
+    for _, destination in pairs(destinations) do
+        local viewUnit = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(destination.modelUnit)
+        viewUnit:setPosition(GridIndexFunctions.toPosition(destination.gridIndex))
+            :setCascadeOpacityEnabled(true)
+        viewDropDestinations:addChild(viewUnit, DROP_DESTIONATIONS_UNIT_Z_ORDER)
+    end
+
+    return self
+end
+
+function ViewActionPlanner:setDropDestinationsVisible(visible)
+    self.m_ViewDropDestinations:setVisible(visible)
 
     return self
 end
