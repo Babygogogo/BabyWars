@@ -1,10 +1,12 @@
 
 local ViewActionPlanner = class("ViewActionPlanner", cc.Node)
 
-local MOVE_PATH_Z_ORDER             = 1
-local REACHABLE_GRIDS_Z_ORDER       = 0
-local ATTACKABLE_GRIDS_Z_ORDER      = 0
-local MOVE_PATH_DESTINATION_Z_ORDER = 0
+local MOVE_PATH_Z_ORDER                = 1
+local PREVIEW_DROP_DESTINATION_Z_ORDER = 1
+local REACHABLE_GRIDS_Z_ORDER          = 0
+local ATTACKABLE_GRIDS_Z_ORDER         = 0
+local MOVE_PATH_DESTINATION_Z_ORDER    = 0
+local DROP_DESTIONATIONS_Z_ORDER       = 0
 
 local SPRITE_FRAME_NAME_EMPTY             = nil
 local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c03_t02_s01_f01.png"
@@ -21,7 +23,7 @@ local SPRITE_FRAME_NAME_CORNER_UP_RIGHT   = "c03_t02_s10_f01.png"
 local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
--- The reachable grids view.
+-- The util functions.
 --------------------------------------------------------------------------------
 local function createViewSingleReachableGrid(gridIndex)
     local view = cc.Sprite:create()
@@ -32,22 +34,6 @@ local function createViewSingleReachableGrid(gridIndex)
     return view
 end
 
-local function createViewReachableGrids()
-    local view = cc.Node:create()
-    view:setOpacity(160)
-        :setCascadeOpacityEnabled(true)
-
-    return view
-end
-
-local function initWithViewReachableGrids(self, view)
-    self.m_ViewReachableGrids = view
-    self:addChild(view, REACHABLE_GRIDS_Z_ORDER)
-end
-
---------------------------------------------------------------------------------
--- The attackable grids view.
---------------------------------------------------------------------------------
 local function createViewSingleAttackableGrid(gridIndex)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
@@ -57,22 +43,6 @@ local function createViewSingleAttackableGrid(gridIndex)
     return view
 end
 
-local function createViewAttackableGrids()
-    local view = cc.Node:create()
-    view:setOpacity(180)
-        :setCascadeOpacityEnabled(true)
-
-    return view
-end
-
-local function initWithViewAttackableGrids(self, view)
-    self.m_ViewAttackableGrids = view
-    self:addChild(view, ATTACKABLE_GRIDS_Z_ORDER)
-end
-
---------------------------------------------------------------------------------
--- The move path.
---------------------------------------------------------------------------------
 local function getSpriteFrameName(prevDirection, nextDirection)
     if (prevDirection == nextDirection) then
         return SPRITE_FRAME_NAME_EMPTY
@@ -139,41 +109,73 @@ local function createViewSingleMovePathGrid(gridIndex, prevGridIndex, nextGridIn
     end
 end
 
-local function createViewMovePath()
-    return cc.Node:create()
+--------------------------------------------------------------------------------
+-- The composition elements.
+--------------------------------------------------------------------------------
+local function initViewReachableGrids(self)
+    local view = cc.Node:create()
+    view:setOpacity(160)
+        :setCascadeOpacityEnabled(true)
+
+    self.m_ViewReachableGrids = view
+    self:addChild(view, REACHABLE_GRIDS_Z_ORDER)
 end
 
-local function initWithViewMothPath(view, pathView)
-    view.m_MovePathView = pathView
-    view:addChild(pathView, MOVE_PATH_Z_ORDER)
+local function initViewAttackableGrids(self)
+    local view = cc.Node:create()
+    view:setOpacity(180)
+        :setCascadeOpacityEnabled(true)
+
+    self.m_ViewAttackableGrids = view
+    self:addChild(view, ATTACKABLE_GRIDS_Z_ORDER)
 end
 
---------------------------------------------------------------------------------
--- The move path destination view.
---------------------------------------------------------------------------------
-local function createViewMovePathDestination()
+local function initViewMovePathDestination(self)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
         :setOpacity(160)
+        :setVisible(false)
         :playAnimationForever(display.getAnimationCache("ReachableGrid"))
 
-    return view
+    self.m_ViewMovePathDestination = view
+    self:addChild(view, MOVE_PATH_DESTINATION_Z_ORDER)
 end
 
-local function initWithViewMovePathDestination(self, view)
-    view:setVisible(false)
-    self.m_MovePathDestinationView = view
-    self:addChild(view, MOVE_PATH_DESTINATION_Z_ORDER)
+local function initViewMovePath(self)
+    local view = cc.Node:create()
+
+    self.m_ViewMovePath = view
+    self:addChild(view, MOVE_PATH_Z_ORDER)
+end
+
+local function initViewPreviewDropDestination(self)
+    local view = cc.Sprite:create()
+    view:ignoreAnchorPointForPosition(true)
+        :setVisible(false)
+
+    self.m_ViewPreviewDropDestination = view
+    self:addChild(view, PREVIEW_DROP_DESTINATION_Z_ORDER)
+end
+
+local function initViewDroppableGrids(self)
+    local view = cc.Node:create()
+    view:setOpacity(160)
+        :setCascadeOpacityEnabled(true)
+
+    self.m_ViewDroppableGrids = view
+    self:addChild(view, DROP_DESTIONATIONS_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewActionPlanner:ctor(param)
-    initWithViewReachableGrids(     self, createViewReachableGrids())
-    initWithViewAttackableGrids(    self, createViewAttackableGrids())
-    initWithViewMovePathDestination(self, createViewMovePathDestination())
-    initWithViewMothPath(           self, createViewMovePath())
+    initViewReachableGrids(        self)
+    initViewAttackableGrids(       self)
+    initViewMovePathDestination(   self)
+    initViewMovePath(              self)
+    initViewPreviewDropDestination(self)
+    initViewDroppableGrids(        self)
 
     return self
 end
@@ -218,7 +220,7 @@ function ViewActionPlanner:setAttackableGridsVisible(visible)
 end
 
 function ViewActionPlanner:setMovePath(path)
-    self.m_MovePathView:removeAllChildren()
+    self.m_ViewMovePath:removeAllChildren()
 
     for i = 1, #path do
         local prevGridIndex = path[i - 1] and path[i - 1].gridIndex or nil
@@ -226,7 +228,7 @@ function ViewActionPlanner:setMovePath(path)
 
         local gridView = createViewSingleMovePathGrid(path[i].gridIndex, prevGridIndex, nextGridIndex)
         if (gridView) then
-            self.m_MovePathView:addChild(gridView)
+            self.m_ViewMovePath:addChild(gridView)
         end
     end
 
@@ -234,19 +236,49 @@ function ViewActionPlanner:setMovePath(path)
 end
 
 function ViewActionPlanner:setMovePathVisible(visible)
-    self.m_MovePathView:setVisible(visible)
+    self.m_ViewMovePath:setVisible(visible)
 
     return self
 end
 
 function ViewActionPlanner:setMovePathDestination(gridIndex)
-    self.m_MovePathDestinationView:setPosition(GridIndexFunctions.toPosition(gridIndex))
+    self.m_ViewMovePathDestination:setPosition(GridIndexFunctions.toPosition(gridIndex))
 
     return self
 end
 
 function ViewActionPlanner:setMovePathDestinationVisible(visible)
-    self.m_MovePathDestinationView:setVisible(visible)
+    self.m_ViewMovePathDestination:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setDroppableGrids(grids)
+    self.m_ViewDroppableGrids:removeAllChildren()
+
+    for _, gridIndex in pairs(grids) do
+        self.m_ViewDroppableGrids:addChild(createViewSingleReachableGrid(gridIndex))
+    end
+
+    return self
+end
+
+function ViewActionPlanner:setDroppableGridsVisible(visible)
+    self.m_ViewDroppableGrids:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewDropDestination(gridIndex, prevGridIndex)
+    local direction = GridIndexFunctions.getAdjacentDirection(prevGridIndex, gridIndex)
+    self.m_ViewPreviewDropDestination:setSpriteFrame(getSpriteFrameName(direction, "invalid"))
+        :setPosition(GridIndexFunctions.toPosition(gridIndex))
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewDropDestinationVisible(visible)
+    self.m_ViewPreviewDropDestination:setVisible(visible)
 
     return self
 end
