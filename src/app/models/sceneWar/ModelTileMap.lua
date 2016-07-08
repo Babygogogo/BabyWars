@@ -322,6 +322,12 @@ function ModelTileMap:doActionLoadModelUnit(action)
     return self
 end
 
+function ModelTileMap:doActionDropModelUnit(action)
+    self:getModelTile(action.path[1]):doActionDropModelUnit(action)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

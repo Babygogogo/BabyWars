@@ -52,6 +52,10 @@ local function getTiledUnitLayer(tiledData)
     return tiledData.layers[3]
 end
 
+local function getLoadedActorUnitWithUnitId(self, unitID)
+    return self.m_LoadedActorUnits[unitID]
+end
+
 local function setActorUnit(self, actor, gridIndex)
     self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actor
     if (actor) then
@@ -70,6 +74,16 @@ local function setActorUnitLoaded(self, gridIndex)
 
     if (self.m_View) then
         self.m_View:setViewUnitLoaded(gridIndex, focusUnitID)
+    end
+end
+
+local function setActorUnitUnloaded(self, unitID, gridIndex)
+    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+    self.m_LoadedActorUnits[unitID] = nil
+    setActorUnit(self, actorUnit, gridIndex)
+
+    if (self.m_View) then
+        self.m_View:setViewUnitUnloaded(gridIndex, unitID)
     end
 end
 
@@ -440,6 +454,31 @@ function ModelUnitMap:doActionLoadModelUnit(action)
     return self
 end
 
+function ModelUnitMap:doActionDropModelUnit(action)
+    local path = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    swapActorUnit(self, beginningGridIndex, endingGridIndex)
+
+    local droppingActorUnits = {}
+    for _, dropDestination in ipairs(action.dropDestinations) do
+        local unitID    = dropDestination.unitID
+        local gridIndex = dropDestination.gridIndex
+        local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+        local modelUnit = actorUnit:getModel()
+
+        droppingActorUnits[#droppingActorUnits + 1] = actorUnit
+        setActorUnitUnloaded(self, unitID, gridIndex)
+        modelUnit:doActionDropModelUnit(action)
+        dispatchEvtModelUnitUpdated(self, modelUnit, gridIndex)
+    end
+
+    local focusModelUnit = self:getModelUnit(beginningGridIndex)
+    focusModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
+
+    return self
+end
+
 function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
@@ -482,7 +521,7 @@ function ModelUnitMap:getModelUnit(gridIndex)
 end
 
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-    local actorUnit = self.m_LoadedActorUnits[unitID]
+    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
 end
 

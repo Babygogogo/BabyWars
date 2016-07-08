@@ -302,6 +302,18 @@ function ModelTile:doActionLoadModelUnit(action)
     return self
 end
 
+function ModelTile:doActionDropModelUnit(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionDropModelUnit) then
+            component:doActionDropModelUnit(action)
+        end
+    end
+
+    dispatchEvtModelTileUpdated(self)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

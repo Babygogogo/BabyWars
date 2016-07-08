@@ -417,11 +417,15 @@ local s_Texts = {
         [1] = function() return "生 产"   end,
         [2] = function() return "Produce" end,
     },
-    --[[
     [80] = {
-        [1] = function() return "待 机" end,
-        [2] = function() return "Wait" end,
+        [1] = function(text) return
+            "您的战局数据与服务器不同步。请返回主菜单并重新进入战局。\n" .. (text or "")
+        end,
+        [2] = function(text)
+            return "The war data is not the same as on the server. Please reenter the war.\n" .. (text or "")
+        end,
     },
+    --[[
     [81] = {
         [1] = function() return "合 流" end,
         [2] = function() return "Join" end,

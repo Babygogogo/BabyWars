@@ -19,7 +19,7 @@ local TableFunctions        = require("app.utilities.TableFunctions")
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
--- The set state functions.
+-- The util functions.
 --------------------------------------------------------------------------------
 local function setStateIdle(self)
     self.m_State = "idle"
@@ -302,6 +302,41 @@ function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
                 :showNormalAnimation()
                 :setVisible(false)
             loaderModelUnit:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+    self:setStateActioned()
+    if (not droppingActorUnits) then
+        return
+    end
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionDropModelUnit) then
+            component:doActionDropModelUnit(action, droppingActorUnits)
+        end
+    end
+
+    if (self.m_View) then
+        local path                  = action.path
+        local loaderEndingGridIndex = path[#path]
+
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            for _, dropActorUnit in ipairs(droppingActorUnits) do
+                local dropModelUnit = dropActorUnit:getModel()
+                local dropViewUnit  = dropActorUnit:getView()
+                dropViewUnit:setVisible(true)
+                    :moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
+                        dropViewUnit:updateWithModelUnit(dropModelUnit)
+                            :showNormalAnimation()
+                    end)
+            end
         end)
     end
 

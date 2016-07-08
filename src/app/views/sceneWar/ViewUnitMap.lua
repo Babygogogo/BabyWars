@@ -106,8 +106,12 @@ function ViewUnitMap:setViewUnitLoaded(gridIndex, unitID)
     return self
 end
 
-function ViewUnitMap:setViewUnitUnloaded(unitID)
-    -- TODO: add code to do the job.
+function ViewUnitMap:setViewUnitUnloaded(gridIndex, unitID)
+    local viewUnit = self.m_LoadedViewUnit[unitID]
+    assert(viewUnit, "ViewUnitMap:setViewUnitUnloaded() the target view doesn't exist.")
+
+    self.m_LoadedViewUnit[unitID] = nil
+    self.m_Map[gridIndex.x][gridIndex.y] = viewUnit
 
     return self
 end

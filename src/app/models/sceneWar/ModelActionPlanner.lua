@@ -409,7 +409,9 @@ local function getAdditionalDropActionList(self)
     end
     list[#list + 1] = {
         name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
-        callback = dispatchEventDropModelUnit(self)
+        callback = function()
+            dispatchEventDropModelUnit(self)
+        end,
     }
 
     return list
