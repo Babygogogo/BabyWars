@@ -40,20 +40,25 @@ local function requireMapData(param)
     end
 end
 
-local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name              = "EvtModelUnitUpdated",
-        modelUnit         = modelUnit,
-        previousGridIndex = previousGridIndex,
-    })
-end
-
 local function getTiledUnitLayer(tiledData)
     return tiledData.layers[3]
 end
 
 local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
+end
+
+local function getLoadedModelUnits(self, loaderModelUnit)
+    if (not loaderModelUnit.getLoadUnitIdList) then
+        return nil
+    else
+        local list = {}
+        for _, unitID in ipairs(loaderModelUnit:getLoadUnitIdList()) do
+            list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
+        end
+
+        return list
+    end
 end
 
 local function setActorUnit(self, actor, gridIndex)
@@ -120,6 +125,36 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
 end
 
+--------------------------------------------------------------------------------
+-- The private functions for dispatching events.
+--------------------------------------------------------------------------------
+local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name              = "EvtModelUnitUpdated",
+        modelUnit         = modelUnit,
+        loadedModelUnits  = getLoadedModelUnits(self, modelUnit),
+        previousGridIndex = previousGridIndex,
+    })
+end
+
+local function dispatchEvtPreviewModelUnit(self, modelUnit)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name             = "EvtPreviewModelUnit",
+        modelUnit        = modelUnit,
+        loadedModelUnits = getLoadedModelUnits(self, modelUnit)
+    })
+end
+
+local function dispatchEvtPreviewNoModelUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtPreviewNoModelUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+--------------------------------------------------------------------------------
+-- The private functions for serialization.
+--------------------------------------------------------------------------------
 local function serializeMapSizeToStringList(mapSize, spaces)
     return {string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)}
 end
@@ -151,32 +186,45 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtMapCursorMoved(self, event)
-    local unitModel = self:getModelUnit(event.gridIndex)
-    if (unitModel) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtPreviewModelUnit",
-            modelUnit = unitModel,
-        })
+    local gridIndex        = event.gridIndex
+    self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
+
+    local modelUnit = self:getModelUnit(gridIndex)
+    if (modelUnit) then
+        dispatchEvtPreviewModelUnit(self, modelUnit)
     else
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtPreviewNoModelUnit",
-            gridIndex = event.gridIndex,
-        })
+        dispatchEvtPreviewNoModelUnit(self, gridIndex)
     end
 end
 
 local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
-    local actorUnit = self:getActorUnit(gridIndex)
-    assert(actorUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
+    local modelUnit = self:getModelUnit(gridIndex)
+    assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
+
+    if (modelUnit.getLoadUnitIdList) then
+        for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
+            self.m_LoadedActorUnits[unitID]:getModel():unsetRootScriptEventDispatcher()
+            self.m_LoadedActorUnits[unitID] = nil
+        end
+    end
 
     setActorUnit(self, nil, gridIndex)
-    actorUnit:getModel():unsetRootScriptEventDispatcher()
+    modelUnit:getModel():unsetRootScriptEventDispatcher()
 end
 
 local function onEvtDestroyViewUnit(self, event)
     if (self.m_View) then
         self.m_View:removeViewUnit(event.gridIndex)
+    end
+end
+
+local function onEvtTurnPhaseMain(self, event)
+    local modelUnit = self:getModelUnit(self.m_CursorGridIndex)
+    if (modelUnit) then
+        dispatchEvtModelUnitUpdated(self, modelUnit)
+    else
+        dispatchEvtPreviewNoModelUnit(self, self.m_CursorGridIndex)
     end
 end
 
@@ -253,6 +301,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
+    self.m_CursorGridIndex = {x = 1, y = 1}
     initWithUnitActorsMap(self, createUnitActorsMap(param))
 
     if (self.m_View) then
@@ -295,6 +344,7 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtGridSelected",       self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
+        :addEventListener("EvtTurnPhaseMain",      self)
 
     local setEventDispatcher = function(modelUnit)
         modelUnit:setRootScriptEventDispatcher(dispatcher)
@@ -308,7 +358,8 @@ end
 function ModelUnitMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
+        :removeEventListener("EvtDestroyViewUnit",  self)
         :removeEventListener("EvtDestroyModelUnit", self)
         :removeEventListener("EvtGridSelected",     self)
         :removeEventListener("EvtMapCursorMoved",   self)
@@ -374,6 +425,8 @@ function ModelUnitMap:onEvent(event)
         onEvtDestroyModelUnit(self, event)
     elseif (name == "EvtDestroyViewUnit") then
         onEvtDestroyViewUnit(self, event)
+    elseif (name == "EvtTurnPhaseMain") then
+        onEvtTurnPhaseMain(self, event)
     end
 
     return self

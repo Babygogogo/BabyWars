@@ -17,11 +17,11 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function updateWithModelUnit(self, modelUnit)
-    self.m_ModelUnit = modelUnit
+local function updateWithModelUnit(self, modelUnit, loadedModelUnits)
+    self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
     if (self.m_View) then
-        self.m_View:updateWithModelUnit(modelUnit)
+        self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
             :setVisible(true)
     end
 end
@@ -32,7 +32,7 @@ end
 local function onEvtPreviewModelUnit(self, event)
     local modelUnit = event.modelUnit
     self.m_CursorGridIndex = GridIndexFunctions.clone(modelUnit:getGridIndex())
-    updateWithModelUnit(self, modelUnit)
+    updateWithModelUnit(self, modelUnit, event.loadedModelUnits)
 end
 
 local function onEvtPreviewNoModelUnit(self, event)
@@ -61,7 +61,7 @@ local function onEvtModelUnitUpdated(self, event)
             if (modelUnit:getCurrentHP() <= 0) then
                 self.m_View:setVisible(false)
             else
-                updateWithModelUnit(self, modelUnit)
+                updateWithModelUnit(self, modelUnit, event.loadedModelUnits)
             end
         end
     end
@@ -132,20 +132,13 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPreviewNoModelUnit") then
-        onEvtPreviewNoModelUnit(self, event)
-    elseif (eventName == "EvtPreviewModelUnit") then
-        onEvtPreviewModelUnit(self, event)
-    elseif (eventName == "EvtDestroyModelUnit") then
-        onEvtDestroyModelUnit(self, event)
-    elseif (eventName == "EvtModelUnitUpdated") then
-        onEvtModelUnitUpdated(self, event)
-    elseif (eventName == "EvtModelUnitProduced") then
-        onEvtModelUnitProduced(self, event)
-    elseif (eventName == "EvtTurnPhaseMain") then
-        onEvtTurnPhaseMain(self, event)
-    elseif (eventName == "EvtModelWeatherUpdated") then
-        onEvtModelWeatherUpdated(self, event)
+    if     (eventName == "EvtPreviewNoModelUnit")  then onEvtPreviewNoModelUnit( self, event)
+    elseif (eventName == "EvtPreviewModelUnit")    then onEvtPreviewModelUnit(   self, event)
+    elseif (eventName == "EvtDestroyModelUnit")    then onEvtDestroyModelUnit(   self, event)
+    elseif (eventName == "EvtModelUnitUpdated")    then onEvtModelUnitUpdated(   self, event)
+    elseif (eventName == "EvtModelUnitProduced")   then onEvtModelUnitProduced(  self, event)
+    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
+    elseif (eventName == "EvtModelWeatherUpdated") then onEvtModelWeatherUpdated(self, event)
     end
 
     return self
@@ -154,9 +147,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelUnitInfo:onPlayerTouch()
+function ModelUnitInfo:onPlayerTouch(index)
     if (self.m_ModelUnitDetail) then
-        self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnit, self.m_ModelPlayer, self.m_ModelWeather)
+        self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnitList[index], self.m_ModelPlayer, self.m_ModelWeather)
             :setEnabled(true)
     end
 

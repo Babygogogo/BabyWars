@@ -96,7 +96,6 @@ local function onEvtTurnPhaseRepairUnit(self, event)
             unit:setPrimaryWeaponCurrentAmmo(unit:getPrimaryWeaponMaxAmmo())
         end
         unit:updateView()
-        eventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = unit})
 
         modelPlayer:setFund(modelPlayer:getFund() - repairCost)
     end
