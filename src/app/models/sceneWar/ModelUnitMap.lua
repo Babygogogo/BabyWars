@@ -472,7 +472,7 @@ function ModelUnitMap:doActionDropModelUnit(action)
         dispatchEvtModelUnitUpdated(self, modelUnit, gridIndex)
     end
 
-    local focusModelUnit = self:getModelUnit(beginningGridIndex)
+    local focusModelUnit = self:getModelUnit(endingGridIndex)
     focusModelUnit:doActionDropModelUnit(action, droppingActorUnits)
     dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
 

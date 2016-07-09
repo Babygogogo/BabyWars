@@ -42,9 +42,13 @@ end
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function UnitLoader:toSerializableTable()
-    return {
-        loaded = self.m_LoadedUnitIds,
-    }
+    if (#self.m_LoadedUnitIds == 0) then
+        return nil
+    else
+        return {
+            loaded = self.m_LoadedUnitIds,
+        }
+    end
 end
 
 --------------------------------------------------------------------------------
