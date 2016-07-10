@@ -451,37 +451,42 @@ function ModelUnitMap:doActionSurrender(action)
     return self
 end
 
-function ModelUnitMap:doActionMoveModelUnit(action)
+
+function ModelUnitMap:doActionWait(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    if (not launchUnitID) then
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    else
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
         setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
-    self:getModelUnit(endingGridIndex):doActionMoveModelUnit(action)
 
-    return self
-end
-
-function ModelUnitMap:doActionWait(action)
-    self:doActionMoveModelUnit(action)
-
-    local path      = action.path
-    local modelUnit = self:getModelUnit(path[#path])
-    modelUnit:doActionWait(action)
-    dispatchEvtModelUnitUpdated(self, modelUnit, path[1])
+    local focusModelUnit = self:getModelUnit(endingGridIndex)
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionWait(action)
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
 
     return self
 end
 
 function ModelUnitMap:doActionAttack(action, attacker, target)
-    self:doActionMoveModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    attacker:doActionAttack(action, attacker, target)
-    dispatchEvtModelUnitUpdated(self, attacker, action.path[1])
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    attacker:doActionMoveModelUnit(action)
+        :doActionAttack(action, attacker, target)
+    dispatchEvtModelUnitUpdated(self, attacker, beginningGridIndex)
 
     if (target.getUnitType) then
         target:doActionAttack(action, attacker, target)
@@ -492,27 +497,46 @@ function ModelUnitMap:doActionAttack(action, attacker, target)
 end
 
 function ModelUnitMap:doActionCapture(action, capturer, target)
-    self:doActionMoveModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    capturer:doActionCapture(action, capturer, target)
-    dispatchEvtModelUnitUpdated(self, capturer, action.path[1])
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    capturer:doActionMoveModelUnit(action)
+        :doActionCapture(action, capturer, target)
+    dispatchEvtModelUnitUpdated(self, capturer, beginningGridIndex)
 
     return self
 end
 
 function ModelUnitMap:doActionLoadModelUnit(action)
-    local path = action.path
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit  = self:getModelUnit(beginningGridIndex)
-    local loaderModelUnit = self:getModelUnit(endingGridIndex)
-    local focusUnitID     = focusModelUnit:getUnitId()
+    local focusModelUnit
 
-    setActorUnitLoaded(self, beginningGridIndex)
-    focusModelUnit :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    if (launchUnitID) then
+        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+    else
+        focusModelUnit = self:getModelUnit(beginningGridIndex)
+        setActorUnitLoaded(self, beginningGridIndex)
+    end
+
+    local focusUnitID     = focusModelUnit:getUnitId()
+    local loaderModelUnit = self:getModelUnit(endingGridIndex)
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
 
-    dispatchEvtModelUnitUpdated(self, focusModelUnit,  beginningGridIndex)
-    dispatchEvtModelUnitUpdated(self, loaderModelUnit, endingGridIndex)
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
+    dispatchEvtModelUnitUpdated(self, loaderModelUnit)
 
     return self
 end

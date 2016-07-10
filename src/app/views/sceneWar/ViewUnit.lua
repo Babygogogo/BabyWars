@@ -263,7 +263,8 @@ function ViewUnit:showMovingAnimation()
 end
 
 function ViewUnit:moveAlongPath(path, callbackOnFinish)
-    self:showMovingAnimation()
+    self:setVisible(true)
+        :showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
         :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
 

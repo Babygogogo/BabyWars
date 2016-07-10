@@ -251,6 +251,16 @@ function ModelUnit:doActionMoveModelUnit(action)
     return self
 end
 
+function ModelUnit:doActionLaunchModelUnit(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionLaunchModelUnit) then
+            component:doActionLaunchModelUnit(action)
+        end
+    end
+
+    return self
+end
+
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
 
@@ -330,7 +340,7 @@ function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionLoadModelUnit) then
-            component:doActionLoadModelUnit(action, focusUnitID)
+            component:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
         end
     end
 

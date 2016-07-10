@@ -65,6 +65,10 @@ local function getTiledTileObjectLayer(tiledData)
     return layer
 end
 
+local function doActionMoveModelUnit(self, action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+end
+
 local function createEmptyMap(width)
     local map = {}
     for x = 1, width do
@@ -294,14 +298,8 @@ function ModelTileMap:doActionSurrender(action)
     return self
 end
 
-function ModelTileMap:doActionMoveModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-
-    return self
-end
-
 function ModelTileMap:doActionAttack(action, attacker, target)
-    self:doActionMoveModelUnit(action)
+    doActionMoveModelUnit(self, action)
     self:getModelTile(action.path[1])        :doActionAttack(action, attacker, target)
     self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
 
@@ -309,20 +307,21 @@ function ModelTileMap:doActionAttack(action, attacker, target)
 end
 
 function ModelTileMap:doActionCapture(action, capturer, target)
-    self:doActionMoveModelUnit(action)
+    doActionMoveModelUnit(self, action)
     target:doActionCapture(action, capturer, target)
 
     return self
 end
 
 function ModelTileMap:doActionWait(action)
-    self:doActionMoveModelUnit(action)
+    doActionMoveModelUnit(self, action)
     self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
 end
 
 function ModelTileMap:doActionLoadModelUnit(action)
+    doActionMoveModelUnit(self, action)
     self:getModelTile(action.path[1]):doActionLoadModelUnit(action)
 
     return self

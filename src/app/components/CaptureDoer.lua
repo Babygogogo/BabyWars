@@ -110,14 +110,6 @@ function CaptureDoer:doActionCapture(action, capturer, target)
     return self
 end
 
-function CaptureDoer:doActionLoadModelUnit(action, focusUnitID)
-    if (focusUnitID == self.m_Owner:getUnitId()) then
-        self.m_IsCapturing = false
-    end
-
-    return self
-end
-
 function CaptureDoer:doActionDropModelUnit(action)
     updateIsCapturingWithPath(self, action.path)
 

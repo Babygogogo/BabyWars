@@ -140,12 +140,6 @@ function CaptureTaker:doActionAttack(action, attacker, target)
     return self
 end
 
-function CaptureTaker:doActionLoadModelUnit(action)
-    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-
-    return self
-end
-
 function CaptureTaker:doActionDropModelUnit(action)
     local path = action.path
     if (isCapturerMovedAway(self.m_Owner:getGridIndex(), path[1], path[#path])) then
