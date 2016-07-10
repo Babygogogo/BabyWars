@@ -300,9 +300,10 @@ function ModelTileMap:doActionMoveModelUnit(action)
     return self
 end
 
-function ModelTileMap:doActionAttack(action)
-    self:getModelTile(action.path[1]):doActionAttack(action, false)
-    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
+function ModelTileMap:doActionAttack(action, attacker, target)
+    self:doActionMoveModelUnit(action)
+    self:getModelTile(action.path[1])        :doActionAttack(action, attacker, target)
+    self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
 
     return self
 end

@@ -238,20 +238,16 @@ function ModelWarField:doActionWait(action)
 end
 
 function ModelWarField:doActionAttack(action)
-    local modelUnitMap = self:getModelUnitMap()
-    local modelTileMap = self:getModelTileMap()
-    action.attacker = modelUnitMap:getModelUnit(action.path[1])
-
+    local modelUnitMap    = self:getModelUnitMap()
+    local modelTileMap    = self:getModelTileMap()
     local targetGridIndex = action.targetGridIndex
-    local targetUnit = modelUnitMap:getModelUnit(targetGridIndex)
-    if (targetUnit) then
-        action.target, action.targetType = targetUnit,                                 "unit"
-    else
-        action.target, action.targetType = modelTileMap:getModelTile(targetGridIndex), "tile"
-    end
+    local target          = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
+    local attacker        = (action.launchUnitID)                        and
+        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
+        (modelUnitMap:getModelUnit(action.path[1]))
 
-    modelUnitMap:doActionAttack(action)
-    modelTileMap:doActionAttack(action)
+    modelUnitMap:doActionAttack(action, attacker, target)
+    modelTileMap:doActionAttack(action, attacker, target)
 
     return self
 end

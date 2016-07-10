@@ -25,6 +25,34 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
+local function dispatchEvtDestroyViewUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtDestroyViewTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyViewTile",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtAttackViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtAttackViewTile",
+        gridIndex = gridIndex,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on EvtTurnPhaseResetUnitState.
 --------------------------------------------------------------------------------
@@ -242,47 +270,47 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action, isAttacker)
-    if (isAttacker) then
+function ModelUnit:doActionAttack(action, attacker, target)
+    if (self == attacker) then
         self:setStateActioned()
     end
 
-    local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
+    local shouldDestroyAttacker = attacker:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget   = target:getCurrentHP()   <= action.attackDamage
+    local eventDispatcher       = self.m_RootScriptEventDispatcher
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
-            component:doActionAttack(action, isAttacker)
+            component:doActionAttack(action, attacker, target)
         end
     end
 
-    if ((self.m_View) and (isAttacker)) then
+    if ((self.m_View) and (self == attacker)) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
-            if (action.target.updateView) then
-                action.target:updateView()
+            if (target.updateView) then
+                target:updateView()
             end
 
             if (shouldDestroyAttacker) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+                dispatchEvtDestroyViewUnit(eventDispatcher, attacker:getGridIndex())
             elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
+                dispatchEvtAttackViewUnit(eventDispatcher, attacker:getGridIndex())
             end
 
             if (shouldDestroyTarget) then
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
+                if (target.getUnitType) then
+                    dispatchEvtDestroyViewUnit(eventDispatcher, action.targetGridIndex)
                 else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                    dispatchEvtDestroyViewTile(eventDispatcher, action.targetGridIndex)
                 end
             else
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
+                if (action.getUnitType) then
+                    dispatchEvtAttackViewUnit(eventDispatcher, action.targetGridIndex)
                 else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
+                    dispatchEvtAttackViewTile(eventDispatcher, action.targetGridIndex)
                 end
             end
 

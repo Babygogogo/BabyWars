@@ -164,14 +164,6 @@ function FuelOwner:doActionMoveModelUnit(action)
     return self
 end
 
-function FuelOwner:doActionAttack(action, isAttacker)
-    if (isAttacker) then
-        self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-    end
-
-    return self
-end
-
 function FuelOwner:doActionCapture(action)
     self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
 

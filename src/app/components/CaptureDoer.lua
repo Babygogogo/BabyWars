@@ -104,14 +104,6 @@ function CaptureDoer:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function CaptureDoer:doActionAttack(action, isAttacker)
-    if (isAttacker) then
-        updateIsCapturingWithPath(self, action.path)
-    end
-
-    return self
-end
-
 function CaptureDoer:doActionCapture(action)
     self.m_IsCapturing = (self:getCaptureAmount() < action.nextTarget:getCurrentCapturePoint())
 

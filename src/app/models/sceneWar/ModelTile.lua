@@ -263,11 +263,10 @@ function ModelTile:doActionMoveModelUnit(action)
     return self
 end
 
-function ModelTile:doActionAttack(action, isAttacker)
-    assert(not isAttacker, "ModelTile:doActionAttack() the param is invalid.")
+function ModelTile:doActionAttack(action, attacker, target)
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionAttack) then
-            component:doActionAttack(action, isAttacker)
+            component:doActionAttack(action, attacker, target)
         end
     end
 

@@ -136,13 +136,10 @@ function CaptureTaker:doActionCapture(action)
     return self
 end
 
-function CaptureTaker:doActionAttack(action, isAttacker)
-    local path = action.path
-    local selfGridIndex = self.m_Owner:getGridIndex()
-
-    if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
-        (isCapturerDestroyed(selfGridIndex, action.attacker)) or
-        ((action.targetType == "unit") and (isCapturerDestroyed(selfGridIndex, action.target)))) then
+function CaptureTaker:doActionAttack(action, attacker, target)
+    local gridIndex = self.m_Owner:getGridIndex()
+    if ((isCapturerDestroyed(gridIndex, attacker))                           or
+        ((target.getUnitType) and (isCapturerDestroyed(gridIndex, target)))) then
         self.m_CurrentCapturePoint = self:getMaxCapturePoint()
     end
 

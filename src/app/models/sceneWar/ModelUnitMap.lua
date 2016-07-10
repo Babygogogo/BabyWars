@@ -477,16 +477,15 @@ function ModelUnitMap:doActionWait(action)
     return self
 end
 
-function ModelUnitMap:doActionAttack(action)
-    local path = action.path
-    swapActorUnit(self, path[1], path[#path])
+function ModelUnitMap:doActionAttack(action, attacker, target)
+    self:doActionMoveModelUnit(action)
 
-    action.attacker:doActionAttack(action, true)
-    dispatchEvtModelUnitUpdated(self, action.attacker, path[1])
+    attacker:doActionAttack(action, attacker, target)
+    dispatchEvtModelUnitUpdated(self, attacker, action.path[1])
 
-    if (action.targetType == "unit") then
-        action.target:doActionAttack(action, false)
-        dispatchEvtModelUnitUpdated(self, action.target)
+    if (target.getUnitType) then
+        target:doActionAttack(action, attacker, target)
+        dispatchEvtModelUnitUpdated(self, target)
     end
 
     return self
