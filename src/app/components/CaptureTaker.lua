@@ -120,17 +120,11 @@ function CaptureTaker:doActionMoveModelUnit(action)
     return self
 end
 
-function CaptureTaker:doActionCapture(action)
-    local modelTile       = self.m_Owner
-    local maxCapturePoint = self:getMaxCapturePoint()
-    if ((action.prevTarget) and (modelTile == action.prevTarget)) then
-        self.m_CurrentCapturePoint = maxCapturePoint
-    else
-        self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - action.capturer:getCaptureAmount(), 0)
-        if (self.m_CurrentCapturePoint <= 0) then
-            self.m_CurrentCapturePoint = maxCapturePoint
-            modelTile:updateWithPlayerIndex(action.capturer:getPlayerIndex())
-        end
+function CaptureTaker:doActionCapture(action, capturer, target)
+    self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - capturer:getCaptureAmount(), 0)
+    if (self.m_CurrentCapturePoint <= 0) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+        self.m_Owner:updateWithPlayerIndex(capturer:getPlayerIndex())
     end
 
     return self

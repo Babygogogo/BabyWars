@@ -275,10 +275,10 @@ function ModelTile:doActionAttack(action, attacker, target)
     return self
 end
 
-function ModelTile:doActionCapture(action)
+function ModelTile:doActionCapture(action, capturer, target)
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionCapture) then
-            component:doActionCapture(action)
+            component:doActionCapture(action, capturer, target)
         end
     end
 

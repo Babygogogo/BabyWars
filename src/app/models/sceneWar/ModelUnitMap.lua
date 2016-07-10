@@ -491,14 +491,11 @@ function ModelUnitMap:doActionAttack(action, attacker, target)
     return self
 end
 
-function ModelUnitMap:doActionCapture(action)
-    local path = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
+function ModelUnitMap:doActionCapture(action, capturer, target)
+    self:doActionMoveModelUnit(action)
 
-    local modelUnit = self:getModelUnit(endingGridIndex)
-    modelUnit:doActionCapture(action)
-    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
+    capturer:doActionCapture(action, capturer, target)
+    dispatchEvtModelUnitUpdated(self, capturer, action.path[1])
 
     return self
 end

@@ -308,11 +308,9 @@ function ModelTileMap:doActionAttack(action, attacker, target)
     return self
 end
 
-function ModelTileMap:doActionCapture(action)
-    if (action.prevTarget) then
-        action.prevTarget:doActionCapture(action)
-    end
-    action.nextTarget:doActionCapture(action)
+function ModelTileMap:doActionCapture(action, capturer, target)
+    self:doActionMoveModelUnit(action)
+    target:doActionCapture(action, capturer, target)
 
     return self
 end

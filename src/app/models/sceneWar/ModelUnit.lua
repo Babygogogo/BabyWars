@@ -381,12 +381,12 @@ function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
     return self
 end
 
-function ModelUnit:doActionCapture(action)
+function ModelUnit:doActionCapture(action, capturer, target)
     self:setStateActioned()
 
     for _, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.doActionCapture) then
-            component:doActionCapture(action)
+            component:doActionCapture(action, capturer, target)
         end
     end
 
@@ -394,7 +394,7 @@ function ModelUnit:doActionCapture(action)
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
-            action.nextTarget:updateView()
+            target:updateView()
 
             if (action.callbackOnCaptureAnimationEnded) then
                 action.callbackOnCaptureAnimationEnded()

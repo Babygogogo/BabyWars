@@ -104,8 +104,8 @@ function CaptureDoer:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function CaptureDoer:doActionCapture(action)
-    self.m_IsCapturing = (self:getCaptureAmount() < action.nextTarget:getCurrentCapturePoint())
+function CaptureDoer:doActionCapture(action, capturer, target)
+    self.m_IsCapturing = (self:getCaptureAmount() < target:getCurrentCapturePoint())
 
     return self
 end

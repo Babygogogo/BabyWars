@@ -164,12 +164,6 @@ function FuelOwner:doActionMoveModelUnit(action)
     return self
 end
 
-function FuelOwner:doActionCapture(action)
-    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-
-    return self
-end
-
 function FuelOwner:doActionLoadModelUnit(action, focusUnitID)
     if (self.m_Owner:getUnitId() == focusUnitID) then
         self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
