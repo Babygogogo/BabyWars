@@ -210,7 +210,7 @@ local function onEvtDestroyModelUnit(self, event)
     end
 
     setActorUnit(self, nil, gridIndex)
-    modelUnit:getModel():unsetRootScriptEventDispatcher()
+    modelUnit:unsetRootScriptEventDispatcher()
 end
 
 local function onEvtDestroyViewUnit(self, event)
@@ -254,7 +254,7 @@ local function createUnitActorsMapWithGridsData(gridsData, mapSize)
 
     for _, gridData in ipairs(gridsData) do
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
 
         map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
     end
@@ -451,14 +451,28 @@ function ModelUnitMap:doActionSurrender(action)
     return self
 end
 
-function ModelUnitMap:doActionWait(action)
-    local path = action.path
+function ModelUnitMap:doActionMoveModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
-    local modelUnit = self:getModelUnit(endingGridIndex)
+    if (not launchUnitID) then
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    else
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    end
+    self:getModelUnit(endingGridIndex):doActionMoveModelUnit(action)
+
+    return self
+end
+
+function ModelUnitMap:doActionWait(action)
+    self:doActionMoveModelUnit(action)
+
+    local path      = action.path
+    local modelUnit = self:getModelUnit(path[#path])
     modelUnit:doActionWait(action)
-    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
+    dispatchEvtModelUnitUpdated(self, modelUnit, path[1])
 
     return self
 end

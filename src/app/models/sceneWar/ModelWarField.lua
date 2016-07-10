@@ -259,8 +259,9 @@ end
 function ModelWarField:doActionCapture(action)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    local beginningGridIndex, endingGridIndex = action.path[1], action.path[#action.path]
     if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
         local prevTarget = modelTileMap:getModelTile(beginningGridIndex)
         if (prevTarget.getCurrentCapturePoint) then

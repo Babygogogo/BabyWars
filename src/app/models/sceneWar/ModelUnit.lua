@@ -213,6 +213,16 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelUnit:doActionMoveModelUnit(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionMoveModelUnit) then
+            component:doActionMoveModelUnit(action)
+        end
+    end
+
+    return self
+end
+
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
 

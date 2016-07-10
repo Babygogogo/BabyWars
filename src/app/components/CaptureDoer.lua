@@ -96,6 +96,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function CaptureDoer:doActionMoveModelUnit(action)
+    if (#action.path > 1) then
+        self.m_IsCapturing = false
+    end
+
+    return self.m_Owner
+end
+
 function CaptureDoer:doActionAttack(action, isAttacker)
     if (isAttacker) then
         updateIsCapturingWithPath(self, action.path)
@@ -106,12 +114,6 @@ end
 
 function CaptureDoer:doActionCapture(action)
     self.m_IsCapturing = (self:getCaptureAmount() < action.nextTarget:getCurrentCapturePoint())
-
-    return self
-end
-
-function CaptureDoer:doActionWait(action)
-    updateIsCapturingWithPath(self, action.path)
 
     return self
 end

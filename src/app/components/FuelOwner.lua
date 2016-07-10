@@ -158,7 +158,7 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function FuelOwner:doActionWait(action)
+function FuelOwner:doActionMoveModelUnit(action)
     self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
 
     return self

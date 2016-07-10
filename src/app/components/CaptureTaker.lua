@@ -110,6 +110,16 @@ function CaptureTaker:doActionSurrender(action)
     return self
 end
 
+function CaptureTaker:doActionMoveModelUnit(action)
+    if ((not action.launchUnitID)                                                   and
+        (#action.path > 1)                                                          and
+        (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    end
+
+    return self
+end
+
 function CaptureTaker:doActionCapture(action)
     local modelTile       = self.m_Owner
     local maxCapturePoint = self:getMaxCapturePoint()
@@ -133,15 +143,6 @@ function CaptureTaker:doActionAttack(action, isAttacker)
     if ((isCapturerMovedAway(selfGridIndex, path[1], path[#path])) or
         (isCapturerDestroyed(selfGridIndex, action.attacker)) or
         ((action.targetType == "unit") and (isCapturerDestroyed(selfGridIndex, action.target)))) then
-        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-    end
-
-    return self
-end
-
-function CaptureTaker:doActionWait(action)
-    local path = action.path
-    if (isCapturerMovedAway(self.m_Owner:getGridIndex(), path[1], path[#path])) then
         self.m_CurrentCapturePoint = self:getMaxCapturePoint()
     end
 

@@ -253,6 +253,16 @@ function ModelTile:doActionSurrender(action)
     return self
 end
 
+function ModelTile:doActionMoveModelUnit(action)
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.doActionMoveModelUnit) then
+            component:doActionMoveModelUnit(action)
+        end
+    end
+
+    return self
+end
+
 function ModelTile:doActionAttack(action, isAttacker)
     assert(not isAttacker, "ModelTile:doActionAttack() the param is invalid.")
     for _, component in pairs(ComponentManager.getAllComponents(self)) do

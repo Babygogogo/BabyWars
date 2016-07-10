@@ -294,6 +294,12 @@ function ModelTileMap:doActionSurrender(action)
     return self
 end
 
+function ModelTileMap:doActionMoveModelUnit(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+
+    return self
+end
+
 function ModelTileMap:doActionAttack(action)
     self:getModelTile(action.path[1]):doActionAttack(action, false)
     self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
@@ -311,6 +317,7 @@ function ModelTileMap:doActionCapture(action)
 end
 
 function ModelTileMap:doActionWait(action)
+    self:doActionMoveModelUnit(action)
     self:getModelTile(action.path[1]):doActionWait(action)
 
     return self
