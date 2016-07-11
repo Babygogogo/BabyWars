@@ -26,6 +26,8 @@
 
 local ComponentManager = {}
 
+local COMPONENT_PATH = "app.components."
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -42,7 +44,7 @@ end
 local function loadComponentClass(componentName)
     assert(type(componentName) == "string", string.format("ComponentManager--loadComponentClass() invalid component name \"%s\"", tostring(componentName)))
 
-    local cls = require("app.components." .. componentName)
+    local cls = require(COMPONENT_PATH .. componentName)
     assert(cls, string.format("ComponentManager--loadComponentClass() component \"%s\" load failed", componentName))
 
 --[[
@@ -122,6 +124,16 @@ end
 
 function ComponentManager.getAllComponents(target)
     return target.components_
+end
+
+function ComponentManager.callMethodForAllComponents(owner, methodName, ...)
+    for _, component in pairs(ComponentManager.getAllComponents(owner)) do
+        if (component[methodName]) then
+            component[methodName](component, ...)
+        end
+    end
+
+    return ComponentManager
 end
 
 function ComponentManager.setMethods(target, component, methods)

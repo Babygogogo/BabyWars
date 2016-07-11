@@ -167,12 +167,7 @@ function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnit:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.setRootScriptEventDispatcher) then
-            component:setRootScriptEventDispatcher(dispatcher)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "setRootScriptEventDispatcher", dispatcher)
 
     return self
 end
@@ -181,12 +176,7 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnit:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
     self.m_RootScriptEventDispatcher = nil
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.unsetRootScriptEventDispatcher) then
-            component:unsetRootScriptEventDispatcher()
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "unsetRootScriptEventDispatcher")
 
     return self
 end
@@ -242,21 +232,13 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelUnit:doActionMoveModelUnit(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionMoveModelUnit) then
-            component:doActionMoveModelUnit(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
 
     return self
 end
 
 function ModelUnit:doActionLaunchModelUnit(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionLaunchModelUnit) then
-            component:doActionLaunchModelUnit(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
 
     return self
 end
@@ -264,11 +246,7 @@ end
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionWait) then
-            component:doActionWait(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
@@ -289,11 +267,7 @@ function ModelUnit:doActionAttack(action, attacker, target)
     local shouldDestroyTarget   = target:getCurrentHP()   <= action.attackDamage
     local eventDispatcher       = self.m_RootScriptEventDispatcher
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionAttack) then
-            component:doActionAttack(action, attacker, target)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
 
     if ((self.m_View) and (self == attacker)) then
         self.m_View:moveAlongPath(action.path, function()
@@ -338,11 +312,7 @@ function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
         self:setStateActioned()
     end
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionLoadModelUnit) then
-            component:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action, focusUnitID, loaderModelUnit)
 
     if ((self:getUnitId() == focusUnitID) and (self.m_View)) then
         self.m_View:moveAlongPath(action.path, function()
@@ -362,11 +332,7 @@ function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
         return
     end
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionDropModelUnit) then
-            component:doActionDropModelUnit(action, droppingActorUnits)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, droppingActorUnits)
 
     if (self.m_View) then
         local path                  = action.path
@@ -380,9 +346,9 @@ function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
                 local dropModelUnit = dropActorUnit:getModel()
                 local dropViewUnit  = dropActorUnit:getView()
                 dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
-                        dropViewUnit:updateWithModelUnit(dropModelUnit)
-                            :showNormalAnimation()
-                    end)
+                    dropViewUnit:updateWithModelUnit(dropModelUnit)
+                        :showNormalAnimation()
+                end)
             end
         end)
     end
@@ -393,11 +359,7 @@ end
 function ModelUnit:doActionCapture(action, capturer, target)
     self:setStateActioned()
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionCapture) then
-            component:doActionCapture(action, capturer, target)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()

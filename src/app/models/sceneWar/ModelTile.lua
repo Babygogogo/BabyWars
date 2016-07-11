@@ -158,12 +158,7 @@ end
 function ModelTile:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelTile:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.setRootScriptEventDispatcher) then
-            component:setRootScriptEventDispatcher(dispatcher)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "setRootScriptEventDispatcher", dispatcher)
 
     return self
 end
@@ -171,12 +166,7 @@ end
 function ModelTile:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTile:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher = nil
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.unsetRootScriptEventDispatcher) then
-            component:unsetRootScriptEventDispatcher()
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "unsetRootScriptEventDispatcher")
 
     return self
 end
@@ -233,11 +223,7 @@ function ModelTile:doActionSurrender(action)
     if (self:getPlayerIndex() == action.lostPlayerIndex) then
         self:updateWithPlayerIndex(0)
     else
-        for _, component in pairs(ComponentManager.getAllComponents(self)) do
-            if (component.doActionSurrender) then
-                component:doActionSurrender(action)
-            end
-        end
+        ComponentManager.callMethodForAllComponents(self, "doActionSurrender", action)
     end
 
     self:updateView()
@@ -246,61 +232,37 @@ function ModelTile:doActionSurrender(action)
 end
 
 function ModelTile:doActionMoveModelUnit(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionMoveModelUnit) then
-            component:doActionMoveModelUnit(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
 
     return self
 end
 
 function ModelTile:doActionAttack(action, attacker, target)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionAttack) then
-            component:doActionAttack(action, attacker, target)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
 
     return self
 end
 
 function ModelTile:doActionCapture(action, capturer, target)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionCapture) then
-            component:doActionCapture(action, capturer, target)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
 
     return self
 end
 
 function ModelTile:doActionWait(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionWait) then
-            component:doActionWait(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
     return self
 end
 
 function ModelTile:doActionLoadModelUnit(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionLoadModelUnit) then
-            component:doActionLoadModelUnit(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
 
     return self
 end
 
 function ModelTile:doActionDropModelUnit(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionDropModelUnit) then
-            component:doActionDropModelUnit(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
 
     return self
 end
