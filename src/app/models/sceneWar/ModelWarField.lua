@@ -256,8 +256,10 @@ function ModelWarField:doActionCapture(action)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
-    local capturer     = modelUnitMap:getModelUnit(path[1])
     local target       = modelTileMap:getModelTile(path[#path])
+    local capturer     = (action.launchUnitID)                        and
+        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
+        (modelUnitMap:getModelUnit(path[1]))
 
     modelUnitMap:doActionCapture(action, capturer, target)
     modelTileMap:doActionCapture(action, capturer, target)

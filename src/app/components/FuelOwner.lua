@@ -164,12 +164,6 @@ function FuelOwner:doActionMoveModelUnit(action)
     return self
 end
 
-function FuelOwner:doActionDropModelUnit(action)
-    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

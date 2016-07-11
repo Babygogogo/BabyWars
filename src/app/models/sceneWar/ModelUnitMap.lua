@@ -542,9 +542,19 @@ function ModelUnitMap:doActionLoadModelUnit(action)
 end
 
 function ModelUnitMap:doActionDropModelUnit(action)
-    local path = action.path
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    local focusModelUnit
+
+    if (launchUnitID) then
+        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        focusModelUnit = self:getModelUnit(beginningGridIndex)
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
 
     local droppingActorUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
@@ -559,8 +569,8 @@ function ModelUnitMap:doActionDropModelUnit(action)
         dispatchEvtModelUnitUpdated(self, modelUnit, gridIndex)
     end
 
-    local focusModelUnit = self:getModelUnit(endingGridIndex)
-    focusModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionDropModelUnit(action, droppingActorUnits)
     dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
 
     return self

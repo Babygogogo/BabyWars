@@ -60,13 +60,6 @@ local ComponentManager      = require("global.components.ComponentManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtModelTileUpdated(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtModelTileUpdated",
-        modelTile = self,
-    })
-end
-
 local function initWithTiledID(self, objectID, baseID)
     self.m_InitialObjectID = self.m_InitialObjectID or objectID
     self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
@@ -248,7 +241,6 @@ function ModelTile:doActionSurrender(action)
     end
 
     self:updateView()
-    dispatchEvtModelTileUpdated(self)
 
     return self
 end
@@ -270,8 +262,6 @@ function ModelTile:doActionAttack(action, attacker, target)
         end
     end
 
-    dispatchEvtModelTileUpdated(self)
-
     return self
 end
 
@@ -281,8 +271,6 @@ function ModelTile:doActionCapture(action, capturer, target)
             component:doActionCapture(action, capturer, target)
         end
     end
-
-    dispatchEvtModelTileUpdated(self)
 
     return self
 end
@@ -294,8 +282,6 @@ function ModelTile:doActionWait(action)
         end
     end
 
-    dispatchEvtModelTileUpdated(self)
-
     return self
 end
 
@@ -306,8 +292,6 @@ function ModelTile:doActionLoadModelUnit(action)
         end
     end
 
-    dispatchEvtModelTileUpdated(self)
-
     return self
 end
 
@@ -317,8 +301,6 @@ function ModelTile:doActionDropModelUnit(action)
             component:doActionDropModelUnit(action)
         end
     end
-
-    dispatchEvtModelTileUpdated(self)
 
     return self
 end

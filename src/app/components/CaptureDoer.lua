@@ -110,12 +110,6 @@ function CaptureDoer:doActionCapture(action, capturer, target)
     return self
 end
 
-function CaptureDoer:doActionDropModelUnit(action)
-    updateIsCapturingWithPath(self, action.path)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
