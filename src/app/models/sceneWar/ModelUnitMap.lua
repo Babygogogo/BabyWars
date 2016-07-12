@@ -197,6 +197,10 @@ local function onEvtMapCursorMoved(self, event)
     end
 end
 
+local function onEvtGridSelected(self, event)
+    onEvtMapCursorMoved(self, event)
+end
+
 local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
     local modelUnit = self:getModelUnit(gridIndex)
@@ -418,15 +422,11 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if ((name == "EvtMapCursorMoved") or
-        (name == "EvtGridSelected")) then
-        onEvtMapCursorMoved(self, event)
-    elseif (name == "EvtDestroyModelUnit") then
-        onEvtDestroyModelUnit(self, event)
-    elseif (name == "EvtDestroyViewUnit") then
-        onEvtDestroyViewUnit(self, event)
-    elseif (name == "EvtTurnPhaseMain") then
-        onEvtTurnPhaseMain(self, event)
+    if     (name == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
+    elseif (name == "EvtGridSelected")        then onEvtGridSelected(       self, event)
+    elseif (name == "EvtDestroyModelUnit")    then onEvtDestroyModelUnit(   self, event)
+    elseif (name == "EvtDestroyViewUnit")     then onEvtDestroyViewUnit(    self, event)
+    elseif (name == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
     end
 
     return self

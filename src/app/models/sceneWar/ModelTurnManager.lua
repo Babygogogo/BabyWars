@@ -99,6 +99,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
         name         = "EvtTurnPhaseConsumeUnitFuel",
         playerIndex  = self.m_PlayerIndex,
         turnIndex    = self.m_TurnIndex,
+        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
     })
     self.m_TurnPhase = "repairUnit"
@@ -109,6 +110,15 @@ local function runTurnPhaseRepairUnit(self)
         name         = "EvtTurnPhaseRepairUnit",
         playerIndex  = self.m_PlayerIndex,
         modelTileMap = self.m_ModelWarField:getModelTileMap(),
+        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
+    })
+    self.m_TurnPhase = "supplyUnit"
+end
+
+local function runTurnPhaseSupplyUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtTurnPhaseSupplyUnit",
+        playerIndex  = self.m_PlayerIndex,
         modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
     })
     self.m_TurnPhase = "main"
@@ -278,37 +288,15 @@ function ModelTurnManager:getPlayerIndex()
 end
 
 function ModelTurnManager:runTurn()
-    if (self.m_TurnPhase == "beginning") then
-        runTurnPhaseBeginning(self)
-    end
-
-    if (self.m_TurnPhase == "getFund") then
-        runTurnPhaseGetFund(self)
-    end
-
-    if (self.m_TurnPhase == "consumeUnitFuel") then
-        runTurnPhaseConsumeUnitFuel(self)
-    end
-
-    if (self.m_TurnPhase == "repairUnit") then
-        runTurnPhaseRepairUnit(self)
-    end
-
-    if (self.m_TurnPhase == "main") then
-        runTurnPhaseMain(self)
-    end
-
-    if (self.m_TurnPhase == "resetUnitState") then
-        runTurnPhaseResetUnitState(self)
-    end
-
-    if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then
-        runTurnPhaseTickTurnAndPlayerIndex(self)
-    end
-
-    if (self.m_TurnPhase == "requestToBegin") then
-        runTurnPhaseRequestToBegin(self)
-    end
+    if (self.m_TurnPhase == "beginning")              then runTurnPhaseBeginning(self)              end
+    if (self.m_TurnPhase == "getFund")                then runTurnPhaseGetFund(self)                end
+    if (self.m_TurnPhase == "consumeUnitFuel")        then runTurnPhaseConsumeUnitFuel(self)        end
+    if (self.m_TurnPhase == "repairUnit")             then runTurnPhaseRepairUnit(self)             end
+    if (self.m_TurnPhase == "supplyUnit")             then runTurnPhaseSupplyUnit(self)             end
+    if (self.m_TurnPhase == "main")                   then runTurnPhaseMain(self)                   end
+    if (self.m_TurnPhase == "resetUnitState")         then runTurnPhaseResetUnitState(self)         end
+    if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then runTurnPhaseTickTurnAndPlayerIndex(self) end
+    if (self.m_TurnPhase == "requestToBegin")         then runTurnPhaseRequestToBegin(self)         end
 
     if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMain)) then
         self.m_CallbackOnEnterTurnPhaseMain()

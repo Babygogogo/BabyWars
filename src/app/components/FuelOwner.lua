@@ -39,7 +39,9 @@ end
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     local modelUnit = self.m_Owner
-    if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
+    if ((event.turnIndex > 1)                                                         and
+        (modelUnit:getPlayerIndex() == event.playerIndex)                             and
+        (not event.modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId()))) then
         self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
         modelUnit:updateView()
 

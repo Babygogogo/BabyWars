@@ -12,7 +12,27 @@ local EXPORTED_METHODS = {
     "canLoadModelUnit",
     "canDropModelUnit",
     "canLaunchModelUnit",
+    "canSupplyLoadedModelUnit",
 }
+
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtTurnPhaseSupplyUnit(self, event)
+    local modelUnitMap = event.modelUnitMap
+    if ((self.m_Owner:getPlayerIndex() == event.playerIndex) and
+        (self:canSupplyLoadedModelUnit()))                   then
+        for _, unitID in pairs(self:getLoadUnitIdList()) do
+            local modelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+            assert(modelUnit, "UnitLoader-onEvtTurnPhaseSupplyUnit() a unit is loaded in the loader, while is not loaded in ModelUnitMap.")
+
+            modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
+            if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
+                modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
+            end
+        end
+    end
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -34,6 +54,24 @@ end
 
 function UnitLoader:loadInstantialData(data)
     self.m_LoadedUnitIds = data.loaded
+
+    return self
+end
+
+function UnitLoader:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "UnitLoader:setRootScriptEventDispatcher() the dispatcher has been set.")
+
+    self.m_RootScriptEventDispatcher = dispatcher
+    dispatcher:addEventListener("EvtTurnPhaseSupplyUnit", self)
+
+    return self
+end
+
+function UnitLoader:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "UnitLoader:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseSupplyUnit", self)
+    self.m_RootScriptEventDispatcher = nil
 
     return self
 end
@@ -68,6 +106,17 @@ function UnitLoader:onUnbind()
 
     ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
     self.m_Owner = nil
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+function UnitLoader:onEvent(event)
+    if (event.name == "EvtTurnPhaseSupplyUnit") then
+        onEvtTurnPhaseSupplyUnit(self, event)
+    end
 
     return self
 end
@@ -156,6 +205,10 @@ end
 
 function UnitLoader:canLaunchModelUnit()
     return self.m_Template.canLaunch
+end
+
+function UnitLoader:canSupplyLoadedModelUnit()
+    return self.m_Template.canSupply
 end
 
 return UnitLoader
