@@ -362,20 +362,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelSceneWar:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces  = spaces .. "    "
-    local strList    = {spaces .. "return {\n"}
-
-    local appendList = require("app.utilities.TableFunctions").appendList
-    appendList(strList, self:getModelWarField()      :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelTurnManager()   :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelPlayerManager() :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelWeatherManager():toStringList(subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelSceneWar:toSerializableTable()
     return {
         fileName = self.m_FileName,

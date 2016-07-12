@@ -45,10 +45,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function GridIndexable:toStringList(spaces)
-    return {string.format("%sGridIndexable = {gridIndex = {x = %d, y = %d}}", spaces or "", self.m_GridIndex.x, self.m_GridIndex.y)}
-end
-
 function GridIndexable:toSerializableTable()
     return {
         gridIndex = {

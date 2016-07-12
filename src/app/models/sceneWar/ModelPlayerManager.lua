@@ -51,17 +51,6 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
-local function serializeModelPlayersToStringList(self, spaces)
-    local strList = {}
-    local appendList = TableFunctions.appendList
-
-    for _, modelPlayer in ipairs(self.m_ModelPlayers) do
-        appendList(strList, modelPlayer:toStringList(spaces), ",\n")
-    end
-
-    return strList
-end
-
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -138,16 +127,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
-function ModelPlayerManager:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "players = {\n"}
-
-    TableFunctions.appendList(strList, serializeModelPlayersToStringList(self, subSpaces), spaces .. "}")
-
-    return strList
-end
-
 function ModelPlayerManager:toSerializableTable()
     local t = {}
     self:forEachModelPlayer(function(modelPlayer, playerIndex)

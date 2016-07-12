@@ -95,15 +95,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function AttackTaker:toStringList(spaces)
-    local currentHP = self:getCurrentHP()
-    if (currentHP ~= self:getMaxHP()) then
-        return {string.format("%sAttackTaker = {currentHP = %d}", spaces, currentHP)}
-    else
-        return nil
-    end
-end
-
 function AttackTaker:toSerializableTable()
     local currentHP = self:getCurrentHP()
     if (currentHP == self:getMaxHP()) then

@@ -187,20 +187,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialzation.
 --------------------------------------------------------------------------------
-function AttackDoer:toStringList(spaces)
-    if ((not self:hasPrimaryWeapon()) or (self:getPrimaryWeaponCurrentAmmo() == self:getPrimaryWeaponMaxAmmo())) then
-        return nil
-    else
-        spaces = spaces or ""
-        local subSpaces = spaces .. "    "
-        return {
-            spaces .. "AttackDoer = {\n",
-            serializePrimaryWeapon(self, subSpaces),
-            "\n" .. spaces .. "}"
-        }
-    end
-end
-
 function AttackDoer:toSerializableTable()
     if ((not self:hasPrimaryWeapon()) or (self:getPrimaryWeaponCurrentAmmo() == self:getPrimaryWeaponMaxAmmo())) then
         return nil

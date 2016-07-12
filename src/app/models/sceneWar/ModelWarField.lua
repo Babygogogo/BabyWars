@@ -174,18 +174,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
-function ModelWarField:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "warField = {\n"}
-
-    local appendList = TableFunctions.appendList
-    appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelWarField:toSerializableTable()
     return {
         tileMap = self:getModelTileMap():toSerializableTable(),

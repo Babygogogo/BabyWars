@@ -56,18 +56,6 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
     end
 end
 
-local function serializeTurnIndexToStringList(self, spaces)
-    return {string.format('%sturnIndex = %d', spaces or "", self:getTurnIndex())}
-end
-
-local function serializePlayerIndexToStringList(self, spaces)
-    return {string.format('%splayerIndex = %d', spaces or "", self:getPlayerIndex())}
-end
-
-local function serializeTurnPhaseToStringList(self, spaces)
-    return {string.format('%sphase = %q', spaces or "", self:getTurnPhase())}
-end
-
 --------------------------------------------------------------------------------
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
@@ -211,19 +199,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
-function ModelTurnManager:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local appendList = TableFunctions.appendList
-
-    local strList = {spaces .. "turn = {\n"}
-    appendList(strList, serializeTurnIndexToStringList(  self, subSpaces), ",\n")
-    appendList(strList, serializePlayerIndexToStringList(self, subSpaces), ",\n")
-    appendList(strList, serializeTurnPhaseToStringList(  self, subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelTurnManager:toSerializableTable()
     return {
         turnIndex   = self:getTurnIndex(),

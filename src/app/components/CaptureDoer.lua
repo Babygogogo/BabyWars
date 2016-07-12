@@ -54,14 +54,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function CaptureDoer:toStringList(spaces)
-    if (self:isCapturing()) then
-        return {string.format("%sCaptureDoer = {isCapturing = true}", spaces or "")}
-    else
-        return nil
-    end
-end
-
 function CaptureDoer:toSerializableTable()
     if (not self:isCapturing()) then
         return nil

@@ -94,40 +94,6 @@ local function loadInstantialData(self, param)
     end
 end
 
-local function serializeObjectIdToStringList(self, spaces)
-    if (self.m_InitialObjectID == self.m_ObjectID) then
-        return nil
-    else
-        return {string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)}
-    end
-end
-
-local function serializeBaseIdToStringList(self, spaces)
-    if (self.m_InitialBaseID == self.m_BaseID) then
-        return nil
-    else
-        return {string.format("%sbaseID = %d", spaces or "", self.m_BaseID)}
-    end
-end
-
-local function serializeComponentsToStringList(self, spaces)
-    spaces = spaces or ""
-    local strList, componentsCount = {}, 0
-    local appendList = TableFunctions.appendList
-
-    for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toStringList) then
-            local componentStrList = component:toStringList(spaces)
-            if (componentStrList) then
-                appendList(strList, component:toStringList(spaces), ",\n")
-                componentsCount = componentsCount + 1
-            end
-        end
-    end
-
-    return strList, componentsCount
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -174,24 +140,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTile:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    local componentStrList, componentsCount = serializeComponentsToStringList(self, subSpaces)
-    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
-        return nil
-    else
-        local strList = {spaces .. "{\n"}
-        local appendList = TableFunctions.appendList
-        appendList(strList, serializeObjectIdToStringList(self, subSpaces), ",\n")
-        appendList(strList, serializeBaseIdToStringList(  self, subSpaces), ",\n")
-        appendList(strList, componentStrList,                               spaces .. "}")
-
-        return strList
-    end
-end
-
 function ModelTile:toSerializableTable()
     local t = {}
 

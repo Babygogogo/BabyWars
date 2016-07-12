@@ -105,40 +105,6 @@ local function loadInstantialData(self, param)
 end
 
 --------------------------------------------------------------------------------
--- The private functions for serialization.
---------------------------------------------------------------------------------
-local function serializeTiledIdToStringList(self, spaces)
-    return {string.format("%stiledID = %d", spaces, self:getTiledID())}
-end
-
-local function serializeUnitIdToStringList(self, spaces)
-    return {string.format("%sunitID = %d", spaces, self:getUnitId())}
-end
-
-local function serializeStateToStringList(self, spaces)
-    local state = self:getState()
-    if (state == "idle") then
-        return nil
-    else
-        return {string.format("%sstate = %q", spaces, state)}
-    end
-end
-
-local function serializeComponentsToStringList(self, spaces)
-    spaces = spaces or ""
-    local strList = {}
-    local appendList = TableFunctions.appendList
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toStringList) then
-            appendList(strList, component:toStringList(spaces), ",\n")
-        end
-    end
-
-    return strList
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
@@ -184,20 +150,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelUnit:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "{\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeTiledIdToStringList(   self, subSpaces), ",\n")
-    appendList(strList, serializeUnitIdToStringList(    self, subSpaces), ",\n")
-    appendList(strList, serializeStateToStringList(     self, subSpaces), ",\n")
-    appendList(strList, serializeComponentsToStringList(self, subSpaces), spaces .. "}")
-
-    return strList
-end
-
 function ModelUnit:toSerializableTable()
     local t = {}
     for name, component in pairs(ComponentManager.getAllComponents(self)) do

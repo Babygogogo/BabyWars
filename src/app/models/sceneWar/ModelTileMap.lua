@@ -117,27 +117,6 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
 end
 
 --------------------------------------------------------------------------------
--- The private functions for serialization.
---------------------------------------------------------------------------------
-local function serializeTemplateNameToStringList(self, spaces)
-    return {string.format("%stemplate = %q", spaces or "", self.m_TemplateName)}
-end
-
-local function serializeModelTilesToStringList(self, spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "grids = {\n"}
-    local appendList = TableFunctions.appendList
-
-    self:forEachModelTile(function(modelTile)
-        appendList(strList, modelTile:toStringList(subSpaces), ",\n")
-    end)
-    strList[#strList + 1] = spaces .. "}"
-
-    return strList
-end
-
---------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtMapCursorMoved(self, event)
@@ -254,18 +233,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTileMap:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "tileMap = {\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeTemplateNameToStringList(self, subSpaces), ",\n")
-    appendList(strList, serializeModelTilesToStringList(  self, subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelTileMap:toSerializableTable()
     local grids = {}
     self:forEachModelTile(function(modelTile)

@@ -153,36 +153,6 @@ local function dispatchEvtPreviewNoModelUnit(self, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The private functions for serialization.
---------------------------------------------------------------------------------
-local function serializeMapSizeToStringList(mapSize, spaces)
-    return {string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)}
-end
-
-local function serializeAvailableUnitIdToStringList(self, spaces)
-    return {string.format("%savailableUnitId = %d", spaces, self.m_AvailableUnitID)}
-end
-
-local function serializeModelUnitsOnMapToStringList(self, spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "grids = {\n"}
-    local appendList = TableFunctions.appendList
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        appendList(strList, modelUnit:toStringList(subSpaces), ",\n")
-    end)
-    strList[#strList + 1] = spaces .. "}"
-
-    return strList
-end
-
-local function serializeLoadedModelUnitsToStringList(self, spaces)
-    -- TODO: add code to do the job.
-    return {spaces .. "loaded = {}"}
-end
-
---------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtMapCursorMoved(self, event)
@@ -381,20 +351,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelUnitMap:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "unitMap = {\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeMapSizeToStringList(self:getMapSize(), subSpaces), ",\n")
-    appendList(strList, serializeAvailableUnitIdToStringList(self, subSpaces),      ",\n")
-    appendList(strList, serializeModelUnitsOnMapToStringList(self, subSpaces),      ",\n")
-    appendList(strList, serializeLoadedModelUnitsToStringList(self, subSpaces),     "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelUnitMap:toSerializableTable()
     local grids = {}
     self:forEachModelUnitOnMap(function(modelUnit)
