@@ -60,13 +60,6 @@ local ComponentManager      = require("global.components.ComponentManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtModelTileUpdated(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtModelTileUpdated",
-        modelTile = self,
-    })
-end
-
 local function initWithTiledID(self, objectID, baseID)
     self.m_InitialObjectID = self.m_InitialObjectID or objectID
     self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
@@ -101,40 +94,6 @@ local function loadInstantialData(self, param)
     end
 end
 
-local function serializeObjectIdToStringList(self, spaces)
-    if (self.m_InitialObjectID == self.m_ObjectID) then
-        return nil
-    else
-        return {string.format("%sobjectID = %d", spaces or "", self.m_ObjectID)}
-    end
-end
-
-local function serializeBaseIdToStringList(self, spaces)
-    if (self.m_InitialBaseID == self.m_BaseID) then
-        return nil
-    else
-        return {string.format("%sbaseID = %d", spaces or "", self.m_BaseID)}
-    end
-end
-
-local function serializeComponentsToStringList(self, spaces)
-    spaces = spaces or ""
-    local strList, componentsCount = {}, 0
-    local appendList = TableFunctions.appendList
-
-    for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toStringList) then
-            local componentStrList = component:toStringList(spaces)
-            if (componentStrList) then
-                appendList(strList, component:toStringList(spaces), ",\n")
-                componentsCount = componentsCount + 1
-            end
-        end
-    end
-
-    return strList, componentsCount
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -165,12 +124,7 @@ end
 function ModelTile:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelTile:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.setRootScriptEventDispatcher) then
-            component:setRootScriptEventDispatcher(dispatcher)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "setRootScriptEventDispatcher", dispatcher)
 
     return self
 end
@@ -178,12 +132,7 @@ end
 function ModelTile:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTile:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher = nil
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.unsetRootScriptEventDispatcher) then
-            component:unsetRootScriptEventDispatcher()
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "unsetRootScriptEventDispatcher")
 
     return self
 end
@@ -191,24 +140,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTile:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-
-    local componentStrList, componentsCount = serializeComponentsToStringList(self, subSpaces)
-    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
-        return nil
-    else
-        local strList = {spaces .. "{\n"}
-        local appendList = TableFunctions.appendList
-        appendList(strList, serializeObjectIdToStringList(self, subSpaces), ",\n")
-        appendList(strList, serializeBaseIdToStringList(  self, subSpaces), ",\n")
-        appendList(strList, componentStrList,                               spaces .. "}")
-
-        return strList
-    end
-end
-
 function ModelTile:toSerializableTable()
     local t = {}
 
@@ -240,52 +171,46 @@ function ModelTile:doActionSurrender(action)
     if (self:getPlayerIndex() == action.lostPlayerIndex) then
         self:updateWithPlayerIndex(0)
     else
-        for _, component in pairs(ComponentManager.getAllComponents(self)) do
-            if (component.doActionSurrender) then
-                component:doActionSurrender(action)
-            end
-        end
+        ComponentManager.callMethodForAllComponents(self, "doActionSurrender", action)
     end
 
     self:updateView()
-    dispatchEvtModelTileUpdated(self)
 
     return self
 end
 
-function ModelTile:doActionAttack(action, isAttacker)
-    assert(not isAttacker, "ModelTile:doActionAttack() the param is invalid.")
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionAttack) then
-            component:doActionAttack(action, isAttacker)
-        end
-    end
-
-    dispatchEvtModelTileUpdated(self)
+function ModelTile:doActionMoveModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
 
     return self
 end
 
-function ModelTile:doActionCapture(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionCapture) then
-            component:doActionCapture(action)
-        end
-    end
+function ModelTile:doActionAttack(action, attacker, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
 
-    dispatchEvtModelTileUpdated(self)
+    return self
+end
+
+function ModelTile:doActionCapture(action, capturer, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
 
     return self
 end
 
 function ModelTile:doActionWait(action)
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionWait) then
-            component:doActionWait(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
-    dispatchEvtModelTileUpdated(self)
+    return self
+end
+
+function ModelTile:doActionLoadModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
+
+    return self
+end
+
+function ModelTile:doActionDropModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
 
     return self
 end

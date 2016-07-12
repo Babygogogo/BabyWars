@@ -38,11 +38,12 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    local modelUnit = self.m_Target
-    if ((modelUnit:getPlayerIndex() == event.playerIndex) and (event.turnIndex > 1)) then
+    local modelUnit = self.m_Owner
+    if ((event.turnIndex > 1)                                                         and
+        (modelUnit:getPlayerIndex() == event.playerIndex)                             and
+        (not event.modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId()))) then
         self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
         modelUnit:updateView()
-        self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitUpdated", modelUnit = modelUnit})
 
         if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
             local gridIndex = modelUnit:getGridIndex()
@@ -104,15 +105,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function FuelOwner:toStringList(spaces)
-    local currentFuel = self:getCurrentFuel()
-    if (currentFuel ~= self:getMaxFuel()) then
-        return {string.format("%sFuelOwner = {current = %d}", spaces or "", currentFuel)}
-    else
-        return nil
-    end
-end
-
 function FuelOwner:toSerializableTable()
     local currentFuel = self:getCurrentFuel()
     if (currentFuel == self:getMaxFuel()) then
@@ -128,19 +120,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function FuelOwner:onBind(target)
-    assert(self.m_Target == nil, "FuelOwner:onBind() the FuelOwner has already bound a target.")
+    assert(self.m_Owner == nil, "FuelOwner:onBind() the FuelOwner has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function FuelOwner:onUnbind()
-    assert(self.m_Target, "FuelOwner:unbind() the component has not bound a target.")
+    assert(self.m_Owner, "FuelOwner:unbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -159,21 +151,7 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function FuelOwner:doActionWait(action)
-    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-
-    return self
-end
-
-function FuelOwner:doActionAttack(action, isAttacker)
-    if (isAttacker) then
-        self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-    end
-
-    return self
-end
-
-function FuelOwner:doActionCapture(action)
+function FuelOwner:doActionMoveModelUnit(action)
     self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
 
     return self

@@ -64,15 +64,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function LevelOwner:toStringList(spaces)
-    local level = self:getLevel()
-    if (level ~= 0) then
-        return {string.format("%sLevelOwner = {level = %d}", spaces, level)}
-    else
-        return nil
-    end
-end
-
 function LevelOwner:toSerializableTable()
     local level = self:getLevel()
     if (level == 0) then
@@ -88,19 +79,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function LevelOwner:onBind(target)
-    assert(self.m_Target == nil, "LevelOwner:onBind() the LevelOwner has already bound a target.")
+    assert(self.m_Owner == nil, "LevelOwner:onBind() the LevelOwner has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function LevelOwner:onUnbind()
-    assert(self.m_Target, "LevelOwner:unbind() the component has not bound a target.")
+    assert(self.m_Owner, "LevelOwner:unbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -108,14 +99,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function LevelOwner:doActionAttack(action, isAttacker)
+function LevelOwner:doActionAttack(action, attacker, target)
     if (self.m_Level < MAX_LEVEL) then
-        if (isAttacker) then
-            if ((action.targetType == "unit") and (action.attackDamage >= action.target:getCurrentHP())) then
+        if (self.m_Owner == attacker) then
+            if ((target.getUnitType) and (action.attackDamage >= target:getCurrentHP())) then
                 setLevel(self, self.m_Level + 1)
             end
         else
-            if (action.attacker:getCurrentHP() <= 0) then -- The hp for the attacker is already updated with the counter damage, so just compare it with 0
+            if (attacker:getCurrentHP() <= 0) then -- The hp for the attacker is already updated with the counter damage, so just compare it with 0
                 setLevel(self, self.m_Level + 1)
             end
         end

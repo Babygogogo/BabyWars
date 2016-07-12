@@ -185,6 +185,14 @@ local function doActionCapture(self, action)
     modelPlayerManager:doActionCapture(action)
 end
 
+local function doActionLoadModelUnit(self, action)
+    self:getModelWarField():doActionLoadModelUnit(action)
+end
+
+local function doActionDropModelUnit(self, action)
+    self:getModelWarField():doActionDropModelUnit(action)
+end
+
 local function doActionProduceOnTile(self, action)
     action.playerIndex = self:getModelTurnManager():getPlayerIndex()
 
@@ -197,30 +205,22 @@ end
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
-    if (actionName == "Logout") then
-        return doActionLogout(self, event)
-    elseif (actionName == "Message") then
-        return doActionMessage(self, event)
-    elseif (actionName == "Error") then
-        return error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
+    if     (actionName == "Logout")  then return doActionLogout( self, event)
+    elseif (actionName == "Message") then return doActionMessage(self, event)
+    elseif (actionName == "Error")   then return error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
     end
 
     if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
         return
-    elseif (actionName == "BeginTurn") then
-        return doActionBeginTurn(self, event)
-    elseif (actionName == "EndTurn") then
-        return doActionEndTurn(self, event)
-    elseif (actionName == "Surrender") then
-        return doActionSurrender(self, event)
-    elseif (actionName == "Wait") then
-        return doActionWait(self, event)
-    elseif (actionName == "Attack") then
-        return doActionAttack(self, event)
-    elseif (actionName == "Capture") then
-        return doActionCapture(self, event)
-    elseif (actionName == "ProduceOnTile") then
-        return doActionProduceOnTile(self, event)
+    elseif (actionName == "BeginTurn")     then return doActionBeginTurn(    self, event)
+    elseif (actionName == "EndTurn")       then return doActionEndTurn(      self, event)
+    elseif (actionName == "Surrender")     then return doActionSurrender(    self, event)
+    elseif (actionName == "Wait")          then return doActionWait(         self, event)
+    elseif (actionName == "Attack")        then return doActionAttack(       self, event)
+    elseif (actionName == "Capture")       then return doActionCapture(      self, event)
+    elseif (actionName == "LoadModelUnit") then return doActionLoadModelUnit(self, event)
+    elseif (actionName == "DropModelUnit") then return doActionDropModelUnit(self, event)
+    elseif (actionName == "ProduceOnTile") then return doActionProduceOnTile(self, event)
     else
         return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end
@@ -362,20 +362,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelSceneWar:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces  = spaces .. "    "
-    local strList    = {spaces .. "return {\n"}
-
-    local appendList = require("app.utilities.TableFunctions").appendList
-    appendList(strList, self:getModelWarField()      :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelTurnManager()   :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelPlayerManager() :toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelWeatherManager():toStringList(subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelSceneWar:toSerializableTable()
     return {
         fileName = self.m_FileName,

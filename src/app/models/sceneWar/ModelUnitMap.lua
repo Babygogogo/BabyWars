@@ -23,7 +23,8 @@ local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
 local TableFunctions     = require("app.utilities.TableFunctions")
 local Actor              = require("global.actors.Actor")
 
-local TEMPLATE_WAR_FIELD_PATH = "data.templateWarField."
+local TEMPLATE_WAR_FIELD_PATH          = "data.templateWarField."
+local GRID_INDEX_FOR_LOADED_MODEL_UNIT = {x = 0, y = 0}
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -39,22 +40,55 @@ local function requireMapData(param)
     end
 end
 
-local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name              = "EvtModelUnitUpdated",
-        modelUnit         = modelUnit,
-        previousGridIndex = previousGridIndex,
-    })
-end
-
 local function getTiledUnitLayer(tiledData)
     return tiledData.layers[3]
+end
+
+local function getLoadedActorUnitWithUnitId(self, unitID)
+    return self.m_LoadedActorUnits[unitID]
+end
+
+local function getLoadedModelUnits(self, loaderModelUnit)
+    if (not loaderModelUnit.getLoadUnitIdList) then
+        return nil
+    else
+        local list = {}
+        for _, unitID in ipairs(loaderModelUnit:getLoadUnitIdList()) do
+            list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
+        end
+
+        return list
+    end
 end
 
 local function setActorUnit(self, actor, gridIndex)
     self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actor
     if (actor) then
         actor:getModel():setGridIndex(gridIndex, false)
+    end
+end
+
+local function setActorUnitLoaded(self, gridIndex)
+    local focusActorUnit = self:getActorUnit(gridIndex)
+    local focusModelUnit = focusActorUnit:getModel()
+    local focusUnitID    = focusModelUnit:getUnitId()
+
+    self.m_LoadedActorUnits[focusUnitID] = focusActorUnit
+    focusModelUnit:setGridIndex(GRID_INDEX_FOR_LOADED_MODEL_UNIT, false)
+    setActorUnit(self, nil, gridIndex)
+
+    if (self.m_View) then
+        self.m_View:setViewUnitLoaded(gridIndex, focusUnitID)
+    end
+end
+
+local function setActorUnitUnloaded(self, unitID, gridIndex)
+    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+    self.m_LoadedActorUnits[unitID] = nil
+    setActorUnit(self, actorUnit, gridIndex)
+
+    if (self.m_View) then
+        self.m_View:setViewUnitUnloaded(gridIndex, unitID)
     end
 end
 
@@ -91,63 +125,80 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
 end
 
-local function serializeMapSizeToStringList(mapSize, spaces)
-    return {string.format("%smapSize = {width = %d, height = %d}", spaces, mapSize.width, mapSize.height)}
+--------------------------------------------------------------------------------
+-- The private functions for dispatching events.
+--------------------------------------------------------------------------------
+local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name              = "EvtModelUnitUpdated",
+        modelUnit         = modelUnit,
+        loadedModelUnits  = getLoadedModelUnits(self, modelUnit),
+        previousGridIndex = previousGridIndex,
+    })
 end
 
-local function serializeAvailableUnitIdToStringList(self, spaces)
-    return {string.format("%savailableUnitId = %d", spaces, self.m_AvailableUnitID)}
+local function dispatchEvtPreviewModelUnit(self, modelUnit)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name             = "EvtPreviewModelUnit",
+        modelUnit        = modelUnit,
+        loadedModelUnits = getLoadedModelUnits(self, modelUnit)
+    })
 end
 
-local function serializeModelUnitsOnMapToStringList(self, spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "grids = {\n"}
-    local appendList = TableFunctions.appendList
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        appendList(strList, modelUnit:toStringList(subSpaces), ",\n")
-    end)
-    strList[#strList + 1] = spaces .. "}"
-
-    return strList
-end
-
-local function serializeLoadedModelUnitsToStringList(self, spaces)
-    -- TODO: add code to do the job.
-    return {spaces .. "loaded = {}"}
+local function dispatchEvtPreviewNoModelUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtPreviewNoModelUnit",
+        gridIndex = gridIndex,
+    })
 end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtMapCursorMoved(self, event)
-    local unitModel = self:getModelUnit(event.gridIndex)
-    if (unitModel) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtPreviewModelUnit",
-            modelUnit = unitModel,
-        })
+    local gridIndex        = event.gridIndex
+    self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
+
+    local modelUnit = self:getModelUnit(gridIndex)
+    if (modelUnit) then
+        dispatchEvtPreviewModelUnit(self, modelUnit)
     else
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtPreviewNoModelUnit",
-            gridIndex = event.gridIndex,
-        })
+        dispatchEvtPreviewNoModelUnit(self, gridIndex)
     end
+end
+
+local function onEvtGridSelected(self, event)
+    onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
-    local actorUnit = self:getActorUnit(gridIndex)
-    assert(actorUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
+    local modelUnit = self:getModelUnit(gridIndex)
+    assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
+
+    if (modelUnit.getLoadUnitIdList) then
+        for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
+            self.m_LoadedActorUnits[unitID]:getModel():unsetRootScriptEventDispatcher()
+            self.m_LoadedActorUnits[unitID] = nil
+        end
+    end
 
     setActorUnit(self, nil, gridIndex)
-    actorUnit:getModel():unsetRootScriptEventDispatcher()
+    modelUnit:unsetRootScriptEventDispatcher()
 end
 
 local function onEvtDestroyViewUnit(self, event)
     if (self.m_View) then
         self.m_View:removeViewUnit(event.gridIndex)
+    end
+end
+
+local function onEvtTurnPhaseMain(self, event)
+    local modelUnit = self:getModelUnit(self.m_CursorGridIndex)
+    if (modelUnit) then
+        dispatchEvtModelUnitUpdated(self, modelUnit)
+    else
+        dispatchEvtPreviewNoModelUnit(self, self.m_CursorGridIndex)
     end
 end
 
@@ -177,7 +228,7 @@ local function createUnitActorsMapWithGridsData(gridsData, mapSize)
 
     for _, gridData in ipairs(gridsData) do
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelTileMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
 
         map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
     end
@@ -190,14 +241,18 @@ local function createUnitActorsMapWithTemplate(mapData)
     local templateMapData = requireMapData(mapData.template)
     local map, mapSize, availableUnitId = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
 
-    return map, mapSize, availableUnitId
+    return map, mapSize, availableUnitId, {}
 end
 
 local function createUnitActorsMapWithoutTemplate(mapData)
     -- If the map is created without template, then we build the map with mapData.grids only.
     local map = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
+    local loadedActorUnits = {}
+    for unitID, unitData in pairs(mapData.loaded or {}) do
+        loadedActorUnits[unitID] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit", unitData)
+    end
 
-    return map, mapData.mapSize, mapData.availableUnitId
+    return map, mapData.mapSize, mapData.availableUnitId, loadedActorUnits
 end
 
 local function createUnitActorsMap(param)
@@ -209,16 +264,18 @@ local function createUnitActorsMap(param)
     end
 end
 
-local function initWithUnitActorsMap(self, map, mapSize, unitID)
-    self.m_UnitActorsMap   = map
-    self.m_MapSize         = mapSize
-    self.m_AvailableUnitID = unitID
+local function initWithUnitActorsMap(self, map, mapSize, unitID, loadedActorUnits)
+    self.m_UnitActorsMap    = map
+    self.m_MapSize          = mapSize
+    self.m_AvailableUnitID  = unitID
+    self.m_LoadedActorUnits = loadedActorUnits
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
+    self.m_CursorGridIndex = {x = 1, y = 1}
     initWithUnitActorsMap(self, createUnitActorsMap(param))
 
     if (self.m_View) then
@@ -246,6 +303,10 @@ function ModelUnitMap:initView()
         end
     end
 
+    for unitID, actorUnit in pairs(self.m_LoadedActorUnits) do
+        view:addLoadedViewUnit(unitID, actorUnit:getView())
+    end
+
     return self
 end
 
@@ -257,12 +318,13 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtGridSelected",       self)
         :addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
+        :addEventListener("EvtTurnPhaseMain",      self)
 
-    self:forEachModelUnitOnMap(function(modelUnit)
+    local setEventDispatcher = function(modelUnit)
         modelUnit:setRootScriptEventDispatcher(dispatcher)
-    end)
-
-    -- TODO: set dispatcher for the loaded units.
+    end
+    self:forEachModelUnitOnMap(setEventDispatcher)
+        :forEachModelUnitLoaded(setEventDispatcher)
 
     return self
 end
@@ -270,17 +332,18 @@ end
 function ModelUnitMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
+        :removeEventListener("EvtDestroyViewUnit",  self)
         :removeEventListener("EvtDestroyModelUnit", self)
         :removeEventListener("EvtGridSelected",     self)
         :removeEventListener("EvtMapCursorMoved",   self)
     self.m_RootScriptEventDispatcher = nil
 
-    self:forEachModelUnitOnMap(function(modelUnit)
+    local unsetEventDispatcher = function(modelUnit)
         modelUnit:unsetRootScriptEventDispatcher()
-    end)
-
-    -- TODO: unset dispatcher for the loaded units.
+    end
+    self:forEachModelUnitOnMap(unsetEventDispatcher)
+        :forEachModelUnitLoaded(unsetEventDispatcher)
 
     return self
 end
@@ -288,28 +351,16 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelUnitMap:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "unitMap = {\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeMapSizeToStringList(self:getMapSize(), subSpaces), ",\n")
-    appendList(strList, serializeAvailableUnitIdToStringList(self, subSpaces),      ",\n")
-    appendList(strList, serializeModelUnitsOnMapToStringList(self, subSpaces),      ",\n")
-    appendList(strList, serializeLoadedModelUnitsToStringList(self, subSpaces),     "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelUnitMap:toSerializableTable()
     local grids = {}
     self:forEachModelUnitOnMap(function(modelUnit)
         grids[#grids + 1] = modelUnit:toSerializableTable()
     end)
 
-    -- TODO: serialize the loaded units.
     local loaded = {}
+    for unitID, actorUnit in pairs(self.m_LoadedActorUnits) do
+        loaded[unitID] = actorUnit:getModel():toSerializableTable()
+    end
 
     return {
         mapSize        = {
@@ -327,13 +378,11 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if ((name == "EvtMapCursorMoved") or
-        (name == "EvtGridSelected")) then
-        onEvtMapCursorMoved(self, event)
-    elseif (name == "EvtDestroyModelUnit") then
-        onEvtDestroyModelUnit(self, event)
-    elseif (name == "EvtDestroyViewUnit") then
-        onEvtDestroyViewUnit(self, event)
+    if     (name == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
+    elseif (name == "EvtGridSelected")        then onEvtGridSelected(       self, event)
+    elseif (name == "EvtDestroyModelUnit")    then onEvtDestroyModelUnit(   self, event)
+    elseif (name == "EvtDestroyViewUnit")     then onEvtDestroyViewUnit(    self, event)
+    elseif (name == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
     end
 
     return self
@@ -358,41 +407,127 @@ function ModelUnitMap:doActionSurrender(action)
     return self
 end
 
-function ModelUnitMap:doActionWait(action)
-    local path = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
-    local modelUnit = self:getModelUnit(endingGridIndex)
-    modelUnit:doActionWait(action)
-    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
+function ModelUnitMap:doActionWait(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    local focusModelUnit = self:getModelUnit(endingGridIndex)
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionWait(action)
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
 
     return self
 end
 
-function ModelUnitMap:doActionAttack(action)
-    local path = action.path
-    swapActorUnit(self, path[1], path[#path])
+function ModelUnitMap:doActionAttack(action, attacker, target)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
 
-    action.attacker:doActionAttack(action, true)
-    dispatchEvtModelUnitUpdated(self, action.attacker, path[1])
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
 
-    if (action.targetType == "unit") then
-        action.target:doActionAttack(action, false)
-        dispatchEvtModelUnitUpdated(self, action.target)
+    attacker:doActionMoveModelUnit(action)
+        :doActionAttack(action, attacker, target)
+    dispatchEvtModelUnitUpdated(self, attacker, beginningGridIndex)
+
+    if (target.getUnitType) then
+        target:doActionAttack(action, attacker, target)
+        dispatchEvtModelUnitUpdated(self, target)
     end
 
     return self
 end
 
-function ModelUnitMap:doActionCapture(action)
-    local path = action.path
+function ModelUnitMap:doActionCapture(action, capturer, target)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    swapActorUnit(self, beginningGridIndex, endingGridIndex)
 
-    local modelUnit = self:getModelUnit(endingGridIndex)
-    modelUnit:doActionCapture(action)
-    dispatchEvtModelUnitUpdated(self, modelUnit, beginningGridIndex)
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    capturer:doActionMoveModelUnit(action)
+        :doActionCapture(action, capturer, target)
+    dispatchEvtModelUnitUpdated(self, capturer, beginningGridIndex)
+
+    return self
+end
+
+function ModelUnitMap:doActionLoadModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    local focusModelUnit
+
+    if (launchUnitID) then
+        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+    else
+        focusModelUnit = self:getModelUnit(beginningGridIndex)
+        setActorUnitLoaded(self, beginningGridIndex)
+    end
+
+    local focusUnitID     = focusModelUnit:getUnitId()
+    local loaderModelUnit = self:getModelUnit(endingGridIndex)
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
+    dispatchEvtModelUnitUpdated(self, loaderModelUnit)
+
+    return self
+end
+
+function ModelUnitMap:doActionDropModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    local focusModelUnit
+
+    if (launchUnitID) then
+        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        focusModelUnit = self:getModelUnit(beginningGridIndex)
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    local droppingActorUnits = {}
+    for _, dropDestination in ipairs(action.dropDestinations) do
+        local unitID    = dropDestination.unitID
+        local gridIndex = dropDestination.gridIndex
+        local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+        local modelUnit = actorUnit:getModel()
+
+        droppingActorUnits[#droppingActorUnits + 1] = actorUnit
+        setActorUnitUnloaded(self, unitID, gridIndex)
+        modelUnit:doActionDropModelUnit(action)
+        dispatchEvtModelUnitUpdated(self, modelUnit, gridIndex)
+    end
+
+    focusModelUnit:doActionMoveModelUnit(action)
+        :doActionDropModelUnit(action, droppingActorUnits)
+    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
 
     return self
 end
@@ -438,6 +573,11 @@ function ModelUnitMap:getModelUnit(gridIndex)
     return unitActor and unitActor:getModel() or nil
 end
 
+function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
 function ModelUnitMap:forEachModelUnitOnMap(func)
     local mapSize = self:getMapSize()
     for x = 1, mapSize.width do
@@ -447,6 +587,14 @@ function ModelUnitMap:forEachModelUnitOnMap(func)
                 func(actorUnit:getModel())
             end
         end
+    end
+
+    return self
+end
+
+function ModelUnitMap:forEachModelUnitLoaded(func)
+    for _, actorUnit in pairs(self.m_LoadedActorUnits) do
+        func(actorUnit:getModel())
     end
 
     return self

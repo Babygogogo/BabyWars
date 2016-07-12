@@ -174,18 +174,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
-function ModelWarField:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "warField = {\n"}
-
-    local appendList = TableFunctions.appendList
-    appendList(strList, self:getModelTileMap():toStringList(subSpaces), ",\n")
-    appendList(strList, self:getModelUnitMap():toStringList(subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelWarField:toSerializableTable()
     return {
         tileMap = self:getModelTileMap():toSerializableTable(),
@@ -238,20 +226,16 @@ function ModelWarField:doActionWait(action)
 end
 
 function ModelWarField:doActionAttack(action)
-    local modelUnitMap = self:getModelUnitMap()
-    local modelTileMap = self:getModelTileMap()
-    action.attacker = modelUnitMap:getModelUnit(action.path[1])
-
+    local modelUnitMap    = self:getModelUnitMap()
+    local modelTileMap    = self:getModelTileMap()
     local targetGridIndex = action.targetGridIndex
-    local targetUnit = modelUnitMap:getModelUnit(targetGridIndex)
-    if (targetUnit) then
-        action.target, action.targetType = targetUnit,                                 "unit"
-    else
-        action.target, action.targetType = modelTileMap:getModelTile(targetGridIndex), "tile"
-    end
+    local target          = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
+    local attacker        = (action.launchUnitID)                        and
+        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
+        (modelUnitMap:getModelUnit(action.path[1]))
 
-    modelUnitMap:doActionAttack(action)
-    modelTileMap:doActionAttack(action)
+    modelUnitMap:doActionAttack(action, attacker, target)
+    modelTileMap:doActionAttack(action, attacker, target)
 
     return self
 end
@@ -259,19 +243,28 @@ end
 function ModelWarField:doActionCapture(action)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
+    local path         = action.path
+    local target       = modelTileMap:getModelTile(path[#path])
+    local capturer     = (action.launchUnitID)                        and
+        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
+        (modelUnitMap:getModelUnit(path[1]))
 
-    local beginningGridIndex, endingGridIndex = action.path[1], action.path[#action.path]
-    if (not GridIndexFunctions.isEqual(beginningGridIndex, endingGridIndex)) then
-        local prevTarget = modelTileMap:getModelTile(beginningGridIndex)
-        if (prevTarget.getCurrentCapturePoint) then
-            action.prevTarget = prevTarget
-        end
-    end
-    action.nextTarget = modelTileMap:getModelTile(endingGridIndex)
-    action.capturer   = modelUnitMap:getModelUnit(beginningGridIndex)
+    modelUnitMap:doActionCapture(action, capturer, target)
+    modelTileMap:doActionCapture(action, capturer, target)
 
-    modelUnitMap:doActionCapture(action)
-    modelTileMap:doActionCapture(action)
+    return self
+end
+
+function ModelWarField:doActionLoadModelUnit(action)
+    self:getModelUnitMap():doActionLoadModelUnit(action)
+    self:getModelTileMap():doActionLoadModelUnit(action)
+
+    return self
+end
+
+function ModelWarField:doActionDropModelUnit(action)
+    self:getModelUnitMap():doActionDropModelUnit(action)
+    self:getModelTileMap():doActionDropModelUnit(action)
 
     return self
 end

@@ -27,6 +27,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewUnitMap:ctor(param)
+    self.m_LoadedViewUnit = {}
+
     return self
 end
 
@@ -47,6 +49,14 @@ function ViewUnitMap:addViewUnit(view, gridIndex)
     assert(not self:getViewUnit(gridIndex), "ViewUnitMap:addViewUnit() there's a view in the gridIndex already.")
 
     setViewUnit(self, view, gridIndex)
+    self:addChild(view)
+
+    return self
+end
+
+function ViewUnitMap:addLoadedViewUnit(unitID, view)
+    self.m_LoadedViewUnit[unitID] = view
+    view:setVisible(false)
     self:addChild(view)
 
     return self
@@ -85,6 +95,23 @@ function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
     local view1, view2 = self:getViewUnit(gridIndex1), self:getViewUnit(gridIndex2)
     setViewUnit(self, view1, gridIndex2)
     setViewUnit(self, view2, gridIndex1)
+
+    return self
+end
+
+function ViewUnitMap:setViewUnitLoaded(gridIndex, unitID)
+    self.m_LoadedViewUnit[unitID] = self:getViewUnit(gridIndex)
+    self.m_Map[gridIndex.x][gridIndex.y] = nil
+
+    return self
+end
+
+function ViewUnitMap:setViewUnitUnloaded(gridIndex, unitID)
+    local viewUnit = self.m_LoadedViewUnit[unitID]
+    assert(viewUnit, "ViewUnitMap:setViewUnitUnloaded() the target view doesn't exist.")
+
+    self.m_LoadedViewUnit[unitID] = nil
+    self.m_Map[gridIndex.x][gridIndex.y] = viewUnit
 
     return self
 end

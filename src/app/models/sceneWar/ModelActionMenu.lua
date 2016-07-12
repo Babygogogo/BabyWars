@@ -50,6 +50,7 @@ function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtActionPlannerMakingMovePath",           self)
         :addEventListener("EvtActionPlannerChoosingAction",           self)
         :addEventListener("EvtActionPlannerChoosingAttackTarget",     self)
+        :addEventListener("EvtActionPlannerChoosingDropDestination",  self)
 
     return self
 end
@@ -57,7 +58,8 @@ end
 function ModelActionMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAttackTarget", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingDropDestination", self)
+        :removeEventListener("EvtActionPlannerChoosingAttackTarget", self)
         :removeEventListener("EvtActionPlannerChoosingAction",           self)
         :removeEventListener("EvtActionPlannerMakingMovePath",           self)
         :removeEventListener("EvtActionPlannerChoosingProductionTarget", self)
@@ -74,7 +76,8 @@ function ModelActionMenu:onEvent(event)
     local eventName = event.name
     if ((eventName == "EvtActionPlannerIdle") or
         (eventName == "EvtActionPlannerMakingMovePath") or
-        (eventName == "EvtActionPlannerChoosingAttackTarget")) then
+        (eventName == "EvtActionPlannerChoosingAttackTarget") or
+        (eventName == "EvtActionPlannerChoosingDropDestination")) then
         self:setEnabled(false)
     elseif (eventName == "EvtActionPlannerChoosingProductionTarget") then
         onEvtActionPlannerChoosingProductionTarget(self, event)

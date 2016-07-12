@@ -35,6 +35,23 @@ local EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function dispatchEvtDestroyModelUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtDestroyModelUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtDestroyModelTile(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtDestroyModelTile",
+        gridIndex = gridIndex,
+    })
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function AttackTaker:ctor(param)
@@ -78,15 +95,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function AttackTaker:toStringList(spaces)
-    local currentHP = self:getCurrentHP()
-    if (currentHP ~= self:getMaxHP()) then
-        return {string.format("%sAttackTaker = {currentHP = %d}", spaces, currentHP)}
-    else
-        return nil
-    end
-end
-
 function AttackTaker:toSerializableTable()
     local currentHP = self:getCurrentHP()
     if (currentHP == self:getMaxHP()) then
@@ -102,19 +110,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function AttackTaker:onBind(target)
-    assert(self.m_Target == nil, "AttackTaker:onBind() the component has already bound a target.")
+    assert(self.m_Owner == nil, "AttackTaker:onBind() the component has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function AttackTaker:onUnbind()
-    assert(self.m_Target ~= nil, "AttackTaker:onUnbind() the component has not bound a target.")
+    assert(self.m_Owner ~= nil, "AttackTaker:onUnbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -122,19 +130,20 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function AttackTaker:doActionAttack(action, isAttacker)
-    if (isAttacker) then
+function AttackTaker:doActionAttack(action, attacker, target)
+    local owner = self.m_Owner
+    if (owner == attacker) then
         self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
         if (self:getCurrentHP() <= 0) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+            dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
         end
     else
         self:setCurrentHP(math.max(self:getCurrentHP() - action.attackDamage, 0))
         if (self:getCurrentHP() <= 0) then
-            if (action.targetType == "unit") then
-                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = self.m_Target:getGridIndex()})
+            if (owner.getUnitType) then
+                dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
             else
-                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelTile", gridIndex = self.m_Target:getGridIndex()})
+                dispatchEvtDestroyModelTile(self, owner:getGridIndex())
             end
         end
     end
@@ -157,7 +166,7 @@ function AttackTaker:setCurrentHP(hp)
     assert((hp >= 0) and (hp <= math.max(UNIT_MAX_HP, TILE_MAX_HP)) and (hp == math.floor(hp)), "AttackTaker:setCurrentHP() the param hp is invalid.")
     self.m_CurrentHP = hp
 
-    return self.m_Target
+    return self.m_Owner
 end
 
 function AttackTaker:getNormalizedCurrentHP()

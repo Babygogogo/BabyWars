@@ -54,14 +54,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function CaptureDoer:toStringList(spaces)
-    if (self:isCapturing()) then
-        return {string.format("%sCaptureDoer = {isCapturing = true}", spaces or "")}
-    else
-        return nil
-    end
-end
-
 function CaptureDoer:toSerializableTable()
     if (not self:isCapturing()) then
         return nil
@@ -76,19 +68,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function CaptureDoer:onBind(target)
-    assert(self.m_Target == nil, "CaptureDoer:onBind() the component has already bound a target.")
+    assert(self.m_Owner == nil, "CaptureDoer:onBind() the component has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function CaptureDoer:onUnbind()
-    assert(self.m_Target ~= nil, "CaptureDoer:onUnbind() the component has not bound a target.")
+    assert(self.m_Owner ~= nil, "CaptureDoer:onUnbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -96,22 +88,16 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function CaptureDoer:doActionAttack(action, isAttacker)
-    if (isAttacker) then
-        updateIsCapturingWithPath(self, action.path)
+function CaptureDoer:doActionMoveModelUnit(action)
+    if (#action.path > 1) then
+        self.m_IsCapturing = false
     end
 
-    return self
+    return self.m_Owner
 end
 
-function CaptureDoer:doActionCapture(action)
-    self.m_IsCapturing = (self:getCaptureAmount() < action.nextTarget:getCurrentCapturePoint())
-
-    return self
-end
-
-function CaptureDoer:doActionWait(action)
-    updateIsCapturingWithPath(self, action.path)
+function CaptureDoer:doActionCapture(action, capturer, target)
+    self.m_IsCapturing = (self:getCaptureAmount() < target:getCurrentCapturePoint())
 
     return self
 end
@@ -124,11 +110,11 @@ function CaptureDoer:isCapturing()
 end
 
 function CaptureDoer:canCapture(modelTile)
-    return (self.m_Target:getPlayerIndex() ~= modelTile:getPlayerIndex() and (modelTile.getCurrentCapturePoint))
+    return (self.m_Owner:getPlayerIndex() ~= modelTile:getPlayerIndex() and (modelTile.getCurrentCapturePoint))
 end
 
 function CaptureDoer:getCaptureAmount()
-    return self.m_Target:getNormalizedCurrentHP()
+    return self.m_Owner:getNormalizedCurrentHP()
 end
 
 return CaptureDoer

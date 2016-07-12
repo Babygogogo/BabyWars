@@ -65,6 +65,20 @@ local function getTiledTileObjectLayer(tiledData)
     return layer
 end
 
+local function dispatchEvtModelTileUpdated(self, ...)
+    local isEqual         = GridIndexFunctions.isEqual
+    local cursorGridIndex = self.m_CursorGridIndex
+    for _, gridIndex in pairs({...}) do
+        if (isEqual(cursorGridIndex, gridIndex)) then
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name      = "EvtModelTileUpdated",
+                modelTile = self:getModelTile(cursorGridIndex),
+            })
+            return
+        end
+    end
+end
+
 local function createEmptyMap(width)
     local map = {}
     for x = 1, width do
@@ -102,24 +116,6 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
     end
 end
 
-local function serializeTemplateNameToStringList(self, spaces)
-    return {string.format("%stemplate = %q", spaces or "", self.m_TemplateName)}
-end
-
-local function serializeModelTilesToStringList(self, spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "grids = {\n"}
-    local appendList = TableFunctions.appendList
-
-    self:forEachModelTile(function(modelTile)
-        appendList(strList, modelTile:toStringList(subSpaces), ",\n")
-    end)
-    strList[#strList + 1] = spaces .. "}"
-
-    return strList
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
@@ -127,6 +123,7 @@ local function onEvtMapCursorMoved(self, event)
     local modelTile = self:getModelTile(event.gridIndex)
     assert(modelTile, "ModelTileMap-onEvtMapCursorMoved() failed to get the tile model with event.gridIndex.")
 
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name      = "EvtPreviewModelTile",
         modelTile = modelTile
@@ -176,6 +173,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileMap:ctor(param)
+    self.m_CursorGridIndex = {x = 1, y = 1}
     initWithTileActorsMap(self, createTileActorsMap(param))
 
     if (self.m_View) then
@@ -235,18 +233,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelTileMap:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "tileMap = {\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeTemplateNameToStringList(self, subSpaces), ",\n")
-    appendList(strList, serializeModelTilesToStringList(  self, subSpaces), "\n" .. spaces .. "}")
-
-    return strList
-end
-
 function ModelTileMap:toSerializableTable()
     local grids = {}
     self:forEachModelTile(function(modelTile)
@@ -291,27 +277,53 @@ function ModelTileMap:doActionSurrender(action)
         self:getModelTile(gridIndex):doActionSurrender(action)
     end
 
-    return self
-end
-
-function ModelTileMap:doActionAttack(action)
-    self:getModelTile(action.path[1]):doActionAttack(action, false)
-    self:getModelTile(action.target:getGridIndex()):doActionAttack(action, false)
+    dispatchEvtModelTileUpdated(self, self.m_CursorGridIndex)
 
     return self
 end
 
-function ModelTileMap:doActionCapture(action)
-    if (action.prevTarget) then
-        action.prevTarget:doActionCapture(action)
-    end
-    action.nextTarget:doActionCapture(action)
+function ModelTileMap:doActionAttack(action, attacker, target)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+        :doActionAttack(action, attacker, target)
+    self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
+
+    dispatchEvtModelTileUpdated(self, action.path[1], action.targetGridIndex)
+
+    return self
+end
+
+function ModelTileMap:doActionCapture(action, capturer, target)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+    target:doActionCapture(action, capturer, target)
+
+    dispatchEvtModelTileUpdated(self, action.path[1], target:getGridIndex())
 
     return self
 end
 
 function ModelTileMap:doActionWait(action)
-    self:getModelTile(action.path[1]):doActionWait(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+        :doActionWait(action)
+
+    dispatchEvtModelTileUpdated(self, action.path[1])
+
+    return self
+end
+
+function ModelTileMap:doActionLoadModelUnit(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+        :doActionLoadModelUnit(action)
+
+    dispatchEvtModelTileUpdated(self, action.path[1])
+
+    return self
+end
+
+function ModelTileMap:doActionDropModelUnit(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+        :doActionDropModelUnit(action)
+
+    dispatchEvtModelTileUpdated(self, action.path[1])
 
     return self
 end

@@ -75,7 +75,12 @@ local function createViewAction(itemModel)
                 itemModel.callback()
             end
         end)
-    view:getRendererNormal():addChild(label)
+
+    local renderer = view:getRendererNormal()
+    renderer:addChild(label)
+    if (itemModel.icon) then
+        renderer:addChild(itemModel.icon)
+    end
 
     return view
 end
@@ -119,7 +124,7 @@ local function createProductionConfirmButton(callback)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(25)
         :setTitleColor(BUTTON_CONFIRM_FONT_COLOR)
-        :setTitleText(LocalizationFunctions.getLocalizedText(86))
+        :setTitleText(LocalizationFunctions.getLocalizedText(79))
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then

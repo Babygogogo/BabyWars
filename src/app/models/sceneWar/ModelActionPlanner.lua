@@ -21,6 +21,7 @@ local MovePathFunctions           = require("app.utilities.MovePathFunctions")
 local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
 local WebSocketManager            = require("app.utilities.WebSocketManager")
 local LocalizationFunctions       = require("app.utilities.LocalizationFunctions")
+local Actor                       = require("global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -44,10 +45,100 @@ local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
         return true
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        return (not existingModelUnit) or
-               (existingModelUnit:canJoin(modelUnit)) or
-               (existingModelUnit.canLoad and existingModelUnit:canLoad(modelUnit))
+        return ((not existingModelUnit) or
+                -- TODO: enable to join the model unit.
+                -- (modelUnit:canJoinModelUnit(existingModelUnit)) or
+                (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit)))
     end
+end
+
+local function isGridInDroppableGrids(gridIndex, droppableGrids)
+    for _, droppableGridIndex in pairs(droppableGrids) do
+        if (GridIndexFunctions.isEqual(gridIndex, droppableGridIndex)) then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function isGridInDropDestinations(gridIndex, dropDestinations)
+    for _, dropDestination in pairs(dropDestinations) do
+        if (GridIndexFunctions.isEqual(gridIndex, dropDestination.gridIndex)) then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function getDroppableGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations)
+    local moveType = droppingModelUnit:getMoveType()
+    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCost(moveType)) then
+        return {}
+    end
+
+    local mapSize        = modelTileMap:getMapSize()
+    local droppableGrids = {}
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(loaderEndingGridIndex)) do
+        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize)) and
+            (modelTileMap:getModelTile(gridIndex):getMoveCost(moveType)) and
+            (not isGridInDropDestinations(gridIndex, dropDestinations))) then
+
+            if ((not modelUnitMap:getModelUnit(gridIndex)) or
+                (GridIndexFunctions.isEqual(gridIndex, loaderBeginningGridIndex))) then
+                droppableGrids[#droppableGrids + 1] = gridIndex
+            end
+        end
+    end
+
+    return droppableGrids
+end
+
+local function pushBackDropDestination(dropDestinations, unitID, destination, modelUnit)
+    dropDestinations[#dropDestinations + 1] = {
+        unitID    = unitID,
+        gridIndex = destination,
+        modelUnit = modelUnit,
+    }
+end
+
+local function popBackDropDestination(dropDestinations)
+    local dropDestination = dropDestinations[#dropDestinations]
+    dropDestinations[#dropDestinations] = nil
+
+    return dropDestination
+end
+
+local function isModelUnitDropped(unitID, dropDestinations)
+    for _, dropDestination in pairs(dropDestinations) do
+        if (unitID == dropDestination.unitID) then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function canDoAdditionalDropAction(self)
+    local focusModelUnit   = self.m_FocusModelUnit
+    local dropDestinations = self.m_DropDestinations
+    if (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) then
+        return false
+    end
+
+    local modelUnitMap             = self.m_ModelUnitMap
+    local modelTileMap             = self.m_ModelTileMap
+    local loaderBeginningGridIndex = focusModelUnit:getGridIndex()
+    local loaderEndingGridIndex    = self.m_PathDestination
+    for _, unitID in pairs(focusModelUnit:getLoadUnitIdList()) do
+        if ((not isModelUnitDropped(unitID, dropDestinations)) and
+            (#getDroppableGrids(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0)) then
+            return true
+        end
+    end
+
+    return false
 end
 
 --------------------------------------------------------------------------------
@@ -96,8 +187,12 @@ end
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
-local function dispatchEventJoin(self)
-    print("The Join action is selected, but not implemented.")
+local function dispatchEventJoinModelUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "JoinModelUnit",
+        path       = self.m_MovePath,
+    })
 end
 
 local function dispatchEventAttack(self, targetGridIndex)
@@ -134,43 +229,92 @@ local function dispatchEventProduceOnTile(self, gridIndex, tiledID)
     })
 end
 
+local function dispatchEventLoadModelUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "LoadModelUnit",
+        path       = self.m_MovePath,
+    })
+end
+
+local function dispatchEventDropModelUnit(self)
+    local dropDestinations = {}
+    for _, dropDestination in ipairs(self.m_DropDestinations) do
+        dropDestinations[#dropDestinations + 1] = {
+            unitID    = dropDestination.unitID,
+            gridIndex = dropDestination.gridIndex,
+        }
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name             = "EvtPlayerRequestDoAction",
+        actionName       = "DropModelUnit",
+        path             = self.m_MovePath,
+        dropDestinations = dropDestinations,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The functions for avaliable action list.
 --------------------------------------------------------------------------------
-local setStateIdle, setStateChoosingProductionTarget, setStateMakingMovePath, setStateChoosingAction, setStateChoosingAttackTarget
+local setStateIdle
+local setStateChoosingProductionTarget
+local setStateMakingMovePath
+local setStateChoosingAction
+local setStateChoosingAttackTarget
+local setStateChoosingDropDestination
+local setStateChoosingAdditionalDropAction
 
-local function getActionJoin(self, destination)
-    if (not GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
-        local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
-        if (existingUnitModel and existingUnitModel:canJoin(self.m_FocusModelUnit)) then
+local function getActionJoinModelUnit(self)
+    local destination = self.m_PathDestination
+    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
+        return nil
+    else
+        local existingModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
+        if ((existingModelUnit) and (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
             return {
-                name     = LocalizationFunctions.getLocalizedText(81),
+                name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
                 callback = function()
-                    dispatchEventJoin(self)
+                    dispatchEventJoinModelUnit(self)
                 end
             }
         end
-    else
-        return nil
     end
 end
 
-local function getActionAttack(self, destination)
+local function getActionLoadModelUnit(self)
+    local destination = self.m_PathDestination
+    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
+        return nil
+    else
+        local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
+        if ((loaderModelUnit) and (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+            return {
+                name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
+                callback = function()
+                    dispatchEventLoadModelUnit(self)
+                end
+            }
+        end
+    end
+end
+
+local function getActionAttack(self)
     if (#self.m_AttackableGridList > 0) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78),
+            name     = LocalizationFunctions.getLocalizedText(78, "Attack"),
             callback = function()
-                setStateChoosingAttackTarget(self, destination)
+                setStateChoosingAttackTarget(self, self.m_PathDestination)
             end
         }
     end
 end
 
-local function getActionCapture(self, destination)
-    local modelTile = self.m_ModelTileMap:getModelTile(destination)
+local function getActionCapture(self)
+    local modelTile = self.m_ModelTileMap:getModelTile(self.m_PathDestination)
     if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(79),
+            name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
             callback = function()
                 dispatchEventCapture(self)
             end,
@@ -180,11 +324,11 @@ local function getActionCapture(self, destination)
     end
 end
 
-local function getActionWait(self, destination)
-    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(destination)
+local function getActionWait(self)
+    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(self.m_PathDestination)
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(80),
+            name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
             callback = function()
                 dispatchEventWait(self)
             end
@@ -194,18 +338,82 @@ local function getActionWait(self, destination)
     end
 end
 
-local function getAvaliableActionList(self, destination)
-    local actionJoin = getActionJoin(self, destination)
+local function getSingleActionDropModelUnit(self, unitID)
+    local icon = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID))
+    icon:ignoreAnchorPointForPosition(true)
+        :setScale(0.5)
+
+    return {
+        name     = LocalizationFunctions.getLocalizedText(78, "DropModelUnit"),
+        icon     = icon,
+        callback = function()
+            setStateChoosingDropDestination(self, unitID)
+        end,
+    }
+end
+
+local function getActionsDropModelUnit(self)
+    local focusModelUnit   = self.m_FocusModelUnit
+    local dropDestinations = self.m_DropDestinations
+
+    if ((not focusModelUnit.getCurrentLoadCount) or
+        (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) or
+        (not focusModelUnit:canDropModelUnit())) then
+        return {}
+    end
+
+    local actions = {}
+    local loaderBeginningGridIndex = self.m_FocusModelUnit:getGridIndex()
+    local loaderEndingGridIndex    = self.m_PathDestination
+    local modelUnitMap             = self.m_ModelUnitMap
+    local modelTileMap             = self.m_ModelTileMap
+
+    for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
+        if (not isModelUnitDropped(unitID, dropDestinations)) then
+            local droppingModelUnit = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+            if (#getDroppableGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0) then
+                actions[#actions + 1] = getSingleActionDropModelUnit(self, unitID)
+            end
+        end
+    end
+
+    return actions
+end
+
+local function getAvaliableActionList(self)
+    local actionJoin = getActionJoinModelUnit(self)
     if (actionJoin) then
         return {actionJoin}
     end
+    local actionLoad = getActionLoadModelUnit(self)
+    if (actionLoad) then
+        return {actionLoad}
+    end
 
     local list = {}
-    list[#list + 1] = getActionAttack( self, destination)
-    list[#list + 1] = getActionCapture(self, destination)
-    list[#list + 1] = getActionWait(   self, destination)
+    list[#list + 1] = getActionAttack( self)
+    list[#list + 1] = getActionCapture(self)
+    for _, action in ipairs(getActionsDropModelUnit(self)) do
+        list[#list + 1] = action
+    end
+    list[#list + 1] = getActionWait(   self)
 
     assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
+    return list
+end
+
+local function getAdditionalDropActionList(self)
+    local list = {}
+    for _, action in ipairs(getActionsDropModelUnit(self)) do
+        list[#list + 1] = action
+    end
+    list[#list + 1] = {
+        name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
+        callback = function()
+            dispatchEventDropModelUnit(self)
+        end,
+    }
+
     return list
 end
 
@@ -213,14 +421,18 @@ end
 -- The set state functions.
 --------------------------------------------------------------------------------
 setStateIdle = function(self)
-    self.m_State          = "idle"
-    self.m_FocusModelUnit = nil
+    self.m_State            = "idle"
+    self.m_FocusModelUnit   = nil
+    self.m_DropDestinations = {}
 
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible(false)
-            :setAttackableGridsVisible(false)
-            :setMovePathVisible(false)
-            :setMovePathDestinationVisible(false)
+        self.m_View:setReachableGridsVisible( false)
+            :setAttackableGridsVisible(       false)
+            :setMovePathVisible(              false)
+            :setMovePathDestinationVisible(   false)
+            :setDroppableGridsVisible(        false)
+            :setPreviewDropDestinationVisible(false)
+            :setDropDestinationsVisible(      false)
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
@@ -261,8 +473,8 @@ end
 
 setStateChoosingAction = function(self, destination)
     updateMovePathWithDestinationGrid(self, destination)
-    self.m_Destination        = destination or self.m_Destination
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, self.m_Destination, self.m_ModelTileMap, self.m_ModelUnitMap)
+    self.m_PathDestination        = destination or self.m_PathDestination
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, self.m_PathDestination, self.m_ModelTileMap, self.m_ModelUnitMap)
     self.m_State              = "choosingAction"
 
     if (self.m_View) then
@@ -270,11 +482,17 @@ setStateChoosingAction = function(self, destination)
             :setAttackableGridsVisible(false)
             :setMovePath(self.m_MovePath)
             :setMovePathVisible(true)
-            :setMovePathDestination(self.m_Destination)
+            :setMovePathDestination(self.m_PathDestination)
             :setMovePathDestinationVisible(true)
+            :setDroppableGridsVisible(false)
+            :setPreviewDropDestinationVisible(false)
+            :setDropDestinationsVisible(false)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAction", list = getAvaliableActionList(self, destination)})
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name = "EvtActionPlannerChoosingAction",
+        list = getAvaliableActionList(self)
+    })
 end
 
 setStateChoosingAttackTarget = function(self, destination)
@@ -286,6 +504,40 @@ setStateChoosingAttackTarget = function(self, destination)
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAttackTarget"})
+end
+
+setStateChoosingDropDestination = function(self, unitID)
+    self.m_State = "choosingDropDestination"
+
+    local droppingModelUnit = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    self.m_DroppableGrids   = getDroppableGrids(droppingModelUnit, self.m_FocusModelUnit:getGridIndex(), self.m_PathDestination, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_DropDestinations)
+    self.m_DroppingUnitID   = unitID
+
+    if (self.m_View) then
+        self.m_View:setDroppableGrids(self.m_DroppableGrids)
+            :setDroppableGridsVisible(true)
+            :setDropDestinations(self.m_DropDestinations)
+            :setDropDestinationsVisible(true)
+            :setPreviewDropDestinationVisible(false)
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingDropDestination"})
+end
+
+setStateChoosingAdditionalDropAction = function(self)
+    self.m_State = "choosingAdditionalDropAction"
+
+    if (self.m_View) then
+        self.m_View:setDroppableGridsVisible( false)
+            :setPreviewDropDestinationVisible(false)
+            :setDropDestinations(self.m_DropDestinations)
+            :setDropDestinationsVisible(true)
+    end
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name = "EvtActionPlannerChoosingAction",
+        list = getAdditionalDropActionList(self),
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -335,6 +587,15 @@ local function onEvtMapCursorMoved(self, event)
         else
             self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
         end
+    elseif (state == "choosingDropDestination") then
+        if (self.m_View) then
+            if (isGridInDroppableGrids(gridIndex, self.m_DroppableGrids)) then
+                self.m_View:setPreviewDropDestination(gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
+                    :setPreviewDropDestinationVisible(true)
+            else
+                self.m_View:setPreviewDropDestinationVisible(false)
+            end
+        end
     end
 end
 
@@ -374,8 +635,25 @@ local function onEvtGridSelected(self, event)
         if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
             dispatchEventAttack(self, gridIndex)
         else
-            setStateChoosingAction(self, self.m_Destination)
+            setStateChoosingAction(self, self.m_PathDestination)
         end
+    elseif (state == "choosingDropDestination") then
+        if (not isGridInDroppableGrids(gridIndex, self.m_DroppableGrids)) then
+            if (#self.m_DropDestinations == 0) then
+                setStateChoosingAction(self, self.m_PathDestination)
+            else
+                setStateChoosingAdditionalDropAction(self)
+            end
+        else
+            pushBackDropDestination(self.m_DropDestinations, self.m_DroppingUnitID, gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
+            if (not canDoAdditionalDropAction(self)) then
+                dispatchEventDropModelUnit(self)
+            else
+                setStateChoosingAdditionalDropAction(self)
+            end
+        end
+    elseif (state == "choosingAdditionalDropAction") then
+        setStateChoosingDropDestination(self, popBackDropDestination(self.m_DropDestinations).unitID)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
@@ -385,7 +663,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    self.m_State = "idle"
+    self.m_State            = "idle"
+    self.m_DropDestinations = {}
 
     return self
 end

@@ -19,10 +19,38 @@ local TableFunctions        = require("app.utilities.TableFunctions")
 local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
--- The set state functions.
+-- The util functions.
 --------------------------------------------------------------------------------
 local function setStateIdle(self)
     self.m_State = "idle"
+end
+
+local function dispatchEvtDestroyViewUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtDestroyViewTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyViewTile",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtAttackViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtAttackViewTile",
+        gridIndex = gridIndex,
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -77,40 +105,6 @@ local function loadInstantialData(self, param)
 end
 
 --------------------------------------------------------------------------------
--- The private functions for serialization.
---------------------------------------------------------------------------------
-local function serializeTiledIdToStringList(self, spaces)
-    return {string.format("%stiledID = %d", spaces, self:getTiledID())}
-end
-
-local function serializeUnitIdToStringList(self, spaces)
-    return {string.format("%sunitID = %d", spaces, self:getUnitId())}
-end
-
-local function serializeStateToStringList(self, spaces)
-    local state = self:getState()
-    if (state == "idle") then
-        return nil
-    else
-        return {string.format("%sstate = %q", spaces, state)}
-    end
-end
-
-local function serializeComponentsToStringList(self, spaces)
-    spaces = spaces or ""
-    local strList = {}
-    local appendList = TableFunctions.appendList
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toStringList) then
-            appendList(strList, component:toStringList(spaces), ",\n")
-        end
-    end
-
-    return strList
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
@@ -139,12 +133,7 @@ function ModelUnit:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnit:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.setRootScriptEventDispatcher) then
-            component:setRootScriptEventDispatcher(dispatcher)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "setRootScriptEventDispatcher", dispatcher)
 
     return self
 end
@@ -153,12 +142,7 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnit:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
     self.m_RootScriptEventDispatcher = nil
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.unsetRootScriptEventDispatcher) then
-            component:unsetRootScriptEventDispatcher()
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "unsetRootScriptEventDispatcher")
 
     return self
 end
@@ -166,20 +150,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function ModelUnit:toStringList(spaces)
-    spaces = spaces or ""
-    local subSpaces = spaces .. "    "
-    local strList = {spaces .. "{\n"}
-    local appendList = TableFunctions.appendList
-
-    appendList(strList, serializeTiledIdToStringList(   self, subSpaces), ",\n")
-    appendList(strList, serializeUnitIdToStringList(    self, subSpaces), ",\n")
-    appendList(strList, serializeStateToStringList(     self, subSpaces), ",\n")
-    appendList(strList, serializeComponentsToStringList(self, subSpaces), spaces .. "}")
-
-    return strList
-end
-
 function ModelUnit:toSerializableTable()
     local t = {}
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
@@ -213,14 +183,22 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelUnit:doActionMoveModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+
+    return self
+end
+
+function ModelUnit:doActionLaunchModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
+
+    return self
+end
+
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionWait) then
-            component:doActionWait(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
@@ -232,47 +210,43 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action, isAttacker)
-    if (isAttacker) then
+function ModelUnit:doActionAttack(action, attacker, target)
+    if (self == attacker) then
         self:setStateActioned()
     end
 
-    local rootScriptEventDispatcher = self.m_RootScriptEventDispatcher
-    local shouldDestroyAttacker     = self:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget       = action.target:getCurrentHP() <= action.attackDamage
+    local shouldDestroyAttacker = attacker:getCurrentHP() <= (action.counterDamage or 0)
+    local shouldDestroyTarget   = target:getCurrentHP()   <= action.attackDamage
+    local eventDispatcher       = self.m_RootScriptEventDispatcher
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionAttack) then
-            component:doActionAttack(action, isAttacker)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
 
-    if ((self.m_View) and (isAttacker)) then
+    if ((self.m_View) and (self == attacker)) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
-            if (action.target.updateView) then
-                action.target:updateView()
+            if (target.updateView) then
+                target:updateView()
             end
 
             if (shouldDestroyAttacker) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = self:getGridIndex()})
+                dispatchEvtDestroyViewUnit(eventDispatcher, attacker:getGridIndex())
             elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
-                rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = self:getGridIndex()})
+                dispatchEvtAttackViewUnit(eventDispatcher, attacker:getGridIndex())
             end
 
             if (shouldDestroyTarget) then
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = action.targetGridIndex})
+                if (target.getUnitType) then
+                    dispatchEvtDestroyViewUnit(eventDispatcher, action.targetGridIndex)
                 else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyViewTile", gridIndex = action.targetGridIndex})
+                    dispatchEvtDestroyViewTile(eventDispatcher, action.targetGridIndex)
                 end
             else
-                if (action.targetType == "unit") then
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewUnit", gridIndex = action.targetGridIndex})
+                if (action.getUnitType) then
+                    dispatchEvtAttackViewUnit(eventDispatcher, action.targetGridIndex)
                 else
-                    rootScriptEventDispatcher:dispatchEvent({name = "EvtAttackViewTile", gridIndex = action.targetGridIndex})
+                    dispatchEvtAttackViewTile(eventDispatcher, action.targetGridIndex)
                 end
             end
 
@@ -285,20 +259,65 @@ function ModelUnit:doActionAttack(action, isAttacker)
     return self
 end
 
-function ModelUnit:doActionCapture(action)
+function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    if (self:getUnitId() == focusUnitID) then
+        self:setStateActioned()
+    end
+
+    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action, focusUnitID, loaderModelUnit)
+
+    if ((self:getUnitId() == focusUnitID) and (self.m_View)) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+                :setVisible(false)
+            loaderModelUnit:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+    self:setStateActioned()
+    if (not droppingActorUnits) then
+        return
+    end
+
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, droppingActorUnits)
+
+    if (self.m_View) then
+        local path                  = action.path
+        local loaderEndingGridIndex = path[#path]
+
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            for _, dropActorUnit in ipairs(droppingActorUnits) do
+                local dropModelUnit = dropActorUnit:getModel()
+                local dropViewUnit  = dropActorUnit:getView()
+                dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
+                    dropViewUnit:updateWithModelUnit(dropModelUnit)
+                        :showNormalAnimation()
+                end)
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionCapture(action, capturer, target)
     self:setStateActioned()
 
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.doActionCapture) then
-            component:doActionCapture(action)
-        end
-    end
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
-            action.nextTarget:updateView()
+            target:updateView()
 
             if (action.callbackOnCaptureAnimationEnded) then
                 action.callbackOnCaptureAnimationEnded()
@@ -378,8 +397,8 @@ function ModelUnit:getProductionCost()
     return self.m_Template.cost
 end
 
-function ModelUnit:canJoin(rhsUnitModel)
-    return (self:getCurrentHP() <= 90) and (self.m_TiledID == rhsUnitModel.m_TiledID)
+function ModelUnit:canJoinModelUnit(rhsUnitModel)
+    return ((self:getTiledID() == rhsUnitModel:getTiledID()) and (rhsUnitModel:getCurrentHP() <= 90))
 end
 
 function ModelUnit:canDoAction(playerIndex)

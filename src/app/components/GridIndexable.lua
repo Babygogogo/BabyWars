@@ -45,10 +45,6 @@ end
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
-function GridIndexable:toStringList(spaces)
-    return {string.format("%sGridIndexable = {gridIndex = {x = %d, y = %d}}", spaces or "", self.m_GridIndex.x, self.m_GridIndex.y)}
-end
-
 function GridIndexable:toSerializableTable()
     return {
         gridIndex = {
@@ -62,19 +58,19 @@ end
 -- The callback functions on ComponentManager.bindComponent()/unbindComponent().
 --------------------------------------------------------------------------------
 function GridIndexable:onBind(target)
-    assert(self.m_Target == nil, "GridIndexable:onBind() the GridIndexable has already bound a target.")
+    assert(self.m_Owner == nil, "GridIndexable:onBind() the GridIndexable has already bound a target.")
 
     ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+    self.m_Owner = target
 
     return self
 end
 
 function GridIndexable:onUnbind()
-    assert(self.m_Target, "GridIndexable:unbind() the component has not bound a target.")
+    assert(self.m_Owner, "GridIndexable:unbind() the component has not bound a target.")
 
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
+    self.m_Owner = nil
 
     return self
 end
@@ -87,24 +83,23 @@ function GridIndexable:getGridIndex()
 end
 
 function GridIndexable:setGridIndex(gridIndex, shouldMoveView)
-    assert(TypeChecker.isGridIndex(gridIndex))
     self.m_GridIndex.x, self.m_GridIndex.y = gridIndex.x, gridIndex.y
 
     if (shouldMoveView ~= false) then
         self:setViewPositionWithGridIndex(self.m_GridIndex)
     end
 
-    return self.m_Target
+    return self.m_Owner
 end
 
 -- The param gridIndex may be nil. If so, the function set the position of view with self.m_GridIndex .
 function GridIndexable:setViewPositionWithGridIndex(gridIndex)
-    local view = self.m_Target and self.m_Target.m_View or nil
+    local view = self.m_Owner and self.m_Owner.m_View or nil
     if (view) then
         view:setPosition(GridIndexFunctions.toPosition(gridIndex or self.m_GridIndex))
     end
 
-    return self.m_Target
+    return self.m_Owner
 end
 
 return GridIndexable
