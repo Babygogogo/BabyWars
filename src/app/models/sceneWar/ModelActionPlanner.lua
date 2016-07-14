@@ -380,19 +380,62 @@ local function getActionsDropModelUnit(self)
     return actions
 end
 
-local function getAvaliableActionList(self)
-    local actionJoin = getActionJoinModelUnit(self)
-    if (actionJoin) then
-        return {actionJoin}
+local function getSingleActionLaunchModelUnit(self, unitID)
+    local modelUnitMap = self.m_ModelUnitMap
+    local modelUnit    = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    local icon         = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(modelUnit)
+    icon:ignoreAnchorPointForPosition(true)
+        :setScale(0.5)
+
+    return {
+        name     = LocalizationFunctions.getLocalizedText(78, "LaunchModelUnit"),
+        icon     = icon,
+        callback = function()
+            modelUnitMap:setPreviewLaunchUnit(modelUnit, self.m_PathDestination)
+                :setPreviewLaunchUnitVisible(true)
+            print("launch!")
+        end,
+    }
+end
+
+local function getActionsLaunchModelUnit(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((#self.m_MovePath ~= 1)                    or
+        (not focusModelUnit.canLaunchModelUnit)    or
+        (not focusModelUnit:canLaunchModelUnit())) then
+        return {}
     end
+
+    local actions        = {}
+    local modelUnitMap   = self.m_ModelUnitMap
+    local modelTile      = self.m_ModelTileMap:getModelTile(self.m_PathDestination)
+    for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
+        local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+        if ((launchModelUnit:getState() == "idle")                  and
+            (modelTile:getMoveCost(launchModelUnit:getMoveType()))) then
+            actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
+        end
+    end
+
+    return actions
+end
+
+local function getAvaliableActionList(self)
     local actionLoad = getActionLoadModelUnit(self)
     if (actionLoad) then
         return {actionLoad}
+    end
+    local actionJoin = getActionJoinModelUnit(self)
+    if (actionJoin) then
+        return {actionJoin}
     end
 
     local list = {}
     list[#list + 1] = getActionAttack( self)
     list[#list + 1] = getActionCapture(self)
+    for _, action in ipairs(getActionsLaunchModelUnit(self)) do
+        list[#list + 1] = action
+    end
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end

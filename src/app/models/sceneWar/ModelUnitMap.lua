@@ -291,7 +291,6 @@ function ModelUnitMap:initView()
 
     local mapSize = self.m_MapSize
     view:setMapSize(mapSize)
-        :removeAllViewUnits()
 
     local unitActors = self.m_UnitActorsMap
     for y = mapSize.height, 1, -1 do
@@ -595,6 +594,22 @@ end
 function ModelUnitMap:forEachModelUnitLoaded(func)
     for _, actorUnit in pairs(self.m_LoadedActorUnits) do
         func(actorUnit:getModel())
+    end
+
+    return self
+end
+
+function ModelUnitMap:setPreviewLaunchUnit(modelUnit, gridIndex)
+    if (self.m_View) then
+        self.m_View:setPreviewLaunchUnit(modelUnit, gridIndex)
+    end
+
+    return self
+end
+
+function ModelUnitMap:setPreviewLaunchUnitVisible(visible)
+    if (self.m_View) then
+        self.m_View:setPreviewLaunchUnitVisible(visible)
     end
 
     return self
