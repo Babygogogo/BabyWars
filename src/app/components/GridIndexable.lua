@@ -76,6 +76,15 @@ function GridIndexable:onUnbind()
 end
 
 --------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function GridIndexable:doActionMoveModelUnit(action, loadedModelUnits)
+    self:setGridIndex(action.path[#action.path], false)
+
+    return self.m_Owner
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function GridIndexable:getGridIndex()

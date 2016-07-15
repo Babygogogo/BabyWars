@@ -183,8 +183,8 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelUnit:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action, loadedModelUnits)
 
     return self
 end
@@ -278,13 +278,13 @@ function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     return self
 end
 
-function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
     self:setStateActioned()
-    if (not droppingActorUnits) then
-        return
+    for _, dropActorUnit in pairs(dropActorUnits) do
+        dropActorUnit:getModel():setStateActioned()
     end
 
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, droppingActorUnits)
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, dropActorUnits)
 
     if (self.m_View) then
         local path                  = action.path
@@ -294,7 +294,7 @@ function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
-            for _, dropActorUnit in ipairs(droppingActorUnits) do
+            for _, dropActorUnit in ipairs(dropActorUnits) do
                 local dropModelUnit = dropActorUnit:getModel()
                 local dropViewUnit  = dropActorUnit:getView()
                 dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
