@@ -24,6 +24,15 @@ function MovePathFunctions.createReversedPath(path)
     return newPath
 end
 
+function MovePathFunctions.createPathForDispatch(path)
+    local newPath = {}
+    for i, node in ipairs(path) do
+        newPath[i] = GridIndex.clone(path[i].gridIndex)
+    end
+
+    return newPath
+end
+
 function MovePathFunctions.hasGridIndex(path, gridIndex)
     for i, pathNode in ipairs(path) do
         if (GridIndexFunctions.isEqual(gridIndex, pathNode.gridIndex)) then

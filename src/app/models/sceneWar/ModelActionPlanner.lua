@@ -26,9 +26,19 @@ local Actor                       = require("global.actors.Actor")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getFocusModelUnit(self, gridIndex, launchUnitID)
+    return (launchUnitID)                                                and
+        (self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(launchUnitID)) or
+        (self.m_ModelUnitMap:getModelUnit(gridIndex))
+end
+
+local function getMovePathDestination(movePath)
+    return movePath[#movePath].gridIndex
+end
+
 local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
-    local existingUnit = modelUnitMap:getModelUnit(gridIndex)
-    if ((existingUnit) and (existingUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+    local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
+    if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
         return nil
     else
         local modelTile = modelTileMap:getModelTile(gridIndex)
@@ -52,9 +62,9 @@ local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
     end
 end
 
-local function isGridInDroppableGrids(gridIndex, droppableGrids)
-    for _, droppableGridIndex in pairs(droppableGrids) do
-        if (GridIndexFunctions.isEqual(gridIndex, droppableGridIndex)) then
+local function isDropGridAvailable(gridIndex, availableDropGrids)
+    for _, availableGridIndex in pairs(availableDropGrids) do
+        if (GridIndexFunctions.isEqual(gridIndex, availableGridIndex)) then
             return true
         end
     end
@@ -62,8 +72,8 @@ local function isGridInDroppableGrids(gridIndex, droppableGrids)
     return false
 end
 
-local function isGridInDropDestinations(gridIndex, dropDestinations)
-    for _, dropDestination in pairs(dropDestinations) do
+local function isDropGridSelected(gridIndex, selectedDropDestinations)
+    for _, dropDestination in pairs(selectedDropDestinations) do
         if (GridIndexFunctions.isEqual(gridIndex, dropDestination.gridIndex)) then
             return true
         end
@@ -72,27 +82,27 @@ local function isGridInDropDestinations(gridIndex, dropDestinations)
     return false
 end
 
-local function getDroppableGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations)
+local function getAvailableDropGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations)
     local moveType = droppingModelUnit:getMoveType()
     if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCost(moveType)) then
         return {}
     end
 
-    local mapSize        = modelTileMap:getMapSize()
-    local droppableGrids = {}
+    local mapSize = modelTileMap:getMapSize()
+    local grids   = {}
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(loaderEndingGridIndex)) do
-        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize)) and
+        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize))         and
             (modelTileMap:getModelTile(gridIndex):getMoveCost(moveType)) and
-            (not isGridInDropDestinations(gridIndex, dropDestinations))) then
+            (not isDropGridSelected(gridIndex, dropDestinations))) then
 
-            if ((not modelUnitMap:getModelUnit(gridIndex)) or
+            if ((not modelUnitMap:getModelUnit(gridIndex))                         or
                 (GridIndexFunctions.isEqual(gridIndex, loaderBeginningGridIndex))) then
-                droppableGrids[#droppableGrids + 1] = gridIndex
+                grids[#grids + 1] = gridIndex
             end
         end
     end
 
-    return droppableGrids
+    return grids
 end
 
 local function pushBackDropDestination(dropDestinations, unitID, destination, modelUnit)
@@ -122,7 +132,7 @@ end
 
 local function canDoAdditionalDropAction(self)
     local focusModelUnit   = self.m_FocusModelUnit
-    local dropDestinations = self.m_DropDestinations
+    local dropDestinations = self.m_SelectedDropDestinations
     if (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) then
         return false
     end
@@ -130,10 +140,10 @@ local function canDoAdditionalDropAction(self)
     local modelUnitMap             = self.m_ModelUnitMap
     local modelTileMap             = self.m_ModelTileMap
     local loaderBeginningGridIndex = focusModelUnit:getGridIndex()
-    local loaderEndingGridIndex    = self.m_PathDestination
+    local loaderEndingGridIndex    = getMovePathDestination(self.m_MovePath)
     for _, unitID in pairs(focusModelUnit:getLoadUnitIdList()) do
         if ((not isModelUnitDropped(unitID, dropDestinations)) and
-            (#getDroppableGrids(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0)) then
+            (#getAvailableDropGrids(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0)) then
             return true
         end
     end
@@ -142,45 +152,42 @@ local function canDoAdditionalDropAction(self)
 end
 
 --------------------------------------------------------------------------------
--- The functions for MovePath.
+-- The functions for MovePath and ReachableArea.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_ModelPlayerLoggedIn, self.m_ModelWeather)
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayerLoggedIn)
+    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather)
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
 
-    if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex)) and
+    if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex))                        and
         (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
         self.m_MovePath = MovePathFunctions.createShortestPath(gridIndex, self.m_ReachableArea)
     end
-end
 
-local function resetMovePath(self, focusModelUnit)
-    if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
-        self.m_MovePath       = {{
-            gridIndex     = GridIndexFunctions.clone(focusModelUnit:getGridIndex()),
-            totalMoveCost = 0,
-        }}
-        if (self.m_View) then
-            self.m_View:setMovePath(self.m_MovePath)
-        end
+    if (self.m_View) then
+        self.m_View:setMovePath(self.m_MovePath)
     end
 end
 
---------------------------------------------------------------------------------
--- The functions for ReachableArea.
---------------------------------------------------------------------------------
-local function resetReachableArea(self, focusModelUnit)
-    if (self.m_FocusModelUnit ~= focusModelUnit) or (self.m_State == "idle") then
-        self.m_ReachableArea = ReachableAreaFunctions.createArea(
-            focusModelUnit:getGridIndex(),
-            getMoveRange(focusModelUnit, self.m_ModelPlayerLoggedIn, self.m_ModelWeather),
-            function(gridIndex)
-                return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_ModelPlayerLoggedIn)
-            end)
+local function resetMovePath(self, gridIndex)
+    self.m_MovePath       = {{
+        gridIndex     = GridIndexFunctions.clone(gridIndex),
+        totalMoveCost = 0,
+    }}
+    if (self.m_View) then
+        self.m_View:setMovePath(self.m_MovePath)
+    end
+end
 
-        if (self.m_View) then
-            self.m_View:setReachableGrids(self.m_ReachableArea)
-        end
+local function resetReachableArea(self, focusModelUnit)
+    self.m_ReachableArea = ReachableAreaFunctions.createArea(
+        focusModelUnit:getGridIndex(),
+        getMoveRange(focusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather),
+        function(gridIndex)
+            return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
+        end)
+
+    if (self.m_View) then
+        self.m_View:setReachableGrids(self.m_ReachableArea)
     end
 end
 
@@ -189,9 +196,10 @@ end
 --------------------------------------------------------------------------------
 local function dispatchEventJoinModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "JoinModelUnit",
-        path       = self.m_MovePath,
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "JoinModelUnit",
+        path         = self.m_MovePath,
+        launchUnitID = self.m_LaunchUnitID,
     })
 end
 
@@ -201,22 +209,25 @@ local function dispatchEventAttack(self, targetGridIndex)
         actionName      = "Attack",
         path            = self.m_MovePath,
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
+        launchUnitID    = self.m_LaunchUnitID,
     })
 end
 
 local function dispatchEventCapture(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "Capture",
-        path       = self.m_MovePath,
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "Capture",
+        path         = self.m_MovePath,
+        launchUnitID = self.m_LaunchUnitID,
     })
 end
 
 local function dispatchEventWait(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "Wait",
-        path       = self.m_MovePath,
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "Wait",
+        path         = self.m_MovePath,
+        launchUnitID = self.m_LaunchUnitID,
     })
 end
 
@@ -231,15 +242,16 @@ end
 
 local function dispatchEventLoadModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
-        actionName = "LoadModelUnit",
-        path       = self.m_MovePath,
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "LoadModelUnit",
+        path         = self.m_MovePath,
+        launchUnitID = self.m_LaunchUnitID,
     })
 end
 
 local function dispatchEventDropModelUnit(self)
     local dropDestinations = {}
-    for _, dropDestination in ipairs(self.m_DropDestinations) do
+    for _, dropDestination in ipairs(self.m_SelectedDropDestinations) do
         dropDestinations[#dropDestinations + 1] = {
             unitID    = dropDestination.unitID,
             gridIndex = dropDestination.gridIndex,
@@ -251,11 +263,12 @@ local function dispatchEventDropModelUnit(self)
         actionName       = "DropModelUnit",
         path             = self.m_MovePath,
         dropDestinations = dropDestinations,
+        launchUnitID     = self.m_LaunchUnitID,
     })
 end
 
 --------------------------------------------------------------------------------
--- The functions for avaliable action list.
+-- The functions for available action list.
 --------------------------------------------------------------------------------
 local setStateIdle
 local setStateChoosingProductionTarget
@@ -266,7 +279,7 @@ local setStateChoosingDropDestination
 local setStateChoosingAdditionalDropAction
 
 local function getActionJoinModelUnit(self)
-    local destination = self.m_PathDestination
+    local destination = getMovePathDestination(self.m_MovePath)
     if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
     else
@@ -283,7 +296,7 @@ local function getActionJoinModelUnit(self)
 end
 
 local function getActionLoadModelUnit(self)
-    local destination = self.m_PathDestination
+    local destination = getMovePathDestination(self.m_MovePath)
     if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
     else
@@ -300,18 +313,20 @@ local function getActionLoadModelUnit(self)
 end
 
 local function getActionAttack(self)
-    if (#self.m_AttackableGridList > 0) then
+    if (#self.m_AttackableGridList == 0) then
+        return nil
+    else
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Attack"),
             callback = function()
-                setStateChoosingAttackTarget(self, self.m_PathDestination)
-            end
+                setStateChoosingAttackTarget(self, getMovePathDestination(self.m_MovePath))
+            end,
         }
     end
 end
 
 local function getActionCapture(self)
-    local modelTile = self.m_ModelTileMap:getModelTile(self.m_PathDestination)
+    local modelTile = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
@@ -325,7 +340,7 @@ local function getActionCapture(self)
 end
 
 local function getActionWait(self)
-    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(self.m_PathDestination)
+    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
@@ -354,7 +369,7 @@ end
 
 local function getActionsDropModelUnit(self)
     local focusModelUnit   = self.m_FocusModelUnit
-    local dropDestinations = self.m_DropDestinations
+    local dropDestinations = self.m_SelectedDropDestinations
 
     if ((not focusModelUnit.getCurrentLoadCount) or
         (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) or
@@ -364,14 +379,14 @@ local function getActionsDropModelUnit(self)
 
     local actions = {}
     local loaderBeginningGridIndex = self.m_FocusModelUnit:getGridIndex()
-    local loaderEndingGridIndex    = self.m_PathDestination
+    local loaderEndingGridIndex    = getMovePathDestination(self.m_MovePath)
     local modelUnitMap             = self.m_ModelUnitMap
     local modelTileMap             = self.m_ModelTileMap
 
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         if (not isModelUnitDropped(unitID, dropDestinations)) then
             local droppingModelUnit = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-            if (#getDroppableGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0) then
+            if (#getAvailableDropGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0) then
                 actions[#actions + 1] = getSingleActionDropModelUnit(self, unitID)
             end
         end
@@ -381,19 +396,16 @@ local function getActionsDropModelUnit(self)
 end
 
 local function getSingleActionLaunchModelUnit(self, unitID)
-    local modelUnitMap = self.m_ModelUnitMap
-    local modelUnit    = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-    local icon         = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(modelUnit)
-    icon:ignoreAnchorPointForPosition(true)
+    local beginningGridIndex = self.m_MovePath[1].gridIndex
+    local icon               = Actor.createView("sceneWar.ViewUnit")
+    icon:updateWithModelUnit(getFocusModelUnit(self, beginningGridIndex, unitID))
         :setScale(0.5)
 
     return {
         name     = LocalizationFunctions.getLocalizedText(78, "LaunchModelUnit"),
         icon     = icon,
         callback = function()
-            modelUnitMap:setPreviewLaunchUnit(modelUnit, self.m_PathDestination)
-                :setPreviewLaunchUnitVisible(true)
-            print("launch!")
+            setStateMakingMovePath(self, beginningGridIndex, unitID)
         end,
     }
 end
@@ -406,9 +418,9 @@ local function getActionsLaunchModelUnit(self)
         return {}
     end
 
-    local actions        = {}
-    local modelUnitMap   = self.m_ModelUnitMap
-    local modelTile      = self.m_ModelTileMap:getModelTile(self.m_PathDestination)
+    local actions      = {}
+    local modelUnitMap = self.m_ModelUnitMap
+    local modelTile    = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
         if ((launchModelUnit:getState() == "idle")                  and
@@ -464,10 +476,6 @@ end
 -- The set state functions.
 --------------------------------------------------------------------------------
 setStateIdle = function(self)
-    self.m_State            = "idle"
-    self.m_FocusModelUnit   = nil
-    self.m_DropDestinations = {}
-
     if (self.m_View) then
         self.m_View:setReachableGridsVisible( false)
             :setAttackableGridsVisible(       false)
@@ -476,15 +484,32 @@ setStateIdle = function(self)
             :setDroppableGridsVisible(        false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(      false)
+
+        self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
+        if (self.m_FocusModelUnit) then
+            self.m_FocusModelUnit:showNormalAnimation()
+        end
     end
+
+    self.m_State                    = "idle"
+    self.m_FocusModelUnit           = nil
+    self.m_LaunchUnitID             = nil
+    self.m_SelectedDropDestinations = {}
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
 end
 
-setStateChoosingProductionTarget = function(self, modelTile)
+local function canSetStateChoosingProductionTarget(self, gridIndex)
+    local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
+    return (not self.m_ModelUnitMap:getModelUnit(gridIndex))       and
+        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+        (modelTile.getProductionList)
+end
+
+setStateChoosingProductionTarget = function(self, gridIndex)
     self.m_State = "choosingProductionTarget"
-    local productionList = modelTile:getProductionList(self.m_ModelPlayerLoggedIn)
-    local gridIndex      = modelTile:getGridIndex()
+    local modelTile      = self.m_ModelTileMap:getModelTile(gridIndex)
+    local productionList = modelTile:getProductionList(self.m_LoggedInModelPlayer)
 
     for _, listItem in ipairs(productionList) do
         listItem.callback = function()
@@ -498,38 +523,67 @@ setStateChoosingProductionTarget = function(self, modelTile)
     })
 end
 
-setStateMakingMovePath = function(self, focusModelUnit)
-    resetReachableArea(self, focusModelUnit)
-    resetMovePath(     self, focusModelUnit)
-    self.m_State          = "makingMovePath"
-    self.m_FocusModelUnit = focusModelUnit
+local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
+    local modelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+end
 
+setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
+    local focusModelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    if (self.m_FocusModelUnit ~= focusModelUnit) then
+        self.m_FocusModelUnit = focusModelUnit
+        resetReachableArea(self, focusModelUnit)
+        resetMovePath(self, beginningGridIndex)
+    end
+
+    self.m_State          = "makingMovePath"
+    self.m_LaunchUnitID   = launchUnitID
+
+    focusModelUnit:showMovingAnimation()
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(true)
             :setAttackableGridsVisible(false)
             :setMovePathVisible(true)
             :setMovePathDestinationVisible(false)
+
+        if (launchUnitID) then
+            self.m_ModelUnitMap:setPreviewLaunchUnit(focusModelUnit, beginningGridIndex)
+                :setPreviewLaunchUnitVisible(true)
+        else
+            self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
+        end
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerMakingMovePath"})
 end
 
-setStateChoosingAction = function(self, destination)
-    updateMovePathWithDestinationGrid(self, destination)
-    self.m_PathDestination        = destination or self.m_PathDestination
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, self.m_PathDestination, self.m_ModelTileMap, self.m_ModelUnitMap)
+setStateChoosingAction = function(self, destination, launchUnitID)
+    local beginningGridIndex = self.m_MovePath[1].gridIndex
+    local focusModelUnit     = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    if (self.m_FocusModelUnit ~= focusModelUnit) then
+        self.m_FocusModelUnit  = focusModelUnit
+        destination            = beginningGridIndex
+        resetReachableArea(self, focusModelUnit)
+    end
+
     self.m_State              = "choosingAction"
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, destination, self.m_ModelTileMap, self.m_ModelUnitMap)
+    self.m_LaunchUnitID       = launchUnitID
+    updateMovePathWithDestinationGrid(self, destination)
 
     if (self.m_View) then
         self.m_View:setReachableGridsVisible(false)
             :setAttackableGridsVisible(false)
-            :setMovePath(self.m_MovePath)
             :setMovePathVisible(true)
-            :setMovePathDestination(self.m_PathDestination)
+            :setMovePathDestination(destination)
             :setMovePathDestinationVisible(true)
             :setDroppableGridsVisible(false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(false)
+
+        if (not launchUnitID) then
+            self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
+        end
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({
@@ -552,14 +606,14 @@ end
 setStateChoosingDropDestination = function(self, unitID)
     self.m_State = "choosingDropDestination"
 
-    local droppingModelUnit = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-    self.m_DroppableGrids   = getDroppableGrids(droppingModelUnit, self.m_FocusModelUnit:getGridIndex(), self.m_PathDestination, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_DropDestinations)
-    self.m_DroppingUnitID   = unitID
+    local droppingModelUnit   = self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    self.m_AvailableDropGrids = getAvailableDropGrids(droppingModelUnit, self.m_FocusModelUnit:getGridIndex(), getMovePathDestination(self.m_MovePath), self.m_ModelUnitMap, self.m_ModelTileMap, self.m_SelectedDropDestinations)
+    self.m_DroppingUnitID     = unitID
 
     if (self.m_View) then
-        self.m_View:setDroppableGrids(self.m_DroppableGrids)
+        self.m_View:setDroppableGrids(self.m_AvailableDropGrids)
             :setDroppableGridsVisible(true)
-            :setDropDestinations(self.m_DropDestinations)
+            :setDropDestinations(self.m_SelectedDropDestinations)
             :setDropDestinationsVisible(true)
             :setPreviewDropDestinationVisible(false)
     end
@@ -573,7 +627,7 @@ setStateChoosingAdditionalDropAction = function(self)
     if (self.m_View) then
         self.m_View:setDroppableGridsVisible( false)
             :setPreviewDropDestinationVisible(false)
-            :setDropDestinations(self.m_DropDestinations)
+            :setDropDestinations(self.m_SelectedDropDestinations)
             :setDropDestinationsVisible(true)
     end
 
@@ -600,7 +654,7 @@ local function onEvtPlayerRequestDoAction(self, event)
 end
 
 local function onEvtMapCursorMoved(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
         return
     end
 
@@ -614,10 +668,6 @@ local function onEvtMapCursorMoved(self, event)
     elseif (state == "makingMovePath") then
         if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             updateMovePathWithDestinationGrid(self, gridIndex)
-            if (self.m_View) then
-                self.m_View:setMovePath(self.m_MovePath)
-                    :setMovePathVisible(true)
-            end
         end
     elseif (state == "choosingAttackTarget") then
         local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
@@ -632,7 +682,7 @@ local function onEvtMapCursorMoved(self, event)
         end
     elseif (state == "choosingDropDestination") then
         if (self.m_View) then
-            if (isGridInDroppableGrids(gridIndex, self.m_DroppableGrids)) then
+            if (isDropGridAvailable(gridIndex, self.m_AvailableDropGrids)) then
                 self.m_View:setPreviewDropDestination(gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
                     :setPreviewDropDestinationVisible(true)
             else
@@ -643,7 +693,7 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtGridSelected(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
         return
     end
 
@@ -651,52 +701,48 @@ local function onEvtGridSelected(self, event)
     local gridIndex = event.gridIndex
 
     if (state == "idle") then
-        local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
-        if (modelUnit) then
-            if (modelUnit:canDoAction(self.m_PlayerIndexLoggedIn)) then
-                modelUnit:showMovingAnimation()
-                setStateMakingMovePath(self, modelUnit)
-            end
-        else
-            local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
-            if ((modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and (modelTile.getProductionList)) then
-                setStateChoosingProductionTarget(self, modelTile)
-            end
+        if (canSetStateMakingMovePath(self, gridIndex)) then
+            setStateMakingMovePath(self, gridIndex)
+        elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then
+            setStateChoosingProductionTarget(self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
         setStateIdle(self)
     elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
-            self.m_FocusModelUnit:showNormalAnimation()
-            setStateIdle(self)
+            if (self.m_LaunchUnitID) then
+                setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
+            else
+                setStateIdle(self)
+            end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
-            setStateChoosingAction(self, gridIndex)
+            setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
         end
     elseif (state == "choosingAction") then
-        setStateMakingMovePath(self, self.m_FocusModelUnit)
+        setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)
     elseif (state == "choosingAttackTarget") then
         if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
             dispatchEventAttack(self, gridIndex)
         else
-            setStateChoosingAction(self, self.m_PathDestination)
+            setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
         end
     elseif (state == "choosingDropDestination") then
-        if (not isGridInDroppableGrids(gridIndex, self.m_DroppableGrids)) then
-            if (#self.m_DropDestinations == 0) then
-                setStateChoosingAction(self, self.m_PathDestination)
-            else
-                setStateChoosingAdditionalDropAction(self)
-            end
-        else
-            pushBackDropDestination(self.m_DropDestinations, self.m_DroppingUnitID, gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
+        if (isDropGridAvailable(gridIndex, self.m_AvailableDropGrids)) then
+            pushBackDropDestination(self.m_SelectedDropDestinations, self.m_DroppingUnitID, gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
             if (not canDoAdditionalDropAction(self)) then
                 dispatchEventDropModelUnit(self)
             else
                 setStateChoosingAdditionalDropAction(self)
             end
+        else
+            if (#self.m_SelectedDropDestinations == 0) then
+                setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+            else
+                setStateChoosingAdditionalDropAction(self)
+            end
         end
     elseif (state == "choosingAdditionalDropAction") then
-        setStateChoosingDropDestination(self, popBackDropDestination(self.m_DropDestinations).unitID)
+        setStateChoosingDropDestination(self, popBackDropDestination(self.m_SelectedDropDestinations).unitID)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
@@ -706,8 +752,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    self.m_State            = "idle"
-    self.m_DropDestinations = {}
+    self.m_State                    = "idle"
+    self.m_SelectedDropDestinations = {}
 
     return self
 end
@@ -733,15 +779,16 @@ function ModelActionPlanner:setModelTileMap(model)
 end
 
 function ModelActionPlanner:setModelPlayerManager(modelPlayerManager)
+    assert(self.m_ModelPlayerManager == nil, "ModelActionPlanner:setModelPlayerManager() the model has been set.")
+    self.m_ModelPlayerManager = modelPlayerManager
+
     local playerAccount = WebSocketManager.getLoggedInAccountAndPassword()
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:getAccount() == playerAccount) then
-            self.m_ModelPlayerLoggedIn = modelPlayer
-            self.m_PlayerIndexLoggedIn = playerIndex
+            self.m_LoggedInModelPlayer = modelPlayer
+            self.m_LoggedInPlayerIndex = playerIndex
         end
     end)
-
-    self.m_ModelPlayerManager = modelPlayerManager
 
     return self
 end
@@ -777,16 +824,11 @@ end
 --------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
-    if (name == "EvtGridSelected") then
-        onEvtGridSelected(self, event)
-    elseif (name == "EvtPlayerIndexUpdated") then
-        onEvtPlayerIndexUpdated(self, event)
-    elseif (name == "EvtModelWeatherUpdated") then
-        onEvtModelWeatherUpdated(self, event)
-    elseif (name == "EvtMapCursorMoved") then
-        onEvtMapCursorMoved(self, event)
-    elseif (name == "EvtPlayerRequestDoAction") then
-        onEvtPlayerRequestDoAction(self, event)
+    if     (name == "EvtGridSelected")          then onEvtGridSelected(         self, event)
+    elseif (name == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
+    elseif (name == "EvtModelWeatherUpdated")   then onEvtModelWeatherUpdated(  self, event)
+    elseif (name == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
+    elseif (name == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
     end
 
     return self
