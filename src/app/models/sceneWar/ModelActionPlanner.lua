@@ -198,7 +198,7 @@ local function dispatchEventJoinModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "JoinModelUnit",
-        path         = self.m_MovePath,
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -207,7 +207,7 @@ local function dispatchEventAttack(self, targetGridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",
         actionName      = "Attack",
-        path            = self.m_MovePath,
+        path            = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
         launchUnitID    = self.m_LaunchUnitID,
     })
@@ -217,7 +217,7 @@ local function dispatchEventCapture(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "Capture",
-        path         = self.m_MovePath,
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -226,7 +226,7 @@ local function dispatchEventWait(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "Wait",
-        path         = self.m_MovePath,
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -244,7 +244,7 @@ local function dispatchEventLoadModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "LoadModelUnit",
-        path         = self.m_MovePath,
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -261,7 +261,7 @@ local function dispatchEventDropModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name             = "EvtPlayerRequestDoAction",
         actionName       = "DropModelUnit",
-        path             = self.m_MovePath,
+        path             = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         dropDestinations = dropDestinations,
         launchUnitID     = self.m_LaunchUnitID,
     })
@@ -475,7 +475,7 @@ end
 --------------------------------------------------------------------------------
 -- The set state functions.
 --------------------------------------------------------------------------------
-setStateIdle = function(self)
+setStateIdle = function(self, resetUnitAnimation)
     if (self.m_View) then
         self.m_View:setReachableGridsVisible( false)
             :setAttackableGridsVisible(       false)
@@ -486,7 +486,7 @@ setStateIdle = function(self)
             :setDropDestinationsVisible(      false)
 
         self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
-        if (self.m_FocusModelUnit) then
+        if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
             self.m_FocusModelUnit:showNormalAnimation()
         end
     end
@@ -642,7 +642,7 @@ end
 --------------------------------------------------------------------------------
 local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndexInTurn = event.playerIndex
-    setStateIdle(self)
+    setStateIdle(self, true)
 end
 
 local function onEvtModelWeatherUpdated(self, event)
@@ -650,7 +650,7 @@ local function onEvtModelWeatherUpdated(self, event)
 end
 
 local function onEvtPlayerRequestDoAction(self, event)
-    setStateIdle(self)
+    setStateIdle(self, false)
 end
 
 local function onEvtMapCursorMoved(self, event)
@@ -664,7 +664,7 @@ local function onEvtMapCursorMoved(self, event)
     if (state == "idle") then
         return
     elseif (state == "choosingProductionTarget") then
-        setStateIdle(self)
+        setStateIdle(self, true)
     elseif (state == "makingMovePath") then
         if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             updateMovePathWithDestinationGrid(self, gridIndex)
@@ -707,13 +707,13 @@ local function onEvtGridSelected(self, event)
             setStateChoosingProductionTarget(self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
-        setStateIdle(self)
+        setStateIdle(self, true)
     elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             if (self.m_LaunchUnitID) then
                 setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
             else
-                setStateIdle(self)
+                setStateIdle(self, true)
             end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
             setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)

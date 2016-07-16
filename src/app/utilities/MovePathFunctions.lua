@@ -27,7 +27,7 @@ end
 function MovePathFunctions.createPathForDispatch(path)
     local newPath = {}
     for i, node in ipairs(path) do
-        newPath[i] = GridIndex.clone(path[i].gridIndex)
+        newPath[i] = path[i].gridIndex
     end
 
     return newPath
