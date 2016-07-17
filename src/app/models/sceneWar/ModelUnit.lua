@@ -192,6 +192,11 @@ end
 function ModelUnit:doActionLaunchModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
 
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+            :showNormalAnimation()
+    end
+
     return self
 end
 

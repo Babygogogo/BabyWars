@@ -48,19 +48,6 @@ local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
-local function getLoadedModelUnits(self, loaderModelUnit)
-    if (not loaderModelUnit.getLoadUnitIdList) then
-        return nil
-    else
-        local list = {}
-        for _, unitID in ipairs(loaderModelUnit:getLoadUnitIdList()) do
-            list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
-        end
-
-        return list
-    end
-end
-
 local function setActorUnitLoaded(self, gridIndex)
     local focusActorUnit = self:getActorUnit(gridIndex)
     local focusUnitID    = focusActorUnit:getModel():getUnitId()
@@ -118,49 +105,13 @@ end
 --------------------------------------------------------------------------------
 -- The private functions for dispatching events.
 --------------------------------------------------------------------------------
-local function dispatchEvtModelUnitUpdated(self, modelUnit, previousGridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name              = "EvtModelUnitUpdated",
-        modelUnit         = modelUnit,
-        loadedModelUnits  = getLoadedModelUnits(self, modelUnit),
-        previousGridIndex = previousGridIndex,
-    })
-end
-
-local function dispatchEvtPreviewModelUnit(self, modelUnit)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name             = "EvtPreviewModelUnit",
-        modelUnit        = modelUnit,
-        loadedModelUnits = getLoadedModelUnits(self, modelUnit)
-    })
-end
-
-local function dispatchEvtPreviewNoModelUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtPreviewNoModelUnit",
-        gridIndex = gridIndex,
-    })
+local function dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtMapCursorMoved(self, event)
-    local gridIndex        = event.gridIndex
-    self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
-
-    local modelUnit = self:getModelUnit(gridIndex)
-    if (modelUnit) then
-        dispatchEvtPreviewModelUnit(self, modelUnit)
-    else
-        dispatchEvtPreviewNoModelUnit(self, gridIndex)
-    end
-end
-
-local function onEvtGridSelected(self, event)
-    onEvtMapCursorMoved(self, event)
-end
-
 local function onEvtDestroyModelUnit(self, event)
     local gridIndex = event.gridIndex
     local modelUnit = self:getModelUnit(gridIndex)
@@ -175,20 +126,13 @@ local function onEvtDestroyModelUnit(self, event)
 
     self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
     modelUnit:unsetRootScriptEventDispatcher()
+
+    dispatchEvtModelUnitMapUpdated(self)
 end
 
 local function onEvtDestroyViewUnit(self, event)
     if (self.m_View) then
         self.m_View:removeViewUnit(event.gridIndex)
-    end
-end
-
-local function onEvtTurnPhaseMain(self, event)
-    local modelUnit = self:getModelUnit(self.m_CursorGridIndex)
-    if (modelUnit) then
-        dispatchEvtModelUnitUpdated(self, modelUnit)
-    else
-        dispatchEvtPreviewNoModelUnit(self, self.m_CursorGridIndex)
     end
 end
 
@@ -265,7 +209,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnitMap:ctor(param)
-    self.m_CursorGridIndex = {x = 1, y = 1}
     initWithUnitActorsMap(self, createUnitActorsMap(param))
 
     if (self.m_View) then
@@ -303,9 +246,7 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitMap:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtMapCursorMoved", self)
-        :addEventListener("EvtGridSelected",       self)
-        :addEventListener("EvtDestroyModelUnit",   self)
+    dispatcher:addEventListener("EvtDestroyModelUnit",   self)
         :addEventListener("EvtDestroyViewUnit",    self)
         :addEventListener("EvtTurnPhaseMain",      self)
 
@@ -324,8 +265,6 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
         :removeEventListener("EvtDestroyViewUnit",  self)
         :removeEventListener("EvtDestroyModelUnit", self)
-        :removeEventListener("EvtGridSelected",     self)
-        :removeEventListener("EvtMapCursorMoved",   self)
     self.m_RootScriptEventDispatcher = nil
 
     local unsetEventDispatcher = function(modelUnit)
@@ -367,11 +306,8 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if     (name == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
-    elseif (name == "EvtGridSelected")        then onEvtGridSelected(       self, event)
-    elseif (name == "EvtDestroyModelUnit")    then onEvtDestroyModelUnit(   self, event)
-    elseif (name == "EvtDestroyViewUnit")     then onEvtDestroyViewUnit(    self, event)
-    elseif (name == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
+    if     (name == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
+    elseif (name == "EvtDestroyViewUnit")  then onEvtDestroyViewUnit( self, event)
     end
 
     return self
@@ -393,9 +329,10 @@ function ModelUnitMap:doActionSurrender(action)
         })
     end
 
+    dispatchEvtModelUnitMapUpdated(self)
+
     return self
 end
-
 
 function ModelUnitMap:doActionWait(action)
     local launchUnitID = action.launchUnitID
@@ -410,9 +347,10 @@ function ModelUnitMap:doActionWait(action)
     end
 
     local focusModelUnit = self:getModelUnit(endingGridIndex)
-    focusModelUnit:doActionMoveModelUnit(action, getLoadedModelUnits(self, focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionWait(action)
-    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
+
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -429,14 +367,14 @@ function ModelUnitMap:doActionAttack(action, attacker, target)
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
 
-    attacker:doActionMoveModelUnit(action, getLoadedModelUnits(self, attacker))
+    attacker:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(attacker))
         :doActionAttack(action, attacker, target)
-    dispatchEvtModelUnitUpdated(self, attacker, beginningGridIndex)
 
     if (target.getUnitType) then
         target:doActionAttack(action, attacker, target)
-        dispatchEvtModelUnitUpdated(self, target)
     end
+
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -453,9 +391,10 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
 
-    capturer:doActionMoveModelUnit(action, getLoadedModelUnits(self, capturer))
+    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
         :doActionCapture(action, capturer, target)
-    dispatchEvtModelUnitUpdated(self, capturer, beginningGridIndex)
+
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -476,12 +415,11 @@ function ModelUnitMap:doActionLoadModelUnit(action)
 
     local focusUnitID     = focusModelUnit:getUnitId()
     local loaderModelUnit = self:getModelUnit(endingGridIndex)
-    focusModelUnit:doActionMoveModelUnit(action, getLoadedModelUnits(self, focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
 
-    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
-    dispatchEvtModelUnitUpdated(self, loaderModelUnit)
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -510,12 +448,12 @@ function ModelUnitMap:doActionDropModelUnit(action)
 
         dropActorUnits[#dropActorUnits + 1] = actorUnit
         setActorUnitUnloaded(self, unitID, gridIndex)
-        dispatchEvtModelUnitUpdated(self, modelUnit, gridIndex)
     end
 
-    focusModelUnit:doActionMoveModelUnit(action, getLoadedModelUnits(self, focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionDropModelUnit(action, dropActorUnits)
-    dispatchEvtModelUnitUpdated(self, focusModelUnit, beginningGridIndex)
+
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -533,10 +471,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
         self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtModelUnitProduced",
-        modelUnit = actorUnit:getModel()
-    })
+    dispatchEvtModelUnitMapUpdated(self)
 
     return self
 end
@@ -564,6 +499,19 @@ end
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
     local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
+function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
+    if (not loaderModelUnit.getLoadUnitIdList) then
+        return nil
+    else
+        local list = {}
+        for _, unitID in ipairs(loaderModelUnit:getLoadUnitIdList()) do
+            list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
+        end
+
+        return list
+    end
 end
 
 function ModelUnitMap:forEachModelUnitOnMap(func)

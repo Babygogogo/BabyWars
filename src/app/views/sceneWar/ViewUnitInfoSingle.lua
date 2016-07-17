@@ -3,6 +3,7 @@ local ViewUnitInfoSingle = class("ViewUnitInfoSingle", cc.Node)
 
 local AnimationLoader       = require("app.utilities.AnimationLoader")
 local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local Actor                 = require("global.actors.Actor")
 
 local UNIT_LABEL_Z_ORDER = 3
 local INFO_LABEL_Z_ORDER = 2
@@ -82,11 +83,8 @@ local function initBackground(self)
 end
 
 local function initUnitIcon(self)
-    local icon = cc.Sprite:create()
-    icon:setAnchorPoint(0, 0)
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(UNIT_ICON_POS_X, UNIT_ICON_POS_Y)
-
+    local icon = Actor.createView("sceneWar.ViewUnit")
+    icon:setPosition(UNIT_ICON_POS_X, UNIT_ICON_POS_Y)
         :setScale(UNIT_ICON_SCALE)
 
     self.m_UnitIcon = icon
@@ -161,8 +159,7 @@ end
 -- The private functions for updating the composition elements.
 --------------------------------------------------------------------------------
 local function updateUnitIconWithModelUnit(self, unit)
-    self.m_UnitIcon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(unit:getTiledID()))
+    self.m_UnitIcon:updateWithModelUnit(unit)
 end
 
 local function updateUnitLabelWithModelUnit(self, unit)

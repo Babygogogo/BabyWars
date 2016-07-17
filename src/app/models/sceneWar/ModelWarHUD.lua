@@ -25,95 +25,67 @@ local Actor = require("global.actors.Actor")
 --------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
-local function createActorConfirmBox()
-    return Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
+local function initActorConfirmBox(self)
+    self.m_ActorConfirmBox = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
 end
 
-local function initWithActorConfirmBox(self, actor)
-    self.m_ActorConfirmBox = actor
-end
-
-local function createActorWarCommandMenu()
-    return Actor.createWithModelAndViewName("sceneWar.ModelWarCommandMenu", nil, "sceneWar.ViewWarCommandMenu")
-end
-
-local function initWithActorWarCommandMenu(self, actor)
+local function initActorWarCommandMenu(self)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarCommandMenu", nil, "sceneWar.ViewWarCommandMenu")
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
+
     self.m_ActorWarCommandMenu = actor
 end
 
-local function createActorMoneyEnergyInfo()
-    return Actor.createWithModelAndViewName("sceneWar.ModelMoneyEnergyInfo", nil, "sceneWar.ViewMoneyEnergyInfo")
-end
-
-local function initWithActorMoneyEnergyInfo(self, actor)
+local function initActorMoneyEnergyInfo(self)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelMoneyEnergyInfo", nil, "sceneWar.ViewMoneyEnergyInfo")
     actor:getModel():setModelWarCommandMenu(self.m_ActorWarCommandMenu:getModel())
+
     self.m_ActorMoneyEnergyInfo = actor
 end
 
-local function createActorActionMenu()
-    return Actor.createWithModelAndViewName("sceneWar.ModelActionMenu", nil, "sceneWar.ViewActionMenu")
+local function initActorActionMenu(self)
+    self.m_ActorActionMenu = Actor.createWithModelAndViewName("sceneWar.ModelActionMenu", nil, "sceneWar.ViewActionMenu")
 end
 
-local function initWithActorActionMenu(self, actor)
-    self.m_ActorActionMenu = actor
+local function initActorUnitDetail(self)
+    self.m_ActorUnitDetail = Actor.createWithModelAndViewName("sceneWar.ModelUnitDetail", nil, "sceneWar.ViewUnitDetail")
 end
 
-local function createActorUnitDetail()
-    return Actor.createWithModelAndViewName("sceneWar.ModelUnitDetail", nil, "sceneWar.ViewUnitDetail")
-end
-
-local function initWithActorUnitDetail(self, actor)
-    self.m_ActorUnitDetail = actor
-end
-
-local function createActorUnitInfo()
-    return Actor.createWithModelAndViewName("sceneWar.ModelUnitInfo", nil, "sceneWar.ViewUnitInfo")
-end
-
-local function initWithActorUnitInfo(self, actor)
+local function initActorUnitInfo(self)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelUnitInfo", nil, "sceneWar.ViewUnitInfo")
     actor:getModel():setModelUnitDetail(self.m_ActorUnitDetail:getModel())
+
     self.m_ActorUnitInfo = actor
 end
 
-local function createActorTileDetail()
-    return Actor.createWithModelAndViewName("sceneWar.ModelTileDetail", nil, "sceneWar.ViewTileDetail")
+local function initActorTileDetail(self)
+    self.m_ActorTileDetail = Actor.createWithModelAndViewName("sceneWar.ModelTileDetail", nil, "sceneWar.ViewTileDetail")
 end
 
-local function initWithActorTileDetail(self, actor)
-    self.m_ActorTileDetail = actor
-end
-
-local function createActorTileInfo()
-    return Actor.createWithModelAndViewName("sceneWar.ModelTileInfo", nil, "sceneWar.ViewTileInfo")
-end
-
-local function initWithActorTileInfo(self, actor)
+local function initActorTileInfo(self)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelTileInfo", nil, "sceneWar.ViewTileInfo")
     actor:getModel():setModelTileDetail(self.m_ActorTileDetail:getModel())
+
     self.m_ActorTileInfo = actor
 end
 
-local function createActorBattleInfo()
-    return Actor.createWithModelAndViewName("sceneWar.ModelBattleInfo", nil, "sceneWar.ViewBattleInfo")
-end
-
-local function initWithActorBattleInfo(self, actor)
-    self.m_ActorBattleInfo = actor
+local function initActorBattleInfo(self)
+    self.m_ActorBattleInfo = Actor.createWithModelAndViewName("sceneWar.ModelBattleInfo", nil, "sceneWar.ViewBattleInfo")
 end
 
 --------------------------------------------------------------------------------
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarHUD:ctor(param)
-    initWithActorConfirmBox(     self, createActorConfirmBox())
-    initWithActorWarCommandMenu( self, createActorWarCommandMenu())
-    initWithActorMoneyEnergyInfo(self, createActorMoneyEnergyInfo())
-    initWithActorActionMenu(     self, createActorActionMenu())
-    initWithActorUnitDetail(     self, createActorUnitDetail())
-    initWithActorUnitInfo(       self, createActorUnitInfo())
-    initWithActorTileDetail(     self, createActorTileDetail())
-    initWithActorTileInfo(       self, createActorTileInfo())
-    initWithActorBattleInfo(     self, createActorBattleInfo())
+    initActorConfirmBox(     self)
+    initActorWarCommandMenu( self)
+    initActorMoneyEnergyInfo(self)
+    initActorActionMenu(     self)
+    initActorUnitDetail(     self)
+    initActorUnitInfo(       self)
+    initActorTileDetail(     self)
+    initActorTileInfo(       self)
+    initActorBattleInfo(     self)
 
     if (self.m_View) then
         self:initView()
@@ -142,6 +114,7 @@ end
 function ModelWarHUD:setModelWarField(model)
     assert(self.m_ModelWarField == nil, "ModelWarHUD:setModelWarField() the model has been set.")
     self.m_ActorWarCommandMenu:getModel():setModelWarField(model)
+    self.m_ActorUnitInfo:getModel():setModelUnitMap(model:getModelUnitMap())
 
     return self
 end
