@@ -78,8 +78,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function GridIndexable:doActionMoveModelUnit(action, loadedModelUnits)
-    self:setGridIndex(action.path[#action.path], false)
+function GridIndexable:doActionMoveModelUnit(action)
+    if (self.m_Owner.getUnitType) then
+        self:setGridIndex(action.path[#action.path], false)
+    end
 
     return self.m_Owner
 end
