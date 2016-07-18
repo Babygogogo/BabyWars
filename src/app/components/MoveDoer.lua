@@ -11,12 +11,12 @@
 --   单位移动范围同时受到燃料残量、天气、co技能等的影响
 --]]--------------------------------------------------------------------------------
 
-local MoveDoer = class("MoveDoer")
+local MoveDoer = require("src.global.functions.class")("MoveDoer")
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
 local EXPORTED_METHODS = {

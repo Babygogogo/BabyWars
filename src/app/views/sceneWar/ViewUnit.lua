@@ -1,10 +1,10 @@
 
 local ViewUnit = class("ViewUnit", cc.Node)
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local AnimationLoader       = require("app.utilities.AnimationLoader")
-local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local AnimationLoader       = require("src.app.utilities.AnimationLoader")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}

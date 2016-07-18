@@ -11,10 +11,10 @@
 --     因此，本组件只要提供接口让外界知道单个收入是多少就行了，不用计算总量
 --]]--------------------------------------------------------------------------------
 
-local IncomeProvider = class("IncomeProvider")
+local IncomeProvider = require("src.global.functions.class")("IncomeProvider")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local ComponentManager   = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getIncomeAmount",

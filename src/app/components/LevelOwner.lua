@@ -11,12 +11,12 @@
 --   不能进行攻击的单位无法升级，因此无需绑定本组件
 --]]--------------------------------------------------------------------------------
 
-local LevelOwner = class("LevelOwner")
+local LevelOwner = require("src.global.functions.class")("LevelOwner")
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local ComponentManager      = require("global.components.ComponentManager")
-local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local ComponentManager      = require("src.global.components.ComponentManager")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 local MAX_LEVEL   = GameConstantFunctions.getMaxLevel()
 local LEVEL_BONUS = GameConstantFunctions.getLevelBonus()

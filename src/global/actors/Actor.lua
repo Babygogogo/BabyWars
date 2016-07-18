@@ -29,15 +29,27 @@
 --     理想状态下，如果需要更换引擎，那么我们只需要改写view就可以，其他都可以不用更改。
 --]]--------------------------------------------------------------------------------
 
-local Actor = class("Actor")
+local Actor = require("src.global.functions.class")("Actor")
 
-local ComponentManager = require("global.components.ComponentManager")
+local MODEL_PATH = "src.app.models."
+local VIEW_PATH  = "src.app.views."
+
+local s_IsViewEnabled = true
+
+--------------------------------------------------------------------------------
+-- The functions for configuration.
+--------------------------------------------------------------------------------
+function Actor.setViewEnabled(enabled)
+    s_IsViewEnabled = enabled
+
+    return Actor
+end
 
 function Actor.createModel(name, param)
     if (not name) then
         return nil
     else
-        return require("app.models." .. name):create(param)
+        return require(MODEL_PATH .. name):create(param)
     end
 end
 
@@ -45,27 +57,30 @@ function Actor.createView(name, param)
     if (not name) then
         return nil
     else
-        return require("app.views." .. name):create(param)
+        return require(VIEW_PATH .. name):create(param)
     end
 end
 
 function Actor.createWithModelAndViewInstance(modelInstance, viewInstance)
     local actor = Actor.new()
-    if (modelInstance) then actor:setModel(modelInstance) end
-    if (viewInstance)  then actor:setView( viewInstance)  end
+    if (modelInstance) then
+        actor:setModel(modelInstance)
+    end
+    if ((s_IsViewEnabled) and (viewInstance)) then
+        actor:setView(viewInstance)
+    end
 
     return actor
 end
 
 function Actor.createWithModelAndViewName(modelName, modelParam, viewName, viewParam)
     local model = Actor.createModel(modelName, modelParam)
-    local view  = Actor.createView( viewName,  viewParam)
+    local view = (s_IsViewEnabled) and (Actor.createView( viewName,  viewParam)) or (nil)
 
     return Actor.createWithModelAndViewInstance(model, view)
 end
 
 function Actor:setView(view)
-    assert(iskindof(view, "cc.Node"), "Actor:setView() the param view is not a kind of cc.Node.")
     assert(view.m_Actor == nil, "Actor:setView() the param view already has an owner actor.")
     assert(self.m_View == nil, "Actor:setView() the actor already has a view.")
 

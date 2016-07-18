@@ -8,11 +8,11 @@
 --   占领点数降为0后，若满足占领即失败的条件（如HQ），则派发相应事件（未完成）。
 --]]--------------------------------------------------------------------------------
 
-local CaptureTaker = class("CaptureTaker")
+local CaptureTaker = require("src.global.functions.class")("CaptureTaker")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local ComponentManager   = require("src.global.components.ComponentManager")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "getCurrentCapturePoint",

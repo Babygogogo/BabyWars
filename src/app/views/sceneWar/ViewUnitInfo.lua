@@ -1,9 +1,9 @@
 
 local ViewUnitInfo = class("ViewUnitInfo", cc.Node)
 
-local AnimationLoader       = require("app.utilities.AnimationLoader")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local Actor                 = require("global.actors.Actor")
+local AnimationLoader       = require("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local Actor                 = require("src.global.actors.Actor")
 
 local SUB_VIEW_Z_ORDER = 0
 

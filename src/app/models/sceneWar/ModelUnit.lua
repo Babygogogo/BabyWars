@@ -10,13 +10,13 @@
 --     有点不同的是，ModelUnit只需一个tiledID即可构造，而ModelTile可能需要1-2个。
 --]]--------------------------------------------------------------------------------
 
-local ModelUnit = class("ModelUnit")
+local ModelUnit = require("src.global.functions.class")("ModelUnit")
 
-local ComponentManager      = require("global.components.ComponentManager")
-local TypeChecker           = require("app.utilities.TypeChecker")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local TableFunctions        = require("app.utilities.TableFunctions")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local TableFunctions        = require("src.app.utilities.TableFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -183,14 +183,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelUnit:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action, loadedModelUnits)
 
     return self
 end
 
 function ModelUnit:doActionLaunchModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
+
+    if (self.m_View) then
+        self.m_View:updateWithModelUnit(self)
+            :showNormalAnimation()
+    end
 
     return self
 end
@@ -278,13 +283,13 @@ function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     return self
 end
 
-function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
+function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
     self:setStateActioned()
-    if (not droppingActorUnits) then
-        return
+    for _, dropActorUnit in pairs(dropActorUnits) do
+        dropActorUnit:getModel():setStateActioned()
     end
 
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, droppingActorUnits)
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, dropActorUnits)
 
     if (self.m_View) then
         local path                  = action.path
@@ -294,7 +299,7 @@ function ModelUnit:doActionDropModelUnit(action, droppingActorUnits)
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
-            for _, dropActorUnit in ipairs(droppingActorUnits) do
+            for _, dropActorUnit in ipairs(dropActorUnits) do
                 local dropModelUnit = dropActorUnit:getModel()
                 local dropViewUnit  = dropActorUnit:getView()
                 dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()

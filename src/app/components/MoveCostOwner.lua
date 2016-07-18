@@ -11,10 +11,10 @@
 --   需要传入移动类型，本组件才能返回相应的移动力消耗值
 --]]--------------------------------------------------------------------------------
 
-local MoveCostOwner = class("MoveCostOwner")
+local MoveCostOwner = require("src.global.functions.class")("MoveCostOwner")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local ComponentManager   = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getMoveCost",

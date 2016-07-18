@@ -40,6 +40,8 @@
 
 local GameConstantFunctions = {}
 
+local Actor = require("src.global.actors.Actor")
+
 local GAME_CONSTANT        = require("res.data.GameConstant")
 local GRID_SIZE            = GAME_CONSTANT.gridSize
 local UNIT_NAMES           = GAME_CONSTANT.categories.AllUnits
@@ -52,6 +54,7 @@ local FATAL_DAMAGE     = 90
 local EFFECTIVE_DAMAGE = 50
 
 local s_IsInitialized = false
+local s_IsServer      = false
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -138,13 +141,24 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function GameConstantFunctions.init()
+function GameConstantFunctions.init(isServer)
     if (not s_IsInitialized) then
         s_IsInitialized = true
+
+        if (isServer) then
+            s_IsServer = true
+            Actor.setViewEnabled(false)
+        end
 
         initTileUnitIndexes()
         initUnitAttackAndDefenseList()
     end
+
+    return GameConstantFunctions
+end
+
+function GameConstantFunctions.isServer()
+    return s_IsServer
 end
 
 function GameConstantFunctions.getGameVersion()

@@ -1,10 +1,10 @@
 
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
-local Actor                 = require("global.actors.Actor")
-local ActorManager          = require("global.actors.ActorManager")
-local WebSocketManager      = require("app.utilities.WebSocketManager")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

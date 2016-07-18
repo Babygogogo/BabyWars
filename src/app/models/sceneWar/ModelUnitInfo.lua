@@ -12,73 +12,50 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function updateWithModelUnit(self, modelUnit, loadedModelUnits)
-    self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
+local function updateWithModelUnitMap(self)
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(self.m_CursorGridIndex)
+    if (modelUnit) then
+        local loadedModelUnits = self.m_ModelUnitMap:getLoadedModelUnitsWithLoader(modelUnit)
+        self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
-            :setVisible(true)
+        if (self.m_View) then
+            self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
+                :setVisible(true)
+        end
+    elseif (self.m_View) then
+        self.m_View:setVisible(false)
     end
 end
 
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPreviewModelUnit(self, event)
-    local modelUnit = event.modelUnit
-    self.m_CursorGridIndex = GridIndexFunctions.clone(modelUnit:getGridIndex())
-    updateWithModelUnit(self, modelUnit, event.loadedModelUnits)
-end
-
-local function onEvtPreviewNoModelUnit(self, event)
-    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
-
-    if (self.m_View) then
-        self.m_View:setVisible(false)
-    end
-end
-
-local function onEvtDestroyModelUnit(self, event)
-    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.gridIndex) and (self.m_View)) then
-        self.m_View:setVisible(false)
-    end
-end
-
-local function onEvtModelUnitUpdated(self, event)
-    if (self.m_View) then
-        local modelUnit        = event.modelUnit
-        local currentGridIndex = modelUnit:getGridIndex()
-
-        if ((GridIndexFunctions.isEqual(event.previousGridIndex, self.m_CursorGridIndex)) and
-            (not GridIndexFunctions.isEqual(event.previousGridIndex, currentGridIndex))) then
-            self.m_View:setVisible(false)
-        elseif (GridIndexFunctions.isEqual(self.m_CursorGridIndex, currentGridIndex)) then
-            if (modelUnit:getCurrentHP() <= 0) then
-                self.m_View:setVisible(false)
-            else
-                updateWithModelUnit(self, modelUnit, event.loadedModelUnits)
-            end
-        end
-    end
-end
-
-local function onEvtModelUnitProduced(self, event)
-    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, event.modelUnit:getGridIndex())) then
-        updateWithModelUnit(self, event.modelUnit)
-    end
+local function onEvtModelUnitMapUpdated(self, event)
+    updateWithModelUnitMap(self)
 end
 
 local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
+    updateWithModelUnitMap(self)
 end
 
 local function onEvtModelWeatherUpdated(self, event)
     self.m_ModelWeather = event.modelWeather
+end
+
+local function onEvtGridSelected(self, event)
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    updateWithModelUnitMap(self)
+end
+
+local function onEvtMapCursorMoved(self, event)
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    updateWithModelUnitMap(self)
 end
 
 --------------------------------------------------------------------------------
@@ -97,17 +74,22 @@ function ModelUnitInfo:setModelUnitDetail(model)
     return self
 end
 
+function ModelUnitInfo:setModelUnitMap(model)
+    assert(self.m_ModelUnitMap == nil, "ModelUnitInfo:setModelUnitMap() the model has been set.")
+    self.m_ModelUnitMap = model
+
+    return self
+end
+
 function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPreviewModelUnit", self)
-        :addEventListener("EvtPreviewNoModelUnit",  self)
-        :addEventListener("EvtDestroyModelUnit",    self)
-        :addEventListener("EvtModelUnitUpdated",    self)
-        :addEventListener("EvtModelUnitProduced",   self)
+    dispatcher:addEventListener("EvtModelUnitMapUpdated", self)
         :addEventListener("EvtTurnPhaseMain",       self)
         :addEventListener("EvtModelWeatherUpdated", self)
+        :addEventListener("EvtGridSelected",        self)
+        :addEventListener("EvtMapCursorMoved",      self)
 
     return self
 end
@@ -115,13 +97,11 @@ end
 function ModelUnitInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtModelWeatherUpdated", self)
-        :removeEventListener("EvtTurnPhaseMain",      self)
-        :removeEventListener("EvtModelUnitProduced",  self)
-        :removeEventListener("EvtModelUnitUpdated",   self)
-        :removeEventListener("EvtDestroyModelUnit",   self)
-        :removeEventListener("EvtPreviewModelUnit",   self)
-        :removeEventListener("EvtPreviewNoModelUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
+        :removeEventListener("EvtGridSelected",        self)
+        :removeEventListener("EvtModelWeatherUpdated", self)
+        :removeEventListener("EvtTurnPhaseMain",       self)
+        :removeEventListener("EvtModelUnitMapUpdated", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -132,13 +112,11 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPreviewNoModelUnit")  then onEvtPreviewNoModelUnit( self, event)
-    elseif (eventName == "EvtPreviewModelUnit")    then onEvtPreviewModelUnit(   self, event)
-    elseif (eventName == "EvtDestroyModelUnit")    then onEvtDestroyModelUnit(   self, event)
-    elseif (eventName == "EvtModelUnitUpdated")    then onEvtModelUnitUpdated(   self, event)
-    elseif (eventName == "EvtModelUnitProduced")   then onEvtModelUnitProduced(  self, event)
+    if     (eventName == "EvtModelUnitMapUpdated") then onEvtModelUnitMapUpdated(self, event)
     elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
     elseif (eventName == "EvtModelWeatherUpdated") then onEvtModelWeatherUpdated(self, event)
+    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(       self, event)
+    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
     end
 
     return self

@@ -1,8 +1,8 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
-local WebSocketManager      = require("app.utilities.WebSocketManager")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local WRITABLE_PATH     = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/"
 local ACCOUNT_FILE_PATH = WRITABLE_PATH  .. "LoggedInAccount.lua"

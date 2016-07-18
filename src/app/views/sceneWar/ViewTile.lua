@@ -4,10 +4,10 @@ local ViewTile = class("ViewTile", cc.Node)
 local TILE_OBJECT_Z_ORDER = 1
 local TILE_BASE_Z_ORDER   = 0
 
-local ComponentManager      = require("global.components.ComponentManager")
-local TypeChecker           = require("app.utilities.TypeChecker")
-local AnimationLoader       = require("app.utilities.AnimationLoader")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local AnimationLoader       = require("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The constructor.

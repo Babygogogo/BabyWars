@@ -49,13 +49,13 @@
 --     3. 读取instantialData中的数据
 --]]--------------------------------------------------------------------------------
 
-local ModelTile = class("ModelTile")
+local ModelTile = require("src.global.functions.class")("ModelTile")
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local TableFunctions        = require("app.utilities.TableFunctions")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local TableFunctions        = require("src.app.utilities.TableFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 --------------------------------------------------------------------------------
 -- The util functions.

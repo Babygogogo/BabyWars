@@ -1,8 +1,8 @@
 
-local UnitLoader = class("UnitLoader")
+local UnitLoader = require("src.global.functions.class")("UnitLoader")
 
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getMaxLoadCount",
@@ -14,6 +14,28 @@ local EXPORTED_METHODS = {
     "canLaunchModelUnit",
     "canSupplyLoadedModelUnit",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getRemainingUnitIdsOnDrop(currentList, dropDestinations)
+    local remainingUnitIds = {}
+    for _, unitID in ipairs(currentList) do
+        local isUnitIdRemaining = true
+        for _, dropDestination in pairs(dropDestinations) do
+            if (unitID == dropDestination.unitID) then
+                isUnitIdRemaining = false
+                break
+            end
+        end
+
+        if (isUnitIdRemaining) then
+            remainingUnitIds[#remainingUnitIds + 1] = unitID
+        end
+    end
+
+    return remainingUnitIds
+end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -124,6 +146,15 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
+    local destination = action.path[#action.path]
+    for _, modelUnit in pairs(loadedModelUnits or {}) do
+        modelUnit:setGridIndex(destination, false)
+    end
+
+    return self.m_Owner
+end
+
 function UnitLoader:doActionLoadModelUnit(action, unitID, loaderModelUnit)
     if (self.m_Owner == loaderModelUnit) then
         self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
@@ -132,23 +163,18 @@ function UnitLoader:doActionLoadModelUnit(action, unitID, loaderModelUnit)
     return self.m_Owner
 end
 
-function UnitLoader:doActionDropModelUnit(action)
-    local remainingUnitIds = {}
-    for _, unitID in ipairs(self:getLoadUnitIdList()) do
-        local isUnitIdRemaining = true
-        for _, dropDestination in pairs(action.dropDestinations) do
-            if (unitID == dropDestination.unitID) then
-                isUnitIdRemaining = false
-                break
+function UnitLoader:doActionDropModelUnit(action, dropActorUnits)
+    local dropDestinations = action.dropDestinations
+    self.m_LoadedUnitIds   = getRemainingUnitIdsOnDrop(self:getLoadUnitIdList(), action.dropDestinations)
+
+    for _, dropActorUnit in pairs(dropActorUnits) do
+        local dropModelUnit = dropActorUnit:getModel()
+        for _, dropDestination in pairs(dropDestinations) do
+            if (dropModelUnit:getUnitId() == dropDestination.unitID) then
+                dropModelUnit:setGridIndex(dropDestination.gridIndex)
             end
         end
-
-        if (isUnitIdRemaining) then
-            remainingUnitIds[#remainingUnitIds + 1] = unitID
-        end
     end
-
-    self.m_LoadedUnitIds = remainingUnitIds
 
     return self.m_Owner
 end

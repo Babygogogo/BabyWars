@@ -1,7 +1,7 @@
 
 local ViewWarConfigurator = class("ViewWarConfigurator", cc.Node)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
 local EDIT_BOX_PASSWORD_HEIGHT = 60  -- The same as the height of the indicator of ViewOptionSelector

@@ -10,12 +10,12 @@
 --   生产价格受co技能影响（但目前未完成）
 --]]--------------------------------------------------------------------------------
 
-local UnitProducer = class("UnitProducer")
+local UnitProducer = require("src.global.functions.class")("UnitProducer")
 
-local ModelUnit             = require("app.models.sceneWar.ModelUnit")
-local TypeChecker           = require("app.utilities.TypeChecker")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getProductionCostWithTiledId",
@@ -87,7 +87,7 @@ function UnitProducer:getProductionList(modelPlayer)
         local cost    = self:getProductionCostWithTiledId(tiledID, modelPlayer)
 
         list[i] = {
-            modelUnit   = ModelUnit:create({tiledID = tiledID}),
+            modelUnit   = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID}),
             fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName,
             cost        = cost,
             isAvaliable = cost <= fund,

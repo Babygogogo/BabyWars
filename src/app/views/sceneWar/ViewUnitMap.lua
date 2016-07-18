@@ -1,7 +1,8 @@
 
 local ViewUnitMap = class("ViewUnitMap", cc.Node)
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local Actor              = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -24,10 +25,22 @@ local function setViewUnit(self, view, gridIndex)
 end
 
 --------------------------------------------------------------------------------
+-- The composition elements.
+--------------------------------------------------------------------------------
+local function initPreviewLaunchUnit(self)
+    local view = Actor.createView("sceneWar.ViewUnit")
+    view:setVisible(false)
+
+    self.m_PreviewLaunchUnit = view
+    self:addChild(view)
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewUnitMap:ctor(param)
     self.m_LoadedViewUnit = {}
+    initPreviewLaunchUnit(self)
 
     return self
 end
@@ -38,6 +51,8 @@ function ViewUnitMap:setMapSize(size)
     local width, height = size.width, size.height
     self.m_Map     = createEmptyMap(width, height)
     self.m_MapSize = {width = width, height = height}
+
+    self.m_PreviewLaunchUnit:setLocalZOrder(height + 1)
 
     return self
 end
@@ -78,15 +93,6 @@ function ViewUnitMap:removeViewUnit(gridIndex)
     return self
 end
 
-function ViewUnitMap:removeAllViewUnits()
-    self:removeAllChildren()
-    if (self.m_Map) then
-        self.m_Map = createEmptyMap(self.m_MapSize.width, self.m_MapSize.height)
-    end
-
-    return self
-end
-
 function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
     if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
         return
@@ -112,6 +118,20 @@ function ViewUnitMap:setViewUnitUnloaded(gridIndex, unitID)
 
     self.m_LoadedViewUnit[unitID] = nil
     self.m_Map[gridIndex.x][gridIndex.y] = viewUnit
+
+    return self
+end
+
+function ViewUnitMap:setPreviewLaunchUnit(modelUnit, gridIndex)
+    self.m_PreviewLaunchUnit:updateWithModelUnit(modelUnit)
+        :showMovingAnimation()
+        :setPosition(GridIndexFunctions.toPosition(gridIndex))
+
+    return self
+end
+
+function ViewUnitMap:setPreviewLaunchUnitVisible(visible)
+    self.m_PreviewLaunchUnit:setVisible(visible)
 
     return self
 end

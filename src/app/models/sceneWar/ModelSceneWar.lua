@@ -25,12 +25,13 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local Actor                  = require("global.actors.Actor")
-local ActorManager           = require("global.actors.ActorManager")
-local TypeChecker            = require("app.utilities.TypeChecker")
-local WebSocketManager       = require("app.utilities.WebSocketManager")
-local SerializationFunctions = require("app.utilities.SerializationFunctions")
-local LocalizationFunctions  = require("app.utilities.LocalizationFunctions")
+local Actor                  = require("src.global.actors.Actor")
+local ActorManager           = require("src.global.actors.ActorManager")
+local EventDispatcher        = require("src.global.events.EventDispatcher")
+local TypeChecker            = require("src.app.utilities.TypeChecker")
+local WebSocketManager       = require("src.app.utilities.WebSocketManager")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -271,7 +272,7 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
-    local dispatcher = require("global.events.EventDispatcher"):create()
+    local dispatcher = EventDispatcher:create()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
         :addEventListener("EvtSystemRequestDoAction", self)
 

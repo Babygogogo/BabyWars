@@ -13,7 +13,7 @@
 
 local AttackableGridListFunctions = {}
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local function canAttackTargetOnGridIndex(attacker, attackerGridIndex, targetGridIndex, modelTileMap, modelUnitMap)
     if (not GridIndexFunctions.isWithinMap(targetGridIndex, modelTileMap:getMapSize())) then

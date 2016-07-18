@@ -9,19 +9,19 @@
 --   - ModelWarField目前包括以下子actor：
 --     - TileMap
 --     - UnitMap
---     - MapCursor
---     - ActionPlanner
---     - GridExplosion
+--     - MapCursor（server不含）
+--     - ActionPlanner（server不含）
+--     - GridExplosion（server不含）
 --]]--------------------------------------------------------------------------------
 
-local ModelWarField = class("ModelWarField")
+local ModelWarField = require("src.global.functions.class")("ModelWarField")
 
-local Actor              = require("global.actors.Actor")
-local TypeChecker        = require("app.utilities.TypeChecker")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local TableFunctions     = require("app.utilities.TableFunctions")
+local Actor              = require("src.global.actors.Actor")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local TableFunctions     = require("src.app.utilities.TableFunctions")
 
-local IS_SERVER = false
+local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
 
 --------------------------------------------------------------------------------
 -- The util functions.

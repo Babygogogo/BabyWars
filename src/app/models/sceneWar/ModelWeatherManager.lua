@@ -13,9 +13,9 @@
 --   目前还没有正式开始实现天气功能。
 --]]--------------------------------------------------------------------------------
 
-local ModelWeatherManager = class("ModelWeatherManager")
+local ModelWeatherManager = require("src.global.functions.class")("ModelWeatherManager")
 
-local TableFunctions = require("app.utilities.TableFunctions")
+local TableFunctions      = require("src.app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The constructor.

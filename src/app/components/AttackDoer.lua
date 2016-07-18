@@ -13,13 +13,13 @@
 --    伤害值受防御类型、hp、地形、等级、co技能、天气等影响
 --]]--------------------------------------------------------------------------------
 
-local AttackDoer = class("AttackDoer")
+local AttackDoer = require("src.global.functions.class")("AttackDoer")
 
-local TypeChecker           = require("app.utilities.TypeChecker")
-local GridIndexFunctions    = require("app.utilities.GridIndexFunctions")
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "hasPrimaryWeapon",

@@ -1,7 +1,7 @@
 
 local ViewTurnManager = class("ViewTurnManager", cc.Node)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local BEGIN_TURN_EFFECT_Z_ORDER = 1
 
@@ -18,9 +18,9 @@ local BEGIN_TURN_EFFECT_MIDDLE_Y = BEGIN_TURN_EFFECT_START_Y
 local BEGIN_TURN_EFFECT_END_X    = - BEGIN_TURN_EFFECT_WIDTH
 local BEGIN_TURN_EFFECT_END_Y    = BEGIN_TURN_EFFECT_START_Y
 
-local BEGIN_TURN_EFFECT_MOVEIN_DURATION  = 0.5
-local BEGIN_TURN_EFFECT_STAY_DURATION    = 1.5
-local BEGIN_TURN_EFFECT_MOVEOUT_DURATION = 0.5
+local BEGIN_TURN_EFFECT_MOVEIN_DURATION  = 0.35
+local BEGIN_TURN_EFFECT_STAY_DURATION    = 1.3
+local BEGIN_TURN_EFFECT_MOVEOUT_DURATION = 0.35
 
 local BEGIN_TURN_EFFECT_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local BEGIN_TURN_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}

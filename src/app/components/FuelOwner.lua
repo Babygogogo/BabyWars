@@ -10,11 +10,11 @@
 --   当前燃料量会影响单位的可移动距离，具体计算目前由ModelActionPlanner进行
 --]]--------------------------------------------------------------------------------
 
-local FuelOwner = class("FuelOwner")
+local FuelOwner = require("src.global.functions.class")("FuelOwner")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local ComponentManager   = require("src.global.components.ComponentManager")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "getCurrentFuel",

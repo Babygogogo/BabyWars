@@ -12,13 +12,22 @@
 
 local MovePathFunctions = {}
 
-local GridIndexFunctions     = require("app.utilities.GridIndexFunctions")
-local ReachableAreaFunctions = require("app.utilities.ReachableAreaFunctions")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local ReachableAreaFunctions = require("src.app.utilities.ReachableAreaFunctions")
 
 function MovePathFunctions.createReversedPath(path)
     local newPath, length = {}, #path
     for i = 1, length do
         newPath[i] = path[length - i + 1]
+    end
+
+    return newPath
+end
+
+function MovePathFunctions.createPathForDispatch(path)
+    local newPath = {}
+    for i, node in ipairs(path) do
+        newPath[i] = path[i].gridIndex
     end
 
     return newPath

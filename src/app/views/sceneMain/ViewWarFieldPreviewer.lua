@@ -1,9 +1,9 @@
 
 local ViewWarFieldPreviewer = class("ViewWarFieldPreviewer", cc.Node)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
+local GRID_SIZE = require("src.app.utilities.GameConstantFunctions").getGridSize()
 
 local BACKGROUND_POS_X  = 30 + 250 + 30 -- These numbers are the width/posX of the menu of the JoinWarSelector.
 local BACKGROUND_POS_Y  = 30 + 60 + 30
