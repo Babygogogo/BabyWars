@@ -12,9 +12,9 @@
 
 local UnitProducer = require("src.global.functions.class")("UnitProducer")
 
-local ModelUnit             = require("src.app.models.sceneWar.modelUnit")
 local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local Actor                 = require("src.global.actors.Actor")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
@@ -87,7 +87,7 @@ function UnitProducer:getProductionList(modelPlayer)
         local cost    = self:getProductionCostWithTiledId(tiledID, modelPlayer)
 
         list[i] = {
-            modelUnit   = ModelUnit:create({tiledID = tiledID}),
+            modelUnit   = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID}),
             fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName,
             cost        = cost,
             isAvaliable = cost <= fund,
