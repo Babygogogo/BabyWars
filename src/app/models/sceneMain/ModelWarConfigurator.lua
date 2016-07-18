@@ -1,8 +1,8 @@
 
 local ModelWarConfigurator = class("ModelWarConfigurator")
 
-local Actor                 = require("global.actors.Actor")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

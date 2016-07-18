@@ -1,8 +1,8 @@
 
-local UnitLoader = class("UnitLoader")
+local UnitLoader = require("src.global.functions.class")("UnitLoader")
 
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local ComponentManager      = require("global.components.ComponentManager")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local EXPORTED_METHODS = {
     "getMaxLoadCount",

@@ -1,7 +1,7 @@
 
 local ViewGameHelper = class("ViewGameHelper", cc.Node)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1

@@ -1,7 +1,7 @@
 
 local ModelGameHelper = class("ModelGameHelper")
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The composition items.

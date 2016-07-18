@@ -16,15 +16,14 @@
 --   - ModelUnitMap中，其他的许多概念都和ModelTileMap很相似，直接参照ModelTileMap即可。
 --]]--------------------------------------------------------------------------------
 
-local ModelUnitMap = class("ModelUnitMap")
+local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local TableFunctions     = require("app.utilities.TableFunctions")
-local Actor              = require("global.actors.Actor")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local TableFunctions     = require("src.app.utilities.TableFunctions")
+local Actor              = require("src.global.actors.Actor")
 
-local TEMPLATE_WAR_FIELD_PATH          = "data.templateWarField."
-local GRID_INDEX_FOR_LOADED_MODEL_UNIT = {x = 0, y = 0}
+local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
 -- The util functions.

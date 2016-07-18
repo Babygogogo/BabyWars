@@ -15,7 +15,7 @@ local AnimationLoader = {}
 
 local GAME_CONSTANT = require("res.data.GameConstant")
 
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

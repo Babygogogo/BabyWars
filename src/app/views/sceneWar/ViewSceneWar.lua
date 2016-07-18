@@ -1,7 +1,7 @@
 
 local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local MESSAGE_INDICATOR_Z_ORDER = 3
 local END_WAR_EFFECT_Z_ORDER    = 3

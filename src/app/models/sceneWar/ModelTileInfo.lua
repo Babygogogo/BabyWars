@@ -12,7 +12,7 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

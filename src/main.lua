@@ -27,17 +27,17 @@ local function main()
     display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.png")
     display.loadSpriteFrames("BabyWarsTextureGallery.plist", "BabyWarsTextureGallery.png")
 
-    require("app.utilities.AnimationLoader").load()
-    require("app.utilities.GameConstantFunctions").init()
+    require("src.app.utilities.AnimationLoader").load()
+    require("src.app.utilities.GameConstantFunctions").init()
 
     math.randomseed(os.time())
 
     cc.Director:getInstance():setDisplayStats(true)
 
-    local actorSceneMain = require("global.actors.Actor").createWithModelAndViewName("sceneMain.ModelSceneMain", nil, "sceneMain.ViewSceneMain")
-    require("app.utilities.WebSocketManager").init()
+    local actorSceneMain = require("src.global.actors.Actor").createWithModelAndViewName("sceneMain.ModelSceneMain", nil, "sceneMain.ViewSceneMain")
+    require("src.app.utilities.WebSocketManager").init()
         .setOwner(actorSceneMain:getModel())
-    require("global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
+    require("src.global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
 end
 
 local status, msg = xpcall(main, __G__TRACKBACK__)

@@ -1,8 +1,8 @@
 
 local ViewGridExplosion = class("ViewGridExplosion", cc.Node)
 
-local GRID_SIZE          = require("app.utilities.GameConstantFunctions").getGridSize()
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GRID_SIZE          = require("src.app.utilities.GameConstantFunctions").getGridSize()
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local DAMAGE_Z_ORDER    = 1
 local EXPLOSION_Z_ORDER = 0

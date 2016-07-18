@@ -1,9 +1,9 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
-local Actor                 = require("global.actors.Actor")
+local Actor                 = require("src.global.actors.Actor")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local WarFieldList          = require("res.data.templateWarField.WarFieldList")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

@@ -10,11 +10,11 @@
 --   占领能力受hp、co技能影响
 --]]--------------------------------------------------------------------------------
 
-local CaptureDoer = class("CaptureDoer")
+local CaptureDoer = require("src.global.functions.class")("CaptureDoer")
 
-local TypeChecker        = require("app.utilities.TypeChecker")
-local ComponentManager   = require("global.components.ComponentManager")
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local TypeChecker        = require("src.app.utilities.TypeChecker")
+local ComponentManager   = require("src.global.components.ComponentManager")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local EXPORTED_METHODS = {
     "isCapturing",

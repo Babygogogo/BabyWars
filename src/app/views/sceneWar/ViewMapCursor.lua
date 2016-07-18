@@ -2,14 +2,14 @@
 -- ViewMapCursor is actually a node(as large as the field) that contains the cursor.
 local ViewMapCursor = class("ViewMapCursor", cc.Node)
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local AnimationLoader    = require("app.utilities.AnimationLoader")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local AnimationLoader    = require("src.app.utilities.AnimationLoader")
 
 local PULSE_IN_DURATION = 0.15
 local PULSE_OUT_DURATION = 0.15
 local PULSE_INTERVAL_DURATION = 0.3
 
-local GRID_SIZE = require("app.utilities.GameConstantFunctions").getGridSize()
+local GRID_SIZE = require("src.app.utilities.GameConstantFunctions").getGridSize()
 local UPPER_LEFT_CORNER_OUTER_POSITION_X = -6
 local UPPER_LEFT_CORNER_INNER_POSITION_X =  4
 local UPPER_LEFT_CORNER_OUTER_POSITION_Y =  6 + GRID_SIZE.height

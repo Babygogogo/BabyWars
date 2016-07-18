@@ -11,10 +11,10 @@
 
 local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
-local Actor                 = require("global.actors.Actor")
-local ActorManager          = require("global.actors.ActorManager")
-local WebSocketManager      = require("app.utilities.WebSocketManager")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local WarFieldList          = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -30,7 +30,6 @@ local function updateWithModelUnitMap(self)
     elseif (self.m_View) then
         self.m_View:setVisible(false)
     end
-
 end
 
 --------------------------------------------------------------------------------
@@ -42,6 +41,7 @@ end
 
 local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
+    updateWithModelUnitMap(self)
 end
 
 local function onEvtModelWeatherUpdated(self, event)

@@ -17,11 +17,12 @@
 --     - 更换weather（EvtTurnPhaseChangeWeather，目前未实现。具体切换与否，由ModelWeatherManager决定）
 --]]--------------------------------------------------------------------------------
 
-local ModelTurnManager      = class("ModelTurnManager")
+local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
-local WebSocketManager      = require("app.utilities.WebSocketManager")
-local TableFunctions        = require("app.utilities.TableFunctions")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local TableFunctions        = require("src.app.utilities.TableFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local WebSocketManager      = (GameConstantFunctions.isServer()) and (nil) or (require("src.app.utilities.WebSocketManager"))
 
 --------------------------------------------------------------------------------
 -- The util functions.

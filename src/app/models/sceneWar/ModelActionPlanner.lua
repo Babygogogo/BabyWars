@@ -15,13 +15,13 @@
 
 local ModelActionPlanner = class("ModelActionPlanner")
 
-local GridIndexFunctions          = require("app.utilities.GridIndexFunctions")
-local ReachableAreaFunctions      = require("app.utilities.ReachableAreaFunctions")
-local MovePathFunctions           = require("app.utilities.MovePathFunctions")
-local AttackableGridListFunctions = require("app.utilities.AttackableGridListFunctions")
-local WebSocketManager            = require("app.utilities.WebSocketManager")
-local LocalizationFunctions       = require("app.utilities.LocalizationFunctions")
-local Actor                       = require("global.actors.Actor")
+local GridIndexFunctions          = require("src.app.utilities.GridIndexFunctions")
+local ReachableAreaFunctions      = require("src.app.utilities.ReachableAreaFunctions")
+local MovePathFunctions           = require("src.app.utilities.MovePathFunctions")
+local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
+local WebSocketManager            = require("src.app.utilities.WebSocketManager")
+local LocalizationFunctions       = require("src.app.utilities.LocalizationFunctions")
+local Actor                       = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.

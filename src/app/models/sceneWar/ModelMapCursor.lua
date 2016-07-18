@@ -26,8 +26,8 @@
 
 local ModelMapCursor = class("ModelMapCursor")
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local ComponentManager   = require("global.components.ComponentManager")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local ComponentManager   = require("src.global.components.ComponentManager")
 
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 

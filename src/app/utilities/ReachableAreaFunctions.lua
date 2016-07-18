@@ -13,7 +13,7 @@
 
 local ReachableAreaFunctions = {}
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local function pushBackToAvailableGridList(list, gridIndex, prevGridIndex, totalMoveCost)
     list[#list + 1] = {

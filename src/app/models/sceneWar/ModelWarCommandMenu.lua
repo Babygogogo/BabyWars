@@ -18,11 +18,11 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local Actor                 = require("global.actors.Actor")
-local ActorManager          = require("global.actors.ActorManager")
-local WebSocketManager      = require("app.utilities.WebSocketManager")
-local TypeChecker           = require("app.utilities.TypeChecker")
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.

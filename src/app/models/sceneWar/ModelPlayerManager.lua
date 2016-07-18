@@ -15,10 +15,10 @@
 --  - 本类目前没有对应的view，因为暂时还不用显示。
 --]]--------------------------------------------------------------------------------
 
-local ModelPlayerManager = class("ModelPlayerManager")
+local ModelPlayerManager = require("src.global.functions.class")("ModelPlayerManager")
 
-local ModelPlayer    = require("app.models.sceneWar.ModelPlayer")
-local TableFunctions = require("app.utilities.TableFunctions")
+local ModelPlayer    = require("src.app.models.sceneWar.ModelPlayer")
+local TableFunctions = require("src.app.utilities.TableFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.

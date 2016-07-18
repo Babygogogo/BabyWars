@@ -1,8 +1,8 @@
 
 local ViewUnitMap = class("ViewUnitMap", cc.Node)
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local Actor              = require("global.actors.Actor")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local Actor              = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.

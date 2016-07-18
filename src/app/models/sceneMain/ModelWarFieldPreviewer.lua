@@ -1,7 +1,7 @@
 
 local ModelWarFieldPreviewer = class("ModelWarFieldPreviewer")
 
-local Actor = require("global.actors.Actor")
+local Actor = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The composition elements.

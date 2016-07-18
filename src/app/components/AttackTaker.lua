@@ -14,11 +14,11 @@
 --   - unit的hp上限实际上为100，但多数情况下（如攻击，占领）按10点来计算（换算关系：实际hp / 10 并向上取整）
 --]]--------------------------------------------------------------------------------
 
-local AttackTaker = class("AttackTaker")
+local AttackTaker = require("src.global.functions.class")("AttackTaker")
 
-local GameConstantFunctions = require("app.utilities.GameConstantFunctions")
-local TypeChecker           = require("app.utilities.TypeChecker")
-local ComponentManager      = require("global.components.ComponentManager")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local TypeChecker           = require("src.app.utilities.TypeChecker")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
 local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()

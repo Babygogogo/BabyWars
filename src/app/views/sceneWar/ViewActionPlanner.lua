@@ -1,8 +1,8 @@
 
 local ViewActionPlanner = class("ViewActionPlanner", cc.Node)
 
-local GridIndexFunctions = require("app.utilities.GridIndexFunctions")
-local Actor              = require("global.actors.Actor")
+local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local Actor              = require("src.global.actors.Actor")
 
 local MOVE_PATH_Z_ORDER                = 1
 local PREVIEW_DROP_DESTINATION_Z_ORDER = 1

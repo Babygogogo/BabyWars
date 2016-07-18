@@ -1,7 +1,8 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
-local LocalizationFunctions = require("app.utilities.LocalizationFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
 
 local BACKGROUND_WIDTH  = 600
 local BACKGROUND_HEIGHT = display.height * 0.5
@@ -124,7 +125,7 @@ local function initTouchListener(self)
     local isTouchWithinBackground = false
 
     listener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = require("app.utilities.DisplayNodeFunctions").isTouchWithinNode(touch, self.m_Background)
+        isTouchWithinBackground = DisplayNodeFunctions.isTouchWithinNode(touch, self.m_Background)
         return true
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
