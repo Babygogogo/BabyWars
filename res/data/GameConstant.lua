@@ -2516,6 +2516,8 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
+        UnitSupplier = {},
+
         cost        = 5000,
         vision      = 1,
     },
