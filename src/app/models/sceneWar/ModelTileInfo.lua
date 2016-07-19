@@ -29,29 +29,25 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPreviewModelTile(self, event)
-    local modelTile = event.modelTile
-    self.m_CursorGridIndex = GridIndexFunctions.clone(modelTile:getGridIndex())
-    updateWithModelTile(self, modelTile)
+local function onEvtModelTileMapUpdated(self, event)
+    updateWithModelTile(self, self.m_ModelTileMap:getModelTile(self.m_CursorGridIndex))
 end
 
 local function onEvtMapCursorMoved(self, event)
-    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    local gridIndex = event.gridIndex
+    if (not GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
+        self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
+        updateWithModelTile(self, self.m_ModelTileMap:getModelTile(gridIndex))
+    end
 end
 
 local function onEvtGridSelected(self, event)
-    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
-end
-
-local function onEvtModelTileUpdated(self, event)
-    local modelTile = event.modelTile
-    if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, modelTile:getGridIndex())) then
-        updateWithModelTile(self, modelTile)
-    end
+    onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
+    updateWithModelTile(self, self.m_ModelTileMap:getModelTile(self.m_CursorGridIndex))
 end
 
 --------------------------------------------------------------------------------
@@ -70,15 +66,23 @@ function ModelTileInfo:setModelTileDetail(model)
     return self
 end
 
+function ModelTileInfo:setModelTileMap(model)
+    assert(self.m_ModelTileMap == nil, "ModelTileInfo:setModelTileMap() the model has been set.")
+    self.m_ModelTileMap = model
+
+    updateWithModelTile(self, model:getModelTile(self.m_CursorGridIndex))
+
+    return self
+end
+
 function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelTileInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPreviewModelTile", self)
-        :addEventListener("EvtMapCursorMoved",   self)
-        :addEventListener("EvtGridSelected",     self)
-        :addEventListener("EvtModelTileUpdated", self)
-        :addEventListener("EvtTurnPhaseMain",    self)
+    dispatcher:addEventListener("EvtModelTileMapUpdated", self)
+        :addEventListener("EvtMapCursorMoved", self)
+        :addEventListener("EvtGridSelected",   self)
+        :addEventListener("EvtTurnPhaseMain",  self)
 
     return self
 end
@@ -87,10 +91,9 @@ function ModelTileInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
-        :removeEventListener("EvtModelTileUpdated", self)
-        :removeEventListener("EvtGridSelected",     self)
-        :removeEventListener("EvtMapCursorMoved",   self)
-        :removeEventListener("EvtPreviewModelTile", self)
+        :removeEventListener("EvtGridSelected",        self)
+        :removeEventListener("EvtMapCursorMoved",      self)
+        :removeEventListener("EvtModelTileMapUpdated", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -101,16 +104,10 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPreviewModelTile") then
-        onEvtPreviewModelTile(self, event)
-    elseif (eventName == "EvtMapCursorMoved") then
-        onEvtMapCursorMoved(self, event)
-    elseif (eventName == "EvtGridSelected") then
-        onEvtGridSelected(self, event)
-    elseif (eventName == "EvtModelTileUpdated") then
-        onEvtModelTileUpdated(self, event)
-    elseif (eventName == "EvtTurnPhaseMain") then
-        onEvtTurnPhaseMain(self, event)
+    if     (eventName == "EvtModelTileMapUpdated") then onEvtModelTileMapUpdated(self, event)
+    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
+    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(       self, event)
+    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
     end
 
     return self

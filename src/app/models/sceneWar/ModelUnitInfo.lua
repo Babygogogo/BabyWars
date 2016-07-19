@@ -78,6 +78,8 @@ function ModelUnitInfo:setModelUnitMap(model)
     assert(self.m_ModelUnitMap == nil, "ModelUnitInfo:setModelUnitMap() the model has been set.")
     self.m_ModelUnitMap = model
 
+    updateWithModelUnitMap(self)
+
     return self
 end
 

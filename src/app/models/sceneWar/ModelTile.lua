@@ -266,8 +266,6 @@ function ModelTile:destroyModelTileObject()
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
     self:setRootScriptEventDispatcher(dispatcher)
 
-    dispatchEvtModelTileUpdated(self)
-
     return self
 end
 

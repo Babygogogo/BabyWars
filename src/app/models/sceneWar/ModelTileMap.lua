@@ -65,20 +65,6 @@ local function getTiledTileObjectLayer(tiledData)
     return layer
 end
 
-local function dispatchEvtModelTileUpdated(self, ...)
-    local isEqual         = GridIndexFunctions.isEqual
-    local cursorGridIndex = self.m_CursorGridIndex
-    for _, gridIndex in pairs({...}) do
-        if (isEqual(cursorGridIndex, gridIndex)) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name      = "EvtModelTileUpdated",
-                modelTile = self:getModelTile(cursorGridIndex),
-            })
-            return
-        end
-    end
-end
-
 local function createEmptyMap(width)
     local map = {}
     for x = 1, width do
@@ -119,19 +105,9 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtMapCursorMoved(self, event)
-    local modelTile = self:getModelTile(event.gridIndex)
-    assert(modelTile, "ModelTileMap-onEvtMapCursorMoved() failed to get the tile model with event.gridIndex.")
-
-    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtPreviewModelTile",
-        modelTile = modelTile
-    })
-end
-
 local function onEvtDestroyModelTile(self, event)
     self:getModelTile(event.gridIndex):destroyModelTileObject()
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 end
 
 local function onEvtDestroyViewTile(self, event)
@@ -173,7 +149,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileMap:ctor(param)
-    self.m_CursorGridIndex = {x = 1, y = 1}
     initWithTileActorsMap(self, createTileActorsMap(param))
 
     if (self.m_View) then
@@ -204,8 +179,6 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile", self)
-        :addEventListener("EvtMapCursorMoved",  self)
-        :addEventListener("EvtGridSelected",    self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -217,9 +190,7 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtGridSelected", self)
-        :removeEventListener("EvtMapCursorMoved",   self)
-        :removeEventListener("EvtDestroyViewTile",  self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile",  self)
         :removeEventListener("EvtDestroyModelTile", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -250,13 +221,8 @@ end
 --------------------------------------------------------------------------------
 function ModelTileMap:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtMapCursorMoved") or
-        (eventName == "EvtGridSelected")) then
-        onEvtMapCursorMoved(self, event)
-    elseif (eventName == "EvtDestroyModelTile") then
-        onEvtDestroyModelTile(self, event)
-    elseif (eventName == "EvtDestroyViewTile") then
-        onEvtDestroyViewTile(self, event)
+    if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
+    elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
     end
 
     return self
@@ -277,7 +243,7 @@ function ModelTileMap:doActionSurrender(action)
         self:getModelTile(gridIndex):doActionSurrender(action)
     end
 
-    dispatchEvtModelTileUpdated(self, self.m_CursorGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -287,7 +253,7 @@ function ModelTileMap:doActionAttack(action, attacker, target)
         :doActionAttack(action, attacker, target)
     self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
 
-    dispatchEvtModelTileUpdated(self, action.path[1], action.targetGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -296,7 +262,7 @@ function ModelTileMap:doActionCapture(action, capturer, target)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     target:doActionCapture(action, capturer, target)
 
-    dispatchEvtModelTileUpdated(self, action.path[1], target:getGridIndex())
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -305,7 +271,7 @@ function ModelTileMap:doActionWait(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionWait(action)
 
-    dispatchEvtModelTileUpdated(self, action.path[1])
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -314,7 +280,7 @@ function ModelTileMap:doActionSupplyModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionSupplyModelUnit(action)
 
-    dispatchEvtModelTileUpdated(self, action.path[1])
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -323,7 +289,7 @@ function ModelTileMap:doActionLoadModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionLoadModelUnit(action)
 
-    dispatchEvtModelTileUpdated(self, action.path[1])
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
@@ -332,7 +298,7 @@ function ModelTileMap:doActionDropModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionDropModelUnit(action)
 
-    dispatchEvtModelTileUpdated(self, action.path[1])
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
