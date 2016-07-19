@@ -357,7 +357,9 @@ local function getActionSupplyModelUnit(self)
     local modelUnitMap = self.m_ModelUnitMap
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getMovePathDestination(self.m_MovePath), modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if ((modelUnit) and (focusModelUnit:canSupplyModelUnit(modelUnit))) then
+        if ((modelUnit)                                     and
+            (modelUnit ~= focusModelUnit)                   and
+            (focusModelUnit:canSupplyModelUnit(modelUnit))) then
             return {
                 name     = LocalizationFunctions.getLocalizedText(78, "SupplyModelUnit"),
                 callback = function()
