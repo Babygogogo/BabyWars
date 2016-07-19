@@ -203,6 +203,12 @@ function ModelTile:doActionWait(action)
     return self
 end
 
+function ModelTile:doActionSupplyModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action)
+
+    return self
+end
+
 function ModelTile:doActionLoadModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
 

@@ -310,6 +310,15 @@ function ModelTileMap:doActionWait(action)
     return self
 end
 
+function ModelTileMap:doActionSupplyModelUnit(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+        :doActionSupplyModelUnit(action)
+
+    dispatchEvtModelTileUpdated(self, action.path[1])
+
+    return self
+end
+
 function ModelTileMap:doActionLoadModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionLoadModelUnit(action)

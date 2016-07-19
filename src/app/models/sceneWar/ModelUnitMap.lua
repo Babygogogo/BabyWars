@@ -47,6 +47,18 @@ local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
+local function getSupplyTargetModelUnits(self, supplier, supplierGridIndex)
+    local targets = {}
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplierGridIndex, self:getMapSize())) do
+        local target = self:getModelUnit(gridIndex)
+        if ((target) and (supplier:canSupplyModelUnit(target))) then
+            targets[#targets + 1] = target
+        end
+    end
+
+    return targets
+end
+
 local function setActorUnitLoaded(self, gridIndex)
     local focusActorUnit = self:getActorUnit(gridIndex)
     local focusUnitID    = focusActorUnit:getModel():getUnitId()
@@ -392,6 +404,27 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
 
     capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
         :doActionCapture(action, capturer, target)
+
+    dispatchEvtModelUnitMapUpdated(self)
+
+    return self
+end
+
+function ModelUnitMap:doActionSupplyModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    local focusModelUnit = self:getModelUnit(endingGridIndex)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+        :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit, endingGridIndex))
 
     dispatchEvtModelUnitMapUpdated(self)
 

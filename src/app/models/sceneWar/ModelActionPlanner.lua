@@ -355,7 +355,7 @@ local function getActionSupplyModelUnit(self)
     end
 
     local modelUnitMap = self.m_ModelUnitMap
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getMovePathDestination(self.m_MovePath))) do
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getMovePathDestination(self.m_MovePath), modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(gridIndex)
         if ((modelUnit) and (focusModelUnit:canSupplyModelUnit(modelUnit))) then
             return {
