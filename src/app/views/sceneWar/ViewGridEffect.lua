@@ -1,5 +1,5 @@
 
-local ViewGridExplosion = class("ViewGridExplosion", cc.Node)
+local ViewGridEffect = class("ViewGridEffect", cc.Node)
 
 local GRID_SIZE          = require("src.app.utilities.GameConstantFunctions").getGridSize()
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
@@ -33,23 +33,23 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ViewGridExplosion:ctor(param)
+function ViewGridEffect:ctor(param)
     return self
 end
 
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewGridExplosion:showAnimationExplosion(gridIndex, callbackOnFinish)
+function ViewGridEffect:showAnimationExplosion(gridIndex, callbackOnFinish)
     self:addChild(createAnimationExplosion(gridIndex), EXPLOSION_Z_ORDER)
 
     return self
 end
 
-function ViewGridExplosion:showAnimationDamage(gridIndex, callbackOnFinish)
+function ViewGridEffect:showAnimationDamage(gridIndex, callbackOnFinish)
     self:addChild(createAnimationDamage(gridIndex), DAMAGE_Z_ORDER)
 
     return self
 end
 
-return ViewGridExplosion
+return ViewGridEffect

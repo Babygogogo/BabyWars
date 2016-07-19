@@ -1,6 +1,6 @@
 
 --[[--------------------------------------------------------------------------------
--- ModelGridExplosion用于显示一个格子上的爆炸效果。
+-- ModelGridEffect用于显示一个格子上的爆炸效果。
 --
 -- 主要职责及使用场景举例：
 --   当有unit或tile爆炸时，显示爆炸效果（通过event来获知爆炸事件）。
@@ -9,17 +9,17 @@
 --   - 本类能够同时显示多处爆炸，因此也可以用于显示导弹爆炸的效果。
 --]]--------------------------------------------------------------------------------
 
-local ModelGridExplosion = class("ModelGridExplosion")
+local ModelGridEffect = class("ModelGridEffect")
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelGridExplosion:ctor()
+function ModelGridEffect:ctor()
     return self
 end
 
-function ModelGridExplosion:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelGridExplosion:setRootScriptEventDispatcher() the dispatcher has been set.")
+function ModelGridEffect:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil, "ModelGridEffect:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyViewUnit", self)
@@ -30,8 +30,8 @@ function ModelGridExplosion:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelGridExplosion:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelGridExplosion:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
+function ModelGridEffect:unsetRootScriptEventDispatcher()
+    assert(self.m_RootScriptEventDispatcher, "ModelGridEffect:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtAttackViewTile", self)
         :removeEventListener("EvtAttackViewUnit",  self)
@@ -45,7 +45,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-function ModelGridExplosion:onEvent(event)
+function ModelGridEffect:onEvent(event)
     local name = event.name
     if ((name == "EvtDestroyViewUnit") or
         (name == "EvtDestroyViewTile")) then
@@ -61,7 +61,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelGridExplosion:showAnimationExplosion(gridIndex, callbackOnFinish)
+function ModelGridEffect:showAnimationExplosion(gridIndex, callbackOnFinish)
     if (self.m_View) then
         self.m_View:showAnimationExplosion(gridIndex, callbackOnFinish)
     elseif (callbackOnFinish) then
@@ -71,7 +71,7 @@ function ModelGridExplosion:showAnimationExplosion(gridIndex, callbackOnFinish)
     return self
 end
 
-function ModelGridExplosion:showAnimationDamage(gridIndex, callbackOnFinish)
+function ModelGridEffect:showAnimationDamage(gridIndex, callbackOnFinish)
     if (self.m_View) then
         self.m_View:showAnimationDamage(gridIndex, callbackOnFinish)
     elseif (callbackOnFinish) then
@@ -81,4 +81,4 @@ function ModelGridExplosion:showAnimationDamage(gridIndex, callbackOnFinish)
     return self
 end
 
-return ModelGridExplosion
+return ModelGridEffect
