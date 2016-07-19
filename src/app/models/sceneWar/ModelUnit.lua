@@ -274,8 +274,13 @@ function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
+            local eventDispatcher = self.m_RootScriptEventDispatcher
             for _, target in pairs(targetModelUnits) do
                 target:updateView()
+                eventDispatcher:dispatchEvent({
+                    name      = "EvtSupplyViewUnit",
+                    gridIndex = target:getGridIndex(),
+                })
             end
         end)
     end

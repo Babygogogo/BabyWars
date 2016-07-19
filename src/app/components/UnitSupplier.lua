@@ -11,6 +11,13 @@ local EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function dispatchEvtSupplyViewUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtSupplyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
 local function canSupplyFuel(modelUnit)
     return (modelUnit.getCurrentFuel)                         and
         (modelUnit:getCurrentFuel() < modelUnit:getMaxFuel())
@@ -43,6 +50,7 @@ local function onEvtTurnPhaseSupplyUnit(self, event)
             local target = modelUnitMap:getModelUnit(gridIndex)
             if ((target) and (self:canSupplyModelUnit(target))) then
                 supplyModelUnit(target)
+                dispatchEvtSupplyViewUnit(self, gridIndex)
             end
         end
     end

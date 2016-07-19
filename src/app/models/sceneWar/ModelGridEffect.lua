@@ -12,6 +12,37 @@
 local ModelGridEffect = class("ModelGridEffect")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function showAnimationExplosion(self, gridIndex, callbackOnFinish)
+    if (self.m_View) then
+        self.m_View:showAnimationExplosion(gridIndex, callbackOnFinish)
+    elseif (callbackOnFinish) then
+        callbackOnFinish()
+    end
+end
+
+local function showAnimationDamage(self, gridIndex, callbackOnFinish)
+    if (self.m_View) then
+        self.m_View:showAnimationDamage(gridIndex, callbackOnFinish)
+    elseif (callbackOnFinish) then
+        callbackOnFinish()
+    end
+end
+
+local function showAnimationSupply(self, gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSupply(gridIndex)
+    end
+end
+
+local function showAnimationRepair(self, gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationRepair(gridIndex)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelGridEffect:ctor()
@@ -26,6 +57,8 @@ function ModelGridEffect:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtDestroyViewTile", self)
         :addEventListener("EvtAttackViewUnit",  self)
         :addEventListener("EvtAttackViewTile",  self)
+        :addEventListener("EvtSupplyViewUnit",  self)
+        :addEventListener("EvtRepairViewUnit",  self)
 
     return self
 end
@@ -33,7 +66,9 @@ end
 function ModelGridEffect:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelGridEffect:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtAttackViewTile", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtRepairViewUnit", self)
+        :removeEventListener("EvtSupplyViewUnit", self)
+        :removeEventListener("EvtAttackViewTile",  self)
         :removeEventListener("EvtAttackViewUnit",  self)
         :removeEventListener("EvtDestroyViewTile", self)
         :removeEventListener("EvtDestroyViewUnit", self)
@@ -46,36 +81,14 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelGridEffect:onEvent(event)
-    local name = event.name
-    if ((name == "EvtDestroyViewUnit") or
-        (name == "EvtDestroyViewTile")) then
-        self:showAnimationExplosion(event.gridIndex)
-    elseif ((name == "EvtAttackViewUnit") or
-        (name == "EvtAttackViewTile")) then
-        self:showAnimationDamage(event.gridIndex)
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelGridEffect:showAnimationExplosion(gridIndex, callbackOnFinish)
-    if (self.m_View) then
-        self.m_View:showAnimationExplosion(gridIndex, callbackOnFinish)
-    elseif (callbackOnFinish) then
-        callbackOnFinish()
-    end
-
-    return self
-end
-
-function ModelGridEffect:showAnimationDamage(gridIndex, callbackOnFinish)
-    if (self.m_View) then
-        self.m_View:showAnimationDamage(gridIndex, callbackOnFinish)
-    elseif (callbackOnFinish) then
-        callbackOnFinish()
+    local name      = event.name
+    local gridIndex = event.gridIndex
+    if     (name == "EvtDestroyViewUnit") then showAnimationExplosion(self, gridIndex)
+    elseif (name == "EvtDestroyViewTile") then showAnimationExplosion(self, gridIndex)
+    elseif (name == "EvtAttackViewUnit")  then showAnimationDamage(   self, gridIndex)
+    elseif (name == "EvtAttackViewTile")  then showAnimationDamage(   self, gridIndex)
+    elseif (name == "EvtSupplyViewUnit")  then showAnimationSupply(   self, gridIndex)
+    elseif (name == "EvtRepairViewUnit")  then showAnimationRepair(   self, gridIndex)
     end
 
     return self
