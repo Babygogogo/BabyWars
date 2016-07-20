@@ -3,7 +3,6 @@ local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
 local AnimationLoader       = require("src.app.utilities.AnimationLoader")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
 
 local TILE_LABEL_Z_ORDER = 3
 local INFO_LABEL_Z_ORDER = 2
@@ -215,14 +214,23 @@ local function updateDefenseInfoWithModelTile(self, tile)
 end
 
 local function updateCaptureInfoWithModelTile(self, tile)
-    local captureTaker = ComponentManager.getComponent(tile, "CaptureTaker")
-    if (not captureTaker) then
-        self.m_CaptureIcon:setVisible(false)
-        self.m_CaptureLabel:setVisible(false)
-    else
+    if (tile.getCurrentCapturePoint) then
         self.m_CaptureIcon:setVisible(true)
         self.m_CaptureLabel:setVisible(true)
-            :setInt(captureTaker:getCurrentCapturePoint())
+            :setInt(tile:getCurrentCapturePoint())
+    elseif (tile.getCurrentBuildPoint) then
+        local buildPoint = tile:getCurrentBuildPoint()
+        if (buildPoint < tile:getMaxBuildPoint()) then
+            self.m_CaptureIcon:setVisible(true)
+            self.m_CaptureLabel:setVisible(true)
+                :setInt(buildPoint)
+        else
+            self.m_CaptureIcon:setVisible(false)
+            self.m_CaptureLabel:setVisible(false)
+        end
+    else
+        self.m_CaptureIcon:setVisible(false)
+        self.m_CaptureLabel:setVisible(false)
     end
 end
 

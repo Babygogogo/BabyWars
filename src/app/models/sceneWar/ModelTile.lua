@@ -257,14 +257,19 @@ function ModelTile:getDescription()
     return LocalizationFunctions.getLocalizedText(117, self:getTileType())
 end
 
-function ModelTile:destroyModelTileObject()
-    assert(self.m_ObjectID > 0, "ModelTile:destroyModelTileObject() there's no tile object.")
-
+function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
     local gridIndex, dispatcher = self:getGridIndex(), self.m_RootScriptEventDispatcher
     self:unsetRootScriptEventDispatcher()
-    initWithTiledID(self, 0, self.m_BaseID)
+    initWithTiledID(self, objectID, baseID)
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
     self:setRootScriptEventDispatcher(dispatcher)
+
+    return self
+end
+
+function ModelTile:destroyModelTileObject()
+    assert(self.m_ObjectID > 0, "ModelTile:destroyModelTileObject() there's no tile object.")
+    self:updateWithObjectAndBaseId(0, self.m_BaseID)
 
     return self
 end

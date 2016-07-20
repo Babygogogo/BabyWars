@@ -691,6 +691,7 @@ GameConstant.categories = {
 }
 
 GameConstant.maxCapturePoint = 20
+GameConstant.maxBuildPoint   = 20
 GameConstant.unitMaxHP       = 100
 GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
@@ -731,6 +732,11 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = false,
             Transport = false,
+        },
+
+        Buildable = {
+            currentBuildPoint = GameConstant.maxBuildPoint,
+            maxBuildPoint     = GameConstant.maxBuildPoint,
         },
     },
 
@@ -791,6 +797,11 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = false,
             Transport = 1,
+        },
+
+        Buildable = {
+            currentBuildPoint = GameConstant.maxBuildPoint,
+            maxBuildPoint     = GameConstant.maxBuildPoint,
         },
     },
 
