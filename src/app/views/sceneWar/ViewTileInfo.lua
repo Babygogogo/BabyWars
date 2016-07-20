@@ -40,7 +40,6 @@ local CAPTURE_INFO_POS_Y = 10
 local HP_INFO_POS_X = DEFENSE_INFO_POS_X
 local HP_INFO_POS_Y = 10
 
-local INFO_ICON_SCALE    = 0.4
 local INFO_LABEL_WIDTH   = BACKGROUND_WIDTH - DEFENSE_INFO_POS_X * 2
 local INFO_LABEL_HEIGHT  = 30
 
@@ -134,8 +133,6 @@ end
 local function initDefenseInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s04_f01.png")
     icon:setAnchorPoint(0, 0)
-        :setScale(INFO_ICON_SCALE)
-
         :ignoreAnchorPointForPosition(true)
         :setPosition(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y)
 
@@ -150,8 +147,6 @@ end
 local function initCaptureInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s05_f01.png")
     icon:setAnchorPoint(0, 0)
-        :setScale(INFO_ICON_SCALE)
-
         :ignoreAnchorPointForPosition(true)
         :setPosition(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y)
 
@@ -166,8 +161,6 @@ end
 local function initHPInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
-        :setScale(INFO_ICON_SCALE)
-
         :ignoreAnchorPointForPosition(true)
         :setPosition(HP_INFO_POS_X + 2, HP_INFO_POS_Y + 2)
 

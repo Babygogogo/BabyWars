@@ -34,7 +34,6 @@ local FUEL_INFO_POS_Y = HP_INFO_POS_Y - 22
 local AMMO_INFO_POS_X = HP_INFO_POS_X
 local AMMO_INFO_POS_Y = FUEL_INFO_POS_Y - 22
 
-local INFO_ICON_SCALE    = 0.5
 local INFO_LABEL_WIDTH   = BACKGROUND_WIDTH - HP_INFO_POS_X * 2
 local INFO_LABEL_HEIGHT  = 30
 
@@ -113,8 +112,6 @@ local function initHPInfo(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(HP_INFO_POS_X + 2, HP_INFO_POS_Y + 2)
 
-        :setScale(INFO_ICON_SCALE)
-
     local label = createLabel(HP_INFO_POS_X, HP_INFO_POS_Y - 4)
 
     self.m_HPIcon  = icon
@@ -127,9 +124,7 @@ local function initFuelInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(FUEL_INFO_POS_X + 2, FUEL_INFO_POS_Y + 0)
-
-        :setScale(INFO_ICON_SCALE)
+        :setPosition(FUEL_INFO_POS_X + 2, FUEL_INFO_POS_Y + 2)
 
     local label = createLabel(FUEL_INFO_POS_X, FUEL_INFO_POS_Y - 4)
 
@@ -143,9 +138,7 @@ local function initAmmoInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(AMMO_INFO_POS_X + 2, AMMO_INFO_POS_Y + 5)
-
-        :setScale(INFO_ICON_SCALE)
+        :setPosition(AMMO_INFO_POS_X + 2, AMMO_INFO_POS_Y + 2)
 
     local label = createLabel(AMMO_INFO_POS_X, AMMO_INFO_POS_Y - 4)
 
