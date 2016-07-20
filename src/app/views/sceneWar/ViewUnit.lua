@@ -100,6 +100,14 @@ local function getLoadIndicatorFrame(unit)
     end
 end
 
+local function getMaterialIndicatorFrame(unit)
+    if ((unit.isMaterialInShort) and (unit:isMaterialInShort())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s02_f04.png")
+    else
+        return nil
+    end
+end
+
 local function playSpriteAnimation(sprite, tiledID, state)
     if (state == "moving") then
         sprite:setPosition(-18, 0)
@@ -198,6 +206,7 @@ local function updateStateIndicator(indicator, unit)
     frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
     frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
     frames[#frames + 1] = getLoadIndicatorFrame(     unit)
+    frames[#frames + 1] = getMaterialIndicatorFrame( unit)
 
     indicator:stopAllActions()
     if (#frames == 0) then

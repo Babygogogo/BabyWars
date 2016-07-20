@@ -174,6 +174,20 @@ local function initAmmoInfo(self)
         :addChild(label, INFO_LABEL_Z_ORDER)
 end
 
+local function initMaterialInfo(self)
+    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s09_f01.png")
+    icon:setAnchorPoint(0, 0)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(AMMO_INFO_POS_X, AMMO_INFO_POS_Y)
+
+    local label = createInfoLabel(AMMO_INFO_POS_X, AMMO_INFO_POS_Y)
+
+    self.m_MaterialIcon  = icon
+    self.m_MaterialLabel = label
+    self.m_Background:getRendererNormal():addChild(icon, INFO_ICON_Z_ORDER)
+        :addChild(label, INFO_LABEL_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The private functions for updating the composition elements.
 --------------------------------------------------------------------------------
@@ -204,16 +218,28 @@ local function updateAmmoInfoWithModelUnit(self, unit)
     end
 end
 
+local function updateMaterialInfoWithModelUnit(self, unit)
+    if (not unit.getCurrentMaterial) then
+        self.m_MaterialIcon :setVisible(false)
+        self.m_MaterialLabel:setVisible(false)
+    else
+        self.m_MaterialIcon :setVisible(true)
+        self.m_MaterialLabel:setVisible(true)
+            :setInt(unit:getCurrentMaterial())
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewUnitInfoSingle:ctor(param)
-    initBackground(self)
-    initUnitIcon(  self)
-    initUnitLabel( self)
-    initHPInfo(    self)
-    initFuelInfo(  self)
-    initAmmoInfo(  self)
+    initBackground(  self)
+    initUnitIcon(    self)
+    initUnitLabel(   self)
+    initHPInfo(      self)
+    initFuelInfo(    self)
+    initAmmoInfo(    self)
+    initMaterialInfo(self)
 
     self:ignoreAnchorPointForPosition(true)
         :setVisible(false)
@@ -235,11 +261,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnitInfoSingle:updateWithModelUnit(modelUnit)
-    updateUnitIconWithModelUnit( self, modelUnit)
-    updateUnitLabelWithModelUnit(self, modelUnit)
-    updateHPInfoWithModelUnit(   self, modelUnit)
-    updateFuelInfoWithModelUnit( self, modelUnit)
-    updateAmmoInfoWithModelUnit( self, modelUnit)
+    updateUnitIconWithModelUnit(    self, modelUnit)
+    updateUnitLabelWithModelUnit(   self, modelUnit)
+    updateHPInfoWithModelUnit(      self, modelUnit)
+    updateFuelInfoWithModelUnit(    self, modelUnit)
+    updateAmmoInfoWithModelUnit(    self, modelUnit)
+    updateMaterialInfoWithModelUnit(self, modelUnit)
 
     return self
 end

@@ -2518,6 +2518,11 @@ GameConstant.templateModelUnits = {
 
         UnitSupplier = {},
 
+        MaterialOwner = {
+            max     = 1,
+            current = 1,
+        },
+
         cost        = 5000,
         vision      = 1,
     },
@@ -3091,6 +3096,11 @@ GameConstant.templateModelUnits = {
 
         LevelOwner = {
             level = 0,
+        },
+
+        MaterialOwner = {
+            max     = 4,
+            current = 4,
         },
 
         cost        = 28000,
