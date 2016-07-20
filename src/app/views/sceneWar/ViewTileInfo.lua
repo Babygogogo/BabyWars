@@ -49,20 +49,46 @@ local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local FONT_OUTLINE_WIDTH = 2
 
+local DIGIT_WIDTH = 16
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getReversedDigitsForInt(int)
+    local digits = {}
+    while (int > 0) do
+        digits[#digits + 1] = int % 10
+        int = math.floor(int / 10)
+    end
+    if (#digits == 0) then
+        digits[1] = 0
+    end
+
+    return digits
+end
+
+local function createDigitSprite(digit, reversedIndex)
+    local sprite = cc.Sprite:createWithSpriteFrameName("c03_t09_s01_f0" .. digit .. ".png")
+    sprite:ignoreAnchorPointForPosition(true)
+        :setPositionX(INFO_LABEL_WIDTH - reversedIndex * DIGIT_WIDTH)
+
+    return sprite
+end
+
 local function createInfoLabel(posX, posY)
-    local label = cc.Label:createWithTTF("", FONT_NAME, FONT_SIZE)
+    local label = cc.Node:create()
     label:ignoreAnchorPointForPosition(true)
         :setPosition(posX, posY)
-        :setDimensions(INFO_LABEL_WIDTH, INFO_LABEL_HEIGHT)
+        :setContentSize(INFO_LABEL_WIDTH, INFO_LABEL_HEIGHT)
 
-        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
-        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+    label.setInt = function(self, int)
+        local digits = getReversedDigitsForInt(int)
 
-        :setTextColor(FONT_COLOR)
-        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+        self:removeAllChildren()
+        for i = 1, #digits do
+            self:addChild(createDigitSprite(digits[i], i))
+        end
+    end
 
     return label
 end
@@ -136,7 +162,7 @@ local function initDefenseInfo(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y)
 
-    local label = createInfoLabel(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y - 4)
+    local label = createInfoLabel(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y)
 
     self.m_DefenseIcon  = icon
     self.m_DefenseLabel = label
@@ -150,7 +176,7 @@ local function initCaptureInfo(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y)
 
-    local label = createInfoLabel(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y - 4)
+    local label = createInfoLabel(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y)
 
     self.m_CaptureIcon  = icon
     self.m_CaptureLabel = label
@@ -162,9 +188,9 @@ local function initHPInfo(self)
     local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(HP_INFO_POS_X + 2, HP_INFO_POS_Y + 2)
+        :setPosition(HP_INFO_POS_X, HP_INFO_POS_Y)
 
-    local label = createInfoLabel(HP_INFO_POS_X, HP_INFO_POS_Y - 4)
+    local label = createInfoLabel(HP_INFO_POS_X, HP_INFO_POS_Y)
 
     self.m_HPIcon  = icon
     self.m_HPLabel = label
@@ -185,7 +211,7 @@ local function updateTileLabelWithModelTile(self, tile)
 end
 
 local function updateDefenseInfoWithModelTile(self, tile)
-    self.m_DefenseLabel:setString(tile:getNormalizedDefenseBonusAmount())
+    self.m_DefenseLabel:setInt(tile:getNormalizedDefenseBonusAmount())
 end
 
 local function updateCaptureInfoWithModelTile(self, tile)
@@ -196,7 +222,7 @@ local function updateCaptureInfoWithModelTile(self, tile)
     else
         self.m_CaptureIcon:setVisible(true)
         self.m_CaptureLabel:setVisible(true)
-            :setString(captureTaker:getCurrentCapturePoint())
+            :setInt(captureTaker:getCurrentCapturePoint())
     end
 end
 
@@ -207,7 +233,7 @@ local function updateHPInfoWithModelTile(self, tile)
     else
         self.m_HPIcon:setVisible(true)
         self.m_HPLabel:setVisible(true)
-            :setString(tile:getCurrentHP())
+            :setInt(tile:getCurrentHP())
     end
 end
 
