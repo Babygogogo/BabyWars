@@ -115,6 +115,7 @@ function ModelWarHUD:setModelWarField(model)
     assert(self.m_ModelWarField == nil, "ModelWarHUD:setModelWarField() the model has been set.")
     self.m_ActorWarCommandMenu:getModel():setModelWarField(model)
     self.m_ActorUnitInfo:getModel():setModelUnitMap(model:getModelUnitMap())
+    self.m_ActorTileInfo:getModel():setModelTileMap(model:getModelTileMap())
 
     return self
 end

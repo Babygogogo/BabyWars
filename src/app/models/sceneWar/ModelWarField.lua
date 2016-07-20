@@ -11,7 +11,7 @@
 --     - UnitMap
 --     - MapCursor（server不含）
 --     - ActionPlanner（server不含）
---     - GridExplosion（server不含）
+--     - GridEffect（server不含）
 --]]--------------------------------------------------------------------------------
 
 local ModelWarField = require("src.global.functions.class")("ModelWarField")
@@ -88,10 +88,10 @@ local function initActorMapCursor(self, param)
     self.m_ActorMapCursor = actor
 end
 
-local function initActorGridExplosion(self)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelGridExplosion", nil, "sceneWar.ViewGridExplosion")
+local function initActorGridEffect(self)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelGridEffect", nil, "sceneWar.ViewGridEffect")
 
-    self.m_ActorGridExplosion = actor
+    self.m_ActorGridEffect = actor
 end
 
 --------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ function ModelWarField:ctor(param)
     if (not IS_SERVER) then
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
-        initActorGridExplosion(self)
+        initActorGridEffect(self)
     end
 
     assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
@@ -126,7 +126,7 @@ function ModelWarField:initView()
         :setViewUnitMap(      self.m_ActorUnitMap:getView())
         :setViewActionPlanner(self.m_ActorActionPlanner:getView())
         :setViewMapCursor(    self.m_ActorMapCursor:getView())
-        :setViewGridExplosion(self.m_ActorGridExplosion:getView())
+        :setViewGridEffect(   self.m_ActorGridEffect:getView())
 
         :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
 
@@ -141,7 +141,7 @@ function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
         self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorGridExplosion:getModel():setRootScriptEventDispatcher(dispatcher)
+        self.m_ActorGridEffect:getModel():setRootScriptEventDispatcher(dispatcher)
     end
 
     self.m_RootScriptEventDispatcher = dispatcher
@@ -160,7 +160,7 @@ function ModelWarField:unsetRootScriptEventDispatcher()
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
         self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorGridExplosion:getModel():unsetRootScriptEventDispatcher()
+        self.m_ActorGridEffect:getModel():unsetRootScriptEventDispatcher()
     end
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
@@ -251,6 +251,13 @@ function ModelWarField:doActionCapture(action)
 
     modelUnitMap:doActionCapture(action, capturer, target)
     modelTileMap:doActionCapture(action, capturer, target)
+
+    return self
+end
+
+function ModelWarField:doActionSupplyModelUnit(action)
+    self:getModelUnitMap():doActionSupplyModelUnit(action)
+    self:getModelTileMap():doActionSupplyModelUnit(action)
 
     return self
 end

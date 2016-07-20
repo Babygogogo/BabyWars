@@ -264,6 +264,30 @@ function ModelUnit:doActionAttack(action, attacker, target)
     return self
 end
 
+function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
+    self:setStateActioned()
+
+    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action, targetModelUnits)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            local eventDispatcher = self.m_RootScriptEventDispatcher
+            for _, target in pairs(targetModelUnits) do
+                target:updateView()
+                eventDispatcher:dispatchEvent({
+                    name      = "EvtSupplyViewUnit",
+                    gridIndex = target:getGridIndex(),
+                })
+            end
+        end)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     if (self:getUnitId() == focusUnitID) then
         self:setStateActioned()

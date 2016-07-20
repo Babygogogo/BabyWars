@@ -222,6 +222,15 @@ local function dispatchEventCapture(self)
     })
 end
 
+local function dispatchEventSupplyModelUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "SupplyModelUnit",
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function dispatchEventWait(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
@@ -339,6 +348,30 @@ local function getActionCapture(self)
     end
 end
 
+local function getActionSupplyModelUnit(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if (not focusModelUnit.canSupplyModelUnit) then
+        return nil
+    end
+
+    local modelUnitMap = self.m_ModelUnitMap
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getMovePathDestination(self.m_MovePath), modelUnitMap:getMapSize())) do
+        local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((modelUnit)                                     and
+            (modelUnit ~= focusModelUnit)                   and
+            (focusModelUnit:canSupplyModelUnit(modelUnit))) then
+            return {
+                name     = LocalizationFunctions.getLocalizedText(78, "SupplyModelUnit"),
+                callback = function()
+                    dispatchEventSupplyModelUnit(self)
+                end,
+            }
+        end
+    end
+
+    return nil
+end
+
 local function getActionWait(self)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
@@ -443,8 +476,9 @@ local function getAvaliableActionList(self)
     end
 
     local list = {}
-    list[#list + 1] = getActionAttack( self)
-    list[#list + 1] = getActionCapture(self)
+    list[#list + 1] = getActionAttack(         self)
+    list[#list + 1] = getActionCapture(        self)
+    list[#list + 1] = getActionSupplyModelUnit(self)
     for _, action in ipairs(getActionsLaunchModelUnit(self)) do
         list[#list + 1] = action
     end

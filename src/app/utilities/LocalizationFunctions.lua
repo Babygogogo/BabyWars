@@ -402,6 +402,7 @@ local s_Texts = {
             elseif (actionType == "DropModelUnit")   then return "卸 载"
             elseif (actionType == "LaunchModelUnit") then return "弹 射"
             elseif (actionType == "JoinModelUnit")   then return "合 流"
+            elseif (actionType == "SupplyModelUnit") then return "补 给"
             end
         end,
         [2] = function(actionType)
@@ -412,6 +413,7 @@ local s_Texts = {
             elseif (actionType == "DropModelUnit")   then return "Drop"
             elseif (actionType == "LaunchModelUnit") then return "Launch"
             elseif (actionType == "JoinModelUnit")   then return "Join"
+            elseif (actionType == "SupplyModelUnit") then return "Supply"
             end
         end,
     },

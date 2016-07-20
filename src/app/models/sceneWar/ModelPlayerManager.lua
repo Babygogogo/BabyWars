@@ -51,6 +51,20 @@ local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerInde
     })
 end
 
+local function dispatchEvtRepairViewUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtRepairViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtSupplyViewUnit(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtSupplyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -77,16 +91,26 @@ local function onEvtTurnPhaseRepairUnit(self, event)
     local modelPlayer     = self.m_ModelPlayers[playerIndex]
     local eventDispatcher = self.m_RootScriptEventDispatcher
     for _, unit in ipairs(getRepairableModelUnits(event.modelUnitMap, modelTileMap, playerIndex)) do
-        local repairAmount, repairCost = modelTileMap:getModelTile(unit:getGridIndex()):getRepairAmountAndCost(unit, modelPlayer)
+        local gridIndex                = unit:getGridIndex()
+        local repairAmount, repairCost = modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(unit, modelPlayer)
+        local shouldSupply             = unit:getCurrentFuel() < unit:getMaxFuel()
 
         unit:setCurrentHP(unit:getCurrentHP() + repairAmount)
             :setCurrentFuel(unit:getMaxFuel())
-        if ((unit.hasPrimaryWeapon) and (unit:hasPrimaryWeapon())) then
+        if ((unit.hasPrimaryWeapon)                                                and
+            (unit:hasPrimaryWeapon())                                              and
+            (unit:getPrimaryWeaponCurrentAmmo() < unit:getPrimaryWeaponMaxAmmo())) then
+            shouldSupply = true
             unit:setPrimaryWeaponCurrentAmmo(unit:getPrimaryWeaponMaxAmmo())
         end
         unit:updateView()
-
         modelPlayer:setFund(modelPlayer:getFund() - repairCost)
+
+        if (repairAmount >= 10) then
+            dispatchEvtRepairViewUnit(self, gridIndex)
+        elseif (shouldSupply) then
+            dispatchEvtSupplyViewUnit(self, gridIndex)
+        end
     end
 
     dispatchEvtModelPlayerUpdated(eventDispatcher, modelPlayer, playerIndex)

@@ -131,10 +131,10 @@ function ViewWarField:setViewMapCursor(view)
     return self
 end
 
-function ViewWarField:setViewGridExplosion(view)
-    assert(self.m_ViewGridExplosion == nil, "ViewWarField:setViewGridExplosion() the view has been set.")
+function ViewWarField:setViewGridEffect(view)
+    assert(self.m_ViewGridEffect == nil, "ViewWarField:setViewGridEffect() the view has been set.")
 
-    self.m_ViewGridExplosion = view
+    self.m_ViewGridEffect = view
     self:addChild(view, GRID_EXPLOSION_Z_ORDER)
 
     return self

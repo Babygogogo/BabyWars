@@ -186,6 +186,10 @@ local function doActionCapture(self, action)
     modelPlayerManager:doActionCapture(action)
 end
 
+local function doActionSupplyModelUnit(self, action)
+    self:getModelWarField():doActionSupplyModelUnit(action)
+end
+
 local function doActionLoadModelUnit(self, action)
     self:getModelWarField():doActionLoadModelUnit(action)
 end
@@ -213,15 +217,16 @@ local function onEvtSystemRequestDoAction(self, event)
 
     if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
         return
-    elseif (actionName == "BeginTurn")     then return doActionBeginTurn(    self, event)
-    elseif (actionName == "EndTurn")       then return doActionEndTurn(      self, event)
-    elseif (actionName == "Surrender")     then return doActionSurrender(    self, event)
-    elseif (actionName == "Wait")          then return doActionWait(         self, event)
-    elseif (actionName == "Attack")        then return doActionAttack(       self, event)
-    elseif (actionName == "Capture")       then return doActionCapture(      self, event)
-    elseif (actionName == "LoadModelUnit") then return doActionLoadModelUnit(self, event)
-    elseif (actionName == "DropModelUnit") then return doActionDropModelUnit(self, event)
-    elseif (actionName == "ProduceOnTile") then return doActionProduceOnTile(self, event)
+    elseif (actionName == "BeginTurn")       then return doActionBeginTurn(      self, event)
+    elseif (actionName == "EndTurn")         then return doActionEndTurn(        self, event)
+    elseif (actionName == "Surrender")       then return doActionSurrender(      self, event)
+    elseif (actionName == "Wait")            then return doActionWait(           self, event)
+    elseif (actionName == "Attack")          then return doActionAttack(         self, event)
+    elseif (actionName == "Capture")         then return doActionCapture(        self, event)
+    elseif (actionName == "SupplyModelUnit") then return doActionSupplyModelUnit(self, event)
+    elseif (actionName == "LoadModelUnit")   then return doActionLoadModelUnit(  self, event)
+    elseif (actionName == "DropModelUnit")   then return doActionDropModelUnit(  self, event)
+    elseif (actionName == "ProduceOnTile")   then return doActionProduceOnTile(  self, event)
     else
         return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end

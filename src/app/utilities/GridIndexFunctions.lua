@@ -75,10 +75,14 @@ function GridIndexFunctions.clone(index)
     return {x = index.x, y = index.y}
 end
 
-function GridIndexFunctions.getAdjacentGrids(index)
+function GridIndexFunctions.getAdjacentGrids(index, mapSize)
     local grids = {}
     for _, offset in ipairs(ADJACENT_GRIDS_OFFSET) do
-        grids[#grids + 1] = GridIndexFunctions.add(index, offset)
+        local adjacentGridIndex = GridIndexFunctions.add(index, offset)
+        if ((not mapSize)                                                 or
+            (GridIndexFunctions.isWithinMap(adjacentGridIndex, mapSize))) then
+            grids[#grids + 1] = GridIndexFunctions.add(index, offset)
+        end
     end
 
     return grids

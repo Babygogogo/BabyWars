@@ -203,6 +203,12 @@ function ModelTile:doActionWait(action)
     return self
 end
 
+function ModelTile:doActionSupplyModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action)
+
+    return self
+end
+
 function ModelTile:doActionLoadModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
 
@@ -259,8 +265,6 @@ function ModelTile:destroyModelTileObject()
     initWithTiledID(self, 0, self.m_BaseID)
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
     self:setRootScriptEventDispatcher(dispatcher)
-
-    dispatchEvtModelTileUpdated(self)
 
     return self
 end
