@@ -1,13 +1,4 @@
 
---[[--------------------------------------------------------------------------------
--- Buildable是ModelTile可用的组件。只有绑定了本组件，才能被可实施占领的对象（即绑定了CaptureDoer的ModelUnit）实施占领。
--- 主要职责：
---   维护有关占领的各种数值（目前只要维护当前占领点数），并提供必要接口给外界访问
--- 使用场景举例：
---   宿主初始化时，根据自身属性来绑定和初始化本组件（比如city需要绑定，plain不需要。具体需要与否，由GameConstant决定）
---   占领点数降为0后，若满足占领即失败的条件（如HQ），则派发相应事件（未完成）。
---]]--------------------------------------------------------------------------------
-
 local Buildable = require("src.global.functions.class")("Buildable")
 
 local ComponentManager      = require("src.global.components.ComponentManager")
@@ -109,7 +100,7 @@ function Buildable:doActionBuildModelTile(action, builder, target)
     if (self.m_CurrentBuildPoint <= 0) then
         local modelTile = self.m_Owner
         local _, baseID = modelTile:getObjectAndBaseId()
-        modelTile:updateWithObjectAndBaseId(builder:getBuildTiledId(), baseID)
+        modelTile:updateWithObjectAndBaseId(builder:getBuildTiledIdWithTileType(modelTile:getTileType()), baseID)
     end
 
     return self

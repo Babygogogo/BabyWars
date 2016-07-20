@@ -2534,6 +2534,13 @@ GameConstant.templateModelUnits = {
             current = 1,
         },
 
+        TileBuilder = {
+            buildList = {
+                Plain = "TempAirport",
+                Beach = "TempSeaport",
+            }
+        },
+
         cost        = 5000,
         vision      = 1,
     },
