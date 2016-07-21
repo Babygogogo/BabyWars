@@ -534,7 +534,7 @@ local function getActionsLaunchModelUnit(self)
     return actions
 end
 
-local function getAvaliableActionList(self)
+local function getAvailableActionList(self)
     local actionLoad = getActionLoadModelUnit(self)
     if (actionLoad) then
         return {actionLoad}
@@ -558,7 +558,7 @@ local function getAvaliableActionList(self)
     list[#list + 1] = getActionProduceModelUnitOnUnit(self)
     list[#list + 1] = getActionWait(                  self)
 
-    assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
+    assert(#list > 0, "ModelActionPlanner-getAvailableActionList() the generated list has no valid action item.")
     return list
 end
 
@@ -693,7 +693,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name = "EvtActionPlannerChoosingAction",
-        list = getAvaliableActionList(self)
+        list = getAvailableActionList(self)
     })
 end
 

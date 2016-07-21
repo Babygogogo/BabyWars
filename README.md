@@ -5,7 +5,7 @@ Baby Wars is a 2D turn-based strategy game, whose gameplay is based on the ones 
 
 ## Main Features
 ### Gameplay
-- For each player, the avaliable units and their base attributes are exactly the same
+- For each player, the available units and their base attributes are exactly the same
 - Capture bases to earn fund every turn and use the fund to build units
 - The attack damage of a unit are greatly affected by its HP (50% damage at 50% HP for example)
 - Each player can equip himself with various abilities to get special advantages in battle
