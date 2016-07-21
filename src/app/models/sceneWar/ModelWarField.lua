@@ -267,6 +267,12 @@ function ModelWarField:doActionBuildModelTile(action)
     return self
 end
 
+function ModelWarField:doActionProduceModelUnitOnUnit(action)
+    self:getModelUnitMap():doActionProduceModelUnitOnUnit(action)
+
+    return self
+end
+
 function ModelWarField:doActionSupplyModelUnit(action)
     self:getModelUnitMap():doActionSupplyModelUnit(action)
     self:getModelTileMap():doActionSupplyModelUnit(action)

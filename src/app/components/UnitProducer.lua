@@ -90,7 +90,7 @@ function UnitProducer:getProductionList(modelPlayer)
             modelUnit   = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID}),
             fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName,
             cost        = cost,
-            isAvaliable = cost <= fund,
+            isAvailable = cost <= fund,
             tiledID     = tiledID,
         }
     end

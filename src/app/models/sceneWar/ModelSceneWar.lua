@@ -190,6 +190,11 @@ local function doActionBuildModelTile(self, action)
     self:getModelWarField():doActionBuildModelTile(action)
 end
 
+local function doActionProduceModelUnitOnUnit(self, action)
+    self:getModelPlayerManager():doActionProduceModelUnitOnUnit(action, self:getModelTurnManager():getPlayerIndex())
+    self:getModelWarField():doActionProduceModelUnitOnUnit(action)
+end
+
 local function doActionSupplyModelUnit(self, action)
     self:getModelWarField():doActionSupplyModelUnit(action)
 end
@@ -203,9 +208,7 @@ local function doActionDropModelUnit(self, action)
 end
 
 local function doActionProduceOnTile(self, action)
-    action.playerIndex = self:getModelTurnManager():getPlayerIndex()
-
-    self:getModelPlayerManager():doActionProduceOnTile(action)
+    self:getModelPlayerManager():doActionProduceOnTile(action, self:getModelTurnManager():getPlayerIndex())
     self:getModelWarField():doActionProduceOnTile(action)
 end
 
@@ -221,17 +224,18 @@ local function onEvtSystemRequestDoAction(self, event)
 
     if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
         return
-    elseif (actionName == "BeginTurn")       then return doActionBeginTurn(      self, event)
-    elseif (actionName == "EndTurn")         then return doActionEndTurn(        self, event)
-    elseif (actionName == "Surrender")       then return doActionSurrender(      self, event)
-    elseif (actionName == "Wait")            then return doActionWait(           self, event)
-    elseif (actionName == "Attack")          then return doActionAttack(         self, event)
-    elseif (actionName == "Capture")         then return doActionCapture(        self, event)
-    elseif (actionName == "BuildModelTile")  then return doActionBuildModelTile( self, event)
-    elseif (actionName == "SupplyModelUnit") then return doActionSupplyModelUnit(self, event)
-    elseif (actionName == "LoadModelUnit")   then return doActionLoadModelUnit(  self, event)
-    elseif (actionName == "DropModelUnit")   then return doActionDropModelUnit(  self, event)
-    elseif (actionName == "ProduceOnTile")   then return doActionProduceOnTile(  self, event)
+    elseif (actionName == "BeginTurn")              then return doActionBeginTurn(             self, event)
+    elseif (actionName == "EndTurn")                then return doActionEndTurn(               self, event)
+    elseif (actionName == "Surrender")              then return doActionSurrender(             self, event)
+    elseif (actionName == "Wait")                   then return doActionWait(                  self, event)
+    elseif (actionName == "Attack")                 then return doActionAttack(                self, event)
+    elseif (actionName == "Capture")                then return doActionCapture(               self, event)
+    elseif (actionName == "BuildModelTile")         then return doActionBuildModelTile(        self, event)
+    elseif (actionName == "ProduceModelUnitOnUnit") then return doActionProduceModelUnitOnUnit(self, event)
+    elseif (actionName == "SupplyModelUnit")        then return doActionSupplyModelUnit(       self, event)
+    elseif (actionName == "LoadModelUnit")          then return doActionLoadModelUnit(         self, event)
+    elseif (actionName == "DropModelUnit")          then return doActionDropModelUnit(         self, event)
+    elseif (actionName == "ProduceOnTile")          then return doActionProduceOnTile(         self, event)
     else
         return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
     end

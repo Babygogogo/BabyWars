@@ -53,9 +53,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function MovableUnitProducer:doActionProduceModelUnitOnUnit(action)
+function MovableUnitProducer:doActionProduceModelUnitOnUnit(action, producedUnitID)
     local owner = self.m_Owner
     owner:setCurrentMaterial(owner:getCurrentMaterial() - 1)
+        :addLoadUnitId(producedUnitID)
 
     return owner
 end

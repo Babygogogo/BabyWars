@@ -82,7 +82,7 @@ local function createViewAction(itemModel)
         renderer:addChild(itemModel.icon)
     end
 
-    if ((itemModel.isAvaliable ~= nil) and (not itemModel.isAvaliable)) then
+    if ((itemModel.isAvailable ~= nil) and (not itemModel.isAvailable)) then
         renderer:setCascadeColorEnabled(true)
         view:setCascadeColorEnabled(true)
             :setEnabled(false)
@@ -174,7 +174,7 @@ local function createViewProduction(self, modelItem)
         self.m_ButtonConfirm:setVisible(enabled)
     end
 
-    if (not modelItem.isAvaliable) then
+    if (not modelItem.isAvailable) then
         view:setEnabled(false)
             :setColor(ITEM_DISABLED_COLOR)
     end

@@ -407,7 +407,7 @@ local function getActionProduceModelUnitOnUnit(self)
         return {
             name        = LocalizationFunctions.getLocalizedText(78, "ProduceModelUnitOnUnit"),
             icon        = icon,
-            isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                  and
+            isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                and
                 (focusModelUnit:getMovableProductionCost() <= self.m_LoggedInModelPlayer:getFund()) and
                 (focusModelUnit:getCurrentLoadCount() < focusModelUnit:getMaxLoadCount()),
             callback    = function()
@@ -548,7 +548,6 @@ local function getAvaliableActionList(self)
     list[#list + 1] = getActionAttack(                self)
     list[#list + 1] = getActionCapture(               self)
     list[#list + 1] = getActionBuildModelTile(        self)
-    list[#list + 1] = getActionProduceModelUnitOnUnit(self)
     list[#list + 1] = getActionSupplyModelUnit(       self)
     for _, action in ipairs(getActionsLaunchModelUnit(self)) do
         list[#list + 1] = action
@@ -556,7 +555,8 @@ local function getAvaliableActionList(self)
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
-    list[#list + 1] = getActionWait(   self)
+    list[#list + 1] = getActionProduceModelUnitOnUnit(self)
+    list[#list + 1] = getActionWait(                  self)
 
     assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
     return list

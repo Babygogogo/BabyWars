@@ -165,10 +165,8 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayerManager:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtTurnPhaseGetFund") then
-        onEvtTurnPhaseGetFund(self, event)
-    elseif (eventName == "EvtTurnPhaseRepairUnit") then
-        onEvtTurnPhaseRepairUnit(self, event)
+    if     (eventName == "EvtTurnPhaseGetFund")    then onEvtTurnPhaseGetFund(self, event)
+    elseif (eventName == "EvtTurnPhaseRepairUnit") then onEvtTurnPhaseRepairUnit(self, event)
     end
 
     return self
@@ -193,10 +191,16 @@ function ModelPlayerManager:doActionCapture(action)
     return self
 end
 
-function ModelPlayerManager:doActionProduceOnTile(action)
-    local playerIndex = action.playerIndex
-    local modelPlayer = self:getModelPlayer(action.playerIndex)
+function ModelPlayerManager:doActionProduceModelUnitOnUnit(action, playerIndex)
+    local modelPlayer = self:getModelPlayer(playerIndex)
+    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
+    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
 
+    return self
+end
+
+function ModelPlayerManager:doActionProduceOnTile(action, playerIndex)
+    local modelPlayer = self:getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
     dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
 
