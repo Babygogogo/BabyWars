@@ -92,6 +92,14 @@ local function getCaptureIndicatorFrame(unit)
     end
 end
 
+local function getBuildIndicatorFrame(unit)
+    if ((unit.isBuildingModelTile) and (unit:isBuildingModelTile())) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s04_f0" .. unit:getPlayerIndex() .. ".png")
+    else
+        return nil
+    end
+end
+
 local function getLoadIndicatorFrame(unit)
     if ((unit.getCurrentLoadCount) and (unit:getCurrentLoadCount() ~= 0)) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
@@ -205,6 +213,7 @@ local function updateStateIndicator(indicator, unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
     frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
     frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
+    frames[#frames + 1] = getBuildIndicatorFrame(    unit)
     frames[#frames + 1] = getLoadIndicatorFrame(     unit)
     frames[#frames + 1] = getMaterialIndicatorFrame( unit)
 

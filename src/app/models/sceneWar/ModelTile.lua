@@ -197,6 +197,12 @@ function ModelTile:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelTile:doActionBuildModelTile(action, builder, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
+
+    return self
+end
+
 function ModelTile:doActionWait(action)
     ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 

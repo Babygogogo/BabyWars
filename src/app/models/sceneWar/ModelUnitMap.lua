@@ -410,6 +410,26 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnitMap:doActionBuildModelTile(action, builder, target)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
+        :doActionBuildModelTile(action, builder, target)
+
+    dispatchEvtModelUnitMapUpdated(self)
+
+    return self
+end
+
 function ModelUnitMap:doActionSupplyModelUnit(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path

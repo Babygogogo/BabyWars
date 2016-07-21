@@ -6,7 +6,7 @@ local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 local EXPORTED_METHODS = {
-    "isBuilding",
+    "isBuildingModelTile",
     "canBuildOnTileType",
     "getBuildAmount",
     "getBuildTiledIdWithTileType",
@@ -28,7 +28,7 @@ function TileBuilder:loadTemplate(template)
 end
 
 function TileBuilder:loadInstantialData(data)
-    self.m_IsBuilding = (data.isBuilding == true) and (true) or (false)
+    self.m_IsBuilding = (data.isBuildingModelTile == true) and (true) or (false)
 
     return self
 end
@@ -37,11 +37,11 @@ end
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function TileBuilder:toSerializableTable()
-    if (not self:isBuilding()) then
+    if (not self:isBuildingModelTile()) then
         return nil
     else
         return {
-            isBuilding = true,
+            isBuildingModelTile = true,
         }
     end
 end
@@ -92,7 +92,7 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function TileBuilder:isBuilding()
+function TileBuilder:isBuildingModelTile()
     return self.m_IsBuilding
 end
 

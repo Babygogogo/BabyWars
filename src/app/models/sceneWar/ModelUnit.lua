@@ -357,6 +357,20 @@ function ModelUnit:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnit:doActionBuildModelTile(action, builder, target)
+    self:setStateActioned()
+
+    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            target:updateView()
+        end)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
