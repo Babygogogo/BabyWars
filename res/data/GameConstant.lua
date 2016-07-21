@@ -2002,7 +2002,7 @@ GameConstant.templateModelUnits = {
         vision      = 3,
     },
 
-    MediumTank     = {
+    MediumTank = {
         GridIndexable = {},
 
         AttackDoer = {
@@ -3119,6 +3119,10 @@ GameConstant.templateModelUnits = {
         MaterialOwner = {
             max     = 4,
             current = 4,
+        },
+
+        MovableUnitProducer = {
+            targetType = "Seaplane",
         },
 
         cost        = 28000,

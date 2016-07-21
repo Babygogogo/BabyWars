@@ -82,6 +82,13 @@ local function createViewAction(itemModel)
         renderer:addChild(itemModel.icon)
     end
 
+    if ((itemModel.isAvaliable ~= nil) and (not itemModel.isAvaliable)) then
+        renderer:setCascadeColorEnabled(true)
+        view:setCascadeColorEnabled(true)
+            :setEnabled(false)
+            :setColor(ITEM_DISABLED_COLOR)
+    end
+
     return view
 end
 
