@@ -232,6 +232,14 @@ local function dispatchEventBuildModelTile(self)
     })
 end
 
+local function dispatchEventProduceModelUnitOnUnit(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name       = "EvtPlayerRequestDoAction",
+        actionName = "ProduceModelUnitOnUnit",
+        path       = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+    })
+end
+
 local function dispatchEventSupplyModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
@@ -381,6 +389,34 @@ local function getActionBuildModelTile(self)
     end
 end
 
+local function getActionProduceModelUnitOnUnit(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((self.m_LaunchUnitID)                            or
+        (#self.m_MovePath ~= 1)                          or
+        (not focusModelUnit.getCurrentMaterial)          or
+        (not focusModelUnit.getMovableProductionTiledId) or
+        (not focusModelUnit.getCurrentLoadCount))        then
+        return nil
+    else
+        local produceTiledId = focusModelUnit:getMovableProductionTiledId()
+        local icon           = cc.Sprite:create()
+        icon:setAnchorPoint(0, 0)
+            :setScale(0.5)
+            :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(produceTiledId))
+
+        return {
+            name        = LocalizationFunctions.getLocalizedText(78, "ProduceModelUnitOnUnit"),
+            icon        = icon,
+            isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                and
+                (focusModelUnit:getMovableProductionCost() <= self.m_LoggedInModelPlayer:getFund()) and
+                (focusModelUnit:getCurrentLoadCount() < focusModelUnit:getMaxLoadCount()),
+            callback    = function()
+                dispatchEventProduceModelUnitOnUnit(self)
+            end,
+        }
+    end
+end
+
 local function getActionSupplyModelUnit(self)
     local focusModelUnit = self.m_FocusModelUnit
     if (not focusModelUnit.canSupplyModelUnit) then
@@ -498,7 +534,7 @@ local function getActionsLaunchModelUnit(self)
     return actions
 end
 
-local function getAvaliableActionList(self)
+local function getAvailableActionList(self)
     local actionLoad = getActionLoadModelUnit(self)
     if (actionLoad) then
         return {actionLoad}
@@ -509,19 +545,20 @@ local function getAvaliableActionList(self)
     end
 
     local list = {}
-    list[#list + 1] = getActionAttack(         self)
-    list[#list + 1] = getActionCapture(        self)
-    list[#list + 1] = getActionBuildModelTile( self)
-    list[#list + 1] = getActionSupplyModelUnit(self)
+    list[#list + 1] = getActionAttack(                self)
+    list[#list + 1] = getActionCapture(               self)
+    list[#list + 1] = getActionBuildModelTile(        self)
+    list[#list + 1] = getActionSupplyModelUnit(       self)
     for _, action in ipairs(getActionsLaunchModelUnit(self)) do
         list[#list + 1] = action
     end
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
-    list[#list + 1] = getActionWait(   self)
+    list[#list + 1] = getActionProduceModelUnitOnUnit(self)
+    list[#list + 1] = getActionWait(                  self)
 
-    assert(#list > 0, "ModelActionPlanner-getAvaliableActionList() the generated list has no valid action item.")
+    assert(#list > 0, "ModelActionPlanner-getAvailableActionList() the generated list has no valid action item.")
     return list
 end
 
@@ -656,7 +693,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name = "EvtActionPlannerChoosingAction",
-        list = getAvaliableActionList(self)
+        list = getAvailableActionList(self)
     })
 end
 

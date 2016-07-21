@@ -129,13 +129,6 @@ local function createActorUnit(tiledID, unitID, gridIndex)
 end
 
 --------------------------------------------------------------------------------
--- The private functions for dispatching events.
---------------------------------------------------------------------------------
-local function dispatchEvtModelUnitMapUpdated(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-end
-
---------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtDestroyModelUnit(self, event)
@@ -153,7 +146,7 @@ local function onEvtDestroyModelUnit(self, event)
     self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
     modelUnit:unsetRootScriptEventDispatcher()
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
 local function onEvtDestroyViewUnit(self, event)
@@ -355,7 +348,7 @@ function ModelUnitMap:doActionSurrender(action)
         })
     end
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -365,7 +358,7 @@ function ModelUnitMap:doActionWait(action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionWait(action)
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -379,7 +372,7 @@ function ModelUnitMap:doActionAttack(action, attacker, target)
         target:doActionAttack(action, attacker, target)
     end
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -389,7 +382,7 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
         :doActionCapture(action, capturer, target)
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -399,7 +392,29 @@ function ModelUnitMap:doActionBuildModelTile(action, builder, target)
     builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
         :doActionBuildModelTile(action, builder, target)
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
+    return self
+end
+
+function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
+    local gridIndex         = action.path[#action.path]
+    local focusModelUnit    = moveActorUnitOnAction(self, action)
+    local producedUnitID    = self.m_AvailableUnitID
+    local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
+    producedActorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setStateActioned()
+
+    self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
+    self.m_LoadedActorUnits[producedUnitID] = producedActorUnit
+    if (self.m_View) then
+        self.m_View:addLoadedViewUnit(producedUnitID, producedActorUnit:getView())
+    end
+
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+        :doActionProduceModelUnitOnUnit(action, producedUnitID)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -409,7 +424,7 @@ function ModelUnitMap:doActionSupplyModelUnit(action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit))
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -434,7 +449,7 @@ function ModelUnitMap:doActionLoadModelUnit(action)
         :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
     loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -468,7 +483,7 @@ function ModelUnitMap:doActionDropModelUnit(action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionDropModelUnit(action, dropActorUnits)
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
@@ -486,7 +501,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
         self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
     end
 
-    dispatchEvtModelUnitMapUpdated(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end

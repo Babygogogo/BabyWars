@@ -13,6 +13,8 @@ local EXPORTED_METHODS = {
     "canDropModelUnit",
     "canLaunchModelUnit",
     "canSupplyLoadedModelUnit",
+
+    "addLoadUnitId",
 }
 
 --------------------------------------------------------------------------------
@@ -235,6 +237,12 @@ end
 
 function UnitLoader:canSupplyLoadedModelUnit()
     return self.m_Template.canSupply
+end
+
+function UnitLoader:addLoadUnitId(unitID)
+    self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
+
+    return self.m_Owner
 end
 
 return UnitLoader

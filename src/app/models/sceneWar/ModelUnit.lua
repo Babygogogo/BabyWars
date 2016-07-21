@@ -248,7 +248,7 @@ function ModelUnit:doActionAttack(action, attacker, target)
                     dispatchEvtDestroyViewTile(eventDispatcher, action.targetGridIndex)
                 end
             else
-                if (action.getUnitType) then
+                if (target.getUnitType) then
                     dispatchEvtAttackViewUnit(eventDispatcher, action.targetGridIndex)
                 else
                     dispatchEvtAttackViewTile(eventDispatcher, action.targetGridIndex)
@@ -359,7 +359,6 @@ end
 
 function ModelUnit:doActionBuildModelTile(action, builder, target)
     self:setStateActioned()
-
     ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
 
     if (self.m_View) then
@@ -369,6 +368,22 @@ function ModelUnit:doActionBuildModelTile(action, builder, target)
             target:updateView()
         end)
     end
+
+    return self
+end
+
+function ModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionProduceModelUnitOnUnit", action, producedUnitID)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+        end)
+    end
+
+    return self
 end
 
 --------------------------------------------------------------------------------
