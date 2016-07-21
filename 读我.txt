@@ -21,7 +21,7 @@ Android运行方法：
 鼠标滚轮：缩放地图（Android上用双指缩放）
 
 尚未完成（但已计划开发）的功能：
-部队特殊指令，如：Join(部队合流),Launch(发射Silo，Plane从Carrier起飞),Supply(补给),Build(Carrier生产SeaPlane,Rig建造临时机场或临时港口),Flare(发射照明弹),Dive/Rise(潜艇上浮下潜)
+部队特殊指令，如：Join(部队合流),Launch(发射Silo),Build(Carrier生产SeaPlane),Flare(发射照明弹),Dive/Rise(潜艇上浮下潜)
 战局相关功能，如：CO，雾战，天气，回放
 玩家信息相关，如：更改昵称，浏览战绩，天梯模式
 

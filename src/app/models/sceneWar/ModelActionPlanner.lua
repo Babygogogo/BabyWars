@@ -21,6 +21,7 @@ local MovePathFunctions           = require("src.app.utilities.MovePathFunctions
 local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
 local WebSocketManager            = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions       = require("src.app.utilities.LocalizationFunctions")
+local AnimationLoader             = require("src.app.utilities.AnimationLoader")
 local Actor                       = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
@@ -222,6 +223,15 @@ local function dispatchEventCapture(self)
     })
 end
 
+local function dispatchEventBuildModelTile(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "BuildModelTile",
+        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function dispatchEventSupplyModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
@@ -345,6 +355,29 @@ local function getActionCapture(self)
         }
     else
         return nil
+    end
+end
+
+local function getActionBuildModelTile(self)
+    local tileType       = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath)):getTileType()
+    local focusModelUnit = self.m_FocusModelUnit
+
+    if ((focusModelUnit.canBuildOnTileType)           and
+        (focusModelUnit:canBuildOnTileType(tileType)) and
+        (focusModelUnit:getCurrentMaterial() > 0))    then
+        local buildTiledId = focusModelUnit:getBuildTiledIdWithTileType(tileType)
+        local icon         = cc.Sprite:create()
+        icon:setAnchorPoint(0, 0)
+            :setScale(0.5)
+            :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(buildTiledId))
+
+        return {
+            name     = LocalizationFunctions.getLocalizedText(78, "BuildModelTile"),
+            icon     = icon,
+            callback = function()
+                dispatchEventBuildModelTile(self)
+            end,
+        }
     end
 end
 
@@ -478,6 +511,7 @@ local function getAvaliableActionList(self)
     local list = {}
     list[#list + 1] = getActionAttack(         self)
     list[#list + 1] = getActionCapture(        self)
+    list[#list + 1] = getActionBuildModelTile( self)
     list[#list + 1] = getActionSupplyModelUnit(self)
     for _, action in ipairs(getActionsLaunchModelUnit(self)) do
         list[#list + 1] = action

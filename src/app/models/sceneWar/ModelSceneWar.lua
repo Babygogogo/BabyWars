@@ -186,6 +186,10 @@ local function doActionCapture(self, action)
     modelPlayerManager:doActionCapture(action)
 end
 
+local function doActionBuildModelTile(self, action)
+    self:getModelWarField():doActionBuildModelTile(action)
+end
+
 local function doActionSupplyModelUnit(self, action)
     self:getModelWarField():doActionSupplyModelUnit(action)
 end
@@ -223,6 +227,7 @@ local function onEvtSystemRequestDoAction(self, event)
     elseif (actionName == "Wait")            then return doActionWait(           self, event)
     elseif (actionName == "Attack")          then return doActionAttack(         self, event)
     elseif (actionName == "Capture")         then return doActionCapture(        self, event)
+    elseif (actionName == "BuildModelTile")  then return doActionBuildModelTile( self, event)
     elseif (actionName == "SupplyModelUnit") then return doActionSupplyModelUnit(self, event)
     elseif (actionName == "LoadModelUnit")   then return doActionLoadModelUnit(  self, event)
     elseif (actionName == "DropModelUnit")   then return doActionDropModelUnit(  self, event)

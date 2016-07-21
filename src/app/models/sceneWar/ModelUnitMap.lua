@@ -47,9 +47,9 @@ local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
-local function getSupplyTargetModelUnits(self, supplier, supplierGridIndex)
+local function getSupplyTargetModelUnits(self, supplier)
     local targets = {}
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplierGridIndex, self:getMapSize())) do
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), self:getMapSize())) do
         local target = self:getModelUnit(gridIndex)
         if ((target) and (supplier:canSupplyModelUnit(target))) then
             targets[#targets + 1] = target
@@ -92,6 +92,21 @@ local function swapActorUnit(self, gridIndex1, gridIndex2)
     if (self.m_View) then
         self.m_View:swapViewUnit(gridIndex1, gridIndex2)
     end
+end
+
+local function moveActorUnitOnAction(self, action)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+
+    if (launchUnitID) then
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+    else
+        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+    end
+
+    return self:getModelUnit(endingGridIndex)
 end
 
 local function createEmptyMap(width)
@@ -346,18 +361,7 @@ function ModelUnitMap:doActionSurrender(action)
 end
 
 function ModelUnitMap:doActionWait(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
-
-    local focusModelUnit = self:getModelUnit(endingGridIndex)
+    local focusModelUnit = moveActorUnitOnAction(self, action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionWait(action)
 
@@ -367,17 +371,7 @@ function ModelUnitMap:doActionWait(action)
 end
 
 function ModelUnitMap:doActionAttack(action, attacker, target)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
-
+    moveActorUnitOnAction(self, action)
     attacker:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(attacker))
         :doActionAttack(action, attacker, target)
 
@@ -391,17 +385,7 @@ function ModelUnitMap:doActionAttack(action, attacker, target)
 end
 
 function ModelUnitMap:doActionCapture(action, capturer, target)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
-
+    moveActorUnitOnAction(self, action)
     capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
         :doActionCapture(action, capturer, target)
 
@@ -410,21 +394,20 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnitMap:doActionBuildModelTile(action, builder, target)
+    moveActorUnitOnAction(self, action)
+    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
+        :doActionBuildModelTile(action, builder, target)
+
+    dispatchEvtModelUnitMapUpdated(self)
+
+    return self
+end
+
 function ModelUnitMap:doActionSupplyModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
-
-    local focusModelUnit = self:getModelUnit(endingGridIndex)
+    local focusModelUnit = moveActorUnitOnAction(self, action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit, endingGridIndex))
+        :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit))
 
     dispatchEvtModelUnitMapUpdated(self)
 

@@ -7,7 +7,7 @@ local s_LongText1_1 = [[
 --- 注：游戏尚有部分功能未完成开发，请谅解。---
 
 --- 游戏流程 ---
-首先，您需要通过主菜单的“注册/登陆”功能连接到游戏（若您曾经成功登陆过，则游戏会尝试自动登陆--暂未完成）。成功后，主菜单将出现新的选项，您可以通过它们来进入战局。
+首先，您需要通过主菜单的“注册/登陆”功能连接到游戏（游戏会记住您上一次登陆使用的账号密码，以便下次登陆）。成功后，主菜单将出现新的选项，您可以通过它们来进入战局。
 
 自行建立战局-开战的流程：
 1. 通过“新建战局”选项创建新的战局。在里面，您可以随意选择模式（天梯或自由战斗）、地图、回合顺序、密码等多种设定。
@@ -403,6 +403,7 @@ local s_Texts = {
             elseif (actionType == "LaunchModelUnit") then return "弹 射"
             elseif (actionType == "JoinModelUnit")   then return "合 流"
             elseif (actionType == "SupplyModelUnit") then return "补 给"
+            elseif (actionType == "BuildModelTile")  then return "建 造"
             end
         end,
         [2] = function(actionType)
@@ -414,6 +415,7 @@ local s_Texts = {
             elseif (actionType == "LaunchModelUnit") then return "Launch"
             elseif (actionType == "JoinModelUnit")   then return "Join"
             elseif (actionType == "SupplyModelUnit") then return "Supply"
+            elseif (actionType == "BuildModelTile")  then return "Build"
             end
         end,
     },

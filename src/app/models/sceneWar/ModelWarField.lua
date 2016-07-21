@@ -186,12 +186,9 @@ end
 --------------------------------------------------------------------------------
 function ModelWarField:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtDragField") then
-        onEvtDragField(self, event)
-    elseif (eventName == "EvtZoomFieldWithScroll") then
-        onEvtZoomFieldWithScroll(self, event)
-    elseif (eventName == "EvtZoomFieldWithTouches") then
-        onEvtZoomFieldWithTouches(self, event)
+    if     (eventName == "EvtDragField")            then onEvtDragField(           self, event)
+    elseif (eventName == "EvtZoomFieldWithScroll")  then onEvtZoomFieldWithScroll( self, event)
+    elseif (eventName == "EvtZoomFieldWithTouches") then onEvtZoomFieldWithTouches(self, event)
     end
 
     return self
@@ -245,12 +242,27 @@ function ModelWarField:doActionCapture(action)
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
     local target       = modelTileMap:getModelTile(path[#path])
-    local capturer     = (action.launchUnitID)                        and
+    local capturer     = (action.launchUnitID)                           and
         (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
         (modelUnitMap:getModelUnit(path[1]))
 
     modelUnitMap:doActionCapture(action, capturer, target)
     modelTileMap:doActionCapture(action, capturer, target)
+
+    return self
+end
+
+function ModelWarField:doActionBuildModelTile(action)
+    local modelUnitMap = self:getModelUnitMap()
+    local modelTileMap = self:getModelTileMap()
+    local path         = action.path
+    local target       = modelTileMap:getModelTile(path[#path])
+    local builder      = (action.launchUnitID)                           and
+        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
+        (modelUnitMap:getModelUnit(path[1]))
+
+    modelUnitMap:doActionBuildModelTile(action, builder, target)
+    modelTileMap:doActionBuildModelTile(action, builder, target)
 
     return self
 end

@@ -267,6 +267,15 @@ function ModelTileMap:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelTileMap:doActionBuildModelTile(action, builder, target)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+    target:doActionBuildModelTile(action, builder, target)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+
+    return self
+end
+
 function ModelTileMap:doActionWait(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
         :doActionWait(action)
