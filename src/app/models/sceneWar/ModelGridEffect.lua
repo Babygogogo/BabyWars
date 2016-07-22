@@ -42,6 +42,12 @@ local function showAnimationRepair(self, gridIndex)
     end
 end
 
+local function showAnimationSiloAttack(self, gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSiloAttack(gridIndex)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -59,6 +65,7 @@ function ModelGridEffect:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtAttackViewTile",  self)
         :addEventListener("EvtSupplyViewUnit",  self)
         :addEventListener("EvtRepairViewUnit",  self)
+        :addEventListener("EvtSiloAttackGrid",  self)
 
     return self
 end
@@ -66,7 +73,8 @@ end
 function ModelGridEffect:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelGridEffect:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtRepairViewUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSiloAttackGrid", self)
+        :removeEventListener("EvtRepairViewUnit", self)
         :removeEventListener("EvtSupplyViewUnit", self)
         :removeEventListener("EvtAttackViewTile",  self)
         :removeEventListener("EvtAttackViewUnit",  self)
@@ -83,12 +91,13 @@ end
 function ModelGridEffect:onEvent(event)
     local name      = event.name
     local gridIndex = event.gridIndex
-    if     (name == "EvtDestroyViewUnit") then showAnimationExplosion(self, gridIndex)
-    elseif (name == "EvtDestroyViewTile") then showAnimationExplosion(self, gridIndex)
-    elseif (name == "EvtAttackViewUnit")  then showAnimationDamage(   self, gridIndex)
-    elseif (name == "EvtAttackViewTile")  then showAnimationDamage(   self, gridIndex)
-    elseif (name == "EvtSupplyViewUnit")  then showAnimationSupply(   self, gridIndex)
-    elseif (name == "EvtRepairViewUnit")  then showAnimationRepair(   self, gridIndex)
+    if     (name == "EvtDestroyViewUnit") then showAnimationExplosion( self, gridIndex)
+    elseif (name == "EvtDestroyViewTile") then showAnimationExplosion( self, gridIndex)
+    elseif (name == "EvtAttackViewUnit")  then showAnimationDamage(    self, gridIndex)
+    elseif (name == "EvtAttackViewTile")  then showAnimationDamage(    self, gridIndex)
+    elseif (name == "EvtSupplyViewUnit")  then showAnimationSupply(    self, gridIndex)
+    elseif (name == "EvtRepairViewUnit")  then showAnimationRepair(    self, gridIndex)
+    elseif (name == "EvtSiloAttackGrid")  then showAnimationSiloAttack(self, gridIndex)
     end
 
     return self

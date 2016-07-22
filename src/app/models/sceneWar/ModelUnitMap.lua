@@ -387,6 +387,17 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnitMap:doActionLaunchSilo(action, modelTile)
+    local focusModelUnit = moveActorUnitOnAction(self, action)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+        :doActionLaunchSilo(action, self, modelTile)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+        :dispatchEvent({name = "EvtModelTileMapUpdated"})
+
+    return self
+end
+
 function ModelUnitMap:doActionBuildModelTile(action, builder, target)
     moveActorUnitOnAction(self, action)
     builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))

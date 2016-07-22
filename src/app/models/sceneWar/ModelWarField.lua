@@ -252,6 +252,12 @@ function ModelWarField:doActionCapture(action)
     return self
 end
 
+function ModelWarField:doActionLaunchSilo(action)
+    self:getModelUnitMap():doActionLaunchSilo(action, self:getModelTileMap():getModelTile(action.path[#action.path]))
+
+    return self
+end
+
 function ModelWarField:doActionBuildModelTile(action)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()

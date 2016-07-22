@@ -405,6 +405,9 @@ local s_Texts = {
             elseif (actionType == "SupplyModelUnit")        then return "补 给"
             elseif (actionType == "BuildModelTile")         then return "建 造"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "生 产"
+            elseif (actionType == "LaunchSilo")             then return "发 射"
+            else
+                return "未 知"
             end
         end,
         [2] = function(actionType)
@@ -418,6 +421,9 @@ local s_Texts = {
             elseif (actionType == "SupplyModelUnit")        then return "Supply"
             elseif (actionType == "BuildModelTile")         then return "Build"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "Produce"
+            elseif (actionType == "LaunchSilo")             then return "Launch"
+            else
+                return "Unknown"
             end
         end,
     },
@@ -783,7 +789,8 @@ local s_Texts = {
             elseif (tileType == "Reef")          then return "礁石"
             elseif (tileType == "Plasma")        then return "等离子体"
             elseif (tileType == "Meteor")        then return "陨石"
-            elseif (tileType == "Silo")          then return "导弹发射井"
+            elseif (tileType == "Silo")          then return "导弹发射塔"
+            elseif (tileType == "EmptySilo")     then return "空发射塔"
             elseif (tileType == "Headquarters")  then return "总部"
             elseif (tileType == "City")          then return "城市"
             elseif (tileType == "CommandTower")  then return "指挥塔"
@@ -815,6 +822,7 @@ local s_Texts = {
             elseif (tileType == "Plasma")        then return "Plasma"
             elseif (tileType == "Meteor")        then return "Meteor"
             elseif (tileType == "Silo")          then return "Silo"
+            elseif (tileType == "EmptySilo")     then return "Silo"
             elseif (tileType == "Headquarters")  then return "HQ"
             elseif (tileType == "City")          then return "City"
             elseif (tileType == "CommandTower")  then return "Com"
@@ -824,7 +832,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "SPort"
             elseif (tileType == "TempAirport")   then return "TempAP"
             elseif (tileType == "TempSeaport")   then return "TempSP"
-            else                                      return "未知"
+            else                                      return "Unknown"
             end
         end,
     },
@@ -833,7 +841,7 @@ local s_Texts = {
             if     (tileType == "Plain")         then return "平原：允许空军和陆军通过。"
             elseif (tileType == "River")         then return "河流：允许空军、步兵和炮兵通过。"
             elseif (tileType == "Sea")           then return "海洋：允许空军和海军通过。"
-            elseif (tileType == "Beach")         then return "海滩：登陆舰和炮艇可以在这里装载和卸载部队。允许大多数部队通过。"
+            elseif (tileType == "Beach")         then return "海滩：登陆舰和炮舰可以在这里装载和卸载部队。允许大多数部队通过。"
             elseif (tileType == "Road")          then return "道路：允许空军和陆军通过。"
             elseif (tileType == "BridgeOnRiver") then return "桥梁：河流及陆地上的桥梁允许空军和陆军通过。"
             elseif (tileType == "BridgeOnSea")   then return "桥梁：海洋上的桥梁允许空军和陆军通过，海军也能在桥下经过和停留。"
@@ -847,7 +855,8 @@ local s_Texts = {
             elseif (tileType == "Reef")          then return "礁石：允许空军和海军通过，但会减缓海军的移动。在雾战时，为海军提供隐蔽场所。"
             elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。"
             elseif (tileType == "Meteor")        then return "陨石：不允许任何部队通过。可以被部队攻击和破坏。"
-            elseif (tileType == "Silo")          then return "导弹发射井：步兵系可以在这里发射一次导弹，用来打击任意位置的小范围的部队。"
+            elseif (tileType == "Silo")          then return "导弹发射塔：步兵系可以在这里发射一次导弹，用来打击任意位置的小范围的部队。"
+            elseif (tileType == "EmptySilo")     then return "空发射塔：使用过的导弹发射塔，无法再次发射导弹。允许空军和陆军通过。"
             elseif (tileType == "Headquarters")  then return "总部：可以提供资金和维修陆军。若我方总部被占领，则我方战败。"
             elseif (tileType == "City")          then return "城市：可以提供资金和维修陆军。"
             elseif (tileType == "CommandTower")  then return "指挥塔：可以提供资金，且为我方全体部队提供攻击加成。"
@@ -879,6 +888,7 @@ local s_Texts = {
             elseif (tileType == "Plasma")        then return "Plasma is impassable."
             elseif (tileType == "Meteor")        then return "Meteors are impassable but can be destroyed."
             elseif (tileType == "Silo")          then return "Silos can be launched by infantry units and damage a 13-square area."
+            elseif (tileType == "EmptySilo")     then return "Empty Silos can't be launched."
             elseif (tileType == "Headquarters")  then return "HQs provide resupply for ground units. Battle ends if it's captured."
             elseif (tileType == "City")          then return "Cities provide resupply for ground units."
             elseif (tileType == "CommandTower")  then return "Command towers boosts your attack once captured."

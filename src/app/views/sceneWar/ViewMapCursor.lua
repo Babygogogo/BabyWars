@@ -25,16 +25,18 @@ local LOWER_LEFT_CORNER_INNER_POSITION_X =  4
 local LOWER_LEFT_CORNER_OUTER_POSITION_Y = -6
 local LOWER_LEFT_CORNER_INNER_POSITION_Y =  4
 
-local LOWER_RIGHT_CORNER_OUTER_POSITION_X =  31 + GRID_SIZE.width
-local LOWER_RIGHT_CORNER_INNER_POSITION_X =  21 + GRID_SIZE.width
-local LOWER_RIGHT_CORNER_OUTER_POSITION_Y = -31
-local LOWER_RIGHT_CORNER_INNER_POSITION_Y = -21
+local LOWER_RIGHT_CORNER_OUTER_POSITION_X =  25 + GRID_SIZE.width
+local LOWER_RIGHT_CORNER_INNER_POSITION_X =  15 + GRID_SIZE.width
+local LOWER_RIGHT_CORNER_OUTER_POSITION_Y = -25
+local LOWER_RIGHT_CORNER_INNER_POSITION_Y = -15
 
-local TARGET_CURSOR_OFFSET_X = - GRID_SIZE.width  / 2
-local TARGET_CURSOR_OFFSET_Y = - GRID_SIZE.height / 2
+local TARGET_CURSOR_OFFSET_X = - GRID_SIZE.width
+local TARGET_CURSOR_OFFSET_Y = - GRID_SIZE.height
+local SILO_CURSOR_OFFSET_X   = - GRID_SIZE.width  * 2
+local SILO_CURSOR_OFFSET_Y   = - GRID_SIZE.height * 2
 
 --------------------------------------------------------------------------------
--- The util functions.
+-- The composition normal cursor.
 --------------------------------------------------------------------------------
 local function createCornerPulseAction(outerX, outerY, innerX, innerY)
     local pulseIn  = cc.MoveTo:create(PULSE_IN_DURATION,  {x = innerX, y = innerY})
@@ -44,10 +46,7 @@ local function createCornerPulseAction(outerX, outerY, innerX, innerY)
     return cc.RepeatForever:create(cc.Sequence:create(pulseIn, pulseOut, interval))
 end
 
---------------------------------------------------------------------------------
--- The composition normal cursor.
---------------------------------------------------------------------------------
-local function createUpperLeftCorner()
+local function initUpperLeftCorner(cursor)
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setPosition(UPPER_LEFT_CORNER_OUTER_POSITION_X, UPPER_LEFT_CORNER_OUTER_POSITION_Y)
@@ -56,15 +55,11 @@ local function createUpperLeftCorner()
                                                    UPPER_LEFT_CORNER_INNER_POSITION_X, UPPER_LEFT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
 
-    return corner
+    cursor.m_UpperLeftCorner = corner
+    cursor:addChild(corner)
 end
 
-local function initWithUpperLeftCorner(self, corner)
-    self.m_UpperLeftCorner = corner
-    self:addChild(corner)
-end
-
-local function createUpperRightCorner()
+local function initUpperRightCorner(cursor)
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setRotation(90)
@@ -74,15 +69,11 @@ local function createUpperRightCorner()
                                                    UPPER_RIGHT_CORNER_INNER_POSITION_X, UPPER_RIGHT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
 
-    return corner
+    cursor.m_UpperRightCorner = corner
+    cursor:addChild(corner)
 end
 
-local function initWithUpperRightCorner(self, corner)
-    self.m_UpperRightCorner = corner
-    self:addChild(corner)
-end
-
-local function createLowerLeftCorner()
+local function initLowerLeftCorner(cursor)
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s06_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setRotation(-90)
@@ -92,15 +83,11 @@ local function createLowerLeftCorner()
                                                    LOWER_LEFT_CORNER_INNER_POSITION_X, LOWER_LEFT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
 
-    return corner
+    cursor.m_LowerLeftCorner = corner
+    cursor:addChild(corner)
 end
 
-local function initWithLowerLeftCorner(self, corner)
-    self.m_LowerLeftCorner = corner
-    self:addChild(corner)
-end
-
-local function createLowerRightCorner()
+local function initLowerRightCorner(cursor)
     local corner = cc.Sprite:createWithSpriteFrameName("c03_t07_s07_f01.png")
     corner:setAnchorPoint(0.5, 0.5)
         :setPosition(LOWER_RIGHT_CORNER_OUTER_POSITION_X, LOWER_RIGHT_CORNER_OUTER_POSITION_Y)
@@ -109,45 +96,41 @@ local function createLowerRightCorner()
                                                    LOWER_RIGHT_CORNER_INNER_POSITION_X,  LOWER_RIGHT_CORNER_INNER_POSITION_Y)
     corner:runAction(corner.m_PulseAction)
 
-    return corner
+    cursor.m_LowerRightCorner = corner
+    cursor:addChild(corner)
 end
 
-local function initWithLowerRightCorner(self, corner)
-    self.m_LowerRightCorner = corner
-    self:addChild(corner)
-end
-
-local function createNormalCursor()
+local function initNormalCursor(self)
     local cursor = cc.Node:create()
     cursor:setAnchorPoint(0.5, 0.5)
         :ignoreAnchorPointForPosition(true)
 
-    initWithUpperLeftCorner( cursor, createUpperLeftCorner())
-    initWithUpperRightCorner(cursor, createUpperRightCorner())
-    initWithLowerLeftCorner( cursor, createLowerLeftCorner())
-    initWithLowerRightCorner(cursor, createLowerRightCorner())
+    initUpperLeftCorner( cursor)
+    initUpperRightCorner(cursor)
+    initLowerLeftCorner( cursor)
+    initLowerRightCorner(cursor)
 
-    return cursor
-end
-
-local function initWithNormalCursor(self, cursor)
     self.m_NormalCursor = cursor
     self:addChild(cursor)
 end
 
 --------------------------------------------------------------------------------
--- The composition target cursor.
+-- The composition target/silo cursor.
 --------------------------------------------------------------------------------
-local function createTargetCursor()
+local function initTargetCursor(self)
     local cursor = cc.Sprite:create()
     cursor:ignoreAnchorPointForPosition(true)
         :playAnimationForever(display.getAnimationCache("TargetCursor"))
 
-    return cursor
+    self.m_TargetCursor = cursor
+    self:addChild(cursor)
 end
 
-local function initWithTargetCursor(self, cursor)
-    self.m_TargetCursor = cursor
+local function initSiloCursor(self)
+    local cursor = cc.Sprite:createWithSpriteFrameName("c03_t07_s10_f01.png")
+    cursor:ignoreAnchorPointForPosition(true)
+
+    self.m_SiloCursor = cursor
     self:addChild(cursor)
 end
 
@@ -157,8 +140,9 @@ end
 function ViewMapCursor:ctor(param)
     self:ignoreAnchorPointForPosition(true)
 
-    initWithNormalCursor(self, createNormalCursor())
-    initWithTargetCursor(self, createTargetCursor())
+    initNormalCursor(self)
+    initTargetCursor(self)
+    initSiloCursor(  self)
 
     return self
 end
@@ -187,6 +171,7 @@ end
 function ViewMapCursor:setPosition(x, y)
     self.m_NormalCursor:setPosition(x, y)
     self.m_TargetCursor:setPosition(x + TARGET_CURSOR_OFFSET_X, y + TARGET_CURSOR_OFFSET_Y)
+    self.m_SiloCursor  :setPosition(x + SILO_CURSOR_OFFSET_X,   y + SILO_CURSOR_OFFSET_Y)
 
     return self
 end
@@ -203,6 +188,12 @@ end
 
 function ViewMapCursor:setTargetCursorVisible(visible)
     self.m_TargetCursor:setVisible(visible)
+
+    return self
+end
+
+function ViewMapCursor:setSiloCursorVisible(visible)
+    self.m_SiloCursor:setVisible(visible)
 
     return self
 end

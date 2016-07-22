@@ -51,6 +51,21 @@ local function createAnimationSupplyOrRepair(gridIndex, isSupply)
     return animation
 end
 
+local function createAnimationSiloAttack(gridIndex)
+    local sprite = cc.Sprite:create()
+    local x, y   = GridIndexFunctions.toPosition(gridIndex)
+    sprite:ignoreAnchorPointForPosition(true)
+        :setPosition(x - GRID_SIZE.width, y - GRID_SIZE.height)
+        :playAnimationOnce(display.getAnimationCache("GridDamage"), {
+            onComplete = function()
+                sprite:setPosition(x - GRID_SIZE.width, y)
+                    :playAnimationOnce(display.getAnimationCache("GridExplosion"), {removeSelf = true})
+            end,
+        })
+
+    return sprite
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -81,6 +96,12 @@ end
 
 function ViewGridEffect:showAnimationRepair(gridIndex)
     self:addChild(createAnimationSupplyOrRepair(gridIndex, false), SUPPLY_Z_ORDER)
+
+    return self
+end
+
+function ViewGridEffect:showAnimationSiloAttack(gridIndex)
+    self:addChild(createAnimationSiloAttack(gridIndex), EXPLOSION_Z_ORDER)
 
     return self
 end
