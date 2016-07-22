@@ -405,6 +405,9 @@ local s_Texts = {
             elseif (actionType == "SupplyModelUnit")        then return "补 给"
             elseif (actionType == "BuildModelTile")         then return "建 造"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "生 产"
+            elseif (actionType == "LaunchSilo")             then return "发 射"
+            else
+                return "未 知"
             end
         end,
         [2] = function(actionType)
@@ -418,6 +421,9 @@ local s_Texts = {
             elseif (actionType == "SupplyModelUnit")        then return "Supply"
             elseif (actionType == "BuildModelTile")         then return "Build"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "Produce"
+            elseif (actionType == "LaunchSilo")             then return "Launch"
+            else
+                return "Unknown"
             end
         end,
     },

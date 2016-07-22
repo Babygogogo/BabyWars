@@ -294,6 +294,16 @@ local function dispatchEventDropModelUnit(self)
     })
 end
 
+local function dispatchEventLaunchSilo(self, targetGridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name            = "EvtPlayerRequestDoAction",
+        actionName      = "LaunchSilo",
+        path            = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        targetGridIndex = targetGridIndex,
+        launchUnitID    = self.m_LaunchUnitID,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The functions for available action list.
 --------------------------------------------------------------------------------
@@ -302,25 +312,9 @@ local setStateChoosingProductionTarget
 local setStateMakingMovePath
 local setStateChoosingAction
 local setStateChoosingAttackTarget
+local setStateChoosingSiloTarget
 local setStateChoosingDropDestination
 local setStateChoosingAdditionalDropAction
-
-local function getActionJoinModelUnit(self)
-    local destination = getMovePathDestination(self.m_MovePath)
-    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
-        return nil
-    else
-        local existingModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((existingModelUnit) and (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
-            return {
-                name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
-                callback = function()
-                    dispatchEventJoinModelUnit(self)
-                end
-            }
-        end
-    end
-end
 
 local function getActionLoadModelUnit(self)
     local destination = getMovePathDestination(self.m_MovePath)
@@ -333,6 +327,23 @@ local function getActionLoadModelUnit(self)
                 name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
                 callback = function()
                     dispatchEventLoadModelUnit(self)
+                end
+            }
+        end
+    end
+end
+
+local function getActionJoinModelUnit(self)
+    local destination = getMovePathDestination(self.m_MovePath)
+    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
+        return nil
+    else
+        local existingModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
+        if ((existingModelUnit) and (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
+            return {
+                name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
+                callback = function()
+                    dispatchEventJoinModelUnit(self)
                 end
             }
         end
@@ -389,34 +400,6 @@ local function getActionBuildModelTile(self)
     end
 end
 
-local function getActionProduceModelUnitOnUnit(self)
-    local focusModelUnit = self.m_FocusModelUnit
-    if ((self.m_LaunchUnitID)                            or
-        (#self.m_MovePath ~= 1)                          or
-        (not focusModelUnit.getCurrentMaterial)          or
-        (not focusModelUnit.getMovableProductionTiledId) or
-        (not focusModelUnit.getCurrentLoadCount))        then
-        return nil
-    else
-        local produceTiledId = focusModelUnit:getMovableProductionTiledId()
-        local icon           = cc.Sprite:create()
-        icon:setAnchorPoint(0, 0)
-            :setScale(0.5)
-            :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(produceTiledId))
-
-        return {
-            name        = LocalizationFunctions.getLocalizedText(78, "ProduceModelUnitOnUnit"),
-            icon        = icon,
-            isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                and
-                (focusModelUnit:getMovableProductionCost() <= self.m_LoggedInModelPlayer:getFund()) and
-                (focusModelUnit:getCurrentLoadCount() < focusModelUnit:getMaxLoadCount()),
-            callback    = function()
-                dispatchEventProduceModelUnitOnUnit(self)
-            end,
-        }
-    end
-end
-
 local function getActionSupplyModelUnit(self)
     local focusModelUnit = self.m_FocusModelUnit
     if (not focusModelUnit.canSupplyModelUnit) then
@@ -441,18 +424,41 @@ local function getActionSupplyModelUnit(self)
     return nil
 end
 
-local function getActionWait(self)
-    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
-    if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
-        return {
-            name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
-            callback = function()
-                dispatchEventWait(self)
-            end
-        }
-    else
-        return nil
+local function getSingleActionLaunchModelUnit(self, unitID)
+    local beginningGridIndex = self.m_MovePath[1].gridIndex
+    local icon               = Actor.createView("sceneWar.ViewUnit")
+    icon:updateWithModelUnit(getFocusModelUnit(self, beginningGridIndex, unitID))
+        :setScale(0.5)
+
+    return {
+        name     = LocalizationFunctions.getLocalizedText(78, "LaunchModelUnit"),
+        icon     = icon,
+        callback = function()
+            setStateMakingMovePath(self, beginningGridIndex, unitID)
+        end,
+    }
+end
+
+local function getActionsLaunchModelUnit(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((#self.m_MovePath ~= 1)                    or
+        (not focusModelUnit.canLaunchModelUnit)    or
+        (not focusModelUnit:canLaunchModelUnit())) then
+        return {}
     end
+
+    local actions      = {}
+    local modelUnitMap = self.m_ModelUnitMap
+    local modelTile    = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
+    for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
+        local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+        if ((launchModelUnit:getState() == "idle")                  and
+            (modelTile:getMoveCost(launchModelUnit:getMoveType()))) then
+            actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
+        end
+    end
+
+    return actions
 end
 
 local function getSingleActionDropModelUnit(self, unitID)
@@ -497,41 +503,63 @@ local function getActionsDropModelUnit(self)
     return actions
 end
 
-local function getSingleActionLaunchModelUnit(self, unitID)
-    local beginningGridIndex = self.m_MovePath[1].gridIndex
-    local icon               = Actor.createView("sceneWar.ViewUnit")
-    icon:updateWithModelUnit(getFocusModelUnit(self, beginningGridIndex, unitID))
-        :setScale(0.5)
+local function getActionLaunchSilo(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    local modelTile      = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
 
-    return {
-        name     = LocalizationFunctions.getLocalizedText(78, "LaunchModelUnit"),
-        icon     = icon,
-        callback = function()
-            setStateMakingMovePath(self, beginningGridIndex, unitID)
-        end,
-    }
+    if ((focusModelUnit.canLaunchSiloOnTileType) and
+        (focusModelUnit:canLaunchSiloOnTileType(modelTile:getTileType()))) then
+        return {
+            name     = LocalizationFunctions.getLocalizedText(78, "LaunchSilo"),
+            callback = function()
+                setStateChoosingSiloTarget(self)
+            end,
+        }
+    else
+        return nil
+    end
 end
 
-local function getActionsLaunchModelUnit(self)
+local function getActionProduceModelUnitOnUnit(self)
     local focusModelUnit = self.m_FocusModelUnit
-    if ((#self.m_MovePath ~= 1)                    or
-        (not focusModelUnit.canLaunchModelUnit)    or
-        (not focusModelUnit:canLaunchModelUnit())) then
-        return {}
-    end
+    if ((self.m_LaunchUnitID)                            or
+        (#self.m_MovePath ~= 1)                          or
+        (not focusModelUnit.getCurrentMaterial)          or
+        (not focusModelUnit.getMovableProductionTiledId) or
+        (not focusModelUnit.getCurrentLoadCount))        then
+        return nil
+    else
+        local produceTiledId = focusModelUnit:getMovableProductionTiledId()
+        local icon           = cc.Sprite:create()
+        icon:setAnchorPoint(0, 0)
+            :setScale(0.5)
+            :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(produceTiledId))
 
-    local actions      = {}
-    local modelUnitMap = self.m_ModelUnitMap
-    local modelTile    = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
-    for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
-        local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-        if ((launchModelUnit:getState() == "idle")                  and
-            (modelTile:getMoveCost(launchModelUnit:getMoveType()))) then
-            actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
-        end
+        return {
+            name        = LocalizationFunctions.getLocalizedText(78, "ProduceModelUnitOnUnit"),
+            icon        = icon,
+            isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                and
+                (focusModelUnit:getMovableProductionCost() <= self.m_LoggedInModelPlayer:getFund()) and
+                (focusModelUnit:getCurrentLoadCount() < focusModelUnit:getMaxLoadCount()),
+            callback    = function()
+                dispatchEventProduceModelUnitOnUnit(self)
+            end,
+        }
     end
+end
 
-    return actions
+local function getActionWait(self)
+    local existingUnitModel = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
+    if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
+        return {
+            name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
+            callback = function()
+                dispatchEventWait(self)
+            end
+        }
+    else
+        return nil
+    end
 end
 
 local function getAvailableActionList(self)
@@ -555,6 +583,7 @@ local function getAvailableActionList(self)
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
+    list[#list + 1] = getActionLaunchSilo(            self)
     list[#list + 1] = getActionProduceModelUnitOnUnit(self)
     list[#list + 1] = getActionWait(                  self)
 
@@ -706,6 +735,10 @@ setStateChoosingAttackTarget = function(self, destination)
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingAttackTarget"})
+end
+
+setStateChoosingSiloTarget = function(self)
+    print("silo!!!")
 end
 
 setStateChoosingDropDestination = function(self, unitID)

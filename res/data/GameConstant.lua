@@ -1523,6 +1523,11 @@ GameConstant.templateModelUnits = {
             isCapturing = false,
         },
 
+        SiloLauncher = {
+            targetType   = "Silo",
+            launchedType = "EmptySilo",
+        },
+
         cost        = 1500,
         vision      = 2,
     },
@@ -1630,6 +1635,11 @@ GameConstant.templateModelUnits = {
             isCapturing = false,
         },
 
+        SiloLauncher = {
+            targetType   = "Silo",
+            launchedType = "EmptySilo",
+        },
+
         cost        = 2500,
         vision      = 2,
     },
@@ -1702,6 +1712,11 @@ GameConstant.templateModelUnits = {
 
         CaptureDoer = {
             isCapturing = false,
+        },
+
+        SiloLauncher = {
+            targetType   = "Silo",
+            launchedType = "EmptySilo",
         },
 
         cost        = 2500,

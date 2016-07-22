@@ -265,6 +265,8 @@ end
 
 function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
     local gridIndex, dispatcher = self:getGridIndex(), self.m_RootScriptEventDispatcher
+    baseID                      = baseID or self.m_BaseID
+
     self:unsetRootScriptEventDispatcher()
     initWithTiledID(self, objectID, baseID)
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
