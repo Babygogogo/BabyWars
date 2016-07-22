@@ -24,7 +24,8 @@ GameConstant.indexesForTileOrUnit = {
     {name = "Reef",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Plasma",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Meteor",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "Silo",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 2,  },
+    {name = "Silo",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "EmptySilo",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Headquarters",    firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
     {name = "City",            firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
     {name = "CommandTower",    firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
@@ -80,16 +81,17 @@ GameConstant.tileAnimations = {
     Reef         = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
     Plasma       = {typeIndex = 15, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
     Meteor       = {typeIndex = 16, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    Silo         = {typeIndex = 17, shapesCount = 2,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
-    Headquarters = {typeIndex = 18, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    City         = {typeIndex = 19, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    CommandTower = {typeIndex = 20, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    Radar        = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    Factory      = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    Airport      = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
-    Seaport      = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
-    TempAirport  = {typeIndex = 25, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    TempSeaport  = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    Silo         = {typeIndex = 17, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    EmptySilo    = {typeIndex = 18, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
+    Headquarters = {typeIndex = 19, shapesCount = 4,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    City         = {typeIndex = 20, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    CommandTower = {typeIndex = 21, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Radar        = {typeIndex = 22, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Factory      = {typeIndex = 23, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Airport      = {typeIndex = 24, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = true,  },
+    Seaport      = {typeIndex = 25, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
+    TempAirport  = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    TempSeaport  = {typeIndex = 27, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
 }
 
 GameConstant.unitAnimations = {
@@ -1076,7 +1078,27 @@ GameConstant.templateModelTiles = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
-            amount         = 20,
+            amount             = 20,
+            targetCategoryType = "GroundUnits",
+        },
+
+        MoveCostOwner = {
+            Infantry  = 1,
+            Mech      = 1,
+            TireA     = 1,
+            TireB     = 1,
+            Tank      = 1,
+            Air       = 1,
+            Ship      = false,
+            Transport = false,
+        },
+    },
+
+    EmptySilo = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount             = 20,
             targetCategoryType = "GroundUnits",
         },
 
