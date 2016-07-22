@@ -489,7 +489,18 @@ function ModelUnit:getProductionCost()
 end
 
 function ModelUnit:canJoinModelUnit(rhsUnitModel)
-    return ((self:getTiledID() == rhsUnitModel:getTiledID()) and (rhsUnitModel:getCurrentHP() <= 90))
+    if (self:getTiledID() ~= rhsUnitModel:getTiledID()) then
+        return false
+    end
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if ((component.canJoinModelUnit)                    and
+            (not component:canJoinModelUnit(rhsUnitModel))) then
+            return false
+        end
+    end
+
+    return true
 end
 
 function ModelUnit:canDoAction(playerIndex)

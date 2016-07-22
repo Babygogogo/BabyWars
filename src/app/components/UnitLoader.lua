@@ -148,6 +148,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function UnitLoader:canJoinModelUnit(modelUnit)
+    return (self:getCurrentLoadCount() == 0)   and
+        (modelUnit.getCurrentLoadCount)        and
+        (modelUnit:getCurrentLoadCount() == 0)
+end
+
 function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
     local destination = action.path[#action.path]
     for _, modelUnit in pairs(loadedModelUnits or {}) do

@@ -130,6 +130,10 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function AttackTaker:canJoinModelUnit(modelUnit)
+    return modelUnit:getNormalizedCurrentHP() < 10
+end
+
 function AttackTaker:doActionAttack(action, attacker, target)
     local owner = self.m_Owner
     if (owner == attacker) then
