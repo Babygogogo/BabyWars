@@ -358,6 +358,22 @@ function ModelUnit:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnit:doActionJoinModelUnit(action, modelPlayerManager, target)
+    target:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, modelPlayerManager, target)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:removeFromParent()
+            self:unsetRootScriptEventDispatcher()
+
+            target:updateView()
+        end)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)

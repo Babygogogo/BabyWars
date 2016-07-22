@@ -71,6 +71,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
+function MaterialOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
+    target:setCurrentMaterial(math.min(
+        target:getMaxMaterial(),
+        self:getCurrentMaterial() + target:getCurrentMaterial()
+    ))
+
+    return self
+end
 
 --------------------------------------------------------------------------------
 -- The exported functions.

@@ -321,7 +321,9 @@ local function getActionLoadModelUnit(self)
         return nil
     else
         local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((loaderModelUnit) and (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+        if ((loaderModelUnit)                                          and
+            (loaderModelUnit.canLoadModelUnit)                         and
+            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
             return {
                 name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
                 callback = function()

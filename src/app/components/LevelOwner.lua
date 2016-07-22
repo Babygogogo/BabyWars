@@ -115,6 +115,12 @@ function LevelOwner:doActionAttack(action, attacker, target)
     return self
 end
 
+function LevelOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
+    setLevel(target, math.max(self:getLevel(), target:getLevel()))
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
