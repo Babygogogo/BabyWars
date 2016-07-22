@@ -17,9 +17,8 @@ local ModelActionMenu = class("ModelActionMenu")
 local function onEvtActionPlannerChoosingAction(self, event)
     self:setEnabled(true)
 
-    local view = self.m_View
-    if (view) then
-        view:removeAllItems()
+    if (self.m_View) then
+        self.m_View:removeAllItems()
             :showActionList(event.list)
     end
 end
@@ -27,9 +26,8 @@ end
 local function onEvtActionPlannerChoosingProductionTarget(self, event)
     self:setEnabled(true)
 
-    local view = self.m_View
-    if (view) then
-        view:removeAllItems()
+    if (self.m_View) then
+        self.m_View:removeAllItems()
             :showProductionList(event.productionList)
     end
 end
@@ -51,6 +49,7 @@ function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtActionPlannerChoosingAction",           self)
         :addEventListener("EvtActionPlannerChoosingAttackTarget",     self)
         :addEventListener("EvtActionPlannerChoosingDropDestination",  self)
+        :addEventListener("EvtActionPlannerChoosingSiloTarget",       self)
 
     return self
 end
@@ -58,8 +57,9 @@ end
 function ModelActionMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingDropDestination", self)
-        :removeEventListener("EvtActionPlannerChoosingAttackTarget", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
+        :removeEventListener("EvtActionPlannerChoosingDropDestination",  self)
+        :removeEventListener("EvtActionPlannerChoosingAttackTarget",     self)
         :removeEventListener("EvtActionPlannerChoosingAction",           self)
         :removeEventListener("EvtActionPlannerMakingMovePath",           self)
         :removeEventListener("EvtActionPlannerChoosingProductionTarget", self)
@@ -74,15 +74,13 @@ end
 --------------------------------------------------------------------------------
 function ModelActionMenu:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtActionPlannerIdle") or
-        (eventName == "EvtActionPlannerMakingMovePath") or
-        (eventName == "EvtActionPlannerChoosingAttackTarget") or
-        (eventName == "EvtActionPlannerChoosingDropDestination")) then
-        self:setEnabled(false)
-    elseif (eventName == "EvtActionPlannerChoosingProductionTarget") then
-        onEvtActionPlannerChoosingProductionTarget(self, event)
-    elseif (eventName == "EvtActionPlannerChoosingAction") then
-        onEvtActionPlannerChoosingAction(self, event)
+    if     (eventName == "EvtActionPlannerIdle")                     then self:setEnabled(false)
+    elseif (eventName == "EvtActionPlannerMakingMovePath")           then self:setEnabled(false)
+    elseif (eventName == "EvtActionPlannerChoosingAttackTarget")     then self:setEnabled(false)
+    elseif (eventName == "EvtActionPlannerChoosingDropDestination")  then self:setEnabled(false)
+    elseif (eventName == "EvtActionPlannerChoosingSiloTarget")       then self:setEnabled(false)
+    elseif (eventName == "EvtActionPlannerChoosingProductionTarget") then onEvtActionPlannerChoosingProductionTarget(self, event)
+    elseif (eventName == "EvtActionPlannerChoosingAction")           then onEvtActionPlannerChoosingAction(self, event)
     end
 
     return self

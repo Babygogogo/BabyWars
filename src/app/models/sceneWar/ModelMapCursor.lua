@@ -34,7 +34,7 @@ local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEventPlayerMovedCursor(self, gridIndex)
+local function dispatchEvtMapCursorMoved(self, gridIndex)
     self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name      = "EvtMapCursorMoved",
@@ -53,22 +53,16 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPreviewBattleDamage(self, event)
+local function setCursorAppearance(self, normalVisible, targetVisible, siloVisible)
     if (self.m_View) then
-        self.m_View:setNormalCursorVisible(false)
-            :setTargetCursorVisible(true)
-    end
-end
-
-local function onEvtPreviewNoBattleDamage(self, event)
-    if (self.m_View) then
-        self.m_View:setNormalCursorVisible(true)
-            :setTargetCursorVisible(false)
+        self.m_View:setNormalCursorVisible(normalVisible)
+            :setTargetCursorVisible(targetVisible)
+            :setSiloCursorVisible(siloVisible)
     end
 end
 
 local function onEvtSceneWarStarted(self, event)
-    dispatchEventPlayerMovedCursor(self, self:getGridIndex())
+    dispatchEvtMapCursorMoved(self, self:getGridIndex())
 end
 
 --------------------------------------------------------------------------------
@@ -107,7 +101,7 @@ local function createTouchListener(self)
                 local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
                 if ((GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) and
                     (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
-                    dispatchEventPlayerMovedCursor(self, gridIndex)
+                    dispatchEvtMapCursorMoved(self, gridIndex)
                     isTouchMoved = true
                 end
             else
@@ -135,7 +129,7 @@ local function createTouchListener(self)
             if (not isTouchMoved) then
                 dispatchEvtGridSelected(self, gridIndex)
             elseif ((isTouchingCursor) and (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
-                dispatchEventPlayerMovedCursor(self, gridIndex)
+                dispatchEvtMapCursorMoved(self, gridIndex)
             end
         end
     end
@@ -206,12 +200,13 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPreviewBattleDamage",   self)
-        :addEventListener("EvtPreviewNoBattleDamage",       self)
-        :addEventListener("EvtActionPlannerIdle",           self)
-        :addEventListener("EvtActionPlannerMakingMovePath", self)
-        :addEventListener("EvtActionPlannerChoosingAction", self)
-        :addEventListener("EvtSceneWarStarted",             self)
+    dispatcher:addEventListener("EvtPreviewBattleDamage",       self)
+        :addEventListener("EvtPreviewNoBattleDamage",           self)
+        :addEventListener("EvtActionPlannerIdle",               self)
+        :addEventListener("EvtActionPlannerMakingMovePath",     self)
+        :addEventListener("EvtActionPlannerChoosingAction",     self)
+        :addEventListener("EvtActionPlannerChoosingSiloTarget", self)
+        :addEventListener("EvtSceneWarStarted",                 self)
 
     return self
 end
@@ -220,11 +215,12 @@ function ModelMapCursor:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
-        :removeEventListener("EvtActionPlannerChoosingAction", self)
-        :removeEventListener("EvtActionPlannerMakingMovePath", self)
-        :removeEventListener("EvtActionPlannerIdle",           self)
-        :removeEventListener("EvtPreviewNoBattleDamage",       self)
-        :removeEventListener("EvtPreviewBattleDamage",         self)
+        :removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
+        :removeEventListener("EvtActionPlannerChoosingAction",     self)
+        :removeEventListener("EvtActionPlannerMakingMovePath",     self)
+        :removeEventListener("EvtActionPlannerIdle",               self)
+        :removeEventListener("EvtPreviewNoBattleDamage",           self)
+        :removeEventListener("EvtPreviewBattleDamage",             self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -235,15 +231,13 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtActionPlannerIdle") or
-        (eventName == "EvtActionPlannerMakingMovePath") or
-        (eventName == "EvtActionPlannerChoosingAction") or
-        (eventName == "EvtPreviewNoBattleDamage")) then
-        onEvtPreviewNoBattleDamage(self, event)
-    elseif (eventName == "EvtPreviewBattleDamage") then
-        onEvtPreviewBattleDamage(self, event)
-    elseif (eventName == "EvtSceneWarStarted") then
-        onEvtSceneWarStarted(self, event)
+    if     (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerMakingMovePath")     then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerChoosingAction")     then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerChoosingSiloTarget") then setCursorAppearance(self, false, true,  true )
+    elseif (eventName == "EvtPreviewNoBattleDamage")           then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtPreviewBattleDamage")             then setCursorAppearance(self, false, true,  false)
+    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(self, event)
     end
 
     return self

@@ -738,7 +738,9 @@ setStateChoosingAttackTarget = function(self, destination)
 end
 
 setStateChoosingSiloTarget = function(self)
-    print("silo!!!")
+    self.m_State = "choosingSiloTarget"
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerChoosingSiloTarget"})
 end
 
 setStateChoosingDropDestination = function(self, unitID)
