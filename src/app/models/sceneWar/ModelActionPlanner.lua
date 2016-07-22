@@ -801,9 +801,7 @@ local function onEvtMapCursorMoved(self, event)
     local state     = self.m_State
     local gridIndex = event.gridIndex
 
-    if (state == "idle") then
-        return
-    elseif (state == "choosingProductionTarget") then
+    if (state == "choosingProductionTarget") then
         setStateIdle(self, true)
     elseif (state == "makingMovePath") then
         if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
@@ -830,6 +828,8 @@ local function onEvtMapCursorMoved(self, event)
             end
         end
     end
+
+    self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
 end
 
 local function onEvtGridSelected(self, event)
@@ -866,6 +866,12 @@ local function onEvtGridSelected(self, event)
         else
             setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
         end
+    elseif (state == "choosingSiloTarget") then
+        if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
+            dispatchEventLaunchSilo(self, gridIndex)
+        elseif (GridIndexFunctions.getDistance(gridIndex, self.m_CursorGridIndex) > 2) then
+            setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+        end
     elseif (state == "choosingDropDestination") then
         if (isDropGridAvailable(gridIndex, self.m_AvailableDropGrids)) then
             pushBackDropDestination(self.m_SelectedDropDestinations, self.m_DroppingUnitID, gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
@@ -886,6 +892,8 @@ local function onEvtGridSelected(self, event)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
+
+    self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
 end
 
 --------------------------------------------------------------------------------

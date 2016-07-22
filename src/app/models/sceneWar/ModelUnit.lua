@@ -16,6 +16,7 @@ local TypeChecker           = require("src.app.utilities.TypeChecker")
 local TableFunctions        = require("src.app.utilities.TableFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 --------------------------------------------------------------------------------
@@ -350,6 +351,38 @@ function ModelUnit:doActionCapture(action, capturer, target)
 
             if (action.callbackOnCaptureAnimationEnded) then
                 action.callbackOnCaptureAnimationEnded()
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            modelTile:updateView()
+
+            local dispatcher  = self.m_RootScriptEventDispatcher
+            local mapSize     = modelUnitMap:getMapSize()
+            local isWithinMap = GridIndexFunctions.isWithinMap
+            for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
+                if (isWithinMap(gridIndex, mapSize)) then
+                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+                    if (modelUnit) then
+                        modelUnit:updateView()
+                    end
+
+                    dispatcher:dispatchEvent({
+                        name      = "EvtSiloAttackGrid",
+                        gridIndex = gridIndex,
+                    })
+                end
             end
         end)
     end
