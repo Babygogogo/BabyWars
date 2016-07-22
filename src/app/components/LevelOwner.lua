@@ -13,7 +13,6 @@
 
 local LevelOwner = require("src.global.functions.class")("LevelOwner")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local ComponentManager      = require("src.global.components.ComponentManager")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
@@ -25,22 +24,9 @@ local EXPORTED_METHODS = {
     "getLevel",
     "getLevelAttackBonus",
     "getLevelDefenseBonus",
+
+    "setLevel",
 }
-
---------------------------------------------------------------------------------
--- The param validators.
---------------------------------------------------------------------------------
-local function isLevel(param)
-    return (param >= 0) and (math.ceil(param) == param) and (param <= MAX_LEVEL)
-end
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function setLevel(self, level)
-    assert(isLevel(level), "LevelOwner-setLevel() the param level is invalid.")
-    self.m_Level = level
-end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -56,7 +42,7 @@ function LevelOwner:loadTemplate(template)
 end
 
 function LevelOwner:loadInstantialData(data)
-    setLevel(self, data.level)
+    self:setLevel(data.level)
 
     return self
 end
@@ -103,11 +89,11 @@ function LevelOwner:doActionAttack(action, attacker, target)
     if (self.m_Level < MAX_LEVEL) then
         if (self.m_Owner == attacker) then
             if ((target.getUnitType) and (action.attackDamage >= target:getCurrentHP())) then
-                setLevel(self, self.m_Level + 1)
+                self:setLevel(self.m_Level + 1)
             end
         else
             if (attacker:getCurrentHP() <= 0) then -- The hp for the attacker is already updated with the counter damage, so just compare it with 0
-                setLevel(self, self.m_Level + 1)
+                self:setLevel(self.m_Level + 1)
             end
         end
     end
@@ -116,7 +102,7 @@ function LevelOwner:doActionAttack(action, attacker, target)
 end
 
 function LevelOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
-    setLevel(target, math.max(self:getLevel(), target:getLevel()))
+    target:setLevel(math.max(self:getLevel(), target:getLevel()))
 
     return self
 end
@@ -142,6 +128,13 @@ function LevelOwner:getLevelDefenseBonus()
     else
         return LEVEL_BONUS[self.m_Level].defense
     end
+end
+
+function LevelOwner:setLevel(level)
+    assert((level >= 0) and (level <= MAX_LEVEL), "LevelOwner:setLevel() the param level is invalid." )
+    self.m_Level = level
+
+    return self.m_Owner
 end
 
 return LevelOwner

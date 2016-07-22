@@ -415,6 +415,9 @@ function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTil
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionJoinModelUnit(action, modelPlayerManager, self:getModelUnit(endingGridIndex))
 
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+        :dispatchEvent({name = "EvtModelTileMapUpdated"})
+
     return self
 end
 
