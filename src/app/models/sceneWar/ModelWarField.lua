@@ -237,6 +237,12 @@ function ModelWarField:doActionAttack(action)
     return self
 end
 
+function ModelWarField:doActionJoinModelUnit(action, modelPlayerManager)
+    self:getModelUnitMap():doActionJoinModelUnit(action, modelPlayerManager, self:getModelTileMap())
+
+    return self
+end
+
 function ModelWarField:doActionCapture(action)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
@@ -253,7 +259,7 @@ function ModelWarField:doActionCapture(action)
 end
 
 function ModelWarField:doActionLaunchSilo(action)
-    self:getModelUnitMap():doActionLaunchSilo(action, self:getModelTileMap():getModelTile(action.path[#action.path]))
+    self:getModelUnitMap():doActionLaunchSilo(action, self:getModelTileMap())
 
     return self
 end

@@ -233,6 +233,17 @@ function AttackDoer:doActionAttack(action, attacker, target)
     return self
 end
 
+function AttackDoer:doActionJoinModelUnit(action, modelPlayerManager, target)
+    if (self:hasPrimaryWeapon()) then
+        target:setPrimaryWeaponCurrentAmmo(math.min(
+            target:getPrimaryWeaponMaxAmmo(),
+            self:getPrimaryWeaponCurrentAmmo() + target:getPrimaryWeaponCurrentAmmo()
+        ))
+    end
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------

@@ -151,6 +151,37 @@ function AttackTaker:doActionAttack(action, attacker, target)
     return self
 end
 
+function AttackTaker:canJoinModelUnit(modelUnit)
+    return modelUnit:getNormalizedCurrentHP() < 10
+end
+
+function AttackTaker:doActionJoinModelUnit(action, modelPlayerManager, target)
+    local joinedNormalizedHP = self:getNormalizedCurrentHP() + target:getNormalizedCurrentHP()
+    if (joinedNormalizedHP > 10) then
+        local owner       = self.m_Owner
+        local playerIndex = owner:getPlayerIndex()
+        local modelPlayer = modelPlayerManager:getModelPlayer(playerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + (joinedNormalizedHP - 10) / 10 * owner:getProductionCost())
+        joinedNormalizedHP = 10
+
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtModelPlayerUpdated",
+            modelPlayer = modelPlayer,
+            playerIndex = playerIndex,
+        })
+    end
+
+    target:setCurrentHP(math.max(
+        (joinedNormalizedHP - 1) * 10 + 1,
+        math.min(
+            self:getCurrentHP() + target:getCurrentHP(),
+            UNIT_MAX_HP
+        )
+    ))
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

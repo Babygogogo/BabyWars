@@ -358,6 +358,22 @@ function ModelUnit:doActionCapture(action, capturer, target)
     return self
 end
 
+function ModelUnit:doActionJoinModelUnit(action, modelPlayerManager, target)
+    target:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, modelPlayerManager, target)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:removeFromParent()
+            self:unsetRootScriptEventDispatcher()
+
+            target:updateView()
+        end)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
@@ -489,7 +505,18 @@ function ModelUnit:getProductionCost()
 end
 
 function ModelUnit:canJoinModelUnit(rhsUnitModel)
-    return ((self:getTiledID() == rhsUnitModel:getTiledID()) and (rhsUnitModel:getCurrentHP() <= 90))
+    if (self:getTiledID() ~= rhsUnitModel:getTiledID()) then
+        return false
+    end
+
+    for _, component in pairs(ComponentManager.getAllComponents(self)) do
+        if ((component.canJoinModelUnit)                    and
+            (not component:canJoinModelUnit(rhsUnitModel))) then
+            return false
+        end
+    end
+
+    return true
 end
 
 function ModelUnit:canDoAction(playerIndex)

@@ -93,6 +93,18 @@ function ViewUnitMap:removeViewUnit(gridIndex)
     return self
 end
 
+function ViewUnitMap:setViewUnitJoinedWithGridIndex(gridIndex)
+    self.m_Map[gridIndex.x][gridIndex.y] = nil
+
+    return self
+end
+
+function ViewUnitMap:setViewUnitJoinedWithUnitId(unitID)
+    self.m_LoadedViewUnit[unitID] = nil
+
+    return self
+end
+
 function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
     if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
         return

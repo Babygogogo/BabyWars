@@ -387,10 +387,46 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     return self
 end
 
-function ModelUnitMap:doActionLaunchSilo(action, modelTile)
+function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTileMap)
+    local launchUnitID = action.launchUnitID
+    local path         = action.path
+    local beginningGridIndex, endingGridIndex = path[1], path[#path]
+    local focusActorUnit
+
+    if (launchUnitID) then
+        focusActorUnit = self.m_LoadedActorUnits[launchUnitID]
+        self.m_LoadedActorUnits[launchUnitID] = nil
+        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
+
+        if (self.m_View) then
+            self.m_View:setViewUnitJoinedWithUnitId(launchUnitID)
+        end
+    else
+        focusActorUnit = self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y]
+        self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
+
+        if (self.m_View) then
+            self.m_View:setViewUnitJoinedWithGridIndex(beginningGridIndex)
+        end
+    end
+
+    local focusModelUnit = focusActorUnit:getModel()
+    modelTileMap:getModelTile(beginningGridIndex):doActionMoveModelUnit(action)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+        :doActionJoinModelUnit(action, modelPlayerManager, self:getModelUnit(endingGridIndex))
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+        :dispatchEvent({name = "EvtModelTileMapUpdated"})
+
+    return self
+end
+
+function ModelUnitMap:doActionLaunchSilo(action, modelTileMap)
+    modelTileMap:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+
     local focusModelUnit = moveActorUnitOnAction(self, action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionLaunchSilo(action, self, modelTile)
+        :doActionLaunchSilo(action, self, modelTileMap:getModelTile(action.path[#action.path]))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
         :dispatchEvent({name = "EvtModelTileMapUpdated"})

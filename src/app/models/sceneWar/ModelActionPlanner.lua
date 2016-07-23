@@ -56,10 +56,9 @@ local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
         return true
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        return ((not existingModelUnit) or
-                -- TODO: enable to join the model unit.
-                -- (modelUnit:canJoinModelUnit(existingModelUnit)) or
-                (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit)))
+        return (not existingModelUnit)                                                            or
+            (modelUnit:canJoinModelUnit(existingModelUnit))                                       or
+            (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit))
     end
 end
 
@@ -322,7 +321,9 @@ local function getActionLoadModelUnit(self)
         return nil
     else
         local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((loaderModelUnit) and (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+        if ((loaderModelUnit)                                          and
+            (loaderModelUnit.canLoadModelUnit)                         and
+            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
             return {
                 name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
                 callback = function()
@@ -334,19 +335,18 @@ local function getActionLoadModelUnit(self)
 end
 
 local function getActionJoinModelUnit(self)
-    local destination = getMovePathDestination(self.m_MovePath)
-    if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
-        return nil
+    local existingModelUnit = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
+    if ((#self.m_MovePath > 1)                                       and
+        (existingModelUnit)                                          and
+        (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
+        return {
+            name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
+            callback = function()
+                dispatchEventJoinModelUnit(self)
+            end
+        }
     else
-        local existingModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((existingModelUnit) and (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
-            return {
-                name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
-                callback = function()
-                    dispatchEventJoinModelUnit(self)
-                end
-            }
-        end
+        return nil
     end
 end
 
