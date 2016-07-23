@@ -79,6 +79,10 @@ local function doActionMessage(self, action)
     getModelMessageIndicator(self):showMessage(action.message)
 end
 
+local function doActionError(self, action)
+    error("ModelSceneWar-doActionError(): " .. action.error)
+end
+
 local function doActionBeginTurn(self, action)
     local modelTurnManager = getModelTurnManager(self)
     local lostPlayerIndex  = action.lostPlayerIndex
@@ -209,12 +213,12 @@ local function doActionCapture(self, action)
     modelPlayerManager:doActionCapture(action)
 end
 
-local function doActionBuildModelTile(self, action)
-    getModelWarField(self):doActionBuildModelTile(action)
-end
-
 local function doActionLaunchSilo(self, action)
     getModelWarField(self):doActionLaunchSilo(action)
+end
+
+local function doActionBuildModelTile(self, action)
+    getModelWarField(self):doActionBuildModelTile(action)
 end
 
 local function doActionProduceModelUnitOnUnit(self, action)
@@ -239,37 +243,33 @@ local function doActionProduceOnTile(self, action)
     getModelWarField(self):doActionProduceOnTile(action)
 end
 
---------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtSystemRequestDoAction(self, event)
-    local actionName = event.actionName
-    if     (actionName == "Logout")  then return doActionLogout( self, event)
-    elseif (actionName == "Message") then return doActionMessage(self, event)
-    elseif (actionName == "Error")   then return error("ModelSceneWar-onEvtSystemRequestDoAction() Error: " .. event.error)
-    end
-
-    if ((event.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
-        return
-    elseif (actionName == "BeginTurn")              then return doActionBeginTurn(             self, event)
-    elseif (actionName == "EndTurn")                then return doActionEndTurn(               self, event)
-    elseif (actionName == "Surrender")              then return doActionSurrender(             self, event)
-    elseif (actionName == "Wait")                   then return doActionWait(                  self, event)
-    elseif (actionName == "Attack")                 then return doActionAttack(                self, event)
-    elseif (actionName == "JoinModelUnit")          then return doActionJoinModelUnit(         self, event)
-    elseif (actionName == "Capture")                then return doActionCapture(               self, event)
-    elseif (actionName == "LaunchSilo")             then return doActionLaunchSilo(            self, event)
-    elseif (actionName == "BuildModelTile")         then return doActionBuildModelTile(        self, event)
-    elseif (actionName == "ProduceModelUnitOnUnit") then return doActionProduceModelUnitOnUnit(self, event)
-    elseif (actionName == "SupplyModelUnit")        then return doActionSupplyModelUnit(       self, event)
-    elseif (actionName == "LoadModelUnit")          then return doActionLoadModelUnit(         self, event)
-    elseif (actionName == "DropModelUnit")          then return doActionDropModelUnit(         self, event)
-    elseif (actionName == "ProduceOnTile")          then return doActionProduceOnTile(         self, event)
-    else
-        return print("ModelSceneWar-onEvtSystemRequestDoAction() unrecognized action.")
+local function doAction(self, action)
+    local actionName = action.actionName
+    if     (actionName == "Logout")                 then doActionLogout(                self, action)
+    elseif (actionName == "Message")                then doActionMessage(               self, action)
+    elseif (actionName == "Error")                  then doActionError(                 self, action)
+    elseif ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then return
+    elseif (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
+    elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
+    elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
+    elseif (actionName == "Wait")                   then doActionWait(                  self, action)
+    elseif (actionName == "Attack")                 then doActionAttack(                self, action)
+    elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
+    elseif (actionName == "Capture")                then doActionCapture(               self, action)
+    elseif (actionName == "LaunchSilo")             then doActionLaunchSilo(            self, action)
+    elseif (actionName == "BuildModelTile")         then doActionBuildModelTile(        self, action)
+    elseif (actionName == "ProduceModelUnitOnUnit") then doActionProduceModelUnitOnUnit(self, action)
+    elseif (actionName == "SupplyModelUnit")        then doActionSupplyModelUnit(       self, action)
+    elseif (actionName == "LoadModelUnit")          then doActionLoadModelUnit(         self, action)
+    elseif (actionName == "DropModelUnit")          then doActionDropModelUnit(         self, action)
+    elseif (actionName == "ProduceOnTile")          then doActionProduceOnTile(         self, action)
+    else                                                 print("ModelSceneWar-doAction() unrecognized action.")
     end
 end
 
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
 local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
@@ -290,8 +290,8 @@ local function onWebSocketMessage(self, param)
     print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
 
     local action = assert(loadstring("return " .. param.message))()
-    -- print(SerializationFunctions.serialize(action))
-    onEvtSystemRequestDoAction(self, action)
+    -- print(SerializationFunctions.toString(action))
+    doAction(self, action)
 end
 
 local function onWebSocketClose(self, param)
@@ -318,7 +318,6 @@ end
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtSystemRequestDoAction", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -339,7 +338,7 @@ end
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :getModelActionPlanner():setModelPlayerManager(self.m_ActorPlayerManager:getModel())
+        :getModelActionPlanner():setModelPlayerManager(getModelPlayerManager(self))
 
     self.m_ActorWarField = actor
 end
@@ -433,9 +432,8 @@ function ModelSceneWar:onStopRunning()
 end
 
 function ModelSceneWar:onEvent(event)
-    local eventName = event.name
-    if     (eventName == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
-    elseif (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
+    if (event.name == "EvtPlayerRequestDoAction") then
+        onEvtPlayerRequestDoAction(self, event)
     end
 
     return self
