@@ -25,13 +25,12 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local Actor                  = require("src.global.actors.Actor")
-local ActorManager           = require("src.global.actors.ActorManager")
-local EventDispatcher        = require("src.global.events.EventDispatcher")
-local TypeChecker            = require("src.app.utilities.TypeChecker")
 local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local Actor                  = require("src.global.actors.Actor")
+local ActorManager           = require("src.global.actors.ActorManager")
+local EventDispatcher        = require("src.global.events.EventDispatcher")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -49,6 +48,26 @@ local function callbackOnWarEnded()
     runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
 end
 
+local function getModelTurnManager(self)
+    return self.m_ActorTurnManager:getModel()
+end
+
+local function getModelPlayerManager(self)
+    return self.m_ActorPlayerManager:getModel()
+end
+
+local function getModelWeatherManager(self)
+    return self.m_ActorWeatherManager:getModel()
+end
+
+local function getModelWarField(self)
+    return self.m_ActorWarField:getModel()
+end
+
+local function getModelMessageIndicator(self)
+    return self.m_ActorMessageIndicator:getModel()
+end
+
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
@@ -57,16 +76,16 @@ local function doActionLogout(self, event)
 end
 
 local function doActionMessage(self, action)
-    self:getModelMessageIndicator():showMessage(action.message)
+    getModelMessageIndicator(self):showMessage(action.message)
 end
 
 local function doActionBeginTurn(self, action)
-    local modelTurnManager = self:getModelTurnManager()
+    local modelTurnManager = getModelTurnManager(self)
     local lostPlayerIndex  = action.lostPlayerIndex
 
     if (lostPlayerIndex) then
-        local modelWarField      = self:getModelWarField()
-        local modelPlayerManager = self:getModelPlayerManager()
+        local modelWarField      = getModelWarField(self)
+        local modelPlayerManager = getModelPlayerManager(self)
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         action.callbackOnEnterTurnPhaseMain = function()
@@ -77,7 +96,7 @@ local function doActionBeginTurn(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -94,22 +113,22 @@ local function doActionBeginTurn(self, action)
 end
 
 local function doActionEndTurn(self, action)
-    self:getModelTurnManager():doActionEndTurn(action)
+    getModelTurnManager(self):doActionEndTurn(action)
 end
 
 local function doActionSurrender(self, action)
-    local modelPlayerManager = self:getModelPlayerManager()
-    local modelTurnManager   = self:getModelTurnManager()
+    local modelPlayerManager = getModelPlayerManager(self)
+    local modelTurnManager   = getModelTurnManager(self)
     modelPlayerManager:doActionSurrender(action)
     modelTurnManager:doActionSurrender(action)
-    self:getModelWarField():doActionSurrender(action)
+    getModelWarField(self):doActionSurrender(action)
 
     local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
     if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
         self.m_IsWarEnded = true
         self.m_View:showEffectSurrender(callbackOnWarEnded)
     else
-        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
+        getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
 
         if (modelPlayerManager:getAlivePlayersCount() == 1) then
             self.m_IsWarEnded = true
@@ -121,13 +140,13 @@ local function doActionSurrender(self, action)
 end
 
 local function doActionWait(self, action)
-    self:getModelWarField():doActionWait(action)
+    getModelWarField(self):doActionWait(action)
 end
 
 local function doActionAttack(self, action)
-    local modelPlayerManager = self:getModelPlayerManager()
-    local modelTurnManager   = self:getModelTurnManager()
-    local modelWarField      = self:getModelWarField()
+    local modelPlayerManager = getModelPlayerManager(self)
+    local modelTurnManager   = getModelTurnManager(self)
+    local modelWarField      = getModelWarField(self)
 
     local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
@@ -141,7 +160,7 @@ local function doActionAttack(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -159,12 +178,12 @@ local function doActionAttack(self, action)
 end
 
 local function doActionJoinModelUnit(self, action)
-    self:getModelWarField():doActionJoinModelUnit(action, self:getModelPlayerManager())
+    getModelWarField(self):doActionJoinModelUnit(action, getModelPlayerManager(self))
 end
 
 local function doActionCapture(self, action)
-    local modelWarField      = self:getModelWarField()
-    local modelPlayerManager = self:getModelPlayerManager()
+    local modelWarField      = getModelWarField(self)
+    local modelPlayerManager = getModelPlayerManager(self)
 
     local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
@@ -177,7 +196,7 @@ local function doActionCapture(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
                     self.m_View:showEffectWin(callbackOnWarEnded)
@@ -191,33 +210,33 @@ local function doActionCapture(self, action)
 end
 
 local function doActionBuildModelTile(self, action)
-    self:getModelWarField():doActionBuildModelTile(action)
+    getModelWarField(self):doActionBuildModelTile(action)
 end
 
 local function doActionLaunchSilo(self, action)
-    self:getModelWarField():doActionLaunchSilo(action)
+    getModelWarField(self):doActionLaunchSilo(action)
 end
 
 local function doActionProduceModelUnitOnUnit(self, action)
-    self:getModelPlayerManager():doActionProduceModelUnitOnUnit(action, self:getModelTurnManager():getPlayerIndex())
-    self:getModelWarField():doActionProduceModelUnitOnUnit(action)
+    getModelPlayerManager(self):doActionProduceModelUnitOnUnit(action, getModelTurnManager(self):getPlayerIndex())
+    getModelWarField(self):doActionProduceModelUnitOnUnit(action)
 end
 
 local function doActionSupplyModelUnit(self, action)
-    self:getModelWarField():doActionSupplyModelUnit(action)
+    getModelWarField(self):doActionSupplyModelUnit(action)
 end
 
 local function doActionLoadModelUnit(self, action)
-    self:getModelWarField():doActionLoadModelUnit(action)
+    getModelWarField(self):doActionLoadModelUnit(action)
 end
 
 local function doActionDropModelUnit(self, action)
-    self:getModelWarField():doActionDropModelUnit(action)
+    getModelWarField(self):doActionDropModelUnit(action)
 end
 
 local function doActionProduceOnTile(self, action)
-    self:getModelPlayerManager():doActionProduceOnTile(action, self:getModelTurnManager():getPlayerIndex())
-    self:getModelWarField():doActionProduceOnTile(action)
+    getModelPlayerManager(self):doActionProduceOnTile(action, getModelTurnManager(self):getPlayerIndex())
+    getModelWarField(self):doActionProduceOnTile(action)
 end
 
 --------------------------------------------------------------------------------
@@ -254,7 +273,8 @@ end
 local function onEvtPlayerRequestDoAction(self, event)
     local request = event
     request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
-    request.sceneWarFileName = self.m_FileName
+    request.sceneWarFileName                      = self.m_FileName
+
     WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
 
@@ -263,7 +283,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(30))
+    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
@@ -276,7 +296,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(31))
+    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(31))
 
     WebSocketManager.close()
         .init()
@@ -285,7 +305,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
+    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
 
     WebSocketManager.close()
         .init()
@@ -327,17 +347,17 @@ end
 local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelWarField(self:getModelWarField())
+        :setModelWarField(getModelWarField(self))
 
     self.m_ActorWarHud = actor
 end
 
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-    actor:getModel():setModelPlayerManager(self:getModelPlayerManager())
+    actor:getModel():setModelPlayerManager(getModelPlayerManager(self))
         :setModelWarField(self.m_ActorWarField:getModel())
         :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelMessageIndicator(self:getModelMessageIndicator())
+        :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorTurnManager = actor
 end
@@ -376,35 +396,23 @@ function ModelSceneWar:initView()
     local view = self.m_View
     assert(view, "ModelSceneWar:initView() no view is attached.")
 
-    view:setViewWarField(        self.m_ActorWarField:getView())
-        :setViewWarHud(          self.m_ActorWarHud:getView())
-        :setViewTurnManager(     self.m_ActorTurnManager:getView())
+    view:setViewWarField(        self.m_ActorWarField        :getView())
+        :setViewWarHud(          self.m_ActorWarHud          :getView())
+        :setViewTurnManager(     self.m_ActorTurnManager     :getView())
         :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
 
     return self
 end
 
 --------------------------------------------------------------------------------
--- The function for serialization.
---------------------------------------------------------------------------------
-function ModelSceneWar:toSerializableTable()
-    return {
-        fileName = self.m_FileName,
-        warField = self.m_ActorWarField:getModel():toSerializableTable(),
-        turn     = self.m_ActorTurnManager:getModel():toSerializableTable(),
-        players  = self.m_ActorPlayerManager:getModel():toSerializableTable(),
-        weather  = self.m_ActorWeatherManager:getModel():toSerializableTable(),
-    }
-end
-
---------------------------------------------------------------------------------
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local playerIndex = self:getModelTurnManager():getPlayerIndex()
+    local modelTurnManager = getModelTurnManager(self)
+    local playerIndex      = modelTurnManager:getPlayerIndex()
     self.m_ScriptEventDispatcher:dispatchEvent({
             name         = "EvtModelWeatherUpdated",
-            modelWeather = self:getModelWeatherManager():getCurrentWeather()
+            modelWeather = getModelWeatherManager(self):getCurrentWeather()
         })
         :dispatchEvent({
             name = "EvtSceneWarStarted",
@@ -412,10 +420,10 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name        = "EvtPlayerIndexUpdated",
             playerIndex = playerIndex,
-            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
+            modelPlayer = getModelPlayerManager(self):getModelPlayer(playerIndex),
         })
 
-    self:getModelTurnManager():runTurn()
+    modelTurnManager:runTurn()
 
     return self
 end
@@ -426,54 +434,21 @@ end
 
 function ModelSceneWar:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerRequestDoAction") then
-        onEvtPlayerRequestDoAction(self, event)
-    elseif (eventName == "EvtSystemRequestDoAction") then
-        onEvtSystemRequestDoAction(self, event)
+    if     (eventName == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
+    elseif (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
     end
 
     return self
 end
 
 function ModelSceneWar:onWebSocketEvent(eventName, param)
-    if (eventName == "open") then
-        onWebSocketOpen(self, param)
-    elseif (eventName == "message") then
-        onWebSocketMessage(self, param)
-    elseif (eventName == "close") then
-        onWebSocketClose(self, param)
-    elseif (eventName == "error") then
-        onWebSocketError(self, param)
+    if     (eventName == "open")    then onWebSocketOpen(   self, param)
+    elseif (eventName == "message") then onWebSocketMessage(self, param)
+    elseif (eventName == "close")   then onWebSocketClose(  self, param)
+    elseif (eventName == "error")   then onWebSocketError(  self, param)
     end
 
     return self
-end
-
---------------------------------------------------------------------------------
--- The public functions.
---------------------------------------------------------------------------------
-function ModelSceneWar:getScriptEventDispatcher()
-    return self.m_ScriptEventDispatcher
-end
-
-function ModelSceneWar:getModelTurnManager()
-    return self.m_ActorTurnManager:getModel()
-end
-
-function ModelSceneWar:getModelPlayerManager()
-    return self.m_ActorPlayerManager:getModel()
-end
-
-function ModelSceneWar:getModelWeatherManager()
-    return self.m_ActorWeatherManager:getModel()
-end
-
-function ModelSceneWar:getModelWarField()
-    return self.m_ActorWarField:getModel()
-end
-
-function ModelSceneWar:getModelMessageIndicator()
-    return self.m_ActorMessageIndicator:getModel()
 end
 
 return ModelSceneWar
