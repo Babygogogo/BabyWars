@@ -19,23 +19,8 @@ local ModelWarField = require("src.global.functions.class")("ModelWarField")
 local Actor              = require("src.global.actors.Actor")
 local TypeChecker        = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local TableFunctions     = require("src.app.utilities.TableFunctions")
 
 local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function requireFieldData(param)
-    local t = type(param)
-    if (t == "table") then
-        return param
-    elseif (t == "string") then
-        return require("data.warField." .. param)
-    else
-        return nil
-    end
-end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -76,9 +61,9 @@ end
 
 local function initActorActionPlanner(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
-
     actor:getModel():setModelTileMap(self:getModelTileMap())
         :setModelUnitMap(self:getModelUnitMap())
+
     self.m_ActorActionPlanner = actor
 end
 
@@ -97,16 +82,13 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelWarField:ctor(param)
-    local warFieldData = requireFieldData(param)
-    assert(TypeChecker.isWarFieldData(warFieldData))
-
+function ModelWarField:ctor(warFieldData)
     initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
     if (not IS_SERVER) then
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
-        initActorGridEffect(self)
+        initActorGridEffect(   self)
     end
 
     assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
@@ -119,14 +101,12 @@ function ModelWarField:ctor(param)
 end
 
 function ModelWarField:initView()
-    local view = self.m_View
-    assert(TypeChecker.isView(view))
-
-    view:setViewTileMap(      self.m_ActorTileMap:getView())
-        :setViewUnitMap(      self.m_ActorUnitMap:getView())
-        :setViewActionPlanner(self.m_ActorActionPlanner:getView())
-        :setViewMapCursor(    self.m_ActorMapCursor:getView())
-        :setViewGridEffect(   self.m_ActorGridEffect:getView())
+    assert(self.m_View, "ModelWarField:initView() no view is attached to the owner actor of the model.")
+    self.m_View:setViewTileMap(self.m_ActorTileMap      :getView())
+        :setViewUnitMap(       self.m_ActorUnitMap      :getView())
+        :setViewActionPlanner( self.m_ActorActionPlanner:getView())
+        :setViewMapCursor(     self.m_ActorMapCursor    :getView())
+        :setViewGridEffect(    self.m_ActorGridEffect   :getView())
 
         :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
 
@@ -136,12 +116,12 @@ end
 function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
-    self.m_ActorTileMap:getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorUnitMap:getModel():setRootScriptEventDispatcher(dispatcher)
+    self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
+    self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
         self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorGridEffect:getModel():setRootScriptEventDispatcher(dispatcher)
+        self.m_ActorGridEffect   :getModel():setRootScriptEventDispatcher(dispatcher)
     end
 
     self.m_RootScriptEventDispatcher = dispatcher
@@ -155,18 +135,26 @@ end
 function ModelWarField:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_ActorTileMap:getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorUnitMap:getModel():unsetRootScriptEventDispatcher()
+    self:getModelTileMap():unsetRootScriptEventDispatcher()
+    self:getModelUnitMap():unsetRootScriptEventDispatcher()
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
         self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorGridEffect:getModel():unsetRootScriptEventDispatcher()
+        self.m_ActorGridEffect   :getModel():unsetRootScriptEventDispatcher()
     end
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
         :removeEventListener("EvtZoomFieldWithScroll", self)
         :removeEventListener("EvtDragField",           self)
     self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
+function ModelWarField:setModelPlayerManager(model)
+    if (not IS_SERVER) then
+        self.m_ActorActionPlanner:getModel():setModelPlayerManager(model)
+    end
 
     return self
 end
@@ -321,10 +309,6 @@ end
 
 function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
-end
-
-function ModelWarField:getModelActionPlanner()
-    return self.m_ActorActionPlanner:getModel()
 end
 
 function ModelWarField:clearPlayerForce(playerIndex)

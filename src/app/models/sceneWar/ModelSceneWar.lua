@@ -338,7 +338,7 @@ end
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :getModelActionPlanner():setModelPlayerManager(getModelPlayerManager(self))
+        :setModelPlayerManager(getModelPlayerManager(self))
 
     self.m_ActorWarField = actor
 end
@@ -353,9 +353,9 @@ end
 
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-    actor:getModel():setModelPlayerManager(getModelPlayerManager(self))
-        :setModelWarField(self.m_ActorWarField:getModel())
-        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelPlayerManager(getModelPlayerManager(self))
+        :setModelWarField(getModelWarField(self))
         :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorTurnManager = actor
@@ -371,8 +371,6 @@ end
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
-
     self.m_FileName   = sceneData.fileName
     self.m_IsWarEnded = sceneData.isEnded
 
@@ -392,10 +390,8 @@ function ModelSceneWar:ctor(sceneData)
 end
 
 function ModelSceneWar:initView()
-    local view = self.m_View
-    assert(view, "ModelSceneWar:initView() no view is attached.")
-
-    view:setViewWarField(        self.m_ActorWarField        :getView())
+    assert(self.m_View, "ModelSceneWar:initView() no view is attached to the owner actor of the model.")
+    self.m_View:setViewWarField( self.m_ActorWarField        :getView())
         :setViewWarHud(          self.m_ActorWarHud          :getView())
         :setViewTurnManager(     self.m_ActorTurnManager     :getView())
         :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
