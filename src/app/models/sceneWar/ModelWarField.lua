@@ -108,7 +108,7 @@ function ModelWarField:initView()
         :setViewMapCursor(     self.m_ActorMapCursor    :getView())
         :setViewGridEffect(    self.m_ActorGridEffect   :getView())
 
-        :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
+        :setContentSizeWithMapSize(self:getModelTileMap():getMapSize())
 
     return self
 end
