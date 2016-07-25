@@ -148,6 +148,20 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function UnitLoader:doActionLaunchModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    assert(launchUnitID, "UnitLoader:doActionLaunchModelUnit() action.launchUnitID is invalid.")
+
+    for i, unitID in ipairs(self.m_LoadedUnitIds) do
+        if (unitID == launchUnitID) then
+            table.remove(self.m_LoadedUnitIds, i)
+            return self.m_Owner
+        end
+    end
+
+    error("UnitLoader:doActionLaunchModelUnit() no loaded unit id matches action.launchUnitID.")
+end
+
 function UnitLoader:canJoinModelUnit(modelUnit)
     return (self:getCurrentLoadCount() == 0)   and
         (modelUnit.getCurrentLoadCount)        and
@@ -165,6 +179,7 @@ end
 
 function UnitLoader:doActionLoadModelUnit(action, unitID, loaderModelUnit)
     if (self.m_Owner == loaderModelUnit) then
+        assert(not self:hasLoadUnitId(unitID), "UnitLoader:doActionLoadModelUnit() the unitID is loaded already.")
         self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
     end
 
@@ -180,20 +195,6 @@ function UnitLoader:doActionDropModelUnit(action, dropActorUnits)
         for _, dropDestination in pairs(dropDestinations) do
             if (dropModelUnit:getUnitId() == dropDestination.unitID) then
                 dropModelUnit:setGridIndex(dropDestination.gridIndex)
-            end
-        end
-    end
-
-    return self.m_Owner
-end
-
-function UnitLoader:doActionLaunchModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    if (launchUnitID) then
-        for i, unitID in ipairs(self.m_LoadedUnitIds) do
-            if (unitID == launchUnitID) then
-                table.remove(self.m_LoadedUnitIds, i)
-                break
             end
         end
     end

@@ -278,8 +278,6 @@ end
 
 function ModelTileMap:doActionWait(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionWait(action)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self

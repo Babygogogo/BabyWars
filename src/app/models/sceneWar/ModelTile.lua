@@ -203,12 +203,6 @@ function ModelTile:doActionBuildModelTile(action, builder, target)
     return self
 end
 
-function ModelTile:doActionWait(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
-
-    return self
-end
-
 function ModelTile:doActionSupplyModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action)
 

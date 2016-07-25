@@ -39,6 +39,14 @@ local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
+local function getFocusModelUnitWithAction(self, action)
+    if (action.launchUnitID) then
+        return getLoadedActorUnitWithUnitId(self, action.launchUnitID):getModel()
+    else
+        return getActorUnit(self, action.path[1]):getModel()
+    end
+end
+
 local function getSupplyTargetModelUnits(self, supplier)
     local targets = {}
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), self:getMapSize())) do
@@ -213,7 +221,7 @@ function ModelUnitMap:initView()
     local view = self.m_View
     assert(view, "ModelUnitMap:initView() there's no view attached to the owner actor of the model.")
 
-    local mapSize = self.m_MapSize
+    local mapSize = self:getMapSize()
     view:setMapSize(mapSize)
 
     local actorUnitsMap = self.m_ActorUnitsMap
@@ -273,19 +281,16 @@ end
 function ModelUnitMap:toSerializableTable()
     local grids = {}
     self:forEachModelUnitOnMap(function(modelUnit)
-        grids[#grids + 1] = modelUnit:toSerializableTable()
+        grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
     end)
 
     local loaded = {}
-    for unitID, actorUnit in pairs(self.m_LoadedActorUnits) do
-        loaded[unitID] = actorUnit:getModel():toSerializableTable()
-    end
+    self:forEachModelUnitLoaded(function(modelUnit)
+        loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+    end)
 
     return {
-        mapSize        = {
-            width  = self.m_MapSize.width,
-            height = self.m_MapSize.height,
-        },
+        mapSize         = self:getMapSize(),
         availableUnitId = self.m_AvailableUnitID,
         grids           = grids,
         loaded          = loaded,
@@ -326,9 +331,10 @@ function ModelUnitMap:doActionSurrender(action)
 end
 
 function ModelUnitMap:doActionWait(action)
-    local focusModelUnit = moveActorUnitOnAction(self, action)
+    local focusModelUnit = getFocusModelUnitWithAction(self, action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionWait(action)
+    moveActorUnitOnAction(self, action)
+    focusModelUnit:doActionWait(action)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
