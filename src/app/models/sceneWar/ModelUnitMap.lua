@@ -28,19 +28,11 @@ local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function requireMapData(param)
-    local t = type(param)
-    if (t == "string") then
-        return require(TEMPLATE_WAR_FIELD_PATH .. param)
-    elseif (t == "table") then
-        return param
-    else
-        return error("ModelUnitMap-requireMapData() the param is invalid.")
-    end
-end
+local function getActorUnit(self, gridIndex)
+    assert(GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize()),
+        "ModelUnitMap-getActorUnit() the param gridIndex is not within the map.")
 
-local function getTiledUnitLayer(tiledData)
-    return tiledData.layers[3]
+    return self.m_ActorUnitsMap[gridIndex.x][gridIndex.y]
 end
 
 local function getLoadedActorUnitWithUnitId(self, unitID)
@@ -60,11 +52,11 @@ local function getSupplyTargetModelUnits(self, supplier)
 end
 
 local function setActorUnitLoaded(self, gridIndex)
-    local focusActorUnit = self:getActorUnit(gridIndex)
+    local focusActorUnit = getActorUnit(self, gridIndex)
     local focusUnitID    = focusActorUnit:getModel():getUnitId()
 
     self.m_LoadedActorUnits[focusUnitID]           = focusActorUnit
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
 
     if (self.m_View) then
         self.m_View:setViewUnitLoaded(gridIndex, focusUnitID)
@@ -72,7 +64,7 @@ local function setActorUnitLoaded(self, gridIndex)
 end
 
 local function setActorUnitUnloaded(self, unitID, gridIndex)
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = self.m_LoadedActorUnits[unitID]
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = self.m_LoadedActorUnits[unitID]
     self.m_LoadedActorUnits[unitID]                = nil
 
     if (self.m_View) then
@@ -85,9 +77,9 @@ local function swapActorUnit(self, gridIndex1, gridIndex2)
         return
     end
 
-    local tempActorUnit = self.m_UnitActorsMap[gridIndex1.x][gridIndex1.y]
-    self.m_UnitActorsMap[gridIndex1.x][gridIndex1.y] = self.m_UnitActorsMap[gridIndex2.x][gridIndex2.y]
-    self.m_UnitActorsMap[gridIndex2.x][gridIndex2.y] = tempActorUnit
+    local tempActorUnit = self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y]
+    self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y] = self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y]
+    self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y] = tempActorUnit
 
     if (self.m_View) then
         self.m_View:swapViewUnit(gridIndex1, gridIndex2)
@@ -143,7 +135,7 @@ local function onEvtDestroyModelUnit(self, event)
         end
     end
 
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
     modelUnit:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
@@ -158,77 +150,57 @@ end
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
-local function createUnitActorsMapWithTiledLayer(layer)
-    local width, height = layer.width, layer.height
-    local map    = createEmptyMap(width)
-    local availableUnitId = 1
+local function createActorUnitsMapWithTemplate(mapData)
+    local layer               = require(TEMPLATE_WAR_FIELD_PATH .. mapData.template).layers[3]
+    local data, width, height = layer.data, layer.width, layer.height
+    local map                 = createEmptyMap(width)
+    local availableUnitId     = 1
 
     for x = 1, width do
         for y = 1, height do
-            local tiledID = layer.data[x + (height - y) * width]
+            local tiledID = data[x + (height - y) * width]
             if (tiledID > 0) then
-                map[x][y] = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
+                map[x][y]       = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
                 availableUnitId = availableUnitId + 1
             end
         end
     end
 
-    return map, {width = width, height = height}, availableUnitId
+    return map, {width = width, height = height}, availableUnitId, {}
 end
 
-local function createUnitActorsMapWithGridsData(gridsData, mapSize)
-    local map = createEmptyMap(mapSize.width)
-
-    for _, gridData in ipairs(gridsData) do
+local function createActorUnitsMapWithoutTemplate(mapData)
+    -- If the map is created without template, then we build the map with mapData.grids only.
+    local mapSize = mapData.mapSize
+    local map     = createEmptyMap(mapSize.width)
+    for _, gridData in pairs(mapData.grids) do
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createActorUnitsMapWithoutTemplate() the gridIndex is invalid.")
 
         map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
     end
 
-    return map
-end
-
-local function createUnitActorsMapWithTemplate(mapData)
-    -- If the map is created with template, then the mapData.grids is ignored.
-    local templateMapData = requireMapData(mapData.template)
-    local map, mapSize, availableUnitId = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
-
-    return map, mapSize, availableUnitId, {}
-end
-
-local function createUnitActorsMapWithoutTemplate(mapData)
-    -- If the map is created without template, then we build the map with mapData.grids only.
-    local map = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
     local loadedActorUnits = {}
     for unitID, unitData in pairs(mapData.loaded or {}) do
         loadedActorUnits[unitID] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit", unitData)
     end
 
-    return map, mapData.mapSize, mapData.availableUnitId, loadedActorUnits
+    return map, mapSize, mapData.availableUnitId, loadedActorUnits
 end
 
-local function createUnitActorsMap(param)
-    local mapData = requireMapData(param)
+local function initActorUnitsMap(self, mapData)
     if (mapData.template) then
-        return createUnitActorsMapWithTemplate(mapData)
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithTemplate(mapData)
     else
-        return createUnitActorsMapWithoutTemplate(mapData)
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithoutTemplate(mapData)
     end
-end
-
-local function initWithUnitActorsMap(self, map, mapSize, unitID, loadedActorUnits)
-    self.m_UnitActorsMap    = map
-    self.m_MapSize          = mapSize
-    self.m_AvailableUnitID  = unitID
-    self.m_LoadedActorUnits = loadedActorUnits
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelUnitMap:ctor(param)
-    initWithUnitActorsMap(self, createUnitActorsMap(param))
+function ModelUnitMap:ctor(mapData)
+    initActorUnitsMap(self, mapData)
 
     if (self.m_View) then
         self:initView()
@@ -244,12 +216,12 @@ function ModelUnitMap:initView()
     local mapSize = self.m_MapSize
     view:setMapSize(mapSize)
 
-    local unitActors = self.m_UnitActorsMap
+    local actorUnitsMap = self.m_ActorUnitsMap
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
-            local unitActor = unitActors[x][y]
-            if (unitActor) then
-                view:addViewUnit(unitActor:getView(), {x = x, y = y})
+            local actorUnit = actorUnitsMap[x][y]
+            if (actorUnit) then
+                view:addViewUnit(actorUnit:getView(), {x = x, y = y})
             end
         end
     end
@@ -402,8 +374,8 @@ function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTil
             self.m_View:setViewUnitJoinedWithUnitId(launchUnitID)
         end
     else
-        focusActorUnit = self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y]
-        self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
+        focusActorUnit = self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y]
+        self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
 
         if (self.m_View) then
             self.m_View:setViewUnitJoinedWithGridIndex(beginningGridIndex)
@@ -543,7 +515,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
         :updateView()
 
     self.m_AvailableUnitID = self.m_AvailableUnitID + 1
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actorUnit
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
     end
@@ -560,17 +532,9 @@ function ModelUnitMap:getMapSize()
     return self.m_MapSize
 end
 
-function ModelUnitMap:getActorUnit(gridIndex)
-    if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
-        return nil
-    else
-        return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
-    end
-end
-
 function ModelUnitMap:getModelUnit(gridIndex)
-    local unitActor = self:getActorUnit(gridIndex)
-    return unitActor and unitActor:getModel() or nil
+    local actorUnit = getActorUnit(self, gridIndex)
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
 end
 
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
@@ -595,7 +559,7 @@ function ModelUnitMap:forEachModelUnitOnMap(func)
     local mapSize = self:getMapSize()
     for x = 1, mapSize.width do
         for y = 1, mapSize.height do
-            local actorUnit = self.m_UnitActorsMap[x][y]
+            local actorUnit = self.m_ActorUnitsMap[x][y]
             if (actorUnit) then
                 func(actorUnit:getModel())
             end

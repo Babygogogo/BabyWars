@@ -38,12 +38,15 @@ local function getMovePathDestination(movePath)
 end
 
 local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
-    local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-    if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+    if (not GridIndexFunctions.isWithinMap(gridIndex, modelUnitMap:getMapSize())) then
         return nil
     else
-        local modelTile = modelTileMap:getModelTile(gridIndex)
-        return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType(), modelPlayer)) or (nil)
+        local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+            return nil
+        else
+            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType(), modelPlayer)
+        end
     end
 end
 
