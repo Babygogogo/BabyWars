@@ -96,9 +96,7 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function CaptureTaker:doActionDestroyModelUnit(action)
-    if (GridIndexFunctions.isEqual(self.m_Owner:getGridIndex(), action.gridIndex)) then
-        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-    end
+    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
 
     return self.m_Owner
 end

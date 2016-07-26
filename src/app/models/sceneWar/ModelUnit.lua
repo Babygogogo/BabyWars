@@ -26,11 +26,10 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
-local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex, attacker)
+local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtDestroyModelUnit",
         gridIndex = gridIndex,
-        attacker  = attacker,
     })
 end
 
@@ -211,6 +210,12 @@ function ModelUnit:doActionDestroyModelUnit(action)
     return self
 end
 
+function ModelUnit:doActionPromoteModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionPromoteModelUnit", action)
+
+    return self
+end
+
 function ModelUnit:doActionLaunchModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
 
@@ -248,11 +253,14 @@ function ModelUnit:doActionAttack(action, attackTarget)
     local dispatcher          = self.m_RootScriptEventDispatcher
 
     if (shouldDestroySelf) then
-        dispatchEvtDestroyModelUnit(dispatcher, selfGridIndex, attackTarget)
+        attackTarget:doActionPromoteModelUnit()
+        dispatchEvtDestroyModelUnit(dispatcher, selfGridIndex)
     end
+
     if (shouldDestroyTarget) then
         if (isTargetUnit) then
-            dispatchEvtDestroyModelUnit(dispatcher, targetGridIndex, self)
+            self:doActionPromoteModelUnit()
+            dispatchEvtDestroyModelUnit(dispatcher, targetGridIndex)
         else
             dispatchEvtDestroyModelTile(dispatcher, targetGridIndex)
         end

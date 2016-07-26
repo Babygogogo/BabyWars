@@ -53,6 +53,7 @@ local ModelTile = require("src.global.functions.class")("ModelTile")
 
 local TypeChecker           = require("src.app.utilities.TypeChecker")
 local TableFunctions        = require("src.app.utilities.TableFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
@@ -169,6 +170,13 @@ end
 --------------------------------------------------------------------------------
 function ModelTile:doActionMoveModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+
+    return self
+end
+
+function ModelTile:doActionDestroyModelUnit(action)
+    assert(GridIndexFunctions.isEqual(self:getGridIndex(), action.gridIndex))
+    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
 
     return self
 end

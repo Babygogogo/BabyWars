@@ -85,13 +85,10 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function LevelOwner:doActionDestroyModelUnit(action)
-    local owner = self.m_Owner
-    if (owner == action.attacker) then
-        local currentLevel = self:getLevel()
-        if (currentLevel < MAX_LEVEL) then
-            self:setLevel(currentLevel + 1)
-        end
+function LevelOwner:doActionPromoteModelUnit(action)
+    local currentLevel = self:getLevel()
+    if (currentLevel < MAX_LEVEL) then
+        self:setLevel(currentLevel + 1)
     end
 
     return owner

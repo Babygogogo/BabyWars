@@ -114,6 +114,10 @@ local function onEvtDestroyViewTile(self, event)
     self:getModelTile(event.gridIndex):destroyViewTileObject()
 end
 
+local function onEvtDestroyModelUnit(self, event)
+    self:getModelTile(event.gridIndex):doActionDestroyModelUnit(event)
+end
+
 --------------------------------------------------------------------------------
 -- The composition tile actors map.
 --------------------------------------------------------------------------------
@@ -178,7 +182,8 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelTile", self)
-        :addEventListener("EvtDestroyViewTile", self)
+        :addEventListener("EvtDestroyViewTile",  self)
+        :addEventListener("EvtDestroyModelUnit", self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -190,7 +195,8 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile",  self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyModelUnit", self)
+        :removeEventListener("EvtDestroyViewTile",  self)
         :removeEventListener("EvtDestroyModelTile", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -223,6 +229,7 @@ function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
     elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
+    elseif (eventName == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
     end
 
     return self

@@ -35,24 +35,6 @@ local EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex, attacker)
-    dispatcher:dispatchEvent({
-        name      = "EvtDestroyModelUnit",
-        gridIndex = gridIndex,
-        attacker  = attacker,
-    })
-end
-
-local function dispatchEvtDestroyModelTile(dispatcher, gridIndex)
-    dispatcher:dispatchEvent({
-        name      = "EvtDestroyModelTile",
-        gridIndex = gridIndex,
-    })
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function AttackTaker:ctor(param)

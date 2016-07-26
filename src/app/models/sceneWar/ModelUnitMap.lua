@@ -137,9 +137,14 @@ local function onEvtDestroyModelUnit(self, event)
     assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
 
     if (modelUnit.getLoadUnitIdList) then
+        local view = self.m_View
         for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
             self.m_LoadedActorUnits[unitID]:getModel():unsetRootScriptEventDispatcher()
             self.m_LoadedActorUnits[unitID] = nil
+
+            if (view) then
+                view:removeLoadedViewUnit(unitID)
+            end
         end
     end
 

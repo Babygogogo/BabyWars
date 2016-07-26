@@ -80,9 +80,7 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function Buildable:doActionDestroyModelUnit(action)
-    if (GridIndexFunctions.isEqual(self.m_Owner:getGridIndex(), action.gridIndex)) then
-        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
-    end
+    self.m_CurrentBuildPoint = self:getMaxBuildPoint()
 
     return self.m_Owner
 end
