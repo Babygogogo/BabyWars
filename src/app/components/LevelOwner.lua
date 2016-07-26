@@ -85,20 +85,16 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function LevelOwner:doActionAttack(action, attacker, target)
-    if (self.m_Level < MAX_LEVEL) then
-        if (self.m_Owner == attacker) then
-            if ((target.getUnitType) and (action.attackDamage >= target:getCurrentHP())) then
-                self:setLevel(self.m_Level + 1)
-            end
-        else
-            if (attacker:getCurrentHP() <= 0) then -- The hp for the attacker is already updated with the counter damage, so just compare it with 0
-                self:setLevel(self.m_Level + 1)
-            end
+function LevelOwner:doActionDestroyModelUnit(action)
+    local owner = self.m_Owner
+    if (owner == action.attacker) then
+        local currentLevel = self:getLevel()
+        if (currentLevel < MAX_LEVEL) then
+            self:setLevel(currentLevel + 1)
         end
     end
 
-    return self
+    return owner
 end
 
 function LevelOwner:doActionJoinModelUnit(action, modelPlayerManager, target)

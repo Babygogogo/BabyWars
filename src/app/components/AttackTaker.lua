@@ -37,15 +37,16 @@ local EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtDestroyModelUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex, attacker)
+    dispatcher:dispatchEvent({
         name      = "EvtDestroyModelUnit",
         gridIndex = gridIndex,
+        attacker  = attacker,
     })
 end
 
-local function dispatchEvtDestroyModelTile(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+local function dispatchEvtDestroyModelTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
         name      = "EvtDestroyModelTile",
         gridIndex = gridIndex,
     })
@@ -130,25 +131,11 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function AttackTaker:doActionAttack(action, attacker, target)
-    local owner = self.m_Owner
-    if (owner == attacker) then
-        self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
-        if (self:getCurrentHP() <= 0) then
-            dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
-        end
-    else
-        self:setCurrentHP(math.max(self:getCurrentHP() - action.attackDamage, 0))
-        if (self:getCurrentHP() <= 0) then
-            if (owner.getUnitType) then
-                dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
-            else
-                dispatchEvtDestroyModelTile(self, owner:getGridIndex())
-            end
-        end
-    end
+function AttackTaker:doActionAttack(action, attackTarget)
+    self        :setCurrentHP(math.max(0, self:getCurrentHP() - (action.counterDamage or 0)))
+    attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - action.attackDamage))
 
-    return self
+    return self.m_Owner
 end
 
 function AttackTaker:canJoinModelUnit(modelUnit)

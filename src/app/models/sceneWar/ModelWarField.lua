@@ -214,13 +214,10 @@ function ModelWarField:doActionAttack(action)
     local modelUnitMap    = self:getModelUnitMap()
     local modelTileMap    = self:getModelTileMap()
     local targetGridIndex = action.targetGridIndex
-    local target          = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
-    local attacker        = (action.launchUnitID)                        and
-        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
-        (modelUnitMap:getModelUnit(action.path[1]))
+    local attackTarget    = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
 
-    modelUnitMap:doActionAttack(action, attacker, target)
-    modelTileMap:doActionAttack(action, attacker, target)
+    modelUnitMap:doActionAttack(action, attackTarget)
+    modelTileMap:doActionAttack(action, attackTarget)
 
     return self
 end

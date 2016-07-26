@@ -144,7 +144,11 @@ local function onEvtDestroyModelUnit(self, event)
     end
 
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
-    modelUnit:unsetRootScriptEventDispatcher()
+    modelUnit:doActionDestroyModelUnit(event)
+        :unsetRootScriptEventDispatcher()
+    if (event.attacker) then
+        event.attacker:doActionDestroyModelUnit(event)
+    end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
@@ -341,14 +345,11 @@ function ModelUnitMap:doActionWait(action)
     return self
 end
 
-function ModelUnitMap:doActionAttack(action, attacker, target)
+function ModelUnitMap:doActionAttack(action, attackTarget)
+    local focusModelUnit = getFocusModelUnitWithAction(self, action)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     moveActorUnitOnAction(self, action)
-    attacker:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(attacker))
-        :doActionAttack(action, attacker, target)
-
-    if (target.getUnitType) then
-        target:doActionAttack(action, attacker, target)
-    end
+    focusModelUnit:doActionAttack(action, attackTarget)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

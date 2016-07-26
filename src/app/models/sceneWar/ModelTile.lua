@@ -167,6 +167,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelTile:doActionMoveModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+
+    return self
+end
+
 function ModelTile:doActionSurrender(action)
     if (self:getPlayerIndex() == action.lostPlayerIndex) then
         self:updateWithPlayerIndex(0)
@@ -175,18 +181,6 @@ function ModelTile:doActionSurrender(action)
     end
 
     self:updateView()
-
-    return self
-end
-
-function ModelTile:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionAttack(action, attacker, target)
-    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
 
     return self
 end

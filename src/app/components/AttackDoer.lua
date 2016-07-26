@@ -28,6 +28,7 @@ local EXPORTED_METHODS = {
     "getPrimaryWeaponCurrentAmmo",
     "getPrimaryWeaponFatalList",
     "getPrimaryWeaponStrongList",
+    "getPrimaryWeaponBaseDamage",
 
     "hasSecondaryWeapon",
     "getSecondaryWeaponFullName",
@@ -56,13 +57,6 @@ local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, max
     return (distance >= minRange) and (distance <= maxRange)
 end
 
-local function getPrimaryWeaponBaseDamage(self, defenseType)
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        return self.m_Template.primaryWeapon.baseDamage[defenseType]
-    else
-        return nil
-    end
-end
 
 local function getSecondaryWeaponBaseDamage(self, defenseType)
     if (self:hasSecondaryWeapon()) then
@@ -77,7 +71,7 @@ local function getBaseDamage(self, defenseType)
         return nil
     end
 
-    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
+    return self:getPrimaryWeaponBaseDamage(defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
 end
 
 local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
@@ -223,11 +217,13 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function AttackDoer:doActionAttack(action, attacker, target)
-    local isAttacker = attacker == self.m_Owner
-    if (((isAttacker)     and (getPrimaryWeaponBaseDamage(self, target:getDefenseType())))                               or
-        ((not isAttacker) and (getPrimaryWeaponBaseDamage(self, attacker:getDefenseType())) and (action.counterDamage))) then
-        self.m_PrimaryWeaponCurrentAmmo = self.m_PrimaryWeaponCurrentAmmo - 1
+function AttackDoer:doActionAttack(action, attackTarget)
+    if (self:getPrimaryWeaponBaseDamage(attackTarget:getDefenseType())) then
+        self:setPrimaryWeaponCurrentAmmo(self:getPrimaryWeaponCurrentAmmo() - 1)
+    end
+
+    if ((action.counterDamage) and (attackTarget:getPrimaryWeaponBaseDamage(self.m_Owner:getDefenseType()))) then
+        attackTarget:setPrimaryWeaponCurrentAmmo(attackTarget:getPrimaryWeaponCurrentAmmo() - 1)
     end
 
     return self
@@ -274,6 +270,14 @@ end
 function AttackDoer:getPrimaryWeaponStrongList()
     assert(self:hasPrimaryWeapon(), "AttackDoer:getPrimaryWeaponStrongList() the attack doer has no primary weapon.")
     return self.m_Template.primaryWeapon.strong
+end
+
+function AttackDoer:getPrimaryWeaponBaseDamage(defenseType)
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        return self.m_Template.primaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
 end
 
 function AttackDoer:hasSecondaryWeapon()

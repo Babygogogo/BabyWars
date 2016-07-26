@@ -26,6 +26,21 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
+local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex, attacker)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyModelUnit",
+        gridIndex = gridIndex,
+        attacker  = attacker,
+    })
+end
+
+local function dispatchEvtDestroyModelTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyModelTile",
+        gridIndex = gridIndex,
+    })
+end
+
 local function dispatchEvtDestroyViewUnit(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtDestroyViewUnit",
@@ -190,6 +205,12 @@ function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
     return self
 end
 
+function ModelUnit:doActionDestroyModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
+
+    return self
+end
+
 function ModelUnit:doActionLaunchModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
 
@@ -203,7 +224,6 @@ end
 
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
-
     ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
     if (self.m_View) then
@@ -216,43 +236,51 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action, attacker, target)
-    if (self == attacker) then
-        self:setStateActioned()
+function ModelUnit:doActionAttack(action, attackTarget)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attackTarget)
+
+    local shouldDestroySelf   = self:getCurrentHP() <= 0
+    local shouldDestroyTarget = attackTarget:getCurrentHP() <= 0
+    local selfGridIndex       = self:getGridIndex()
+    local targetGridIndex     = action.targetGridIndex
+    local isTargetUnit        = attackTarget.getUnitType
+    local dispatcher          = self.m_RootScriptEventDispatcher
+
+    if (shouldDestroySelf) then
+        dispatchEvtDestroyModelUnit(dispatcher, selfGridIndex, attackTarget)
+    end
+    if (shouldDestroyTarget) then
+        if (isTargetUnit) then
+            dispatchEvtDestroyModelUnit(dispatcher, targetGridIndex, self)
+        else
+            dispatchEvtDestroyModelTile(dispatcher, targetGridIndex)
+        end
     end
 
-    local shouldDestroyAttacker = attacker:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget   = target:getCurrentHP()   <= action.attackDamage
-    local eventDispatcher       = self.m_RootScriptEventDispatcher
-
-    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
-
-    if ((self.m_View) and (self == attacker)) then
+    if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
+            attackTarget:updateView()
 
-            if (target.updateView) then
-                target:updateView()
-            end
-
-            if (shouldDestroyAttacker) then
-                dispatchEvtDestroyViewUnit(eventDispatcher, attacker:getGridIndex())
+            if (shouldDestroySelf) then
+                dispatchEvtDestroyViewUnit(dispatcher, selfGridIndex)
             elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
-                dispatchEvtAttackViewUnit(eventDispatcher, attacker:getGridIndex())
+                dispatchEvtAttackViewUnit(dispatcher, selfGridIndex)
             end
 
             if (shouldDestroyTarget) then
-                if (target.getUnitType) then
-                    dispatchEvtDestroyViewUnit(eventDispatcher, action.targetGridIndex)
+                if (isTargetUnit) then
+                    dispatchEvtDestroyViewUnit(dispatcher, targetGridIndex)
                 else
-                    dispatchEvtDestroyViewTile(eventDispatcher, action.targetGridIndex)
+                    dispatchEvtDestroyViewTile(dispatcher, targetGridIndex)
                 end
             else
-                if (target.getUnitType) then
-                    dispatchEvtAttackViewUnit(eventDispatcher, action.targetGridIndex)
+                if (isTargetUnit) then
+                    dispatchEvtAttackViewUnit(dispatcher, targetGridIndex)
                 else
-                    dispatchEvtAttackViewTile(eventDispatcher, action.targetGridIndex)
+                    dispatchEvtAttackViewTile(dispatcher, targetGridIndex)
                 end
             end
 

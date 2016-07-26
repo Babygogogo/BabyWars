@@ -79,6 +79,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function Buildable:doActionDestroyModelUnit(action)
+    if (GridIndexFunctions.isEqual(self.m_Owner:getGridIndex(), action.gridIndex)) then
+        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
+    end
+
+    return self.m_Owner
+end
+
 function Buildable:doActionSurrender(action)
     self.m_CurrentBuildPoint = self:getMaxBuildPoint()
 
@@ -101,16 +109,6 @@ function Buildable:doActionBuildModelTile(action, builder, target)
         local modelTile = self.m_Owner
         local _, baseID = modelTile:getObjectAndBaseId()
         modelTile:updateWithObjectAndBaseId(builder:getBuildTiledIdWithTileType(modelTile:getTileType()), baseID)
-    end
-
-    return self
-end
-
-function Buildable:doActionAttack(action, attacker, target)
-    local gridIndex = self.m_Owner:getGridIndex()
-    if ((isBuilderDestroyed(gridIndex, attacker))                           or
-        ((target.getUnitType) and (isBuilderDestroyed(gridIndex, target)))) then
-        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
     end
 
     return self

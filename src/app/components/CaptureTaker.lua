@@ -95,6 +95,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function CaptureTaker:doActionDestroyModelUnit(action)
+    if (GridIndexFunctions.isEqual(self.m_Owner:getGridIndex(), action.gridIndex)) then
+        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    end
+
+    return self.m_Owner
+end
+
 function CaptureTaker:doActionSurrender(action)
     self.m_CurrentCapturePoint = self:getMaxCapturePoint()
 
@@ -116,16 +124,6 @@ function CaptureTaker:doActionCapture(action, capturer, target)
     if (self.m_CurrentCapturePoint <= 0) then
         self.m_CurrentCapturePoint = self:getMaxCapturePoint()
         self.m_Owner:updateWithPlayerIndex(capturer:getPlayerIndex())
-    end
-
-    return self
-end
-
-function CaptureTaker:doActionAttack(action, attacker, target)
-    local gridIndex = self.m_Owner:getGridIndex()
-    if ((isCapturerDestroyed(gridIndex, attacker))                           or
-        ((target.getUnitType) and (isCapturerDestroyed(gridIndex, target)))) then
-        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
     end
 
     return self

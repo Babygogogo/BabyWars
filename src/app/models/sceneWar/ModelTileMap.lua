@@ -248,11 +248,8 @@ function ModelTileMap:doActionSurrender(action)
     return self
 end
 
-function ModelTileMap:doActionAttack(action, attacker, target)
+function ModelTileMap:doActionAttack(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionAttack(action, attacker, target)
-    self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
