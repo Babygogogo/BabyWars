@@ -14,7 +14,7 @@
 --
 --   - 绑定component时，不仅会把component的实例加入到component_域中，还会把component指定的方法直接绑定到宿主上。举例：
 --     target = {}
---     ComponentExample = { EXPORT_METHOD = "someMethod", ...}
+--     ComponentExample = { EXPORTED_METHODS = "someMethod", ...}
 --     ComponentManager.bindComponent(target, ComponentExample)
 --     这三句代码执行后，target就会自动具有一个名为someMethod的域（另外还有component_域，里面存放了一个ComponentExample的实例）。
 --     之后，其他代码就可以直接调用target.someMethod，就好像target本来就具有这个域。
@@ -31,99 +31,77 @@ local COMPONENT_PATH = "src.app.components."
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function isItemInList(item, list)
-    for _, listItem in ipairs(list) do
-        if (item == listItem) then
-            return true
-        end
-    end
-
-    return false
-end
-
 local function loadComponentClass(componentName)
-    assert(type(componentName) == "string", string.format("ComponentManager--loadComponentClass() invalid component name \"%s\"", tostring(componentName)))
-
     local cls = require(COMPONENT_PATH .. componentName)
     assert(cls, string.format("ComponentManager--loadComponentClass() component \"%s\" load failed", componentName))
 
---[[
-    if DEBUG > 1 then
-        printInfo("ComponentManager--loadComponentClass() succeed loading \"%s\" ", componentName)
-    end
---]]
     return cls
 end
 
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ComponentManager.bindComponent(target, componentName, initParam)
-    target.components_ = target.components_ or {}
-    assert(target.components_[componentName] == nil, string.format("ComponentManager.bindComponent() the target has already bound a %s", componentName))
+function ComponentManager.bindComponent(owner, componentName, initParam)
+    owner.components_ = owner.components_ or {}
+    assert(not ComponentManager.getComponent(owner, componentName), string.format("ComponentManager.bindComponent() the owner has already bound a %s", componentName))
 
     local componentClass = loadComponentClass(componentName)
     for _, depend in ipairs(componentClass.DEPENDS or {}) do
-        if (target.components_[depend] == nil) then
-            Component.bindComponent(target, depend)
+        if (not ComponentManager.getComponent(owner, depend)) then
+            ComponentManager.bindComponent(owner, depend)
         end
     end
 
     local component = componentClass:create(initParam)
-    target.components_[componentName] = component
-    component:onBind(target)
+    component.m_Owner = owner
+    ComponentManager.setMethods(owner, component, componentClass.EXPORTED_METHODS)
+    owner.components_[componentName] = component
 
-    return ComponentManager
-end
-
-function ComponentManager.unbindComponent(target, componentName)
-    assert(target.components_[componentName] ~= nil, "ComponentManager.unbindComponent() the target has no component named %s.", componentName)
-
-    target.components_[componentName]:onUnbind()
-    target.components_[componentName] = nil
-
-    return ComponentManager
-end
-
-function ComponentManager.unbindAllComponentsExceptFor(target, ...)
-    local components = target.components_
-    if (components == nil) then
-        return ComponentManager
-    end
-
-    local exceptions = {...}
-    for name, component in pairs(components) do
-        if (not isItemInList(name, exceptions)) then
-            ComponentManager.unbindComponent(target, name)
-        end
+    if (component.onBind) then
+        component:onBind()
     end
 
     return ComponentManager
 end
 
-function ComponentManager.unbindAllComponents(target)
-    local components = target.components_
+function ComponentManager.unbindComponent(owner, componentName)
+    local component = ComponentManager.getComponent(owner, componentName)
+    assert(component ~= nil, "ComponentManager.unbindComponent() the owner has no component named %s.", componentName)
+
+    if (component.onUnbind) then
+        component:onUnbind()
+    end
+
+    owner.components_[componentName] = nil
+    ComponentManager.unsetMethods(owner, loadComponentClass(componentName).EXPORTED_METHODS)
+    component.m_Owner = nil
+
+    return ComponentManager
+end
+
+function ComponentManager.unbindAllComponents(owner)
+    local components = owner.components_
     if (components == nil) then
         return ComponentManager
     end
 
     for name, component in pairs(components) do
-        ComponentManager.unbindComponent(target, name)
+        ComponentManager.unbindComponent(owner, name)
     end
 
     return ComponentManager
 end
 
-function ComponentManager.getComponent(target, componentName)
-    if (target.components_ == nil) then
+function ComponentManager.getComponent(owner, componentName)
+    if (owner.components_ == nil) then
         return nil
     else
-        return target.components_[componentName]
+        return owner.components_[componentName]
     end
 end
 
-function ComponentManager.getAllComponents(target)
-    return target.components_
+function ComponentManager.getAllComponents(owner)
+    return owner.components_
 end
 
 function ComponentManager.callMethodForAllComponents(owner, methodName, ...)
@@ -136,10 +114,10 @@ function ComponentManager.callMethodForAllComponents(owner, methodName, ...)
     return ComponentManager
 end
 
-function ComponentManager.setMethods(target, component, methods)
-    for _, name in ipairs(methods) do
-        assert(target[name] == nil, "ComponentManager.setMethods() the target already has a field named " .. name)
-        target[name] = function(__, ...)
+function ComponentManager.setMethods(owner, component, methodNames)
+    for _, name in ipairs(methodNames) do
+        assert(owner[name] == nil, "ComponentManager.setMethods() the owner already has a field named " .. name)
+        owner[name] = function(__, ...)
             return component[name](component, ...)
         end
     end
@@ -147,9 +125,9 @@ function ComponentManager.setMethods(target, component, methods)
     return ComponentManager
 end
 
-function ComponentManager.unsetMethods(target, methods)
-    for _, name in ipairs(methods) do
-        target[name] = nil
+function ComponentManager.unsetMethods(owner, methodNames)
+    for _, name in ipairs(methodNames) do
+        owner[name] = nil
     end
 
     return ComponentManager

@@ -5,7 +5,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local Actor                 = require("src.global.actors.Actor")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+MovableUnitProducer.EXPORTED_METHODS = {
     "getMovableProductionCost",
     "getMovableProductionTiledId",
 }
@@ -26,27 +26,6 @@ function MovableUnitProducer:loadTemplate(template)
 end
 
 function MovableUnitProducer:loadInstantialData(data)
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function MovableUnitProducer:onBind(target)
-    assert(self.m_Owner == nil, "MovableUnitProducer:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function MovableUnitProducer:onUnbind()
-    assert(self.m_Owner ~= nil, "MovableUnitProducer:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
     return self
 end
 

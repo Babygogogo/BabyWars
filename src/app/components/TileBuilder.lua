@@ -5,7 +5,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
-local EXPORTED_METHODS = {
+TileBuilder.EXPORTED_METHODS = {
     "isBuildingModelTile",
     "canBuildOnTileType",
     "getBuildAmount",
@@ -44,27 +44,6 @@ function TileBuilder:toSerializableTable()
             isBuildingModelTile = true,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function TileBuilder:onBind(target)
-    assert(self.m_Owner == nil, "TileBuilder:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function TileBuilder:onUnbind()
-    assert(self.m_Owner ~= nil, "TileBuilder:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

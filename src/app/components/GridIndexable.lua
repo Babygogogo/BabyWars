@@ -18,7 +18,7 @@ local TypeChecker        = require("src.app.utilities.TypeChecker")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+GridIndexable.EXPORTED_METHODS = {
     "getGridIndex",
     "setGridIndex",
     "setViewPositionWithGridIndex"
@@ -52,27 +52,6 @@ function GridIndexable:toSerializableTable()
             y = self.m_GridIndex.y,
         },
     }
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function GridIndexable:onBind(target)
-    assert(self.m_Owner == nil, "GridIndexable:onBind() the GridIndexable has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function GridIndexable:onUnbind()
-    assert(self.m_Owner, "GridIndexable:unbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

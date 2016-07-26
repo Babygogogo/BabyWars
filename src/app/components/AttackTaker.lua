@@ -23,7 +23,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
 local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()
 
-local EXPORTED_METHODS = {
+AttackTaker.EXPORTED_METHODS = {
     "getCurrentHP",
     "setCurrentHP",
     "getNormalizedCurrentHP",
@@ -87,27 +87,6 @@ function AttackTaker:toSerializableTable()
             currentHP = currentHP,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function AttackTaker:onBind(target)
-    assert(self.m_Owner == nil, "AttackTaker:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function AttackTaker:onUnbind()
-    assert(self.m_Owner ~= nil, "AttackTaker:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

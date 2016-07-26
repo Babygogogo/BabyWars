@@ -4,7 +4,7 @@ local UnitLoader = require("src.global.functions.class")("UnitLoader")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+UnitLoader.EXPORTED_METHODS = {
     "getMaxLoadCount",
     "getCurrentLoadCount",
     "getLoadUnitIdList",
@@ -111,27 +111,6 @@ function UnitLoader:toSerializableTable()
             loaded = self.m_LoadedUnitIds,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function UnitLoader:onBind(target)
-    assert(self.m_Owner == nil, "UnitLoader:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function UnitLoader:onUnbind()
-    assert(self.m_Owner ~= nil, "UnitLoader:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

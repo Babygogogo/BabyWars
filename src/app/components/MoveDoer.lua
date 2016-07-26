@@ -19,13 +19,12 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
-local EXPORTED_METHODS = {
+
+MoveDoer.EXPORTED_METHODS = {
     "getMoveRange",
     "getMoveType",
     "getMoveTypeFullName",
 }
-
-MoveDoer.DEPENDS = {}
 
 --------------------------------------------------------------------------------
 -- The param validators.
@@ -57,27 +56,6 @@ function MoveDoer:loadTemplate(template)
     assert(isMoveRange(template.range), "MoveDoer:loadTemplate() the template.range is expected to be an integer.")
     assert(isMoveType(template.type), "MoveDoer:loadTemplate() the template.type is invalid.")
     self.m_Template = template
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function MoveDoer:onBind(target)
-    assert(self.m_Target == nil, "MoveDoer:onBind() the MoveDoer has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
-
-    return self
-end
-
-function MoveDoer:onUnbind()
-    assert(self.m_Target, "MoveDoer:unbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
 
     return self
 end

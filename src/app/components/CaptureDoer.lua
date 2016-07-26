@@ -16,7 +16,7 @@ local TypeChecker        = require("src.app.utilities.TypeChecker")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+CaptureDoer.EXPORTED_METHODS = {
     "isCapturing",
     "canCapture",
     "getCaptureAmount",
@@ -62,27 +62,6 @@ function CaptureDoer:toSerializableTable()
             isCapturing = true,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function CaptureDoer:onBind(target)
-    assert(self.m_Owner == nil, "CaptureDoer:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function CaptureDoer:onUnbind()
-    assert(self.m_Owner ~= nil, "CaptureDoer:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

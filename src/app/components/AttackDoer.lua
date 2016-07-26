@@ -21,7 +21,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+AttackDoer.EXPORTED_METHODS = {
     "hasPrimaryWeapon",
     "getPrimaryWeaponFullName",
     "getPrimaryWeaponMaxAmmo",
@@ -191,27 +191,6 @@ function AttackDoer:toSerializableTable()
             }
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function AttackDoer:onBind(target)
-    assert(self.m_Owner == nil, "AttackDoer:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function AttackDoer:onUnbind()
-    assert(self.m_Owner ~= nil, "AttackDoer:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

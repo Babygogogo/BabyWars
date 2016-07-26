@@ -14,7 +14,7 @@ local TypeChecker        = require("src.app.utilities.TypeChecker")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+CaptureTaker.EXPORTED_METHODS = {
     "getCurrentCapturePoint",
     "getMaxCapturePoint",
     "isDefeatOnCapture",
@@ -69,27 +69,6 @@ function CaptureTaker:toSerializableTable()
             currentCapturePoint = currentCapturePoint,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function CaptureTaker:onBind(target)
-    assert(self.m_Owner == nil, "CaptureTaker:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function CaptureTaker:onUnbind()
-    assert(self.m_Owner ~= nil, "CaptureTaker:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

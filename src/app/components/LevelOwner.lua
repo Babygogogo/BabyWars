@@ -20,7 +20,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local MAX_LEVEL   = GameConstantFunctions.getMaxLevel()
 local LEVEL_BONUS = GameConstantFunctions.getLevelBonus()
 
-local EXPORTED_METHODS = {
+LevelOwner.EXPORTED_METHODS = {
     "getLevel",
     "getLevelAttackBonus",
     "getLevelDefenseBonus",
@@ -59,27 +59,6 @@ function LevelOwner:toSerializableTable()
             level = level,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function LevelOwner:onBind(target)
-    assert(self.m_Owner == nil, "LevelOwner:onBind() the LevelOwner has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function LevelOwner:onUnbind()
-    assert(self.m_Owner, "LevelOwner:unbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
 end
 
 --------------------------------------------------------------------------------

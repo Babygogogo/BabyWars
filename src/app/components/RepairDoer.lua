@@ -22,7 +22,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+RepairDoer.EXPORTED_METHODS = {
     "getRepairTargetCategoryFullName",
     "getRepairTargetCategory",
     "canRepairTarget",
@@ -54,27 +54,6 @@ function RepairDoer:loadInstantialData(data)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function RepairDoer:onBind(target)
-    assert(self.m_Target == nil, "RepairDoer:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
-
-    return self
-end
-
-function RepairDoer:onUnbind()
-    assert(self.m_Target, "RepairDoer:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------
 function RepairDoer:getRepairTargetCategoryFullName()
@@ -87,7 +66,7 @@ end
 
 function RepairDoer:canRepairTarget(target)
     local targetTiledID = target:getTiledID()
-    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Target:getPlayerIndex()) then
+    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Owner:getPlayerIndex()) then
         return false
     end
 
