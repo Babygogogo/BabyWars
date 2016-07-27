@@ -75,6 +75,13 @@ function AttackTaker:unsetRootScriptEventDispatcher()
     return self
 end
 
+function AttackTaker:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "AttackTaker:setModelPlayerManager() the model has been set.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

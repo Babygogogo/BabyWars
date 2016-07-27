@@ -284,6 +284,19 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelUnitMap:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelUnitMap:setModelPlayerManager() the model has been set already.")
+
+    self:forEachModelUnitOnMap(function(modelUnit)
+        modelUnit:setModelPlayerManager(model)
+    end)
+    self:forEachModelUnitLoaded(function(modelUnit)
+        modelUnit:setModelPlayerManager(model)
+    end)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -350,11 +363,11 @@ function ModelUnitMap:doActionWait(action)
     return self
 end
 
-function ModelUnitMap:doActionAttack(action, attackTarget)
+function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     local focusModelUnit = getFocusModelUnitWithAction(self, action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionAttack(action, attackTarget)
+    focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -523,6 +536,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
     actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setModelPlayerManager(self.m_ModelPlayerManager)
         :setStateActioned()
         :updateView()
 

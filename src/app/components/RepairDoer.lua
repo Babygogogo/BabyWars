@@ -53,6 +53,13 @@ function RepairDoer:loadInstantialData(data)
     return self
 end
 
+function RepairDoer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "RepairDoer:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------

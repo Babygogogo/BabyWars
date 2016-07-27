@@ -207,6 +207,14 @@ function ModelTileMap:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelTileMap:setModelPlayerManager(model)
+    self:forEachModelTile(function(modelTile)
+        modelTile:setModelPlayerManager(model)
+    end)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

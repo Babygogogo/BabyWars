@@ -178,6 +178,13 @@ function AttackDoer:loadInstantialData(data)
     return self
 end
 
+function AttackDoer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "AttackDoer:setModelPlayerManager() the model has been set.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialzation.
 --------------------------------------------------------------------------------

@@ -162,6 +162,14 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelUnit:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelUnit:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelPlayerManager", model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -241,7 +249,7 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action, attackTarget)
+function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attackTarget)
 
@@ -292,8 +300,8 @@ function ModelUnit:doActionAttack(action, attackTarget)
                 end
             end
 
-            if (action.callbackOnAttackAnimationEnded) then
-                action.callbackOnAttackAnimationEnded()
+            if (callbackOnAttackAnimationEnded) then
+                callbackOnAttackAnimationEnded()
             end
         end)
     end

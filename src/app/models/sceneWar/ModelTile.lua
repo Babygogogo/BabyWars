@@ -138,6 +138,14 @@ function ModelTile:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelTile:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelTile:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelPlayerManager", model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

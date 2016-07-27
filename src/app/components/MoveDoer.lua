@@ -60,6 +60,13 @@ function MoveDoer:loadTemplate(template)
     return self
 end
 
+function MoveDoer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "MoveDoer:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

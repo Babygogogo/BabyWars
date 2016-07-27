@@ -177,7 +177,9 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayerManager:doActionAttack(action)
     if (action.lostPlayerIndex) then
-        self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
+        local modelPlayer = self:getModelPlayer(action.lostPlayerIndex)
+        assert(modelPlayer:isAlive(), "ModelPlayerManager:doActionAttack() the player that is being defeated is not alive.")
+        modelPlayer:setAlive(false)
     end
 
     return self

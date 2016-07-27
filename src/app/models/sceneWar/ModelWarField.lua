@@ -152,6 +152,8 @@ function ModelWarField:unsetRootScriptEventDispatcher()
 end
 
 function ModelWarField:setModelPlayerManager(model)
+    self:getModelUnitMap():setModelPlayerManager(model)
+    self:getModelTileMap():setModelPlayerManager(model)
     if (not IS_SERVER) then
         self.m_ActorActionPlanner:getModel():setModelPlayerManager(model)
     end
@@ -210,13 +212,13 @@ function ModelWarField:doActionWait(action)
     return self
 end
 
-function ModelWarField:doActionAttack(action)
+function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
     local modelUnitMap    = self:getModelUnitMap()
     local modelTileMap    = self:getModelTileMap()
     local targetGridIndex = action.targetGridIndex
     local attackTarget    = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
 
-    modelUnitMap:doActionAttack(action, attackTarget)
+    modelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     modelTileMap:doActionAttack(action, attackTarget)
 
     return self

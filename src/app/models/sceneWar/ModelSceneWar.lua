@@ -151,13 +151,14 @@ local function doActionAttack(self, action)
     local modelPlayerManager = getModelPlayerManager(self)
     local modelTurnManager   = getModelTurnManager(self)
     local modelWarField      = getModelWarField(self)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local callbackOnAttackAnimationEnded
 
-    local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
         local currentPlayerIndex = modelTurnManager:getPlayerIndex()
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
-        action.callbackOnAttackAnimationEnded = function()
+        callbackOnAttackAnimationEnded = function()
             modelWarField:clearPlayerForce(lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
@@ -176,9 +177,9 @@ local function doActionAttack(self, action)
         end
     end
 
-    modelWarField:doActionAttack(action)
+    modelWarField     :doActionAttack(action, callbackOnAttackAnimationEnded)
     modelPlayerManager:doActionAttack(action)
-    modelTurnManager:doActionAttack(action)
+    modelTurnManager  :doActionAttack(action)
 end
 
 local function doActionJoinModelUnit(self, action)
