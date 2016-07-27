@@ -77,7 +77,7 @@ end
 local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
     -- TODO: Calculate the bonus with co skills and so on.
     local bonus = 0
-    bonus = bonus + ((attacker.getLevelAttackBonus) and (attacker:getLevelAttackBonus()) or 0)
+    bonus = bonus + ((attacker.getPromotionAttackBonus) and (attacker:getPromotionAttackBonus()) or 0)
 
     return bonus
 end
@@ -86,7 +86,7 @@ local function getDefenseBonus(attacker, attackerTile, target, targetTile, model
     local targetTypeName = GameConstantFunctions.getUnitTypeWithTiledId(target:getTiledID())
     local bonus = 0
     bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
-    bonus = bonus + ((target.getLevelDefenseBonus) and (target:getLevelDefenseBonus()) or 0)
+    bonus = bonus + ((target.getPromotionDefenseBonus) and (target:getPromotionDefenseBonus()) or 0)
     -- TODO: Calculate the bonus with co skills and so on.
 
     return bonus

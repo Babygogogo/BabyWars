@@ -53,8 +53,8 @@ local function createActionMoveAlongPath(self, path, callback)
 end
 
 local function getLevelIndicatorFrame(unit)
-    if ((unit.getLevel) and (unit:getLevel() > 0)) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getLevel() .. ".png")
+    if ((unit.getCurrentPromotion) and (unit:getCurrentPromotion() > 0)) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getCurrentPromotion() .. ".png")
     else
         return nil
     end

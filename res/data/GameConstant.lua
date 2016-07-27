@@ -698,8 +698,8 @@ GameConstant.unitMaxHP       = 100
 GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
 
-GameConstant.maxLevel   = 3
-GameConstant.levelBonus = {
+GameConstant.maxPromotion   = 3
+GameConstant.promotionBonus = {
     {attack = 5,  defense = 5 },
     {attack = 10, defense = 10},
     {attack = 20, defense = 20},
@@ -1515,8 +1515,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         CaptureDoer = {
@@ -1627,8 +1627,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         CaptureDoer = {
@@ -1706,8 +1706,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         CaptureDoer = {
@@ -1785,8 +1785,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 4000,
@@ -1855,8 +1855,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 5000,
@@ -1928,8 +1928,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 7000,
@@ -2031,8 +2031,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 7000,
@@ -2134,8 +2134,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 12000,
@@ -2237,8 +2237,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 16000,
@@ -2309,8 +2309,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 6000,
@@ -2381,8 +2381,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 11000,
@@ -2454,8 +2454,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 15000,
@@ -2526,8 +2526,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 12000,
@@ -2646,8 +2646,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 20000,
@@ -2718,8 +2718,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 20000,
@@ -2790,8 +2790,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 13000,
@@ -2893,8 +2893,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 9000,
@@ -2999,8 +2999,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 15000,
@@ -3071,8 +3071,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 25000,
@@ -3149,8 +3149,8 @@ GameConstant.templateModelUnits = {
             canSupply          = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         MaterialOwner = {
@@ -3230,8 +3230,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 20000,
@@ -3333,8 +3333,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         UnitLoader = {
@@ -3455,8 +3455,8 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         cost        = 6000,
