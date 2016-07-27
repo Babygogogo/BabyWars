@@ -1528,7 +1528,10 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 1500,
+        Producible = {
+            productionCost = 1500,
+        },
+
         vision      = 2,
     },
 
@@ -1640,7 +1643,10 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 2500,
+        Producible = {
+            productionCost = 2500,
+        },
+
         vision      = 2,
     },
 
@@ -1719,7 +1725,10 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 2500,
+        Producible = {
+            productionCost = 2500,
+        },
+
         vision      = 2,
     },
 
@@ -1789,7 +1798,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 4000,
+        Producible = {
+            productionCost = 4000,
+        },
+
         vision      = 5,
     },
 
@@ -1859,7 +1871,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
         vision      = 2,
     },
 
@@ -1932,7 +1947,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 7000,
+        Producible = {
+            productionCost = 7000,
+        },
+
         vision      = 3,
     },
 
@@ -2035,7 +2053,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 7000,
+        Producible = {
+            productionCost = 7000,
+        },
+
         vision      = 3,
     },
 
@@ -2138,7 +2159,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 12000,
+        Producible = {
+            productionCost = 12000,
+        },
+
         vision      = 2,
     },
 
@@ -2241,7 +2265,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 16000,
+        Producible = {
+            productionCost = 16000,
+        },
+
         vision      = 2,
     },
 
@@ -2313,7 +2340,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 6000,
+        Producible = {
+            productionCost = 6000,
+        },
+
         vision      = 3,
     },
 
@@ -2385,7 +2415,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 11000,
+        Producible = {
+            productionCost = 11000,
+        },
+
         vision      = 3,
     },
 
@@ -2458,7 +2491,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 15000,
+        Producible = {
+            productionCost = 15000,
+        },
+
         vision      = 3,
     },
 
@@ -2530,7 +2566,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 12000,
+        Producible = {
+            productionCost = 12000,
+        },
+
         vision      = 5,
     },
 
@@ -2578,7 +2617,10 @@ GameConstant.templateModelUnits = {
             }
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
         vision      = 1,
     },
 
@@ -2650,7 +2692,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
         vision      = 5,
     },
 
@@ -2722,7 +2767,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
         vision      = 3,
     },
 
@@ -2794,7 +2842,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 13000,
+        Producible = {
+            productionCost = 13000,
+        },
+
         vision      = 4,
     },
 
@@ -2897,7 +2948,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 9000,
+        Producible = {
+            productionCost = 9000,
+        },
+
         vision      = 2,
     },
 
@@ -2931,7 +2985,10 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
         vision      = 1,
     },
 
@@ -3003,7 +3060,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 15000,
+        Producible = {
+            productionCost = 15000,
+        },
+
         vision      = 4,
     },
 
@@ -3075,7 +3135,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 25000,
+        Producible = {
+            productionCost = 25000,
+        },
+
         vision      = 3,
     },
 
@@ -3162,7 +3225,10 @@ GameConstant.templateModelUnits = {
             targetType = "Seaplane",
         },
 
-        cost        = 28000,
+        Producible = {
+            productionCost = 28000,
+        },
+
         vision      = 4,
     },
 
@@ -3234,7 +3300,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
         vision      = 5,
     },
 
@@ -3345,7 +3414,10 @@ GameConstant.templateModelUnits = {
             canSupply          = true,
         },
 
-        cost        = 16000,
+        Producible = {
+            productionCost = 16000,
+        },
+
         vision      = 5,
     },
 
@@ -3379,7 +3451,10 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        cost        = 10000,
+        Producible = {
+            productionCost = 10000,
+        },
+
         vision      = 1,
     },
 
@@ -3459,7 +3534,10 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        cost        = 6000,
+        Producible = {
+            productionCost = 6000,
+        },
+
         vision      = 2,
     },
 }

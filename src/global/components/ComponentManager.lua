@@ -116,7 +116,11 @@ end
 
 function ComponentManager.setMethods(owner, component, methodNames)
     for _, name in ipairs(methodNames) do
-        assert(owner[name] == nil, "ComponentManager.setMethods() the owner already has a field named " .. name)
+        assert(owner[name] == nil,
+            "ComponentManager.setMethods() the owner already has a field named " .. name)
+        assert(type(component[name]) == "function",
+            "ComponentManager.setMethods() the field named " .. name .. " of the component is not a function.")
+
         owner[name] = function(__, ...)
             return component[name](component, ...)
         end

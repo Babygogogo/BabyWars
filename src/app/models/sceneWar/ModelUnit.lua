@@ -490,6 +490,22 @@ function ModelUnit:updateView()
     return self
 end
 
+function ModelUnit:showNormalAnimation()
+    if (self.m_View) then
+        self.m_View:showNormalAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:showMovingAnimation()
+    if (self.m_View) then
+        self.m_View:showMovingAnimation()
+    end
+
+    return self
+end
+
 function ModelUnit:getTiledID()
     return self.m_TiledID
 end
@@ -512,22 +528,6 @@ function ModelUnit:setStateActioned()
     return self
 end
 
-function ModelUnit:showNormalAnimation()
-    if (self.m_View) then
-        self.m_View:showNormalAnimation()
-    end
-
-    return self
-end
-
-function ModelUnit:showMovingAnimation()
-    if (self.m_View) then
-        self.m_View:showMovingAnimation()
-    end
-
-    return self
-end
-
 function ModelUnit:getUnitType()
     return GameConstantFunctions.getUnitTypeWithTiledId(self:getTiledID())
 end
@@ -542,10 +542,6 @@ end
 
 function ModelUnit:getVision()
     return self.m_Template.vision
-end
-
-function ModelUnit:getProductionCost()
-    return self.m_Template.cost
 end
 
 function ModelUnit:canJoinModelUnit(rhsUnitModel)
