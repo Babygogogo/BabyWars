@@ -39,14 +39,6 @@ local function getLoadedActorUnitWithUnitId(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
-local function getFocusModelUnitWithAction(self, action)
-    if (action.launchUnitID) then
-        return getLoadedActorUnitWithUnitId(self, action.launchUnitID):getModel()
-    else
-        return getActorUnit(self, action.path[1]):getModel()
-    end
-end
-
 local function getSupplyTargetModelUnits(self, supplier)
     local targets = {}
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), self:getMapSize())) do
@@ -353,7 +345,7 @@ function ModelUnitMap:doActionSurrender(action)
 end
 
 function ModelUnitMap:doActionWait(action)
-    local focusModelUnit = getFocusModelUnitWithAction(self, action)
+    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     moveActorUnitOnAction(self, action)
     focusModelUnit:doActionWait(action)
@@ -364,7 +356,7 @@ function ModelUnitMap:doActionWait(action)
 end
 
 function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-    local focusModelUnit = getFocusModelUnitWithAction(self, action)
+    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     moveActorUnitOnAction(self, action)
     focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
@@ -566,6 +558,12 @@ end
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
     local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
+function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
+    return (launchUnitID)                                 and
+        (self:getLoadedModelUnitWithUnitId(launchUnitID)) or
+        (self:getModelUnit(gridIndex))
 end
 
 function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)

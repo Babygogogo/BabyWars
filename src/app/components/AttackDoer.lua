@@ -126,14 +126,15 @@ local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, targe
     end
 end
 
-local function getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getAttackDamage)
+local function getBattleDamage(self, attackerTile, target, targetTile, weather, getAttackDamage)
     local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
     if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
         return nil, nil
     end
 
-    local attacker = self.m_Owner
-    local attackDamage = getAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
+    local attacker           = self.m_Owner
+    local modelPlayerManager = self.m_ModelPlayerManager
+    local attackDamage       = getAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
     assert(attackDamage, "AttackDoer-getBattleDamage() failed to get the attack damage.")
 
     if ((target.canAttackTarget) and
@@ -143,10 +144,6 @@ local function getBattleDamage(self, attackerTile, target, targetTile, modelPlay
     else
         return attackDamage, nil
     end
-end
-
-local function serializePrimaryWeapon(self, spaces)
-    return string.format("%sprimaryWeapon = {currentAmmo = %d}", spaces or "", self:getPrimaryWeaponCurrentAmmo())
 end
 
 --------------------------------------------------------------------------------
@@ -172,7 +169,7 @@ end
 
 function AttackDoer:loadInstantialData(data)
     if (data.primaryWeapon) then
-        self.m_PrimaryWeaponCurrentAmmo = data.primaryWeapon.currentAmmo or self.m_PrimaryWeaponCurrentAmmo
+        self.m_PrimaryWeaponCurrentAmmo = data.primaryWeapon.currentAmmo
     end
 
     return self
@@ -297,12 +294,12 @@ function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
     return (getBaseDamage(self, target:getDefenseType()) ~= nil)
 end
 
-function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
-    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getEstimatedAttackDamage)
+function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, weather)
+    return getBattleDamage(self, attackerTile, target, targetTile, weather, getEstimatedAttackDamage)
 end
 
-function AttackDoer:getUltimateBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
-    return getBattleDamage(self, attackerTile, target, targetTile, modelPlayerManager, weather, getUltimateAttackDamage)
+function AttackDoer:getUltimateBattleDamage(attackerTile, target, targetTile, weather)
+    return getBattleDamage(self, attackerTile, target, targetTile, weather, getUltimateAttackDamage)
 end
 
 function AttackDoer:getAttackRangeMinMax()
