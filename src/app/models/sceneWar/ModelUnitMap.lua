@@ -277,14 +277,23 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 end
 
 function ModelUnitMap:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "ModelUnitMap:setModelPlayerManager() the model has been set already.")
-
     self:forEachModelUnitOnMap(function(modelUnit)
-        modelUnit:setModelPlayerManager(model)
-    end)
-    self:forEachModelUnitLoaded(function(modelUnit)
-        modelUnit:setModelPlayerManager(model)
-    end)
+            modelUnit:setModelPlayerManager(model)
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            modelUnit:setModelPlayerManager(model)
+        end)
+
+    return self
+end
+
+function ModelUnitMap:setModelWeatherManager(model)
+    self:forEachModelUnitOnMap(function(modelUnit)
+            modelUnit:setModelWeatherManager(model)
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            modelUnit:setModelWeatherManager(model)
+        end)
 
     return self
 end

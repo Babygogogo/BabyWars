@@ -276,8 +276,8 @@ local function updateDescriptionWithModelUnit(self, unit)
     self.m_DescriptionLabel:setString(unit:getDescription())
 end
 
-local function updateMovementInfoWithModelUnit(self, unit, modelPlayer, modelWeather)
-    self.m_MovementLabel:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(modelPlayer, modelWeather), unit:getMoveTypeFullName()))
+local function updateMovementInfoWithModelUnit(self, unit)
+    self.m_MovementLabel:setString(LocalizationFunctions.getLocalizedText(91, unit:getMoveRange(), unit:getMoveTypeFullName()))
 end
 
 local function updateVisionInfoWithModelUnit(self, unit)
@@ -359,9 +359,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewUnitDetail:updateWithModelUnit(modelUnit, modelPlayer, modelWeather)
+function ViewUnitDetail:updateWithModelUnit(modelUnit)
     updateDescriptionWithModelUnit(        self, modelUnit)
-    updateMovementInfoWithModelUnit(       self, modelUnit, modelPlayer, modelWeather)
+    updateMovementInfoWithModelUnit(       self, modelUnit)
     updateVisionInfoWithModelUnit(         self, modelUnit)
     updateFuelInfoWithModelUnit(           self, modelUnit)
     updatePrimaryWeaponInfoWithModelUnit(  self, modelUnit)

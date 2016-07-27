@@ -13,12 +13,11 @@
 
 local MoveDoer = require("src.global.functions.class")("MoveDoer")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
+local MOVE_TYPES = require("res.data.GameConstant").moveTypes
 
 MoveDoer.EXPORTED_METHODS = {
     "getMoveRange",
@@ -67,10 +66,17 @@ function MoveDoer:setModelPlayerManager(model)
     return self
 end
 
+function MoveDoer:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "MoveDoer:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function MoveDoer:getMoveRange(modelPlayer, modelWeather)
+function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
     return self.m_Template.range
 end

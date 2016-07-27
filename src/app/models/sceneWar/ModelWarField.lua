@@ -161,6 +161,12 @@ function ModelWarField:setModelPlayerManager(model)
     return self
 end
 
+function ModelWarField:setModelWeatherManager(model)
+    self:getModelUnitMap():setModelWeatherManager(model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------

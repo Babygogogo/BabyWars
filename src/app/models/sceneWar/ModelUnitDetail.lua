@@ -21,9 +21,9 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelUnitDetail:updateWithModelUnit(unit, modelPlayer, modelWeather)
+function ModelUnitDetail:updateWithModelUnit(unit)
     if (self.m_View) then
-        self.m_View:updateWithModelUnit(unit, modelPlayer, modelWeather)
+        self.m_View:updateWithModelUnit(unit)
     end
 
     return self

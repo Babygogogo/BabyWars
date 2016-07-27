@@ -50,10 +50,6 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, mod
     end
 end
 
-local function getMoveRange(modelUnit, modelPlayer, modelWeather)
-    return math.min(modelUnit:getMoveRange(modelPlayer, modelWeather), modelUnit:getCurrentFuel())
-end
-
 local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
     if (GridIndexFunctions.isEqual(modelUnit:getGridIndex(), gridIndex)) then
         return true
@@ -158,7 +154,7 @@ end
 -- The functions for MovePath and ReachableArea.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather)
+    local maxRange     = math.min(self.m_FocusModelUnit:getMoveRange(), self.m_FocusModelUnit:getCurrentFuel())
     local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex))                        and
@@ -184,7 +180,7 @@ end
 local function resetReachableArea(self, focusModelUnit)
     self.m_ReachableArea = ReachableAreaFunctions.createArea(
         focusModelUnit:getGridIndex(),
-        getMoveRange(focusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather),
+        math.min(focusModelUnit:getMoveRange(), focusModelUnit:getCurrentFuel()),
         function(gridIndex)
             return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
         end)

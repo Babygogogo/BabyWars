@@ -336,10 +336,17 @@ local function initActorPlayerManager(self, playersData)
     self.m_ActorPlayerManager = actor
 end
 
+local function initActorWeatherManager(self, weatherData)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
+
+    self.m_ActorWeatherManager = actor
+end
+
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :setModelPlayerManager(getModelPlayerManager(self))
+        :setModelWeatherManager(getModelWeatherManager(self))
 
     self.m_ActorWarField = actor
 end
@@ -362,12 +369,6 @@ local function initActorTurnManager(self, turnData)
     self.m_ActorTurnManager = actor
 end
 
-local function initActorWeatherManager(self, weatherData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
-
-    self.m_ActorWeatherManager = actor
-end
-
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -378,10 +379,10 @@ function ModelSceneWar:ctor(sceneData)
     initScriptEventDispatcher(self)
     initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
+    initActorWeatherManager(  self, sceneData.weather)
     initActorWarField(        self, sceneData.warField)
     initActorWarHud(          self)
     initActorTurnManager(     self, sceneData.turn)
-    initActorWeatherManager(  self, sceneData.weather)
 
     if (self.m_View) then
         self:initView()

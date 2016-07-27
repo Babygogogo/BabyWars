@@ -170,6 +170,14 @@ function ModelUnit:setModelPlayerManager(model)
     return self
 end
 
+function ModelUnit:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "ModelUnit:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelWeatherManager", model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
