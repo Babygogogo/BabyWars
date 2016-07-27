@@ -1,6 +1,7 @@
 
 local MovableUnitProducer = require("src.global.functions.class")("MovableUnitProducer")
 
+local Producible            = require("src.app.components.Producible")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local Actor                 = require("src.global.actors.Actor")
 local ComponentManager      = require("src.global.components.ComponentManager")
@@ -25,7 +26,10 @@ function MovableUnitProducer:loadTemplate(template)
     return self
 end
 
-function MovableUnitProducer:loadInstantialData(data)
+function MovableUnitProducer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "MovableUnitProducer:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
     return self
 end
 
@@ -44,10 +48,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function MovableUnitProducer:getMovableProductionCost()
-    local tiledID      = self:getMovableProductionTiledId()
-    local templateUnit = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
-    -- TODO: take the ablities of the player into account
-    return templateUnit.cost
+    return Producible.getProductionCostWithTiledId(self:getMovableProductionTiledId(), self.m_ModelPlayerManager)
 end
 
 function MovableUnitProducer:getMovableProductionTiledId()

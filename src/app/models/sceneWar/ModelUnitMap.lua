@@ -277,6 +277,9 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 end
 
 function ModelUnitMap:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelUnitMap:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
     self:forEachModelUnitOnMap(function(modelUnit)
             modelUnit:setModelPlayerManager(model)
         end)
@@ -288,6 +291,9 @@ function ModelUnitMap:setModelPlayerManager(model)
 end
 
 function ModelUnitMap:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "ModelUnitMap:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
+
     self:forEachModelUnitOnMap(function(modelUnit)
             modelUnit:setModelWeatherManager(model)
         end)
@@ -448,6 +454,8 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
     producedActorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setModelPlayerManager(self.m_ModelPlayerManager)
+        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
 
     self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
@@ -538,6 +546,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
     actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
         :setModelPlayerManager(self.m_ModelPlayerManager)
+        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
         :updateView()
 
