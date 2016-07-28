@@ -136,7 +136,7 @@ function FuelOwner:doActionMoveModelUnit(action)
     return self
 end
 
-function FuelOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
+function FuelOwner:doActionJoinModelUnit(action, target)
     target:setCurrentFuel(math.min(
         target:getMaxFuel(),
         self:getCurrentFuel() + target:getCurrentFuel()

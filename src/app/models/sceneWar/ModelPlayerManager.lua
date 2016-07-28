@@ -185,6 +185,17 @@ function ModelPlayerManager:doActionAttack(action)
     return self
 end
 
+function ModelPlayerManager:doActionJoinModelUnit(action, playerIndex)
+    local joinIncome = action.joinIncome
+    if ((joinIncome) and (joinIncome ~= 0)) then
+        local modelPlayer = self:getModelPlayer(playerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
+        dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+    end
+
+    return self
+end
+
 function ModelPlayerManager:doActionCapture(action)
     if (action.lostPlayerIndex) then
         self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)

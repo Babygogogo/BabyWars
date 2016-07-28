@@ -1532,6 +1532,8 @@ GameConstant.templateModelUnits = {
             productionCost = 1500,
         },
 
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1647,6 +1649,8 @@ GameConstant.templateModelUnits = {
             productionCost = 2500,
         },
 
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1729,6 +1733,8 @@ GameConstant.templateModelUnits = {
             productionCost = 2500,
         },
 
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1802,6 +1808,8 @@ GameConstant.templateModelUnits = {
             productionCost = 4000,
         },
 
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -1874,6 +1882,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 5000,
         },
+
+        Joinable = {},
 
         vision      = 2,
     },
@@ -1950,6 +1960,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 7000,
         },
+
+        Joinable = {},
 
         vision      = 3,
     },
@@ -2057,6 +2069,8 @@ GameConstant.templateModelUnits = {
             productionCost = 7000,
         },
 
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2162,6 +2176,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 12000,
         },
+
+        Joinable = {},
 
         vision      = 2,
     },
@@ -2269,6 +2285,8 @@ GameConstant.templateModelUnits = {
             productionCost = 16000,
         },
 
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -2344,6 +2362,8 @@ GameConstant.templateModelUnits = {
             productionCost = 6000,
         },
 
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2418,6 +2438,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 11000,
         },
+
+        Joinable = {},
 
         vision      = 3,
     },
@@ -2495,6 +2517,8 @@ GameConstant.templateModelUnits = {
             productionCost = 15000,
         },
 
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2570,6 +2594,8 @@ GameConstant.templateModelUnits = {
             productionCost = 12000,
         },
 
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -2620,6 +2646,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 5000,
         },
+
+        Joinable = {},
 
         vision      = 1,
     },
@@ -2696,6 +2724,8 @@ GameConstant.templateModelUnits = {
             productionCost = 20000,
         },
 
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -2771,6 +2801,8 @@ GameConstant.templateModelUnits = {
             productionCost = 20000,
         },
 
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2845,6 +2877,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 13000,
         },
+
+        Joinable = {},
 
         vision      = 4,
     },
@@ -2952,6 +2986,8 @@ GameConstant.templateModelUnits = {
             productionCost = 9000,
         },
 
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -2988,6 +3024,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 5000,
         },
+
+        Joinable = {},
 
         vision      = 1,
     },
@@ -3064,6 +3102,8 @@ GameConstant.templateModelUnits = {
             productionCost = 15000,
         },
 
+        Joinable = {},
+
         vision      = 4,
     },
 
@@ -3138,6 +3178,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 25000,
         },
+
+        Joinable = {},
 
         vision      = 3,
     },
@@ -3229,6 +3271,8 @@ GameConstant.templateModelUnits = {
             productionCost = 28000,
         },
 
+        Joinable = {},
+
         vision      = 4,
     },
 
@@ -3303,6 +3347,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 20000,
         },
+
+        Joinable = {},
 
         vision      = 5,
     },
@@ -3418,6 +3464,8 @@ GameConstant.templateModelUnits = {
             productionCost = 16000,
         },
 
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -3454,6 +3502,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 10000,
         },
+
+        Joinable = {},
 
         vision      = 1,
     },
@@ -3537,6 +3587,8 @@ GameConstant.templateModelUnits = {
         Producible = {
             productionCost = 6000,
         },
+
+        Joinable = {},
 
         vision      = 2,
     },

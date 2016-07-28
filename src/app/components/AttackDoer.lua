@@ -212,7 +212,7 @@ function AttackDoer:doActionAttack(action, attackTarget)
     return self
 end
 
-function AttackDoer:doActionJoinModelUnit(action, modelPlayerManager, target)
+function AttackDoer:doActionJoinModelUnit(action, target)
     if (self:hasPrimaryWeapon()) then
         target:setPrimaryWeaponCurrentAmmo(math.min(
             target:getPrimaryWeaponMaxAmmo(),

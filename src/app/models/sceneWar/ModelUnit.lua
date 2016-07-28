@@ -410,15 +410,14 @@ function ModelUnit:doActionCapture(action, capturer, target)
     return self
 end
 
-function ModelUnit:doActionJoinModelUnit(action, modelPlayerManager, target)
+function ModelUnit:doActionJoinModelUnit(action, target)
     target:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, modelPlayerManager, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
+    self:unsetRootScriptEventDispatcher()
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:removeFromParent()
-            self:unsetRootScriptEventDispatcher()
-
             target:updateView()
         end)
     end
@@ -550,21 +549,6 @@ end
 
 function ModelUnit:getVision()
     return self.m_Template.vision
-end
-
-function ModelUnit:canJoinModelUnit(rhsUnitModel)
-    if (self:getTiledID() ~= rhsUnitModel:getTiledID()) then
-        return false
-    end
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if ((component.canJoinModelUnit)                    and
-            (not component:canJoinModelUnit(rhsUnitModel))) then
-            return false
-        end
-    end
-
-    return true
 end
 
 function ModelUnit:canDoAction(playerIndex)

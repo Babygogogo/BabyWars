@@ -391,7 +391,7 @@ function ModelUnitMap:doActionCapture(action, capturer, target)
     return self
 end
 
-function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTileMap)
+function ModelUnitMap:doActionJoinModelUnit(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
@@ -415,12 +415,10 @@ function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTil
     end
 
     local focusModelUnit = focusActorUnit:getModel()
-    modelTileMap:getModelTile(beginningGridIndex):doActionMoveModelUnit(action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionJoinModelUnit(action, modelPlayerManager, self:getModelUnit(endingGridIndex))
+        :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-        :dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end

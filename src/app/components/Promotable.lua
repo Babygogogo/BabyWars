@@ -35,10 +35,6 @@ function Promotable:ctor(param)
     return self
 end
 
-function Promotable:loadTemplate(template)
-    return self
-end
-
 function Promotable:loadInstantialData(data)
     self:setCurrentPromotion(data.current)
 
@@ -71,7 +67,7 @@ function Promotable:doActionPromoteModelUnit(action)
     return owner
 end
 
-function Promotable:doActionJoinModelUnit(action, modelPlayerManager, target)
+function Promotable:doActionJoinModelUnit(action, target)
     target:setCurrentPromotion(math.max(self:getCurrentPromotion(), target:getCurrentPromotion()))
 
     return self

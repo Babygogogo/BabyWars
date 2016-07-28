@@ -183,7 +183,8 @@ local function doActionAttack(self, action)
 end
 
 local function doActionJoinModelUnit(self, action)
-    getModelWarField(self):doActionJoinModelUnit(action, getModelPlayerManager(self))
+    getModelWarField(self):doActionJoinModelUnit(action)
+    getModelPlayerManager(self):doActionJoinModelUnit(action, getModelTurnManager(self):getPlayerIndex())
 end
 
 local function doActionCapture(self, action)
