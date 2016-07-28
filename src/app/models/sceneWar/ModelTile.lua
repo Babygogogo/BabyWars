@@ -306,7 +306,7 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
         initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
-            CaptureTaker  = {currentCapturePoint = currentCapturePoint},
+            Capturable    = {currentCapturePoint = currentCapturePoint},
         })
         self:setRootScriptEventDispatcher(dispatcher)
     end

@@ -1117,7 +1117,7 @@ GameConstant.templateModelTiles = {
     Headquarters = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = true,
@@ -1152,7 +1152,7 @@ GameConstant.templateModelTiles = {
     City = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1187,7 +1187,7 @@ GameConstant.templateModelTiles = {
     CommandTower = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1217,7 +1217,7 @@ GameConstant.templateModelTiles = {
     Radar = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1247,7 +1247,7 @@ GameConstant.templateModelTiles = {
     Factory = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1301,7 +1301,7 @@ GameConstant.templateModelTiles = {
     Airport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1346,7 +1346,7 @@ GameConstant.templateModelTiles = {
     Seaport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1392,7 +1392,7 @@ GameConstant.templateModelTiles = {
     TempAirport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1423,7 +1423,7 @@ GameConstant.templateModelTiles = {
     TempSeaport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,

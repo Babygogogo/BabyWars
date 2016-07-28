@@ -317,6 +317,114 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
     return self
 end
 
+function ModelUnit:doActionJoinModelUnit(action, target)
+    local joinIncome = self:getJoinIncome(target)
+    if (joinIncome ~= 0) then
+        local playerIndex = self:getPlayerIndex()
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(playerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtModelPlayerUpdated",
+            modelPlayer = modelPlayer,
+            playerIndex = playerIndex,
+        })
+    end
+
+    target:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
+    self:unsetRootScriptEventDispatcher()
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:removeFromParent()
+            target:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionCapture(action, capturer, target)
+    self:setStateActioned()
+
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            target:updateView()
+
+            if (action.callbackOnCaptureAnimationEnded) then
+                action.callbackOnCaptureAnimationEnded()
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            modelTile:updateView()
+
+            local dispatcher  = self.m_RootScriptEventDispatcher
+            local mapSize     = modelUnitMap:getMapSize()
+            local isWithinMap = GridIndexFunctions.isWithinMap
+            for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
+                if (isWithinMap(gridIndex, mapSize)) then
+                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+                    if (modelUnit) then
+                        modelUnit:updateView()
+                    end
+
+                    dispatcher:dispatchEvent({
+                        name      = "EvtSiloAttackGrid",
+                        gridIndex = gridIndex,
+                    })
+                end
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionBuildModelTile(action, builder, target)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            target:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionProduceModelUnitOnUnit", action, producedUnitID)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+        end)
+    end
+
+    return self
+end
+
 function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
     self:setStateActioned()
 
@@ -384,114 +492,6 @@ function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
                         :showNormalAnimation()
                 end)
             end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionCapture(action, capturer, target)
-    self:setStateActioned()
-
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            target:updateView()
-
-            if (action.callbackOnCaptureAnimationEnded) then
-                action.callbackOnCaptureAnimationEnded()
-            end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionJoinModelUnit(action, target)
-    local joinIncome = self:getJoinIncome(target)
-    if (joinIncome ~= 0) then
-        local playerIndex = self:getPlayerIndex()
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(playerIndex)
-        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name        = "EvtModelPlayerUpdated",
-            modelPlayer = modelPlayer,
-            playerIndex = playerIndex,
-        })
-    end
-
-    target:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
-    self:unsetRootScriptEventDispatcher()
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:removeFromParent()
-            target:updateView()
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            modelTile:updateView()
-
-            local dispatcher  = self.m_RootScriptEventDispatcher
-            local mapSize     = modelUnitMap:getMapSize()
-            local isWithinMap = GridIndexFunctions.isWithinMap
-            for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
-                if (isWithinMap(gridIndex, mapSize)) then
-                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
-                    if (modelUnit) then
-                        modelUnit:updateView()
-                    end
-
-                    dispatcher:dispatchEvent({
-                        name      = "EvtSiloAttackGrid",
-                        gridIndex = gridIndex,
-                    })
-                end
-            end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionBuildModelTile(action, builder, target)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            target:updateView()
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionProduceModelUnitOnUnit", action, producedUnitID)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
         end)
     end
 
