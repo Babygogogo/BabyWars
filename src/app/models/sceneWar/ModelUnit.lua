@@ -411,6 +411,18 @@ function ModelUnit:doActionCapture(action, capturer, target)
 end
 
 function ModelUnit:doActionJoinModelUnit(action, target)
+    local joinIncome = self:getJoinIncome(target)
+    if (joinIncome ~= 0) then
+        local playerIndex = self:getPlayerIndex()
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(playerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtModelPlayerUpdated",
+            modelPlayer = modelPlayer,
+            playerIndex = playerIndex,
+        })
+    end
+
     target:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
     self:unsetRootScriptEventDispatcher()
