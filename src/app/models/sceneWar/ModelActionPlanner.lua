@@ -212,10 +212,10 @@ local function dispatchEventAttack(self, targetGridIndex)
     })
 end
 
-local function dispatchEventCapture(self)
+local function dispatchEventCaptureModelTile(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
-        actionName   = "Capture",
+        actionName   = "CaptureModelTile",
         path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
@@ -366,9 +366,9 @@ local function getActionCapture(self)
     local modelTile = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     if ((self.m_FocusModelUnit.canCaptureModelTile) and (self.m_FocusModelUnit:canCaptureModelTile(modelTile))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
+            name     = LocalizationFunctions.getLocalizedText(78, "CaptureModelTile"),
             callback = function()
-                dispatchEventCapture(self)
+                dispatchEventCaptureModelTile(self)
             end,
         }
     else

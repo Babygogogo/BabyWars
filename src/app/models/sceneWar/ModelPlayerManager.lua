@@ -185,7 +185,7 @@ function ModelPlayerManager:doActionAttack(action)
     return self
 end
 
-function ModelPlayerManager:doActionCapture(action)
+function ModelPlayerManager:doActionCaptureModelTile(action)
     if (action.lostPlayerIndex) then
         self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
     end

@@ -237,14 +237,14 @@ function ModelWarField:doActionJoinModelUnit(action)
     return self
 end
 
-function ModelWarField:doActionCapture(action, callbackOnCaptureAnimationEnded)
+function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
     local target       = modelTileMap:getModelTile(path[#path])
 
-    modelUnitMap:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
-    modelTileMap:doActionCapture(action, target)
+    modelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
+    modelTileMap:doActionCaptureModelTile(action, target)
 
     return self
 end

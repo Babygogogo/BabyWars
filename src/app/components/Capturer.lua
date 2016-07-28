@@ -64,7 +64,7 @@ function Capturer:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function Capturer:doActionCapture(action, target)
+function Capturer:doActionCaptureModelTile(action, target)
     local capturePoint = math.max(0, target:getCurrentCapturePoint() - self:getCaptureAmount())
     if (capturePoint > 0) then
         self.m_IsCapturing = true

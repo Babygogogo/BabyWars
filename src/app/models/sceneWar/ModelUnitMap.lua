@@ -413,11 +413,11 @@ function ModelUnitMap:doActionJoinModelUnit(action)
     return self
 end
 
-function ModelUnitMap:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
+function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
     moveActorUnitOnAction(self, action)
-    capturer:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
+    capturer:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

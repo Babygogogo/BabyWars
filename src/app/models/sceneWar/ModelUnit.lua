@@ -344,9 +344,9 @@ function ModelUnit:doActionJoinModelUnit(action, target)
     return self
 end
 
-function ModelUnit:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
+function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionCaptureModelTile", action, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()

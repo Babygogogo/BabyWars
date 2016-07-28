@@ -186,7 +186,7 @@ local function doActionJoinModelUnit(self, action)
     getModelWarField(self):doActionJoinModelUnit(action)
 end
 
-local function doActionCapture(self, action)
+local function doActionCaptureModelTile(self, action)
     local modelWarField      = getModelWarField(self)
     local modelPlayerManager = getModelPlayerManager(self)
     local lostPlayerIndex    = action.lostPlayerIndex
@@ -211,8 +211,8 @@ local function doActionCapture(self, action)
         end
     end
 
-    modelWarField     :doActionCapture(action, callbackOnCaptureAnimationEnded)
-    modelPlayerManager:doActionCapture(action)
+    modelWarField     :doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
+    modelPlayerManager:doActionCaptureModelTile(action)
 end
 
 local function doActionLaunchSilo(self, action)
@@ -257,7 +257,7 @@ local function doAction(self, action)
     elseif (actionName == "Wait")                   then doActionWait(                  self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
-    elseif (actionName == "Capture")                then doActionCapture(               self, action)
+    elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     elseif (actionName == "LaunchSilo")             then doActionLaunchSilo(            self, action)
     elseif (actionName == "BuildModelTile")         then doActionBuildModelTile(        self, action)
     elseif (actionName == "ProduceModelUnitOnUnit") then doActionProduceModelUnitOnUnit(self, action)

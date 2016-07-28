@@ -284,7 +284,7 @@ function ModelTileMap:doActionJoinModelUnit(action)
     return self
 end
 
-function ModelTileMap:doActionCapture(action)
+function ModelTileMap:doActionCaptureModelTile(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
