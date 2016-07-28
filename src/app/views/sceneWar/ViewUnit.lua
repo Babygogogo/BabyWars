@@ -85,7 +85,7 @@ local function getSubmergedIndicatorFrame(unit)
 end
 
 local function getCaptureIndicatorFrame(unit)
-    if ((unit.isCapturing) and (unit:isCapturing())) then
+    if ((unit.isCapturingModelTile) and (unit:isCapturingModelTile())) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s04_f0" .. unit:getPlayerIndex() .. ".png")
     else
         return nil

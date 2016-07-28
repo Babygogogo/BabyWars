@@ -5,7 +5,7 @@
 --   维护宿主的生命值以及防御类型，提供接口给外界访问
 -- 使用场景举例：
 --   宿主初始化时，根据自身属性来绑定和初始化本组件（比如infantry需要绑定，plain不需要，meteor需要）
---   AttackTaker计算伤害值时，或CaptureDoer计算占领值时，需要通过本组件获取当前生命值
+--   AttackTaker计算伤害值时，或Capturer计算占领值时，需要通过本组件获取当前生命值
 --   若生命值降为0，则本组件需要发送消息以通知ModelUnitMap/ModelTileMap删除对应的unit/tile
 -- 其他：
 --   - 所有种类的ModelUnit都必须绑定本组件，但ModelUnit里没有写死，而是由GameConstant决定

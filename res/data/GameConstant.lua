@@ -1519,7 +1519,7 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 
@@ -1636,7 +1636,7 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 
@@ -1720,7 +1720,7 @@ GameConstant.templateModelUnits = {
             current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 

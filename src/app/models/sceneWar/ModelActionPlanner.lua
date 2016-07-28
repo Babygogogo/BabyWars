@@ -364,7 +364,7 @@ end
 
 local function getActionCapture(self)
     local modelTile = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
-    if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
+    if ((self.m_FocusModelUnit.canCaptureModelTile) and (self.m_FocusModelUnit:canCaptureModelTile(modelTile))) then
         return {
             name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
             callback = function()
