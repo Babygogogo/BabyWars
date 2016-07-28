@@ -263,6 +263,13 @@ function ModelTileMap:doActionSurrender(action)
     return self
 end
 
+function ModelTileMap:doActionWait(action)
+    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+
+    return self
+end
+
 function ModelTileMap:doActionAttack(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
@@ -277,10 +284,8 @@ function ModelTileMap:doActionJoinModelUnit(action)
     return self
 end
 
-function ModelTileMap:doActionCapture(action, capturer, target)
+function ModelTileMap:doActionCapture(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    target:doActionCapture(action, capturer, target)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
@@ -290,13 +295,6 @@ function ModelTileMap:doActionBuildModelTile(action, builder, target)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     target:doActionBuildModelTile(action, builder, target)
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelTileMap:doActionWait(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self

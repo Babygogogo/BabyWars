@@ -16,6 +16,8 @@ Capturable.EXPORTED_METHODS = {
     "getCurrentCapturePoint",
     "getMaxCapturePoint",
     "isDefeatOnCapture",
+
+    "setCurrentCapturePoint",
 }
 
 --------------------------------------------------------------------------------
@@ -37,7 +39,7 @@ end
 
 function Capturable:loadInstantialData(data)
     assert(data.currentCapturePoint, "Capturable:loadInstantialData() the param data.currentCapturePoint is invalid.")
-    self.m_CurrentCapturePoint = data.currentCapturePoint
+    self:setCurrentCapturePoint(data.currentCapturePoint)
 
     return self
 end
@@ -60,13 +62,13 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function Capturable:doActionDestroyModelUnit(action)
-    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    self:setCurrentCapturePoint(self:getMaxCapturePoint())
 
     return self.m_Owner
 end
 
 function Capturable:doActionSurrender(action)
-    self.m_CurrentCapturePoint = self:getMaxCapturePoint()
+    self:setCurrentCapturePoint(self:getMaxCapturePoint())
 
     return self
 end
@@ -75,17 +77,7 @@ function Capturable:doActionMoveModelUnit(action)
     if ((not action.launchUnitID)                                                   and
         (#action.path > 1)                                                          and
         (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
-        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-    end
-
-    return self
-end
-
-function Capturable:doActionCapture(action, capturer, target)
-    self.m_CurrentCapturePoint = math.max(self.m_CurrentCapturePoint - capturer:getCaptureAmount(), 0)
-    if (self.m_CurrentCapturePoint <= 0) then
-        self.m_CurrentCapturePoint = self:getMaxCapturePoint()
-        self.m_Owner:updateWithPlayerIndex(capturer:getPlayerIndex())
+        self:setCurrentCapturePoint(self:getMaxCapturePoint())
     end
 
     return self
@@ -104,6 +96,15 @@ end
 
 function Capturable:isDefeatOnCapture()
     return self.m_Template.defeatOnCapture
+end
+
+function Capturable:setCurrentCapturePoint(point)
+    assert((point >= 0) and (point <= self:getMaxCapturePoint()) and (point == math.floor(point)),
+        "Capturable:setCurrentCapturePoint() the param point is invalid.")
+
+    self.m_CurrentCapturePoint = point
+
+    return self.m_Owner
 end
 
 return Capturable

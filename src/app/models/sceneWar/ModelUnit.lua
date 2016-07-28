@@ -344,10 +344,9 @@ function ModelUnit:doActionJoinModelUnit(action, target)
     return self
 end
 
-function ModelUnit:doActionCapture(action, capturer, target)
+function ModelUnit:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
     self:setStateActioned()
-
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
@@ -355,8 +354,8 @@ function ModelUnit:doActionCapture(action, capturer, target)
                 :showNormalAnimation()
             target:updateView()
 
-            if (action.callbackOnCaptureAnimationEnded) then
-                action.callbackOnCaptureAnimationEnded()
+            if (callbackOnCaptureAnimationEnded) then
+                callbackOnCaptureAnimationEnded()
             end
         end)
     end

@@ -64,10 +64,18 @@ function Capturer:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function Capturer:doActionCapture(action, capturer, target)
-    self.m_IsCapturing = (self:getCaptureAmount() < target:getCurrentCapturePoint())
+function Capturer:doActionCapture(action, target)
+    local capturePoint = math.max(0, target:getCurrentCapturePoint() - self:getCaptureAmount())
+    if (capturePoint > 0) then
+        self.m_IsCapturing = true
+        target:setCurrentCapturePoint(capturePoint)
+    else
+        self.m_IsCapturing = false
+        target:setCurrentCapturePoint(target:getMaxCapturePoint())
+            :updateWithPlayerIndex(self.m_Owner:getPlayerIndex())
+    end
 
-    return self
+    return self.m_Owner
 end
 
 --------------------------------------------------------------------------------

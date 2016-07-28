@@ -381,16 +381,6 @@ function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnima
     return self
 end
 
-function ModelUnitMap:doActionCapture(action, capturer, target)
-    moveActorUnitOnAction(self, action)
-    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
-        :doActionCapture(action, capturer, target)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionJoinModelUnit(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
@@ -417,6 +407,17 @@ function ModelUnitMap:doActionJoinModelUnit(action)
     local focusModelUnit = focusActorUnit:getModel()
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
         :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
+    return self
+end
+
+function ModelUnitMap:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
+    local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
+    moveActorUnitOnAction(self, action)
+    capturer:doActionCapture(action, target, callbackOnCaptureAnimationEnded)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

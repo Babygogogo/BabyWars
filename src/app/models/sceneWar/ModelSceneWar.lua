@@ -189,12 +189,13 @@ end
 local function doActionCapture(self, action)
     local modelWarField      = getModelWarField(self)
     local modelPlayerManager = getModelPlayerManager(self)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local callbackOnCaptureAnimationEnded
 
-    local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
         local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
-        action.callbackOnCaptureAnimationEnded = function()
+        callbackOnCaptureAnimationEnded = function()
             modelWarField:clearPlayerForce(lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
@@ -210,7 +211,7 @@ local function doActionCapture(self, action)
         end
     end
 
-    modelWarField:doActionCapture(action)
+    modelWarField     :doActionCapture(action, callbackOnCaptureAnimationEnded)
     modelPlayerManager:doActionCapture(action)
 end
 

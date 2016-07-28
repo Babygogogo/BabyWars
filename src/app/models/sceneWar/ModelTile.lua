@@ -201,12 +201,6 @@ function ModelTile:doActionSurrender(action)
     return self
 end
 
-function ModelTile:doActionCapture(action, capturer, target)
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
-
-    return self
-end
-
 function ModelTile:doActionBuildModelTile(action, builder, target)
     ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
 
