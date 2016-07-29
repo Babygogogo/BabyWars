@@ -273,6 +273,7 @@ end
 
 function ModelWarField:doActionProduceModelUnitOnUnit(action)
     self:getModelUnitMap():doActionProduceModelUnitOnUnit(action)
+    self:getModelTileMap():doActionProduceModelUnitOnUnit(action)
 
     return self
 end

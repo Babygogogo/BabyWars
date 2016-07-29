@@ -444,8 +444,12 @@ function ModelUnitMap:doActionBuildModelTile(action, target)
 end
 
 function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
-    local gridIndex         = action.path[#action.path]
-    local focusModelUnit    = moveActorUnitOnAction(self, action)
+    local path              = action.path
+    local gridIndex         = path[#path]
+    local focusModelUnit    = self:getFocusModelUnit(path[1], action.launchUnitID)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    moveActorUnitOnAction(self, action)
+
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
     producedActorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
@@ -459,8 +463,7 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
         self.m_View:addLoadedViewUnit(producedUnitID, producedActorUnit:getView())
     end
 
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionProduceModelUnitOnUnit(action, producedUnitID)
+    focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
