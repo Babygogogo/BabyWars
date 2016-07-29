@@ -314,8 +314,6 @@ end
 
 function ModelTileMap:doActionSupplyModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionSupplyModelUnit(action)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self

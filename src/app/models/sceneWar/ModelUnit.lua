@@ -426,7 +426,6 @@ end
 
 function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
     self:setStateActioned()
-
     ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action, targetModelUnits)
 
     if (self.m_View) then

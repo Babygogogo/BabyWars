@@ -97,8 +97,6 @@ local function moveActorUnitOnAction(self, action)
     else
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
-
-    return self:getModelUnit(endingGridIndex)
 end
 
 local function createEmptyMap(width)
@@ -471,9 +469,10 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
 end
 
 function ModelUnitMap:doActionSupplyModelUnit(action)
-    local focusModelUnit = moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit))
+    local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier))
+    moveActorUnitOnAction(self, action)
+    supplier:doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, supplier))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

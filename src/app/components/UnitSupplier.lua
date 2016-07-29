@@ -63,14 +63,6 @@ function UnitSupplier:ctor(param)
     return self
 end
 
-function UnitSupplier:loadTemplate(template)
-    return self
-end
-
-function UnitSupplier:loadInstantialData(data)
-    return self
-end
-
 function UnitSupplier:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "UnitSupplier:setRootScriptEventDispatcher() the dispatcher has been set.")
 
