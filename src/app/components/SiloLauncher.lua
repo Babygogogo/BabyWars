@@ -32,8 +32,8 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function SiloLauncher:doActionLaunchSilo(action, modelUnitMap, modelTile)
-    modelTile:updateWithObjectAndBaseId(self:getTileObjectIdAfterLaunch())
+function SiloLauncher:doActionLaunchSilo(action, modelUnitMap, silo)
+    silo:updateWithObjectAndBaseId(self:getTileObjectIdAfterLaunch())
 
     local isWithinMap = GridIndexFunctions.isWithinMap
     local mapSize     = modelUnitMap:getMapSize()

@@ -363,15 +363,15 @@ function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAni
     return self
 end
 
-function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
+function ModelUnit:doActionLaunchSilo(action, modelUnitMap, silo)
     self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, silo)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
-            modelTile:updateView()
+            silo:updateView()
 
             local dispatcher  = self.m_RootScriptEventDispatcher
             local mapSize     = modelUnitMap:getMapSize()
