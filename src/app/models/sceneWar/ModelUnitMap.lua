@@ -483,21 +483,15 @@ function ModelUnitMap:doActionLoadModelUnit(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit
+    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     if (launchUnitID) then
-        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
     else
-        focusModelUnit = self:getModelUnit(beginningGridIndex)
         setActorUnitLoaded(self, beginningGridIndex)
     end
-
-    local focusUnitID     = focusModelUnit:getUnitId()
-    local loaderModelUnit = self:getModelUnit(endingGridIndex)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
-    loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    focusModelUnit:doActionLoadModelUnit(action, self:getModelUnit(endingGridIndex))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

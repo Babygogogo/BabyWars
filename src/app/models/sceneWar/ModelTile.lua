@@ -201,18 +201,6 @@ function ModelTile:doActionSurrender(action)
     return self
 end
 
-function ModelTile:doActionSupplyModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionLoadModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
-
-    return self
-end
-
 function ModelTile:doActionDropModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
 

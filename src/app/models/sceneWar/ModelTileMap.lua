@@ -321,8 +321,6 @@ end
 
 function ModelTileMap:doActionLoadModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionLoadModelUnit(action)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self

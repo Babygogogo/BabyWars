@@ -447,19 +447,17 @@ function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
     return self
 end
 
-function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
-    if (self:getUnitId() == focusUnitID) then
-        self:setStateActioned()
-    end
+function ModelUnit:doActionLoadModelUnit(action, loader)
+    self:setStateActioned()
+    -- Attention! We should be invoking the doActionLoadModelUnit methods for the loader rather than self.
+    ComponentManager.callMethodForAllComponents(loader, "doActionLoadModelUnit", action, self:getUnitId())
 
-    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action, focusUnitID, loaderModelUnit)
-
-    if ((self:getUnitId() == focusUnitID) and (self.m_View)) then
+    if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
                 :setVisible(false)
-            loaderModelUnit:updateView()
+            loader:updateView()
         end)
     end
 
