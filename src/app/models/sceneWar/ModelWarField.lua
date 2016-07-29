@@ -261,16 +261,12 @@ function ModelWarField:doActionLaunchSilo(action)
 end
 
 function ModelWarField:doActionBuildModelTile(action)
-    local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
     local target       = modelTileMap:getModelTile(path[#path])
-    local builder      = (action.launchUnitID)                           and
-        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
-        (modelUnitMap:getModelUnit(path[1]))
 
-    modelUnitMap:doActionBuildModelTile(action, builder, target)
-    modelTileMap:doActionBuildModelTile(action, builder, target)
+    self:getModelUnitMap():doActionBuildModelTile(action, target)
+    modelTileMap          :doActionBuildModelTile(action)
 
     return self
 end

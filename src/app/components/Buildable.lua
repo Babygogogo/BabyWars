@@ -7,6 +7,8 @@ local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 Buildable.EXPORTED_METHODS = {
     "getCurrentBuildPoint",
     "getMaxBuildPoint",
+
+    "setCurrentBuildPoint",
 }
 
 --------------------------------------------------------------------------------
@@ -36,7 +38,7 @@ end
 
 function Buildable:loadInstantialData(data)
     assert(data.currentBuildPoint, "Buildable:loadInstantialData() the param data.currentBuildPoint is invalid.")
-    self.m_CurrentBuildPoint = data.currentBuildPoint
+    self:setCurrentBuildPoint(data.currentBuildPoint)
 
     return self
 end
@@ -59,13 +61,13 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function Buildable:doActionDestroyModelUnit(action)
-    self.m_CurrentBuildPoint = self:getMaxBuildPoint()
+    self:setCurrentBuildPoint(self:getMaxBuildPoint())
 
     return self.m_Owner
 end
 
 function Buildable:doActionSurrender(action)
-    self.m_CurrentBuildPoint = self:getMaxBuildPoint()
+    self:setCurrentBuildPoint(self:getMaxBuildPoint())
 
     return self
 end
@@ -74,18 +76,7 @@ function Buildable:doActionMoveModelUnit(action)
     if ((not action.launchUnitID)                                                   and
         (#action.path > 1)                                                          and
         (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
-        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
-    end
-
-    return self
-end
-
-function Buildable:doActionBuildModelTile(action, builder, target)
-    self.m_CurrentBuildPoint = math.max(self.m_CurrentBuildPoint - builder:getBuildAmount(), 0)
-    if (self.m_CurrentBuildPoint <= 0) then
-        local modelTile = self.m_Owner
-        local _, baseID = modelTile:getObjectAndBaseId()
-        modelTile:updateWithObjectAndBaseId(builder:getBuildTiledIdWithTileType(modelTile:getTileType()), baseID)
+        self:setCurrentBuildPoint(self:getMaxBuildPoint())
     end
 
     return self
@@ -100,6 +91,13 @@ end
 
 function Buildable:getMaxBuildPoint()
     return self.m_Template.maxBuildPoint
+end
+
+function Buildable:setCurrentBuildPoint(point)
+    assert((point >= 0) and (point <= self:getMaxBuildPoint()) and (math.floor(point) == point))
+    self.m_CurrentBuildPoint = point
+
+    return self.m_Owner
 end
 
 return Buildable

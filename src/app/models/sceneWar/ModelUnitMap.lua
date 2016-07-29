@@ -143,9 +143,6 @@ local function onEvtDestroyModelUnit(self, event)
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
     modelUnit:doActionDestroyModelUnit(event)
         :unsetRootScriptEventDispatcher()
-    if (event.attacker) then
-        event.attacker:doActionDestroyModelUnit(event)
-    end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
@@ -435,10 +432,11 @@ function ModelUnitMap:doActionLaunchSilo(action, silo)
     return self
 end
 
-function ModelUnitMap:doActionBuildModelTile(action, builder, target)
-    moveActorUnitOnAction(self, action)
+function ModelUnitMap:doActionBuildModelTile(action, target)
+    local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
-        :doActionBuildModelTile(action, builder, target)
+    moveActorUnitOnAction(self, action)
+    builder:doActionBuildModelTile(action, target)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 

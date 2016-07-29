@@ -395,9 +395,9 @@ function ModelUnit:doActionLaunchSilo(action, modelUnitMap, silo)
     return self
 end
 
-function ModelUnit:doActionBuildModelTile(action, builder, target)
+function ModelUnit:doActionBuildModelTile(action, target)
     self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()

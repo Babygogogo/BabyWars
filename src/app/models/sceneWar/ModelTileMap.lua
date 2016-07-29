@@ -298,10 +298,8 @@ function ModelTileMap:doActionLaunchSilo(action)
     return self
 end
 
-function ModelTileMap:doActionBuildModelTile(action, builder, target)
+function ModelTileMap:doActionBuildModelTile(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    target:doActionBuildModelTile(action, builder, target)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
