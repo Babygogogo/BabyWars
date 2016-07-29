@@ -27,12 +27,6 @@ local Actor                       = require("src.global.actors.Actor")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getFocusModelUnit(self, gridIndex, launchUnitID)
-    return (launchUnitID)                                                and
-        (self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(launchUnitID)) or
-        (self.m_ModelUnitMap:getModelUnit(gridIndex))
-end
-
 local function getMovePathDestination(movePath)
     return movePath[#movePath].gridIndex
 end
@@ -426,7 +420,7 @@ end
 local function getSingleActionLaunchModelUnit(self, unitID)
     local beginningGridIndex = self.m_MovePath[1].gridIndex
     local icon               = Actor.createView("sceneWar.ViewUnit")
-    icon:updateWithModelUnit(getFocusModelUnit(self, beginningGridIndex, unitID))
+    icon:updateWithModelUnit(self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, unitID))
         :setScale(0.5)
 
     return {
@@ -657,12 +651,12 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local modelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
 end
 
 setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
-    local focusModelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local focusModelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     if (self.m_FocusModelUnit ~= focusModelUnit) then
         self.m_FocusModelUnit = focusModelUnit
         resetReachableArea(self, focusModelUnit)
@@ -692,7 +686,7 @@ end
 
 setStateChoosingAction = function(self, destination, launchUnitID)
     local beginningGridIndex = self.m_MovePath[1].gridIndex
-    local focusModelUnit     = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local focusModelUnit     = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     if (self.m_FocusModelUnit ~= focusModelUnit) then
         self.m_FocusModelUnit  = focusModelUnit
         destination            = beginningGridIndex
@@ -855,7 +849,11 @@ local function onEvtGridSelected(self, event)
                 setStateIdle(self, true)
             end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
-            setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
+            if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
+                setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
+            else
+                setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
+            end
         end
     elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)
