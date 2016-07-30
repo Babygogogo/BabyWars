@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.5.9"
+GameConstant.version = "0.1.5.10"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -698,8 +698,8 @@ GameConstant.unitMaxHP       = 100
 GameConstant.tileMaxHP       = 99
 GameConstant.incomePerTurn   = 1000
 
-GameConstant.maxLevel   = 3
-GameConstant.levelBonus = {
+GameConstant.maxPromotion   = 3
+GameConstant.promotionBonus = {
     {attack = 5,  defense = 5 },
     {attack = 10, defense = 10},
     {attack = 20, defense = 20},
@@ -1117,7 +1117,7 @@ GameConstant.templateModelTiles = {
     Headquarters = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = true,
@@ -1152,7 +1152,7 @@ GameConstant.templateModelTiles = {
     City = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1187,7 +1187,7 @@ GameConstant.templateModelTiles = {
     CommandTower = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1217,7 +1217,7 @@ GameConstant.templateModelTiles = {
     Radar = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1247,7 +1247,7 @@ GameConstant.templateModelTiles = {
     Factory = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1301,7 +1301,7 @@ GameConstant.templateModelTiles = {
     Airport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1346,7 +1346,7 @@ GameConstant.templateModelTiles = {
     Seaport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1392,7 +1392,7 @@ GameConstant.templateModelTiles = {
     TempAirport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1423,7 +1423,7 @@ GameConstant.templateModelTiles = {
     TempSeaport = {
         GridIndexable = {},
 
-        CaptureTaker = {
+        Capturable = {
             maxCapturePoint     = GameConstant.maxCapturePoint,
             currentCapturePoint = GameConstant.maxCapturePoint,
             defeatOnCapture     = false,
@@ -1515,11 +1515,11 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 
@@ -1528,7 +1528,12 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 1500,
+        Producible = {
+            productionCost = 1500,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1627,11 +1632,11 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 
@@ -1640,7 +1645,12 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 2500,
+        Producible = {
+            productionCost = 2500,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1706,11 +1716,11 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        CaptureDoer = {
+        Capturer = {
             isCapturing = false,
         },
 
@@ -1719,7 +1729,12 @@ GameConstant.templateModelUnits = {
             launchedType = "EmptySilo",
         },
 
-        cost        = 2500,
+        Producible = {
+            productionCost = 2500,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1785,11 +1800,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 4000,
+        Producible = {
+            productionCost = 4000,
+        },
+
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -1855,11 +1875,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -1928,11 +1953,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 7000,
+        Producible = {
+            productionCost = 7000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2031,11 +2061,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 7000,
+        Producible = {
+            productionCost = 7000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2134,11 +2169,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 12000,
+        Producible = {
+            productionCost = 12000,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -2237,11 +2277,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 16000,
+        Producible = {
+            productionCost = 16000,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -2309,11 +2354,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 6000,
+        Producible = {
+            productionCost = 6000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2381,11 +2431,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 11000,
+        Producible = {
+            productionCost = 11000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2454,11 +2509,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 15000,
+        Producible = {
+            productionCost = 15000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2526,11 +2586,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 12000,
+        Producible = {
+            productionCost = 12000,
+        },
+
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -2578,7 +2643,12 @@ GameConstant.templateModelUnits = {
             }
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
+        Joinable = {},
+
         vision      = 1,
     },
 
@@ -2646,11 +2716,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -2718,11 +2793,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -2790,11 +2870,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 13000,
+        Producible = {
+            productionCost = 13000,
+        },
+
+        Joinable = {},
+
         vision      = 4,
     },
 
@@ -2893,11 +2978,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 9000,
+        Producible = {
+            productionCost = 9000,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 
@@ -2931,7 +3021,12 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        cost        = 5000,
+        Producible = {
+            productionCost = 5000,
+        },
+
+        Joinable = {},
+
         vision      = 1,
     },
 
@@ -2999,11 +3094,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 15000,
+        Producible = {
+            productionCost = 15000,
+        },
+
+        Joinable = {},
+
         vision      = 4,
     },
 
@@ -3071,11 +3171,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 25000,
+        Producible = {
+            productionCost = 25000,
+        },
+
+        Joinable = {},
+
         vision      = 3,
     },
 
@@ -3149,8 +3254,8 @@ GameConstant.templateModelUnits = {
             canSupply          = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         MaterialOwner = {
@@ -3162,7 +3267,12 @@ GameConstant.templateModelUnits = {
             targetType = "Seaplane",
         },
 
-        cost        = 28000,
+        Producible = {
+            productionCost = 28000,
+        },
+
+        Joinable = {},
+
         vision      = 4,
     },
 
@@ -3230,11 +3340,16 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 20000,
+        Producible = {
+            productionCost = 20000,
+        },
+
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -3333,8 +3448,8 @@ GameConstant.templateModelUnits = {
             destroyOnOutOfFuel     = true,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
         UnitLoader = {
@@ -3345,7 +3460,12 @@ GameConstant.templateModelUnits = {
             canSupply          = true,
         },
 
-        cost        = 16000,
+        Producible = {
+            productionCost = 16000,
+        },
+
+        Joinable = {},
+
         vision      = 5,
     },
 
@@ -3379,7 +3499,12 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        cost        = 10000,
+        Producible = {
+            productionCost = 10000,
+        },
+
+        Joinable = {},
+
         vision      = 1,
     },
 
@@ -3455,11 +3580,16 @@ GameConstant.templateModelUnits = {
             canSupply          = false,
         },
 
-        LevelOwner = {
-            level = 0,
+        Promotable = {
+            current = 0,
         },
 
-        cost        = 6000,
+        Producible = {
+            productionCost = 6000,
+        },
+
+        Joinable = {},
+
         vision      = 2,
     },
 }

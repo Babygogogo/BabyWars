@@ -40,12 +40,7 @@ local function onEvtModelUnitMapUpdated(self, event)
 end
 
 local function onEvtTurnPhaseMain(self, event)
-    self.m_ModelPlayer = event.modelPlayer
     updateWithModelUnitMap(self)
-end
-
-local function onEvtModelWeatherUpdated(self, event)
-    self.m_ModelWeather = event.modelWeather
 end
 
 local function onEvtGridSelected(self, event)
@@ -89,7 +84,6 @@ function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtModelUnitMapUpdated", self)
         :addEventListener("EvtTurnPhaseMain",       self)
-        :addEventListener("EvtModelWeatherUpdated", self)
         :addEventListener("EvtGridSelected",        self)
         :addEventListener("EvtMapCursorMoved",      self)
 
@@ -101,7 +95,6 @@ function ModelUnitInfo:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
         :removeEventListener("EvtGridSelected",        self)
-        :removeEventListener("EvtModelWeatherUpdated", self)
         :removeEventListener("EvtTurnPhaseMain",       self)
         :removeEventListener("EvtModelUnitMapUpdated", self)
     self.m_RootScriptEventDispatcher = nil
@@ -116,7 +109,6 @@ function ModelUnitInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtModelUnitMapUpdated") then onEvtModelUnitMapUpdated(self, event)
     elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
-    elseif (eventName == "EvtModelWeatherUpdated") then onEvtModelWeatherUpdated(self, event)
     elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(       self, event)
     elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
     end
@@ -129,7 +121,7 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onPlayerTouch(index)
     if (self.m_ModelUnitDetail) then
-        self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnitList[index], self.m_ModelPlayer, self.m_ModelWeather)
+        self.m_ModelUnitDetail:updateWithModelUnit(self.m_ModelUnitList[index])
             :setEnabled(true)
     end
 

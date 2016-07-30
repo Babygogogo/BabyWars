@@ -5,7 +5,7 @@
 --   维护宿主的生命值以及防御类型，提供接口给外界访问
 -- 使用场景举例：
 --   宿主初始化时，根据自身属性来绑定和初始化本组件（比如infantry需要绑定，plain不需要，meteor需要）
---   AttackTaker计算伤害值时，或CaptureDoer计算占领值时，需要通过本组件获取当前生命值
+--   AttackTaker计算伤害值时，或Capturer计算占领值时，需要通过本组件获取当前生命值
 --   若生命值降为0，则本组件需要发送消息以通知ModelUnitMap/ModelTileMap删除对应的unit/tile
 -- 其他：
 --   - 所有种类的ModelUnit都必须绑定本组件，但ModelUnit里没有写死，而是由GameConstant决定
@@ -23,7 +23,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
 local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()
 
-local EXPORTED_METHODS = {
+AttackTaker.EXPORTED_METHODS = {
     "getCurrentHP",
     "setCurrentHP",
     "getNormalizedCurrentHP",
@@ -33,23 +33,6 @@ local EXPORTED_METHODS = {
     "getDefenseWeakList",
     "isAffectedByLuck",
 }
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function dispatchEvtDestroyModelUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtDestroyModelUnit",
-        gridIndex = gridIndex,
-    })
-end
-
-local function dispatchEvtDestroyModelTile(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtDestroyModelTile",
-        gridIndex = gridIndex,
-    })
-end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -92,6 +75,13 @@ function AttackTaker:unsetRootScriptEventDispatcher()
     return self
 end
 
+function AttackTaker:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "AttackTaker:setModelPlayerManager() the model has been set.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -107,70 +97,21 @@ function AttackTaker:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function AttackTaker:onBind(target)
-    assert(self.m_Owner == nil, "AttackTaker:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function AttackTaker:onUnbind()
-    assert(self.m_Owner ~= nil, "AttackTaker:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function AttackTaker:doActionAttack(action, attacker, target)
-    local owner = self.m_Owner
-    if (owner == attacker) then
-        self:setCurrentHP(math.max(self:getCurrentHP() - (action.counterDamage or 0), 0))
-        if (self:getCurrentHP() <= 0) then
-            dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
-        end
-    else
-        self:setCurrentHP(math.max(self:getCurrentHP() - action.attackDamage, 0))
-        if (self:getCurrentHP() <= 0) then
-            if (owner.getUnitType) then
-                dispatchEvtDestroyModelUnit(self, owner:getGridIndex())
-            else
-                dispatchEvtDestroyModelTile(self, owner:getGridIndex())
-            end
-        end
-    end
+function AttackTaker:doActionAttack(action, attackTarget)
+    self        :setCurrentHP(math.max(0, self:getCurrentHP() - (action.counterDamage or 0)))
+    attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - action.attackDamage))
 
-    return self
+    return self.m_Owner
 end
 
 function AttackTaker:canJoinModelUnit(modelUnit)
     return modelUnit:getNormalizedCurrentHP() < 10
 end
 
-function AttackTaker:doActionJoinModelUnit(action, modelPlayerManager, target)
-    local joinedNormalizedHP = self:getNormalizedCurrentHP() + target:getNormalizedCurrentHP()
-    if (joinedNormalizedHP > 10) then
-        local owner       = self.m_Owner
-        local playerIndex = owner:getPlayerIndex()
-        local modelPlayer = modelPlayerManager:getModelPlayer(playerIndex)
-        modelPlayer:setFund(modelPlayer:getFund() + (joinedNormalizedHP - 10) / 10 * owner:getProductionCost())
-        joinedNormalizedHP = 10
-
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name        = "EvtModelPlayerUpdated",
-            modelPlayer = modelPlayer,
-            playerIndex = playerIndex,
-        })
-    end
-
+function AttackTaker:doActionJoinModelUnit(action, target)
+    local joinedNormalizedHP = math.min(10, self:getNormalizedCurrentHP() + target:getNormalizedCurrentHP())
     target:setCurrentHP(math.max(
         (joinedNormalizedHP - 1) * 10 + 1,
         math.min(

@@ -4,7 +4,7 @@ local UnitLoader = require("src.global.functions.class")("UnitLoader")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+UnitLoader.EXPORTED_METHODS = {
     "getMaxLoadCount",
     "getCurrentLoadCount",
     "getLoadUnitIdList",
@@ -36,6 +36,7 @@ local function getRemainingUnitIdsOnDrop(currentList, dropDestinations)
         end
     end
 
+    assert(#currentList == #dropDestinations + #remainingUnitIds)
     return remainingUnitIds
 end
 
@@ -114,27 +115,6 @@ function UnitLoader:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function UnitLoader:onBind(target)
-    assert(self.m_Owner == nil, "UnitLoader:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function UnitLoader:onUnbind()
-    assert(self.m_Owner ~= nil, "UnitLoader:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function UnitLoader:onEvent(event)
@@ -148,6 +128,20 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function UnitLoader:doActionLaunchModelUnit(action)
+    local launchUnitID = action.launchUnitID
+    assert(launchUnitID, "UnitLoader:doActionLaunchModelUnit() action.launchUnitID is invalid.")
+
+    for i, unitID in ipairs(self.m_LoadedUnitIds) do
+        if (unitID == launchUnitID) then
+            table.remove(self.m_LoadedUnitIds, i)
+            return self.m_Owner
+        end
+    end
+
+    error("UnitLoader:doActionLaunchModelUnit() no loaded unit id matches action.launchUnitID.")
+end
+
 function UnitLoader:canJoinModelUnit(modelUnit)
     return (self:getCurrentLoadCount() == 0)   and
         (modelUnit.getCurrentLoadCount)        and
@@ -163,40 +157,14 @@ function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
     return self.m_Owner
 end
 
-function UnitLoader:doActionLoadModelUnit(action, unitID, loaderModelUnit)
-    if (self.m_Owner == loaderModelUnit) then
-        self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
-    end
+function UnitLoader:doActionLoadModelUnit(action, unitID)
+    self:addLoadUnitId(unitID)
 
     return self.m_Owner
 end
 
-function UnitLoader:doActionDropModelUnit(action, dropActorUnits)
-    local dropDestinations = action.dropDestinations
+function UnitLoader:doActionDropModelUnit(action)
     self.m_LoadedUnitIds   = getRemainingUnitIdsOnDrop(self:getLoadUnitIdList(), action.dropDestinations)
-
-    for _, dropActorUnit in pairs(dropActorUnits) do
-        local dropModelUnit = dropActorUnit:getModel()
-        for _, dropDestination in pairs(dropDestinations) do
-            if (dropModelUnit:getUnitId() == dropDestination.unitID) then
-                dropModelUnit:setGridIndex(dropDestination.gridIndex)
-            end
-        end
-    end
-
-    return self.m_Owner
-end
-
-function UnitLoader:doActionLaunchModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    if (launchUnitID) then
-        for i, unitID in ipairs(self.m_LoadedUnitIds) do
-            if (unitID == launchUnitID) then
-                table.remove(self.m_LoadedUnitIds, i)
-                break
-            end
-        end
-    end
 
     return self.m_Owner
 end
@@ -246,6 +214,8 @@ function UnitLoader:canSupplyLoadedModelUnit()
 end
 
 function UnitLoader:addLoadUnitId(unitID)
+    assert(not self:hasLoadUnitId(unitID), "UnitLoader:addLoadUnitId() the id has been loaded already.")
+    assert(self:getCurrentLoadCount() < self:getMaxLoadCount(), "UnitLoader:addLoadUnitId() too many units are loaded.")
     self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
 
     return self.m_Owner

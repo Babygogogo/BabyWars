@@ -13,19 +13,17 @@
 
 local MoveDoer = require("src.global.functions.class")("MoveDoer")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local MOVE_TYPES       = require("res.data.GameConstant").moveTypes
-local EXPORTED_METHODS = {
+local MOVE_TYPES = require("res.data.GameConstant").moveTypes
+
+MoveDoer.EXPORTED_METHODS = {
     "getMoveRange",
     "getMoveType",
     "getMoveTypeFullName",
 }
-
-MoveDoer.DEPENDS = {}
 
 --------------------------------------------------------------------------------
 -- The param validators.
@@ -61,23 +59,16 @@ function MoveDoer:loadTemplate(template)
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function MoveDoer:onBind(target)
-    assert(self.m_Target == nil, "MoveDoer:onBind() the MoveDoer has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
+function MoveDoer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "MoveDoer:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
 
     return self
 end
 
-function MoveDoer:onUnbind()
-    assert(self.m_Target, "MoveDoer:unbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+function MoveDoer:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "MoveDoer:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
 
     return self
 end
@@ -85,7 +76,7 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function MoveDoer:getMoveRange(modelPlayer, modelWeather)
+function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
     return self.m_Template.range
 end

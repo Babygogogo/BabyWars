@@ -28,19 +28,11 @@ local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function requireMapData(param)
-    local t = type(param)
-    if (t == "string") then
-        return require(TEMPLATE_WAR_FIELD_PATH .. param)
-    elseif (t == "table") then
-        return param
-    else
-        return error("ModelUnitMap-requireMapData() the param is invalid.")
-    end
-end
+local function getActorUnit(self, gridIndex)
+    assert(GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize()),
+        "ModelUnitMap-getActorUnit() the param gridIndex is not within the map.")
 
-local function getTiledUnitLayer(tiledData)
-    return tiledData.layers[3]
+    return self.m_ActorUnitsMap[gridIndex.x][gridIndex.y]
 end
 
 local function getLoadedActorUnitWithUnitId(self, unitID)
@@ -60,11 +52,11 @@ local function getSupplyTargetModelUnits(self, supplier)
 end
 
 local function setActorUnitLoaded(self, gridIndex)
-    local focusActorUnit = self:getActorUnit(gridIndex)
+    local focusActorUnit = getActorUnit(self, gridIndex)
     local focusUnitID    = focusActorUnit:getModel():getUnitId()
 
     self.m_LoadedActorUnits[focusUnitID]           = focusActorUnit
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
 
     if (self.m_View) then
         self.m_View:setViewUnitLoaded(gridIndex, focusUnitID)
@@ -72,7 +64,7 @@ local function setActorUnitLoaded(self, gridIndex)
 end
 
 local function setActorUnitUnloaded(self, unitID, gridIndex)
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = self.m_LoadedActorUnits[unitID]
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = self.m_LoadedActorUnits[unitID]
     self.m_LoadedActorUnits[unitID]                = nil
 
     if (self.m_View) then
@@ -85,9 +77,9 @@ local function swapActorUnit(self, gridIndex1, gridIndex2)
         return
     end
 
-    local tempActorUnit = self.m_UnitActorsMap[gridIndex1.x][gridIndex1.y]
-    self.m_UnitActorsMap[gridIndex1.x][gridIndex1.y] = self.m_UnitActorsMap[gridIndex2.x][gridIndex2.y]
-    self.m_UnitActorsMap[gridIndex2.x][gridIndex2.y] = tempActorUnit
+    local tempActorUnit = self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y]
+    self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y] = self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y]
+    self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y] = tempActorUnit
 
     if (self.m_View) then
         self.m_View:swapViewUnit(gridIndex1, gridIndex2)
@@ -105,8 +97,6 @@ local function moveActorUnitOnAction(self, action)
     else
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
-
-    return self:getModelUnit(endingGridIndex)
 end
 
 local function createEmptyMap(width)
@@ -137,14 +127,20 @@ local function onEvtDestroyModelUnit(self, event)
     assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
 
     if (modelUnit.getLoadUnitIdList) then
+        local view = self.m_View
         for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
             self.m_LoadedActorUnits[unitID]:getModel():unsetRootScriptEventDispatcher()
             self.m_LoadedActorUnits[unitID] = nil
+
+            if (view) then
+                view:removeLoadedViewUnit(unitID)
+            end
         end
     end
 
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = nil
-    modelUnit:unsetRootScriptEventDispatcher()
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
+    modelUnit:doActionDestroyModelUnit(event)
+        :unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
@@ -158,77 +154,57 @@ end
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
-local function createUnitActorsMapWithTiledLayer(layer)
-    local width, height = layer.width, layer.height
-    local map    = createEmptyMap(width)
-    local availableUnitId = 1
+local function createActorUnitsMapWithTemplate(mapData)
+    local layer               = require(TEMPLATE_WAR_FIELD_PATH .. mapData.template).layers[3]
+    local data, width, height = layer.data, layer.width, layer.height
+    local map                 = createEmptyMap(width)
+    local availableUnitId     = 1
 
     for x = 1, width do
         for y = 1, height do
-            local tiledID = layer.data[x + (height - y) * width]
+            local tiledID = data[x + (height - y) * width]
             if (tiledID > 0) then
-                map[x][y] = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
+                map[x][y]       = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
                 availableUnitId = availableUnitId + 1
             end
         end
     end
 
-    return map, {width = width, height = height}, availableUnitId
+    return map, {width = width, height = height}, availableUnitId, {}
 end
 
-local function createUnitActorsMapWithGridsData(gridsData, mapSize)
-    local map = createEmptyMap(mapSize.width)
-
-    for _, gridData in ipairs(gridsData) do
+local function createActorUnitsMapWithoutTemplate(mapData)
+    -- If the map is created without template, then we build the map with mapData.grids only.
+    local mapSize = mapData.mapSize
+    local map     = createEmptyMap(mapSize.width)
+    for _, gridData in pairs(mapData.grids) do
         local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createUnitActorsMapWithGridsData() the gridIndex is invalid.")
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createActorUnitsMapWithoutTemplate() the gridIndex is invalid.")
 
         map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
     end
 
-    return map
-end
-
-local function createUnitActorsMapWithTemplate(mapData)
-    -- If the map is created with template, then the mapData.grids is ignored.
-    local templateMapData = requireMapData(mapData.template)
-    local map, mapSize, availableUnitId = createUnitActorsMapWithTiledLayer(getTiledUnitLayer(templateMapData))
-
-    return map, mapSize, availableUnitId, {}
-end
-
-local function createUnitActorsMapWithoutTemplate(mapData)
-    -- If the map is created without template, then we build the map with mapData.grids only.
-    local map = createUnitActorsMapWithGridsData(mapData.grids, mapData.mapSize)
     local loadedActorUnits = {}
     for unitID, unitData in pairs(mapData.loaded or {}) do
         loadedActorUnits[unitID] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit", unitData)
     end
 
-    return map, mapData.mapSize, mapData.availableUnitId, loadedActorUnits
+    return map, mapSize, mapData.availableUnitId, loadedActorUnits
 end
 
-local function createUnitActorsMap(param)
-    local mapData = requireMapData(param)
+local function initActorUnitsMap(self, mapData)
     if (mapData.template) then
-        return createUnitActorsMapWithTemplate(mapData)
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithTemplate(mapData)
     else
-        return createUnitActorsMapWithoutTemplate(mapData)
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithoutTemplate(mapData)
     end
-end
-
-local function initWithUnitActorsMap(self, map, mapSize, unitID, loadedActorUnits)
-    self.m_UnitActorsMap    = map
-    self.m_MapSize          = mapSize
-    self.m_AvailableUnitID  = unitID
-    self.m_LoadedActorUnits = loadedActorUnits
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelUnitMap:ctor(param)
-    initWithUnitActorsMap(self, createUnitActorsMap(param))
+function ModelUnitMap:ctor(mapData)
+    initActorUnitsMap(self, mapData)
 
     if (self.m_View) then
         self:initView()
@@ -241,15 +217,15 @@ function ModelUnitMap:initView()
     local view = self.m_View
     assert(view, "ModelUnitMap:initView() there's no view attached to the owner actor of the model.")
 
-    local mapSize = self.m_MapSize
+    local mapSize = self:getMapSize()
     view:setMapSize(mapSize)
 
-    local unitActors = self.m_UnitActorsMap
+    local actorUnitsMap = self.m_ActorUnitsMap
     for y = mapSize.height, 1, -1 do
         for x = mapSize.width, 1, -1 do
-            local unitActor = unitActors[x][y]
-            if (unitActor) then
-                view:addViewUnit(unitActor:getView(), {x = x, y = y})
+            local actorUnit = actorUnitsMap[x][y]
+            if (actorUnit) then
+                view:addViewUnit(actorUnit:getView(), {x = x, y = y})
             end
         end
     end
@@ -295,25 +271,50 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelUnitMap:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelUnitMap:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
+    self:forEachModelUnitOnMap(function(modelUnit)
+            modelUnit:setModelPlayerManager(model)
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            modelUnit:setModelPlayerManager(model)
+        end)
+
+    return self
+end
+
+function ModelUnitMap:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "ModelUnitMap:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
+
+    self:forEachModelUnitOnMap(function(modelUnit)
+            modelUnit:setModelWeatherManager(model)
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            modelUnit:setModelWeatherManager(model)
+        end)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function ModelUnitMap:toSerializableTable()
     local grids = {}
     self:forEachModelUnitOnMap(function(modelUnit)
-        grids[#grids + 1] = modelUnit:toSerializableTable()
+        grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
     end)
 
     local loaded = {}
-    for unitID, actorUnit in pairs(self.m_LoadedActorUnits) do
-        loaded[unitID] = actorUnit:getModel():toSerializableTable()
-    end
+    self:forEachModelUnitLoaded(function(modelUnit)
+        loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+    end)
 
     return {
-        mapSize        = {
-            width  = self.m_MapSize.width,
-            height = self.m_MapSize.height,
-        },
+        mapSize         = self:getMapSize(),
         availableUnitId = self.m_AvailableUnitID,
         grids           = grids,
         loaded          = loaded,
@@ -354,40 +355,28 @@ function ModelUnitMap:doActionSurrender(action)
 end
 
 function ModelUnitMap:doActionWait(action)
-    local focusModelUnit = moveActorUnitOnAction(self, action)
+    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionWait(action)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionAttack(action, attacker, target)
     moveActorUnitOnAction(self, action)
-    attacker:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(attacker))
-        :doActionAttack(action, attacker, target)
-
-    if (target.getUnitType) then
-        target:doActionAttack(action, attacker, target)
-    end
+    focusModelUnit:doActionWait(action)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
 
-function ModelUnitMap:doActionCapture(action, capturer, target)
+function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
+    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     moveActorUnitOnAction(self, action)
-    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
-        :doActionCapture(action, capturer, target)
+    focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
 end
 
-function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTileMap)
+function ModelUnitMap:doActionJoinModelUnit(action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
@@ -402,8 +391,8 @@ function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTil
             self.m_View:setViewUnitJoinedWithUnitId(launchUnitID)
         end
     else
-        focusActorUnit = self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y]
-        self.m_UnitActorsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
+        focusActorUnit = self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y]
+        self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
 
         if (self.m_View) then
             self.m_View:setViewUnitJoinedWithGridIndex(beginningGridIndex)
@@ -411,33 +400,41 @@ function ModelUnitMap:doActionJoinModelUnit(action, modelPlayerManager, modelTil
     end
 
     local focusModelUnit = focusActorUnit:getModel()
-    modelTileMap:getModelTile(beginningGridIndex):doActionMoveModelUnit(action)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionJoinModelUnit(action, modelPlayerManager, self:getModelUnit(endingGridIndex))
+        :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-        :dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
 
-function ModelUnitMap:doActionLaunchSilo(action, modelTileMap)
-    modelTileMap:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-
-    local focusModelUnit = moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionLaunchSilo(action, self, modelTileMap:getModelTile(action.path[#action.path]))
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-        :dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionBuildModelTile(action, builder, target)
+function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
+    local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
     moveActorUnitOnAction(self, action)
+    capturer:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
+    return self
+end
+
+function ModelUnitMap:doActionLaunchSilo(action, silo)
+    local launcher = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    launcher:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(launcher))
+    moveActorUnitOnAction(self, action)
+    launcher:doActionLaunchSilo(action, self, silo)
+
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
+    return self
+end
+
+function ModelUnitMap:doActionBuildModelTile(action, target)
+    local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
-        :doActionBuildModelTile(action, builder, target)
+    moveActorUnitOnAction(self, action)
+    builder:doActionBuildModelTile(action, target)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -445,11 +442,17 @@ function ModelUnitMap:doActionBuildModelTile(action, builder, target)
 end
 
 function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
-    local gridIndex         = action.path[#action.path]
-    local focusModelUnit    = moveActorUnitOnAction(self, action)
+    local path              = action.path
+    local gridIndex         = path[#path]
+    local focusModelUnit    = self:getFocusModelUnit(path[1], action.launchUnitID)
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    moveActorUnitOnAction(self, action)
+
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
     producedActorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setModelPlayerManager(self.m_ModelPlayerManager)
+        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
 
     self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
@@ -458,8 +461,7 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
         self.m_View:addLoadedViewUnit(producedUnitID, producedActorUnit:getView())
     end
 
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionProduceModelUnitOnUnit(action, producedUnitID)
+    focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -467,9 +469,10 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
 end
 
 function ModelUnitMap:doActionSupplyModelUnit(action)
-    local focusModelUnit = moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, focusModelUnit))
+    local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
+    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier))
+    moveActorUnitOnAction(self, action)
+    supplier:doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, supplier))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -477,24 +480,18 @@ function ModelUnitMap:doActionSupplyModelUnit(action)
 end
 
 function ModelUnitMap:doActionLoadModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
+    local launchUnitID   = action.launchUnitID
+    local path           = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit
+    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     if (launchUnitID) then
-        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
     else
-        focusModelUnit = self:getModelUnit(beginningGridIndex)
         setActorUnitLoaded(self, beginningGridIndex)
     end
-
-    local focusUnitID     = focusModelUnit:getUnitId()
-    local loaderModelUnit = self:getModelUnit(endingGridIndex)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
-    loaderModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
+    focusModelUnit:doActionLoadModelUnit(action, self:getModelUnit(endingGridIndex))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -502,33 +499,29 @@ function ModelUnitMap:doActionLoadModelUnit(action)
 end
 
 function ModelUnitMap:doActionDropModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
+    local launchUnitID   = action.launchUnitID
+    local path           = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit
+    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     if (launchUnitID) then
-        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
         setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
     else
-        focusModelUnit = self:getModelUnit(beginningGridIndex)
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
 
     local dropActorUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
-        local unitID    = dropDestination.unitID
         local gridIndex = dropDestination.gridIndex
-        local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
-        local modelUnit = actorUnit:getModel()
+        setActorUnitUnloaded(self, dropDestination.unitID, gridIndex)
 
-        dropActorUnits[#dropActorUnits + 1] = actorUnit
-        setActorUnitUnloaded(self, unitID, gridIndex)
+        local dropActorUnit = getActorUnit(self, gridIndex)
+        dropActorUnit:getModel():setGridIndex(gridIndex, false)
+        dropActorUnits[#dropActorUnits + 1] = dropActorUnit
     end
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionDropModelUnit(action, dropActorUnits)
+    focusModelUnit:doActionDropModelUnit(action, dropActorUnits)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -539,11 +532,13 @@ function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
     actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+        :setModelPlayerManager(self.m_ModelPlayerManager)
+        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
         :updateView()
 
     self.m_AvailableUnitID = self.m_AvailableUnitID + 1
-    self.m_UnitActorsMap[gridIndex.x][gridIndex.y] = actorUnit
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
     end
@@ -560,22 +555,20 @@ function ModelUnitMap:getMapSize()
     return self.m_MapSize
 end
 
-function ModelUnitMap:getActorUnit(gridIndex)
-    if (not GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
-        return nil
-    else
-        return self.m_UnitActorsMap[gridIndex.x][gridIndex.y]
-    end
-end
-
 function ModelUnitMap:getModelUnit(gridIndex)
-    local unitActor = self:getActorUnit(gridIndex)
-    return unitActor and unitActor:getModel() or nil
+    local actorUnit = getActorUnit(self, gridIndex)
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
 end
 
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
     local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
+function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
+    return (launchUnitID)                                 and
+        (self:getLoadedModelUnitWithUnitId(launchUnitID)) or
+        (self:getModelUnit(gridIndex))
 end
 
 function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
@@ -587,6 +580,7 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
             list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
         end
 
+        assert(#list == loaderModelUnit:getCurrentLoadCount())
         return list
     end
 end
@@ -595,7 +589,7 @@ function ModelUnitMap:forEachModelUnitOnMap(func)
     local mapSize = self:getMapSize()
     for x = 1, mapSize.width do
         for y = 1, mapSize.height do
-            local actorUnit = self.m_UnitActorsMap[x][y]
+            local actorUnit = self.m_ActorUnitsMap[x][y]
             if (actorUnit) then
                 func(actorUnit:getModel())
             end

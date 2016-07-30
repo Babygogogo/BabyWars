@@ -177,12 +177,12 @@ function GameConstantFunctions.getTileMaxHP()
     return GAME_CONSTANT.tileMaxHP
 end
 
-function GameConstantFunctions.getMaxLevel()
-    return GAME_CONSTANT.maxLevel
+function GameConstantFunctions.getMaxPromotion()
+    return GAME_CONSTANT.maxPromotion
 end
 
-function GameConstantFunctions.getLevelBonus()
-    return GAME_CONSTANT.levelBonus
+function GameConstantFunctions.getPromotionBonus()
+    return GAME_CONSTANT.promotionBonus
 end
 
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)

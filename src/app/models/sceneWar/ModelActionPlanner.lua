@@ -27,28 +27,21 @@ local Actor                       = require("src.global.actors.Actor")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getFocusModelUnit(self, gridIndex, launchUnitID)
-    return (launchUnitID)                                                and
-        (self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(launchUnitID)) or
-        (self.m_ModelUnitMap:getModelUnit(gridIndex))
-end
-
 local function getMovePathDestination(movePath)
     return movePath[#movePath].gridIndex
 end
 
 local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
-    local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-    if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+    if (not GridIndexFunctions.isWithinMap(gridIndex, modelUnitMap:getMapSize())) then
         return nil
     else
-        local modelTile = modelTileMap:getModelTile(gridIndex)
-        return (modelTile) and (modelTile:getMoveCost(modelUnit:getMoveType(), modelPlayer)) or (nil)
+        local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+            return nil
+        else
+            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType(), modelPlayer)
+        end
     end
-end
-
-local function getMoveRange(modelUnit, modelPlayer, modelWeather)
-    return math.min(modelUnit:getMoveRange(modelPlayer, modelWeather), modelUnit:getCurrentFuel())
 end
 
 local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
@@ -155,7 +148,7 @@ end
 -- The functions for MovePath and ReachableArea.
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
-    local maxRange     = getMoveRange(self.m_FocusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather)
+    local maxRange     = math.min(self.m_FocusModelUnit:getMoveRange(), self.m_FocusModelUnit:getCurrentFuel())
     local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex))                        and
@@ -181,7 +174,7 @@ end
 local function resetReachableArea(self, focusModelUnit)
     self.m_ReachableArea = ReachableAreaFunctions.createArea(
         focusModelUnit:getGridIndex(),
-        getMoveRange(focusModelUnit, self.m_LoggedInModelPlayer, self.m_ModelWeather),
+        math.min(focusModelUnit:getMoveRange(), focusModelUnit:getCurrentFuel()),
         function(gridIndex)
             return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
         end)
@@ -213,10 +206,10 @@ local function dispatchEventAttack(self, targetGridIndex)
     })
 end
 
-local function dispatchEventCapture(self)
+local function dispatchEventCaptureModelTile(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
-        actionName   = "Capture",
+        actionName   = "CaptureModelTile",
         path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
@@ -365,11 +358,11 @@ end
 
 local function getActionCapture(self)
     local modelTile = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
-    if ((self.m_FocusModelUnit.canCapture) and (self.m_FocusModelUnit:canCapture(modelTile))) then
+    if ((self.m_FocusModelUnit.canCaptureModelTile) and (self.m_FocusModelUnit:canCaptureModelTile(modelTile))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "Capture"),
+            name     = LocalizationFunctions.getLocalizedText(78, "CaptureModelTile"),
             callback = function()
-                dispatchEventCapture(self)
+                dispatchEventCaptureModelTile(self)
             end,
         }
     else
@@ -427,7 +420,7 @@ end
 local function getSingleActionLaunchModelUnit(self, unitID)
     local beginningGridIndex = self.m_MovePath[1].gridIndex
     local icon               = Actor.createView("sceneWar.ViewUnit")
-    icon:updateWithModelUnit(getFocusModelUnit(self, beginningGridIndex, unitID))
+    icon:updateWithModelUnit(self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, unitID))
         :setScale(0.5)
 
     return {
@@ -658,12 +651,12 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local modelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
 end
 
 setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
-    local focusModelUnit = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local focusModelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     if (self.m_FocusModelUnit ~= focusModelUnit) then
         self.m_FocusModelUnit = focusModelUnit
         resetReachableArea(self, focusModelUnit)
@@ -693,7 +686,7 @@ end
 
 setStateChoosingAction = function(self, destination, launchUnitID)
     local beginningGridIndex = self.m_MovePath[1].gridIndex
-    local focusModelUnit     = getFocusModelUnit(self, beginningGridIndex, launchUnitID)
+    local focusModelUnit     = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     if (self.m_FocusModelUnit ~= focusModelUnit) then
         self.m_FocusModelUnit  = focusModelUnit
         destination            = beginningGridIndex
@@ -701,7 +694,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
     end
 
     self.m_State              = "choosingAction"
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, destination, self.m_ModelTileMap, self.m_ModelUnitMap)
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, destination, self.m_ModelTileMap, self.m_ModelUnitMap, self.m_ModelWeather)
     self.m_LaunchUnitID       = launchUnitID
     updateMovePathWithDestinationGrid(self, destination)
 
@@ -856,7 +849,11 @@ local function onEvtGridSelected(self, event)
                 setStateIdle(self, true)
             end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
-            setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
+            if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
+                setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
+            else
+                setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
+            end
         end
     elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)

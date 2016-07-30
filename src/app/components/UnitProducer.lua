@@ -12,13 +12,12 @@
 
 local UnitProducer = require("src.global.functions.class")("UnitProducer")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local Actor                 = require("src.global.actors.Actor")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
-    "getProductionCostWithTiledId",
+UnitProducer.EXPORTED_METHODS = {
+    "canProduceUnitWithTiledId",
     "getProductionList",
 }
 
@@ -27,7 +26,6 @@ local EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 function UnitProducer:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -39,27 +37,9 @@ function UnitProducer:loadTemplate(template)
     return self
 end
 
-function UnitProducer:loadInstantialData(data)
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function UnitProducer:onBind(target)
-    assert(self.m_Target == nil, "UnitProducer:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Target = target
-
-    return self
-end
-
-function UnitProducer:onUnbind()
-    assert(self.m_Target ~= nil, "UnitProducer:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Target, EXPORTED_METHODS)
-    self.m_Target = nil
+function UnitProducer:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "UnitProducer:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
 
     return self
 end
@@ -67,28 +47,35 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function UnitProducer:getProductionCostWithTiledId(tiledID, modelPlayer)
-    if (GameConstantFunctions.getPlayerIndexWithTiledId(tiledID) ~= self.m_Target:getPlayerIndex()) then
-        return nil
-    end
+function UnitProducer:canProduceUnitWithTiledId(tiledID)
+    if (self.m_Owner:getPlayerIndex() ~= GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)) then
+        return false
+    else
+        local unitType = GameConstantFunctions.getUnitTypeWithTiledId(tiledID)
+        for _, t in pairs(self.m_Template.productionList) do
+            if (unitType == t) then
+                return true
+            end
+        end
 
-    local templateUnit = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
-    -- TODO: take the ablities of the player into account
-    return templateUnit.cost
+        return false
+    end
 end
 
-function UnitProducer:getProductionList(modelPlayer)
+function UnitProducer:getProductionList()
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    local fund        = self.m_ModelPlayerManager:getModelPlayer(playerIndex):getFund()
     local list        = {}
-    local fund        = modelPlayer:getFund()
-    local playerIndex = self.m_Target:getPlayerIndex()
 
     for i, unitName in ipairs(self.m_Template.productionList) do
-        local tiledID = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
-        local cost    = self:getProductionCostWithTiledId(tiledID, modelPlayer)
+        local tiledID   = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
+        local modelUnit = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID})
+        modelUnit:setModelPlayerManager(self.m_ModelPlayerManager)
+        local cost      = modelUnit:getProductionCost()
 
         list[i] = {
-            modelUnit   = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID}),
-            fullName    = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).fullName,
+            modelUnit   = modelUnit,
+            fullName    = modelUnit:getUnitType(),
             cost        = cost,
             isAvailable = cost <= fund,
             tiledID     = tiledID,

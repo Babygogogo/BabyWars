@@ -151,13 +151,14 @@ local function doActionAttack(self, action)
     local modelPlayerManager = getModelPlayerManager(self)
     local modelTurnManager   = getModelTurnManager(self)
     local modelWarField      = getModelWarField(self)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local callbackOnAttackAnimationEnded
 
-    local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
         local currentPlayerIndex = modelTurnManager:getPlayerIndex()
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
-        action.callbackOnAttackAnimationEnded = function()
+        callbackOnAttackAnimationEnded = function()
             modelWarField:clearPlayerForce(lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
@@ -176,24 +177,25 @@ local function doActionAttack(self, action)
         end
     end
 
-    modelWarField:doActionAttack(action)
+    modelWarField     :doActionAttack(action, callbackOnAttackAnimationEnded)
     modelPlayerManager:doActionAttack(action)
-    modelTurnManager:doActionAttack(action)
+    modelTurnManager  :doActionAttack(action)
 end
 
 local function doActionJoinModelUnit(self, action)
-    getModelWarField(self):doActionJoinModelUnit(action, getModelPlayerManager(self))
+    getModelWarField(self):doActionJoinModelUnit(action)
 end
 
-local function doActionCapture(self, action)
+local function doActionCaptureModelTile(self, action)
     local modelWarField      = getModelWarField(self)
     local modelPlayerManager = getModelPlayerManager(self)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local callbackOnCaptureAnimationEnded
 
-    local lostPlayerIndex = action.lostPlayerIndex
     if (lostPlayerIndex) then
         local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
-        action.callbackOnCaptureAnimationEnded = function()
+        callbackOnCaptureAnimationEnded = function()
             modelWarField:clearPlayerForce(lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
@@ -209,8 +211,8 @@ local function doActionCapture(self, action)
         end
     end
 
-    modelWarField:doActionCapture(action)
-    modelPlayerManager:doActionCapture(action)
+    modelWarField     :doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
+    modelPlayerManager:doActionCaptureModelTile(action)
 end
 
 local function doActionLaunchSilo(self, action)
@@ -255,7 +257,7 @@ local function doAction(self, action)
     elseif (actionName == "Wait")                   then doActionWait(                  self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
-    elseif (actionName == "Capture")                then doActionCapture(               self, action)
+    elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     elseif (actionName == "LaunchSilo")             then doActionLaunchSilo(            self, action)
     elseif (actionName == "BuildModelTile")         then doActionBuildModelTile(        self, action)
     elseif (actionName == "ProduceModelUnitOnUnit") then doActionProduceModelUnitOnUnit(self, action)
@@ -335,10 +337,17 @@ local function initActorPlayerManager(self, playersData)
     self.m_ActorPlayerManager = actor
 end
 
+local function initActorWeatherManager(self, weatherData)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
+
+    self.m_ActorWeatherManager = actor
+end
+
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :getModelActionPlanner():setModelPlayerManager(getModelPlayerManager(self))
+        :setModelPlayerManager(getModelPlayerManager(self))
+        :setModelWeatherManager(getModelWeatherManager(self))
 
     self.m_ActorWarField = actor
 end
@@ -353,36 +362,28 @@ end
 
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-    actor:getModel():setModelPlayerManager(getModelPlayerManager(self))
-        :setModelWarField(self.m_ActorWarField:getModel())
-        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+        :setModelPlayerManager(getModelPlayerManager(self))
+        :setModelWarField(getModelWarField(self))
         :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorTurnManager = actor
-end
-
-local function initActorWeatherManager(self, weatherData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
-
-    self.m_ActorWeatherManager = actor
 end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    assert(type(sceneData) == "table", "ModelSceneWar:ctor() the param is invalid.")
-
     self.m_FileName   = sceneData.fileName
     self.m_IsWarEnded = sceneData.isEnded
 
     initScriptEventDispatcher(self)
     initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
+    initActorWeatherManager(  self, sceneData.weather)
     initActorWarField(        self, sceneData.warField)
     initActorWarHud(          self)
     initActorTurnManager(     self, sceneData.turn)
-    initActorWeatherManager(  self, sceneData.weather)
 
     if (self.m_View) then
         self:initView()
@@ -392,10 +393,8 @@ function ModelSceneWar:ctor(sceneData)
 end
 
 function ModelSceneWar:initView()
-    local view = self.m_View
-    assert(view, "ModelSceneWar:initView() no view is attached.")
-
-    view:setViewWarField(        self.m_ActorWarField        :getView())
+    assert(self.m_View, "ModelSceneWar:initView() no view is attached to the owner actor of the model.")
+    self.m_View:setViewWarField( self.m_ActorWarField        :getView())
         :setViewWarHud(          self.m_ActorWarHud          :getView())
         :setViewTurnManager(     self.m_ActorTurnManager     :getView())
         :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())

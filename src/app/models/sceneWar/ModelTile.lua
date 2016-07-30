@@ -53,6 +53,7 @@ local ModelTile = require("src.global.functions.class")("ModelTile")
 
 local TypeChecker           = require("src.app.utilities.TypeChecker")
 local TableFunctions        = require("src.app.utilities.TableFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
@@ -137,6 +138,14 @@ function ModelTile:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelTile:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelTile:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelPlayerManager", model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -167,6 +176,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelTile:doActionMoveModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
+
+    return self
+end
+
+function ModelTile:doActionDestroyModelUnit(action)
+    assert(GridIndexFunctions.isEqual(self:getGridIndex(), action.gridIndex))
+    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
+
+    return self
+end
+
 function ModelTile:doActionSurrender(action)
     if (self:getPlayerIndex() == action.lostPlayerIndex) then
         self:updateWithPlayerIndex(0)
@@ -175,54 +197,6 @@ function ModelTile:doActionSurrender(action)
     end
 
     self:updateView()
-
-    return self
-end
-
-function ModelTile:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionAttack(action, attacker, target)
-    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
-
-    return self
-end
-
-function ModelTile:doActionCapture(action, capturer, target)
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
-
-    return self
-end
-
-function ModelTile:doActionBuildModelTile(action, builder, target)
-    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
-
-    return self
-end
-
-function ModelTile:doActionWait(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
-
-    return self
-end
-
-function ModelTile:doActionSupplyModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionLoadModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionDropModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
 
     return self
 end
@@ -302,7 +276,7 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
         initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
-            CaptureTaker  = {currentCapturePoint = currentCapturePoint},
+            Capturable    = {currentCapturePoint = currentCapturePoint},
         })
         self:setRootScriptEventDispatcher(dispatcher)
     end

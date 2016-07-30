@@ -4,9 +4,11 @@ local Buildable = require("src.global.functions.class")("Buildable")
 local ComponentManager      = require("src.global.components.ComponentManager")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+Buildable.EXPORTED_METHODS = {
     "getCurrentBuildPoint",
     "getMaxBuildPoint",
+
+    "setCurrentBuildPoint",
 }
 
 --------------------------------------------------------------------------------
@@ -36,7 +38,7 @@ end
 
 function Buildable:loadInstantialData(data)
     assert(data.currentBuildPoint, "Buildable:loadInstantialData() the param data.currentBuildPoint is invalid.")
-    self.m_CurrentBuildPoint = data.currentBuildPoint
+    self:setCurrentBuildPoint(data.currentBuildPoint)
 
     return self
 end
@@ -56,31 +58,16 @@ function Buildable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function Buildable:onBind(target)
-    assert(self.m_Owner == nil, "Buildable:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function Buildable:onUnbind()
-    assert(self.m_Owner ~= nil, "Buildable:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
+function Buildable:doActionDestroyModelUnit(action)
+    self:setCurrentBuildPoint(self:getMaxBuildPoint())
+
+    return self.m_Owner
+end
+
 function Buildable:doActionSurrender(action)
-    self.m_CurrentBuildPoint = self:getMaxBuildPoint()
+    self:setCurrentBuildPoint(self:getMaxBuildPoint())
 
     return self
 end
@@ -89,28 +76,7 @@ function Buildable:doActionMoveModelUnit(action)
     if ((not action.launchUnitID)                                                   and
         (#action.path > 1)                                                          and
         (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
-        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
-    end
-
-    return self
-end
-
-function Buildable:doActionBuildModelTile(action, builder, target)
-    self.m_CurrentBuildPoint = math.max(self.m_CurrentBuildPoint - builder:getBuildAmount(), 0)
-    if (self.m_CurrentBuildPoint <= 0) then
-        local modelTile = self.m_Owner
-        local _, baseID = modelTile:getObjectAndBaseId()
-        modelTile:updateWithObjectAndBaseId(builder:getBuildTiledIdWithTileType(modelTile:getTileType()), baseID)
-    end
-
-    return self
-end
-
-function Buildable:doActionAttack(action, attacker, target)
-    local gridIndex = self.m_Owner:getGridIndex()
-    if ((isBuilderDestroyed(gridIndex, attacker))                           or
-        ((target.getUnitType) and (isBuilderDestroyed(gridIndex, target)))) then
-        self.m_CurrentBuildPoint = self:getMaxBuildPoint()
+        self:setCurrentBuildPoint(self:getMaxBuildPoint())
     end
 
     return self
@@ -125,6 +91,13 @@ end
 
 function Buildable:getMaxBuildPoint()
     return self.m_Template.maxBuildPoint
+end
+
+function Buildable:setCurrentBuildPoint(point)
+    assert((point >= 0) and (point <= self:getMaxBuildPoint()) and (math.floor(point) == point))
+    self.m_CurrentBuildPoint = point
+
+    return self.m_Owner
 end
 
 return Buildable

@@ -3,7 +3,7 @@ local MaterialOwner = require("src.global.functions.class")("MaterialOwner")
 
 local ComponentManager   = require("src.global.components.ComponentManager")
 
-local EXPORTED_METHODS = {
+MaterialOwner.EXPORTED_METHODS = {
     "getCurrentMaterial",
     "getMaxMaterial",
     "isMaterialInShort",
@@ -48,30 +48,9 @@ function MaterialOwner:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function MaterialOwner:onBind(target)
-    assert(self.m_Owner == nil, "MaterialOwner:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function MaterialOwner:onUnbind()
-    assert(self.m_Owner ~= nil, "MaterialOwner:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
-function MaterialOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
+function MaterialOwner:doActionJoinModelUnit(action, target)
     target:setCurrentMaterial(math.min(
         target:getMaxMaterial(),
         self:getCurrentMaterial() + target:getCurrentMaterial()

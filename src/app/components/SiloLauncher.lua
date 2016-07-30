@@ -5,7 +5,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
-local EXPORTED_METHODS = {
+SiloLauncher.EXPORTED_METHODS = {
     "canLaunchSiloOnTileType",
     "getTileObjectIdAfterLaunch",
 }
@@ -30,31 +30,10 @@ function SiloLauncher:loadInstantialData(data)
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function SiloLauncher:onBind(target)
-    assert(self.m_Owner == nil, "SiloLauncher:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function SiloLauncher:onUnbind()
-    assert(self.m_Owner ~= nil, "SiloLauncher:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function SiloLauncher:doActionLaunchSilo(action, modelUnitMap, modelTile)
-    modelTile:updateWithObjectAndBaseId(self:getTileObjectIdAfterLaunch())
+function SiloLauncher:doActionLaunchSilo(action, modelUnitMap, silo)
+    silo:updateWithObjectAndBaseId(self:getTileObjectIdAfterLaunch())
 
     local isWithinMap = GridIndexFunctions.isWithinMap
     local mapSize     = modelUnitMap:getMapSize()

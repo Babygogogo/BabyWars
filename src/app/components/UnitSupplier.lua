@@ -4,7 +4,7 @@ local UnitSupplier = require("src.global.functions.class")("UnitSupplier")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+UnitSupplier.EXPORTED_METHODS = {
     "canSupplyModelUnit",
 }
 
@@ -63,14 +63,6 @@ function UnitSupplier:ctor(param)
     return self
 end
 
-function UnitSupplier:loadTemplate(template)
-    return self
-end
-
-function UnitSupplier:loadInstantialData(data)
-    return self
-end
-
 function UnitSupplier:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "UnitSupplier:setRootScriptEventDispatcher() the dispatcher has been set.")
 
@@ -85,27 +77,6 @@ function UnitSupplier:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseSupplyUnit", self)
     self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function UnitSupplier:onBind(target)
-    assert(self.m_Owner == nil, "UnitSupplier:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function UnitSupplier:onUnbind()
-    assert(self.m_Owner ~= nil, "UnitSupplier:onUnbind() the component has not bound to a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
 
     return self
 end

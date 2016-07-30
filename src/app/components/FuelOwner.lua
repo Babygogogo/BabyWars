@@ -16,7 +16,7 @@ local TypeChecker        = require("src.app.utilities.TypeChecker")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local EXPORTED_METHODS = {
+FuelOwner.EXPORTED_METHODS = {
     "getCurrentFuel",
     "getMaxFuel",
     "getFuelConsumptionPerTurn",
@@ -117,27 +117,6 @@ function FuelOwner:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function FuelOwner:onBind(target)
-    assert(self.m_Owner == nil, "FuelOwner:onBind() the FuelOwner has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function FuelOwner:onUnbind()
-    assert(self.m_Owner, "FuelOwner:unbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function FuelOwner:onEvent(event)
@@ -157,7 +136,7 @@ function FuelOwner:doActionMoveModelUnit(action)
     return self
 end
 
-function FuelOwner:doActionJoinModelUnit(action, modelPlayerManager, target)
+function FuelOwner:doActionJoinModelUnit(action, target)
     target:setCurrentFuel(math.min(
         target:getMaxFuel(),
         self:getCurrentFuel() + target:getCurrentFuel()

@@ -24,6 +24,12 @@ local function setViewUnit(self, view, gridIndex)
     end
 end
 
+local function getViewUnit(self, gridIndex)
+    assert(GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize), "ViewUnitMap-getViewUnit() the param gridIndex is not within the map.")
+
+    return self.m_Map[gridIndex.x][gridIndex.y]
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -61,10 +67,18 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnitMap:addViewUnit(view, gridIndex)
-    assert(not self:getViewUnit(gridIndex), "ViewUnitMap:addViewUnit() there's a view in the gridIndex already.")
+    assert(not getViewUnit(self, gridIndex), "ViewUnitMap:addViewUnit() there's a view in the gridIndex already.")
 
     setViewUnit(self, view, gridIndex)
     self:addChild(view)
+
+    return self
+end
+
+function ViewUnitMap:removeViewUnit(gridIndex)
+    local view = getViewUnit(self, gridIndex)
+    setViewUnit(self, nil, gridIndex)
+    self:removeChild(view)
 
     return self
 end
@@ -77,18 +91,9 @@ function ViewUnitMap:addLoadedViewUnit(unitID, view)
     return self
 end
 
-function ViewUnitMap:getViewUnit(gridIndex)
-    assert(GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize), "ViewUnitMap:getViewUnit() the param gridIndex is not within the map.")
-
-    return self.m_Map[gridIndex.x][gridIndex.y]
-end
-
-function ViewUnitMap:removeViewUnit(gridIndex)
-    local view = self:getViewUnit(gridIndex)
-    assert(view, "ViewUnitMap:removeViewUnit() there's no view in the gridIndex.")
-
-    setViewUnit(self, nil, gridIndex)
-    self:removeChild(view)
+function ViewUnitMap:removeLoadedViewUnit(unitID)
+    self:removeChild(self.m_LoadedViewUnit[unitID])
+    self.m_LoadedViewUnit[unitID] = nil
 
     return self
 end
@@ -110,7 +115,7 @@ function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
         return
     end
 
-    local view1, view2 = self:getViewUnit(gridIndex1), self:getViewUnit(gridIndex2)
+    local view1, view2 = getViewUnit(self, gridIndex1), getViewUnit(self, gridIndex2)
     setViewUnit(self, view1, gridIndex2)
     setViewUnit(self, view2, gridIndex1)
 
@@ -118,7 +123,10 @@ function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
 end
 
 function ViewUnitMap:setViewUnitLoaded(gridIndex, unitID)
-    self.m_LoadedViewUnit[unitID] = self:getViewUnit(gridIndex)
+    local view = getViewUnit(self, gridIndex)
+    assert(view, "ViewUnitMap:setViewUnitLoaded() there's no view unit on the grid.")
+
+    self.m_LoadedViewUnit[unitID] = view
     self.m_Map[gridIndex.x][gridIndex.y] = nil
 
     return self

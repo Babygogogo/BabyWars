@@ -26,6 +26,20 @@ local function setStateIdle(self)
     self.m_State = "idle"
 end
 
+local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyModelUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtDestroyModelTile(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtDestroyModelTile",
+        gridIndex = gridIndex,
+    })
+end
+
 local function dispatchEvtDestroyViewUnit(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtDestroyViewUnit",
@@ -148,6 +162,22 @@ function ModelUnit:unsetRootScriptEventDispatcher()
     return self
 end
 
+function ModelUnit:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelUnit:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelPlayerManager", model)
+
+    return self
+end
+
+function ModelUnit:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "ModelUnit:setModelWeatherManager() the model has been set already.")
+    self.m_ModelWeatherManager = model
+    ComponentManager.callMethodForAllComponents(self, "setModelWeatherManager", model)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -190,6 +220,18 @@ function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
     return self
 end
 
+function ModelUnit:doActionDestroyModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
+
+    return self
+end
+
+function ModelUnit:doActionPromoteModelUnit(action)
+    ComponentManager.callMethodForAllComponents(self, "doActionPromoteModelUnit", action)
+
+    return self
+end
+
 function ModelUnit:doActionLaunchModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
 
@@ -203,7 +245,6 @@ end
 
 function ModelUnit:doActionWait(action)
     self:setStateActioned()
-
     ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
 
     if (self.m_View) then
@@ -216,48 +257,59 @@ function ModelUnit:doActionWait(action)
     return self
 end
 
-function ModelUnit:doActionAttack(action, attacker, target)
-    if (self == attacker) then
-        self:setStateActioned()
+function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attackTarget)
+
+    local shouldDestroySelf   = self:getCurrentHP() <= 0
+    local shouldDestroyTarget = attackTarget:getCurrentHP() <= 0
+    local selfGridIndex       = self:getGridIndex()
+    local targetGridIndex     = action.targetGridIndex
+    local isTargetUnit        = attackTarget.getUnitType
+    local dispatcher          = self.m_RootScriptEventDispatcher
+
+    if (shouldDestroySelf) then
+        attackTarget:doActionPromoteModelUnit()
+        dispatchEvtDestroyModelUnit(dispatcher, selfGridIndex)
     end
 
-    local shouldDestroyAttacker = attacker:getCurrentHP() <= (action.counterDamage or 0)
-    local shouldDestroyTarget   = target:getCurrentHP()   <= action.attackDamage
-    local eventDispatcher       = self.m_RootScriptEventDispatcher
+    if (shouldDestroyTarget) then
+        if (isTargetUnit) then
+            self:doActionPromoteModelUnit()
+            dispatchEvtDestroyModelUnit(dispatcher, targetGridIndex)
+        else
+            dispatchEvtDestroyModelTile(dispatcher, targetGridIndex)
+        end
+    end
 
-    ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attacker, target)
-
-    if ((self.m_View) and (self == attacker)) then
+    if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
+            attackTarget:updateView()
 
-            if (target.updateView) then
-                target:updateView()
-            end
-
-            if (shouldDestroyAttacker) then
-                dispatchEvtDestroyViewUnit(eventDispatcher, attacker:getGridIndex())
+            if (shouldDestroySelf) then
+                dispatchEvtDestroyViewUnit(dispatcher, selfGridIndex)
             elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
-                dispatchEvtAttackViewUnit(eventDispatcher, attacker:getGridIndex())
+                dispatchEvtAttackViewUnit(dispatcher, selfGridIndex)
             end
 
             if (shouldDestroyTarget) then
-                if (target.getUnitType) then
-                    dispatchEvtDestroyViewUnit(eventDispatcher, action.targetGridIndex)
+                if (isTargetUnit) then
+                    dispatchEvtDestroyViewUnit(dispatcher, targetGridIndex)
                 else
-                    dispatchEvtDestroyViewTile(eventDispatcher, action.targetGridIndex)
+                    dispatchEvtDestroyViewTile(dispatcher, targetGridIndex)
                 end
             else
-                if (target.getUnitType) then
-                    dispatchEvtAttackViewUnit(eventDispatcher, action.targetGridIndex)
+                if (isTargetUnit) then
+                    dispatchEvtAttackViewUnit(dispatcher, targetGridIndex)
                 else
-                    dispatchEvtAttackViewTile(eventDispatcher, action.targetGridIndex)
+                    dispatchEvtAttackViewTile(dispatcher, targetGridIndex)
                 end
             end
 
-            if (action.callbackOnAttackAnimationEnded) then
-                action.callbackOnAttackAnimationEnded()
+            if (callbackOnAttackAnimationEnded) then
+                callbackOnAttackAnimationEnded()
             end
         end)
     end
@@ -265,108 +317,26 @@ function ModelUnit:doActionAttack(action, attacker, target)
     return self
 end
 
-function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
-    self:setStateActioned()
-
-    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action, targetModelUnits)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-
-            local eventDispatcher = self.m_RootScriptEventDispatcher
-            for _, target in pairs(targetModelUnits) do
-                target:updateView()
-                eventDispatcher:dispatchEvent({
-                    name      = "EvtSupplyViewUnit",
-                    gridIndex = target:getGridIndex(),
-                })
-            end
-        end)
+function ModelUnit:doActionJoinModelUnit(action, target)
+    local joinIncome = self:getJoinIncome(target)
+    if (joinIncome ~= 0) then
+        local playerIndex = self:getPlayerIndex()
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(playerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtModelPlayerUpdated",
+            modelPlayer = modelPlayer,
+            playerIndex = playerIndex,
+        })
     end
 
-    return self
-end
-
-function ModelUnit:doActionLoadModelUnit(action, focusUnitID, loaderModelUnit)
-    if (self:getUnitId() == focusUnitID) then
-        self:setStateActioned()
-    end
-
-    ComponentManager.callMethodForAllComponents(self, "doActionLoadModelUnit", action, focusUnitID, loaderModelUnit)
-
-    if ((self:getUnitId() == focusUnitID) and (self.m_View)) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-                :setVisible(false)
-            loaderModelUnit:updateView()
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
-    self:setStateActioned()
-    for _, dropActorUnit in pairs(dropActorUnits) do
-        dropActorUnit:getModel():setStateActioned()
-    end
-
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, dropActorUnits)
-
-    if (self.m_View) then
-        local path                  = action.path
-        local loaderEndingGridIndex = path[#path]
-
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-
-            for _, dropActorUnit in ipairs(dropActorUnits) do
-                local dropModelUnit = dropActorUnit:getModel()
-                local dropViewUnit  = dropActorUnit:getView()
-                dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
-                    dropViewUnit:updateWithModelUnit(dropModelUnit)
-                        :showNormalAnimation()
-                end)
-            end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionCapture(action, capturer, target)
-    self:setStateActioned()
-
-    ComponentManager.callMethodForAllComponents(self, "doActionCapture", action, capturer, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            target:updateView()
-
-            if (action.callbackOnCaptureAnimationEnded) then
-                action.callbackOnCaptureAnimationEnded()
-            end
-        end)
-    end
-
-    return self
-end
-
-function ModelUnit:doActionJoinModelUnit(action, modelPlayerManager, target)
     target:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, modelPlayerManager, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
+    self:unsetRootScriptEventDispatcher()
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:removeFromParent()
-            self:unsetRootScriptEventDispatcher()
-
             target:updateView()
         end)
     end
@@ -374,15 +344,34 @@ function ModelUnit:doActionJoinModelUnit(action, modelPlayerManager, target)
     return self
 end
 
-function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
+function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, modelTile)
+    ComponentManager.callMethodForAllComponents(self, "doActionCaptureModelTile", action, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
-            modelTile:updateView()
+            target:updateView()
+
+            if (callbackOnCaptureAnimationEnded) then
+                callbackOnCaptureAnimationEnded()
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionLaunchSilo(action, modelUnitMap, silo)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, silo)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+            silo:updateView()
 
             local dispatcher  = self.m_RootScriptEventDispatcher
             local mapSize     = modelUnitMap:getMapSize()
@@ -406,9 +395,9 @@ function ModelUnit:doActionLaunchSilo(action, modelUnitMap, modelTile)
     return self
 end
 
-function ModelUnit:doActionBuildModelTile(action, builder, target)
+function ModelUnit:doActionBuildModelTile(action, target)
     self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, builder, target)
+    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, target)
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
@@ -435,12 +424,102 @@ function ModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
     return self
 end
 
+function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
+    self:setStateActioned()
+    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action, targetModelUnits)
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            local eventDispatcher = self.m_RootScriptEventDispatcher
+            for _, target in pairs(targetModelUnits) do
+                target:updateView()
+                eventDispatcher:dispatchEvent({
+                    name      = "EvtSupplyViewUnit",
+                    gridIndex = target:getGridIndex(),
+                })
+            end
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionLoadModelUnit(action, loader)
+    self:setStateActioned()
+    -- Attention! We should be invoking the doActionLoadModelUnit methods for the loader rather than self.
+    ComponentManager.callMethodForAllComponents(loader, "doActionLoadModelUnit", action, self:getUnitId())
+
+    if (self.m_View) then
+        self.m_View:moveAlongPath(action.path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+                :setVisible(false)
+            loader:updateView()
+        end)
+    end
+
+    return self
+end
+
+function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
+    self:setStateActioned()
+    for _, dropActorUnit in ipairs(dropActorUnits) do
+        dropActorUnit:getModel():setStateActioned()
+    end
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
+
+    if (self.m_View) then
+        local path                  = action.path
+        local loaderEndingGridIndex = path[#path]
+
+        self.m_View:moveAlongPath(path, function()
+            self.m_View:updateWithModelUnit(self)
+                :showNormalAnimation()
+
+            for _, dropActorUnit in ipairs(dropActorUnits) do
+                local dropModelUnit = dropActorUnit:getModel()
+                local dropViewUnit  = dropActorUnit:getView()
+                dropViewUnit:moveAlongPath({
+                        loaderEndingGridIndex,
+                        dropModelUnit:getGridIndex(),
+                    },
+                    function()
+                        dropViewUnit:updateWithModelUnit(dropModelUnit)
+                            :showNormalAnimation()
+                    end
+                )
+            end
+        end)
+    end
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnit:updateView()
     if (self.m_View) then
         self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
+function ModelUnit:showNormalAnimation()
+    if (self.m_View) then
+        self.m_View:showNormalAnimation()
+    end
+
+    return self
+end
+
+function ModelUnit:showMovingAnimation()
+    if (self.m_View) then
+        self.m_View:showMovingAnimation()
     end
 
     return self
@@ -468,22 +547,6 @@ function ModelUnit:setStateActioned()
     return self
 end
 
-function ModelUnit:showNormalAnimation()
-    if (self.m_View) then
-        self.m_View:showNormalAnimation()
-    end
-
-    return self
-end
-
-function ModelUnit:showMovingAnimation()
-    if (self.m_View) then
-        self.m_View:showMovingAnimation()
-    end
-
-    return self
-end
-
 function ModelUnit:getUnitType()
     return GameConstantFunctions.getUnitTypeWithTiledId(self:getTiledID())
 end
@@ -498,25 +561,6 @@ end
 
 function ModelUnit:getVision()
     return self.m_Template.vision
-end
-
-function ModelUnit:getProductionCost()
-    return self.m_Template.cost
-end
-
-function ModelUnit:canJoinModelUnit(rhsUnitModel)
-    if (self:getTiledID() ~= rhsUnitModel:getTiledID()) then
-        return false
-    end
-
-    for _, component in pairs(ComponentManager.getAllComponents(self)) do
-        if ((component.canJoinModelUnit)                    and
-            (not component:canJoinModelUnit(rhsUnitModel))) then
-            return false
-        end
-    end
-
-    return true
 end
 
 function ModelUnit:canDoAction(playerIndex)

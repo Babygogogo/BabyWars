@@ -40,7 +40,7 @@ function AttackableGridListFunctions.getListNode(list, gridIndex)
     return nil
 end
 
-function AttackableGridListFunctions.createList(attacker, attackerGridIndex, modelTileMap, modelUnitMap)
+function AttackableGridListFunctions.createList(attacker, attackerGridIndex, modelTileMap, modelUnitMap, weatherType)
     if ((not attacker.canAttackTarget) or
        ((not attacker:canAttackAfterMove()) and (not GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)))) then
         return {}
@@ -54,7 +54,7 @@ function AttackableGridListFunctions.createList(attacker, attackerGridIndex, mod
         else
             local targetTile = modelTileMap:getModelTile(targetGridIndex)
             local target = modelUnitMap:getModelUnit(targetGridIndex) or targetTile
-            targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage = attacker:getEstimatedBattleDamage(attackerTile, target, targetTile, modelPlayerManager, weather)
+            targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage = attacker:getEstimatedBattleDamage(attackerTile, target, targetTile, weatherType)
 
             return true
         end

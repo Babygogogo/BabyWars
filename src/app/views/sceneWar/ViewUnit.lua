@@ -53,8 +53,8 @@ local function createActionMoveAlongPath(self, path, callback)
 end
 
 local function getLevelIndicatorFrame(unit)
-    if ((unit.getLevel) and (unit:getLevel() > 0)) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getLevel() .. ".png")
+    if ((unit.getCurrentPromotion) and (unit:getCurrentPromotion() > 0)) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getCurrentPromotion() .. ".png")
     else
         return nil
     end
@@ -85,7 +85,7 @@ local function getSubmergedIndicatorFrame(unit)
 end
 
 local function getCaptureIndicatorFrame(unit)
-    if ((unit.isCapturing) and (unit:isCapturing())) then
+    if ((unit.isCapturingModelTile) and (unit:isCapturingModelTile())) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s04_f0" .. unit:getPlayerIndex() .. ".png")
     else
         return nil

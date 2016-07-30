@@ -52,17 +52,11 @@ local function requireMapData(param)
 end
 
 local function getTiledTileBaseLayer(tiledData)
-    local layer = tiledData.layers[1]
-    assert(layer, "ModelTileMap-getTiledTileBaseLayer() the param tiledData has no tile base layer.")
-
-    return layer
+    return tiledData.layers[1]
 end
 
 local function getTiledTileObjectLayer(tiledData)
-    local layer = tiledData.layers[2]
-    assert(layer, "ModelTileMap-getTiledTileObjectLayer() the param tiledData has no tile object layer.")
-
-    return layer
+    return tiledData.layers[2]
 end
 
 local function createEmptyMap(width)
@@ -114,29 +108,20 @@ local function onEvtDestroyViewTile(self, event)
     self:getModelTile(event.gridIndex):destroyViewTileObject()
 end
 
+local function onEvtDestroyModelUnit(self, event)
+    self:getModelTile(event.gridIndex):doActionDestroyModelUnit(event)
+end
+
 --------------------------------------------------------------------------------
 -- The composition tile actors map.
 --------------------------------------------------------------------------------
-local function createTileActorsMapWithTemplate(mapData)
+local function createTileActorsMap(param)
+    local mapData         = requireMapData(param)
     local templateMapData = requireMapData(mapData.template)
-    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
+    local map, mapSize    = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
     updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
     return map, mapSize, mapData.template
-end
-
-local function createTileActorsMapWithoutTemplate(mapData)
-    local map, mapSize = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(mapData), getTiledTileBaseLayer(mapData))
-    updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
-
-    return map, mapSize
-end
-
-local function createTileActorsMap(param)
-    local mapData = requireMapData(param)
-    -- The data for a tile map that contains no template is too large, so it's forbidden.
-    assert(mapData.template, "ModelTileMap-createTileActorsMap() the param contains no template.")
-    return createTileActorsMapWithTemplate(mapData)
 end
 
 local function initWithTileActorsMap(self, map, mapSize, templateName)
@@ -178,7 +163,8 @@ function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelTile", self)
-        :addEventListener("EvtDestroyViewTile", self)
+        :addEventListener("EvtDestroyViewTile",  self)
+        :addEventListener("EvtDestroyModelUnit", self)
 
     self:forEachModelTile(function(modelTile)
         modelTile:setRootScriptEventDispatcher(dispatcher)
@@ -190,12 +176,21 @@ end
 function ModelTileMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyViewTile",  self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyModelUnit", self)
+        :removeEventListener("EvtDestroyViewTile",  self)
         :removeEventListener("EvtDestroyModelTile", self)
     self.m_RootScriptEventDispatcher = nil
 
     self:forEachModelTile(function(modelTile)
         modelTile:unsetRootScriptEventDispatcher()
+    end)
+
+    return self
+end
+
+function ModelTileMap:setModelPlayerManager(model)
+    self:forEachModelTile(function(modelTile)
+        modelTile:setModelPlayerManager(model)
     end)
 
     return self
@@ -223,6 +218,7 @@ function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
     elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
+    elseif (eventName == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
     end
 
     return self
@@ -248,68 +244,51 @@ function ModelTileMap:doActionSurrender(action)
     return self
 end
 
-function ModelTileMap:doActionAttack(action, attacker, target)
+function ModelTileMap:doActionMoveModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionAttack(action, attacker, target)
-    self:getModelTile(action.targetGridIndex):doActionAttack(action, attacker, target)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelTileMap:doActionCapture(action, capturer, target)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    target:doActionCapture(action, capturer, target)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelTileMap:doActionBuildModelTile(action, builder, target)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    target:doActionBuildModelTile(action, builder, target)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
 
 function ModelTileMap:doActionWait(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionWait(action)
+    return self:doActionMoveModelUnit(action)
+end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+function ModelTileMap:doActionAttack(action)
+    return self:doActionMoveModelUnit(action)
+end
 
-    return self
+function ModelTileMap:doActionJoinModelUnit(action)
+    return self:doActionMoveModelUnit(action)
+end
+
+function ModelTileMap:doActionCaptureModelTile(action)
+    return self:doActionMoveModelUnit(action)
+end
+
+function ModelTileMap:doActionLaunchSilo(action)
+    return self:doActionMoveModelUnit(action)
+end
+
+function ModelTileMap:doActionBuildModelTile(action)
+    return self:doActionMoveModelUnit(action)
+end
+
+function ModelTileMap:doActionProduceModelUnitOnUnit(action)
+    return self:doActionMoveModelUnit(action)
 end
 
 function ModelTileMap:doActionSupplyModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionSupplyModelUnit(action)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
+    return self:doActionMoveModelUnit(action)
 end
 
 function ModelTileMap:doActionLoadModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionLoadModelUnit(action)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
+    return self:doActionMoveModelUnit(action)
 end
 
 function ModelTileMap:doActionDropModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionDropModelUnit(action)
-
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
+    return self:doActionMoveModelUnit(action)
 end
 
 --------------------------------------------------------------------------------

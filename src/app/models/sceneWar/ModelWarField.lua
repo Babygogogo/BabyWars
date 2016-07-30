@@ -19,23 +19,8 @@ local ModelWarField = require("src.global.functions.class")("ModelWarField")
 local Actor              = require("src.global.actors.Actor")
 local TypeChecker        = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local TableFunctions     = require("src.app.utilities.TableFunctions")
 
 local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function requireFieldData(param)
-    local t = type(param)
-    if (t == "table") then
-        return param
-    elseif (t == "string") then
-        return require("data.warField." .. param)
-    else
-        return nil
-    end
-end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -76,9 +61,9 @@ end
 
 local function initActorActionPlanner(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
-
     actor:getModel():setModelTileMap(self:getModelTileMap())
         :setModelUnitMap(self:getModelUnitMap())
+
     self.m_ActorActionPlanner = actor
 end
 
@@ -97,16 +82,13 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelWarField:ctor(param)
-    local warFieldData = requireFieldData(param)
-    assert(TypeChecker.isWarFieldData(warFieldData))
-
+function ModelWarField:ctor(warFieldData)
     initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
     if (not IS_SERVER) then
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
-        initActorGridEffect(self)
+        initActorGridEffect(   self)
     end
 
     assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
@@ -119,16 +101,14 @@ function ModelWarField:ctor(param)
 end
 
 function ModelWarField:initView()
-    local view = self.m_View
-    assert(TypeChecker.isView(view))
+    assert(self.m_View, "ModelWarField:initView() no view is attached to the owner actor of the model.")
+    self.m_View:setViewTileMap(self.m_ActorTileMap      :getView())
+        :setViewUnitMap(       self.m_ActorUnitMap      :getView())
+        :setViewActionPlanner( self.m_ActorActionPlanner:getView())
+        :setViewMapCursor(     self.m_ActorMapCursor    :getView())
+        :setViewGridEffect(    self.m_ActorGridEffect   :getView())
 
-    view:setViewTileMap(      self.m_ActorTileMap:getView())
-        :setViewUnitMap(      self.m_ActorUnitMap:getView())
-        :setViewActionPlanner(self.m_ActorActionPlanner:getView())
-        :setViewMapCursor(    self.m_ActorMapCursor:getView())
-        :setViewGridEffect(   self.m_ActorGridEffect:getView())
-
-        :setContentSizeWithMapSize(self.m_ActorTileMap:getModel():getMapSize())
+        :setContentSizeWithMapSize(self:getModelTileMap():getMapSize())
 
     return self
 end
@@ -136,12 +116,12 @@ end
 function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
-    self.m_ActorTileMap:getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorUnitMap:getModel():setRootScriptEventDispatcher(dispatcher)
+    self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
+    self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
         self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorGridEffect:getModel():setRootScriptEventDispatcher(dispatcher)
+        self.m_ActorGridEffect   :getModel():setRootScriptEventDispatcher(dispatcher)
     end
 
     self.m_RootScriptEventDispatcher = dispatcher
@@ -155,18 +135,34 @@ end
 function ModelWarField:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_ActorTileMap:getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorUnitMap:getModel():unsetRootScriptEventDispatcher()
+    self:getModelTileMap():unsetRootScriptEventDispatcher()
+    self:getModelUnitMap():unsetRootScriptEventDispatcher()
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
         self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorGridEffect:getModel():unsetRootScriptEventDispatcher()
+        self.m_ActorGridEffect   :getModel():unsetRootScriptEventDispatcher()
     end
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
         :removeEventListener("EvtZoomFieldWithScroll", self)
         :removeEventListener("EvtDragField",           self)
     self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
+function ModelWarField:setModelPlayerManager(model)
+    self:getModelUnitMap():setModelPlayerManager(model)
+    self:getModelTileMap():setModelPlayerManager(model)
+    if (not IS_SERVER) then
+        self.m_ActorActionPlanner:getModel():setModelPlayerManager(model)
+    end
+
+    return self
+end
+
+function ModelWarField:setModelWeatherManager(model)
+    self:getModelUnitMap():setModelWeatherManager(model)
 
     return self
 end
@@ -222,65 +218,62 @@ function ModelWarField:doActionWait(action)
     return self
 end
 
-function ModelWarField:doActionAttack(action)
+function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
     local modelUnitMap    = self:getModelUnitMap()
     local modelTileMap    = self:getModelTileMap()
     local targetGridIndex = action.targetGridIndex
-    local target          = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
-    local attacker        = (action.launchUnitID)                        and
-        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
-        (modelUnitMap:getModelUnit(action.path[1]))
+    local attackTarget    = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
 
-    modelUnitMap:doActionAttack(action, attacker, target)
-    modelTileMap:doActionAttack(action, attacker, target)
+    modelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
+    modelTileMap:doActionAttack(action, attackTarget)
 
     return self
 end
 
-function ModelWarField:doActionJoinModelUnit(action, modelPlayerManager)
-    self:getModelUnitMap():doActionJoinModelUnit(action, modelPlayerManager, self:getModelTileMap())
+function ModelWarField:doActionJoinModelUnit(action)
+    self:getModelUnitMap():doActionJoinModelUnit(action)
+    self:getModelTileMap():doActionJoinModelUnit(action)
 
     return self
 end
 
-function ModelWarField:doActionCapture(action)
+function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
     local target       = modelTileMap:getModelTile(path[#path])
-    local capturer     = (action.launchUnitID)                           and
-        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
-        (modelUnitMap:getModelUnit(path[1]))
 
-    modelUnitMap:doActionCapture(action, capturer, target)
-    modelTileMap:doActionCapture(action, capturer, target)
+    modelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
+    modelTileMap:doActionCaptureModelTile(action, target)
 
     return self
 end
 
 function ModelWarField:doActionLaunchSilo(action)
-    self:getModelUnitMap():doActionLaunchSilo(action, self:getModelTileMap())
+    local modelTileMap = self:getModelTileMap()
+    local path         = action.path
+    local silo         = modelTileMap:getModelTile(path[#path])
+
+    self:getModelUnitMap():doActionLaunchSilo(action, silo)
+    modelTileMap          :doActionLaunchSilo(action)
 
     return self
 end
 
 function ModelWarField:doActionBuildModelTile(action)
-    local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
     local target       = modelTileMap:getModelTile(path[#path])
-    local builder      = (action.launchUnitID)                           and
-        (modelUnitMap:getLoadedModelUnitWithUnitId(action.launchUnitID)) or
-        (modelUnitMap:getModelUnit(path[1]))
 
-    modelUnitMap:doActionBuildModelTile(action, builder, target)
-    modelTileMap:doActionBuildModelTile(action, builder, target)
+    self:getModelUnitMap():doActionBuildModelTile(action, target)
+    modelTileMap          :doActionBuildModelTile(action)
 
     return self
 end
 
 function ModelWarField:doActionProduceModelUnitOnUnit(action)
     self:getModelUnitMap():doActionProduceModelUnitOnUnit(action)
+    self:getModelTileMap():doActionProduceModelUnitOnUnit(action)
 
     return self
 end
@@ -321,10 +314,6 @@ end
 
 function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
-end
-
-function ModelWarField:getModelActionPlanner()
-    return self.m_ActorActionPlanner:getModel()
 end
 
 function ModelWarField:clearPlayerForce(playerIndex)

@@ -5,7 +5,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
-local EXPORTED_METHODS = {
+TileBuilder.EXPORTED_METHODS = {
     "isBuildingModelTile",
     "canBuildOnTileType",
     "getBuildAmount",
@@ -33,6 +33,13 @@ function TileBuilder:loadInstantialData(data)
     return self
 end
 
+function TileBuilder:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "TileBuilder:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -47,27 +54,6 @@ function TileBuilder:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on ComponentManager.bindComponent()/unbindComponent().
---------------------------------------------------------------------------------
-function TileBuilder:onBind(target)
-    assert(self.m_Owner == nil, "TileBuilder:onBind() the component has already bound a target.")
-
-    ComponentManager.setMethods(target, self, EXPORTED_METHODS)
-    self.m_Owner = target
-
-    return self
-end
-
-function TileBuilder:onUnbind()
-    assert(self.m_Owner ~= nil, "TileBuilder:onUnbind() the component has not bound a target.")
-
-    ComponentManager.unsetMethods(self.m_Owner, EXPORTED_METHODS)
-    self.m_Owner = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function TileBuilder:doActionMoveModelUnit(action)
@@ -78,12 +64,16 @@ function TileBuilder:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function TileBuilder:doActionBuildModelTile(action, builder, target)
-    self.m_IsBuilding = (self:getBuildAmount() < target:getCurrentBuildPoint())
-
-    local owner = self.m_Owner
-    if (not self.m_IsBuilding) then
+function TileBuilder:doActionBuildModelTile(action, target)
+    local owner      = self.m_Owner
+    local buildPoint = target:getCurrentBuildPoint() - self:getBuildAmount()
+    if (buildPoint > 0) then
+        self.m_IsBuilding = true
+        target:setCurrentBuildPoint(buildPoint)
+    else
+        self.m_IsBuilding = false
         owner:setCurrentMaterial(owner:getCurrentMaterial() - 1)
+        target:updateWithObjectAndBaseId(self:getBuildTiledIdWithTileType(target:getTileType()))
     end
 
     return owner
@@ -101,6 +91,7 @@ function TileBuilder:canBuildOnTileType(tileType)
 end
 
 function TileBuilder:getBuildAmount()
+    -- TODO: take the player skills into account.
     return self.m_Owner:getNormalizedCurrentHP()
 end
 
