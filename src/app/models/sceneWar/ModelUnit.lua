@@ -466,27 +466,31 @@ end
 
 function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
     self:setStateActioned()
-    for _, dropActorUnit in pairs(dropActorUnits) do
+    for _, dropActorUnit in ipairs(dropActorUnits) do
         dropActorUnit:getModel():setStateActioned()
     end
-
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action, dropActorUnits)
+    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
 
     if (self.m_View) then
         local path                  = action.path
         local loaderEndingGridIndex = path[#path]
 
-        self.m_View:moveAlongPath(action.path, function()
+        self.m_View:moveAlongPath(path, function()
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
             for _, dropActorUnit in ipairs(dropActorUnits) do
                 local dropModelUnit = dropActorUnit:getModel()
                 local dropViewUnit  = dropActorUnit:getView()
-                dropViewUnit:moveAlongPath({loaderEndingGridIndex, dropModelUnit:getGridIndex()}, function()
-                    dropViewUnit:updateWithModelUnit(dropModelUnit)
-                        :showNormalAnimation()
-                end)
+                dropViewUnit:moveAlongPath({
+                        loaderEndingGridIndex,
+                        dropModelUnit:getGridIndex(),
+                    },
+                    function()
+                        dropViewUnit:updateWithModelUnit(dropModelUnit)
+                            :showNormalAnimation()
+                    end
+                )
             end
         end)
     end

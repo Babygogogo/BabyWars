@@ -201,12 +201,6 @@ function ModelTile:doActionSurrender(action)
     return self
 end
 
-function ModelTile:doActionDropModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionDropModelUnit", action)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

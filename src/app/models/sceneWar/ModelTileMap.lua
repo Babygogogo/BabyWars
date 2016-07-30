@@ -328,8 +328,6 @@ end
 
 function ModelTileMap:doActionDropModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-        :doActionDropModelUnit(action)
-
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self

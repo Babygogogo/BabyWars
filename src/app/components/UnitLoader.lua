@@ -36,6 +36,7 @@ local function getRemainingUnitIdsOnDrop(currentList, dropDestinations)
         end
     end
 
+    assert(#currentList == #dropDestinations + #remainingUnitIds)
     return remainingUnitIds
 end
 
@@ -162,18 +163,8 @@ function UnitLoader:doActionLoadModelUnit(action, unitID)
     return self.m_Owner
 end
 
-function UnitLoader:doActionDropModelUnit(action, dropActorUnits)
-    local dropDestinations = action.dropDestinations
+function UnitLoader:doActionDropModelUnit(action)
     self.m_LoadedUnitIds   = getRemainingUnitIdsOnDrop(self:getLoadUnitIdList(), action.dropDestinations)
-
-    for _, dropActorUnit in pairs(dropActorUnits) do
-        local dropModelUnit = dropActorUnit:getModel()
-        for _, dropDestination in pairs(dropDestinations) do
-            if (dropModelUnit:getUnitId() == dropDestination.unitID) then
-                dropModelUnit:setGridIndex(dropDestination.gridIndex)
-            end
-        end
-    end
 
     return self.m_Owner
 end

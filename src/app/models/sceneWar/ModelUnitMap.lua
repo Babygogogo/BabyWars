@@ -480,8 +480,8 @@ function ModelUnitMap:doActionSupplyModelUnit(action)
 end
 
 function ModelUnitMap:doActionLoadModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
+    local launchUnitID   = action.launchUnitID
+    local path           = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
     local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
@@ -499,33 +499,29 @@ function ModelUnitMap:doActionLoadModelUnit(action)
 end
 
 function ModelUnitMap:doActionDropModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
+    local launchUnitID   = action.launchUnitID
+    local path           = action.path
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit
+    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
     if (launchUnitID) then
-        focusModelUnit = self:getLoadedModelUnitWithUnitId(launchUnitID)
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
         setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
     else
-        focusModelUnit = self:getModelUnit(beginningGridIndex)
         swapActorUnit(self, beginningGridIndex, endingGridIndex)
     end
 
     local dropActorUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
-        local unitID    = dropDestination.unitID
         local gridIndex = dropDestination.gridIndex
-        local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
-        local modelUnit = actorUnit:getModel()
+        setActorUnitUnloaded(self, dropDestination.unitID, gridIndex)
 
-        dropActorUnits[#dropActorUnits + 1] = actorUnit
-        setActorUnitUnloaded(self, unitID, gridIndex)
+        local dropActorUnit = getActorUnit(self, gridIndex)
+        dropActorUnit:getModel():setGridIndex(gridIndex, false)
+        dropActorUnits[#dropActorUnits + 1] = dropActorUnit
     end
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-        :doActionDropModelUnit(action, dropActorUnits)
+    focusModelUnit:doActionDropModelUnit(action, dropActorUnits)
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
@@ -584,6 +580,7 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
             list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
         end
 
+        assert(#list == loaderModelUnit:getCurrentLoadCount())
         return list
     end
 end
