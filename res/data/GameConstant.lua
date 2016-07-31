@@ -35,6 +35,7 @@ GameConstant.indexesForTileOrUnit = {
     {name = "Seaport",         firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
     {name = "TempAirport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
     {name = "TempSeaport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
+    {name = "RedPlasma",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
 
     {name = "Infantry",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
     {name = "Mech",            firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
@@ -92,6 +93,7 @@ GameConstant.tileAnimations = {
     Seaport      = {typeIndex = 25, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
     TempAirport  = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
     TempSeaport  = {typeIndex = 27, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
+    RedPlasma    = {typeIndex = 28, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
 }
 
 GameConstant.unitAnimations = {
@@ -1028,6 +1030,26 @@ GameConstant.templateModelTiles = {
     },
 
     Plasma = {
+        GridIndexable = {},
+
+        DefenseBonusProvider = {
+            amount         = 0,
+            targetCategoryType = "None",
+        },
+
+        MoveCostOwner = {
+            Infantry  = false,
+            Mech      = false,
+            TireA     = false,
+            TireB     = false,
+            Tank      = false,
+            Air       = false,
+            Ship      = false,
+            Transport = false,
+        },
+    },
+
+    RedPlasma = {
         GridIndexable = {},
 
         DefenseBonusProvider = {
