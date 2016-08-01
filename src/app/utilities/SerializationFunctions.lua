@@ -1,7 +1,8 @@
 
 local SerializationFunctions = {}
 
-local INDENT_SPACES = " "
+local INDENT_SPACES             = " "
+local ERROR_MESSAGE_DEPTH_LIMIT = 2
 
 function SerializationFunctions.toString(o, spaces)
     spaces = spaces or ""
@@ -67,6 +68,32 @@ function SerializationFunctions.appendToFile(o, spaces, file)
         file:write(spaces, "}")
     else
         error("SerializationFunctions.appendToFile() cannot serialize a key with type " .. keyType)
+    end
+end
+
+function SerializationFunctions.toErrorMessage(o, depth)
+    local t = type(o)
+    if     (t == "number")  then return "" .. o
+    elseif (t == "string")  then return o
+    elseif (t == "boolean") then return (o) and ("true") or ("false")
+    elseif (t == "table")   then
+        depth = depth or 1
+        if (depth > ERROR_MESSAGE_DEPTH_LIMIT) then
+            return "table"
+        else
+            local strList = {"{"}
+            for k, v in pairs(o) do
+                strList[#strList + 1] = string.format("%s=%s, ",
+                    SerializationFunctions.toErrorMessage(k, depth + 1),
+                    SerializationFunctions.toErrorMessage(v, depth + 1)
+                )
+            end
+            strList[#strList + 1] = "}"
+
+            return table.concat(strList)
+        end
+    else
+        return t
     end
 end
 
