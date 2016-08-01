@@ -2,8 +2,8 @@
 local templateWarFieldPath = "res.data.templateWarField."
 
 return {
-    Chessboard       = require(templateWarFieldPath .. "Chessboard")      .warFieldName,
-    EqualIsland      = require(templateWarFieldPath .. "EqualIsland")     .warFieldName,
+    JiangQi          = require(templateWarFieldPath .. "JiangQi")         .warFieldName,
+    DuiChenDaoYu     = require(templateWarFieldPath .. "DuiChenDaoYu")    .warFieldName,
     FullTest         = require(templateWarFieldPath .. "FullTest")        .warFieldName,
     HuanXingShanMai  = require(templateWarFieldPath .. "HuanXingShanMai") .warFieldName,
     ChaZuoShanMai    = require(templateWarFieldPath .. "ChaZuoShanMai")   .warFieldName,
