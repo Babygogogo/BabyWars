@@ -3,18 +3,8 @@ return {
   authorName   = "Babygogogo",
   playersCount = 2,
 
-  version = "1.1",
-  luaversion = "5.1",
-  tiledversion = "0.15.0",
-  orientation = "orthogonal",
-  renderorder = "right-down",
   width = 8,
   height = 7,
-  tilewidth = 24,
-  tileheight = 24,
-  nextobjectid = 1,
-  properties = {},
-
   layers = {
     {
       type = "tilelayer",
@@ -82,7 +72,7 @@ return {
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 156
+        0, 0, 0, 0, 0, 0, 0, 157
       }
     }
   }
