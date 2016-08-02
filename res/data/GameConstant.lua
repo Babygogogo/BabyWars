@@ -694,11 +694,12 @@ GameConstant.categories = {
     }
 }
 
-GameConstant.maxCapturePoint = 20
-GameConstant.maxBuildPoint   = 20
-GameConstant.unitMaxHP       = 100
-GameConstant.tileMaxHP       = 99
-GameConstant.incomePerTurn   = 1000
+GameConstant.maxCapturePoint         = 20
+GameConstant.maxBuildPoint           = 20
+GameConstant.unitMaxHP               = 100
+GameConstant.tileMaxHP               = 99
+GameConstant.incomePerTurn           = 1000
+GameConstant.commandTowerAttackBonus = 8
 
 GameConstant.maxPromotion   = 3
 GameConstant.promotionBonus = {

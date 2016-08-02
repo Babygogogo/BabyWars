@@ -14,18 +14,7 @@
 local AttackableGridListFunctions = {}
 
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-
-local function canAttackTargetOnGridIndex(attacker, attackerGridIndex, targetGridIndex, modelTileMap, modelUnitMap)
-    if (not GridIndexFunctions.isWithinMap(targetGridIndex, modelTileMap:getMapSize())) then
-        return false
-    end
-
-    if (attacker:canAttackTarget(attackerGridIndex, modelUnitMap:getModelUnit(targetGridIndex), targetGridIndex)) then
-        return true
-    else
-        return attacker:canAttackTarget(attackerGridIndex, modelTileMap:getModelTile(targetGridIndex), targetGridIndex)
-    end
-end
+local isWithinMap        = GridIndexFunctions.isWithinMap
 
 --------------------------------------------------------------------------------
 -- The public functions.
@@ -40,23 +29,23 @@ function AttackableGridListFunctions.getListNode(list, gridIndex)
     return nil
 end
 
-function AttackableGridListFunctions.createList(attacker, attackerGridIndex, modelTileMap, modelUnitMap, weatherType)
-    if ((not attacker.canAttackTarget) or
-       ((not attacker:canAttackAfterMove()) and (not GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)))) then
+function AttackableGridListFunctions.createList(attacker, attackerGridIndex, modelTileMap, modelUnitMap)
+    if ((not attacker.getEstimatedBattleDamage)                                                                                 or
+        ((not attacker:canAttackAfterMove()) and (not GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)))) then
         return {}
     end
 
+    local mapSize            = modelTileMap:getMapSize()
     local minRange, maxRange = attacker:getAttackRangeMinMax()
-    local attackerTile = modelTileMap:getModelTile(attackerGridIndex)
     return GridIndexFunctions.getGridsWithinDistance(attackerGridIndex, minRange, maxRange, function(targetGridIndex)
-        if (not canAttackTargetOnGridIndex(attacker, attackerGridIndex, targetGridIndex, modelTileMap, modelUnitMap)) then
+        if (not isWithinMap(targetGridIndex, mapSize)) then
             return false
         else
             local targetTile = modelTileMap:getModelTile(targetGridIndex)
-            local target = modelUnitMap:getModelUnit(targetGridIndex) or targetTile
-            targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage = attacker:getEstimatedBattleDamage(attackerTile, target, targetTile, weatherType)
+            local target     = modelUnitMap:getModelUnit(targetGridIndex) or targetTile
+            targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage = attacker:getEstimatedBattleDamage(target, attackerGridIndex, modelTileMap)
 
-            return true
+            return targetGridIndex.estimatedAttackDamage ~= nil
         end
     end)
 end
