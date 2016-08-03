@@ -782,12 +782,14 @@ local function onEvtModelWeatherUpdated(self, event)
     self.m_ModelWeather = event.modelWeather
 end
 
-local function onEvtPlayerRequestDoAction(self, event)
+local function onEvtSetActionPlannerEnabled(self, event)
     setStateIdle(self, false)
+    self.m_IsEnabled = event.enabled
 end
 
 local function onEvtMapCursorMoved(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if ((not self.m_IsEnabled)                                    or
+        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
         return
     end
 
@@ -826,7 +828,8 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtGridSelected(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if ((not self.m_IsEnabled) or
+        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
         return
     end
 
@@ -898,6 +901,7 @@ end
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
     self.m_State                    = "idle"
+    self.m_IsEnabled                = true
     self.m_SelectedDropDestinations = {}
 
     return self
@@ -942,11 +946,11 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtGridSelected",    self)
-        :addEventListener("EvtMapCursorMoved",        self)
-        :addEventListener("EvtPlayerIndexUpdated",    self)
-        :addEventListener("EvtModelWeatherUpdated",   self)
-        :addEventListener("EvtPlayerRequestDoAction", self)
+    dispatcher:addEventListener("EvtGridSelected",      self)
+        :addEventListener("EvtMapCursorMoved",          self)
+        :addEventListener("EvtPlayerIndexUpdated",      self)
+        :addEventListener("EvtModelWeatherUpdated",     self)
+        :addEventListener("EvtSetActionPlannerEnabled", self)
 
     return self
 end
@@ -954,7 +958,7 @@ end
 function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSetActionPlannerEnabled", self)
         :removeEventListener("EvtModelWeatherUpdated", self)
         :removeEventListener("EvtPlayerIndexUpdated",  self)
         :removeEventListener("EvtMapCursorMoved",      self)
@@ -969,11 +973,11 @@ end
 --------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
-    if     (name == "EvtGridSelected")          then onEvtGridSelected(         self, event)
-    elseif (name == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
-    elseif (name == "EvtModelWeatherUpdated")   then onEvtModelWeatherUpdated(  self, event)
-    elseif (name == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
-    elseif (name == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
+    if     (name == "EvtGridSelected")            then onEvtGridSelected(           self, event)
+    elseif (name == "EvtPlayerIndexUpdated")      then onEvtPlayerIndexUpdated(     self, event)
+    elseif (name == "EvtModelWeatherUpdated")     then onEvtModelWeatherUpdated(    self, event)
+    elseif (name == "EvtMapCursorMoved")          then onEvtMapCursorMoved(         self, event)
+    elseif (name == "EvtSetActionPlannerEnabled") then onEvtSetActionPlannerEnabled(self, event)
     end
 
     return self

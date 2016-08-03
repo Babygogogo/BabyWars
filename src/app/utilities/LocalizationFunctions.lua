@@ -432,18 +432,30 @@ local s_Texts = {
         [2] = function() return "Produce" end,
     },
     [80] = {
-        [1] = function(text) return
-            "您的战局数据与服务器不同步。请返回主菜单并重新进入战局。\n" .. (text or "")
+        [1] = function() return "正在传输数据，请稍后。\n若长时间没有反应，请重新载入战局。" end,
+        [2] = function() return "Transfering data.\nIf it's not responding, please reload the war." end,
+    },
+    [81] = {
+        [1] = function(errType, text)
+            text = (text) and (" " .. text) or ("")
+            if     (errType == "CorruptedAction")    then return "网络传输出现错误。将自动刷新场景。" .. text
+            elseif (errType == "InvalidWarFileName") then return "战局不存在，或已结束。将自动回到主界面。" .. text
+            elseif (errType == "InvalidAccount")     then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "OutOfSync")          then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
+            else                                          return "未知错误类型[81] " .. text
+            end
         end,
-        [2] = function(text)
-            return "The war data is not the same as on the server. Please reenter the war.\n" .. (text or "")
+        [2] = function(errType, text)
+            text = (text) and (" " .. text) or ("")
+            if     (errType == "CorruptedAction")    then return "Data transfer error." .. text
+            elseif (errType == "InvalidWarFileName") then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidAccount")     then return "Invalid account/password." .. text
+            elseif (errType == "OutOfSync")          then return "The war data is out of sync." .. text
+            else                                          return "Unknown errType[81]" .. text
+            end
         end,
     },
     --[[
-    [81] = {
-        [1] = function() return "合 流" end,
-        [2] = function() return "Join" end,
-    },
     [82] = {
         [1] = function() return "装 载" end,
         [2] = function() return "Load"  end,

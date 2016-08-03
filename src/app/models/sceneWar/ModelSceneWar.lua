@@ -35,19 +35,6 @@ local EventDispatcher        = require("src.global.events.EventDispatcher")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
-    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
-
-    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
-        .setOwner(modelSceneMain)
-    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
-end
-
-local function callbackOnWarEnded()
-    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager:getLoggedInAccountAndPassword())
-end
-
 local function getModelTurnManager(self)
     return self.m_ActorTurnManager:getModel()
 end
@@ -68,6 +55,48 @@ local function getModelMessageIndicator(self)
     return self.m_ActorMessageIndicator:getModel()
 end
 
+local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
+    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
+
+    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
+        .setOwner(modelSceneMain)
+    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
+end
+
+local function dispatchEvtSetActionPlannerEnabled(self, enabled)
+    self.m_ScriptEventDispatcher:dispatchEvent({
+        name    = "EvtSetActionPlannerEnabled",
+        enabled = enabled,
+    })
+end
+
+local function requestReload(self, durationSec)
+    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    dispatchEvtSetActionPlannerEnabled(self, false)
+
+    local func = function()
+        self.m_ScriptEventDispatcher:dispatchEvent({
+            name       = "EvtPlayerRequestDoAction",
+            actionName = "GetSceneWarData",
+            fileName   = self.m_FileName,
+        })
+    end
+
+    if ((self.m_View) and (durationSec) and (durationSec > 0)) then
+        self.m_View:runAction(cc.Sequence:create(
+            cc.DelayTime:create(durationSec),
+            cc.CallFunc:create(func)
+        ))
+    else
+        func()
+    end
+end
+
+local function callbackOnWarEnded()
+    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+end
+
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
@@ -77,10 +106,20 @@ end
 
 local function doActionMessage(self, action)
     getModelMessageIndicator(self):showMessage(action.message)
+    local additionalAction = action.additionalAction
+    if     (additionalAction == "RunSceneMain")   then runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+    elseif (additionalAction == "ReloadSceneWar") then requestReload(self, 3)
+    end
 end
 
 local function doActionError(self, action)
     error("ModelSceneWar-doActionError(): " .. action.error)
+end
+
+local function doActionGetSceneWarData(self, action)
+    local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
+    WebSocketManager.setOwner(actorSceneWar:getModel())
+    ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
 end
 
 local function doActionBeginTurn(self, action)
@@ -247,11 +286,25 @@ end
 
 local function doAction(self, action)
     local actionName = action.actionName
-    if     (actionName == "Logout")                 then doActionLogout(                self, action)
-    elseif (actionName == "Message")                then doActionMessage(               self, action)
-    elseif (actionName == "Error")                  then doActionError(                 self, action)
-    elseif ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then return
-    elseif (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
+    if     (actionName == "Logout")          then doActionLogout(         self, action)
+    elseif (actionName == "Message")         then doActionMessage(        self, action)
+    elseif (actionName == "Error")           then doActionError(          self, action)
+    elseif (actionName == "GetSceneWarData") then doActionGetSceneWarData(self, action)
+    end
+
+    if ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
+        return
+    elseif (action.actionID ~= self.m_ActionID + 1) then
+        getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(81, "OutOfSync"))
+        requestReload(self, 3)
+        return
+    end
+
+    self.m_ActionID = action.actionID
+    getModelMessageIndicator(self):hidePersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    dispatchEvtSetActionPlannerEnabled(self, true)
+
+    if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
     elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
     elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
     elseif (actionName == "Wait")                   then doActionWait(                  self, action)
@@ -273,10 +326,12 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerRequestDoAction(self, event)
-    local request = event
-    request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
-    request.sceneWarFileName                      = self.m_FileName
+    local request  = event
+    request.playerAccount,    request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
+    request.sceneWarFileName, request.actionID       = self.m_FileName, self.m_ActionID + 1
 
+    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    dispatchEvtSetActionPlannerEnabled(self, false)
     WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
 
@@ -376,6 +431,7 @@ end
 function ModelSceneWar:ctor(sceneData)
     self.m_FileName   = sceneData.fileName
     self.m_IsWarEnded = sceneData.isEnded
+    self.m_ActionID   = sceneData.actionID
 
     initScriptEventDispatcher(self)
     initActorMessageIndicator(self)
