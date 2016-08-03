@@ -22,7 +22,10 @@ local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local TableFunctions        = require("src.app.utilities.TableFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local WebSocketManager      = (GameConstantFunctions.isServer()) and (nil) or (require("src.app.utilities.WebSocketManager"))
+local WebSocketManager
+if (not GameConstantFunctions.isServer()) then
+    WebSocketManager = require("src.app.utilities.WebSocketManager")
+end
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -281,9 +284,9 @@ function ModelTurnManager:runTurn()
 
     if (self.m_ModelMessageIndicator) then
         if (isLoggedInPlayerInTurn(self)) then
-            self.m_ModelMessageIndicator:hidePersistentMessage()
+            self.m_ModelMessageIndicator:hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
         else
-            self.m_ModelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(71))
+            self.m_ModelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
         end
     end
 

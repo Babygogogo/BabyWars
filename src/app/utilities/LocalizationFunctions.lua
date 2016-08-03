@@ -361,10 +361,12 @@ local s_Texts = {
             return string.format("Idle factories count: %d\n Idle units count: %d\nAre you sure to end turn?", emptyProducersCount, idleUnitsCount)
         end,
     },
+    --[[
     [71] = {
         [1] = function() return "当前是您对手的回合，请耐心等候。"           end,
         [2] = function() return "It's your opponent's turn. Please wait." end,
     },
+    --]]
     [72] = {
         [1] = function(turnIndex, nickname)
             return string.format("回合：%d\n玩家：%s\n战斗开始！", turnIndex, nickname)
@@ -432,8 +434,18 @@ local s_Texts = {
         [2] = function() return "Produce" end,
     },
     [80] = {
-        [1] = function() return "正在传输数据，请稍后。\n若长时间没有反应，请重新载入战局。" end,
-        [2] = function() return "Transfering data.\nIf it's not responding, please reload the war." end,
+        [1] = function(textType)
+            if     (textType == "NotInTurn")       then return "当前是您对手的回合，请耐心等候。"
+            elseif (textType == "TransferingData") then return "正在传输数据，请稍后。\n若长时间没有反应，请重新载入战局。"
+            else                                        return "未知文本类型[80]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "NotInTurn")       then return "It's your opponent's turn. Please wait."
+            elseif (textType == "TransferingData") then return "Transfering data.\nIf it's not responding, please reload the war."
+            else                                        return "Unknown textType[80]: " .. (textType or "")
+            end
+        end,
     },
     [81] = {
         [1] = function(errType, text)

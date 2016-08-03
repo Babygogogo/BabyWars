@@ -72,7 +72,7 @@ local function dispatchEvtSetActionPlannerEnabled(self, enabled)
 end
 
 local function requestReload(self, durationSec)
-    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtSetActionPlannerEnabled(self, false)
 
     local func = function()
@@ -301,7 +301,7 @@ local function doAction(self, action)
     end
 
     self.m_ActionID = action.actionID
-    getModelMessageIndicator(self):hidePersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    getModelMessageIndicator(self):hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtSetActionPlannerEnabled(self, true)
 
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
@@ -330,7 +330,7 @@ local function onEvtPlayerRequestDoAction(self, event)
     request.playerAccount,    request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     request.sceneWarFileName, request.actionID       = self.m_FileName, self.m_ActionID + 1
 
-    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80))
+    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtSetActionPlannerEnabled(self, false)
     WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
