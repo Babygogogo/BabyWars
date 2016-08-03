@@ -21,7 +21,6 @@ local ModelWarCommandMenu = class("ModelWarCommandMenu")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
@@ -30,6 +29,11 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndex    = event.playerIndex
     self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+end
+
+local function onEvtIsWaitingForServerResponse(self, event)
+    self:setEnabled(false)
+    self.m_IsWaitingForServerResponse = event.waiting
 end
 
 local function getEmptyProducersCount(self)
@@ -65,7 +69,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemQuit(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65),
+        name     = LocalizationFunctions.getLocalizedText(65, "QuitWar"),
         callback = function()
             self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "QuitWar"))
                 :setOnConfirmYes(function()
@@ -80,11 +84,27 @@ local function initItemQuit(self)
     self.m_ItemQuit = item
 end
 
+local function initItemReload(self)
+    local item = {
+        name     = LocalizationFunctions.getLocalizedText(65, "ReloadWar"),
+        callback = function()
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "ReloadWar"))
+                :setOnConfirmYes(function()
+                    self.m_ModelConfirmBox:setEnabled(false)
+                    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtReloadSceneWar"})
+                end)
+                :setEnabled(true)
+        end,
+    }
+
+    self.m_ItemReload = item
+end
+
 local function initItemSurrender(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(67),
+        name     = LocalizationFunctions.getLocalizedText(65, "Surrender"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(68))
+            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "Surrender"))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -102,7 +122,7 @@ end
 
 local function initItemEndTurn(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(69),
+        name     = LocalizationFunctions.getLocalizedText(65, "EndTurn"),
         callback = function()
             self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
                 :setOnConfirmYes(function()
@@ -121,8 +141,11 @@ local function initItemEndTurn(self)
 end
 
 local function generateItems(self)
-    local items = {self.m_ItemQuit}
-    if (self.m_IsPlayerInTurn) then
+    local items = {
+        self.m_ItemQuit,
+        self.m_ItemReload,
+    }
+    if ((self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)) then
         items[#items + 1] = self.m_ItemSurrender
         items[#items + 1] = self.m_ItemEndTurn
     end
@@ -134,7 +157,10 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
+    self.m_IsWaitingForServerResponse = false
+
     initItemQuit(     self)
+    initItemReload(   self)
     initItemSurrender(self)
     initItemEndTurn(  self)
 
@@ -173,7 +199,8 @@ function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarCommandMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerIndexUpdated", self)
+    dispatcher:addEventListener("EvtPlayerIndexUpdated",   self)
+        :addEventListener("EvtIsWaitingForServerResponse", self)
 
     return self
 end
@@ -181,7 +208,8 @@ end
 function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtIsWaitingForServerResponse", self)
+        :removeEventListener("EvtPlayerIndexUpdated", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -192,8 +220,8 @@ end
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerIndexUpdated") then
-        onEvtPlayerIndexUpdated(self, event)
+    if     (eventName == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
+    elseif (eventName == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     end
 
     return self

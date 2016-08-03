@@ -64,16 +64,16 @@ local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
-local function dispatchEvtSetActionPlannerEnabled(self, enabled)
+local function dispatchEvtIsWaitingForServerResponse(self, waiting)
     self.m_ScriptEventDispatcher:dispatchEvent({
-        name    = "EvtSetActionPlannerEnabled",
-        enabled = enabled,
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = waiting,
     })
 end
 
 local function requestReload(self, durationSec)
     getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtSetActionPlannerEnabled(self, false)
+    dispatchEvtIsWaitingForServerResponse(self, true)
 
     local func = function()
         self.m_ScriptEventDispatcher:dispatchEvent({
@@ -302,7 +302,7 @@ local function doAction(self, action)
 
     self.m_ActionID = action.actionID
     getModelMessageIndicator(self):hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtSetActionPlannerEnabled(self, true)
+    dispatchEvtIsWaitingForServerResponse(self, false)
 
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
     elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
@@ -331,8 +331,12 @@ local function onEvtPlayerRequestDoAction(self, event)
     request.sceneWarFileName, request.actionID       = self.m_FileName, self.m_ActionID + 1
 
     getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtSetActionPlannerEnabled(self, false)
+    dispatchEvtIsWaitingForServerResponse(self, true)
     WebSocketManager.sendString(SerializationFunctions.toString(request))
+end
+
+local function onEvtReloadSceneWar(self, event)
+    requestReload(self)
 end
 
 --------------------------------------------------------------------------------
@@ -375,6 +379,7 @@ end
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
     dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
+        :addEventListener("EvtReloadSceneWar", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -487,8 +492,9 @@ function ModelSceneWar:onStopRunning()
 end
 
 function ModelSceneWar:onEvent(event)
-    if (event.name == "EvtPlayerRequestDoAction") then
-        onEvtPlayerRequestDoAction(self, event)
+    local name = event.name
+    if     (name == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
+    elseif (name == "EvtReloadSceneWar")        then onEvtReloadSceneWar(       self, event)
     end
 
     return self

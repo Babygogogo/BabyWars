@@ -324,23 +324,42 @@ local s_Texts = {
         [2] = function(energy) return "Energy:  " .. energy end,
     },
     [65] = {
-        [1] = function() return "退 出" end,
-        [2] = function() return "Quit" end,
+        [1] = function(textType)
+            if     (textType == "QuitWar")   then return "退 出"
+            elseif (textType == "Surrender") then return "投 降"
+            elseif (textType == "ReloadWar") then return "重 新 载 入"
+            elseif (textType == "EndTurn")   then return "结 束 回 合"
+            else                                  return "未知[65]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "QuitWar")   then return "Quit"
+            elseif (textType == "Surrender") then return "Surrender"
+            elseif (textType == "ReloadWar") then return "Reload"
+            elseif (textType == "EndTurn")   then return "End Turn"
+            else                                  return "Unknown[65]: " .. (textType or "")
+            end
+        end,
     },
     [66] = {
         [1] = function(confirmType)
-            if     (confirmType == "QuitWar")  then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (confirmType == "ExitGame") then return "是否确定退出游戏？"
-            else                                    return "未识别：[66]" .. confirmType
+            if     (confirmType == "QuitWar")   then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (confirmType == "Surrender") then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            elseif (confirmType == "ReloadWar") then return "是否确定要重新载入战局？"
+            elseif (confirmType == "ExitGame")  then return "是否确定退出游戏？"
+            else                                     return "未识别：[66]" .. confirmType
             end
         end,
         [2] = function(confirmType)
-            if     (confirmType == "QuitWar")  then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (confirmType == "ExitGame") then return "Are you sure to exit the game?"
-            else                                    return "Unrecognized:[66]" .. confirmType
+            if     (confirmType == "QuitWar")   then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (confirmType == "Surrender") then return "You will lose the game by surrendering!\nAre you sure?"
+            elseif (confirmType == "ReloadWar") then return "Are you sure to reload the war?"
+            elseif (confirmType == "ExitGame")  then return "Are you sure to exit the game?"
+            else                                     return "Unrecognized:[66]" .. confirmType
             end
         end,
     },
+    --[[
     [67] = {
         [1] = function() return "投 降" end,
         [2] = function() return "Surrender" end,
@@ -353,6 +372,7 @@ local s_Texts = {
         [1] = function() return "结 束 回 合" end,
         [2] = function() return "End Turn" end,
     },
+    -]]
     [70] = {
         [1] = function(emptyProducersCount, idleUnitsCount)
             return string.format("空闲工厂机场海港数量：%d\n空闲部队数量：%d\n您是否确定结束回合？", emptyProducersCount, idleUnitsCount)
