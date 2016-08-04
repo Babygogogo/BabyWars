@@ -290,6 +290,7 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
 
             if (shouldDestroySelf) then
                 dispatchEvtDestroyViewUnit(dispatcher, selfGridIndex)
+                self.m_View:removeFromParent()
             elseif ((action.counterDamage) and (not shouldDestroyTarget)) then
                 dispatchEvtAttackViewUnit(dispatcher, selfGridIndex)
             end
@@ -297,6 +298,7 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
             if (shouldDestroyTarget) then
                 if (isTargetUnit) then
                     dispatchEvtDestroyViewUnit(dispatcher, targetGridIndex)
+                    attackTarget.m_View:removeFromParent()
                 else
                     dispatchEvtDestroyViewTile(dispatcher, targetGridIndex)
                 end

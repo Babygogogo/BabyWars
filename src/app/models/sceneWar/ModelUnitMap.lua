@@ -52,23 +52,26 @@ local function getSupplyTargetModelUnits(self, supplier)
 end
 
 local function setActorUnitLoaded(self, gridIndex)
-    local focusActorUnit = getActorUnit(self, gridIndex)
-    local focusUnitID    = focusActorUnit:getModel():getUnitId()
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    local unitID = map[x][y]:getModel():getUnitId()
+    assert(loaded[unitID] == nil, "ModelUnitMap-setActorUnitLoaded() the focus unit has been loaded already.")
 
-    self.m_LoadedActorUnits[focusUnitID]           = focusActorUnit
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
-
-    if (self.m_View) then
-        self.m_View:setViewUnitLoaded(gridIndex, focusUnitID)
-    end
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
 end
 
 local function setActorUnitUnloaded(self, unitID, gridIndex)
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = self.m_LoadedActorUnits[unitID]
-    self.m_LoadedActorUnits[unitID]                = nil
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    assert(loaded[unitID], "ModelUnitMap-setActorUnitUnloaded() the focus unit is not loaded.")
+    assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
+
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
 
     if (self.m_View) then
-        self.m_View:setViewUnitUnloaded(gridIndex, unitID)
+        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
     end
 end
 
@@ -77,12 +80,15 @@ local function swapActorUnit(self, gridIndex1, gridIndex2)
         return
     end
 
-    local tempActorUnit = self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y]
-    self.m_ActorUnitsMap[gridIndex1.x][gridIndex1.y] = self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y]
-    self.m_ActorUnitsMap[gridIndex2.x][gridIndex2.y] = tempActorUnit
+    local x1, y1 = gridIndex1.x, gridIndex1.y
+    local x2, y2 = gridIndex2.x, gridIndex2.y
+    local map    = self.m_ActorUnitsMap
+    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
 
-    if (self.m_View) then
-        self.m_View:swapViewUnit(gridIndex1, gridIndex2)
+    local view = self.m_View
+    if (view) then
+        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
+        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
     end
 end
 
@@ -129,11 +135,13 @@ local function onEvtDestroyModelUnit(self, event)
     if (modelUnit.getLoadUnitIdList) then
         local view = self.m_View
         for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-            self.m_LoadedActorUnits[unitID]:getModel():unsetRootScriptEventDispatcher()
+            local loadedActorUnit = self.m_LoadedActorUnits[unitID]
             self.m_LoadedActorUnits[unitID] = nil
+            loadedActorUnit:getModel():unsetRootScriptEventDispatcher()
 
-            if (view) then
-                view:removeLoadedViewUnit(unitID)
+            local loadedViewUnit = loadedActorUnit:getView()
+            if (loadedViewUnit) then
+                loadedViewUnit:removeFromParent()
             end
         end
     end
@@ -143,12 +151,6 @@ local function onEvtDestroyModelUnit(self, event)
         :unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-end
-
-local function onEvtDestroyViewUnit(self, event)
-    if (self.m_View) then
-        self.m_View:removeViewUnit(event.gridIndex)
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -225,13 +227,13 @@ function ModelUnitMap:initView()
         for x = mapSize.width, 1, -1 do
             local actorUnit = actorUnitsMap[x][y]
             if (actorUnit) then
-                view:addViewUnit(actorUnit:getView(), {x = x, y = y})
+                view:addViewUnit(actorUnit:getView(), actorUnit:getModel())
             end
         end
     end
 
     for unitID, actorUnit in pairs(self.m_LoadedActorUnits) do
-        view:addLoadedViewUnit(unitID, actorUnit:getView())
+        view:addViewUnit(actorUnit:getView(), actorUnit:getModel())
     end
 
     return self
@@ -242,7 +244,6 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelUnit",   self)
-        :addEventListener("EvtDestroyViewUnit",    self)
         :addEventListener("EvtTurnPhaseMain",      self)
 
     local setEventDispatcher = function(modelUnit)
@@ -258,7 +259,6 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
-        :removeEventListener("EvtDestroyViewUnit",  self)
         :removeEventListener("EvtDestroyModelUnit", self)
     self.m_RootScriptEventDispatcher = nil
 
@@ -326,8 +326,8 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if     (name == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
-    elseif (name == "EvtDestroyViewUnit")  then onEvtDestroyViewUnit( self, event)
+    if (name == "EvtDestroyModelUnit") then
+        onEvtDestroyModelUnit(self, event)
     end
 
     return self
@@ -338,17 +338,24 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:doActionSurrender(action)
     local eventDispatcher = self.m_RootScriptEventDispatcher
-    for _, gridIndex in ipairs(action.lostUnitGridIndexes) do
-        eventDispatcher:dispatchEvent({
-            name      = "EvtDestroyModelUnit",
-            gridIndex = gridIndex,
-        })
-        eventDispatcher:dispatchEvent({
-            name      = "EvtDestroyViewUnit",
-            gridIndex = gridIndex,
-        })
-    end
+    local playerIndex     = action.lostPlayerIndex
 
+    self:forEachModelUnitOnMap(function(modelUnit)
+        if (modelUnit:getPlayerIndex() == playerIndex) then
+            eventDispatcher:dispatchEvent({
+                    name      = "EvtDestroyModelUnit",
+                    gridIndex = modelUnit:getGridIndex(),
+                })
+                :dispatchEvent({
+                    name     = "EvtDestroyViewUnit",
+                    viewUnit = modelUnit:getGridIndex(),
+                })
+
+            if (modelUnit.m_View) then
+                modelUnit.m_View:removeFromParent()
+            end
+        end
+    end)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 
     return self
@@ -386,17 +393,9 @@ function ModelUnitMap:doActionJoinModelUnit(action)
         focusActorUnit = self.m_LoadedActorUnits[launchUnitID]
         self.m_LoadedActorUnits[launchUnitID] = nil
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-
-        if (self.m_View) then
-            self.m_View:setViewUnitJoinedWithUnitId(launchUnitID)
-        end
     else
         focusActorUnit = self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y]
         self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
-
-        if (self.m_View) then
-            self.m_View:setViewUnitJoinedWithGridIndex(beginningGridIndex)
-        end
     end
 
     local focusModelUnit = focusActorUnit:getModel()
@@ -458,7 +457,7 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
     self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
     self.m_LoadedActorUnits[producedUnitID] = producedActorUnit
     if (self.m_View) then
-        self.m_View:addLoadedViewUnit(producedUnitID, producedActorUnit:getView())
+        self.m_View:addViewUnit(producedActorUnit:getView(), producedActorUnit:getModel())
     end
 
     focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
@@ -505,12 +504,7 @@ function ModelUnitMap:doActionDropModelUnit(action)
     local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
+    moveActorUnitOnAction(self, action)
 
     local dropActorUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
@@ -540,7 +534,7 @@ function ModelUnitMap:doActionProduceOnTile(action)
     self.m_AvailableUnitID = self.m_AvailableUnitID + 1
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
     if (self.m_View) then
-        self.m_View:addViewUnit(actorUnit:getView(), gridIndex)
+        self.m_View:addViewUnit(actorUnit:getView(), actorUnit:getModel())
     end
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})

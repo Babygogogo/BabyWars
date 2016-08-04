@@ -50,8 +50,18 @@ local function onEvtTurnPhaseConsumeUnitFuel(self, event)
             local tile = event.modelTileMap:getModelTile(gridIndex)
 
             if ((not tile.getRepairAmount) or (not tile:getRepairAmount(modelUnit))) then
-                self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtDestroyModelUnit", gridIndex = gridIndex})
-                    :dispatchEvent({name = "EvtDestroyViewUnit", gridIndex = gridIndex})
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name      = "EvtDestroyModelUnit",
+                        gridIndex = gridIndex,
+                    })
+                    :dispatchEvent({
+                        name      = "EvtDestroyViewUnit",
+                        viewUnit  = gridIndex,
+                    })
+
+                if (modelUnit.m_View) then
+                    modelUnit.m_View:removeFromParent()
+                end
             end
         end
     end
