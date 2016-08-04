@@ -11,6 +11,7 @@ local REACHABLE_GRIDS_Z_ORDER          = 0
 local ATTACKABLE_GRIDS_Z_ORDER         = 0
 local MOVE_PATH_DESTINATION_Z_ORDER    = 0
 local DROPPABLE_GRIDS_Z_ORDER          = 0
+local PREVIEW_ATTACKABLE_AREA_Z_ORDER  = 0
 
 local DROP_DESTIONATIONS_UNIT_Z_ORDER = 0
 
@@ -182,6 +183,15 @@ local function initViewDroppableGrids(self)
     self:addChild(view, DROPPABLE_GRIDS_Z_ORDER)
 end
 
+local function initViewPreviewAttackableArea(self)
+    local view = cc.Node:create()
+    view:setOpacity(180)
+        :setCascadeOpacityEnabled(true)
+
+    self.m_ViewPreviewAttackableArea = view
+    self:addChild(view, PREVIEW_ATTACKABLE_AREA_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -193,6 +203,7 @@ function ViewActionPlanner:ctor(param)
     initViewPreviewDropDestination(self)
     initViewDropDestinations(      self)
     initViewDroppableGrids(        self)
+    initViewPreviewAttackableArea( self)
 
     return self
 end
@@ -315,6 +326,27 @@ end
 
 function ViewActionPlanner:setDropDestinationsVisible(visible)
     self.m_ViewDropDestinations:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewAttackableArea(area)
+    local view = self.m_ViewPreviewAttackableArea
+    view:removeAllChildren()
+
+    for x, column in pairs(area) do
+        if (type(column) == "table") then
+            for y, _ in pairs(column) do
+                view:addChild(createViewSingleAttackableGrid({x = x, y = y}))
+            end
+        end
+    end
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewAttackableAreaVisible(visible)
+    self.m_ViewPreviewAttackableArea:setVisible(visible)
 
     return self
 end

@@ -347,8 +347,8 @@ function ModelUnitMap:doActionSurrender(action)
                     gridIndex = modelUnit:getGridIndex(),
                 })
                 :dispatchEvent({
-                    name     = "EvtDestroyViewUnit",
-                    viewUnit = modelUnit:getGridIndex(),
+                    name      = "EvtDestroyViewUnit",
+                    gridIndex = modelUnit:getGridIndex(),
                 })
 
             if (modelUnit.m_View) then

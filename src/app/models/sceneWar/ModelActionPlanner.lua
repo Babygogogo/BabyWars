@@ -177,7 +177,8 @@ local function resetReachableArea(self, focusModelUnit)
         math.min(focusModelUnit:getMoveRange(), focusModelUnit:getCurrentFuel()),
         function(gridIndex)
             return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
-        end)
+        end
+    )
 
     if (self.m_View) then
         self.m_View:setReachableGrids(self.m_ReachableArea)
@@ -300,6 +301,7 @@ end
 -- The functions for available action list.
 --------------------------------------------------------------------------------
 local setStateIdle
+local setStatePreviewAttackableArea
 local setStateChoosingProductionTarget
 local setStateMakingMovePath
 local setStateChoosingAction
@@ -611,19 +613,43 @@ setStateIdle = function(self, resetUnitAnimation)
             :setDroppableGridsVisible(        false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(      false)
+            :setPreviewAttackableAreaVisible( false)
 
         self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
         if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
             self.m_FocusModelUnit:showNormalAnimation()
         end
+        if (self.m_PreviewModelUnit) then
+            self.m_PreviewModelUnit:showNormalAnimation()
+        end
     end
 
     self.m_State                    = "idle"
     self.m_FocusModelUnit           = nil
+    self.m_PreviewModelUnit         = nil
     self.m_LaunchUnitID             = nil
     self.m_SelectedDropDestinations = {}
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
+end
+
+local function canSetStatePreviewingAttackableArea(self, gridIndex)
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    return (modelUnit)                                             and
+        (modelUnit.getAttackRangeMinMax)                           and
+        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+end
+
+setStatePreviewAttackableArea = function(self, gridIndex)
+    self.m_State            = "previewingAttackableArea"
+    self.m_PreviewModelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+
+    if (self.m_View) then
+        local area = AttackableGridListFunctions.createAttackableArea(gridIndex, self.m_ModelTileMap, self.m_ModelUnitMap)
+        self.m_View:setPreviewAttackableArea(area)
+            :setPreviewAttackableAreaVisible(true)
+        self.m_PreviewModelUnit:showMovingAnimation()
+    end
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
@@ -841,6 +867,8 @@ local function onEvtGridSelected(self, event)
             setStateMakingMovePath(self, gridIndex)
         elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then
             setStateChoosingProductionTarget(self, gridIndex)
+        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then
+            setStatePreviewAttackableArea(self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
         setStateIdle(self, true)
@@ -889,6 +917,8 @@ local function onEvtGridSelected(self, event)
         end
     elseif (state == "choosingAdditionalDropAction") then
         setStateChoosingDropDestination(self, popBackDropDestination(self.m_SelectedDropDestinations).unitID)
+    elseif (state == "previewingAttackableArea") then
+        setStateIdle(self, true)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
