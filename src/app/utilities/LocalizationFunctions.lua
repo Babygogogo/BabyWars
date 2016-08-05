@@ -324,23 +324,42 @@ local s_Texts = {
         [2] = function(energy) return "Energy:  " .. energy end,
     },
     [65] = {
-        [1] = function() return "退 出" end,
-        [2] = function() return "Quit" end,
+        [1] = function(textType)
+            if     (textType == "QuitWar")   then return "退 出"
+            elseif (textType == "Surrender") then return "投 降"
+            elseif (textType == "ReloadWar") then return "重 新 载 入"
+            elseif (textType == "EndTurn")   then return "结 束 回 合"
+            else                                  return "未知[65]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "QuitWar")   then return "Quit"
+            elseif (textType == "Surrender") then return "Surrender"
+            elseif (textType == "ReloadWar") then return "Reload"
+            elseif (textType == "EndTurn")   then return "End Turn"
+            else                                  return "Unknown[65]: " .. (textType or "")
+            end
+        end,
     },
     [66] = {
         [1] = function(confirmType)
-            if     (confirmType == "QuitWar")  then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (confirmType == "ExitGame") then return "是否确定退出游戏？"
-            else                                    return "未识别：[66]" .. confirmType
+            if     (confirmType == "QuitWar")   then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (confirmType == "Surrender") then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            elseif (confirmType == "ReloadWar") then return "是否确定要重新载入战局？"
+            elseif (confirmType == "ExitGame")  then return "是否确定退出游戏？"
+            else                                     return "未识别：[66]" .. confirmType
             end
         end,
         [2] = function(confirmType)
-            if     (confirmType == "QuitWar")  then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (confirmType == "ExitGame") then return "Are you sure to exit the game?"
-            else                                    return "Unrecognized:[66]" .. confirmType
+            if     (confirmType == "QuitWar")   then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (confirmType == "Surrender") then return "You will lose the game by surrendering!\nAre you sure?"
+            elseif (confirmType == "ReloadWar") then return "Are you sure to reload the war?"
+            elseif (confirmType == "ExitGame")  then return "Are you sure to exit the game?"
+            else                                     return "Unrecognized:[66]" .. confirmType
             end
         end,
     },
+    --[[
     [67] = {
         [1] = function() return "投 降" end,
         [2] = function() return "Surrender" end,
@@ -353,6 +372,7 @@ local s_Texts = {
         [1] = function() return "结 束 回 合" end,
         [2] = function() return "End Turn" end,
     },
+    -]]
     [70] = {
         [1] = function(emptyProducersCount, idleUnitsCount)
             return string.format("空闲工厂机场海港数量：%d\n空闲部队数量：%d\n您是否确定结束回合？", emptyProducersCount, idleUnitsCount)
@@ -361,10 +381,12 @@ local s_Texts = {
             return string.format("Idle factories count: %d\n Idle units count: %d\nAre you sure to end turn?", emptyProducersCount, idleUnitsCount)
         end,
     },
+    --[[
     [71] = {
         [1] = function() return "当前是您对手的回合，请耐心等候。"           end,
         [2] = function() return "It's your opponent's turn. Please wait." end,
     },
+    --]]
     [72] = {
         [1] = function(turnIndex, nickname)
             return string.format("回合：%d\n玩家：%s\n战斗开始！", turnIndex, nickname)
@@ -432,18 +454,40 @@ local s_Texts = {
         [2] = function() return "Produce" end,
     },
     [80] = {
-        [1] = function(text) return
-            "您的战局数据与服务器不同步。请返回主菜单并重新进入战局。\n" .. (text or "")
+        [1] = function(textType)
+            if     (textType == "NotInTurn")       then return "当前是您对手的回合，请耐心等候。"
+            elseif (textType == "TransferingData") then return "正在传输数据，请稍后。\n若长时间没有反应，请重新载入战局。"
+            else                                        return "未知文本类型[80]: " .. (textType or "")
+            end
         end,
-        [2] = function(text)
-            return "The war data is not the same as on the server. Please reenter the war.\n" .. (text or "")
+        [2] = function(textType)
+            if     (textType == "NotInTurn")       then return "It's your opponent's turn. Please wait."
+            elseif (textType == "TransferingData") then return "Transfering data.\nIf it's not responding, please reload the war."
+            else                                        return "Unknown textType[80]: " .. (textType or "")
+            end
+        end,
+    },
+    [81] = {
+        [1] = function(errType, text)
+            text = (text) and (" " .. text) or ("")
+            if     (errType == "CorruptedAction")    then return "网络传输出现错误。将自动刷新场景。" .. text
+            elseif (errType == "InvalidWarFileName") then return "战局不存在，或已结束。将自动回到主界面。" .. text
+            elseif (errType == "InvalidAccount")     then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "OutOfSync")          then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
+            else                                          return "未知错误类型[81] " .. text
+            end
+        end,
+        [2] = function(errType, text)
+            text = (text) and (" " .. text) or ("")
+            if     (errType == "CorruptedAction")    then return "Data transfer error." .. text
+            elseif (errType == "InvalidWarFileName") then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidAccount")     then return "Invalid account/password." .. text
+            elseif (errType == "OutOfSync")          then return "The war data is out of sync." .. text
+            else                                          return "Unknown errType[81]" .. text
+            end
         end,
     },
     --[[
-    [81] = {
-        [1] = function() return "合 流" end,
-        [2] = function() return "Join" end,
-    },
     [82] = {
         [1] = function() return "装 载" end,
         [2] = function() return "Load"  end,
@@ -788,6 +832,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "迷雾"
             elseif (tileType == "Reef")          then return "礁石"
             elseif (tileType == "Plasma")        then return "等离子体"
+            elseif (tileType == "RedPlasma")     then return "红色等离子"
             elseif (tileType == "Meteor")        then return "陨石"
             elseif (tileType == "Silo")          then return "导弹发射塔"
             elseif (tileType == "EmptySilo")     then return "空发射塔"
@@ -820,6 +865,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mist"
             elseif (tileType == "Reef")          then return "Reef"
             elseif (tileType == "Plasma")        then return "Plasma"
+            elseif (tileType == "RedPlasma")     then return "Plasma"
             elseif (tileType == "Meteor")        then return "Meteor"
             elseif (tileType == "Silo")          then return "Silo"
             elseif (tileType == "EmptySilo")     then return "Silo"
@@ -854,6 +900,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "迷雾：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。"
             elseif (tileType == "Reef")          then return "礁石：允许空军和海军通过，但会减缓海军的移动。在雾战时，为海军提供隐蔽场所。"
             elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。"
+            elseif (tileType == "RedPlasma")     then return "红色等离子：不允许任何部队通过。"
             elseif (tileType == "Meteor")        then return "陨石：不允许任何部队通过。可以被部队攻击和破坏。"
             elseif (tileType == "Silo")          then return "导弹发射塔：步兵系可以在这里发射一次导弹，用来打击任意位置的小范围的部队。"
             elseif (tileType == "EmptySilo")     then return "空发射塔：使用过的导弹发射塔，无法再次发射导弹。允许空军和陆军通过。"
@@ -886,6 +933,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mists provide hiding places for naval units in Fog of War."
             elseif (tileType == "Reef")          then return "Reefs provide hiding places for naval units in Fog of War."
             elseif (tileType == "Plasma")        then return "Plasma is impassable."
+            elseif (tileType == "RedPlasma")     then return "Red Plasma is impassable."
             elseif (tileType == "Meteor")        then return "Meteors are impassable but can be destroyed."
             elseif (tileType == "Silo")          then return "Silos can be launched by infantry units and damage a 13-square area."
             elseif (tileType == "EmptySilo")     then return "Empty Silos can't be launched."

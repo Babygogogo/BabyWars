@@ -27,9 +27,9 @@ function ModelMessageIndicator:showPersistentMessage(msg)
     return self
 end
 
-function ModelMessageIndicator:hidePersistentMessage()
+function ModelMessageIndicator:hidePersistentMessage(msg)
     if (self.m_View) then
-        self.m_View:hidePersistentMessage()
+        self.m_View:hidePersistentMessage(msg)
     end
 
     return self

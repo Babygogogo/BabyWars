@@ -52,7 +52,7 @@
   <tile id="16">
    <image width="24" height="24" source="textures/tileBase/c01_t02_s16_f01.png"/>
   </tile>
-  <tile id="17" probability="4">
+  <tile id="17">
    <image width="24" height="24" source="textures/tileBase/c01_t03_s01_f01.png"/>
   </tile>
   <tile id="18">
@@ -230,7 +230,7 @@
    <image width="24" height="24" source="textures/tileBase/c01_t04_s12_f01.png"/>
   </tile>
  </tileset>
- <tileset firstgid="77" name="tileObject" tilewidth="24" tileheight="48" tilecount="78" columns="0">
+ <tileset firstgid="77" name="tileObject" tilewidth="24" tileheight="48" tilecount="79" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/tileObject/c01_t05_s01_f01.png"/>
   </tile>
@@ -331,142 +331,145 @@
    <image width="24" height="29" source="textures/tileObject/c01_t17_s01_f01.png"/>
   </tile>
   <tile id="33">
-   <image width="24" height="26" source="textures/tileObject/c01_t17_s02_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t18_s01_f01.png"/>
   </tile>
   <tile id="34">
-   <image width="24" height="36" source="textures/tileObject/c01_t18_s01_f01.png"/>
+   <image width="24" height="36" source="textures/tileObject/c01_t19_s01_f01.png"/>
   </tile>
   <tile id="35">
-   <image width="24" height="36" source="textures/tileObject/c01_t18_s02_f01.png"/>
+   <image width="24" height="36" source="textures/tileObject/c01_t19_s02_f01.png"/>
   </tile>
   <tile id="36">
-   <image width="24" height="36" source="textures/tileObject/c01_t18_s03_f01.png"/>
+   <image width="24" height="36" source="textures/tileObject/c01_t19_s03_f01.png"/>
   </tile>
   <tile id="37">
-   <image width="24" height="36" source="textures/tileObject/c01_t18_s04_f01.png"/>
+   <image width="24" height="36" source="textures/tileObject/c01_t19_s04_f01.png"/>
   </tile>
   <tile id="38">
-   <image width="24" height="28" source="textures/tileObject/c01_t19_s01_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t20_s01_f01.png"/>
   </tile>
   <tile id="39">
-   <image width="24" height="28" source="textures/tileObject/c01_t19_s02_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t20_s02_f01.png"/>
   </tile>
   <tile id="40">
-   <image width="24" height="28" source="textures/tileObject/c01_t19_s03_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t20_s03_f01.png"/>
   </tile>
   <tile id="41">
-   <image width="24" height="28" source="textures/tileObject/c01_t19_s04_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t20_s04_f01.png"/>
   </tile>
   <tile id="42">
-   <image width="24" height="28" source="textures/tileObject/c01_t19_s05_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t20_s05_f01.png"/>
   </tile>
   <tile id="43">
-   <image width="24" height="30" source="textures/tileObject/c01_t20_s01_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t21_s01_f01.png"/>
   </tile>
   <tile id="44">
-   <image width="24" height="30" source="textures/tileObject/c01_t20_s02_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t21_s02_f01.png"/>
   </tile>
   <tile id="45">
-   <image width="24" height="30" source="textures/tileObject/c01_t20_s03_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t21_s03_f01.png"/>
   </tile>
   <tile id="46">
-   <image width="24" height="30" source="textures/tileObject/c01_t20_s04_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t21_s04_f01.png"/>
   </tile>
   <tile id="47">
-   <image width="24" height="30" source="textures/tileObject/c01_t20_s05_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t21_s05_f01.png"/>
   </tile>
   <tile id="48">
-   <image width="24" height="26" source="textures/tileObject/c01_t21_s01_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t22_s01_f01.png"/>
   </tile>
   <tile id="49">
-   <image width="24" height="26" source="textures/tileObject/c01_t21_s02_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t22_s02_f01.png"/>
   </tile>
   <tile id="50">
-   <image width="24" height="26" source="textures/tileObject/c01_t21_s03_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t22_s03_f01.png"/>
   </tile>
   <tile id="51">
-   <image width="24" height="26" source="textures/tileObject/c01_t21_s04_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t22_s04_f01.png"/>
   </tile>
   <tile id="52">
-   <image width="24" height="26" source="textures/tileObject/c01_t21_s05_f01.png"/>
+   <image width="24" height="26" source="textures/tileObject/c01_t22_s05_f01.png"/>
   </tile>
   <tile id="53">
-   <image width="24" height="24" source="textures/tileObject/c01_t22_s01_f01.png"/>
+   <image width="24" height="24" source="textures/tileObject/c01_t23_s01_f01.png"/>
   </tile>
   <tile id="54">
-   <image width="24" height="24" source="textures/tileObject/c01_t22_s02_f01.png"/>
+   <image width="24" height="24" source="textures/tileObject/c01_t23_s02_f01.png"/>
   </tile>
   <tile id="55">
-   <image width="24" height="24" source="textures/tileObject/c01_t22_s03_f01.png"/>
+   <image width="24" height="24" source="textures/tileObject/c01_t23_s03_f01.png"/>
   </tile>
   <tile id="56">
-   <image width="24" height="24" source="textures/tileObject/c01_t22_s04_f01.png"/>
+   <image width="24" height="24" source="textures/tileObject/c01_t23_s04_f01.png"/>
   </tile>
   <tile id="57">
-   <image width="24" height="24" source="textures/tileObject/c01_t22_s05_f01.png"/>
+   <image width="24" height="24" source="textures/tileObject/c01_t23_s05_f01.png"/>
   </tile>
   <tile id="58">
-   <image width="24" height="28" source="textures/tileObject/c01_t23_s01_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t24_s01_f01.png"/>
   </tile>
   <tile id="59">
-   <image width="24" height="28" source="textures/tileObject/c01_t23_s02_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t24_s02_f01.png"/>
   </tile>
   <tile id="60">
-   <image width="24" height="28" source="textures/tileObject/c01_t23_s03_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t24_s03_f01.png"/>
   </tile>
   <tile id="61">
-   <image width="24" height="28" source="textures/tileObject/c01_t23_s04_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t24_s04_f01.png"/>
   </tile>
   <tile id="62">
-   <image width="24" height="28" source="textures/tileObject/c01_t23_s05_f01.png"/>
+   <image width="24" height="28" source="textures/tileObject/c01_t24_s05_f01.png"/>
   </tile>
   <tile id="63">
-   <image width="24" height="30" source="textures/tileObject/c01_t24_s01_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t25_s01_f01.png"/>
   </tile>
   <tile id="64">
-   <image width="24" height="30" source="textures/tileObject/c01_t24_s02_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t25_s02_f01.png"/>
   </tile>
   <tile id="65">
-   <image width="24" height="30" source="textures/tileObject/c01_t24_s03_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t25_s03_f01.png"/>
   </tile>
   <tile id="66">
-   <image width="24" height="30" source="textures/tileObject/c01_t24_s04_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t25_s04_f01.png"/>
   </tile>
   <tile id="67">
-   <image width="24" height="30" source="textures/tileObject/c01_t24_s05_f01.png"/>
+   <image width="24" height="30" source="textures/tileObject/c01_t25_s05_f01.png"/>
   </tile>
   <tile id="68">
-   <image width="24" height="24" source="textures/tileObject/c01_t25_s01_f01.png"/>
-  </tile>
-  <tile id="69">
-   <image width="24" height="24" source="textures/tileObject/c01_t25_s02_f01.png"/>
-  </tile>
-  <tile id="70">
-   <image width="24" height="24" source="textures/tileObject/c01_t25_s03_f01.png"/>
-  </tile>
-  <tile id="71">
-   <image width="24" height="24" source="textures/tileObject/c01_t25_s04_f01.png"/>
-  </tile>
-  <tile id="72">
-   <image width="24" height="24" source="textures/tileObject/c01_t25_s05_f01.png"/>
-  </tile>
-  <tile id="73">
    <image width="24" height="24" source="textures/tileObject/c01_t26_s01_f01.png"/>
   </tile>
-  <tile id="74">
+  <tile id="69">
    <image width="24" height="24" source="textures/tileObject/c01_t26_s02_f01.png"/>
   </tile>
-  <tile id="75">
+  <tile id="70">
    <image width="24" height="24" source="textures/tileObject/c01_t26_s03_f01.png"/>
   </tile>
-  <tile id="76">
+  <tile id="71">
    <image width="24" height="24" source="textures/tileObject/c01_t26_s04_f01.png"/>
   </tile>
-  <tile id="77">
+  <tile id="72">
    <image width="24" height="24" source="textures/tileObject/c01_t26_s05_f01.png"/>
   </tile>
+  <tile id="73">
+   <image width="24" height="24" source="textures/tileObject/c01_t27_s01_f01.png"/>
+  </tile>
+  <tile id="74">
+   <image width="24" height="24" source="textures/tileObject/c01_t27_s02_f01.png"/>
+  </tile>
+  <tile id="75">
+   <image width="24" height="24" source="textures/tileObject/c01_t27_s03_f01.png"/>
+  </tile>
+  <tile id="76">
+   <image width="24" height="24" source="textures/tileObject/c01_t27_s04_f01.png"/>
+  </tile>
+  <tile id="77">
+   <image width="24" height="24" source="textures/tileObject/c01_t27_s05_f01.png"/>
+  </tile>
+  <tile id="78">
+   <image width="24" height="24" source="textures/tileObject/c01_t28_s01_f01.png"/>
+  </tile>
  </tileset>
- <tileset firstgid="155" name="units" tilewidth="24" tileheight="29" tilecount="104" columns="0">
+ <tileset firstgid="156" name="unit" tilewidth="24" tileheight="29" tilecount="104" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/units/c02_t01_s01_f01.png"/>
   </tile>
@@ -784,18 +787,18 @@
   <data encoding="csv">
 1,1,1,1,1,67,18,18,68,1,1,1,1,1,1,
 1,1,1,1,69,26,18,18,68,1,1,1,1,1,1,
-1,1,1,58,27,43,22,18,34,1,1,1,1,1,1,
-1,1,69,26,34,1,72,18,18,56,1,1,1,1,1,
-18,65,18,43,1,1,1,67,18,20,70,1,1,1,1,
+1,1,1,58,27,43,22,18,20,56,1,1,1,1,1,
+60,1,69,26,34,1,72,22,18,34,1,1,1,1,1,
+28,65,27,43,47,1,1,67,18,20,70,1,1,1,1,
 18,18,34,1,1,1,1,38,18,18,34,1,1,1,1,
-18,18,34,1,1,1,59,26,18,18,20,52,52,70,1,
-66,22,20,52,65,65,18,18,18,66,66,43,23,18,65,
-1,72,43,43,22,18,18,18,47,1,1,1,38,18,18,
+18,18,34,1,1,1,58,26,18,18,20,52,52,70,1,
+66,22,20,52,65,65,26,18,19,66,66,43,22,20,65,
+1,72,43,43,22,18,18,19,47,1,1,1,38,18,18,
 1,1,1,1,38,18,18,34,1,1,1,1,38,18,18,
-1,1,1,1,72,22,18,68,1,1,1,52,27,66,18,
-1,1,1,1,1,49,18,18,70,1,38,18,71,1,1,
-1,1,1,1,1,1,38,18,20,52,26,47,1,1,1,
-1,1,1,1,1,1,67,18,18,18,71,1,1,1,1,
+1,1,1,1,72,22,18,68,1,1,58,52,27,66,23,
+1,1,1,1,1,38,18,20,70,1,38,19,71,1,51,
+1,1,1,1,1,49,22,18,20,52,27,47,1,1,1,
+1,1,1,1,1,1,67,18,18,19,71,1,1,1,1,
 1,1,1,1,1,1,67,18,18,68,1,1,1,1,1
 </data>
  </layer>
@@ -820,9 +823,9 @@
  </layer>
  <layer name="Unit" width="15" height="15">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,252,0,0,0,156,0,247,
-0,0,0,0,0,0,0,0,0,0,0,0,156,0,0,
-208,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,253,0,0,0,157,0,248,
+0,0,0,0,0,0,0,0,0,0,0,0,157,0,0,
+209,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -832,9 +835,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,207,
-0,0,155,0,0,0,0,0,0,0,0,0,0,0,0,
-248,0,155,0,0,0,251,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,208,
+0,0,156,0,0,0,0,0,0,0,0,0,0,0,0,
+249,0,156,0,0,0,252,0,0,0,0,0,0,0,0
 </data>
  </layer>
 </map>

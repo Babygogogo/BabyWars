@@ -1,44 +1,65 @@
 
 local ViewUnitMap = class("ViewUnitMap", cc.Node)
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local Actor              = require("src.global.actors.Actor")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local Actor                  = require("src.global.actors.Actor")
+
+local isTypeInCategory = GameConstantFunctions.isTypeInCategory
+local toErrorMessage   = SerializationFunctions.toErrorMessage
+
+local CATEGORY_AIR_UNITS    = "AirUnits"
+local CATEGORY_GROUND_UNITS = "GroundUnits"
+local CATEGORY_NAVAL_UNITS  = "NavalUnits"
+
+local LAUNCH_UNIT_Z_ORDER = 3
+local AIR_UNIT_Z_ORDER    = 2
+local GROUND_UNIT_Z_ORDER = 1
+local NAVAL_UNIT_Z_ORDER  = 0
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createEmptyMap(width, height)
-    local map = {}
-    for i = 1, width do
-        map[i] = {}
+local function getUnitCategoryType(modelUnit)
+    local unitType = modelUnit:getUnitType()
+    if     (isTypeInCategory(unitType, CATEGORY_AIR_UNITS))    then return CATEGORY_AIR_UNITS
+    elseif (isTypeInCategory(unitType, CATEGORY_GROUND_UNITS)) then return CATEGORY_GROUND_UNITS
+    elseif (isTypeInCategory(unitType, CATEGORY_NAVAL_UNITS))  then return CATEGORY_NAVAL_UNITS
+    else   error("ViewUnitMap-getUnitCategoryType() no category matched unitType: " .. toErrorMessage(unitType))
     end
-
-    return map
-end
-
-local function setViewUnit(self, view, gridIndex)
-    self.m_Map[gridIndex.x][gridIndex.y] = view
-
-    if (view) then
-        view:setLocalZOrder(self.m_MapSize.height - gridIndex.y)
-    end
-end
-
-local function getViewUnit(self, gridIndex)
-    assert(GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize), "ViewUnitMap-getViewUnit() the param gridIndex is not within the map.")
-
-    return self.m_Map[gridIndex.x][gridIndex.y]
 end
 
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function initLayerAir(self)
+    local layer = cc.Node:create()
+
+    self.m_Layers[CATEGORY_AIR_UNITS] = layer
+    self:addChild(layer, AIR_UNIT_Z_ORDER)
+end
+
+local function initLayerGround(self)
+    local layer = cc.Node:create()
+
+    self.m_Layers[CATEGORY_GROUND_UNITS] = layer
+    self:addChild(layer, GROUND_UNIT_Z_ORDER)
+end
+
+local function initLayerNaval(self)
+    local layer = cc.Node:create()
+
+    self.m_Layers[CATEGORY_NAVAL_UNITS] = layer
+    self:addChild(layer, NAVAL_UNIT_Z_ORDER)
+end
+
 local function initPreviewLaunchUnit(self)
     local view = Actor.createView("sceneWar.ViewUnit")
     view:setVisible(false)
 
     self.m_PreviewLaunchUnit = view
-    self:addChild(view)
+    self:addChild(view, LAUNCH_UNIT_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -46,19 +67,18 @@ end
 --------------------------------------------------------------------------------
 function ViewUnitMap:ctor(param)
     self.m_LoadedViewUnit = {}
+    self.m_Layers = {}
+    initLayerAir(         self)
+    initLayerGround(      self)
+    initLayerNaval(       self)
     initPreviewLaunchUnit(self)
 
     return self
 end
 
 function ViewUnitMap:setMapSize(size)
-    assert(not self.m_Map, "ViewUnitMap:setMapSize() the map already exists.")
-
-    local width, height = size.width, size.height
-    self.m_Map     = createEmptyMap(width, height)
-    self.m_MapSize = {width = width, height = height}
-
-    self.m_PreviewLaunchUnit:setLocalZOrder(height + 1)
+    assert(self.m_MapHeight == nil, "ViewUnitMap:setMapSize() the size has been set already.")
+    self.m_MapHeight = size.height
 
     return self
 end
@@ -66,78 +86,21 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewUnitMap:addViewUnit(view, gridIndex)
-    assert(not getViewUnit(self, gridIndex), "ViewUnitMap:addViewUnit() there's a view in the gridIndex already.")
+function ViewUnitMap:addViewUnit(viewUnit, modelUnit)
+    local gridIndex = modelUnit:getGridIndex()
+    local category  = getUnitCategoryType(modelUnit)
+    self.m_Layers[category]:addChild(viewUnit, self.m_MapHeight - gridIndex.y)
 
-    setViewUnit(self, view, gridIndex)
-    self:addChild(view)
-
-    return self
-end
-
-function ViewUnitMap:removeViewUnit(gridIndex)
-    local view = getViewUnit(self, gridIndex)
-    setViewUnit(self, nil, gridIndex)
-    self:removeChild(view)
-
-    return self
-end
-
-function ViewUnitMap:addLoadedViewUnit(unitID, view)
-    self.m_LoadedViewUnit[unitID] = view
-    view:setVisible(false)
-    self:addChild(view)
-
-    return self
-end
-
-function ViewUnitMap:removeLoadedViewUnit(unitID)
-    self:removeChild(self.m_LoadedViewUnit[unitID])
-    self.m_LoadedViewUnit[unitID] = nil
-
-    return self
-end
-
-function ViewUnitMap:setViewUnitJoinedWithGridIndex(gridIndex)
-    self.m_Map[gridIndex.x][gridIndex.y] = nil
-
-    return self
-end
-
-function ViewUnitMap:setViewUnitJoinedWithUnitId(unitID)
-    self.m_LoadedViewUnit[unitID] = nil
-
-    return self
-end
-
-function ViewUnitMap:swapViewUnit(gridIndex1, gridIndex2)
-    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
-        return
+    local unitID = modelUnit:getUnitId()
+    if (self.m_Model:getLoadedModelUnitWithUnitId(unitID)) then
+        viewUnit:setVisible(false)
     end
 
-    local view1, view2 = getViewUnit(self, gridIndex1), getViewUnit(self, gridIndex2)
-    setViewUnit(self, view1, gridIndex2)
-    setViewUnit(self, view2, gridIndex1)
-
     return self
 end
 
-function ViewUnitMap:setViewUnitLoaded(gridIndex, unitID)
-    local view = getViewUnit(self, gridIndex)
-    assert(view, "ViewUnitMap:setViewUnitLoaded() there's no view unit on the grid.")
-
-    self.m_LoadedViewUnit[unitID] = view
-    self.m_Map[gridIndex.x][gridIndex.y] = nil
-
-    return self
-end
-
-function ViewUnitMap:setViewUnitUnloaded(gridIndex, unitID)
-    local viewUnit = self.m_LoadedViewUnit[unitID]
-    assert(viewUnit, "ViewUnitMap:setViewUnitUnloaded() the target view doesn't exist.")
-
-    self.m_LoadedViewUnit[unitID] = nil
-    self.m_Map[gridIndex.x][gridIndex.y] = viewUnit
+function ViewUnitMap:adjustViewUnitZOrder(viewUnit, gridIndex)
+    viewUnit:setLocalZOrder(self.m_MapHeight - gridIndex.y)
 
     return self
 end

@@ -177,6 +177,10 @@ function GameConstantFunctions.getTileMaxHP()
     return GAME_CONSTANT.tileMaxHP
 end
 
+function GameConstantFunctions.getCommandTowerAttackBonus()
+    return GAME_CONSTANT.commandTowerAttackBonus
+end
+
 function GameConstantFunctions.getMaxPromotion()
     return GAME_CONSTANT.maxPromotion
 end

@@ -31,7 +31,7 @@ local function getMovePathDestination(movePath)
     return movePath[#movePath].gridIndex
 end
 
-local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, modelPlayer)
+local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
     if (not GridIndexFunctions.isWithinMap(gridIndex, modelUnitMap:getMapSize())) then
         return nil
     else
@@ -39,7 +39,7 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap, mod
         if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
             return nil
         else
-            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType(), modelPlayer)
+            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType())
         end
     end
 end
@@ -149,7 +149,7 @@ end
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
     local maxRange     = math.min(self.m_FocusModelUnit:getMoveRange(), self.m_FocusModelUnit:getCurrentFuel())
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
+    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex))                        and
         (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
@@ -176,17 +176,30 @@ local function resetReachableArea(self, focusModelUnit)
         focusModelUnit:getGridIndex(),
         math.min(focusModelUnit:getMoveRange(), focusModelUnit:getCurrentFuel()),
         function(gridIndex)
-            return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap, self.m_LoggedInModelPlayer)
-        end)
+            return getMoveCost(gridIndex, focusModelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
+        end
+    )
 
     if (self.m_View) then
-        self.m_View:setReachableGrids(self.m_ReachableArea)
+        self.m_View:setReachableArea(self.m_ReachableArea)
     end
 end
 
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
+local function dispatchEvtPreviewBattleDamage(self, attackDamage, counterDamage)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name          = "EvtPreviewBattleDamage",
+        attackDamage  = attackDamage,
+        counterDamage = counterDamage,
+    })
+end
+
+local function dispatchEvtPreviewNoBattleDatame(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
+end
+
 local function dispatchEventJoinModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
@@ -300,6 +313,8 @@ end
 -- The functions for available action list.
 --------------------------------------------------------------------------------
 local setStateIdle
+local setStatePreviewingAttackableArea
+local setStatePreviewingReachableArea
 local setStateChoosingProductionTarget
 local setStateMakingMovePath
 local setStateChoosingAction
@@ -604,26 +619,90 @@ end
 --------------------------------------------------------------------------------
 setStateIdle = function(self, resetUnitAnimation)
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible( false)
+        self.m_View:setReachableAreaVisible( false)
             :setAttackableGridsVisible(       false)
             :setMovePathVisible(              false)
             :setMovePathDestinationVisible(   false)
             :setDroppableGridsVisible(        false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(      false)
+            :setPreviewAttackableAreaVisible( false)
+            :setPreviewReachableAreaVisible(  false)
 
         self.m_ModelUnitMap:setPreviewLaunchUnitVisible(false)
         if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
             self.m_FocusModelUnit:showNormalAnimation()
         end
+        for _, modelUnit in pairs(self.m_PreviewAttackModelUnits) do
+            modelUnit:showNormalAnimation()
+        end
+        if (self.m_PreviewReachModelUnit) then
+            self.m_PreviewReachModelUnit:showNormalAnimation()
+        end
     end
 
     self.m_State                    = "idle"
     self.m_FocusModelUnit           = nil
+    self.m_PreviewAttackModelUnits  = {}
+    self.m_PreviewAttackableArea    = {}
+    self.m_PreviewReachModelUnit    = nil
     self.m_LaunchUnitID             = nil
     self.m_SelectedDropDestinations = {}
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtActionPlannerIdle"})
+end
+
+local function canSetStatePreviewingAttackableArea(self, gridIndex)
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    return (modelUnit)                                             and
+        (modelUnit.getAttackRangeMinMax)                           and
+        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+end
+
+setStatePreviewingAttackableArea = function(self, gridIndex)
+    self.m_State = "previewingAttackableArea"
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    for _, existingModelUnit in pairs(self.m_PreviewAttackModelUnits) do
+        if (modelUnit == existingModelUnit) then
+            return
+        end
+    end
+
+    self.m_PreviewAttackModelUnits[#self.m_PreviewAttackModelUnits + 1] = modelUnit
+    self.m_PreviewAttackableArea = AttackableGridListFunctions.createAttackableArea(gridIndex, self.m_ModelTileMap, self.m_ModelUnitMap, self.m_PreviewAttackableArea)
+
+    if (self.m_View) then
+        self.m_View:setPreviewAttackableArea(self.m_PreviewAttackableArea)
+            :setPreviewAttackableAreaVisible(true)
+        modelUnit:showMovingAnimation()
+    end
+end
+
+local function canSetStatePreviewingReachableArea(self, gridIndex)
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    return (modelUnit)                                             and
+        (not modelUnit.getAttackRangeMinMax)                       and
+        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+end
+
+setStatePreviewingReachableArea = function(self, gridIndex)
+    self.m_State = "previewingReachableArea"
+
+    local modelUnit              = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    self.m_PreviewReachModelUnit = modelUnit
+    self.m_PreviewReachableArea  = ReachableAreaFunctions.createArea(
+        gridIndex,
+        math.min(modelUnit:getMoveRange(), modelUnit:getCurrentFuel()),
+        function(gridIndex)
+            return getMoveCost(gridIndex, modelUnit, self.m_ModelUnitMap, self.m_ModelTileMap)
+        end
+    )
+
+    if (self.m_View) then
+        self.m_View:setPreviewReachableArea(self.m_PreviewReachableArea)
+            :setPreviewReachableAreaVisible(true)
+        modelUnit:showMovingAnimation()
+    end
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
@@ -668,7 +747,7 @@ setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
 
     focusModelUnit:showMovingAnimation()
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible(true)
+        self.m_View:setReachableAreaVisible(true)
             :setAttackableGridsVisible(false)
             :setMovePathVisible(true)
             :setMovePathDestinationVisible(false)
@@ -699,7 +778,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
     updateMovePathWithDestinationGrid(self, destination)
 
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible(false)
+        self.m_View:setReachableAreaVisible(false)
             :setAttackableGridsVisible(false)
             :setMovePathVisible(true)
             :setMovePathDestination(destination)
@@ -782,12 +861,14 @@ local function onEvtModelWeatherUpdated(self, event)
     self.m_ModelWeather = event.modelWeather
 end
 
-local function onEvtPlayerRequestDoAction(self, event)
+local function onEvtIsWaitingForServerResponse(self, event)
     setStateIdle(self, false)
+    self.m_IsWaitingForServerResponse = event.waiting
 end
 
 local function onEvtMapCursorMoved(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if ((self.m_IsWaitingForServerResponse)                       or
+        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
         return
     end
 
@@ -803,13 +884,9 @@ local function onEvtMapCursorMoved(self, event)
     elseif (state == "choosingAttackTarget") then
         local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
         if (listNode) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name          = "EvtPreviewBattleDamage",
-                attackDamage  = listNode.estimatedAttackDamage,
-                counterDamage = listNode.estimatedCounterDamage
-            })
+            dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
         else
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
+            dispatchEvtPreviewNoBattleDatame(self)
         end
     elseif (state == "choosingDropDestination") then
         if (self.m_View) then
@@ -826,7 +903,8 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtGridSelected(self, event)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if ((self.m_IsWaitingForServerResponse)                       or
+        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
         return
     end
 
@@ -838,6 +916,10 @@ local function onEvtGridSelected(self, event)
             setStateMakingMovePath(self, gridIndex)
         elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then
             setStateChoosingProductionTarget(self, gridIndex)
+        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then
+            setStatePreviewingAttackableArea(self, gridIndex)
+        elseif (canSetStatePreviewingReachableArea(self, gridIndex)) then
+            setStatePreviewingReachableArea(self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
         setStateIdle(self, true)
@@ -858,10 +940,15 @@ local function onEvtGridSelected(self, event)
     elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)
     elseif (state == "choosingAttackTarget") then
-        if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
-            dispatchEventAttack(self, gridIndex)
-        else
+        local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
+        if (not listNode) then
             setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+        else
+            if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, gridIndex)) then
+                dispatchEventAttack(self, gridIndex)
+            else
+                dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
+            end
         end
     elseif (state == "choosingSiloTarget") then
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
@@ -886,6 +973,14 @@ local function onEvtGridSelected(self, event)
         end
     elseif (state == "choosingAdditionalDropAction") then
         setStateChoosingDropDestination(self, popBackDropDestination(self.m_SelectedDropDestinations).unitID)
+    elseif (state == "previewingAttackableArea") then
+        if (canSetStatePreviewingAttackableArea(self, gridIndex)) then
+            setStatePreviewingAttackableArea(self, gridIndex)
+        else
+            setStateIdle(self, true)
+        end
+    elseif (state == "previewingReachableArea") then
+        setStateIdle(self, true)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
@@ -897,15 +992,15 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:ctor(param)
-    self.m_State                    = "idle"
-    self.m_SelectedDropDestinations = {}
+    self.m_State                      = "idle"
+    self.m_IsWaitingForServerResponse = false
+    self.m_PreviewAttackModelUnits    = {}
+    self.m_SelectedDropDestinations   = {}
 
     return self
 end
 
 function ModelActionPlanner:initView()
-    assert(self.m_View, "ModelActionPlanner:initView() no view is attached to the owner actor of the model.")
-
     return self
 end
 
@@ -919,6 +1014,10 @@ end
 function ModelActionPlanner:setModelTileMap(model)
     assert(self.m_ModelTileMap == nil, "ModelActionPlanner:setModelTileMap() the model has been set already.")
     self.m_ModelTileMap = model
+
+    if (self.m_View) then
+        self.m_View:setMapSize(model:getMapSize())
+    end
 
     return self
 end
@@ -942,11 +1041,11 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelActionPlanner:setRootScriptEventDispatcher() the dispatcher has been set already.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtGridSelected",    self)
-        :addEventListener("EvtMapCursorMoved",        self)
-        :addEventListener("EvtPlayerIndexUpdated",    self)
-        :addEventListener("EvtModelWeatherUpdated",   self)
-        :addEventListener("EvtPlayerRequestDoAction", self)
+    dispatcher:addEventListener("EvtGridSelected",         self)
+        :addEventListener("EvtMapCursorMoved",             self)
+        :addEventListener("EvtPlayerIndexUpdated",         self)
+        :addEventListener("EvtModelWeatherUpdated",        self)
+        :addEventListener("EvtIsWaitingForServerResponse", self)
 
     return self
 end
@@ -954,7 +1053,7 @@ end
 function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerRequestDoAction", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtIsWaitingForServerResponse", self)
         :removeEventListener("EvtModelWeatherUpdated", self)
         :removeEventListener("EvtPlayerIndexUpdated",  self)
         :removeEventListener("EvtMapCursorMoved",      self)
@@ -969,11 +1068,11 @@ end
 --------------------------------------------------------------------------------
 function ModelActionPlanner:onEvent(event)
     local name = event.name
-    if     (name == "EvtGridSelected")          then onEvtGridSelected(         self, event)
-    elseif (name == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
-    elseif (name == "EvtModelWeatherUpdated")   then onEvtModelWeatherUpdated(  self, event)
-    elseif (name == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
-    elseif (name == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
+    if     (name == "EvtGridSelected")               then onEvtGridSelected(              self, event)
+    elseif (name == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
+    elseif (name == "EvtModelWeatherUpdated")        then onEvtModelWeatherUpdated(       self, event)
+    elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
+    elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     end
 
     return self

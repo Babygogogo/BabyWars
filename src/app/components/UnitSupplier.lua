@@ -50,6 +50,7 @@ local function onEvtTurnPhaseSupplyUnit(self, event)
             local target = modelUnitMap:getModelUnit(gridIndex)
             if ((target) and (self:canSupplyModelUnit(target))) then
                 supplyModelUnit(target)
+                target:updateView()
                 dispatchEvtSupplyViewUnit(self, gridIndex)
             end
         end

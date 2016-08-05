@@ -30,10 +30,11 @@
 
 local ModelTileMap = require("src.global.functions.class")("ModelTileMap")
 
-local Actor              = require("src.global.actors.Actor")
-local TypeChecker        = require("src.app.utilities.TypeChecker")
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local TableFunctions     = require("src.app.utilities.TableFunctions")
+local Actor                  = require("src.global.actors.Actor")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local toErrMsg               = SerializationFunctions.toErrorMessage
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
@@ -96,16 +97,50 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
     end
 end
 
+local function destroyAdjacentModelPlasma(self, gridIndex, mapSize)
+    local modelTile = self:getModelTile(gridIndex)
+    if (modelTile:getTileType() == "Plasma") then
+        modelTile:destroyModelTileObject()
+        self.m_PlasmaGridsToDestroy[#self.m_PlasmaGridsToDestroy + 1] = gridIndex
+
+        for _, g in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, mapSize)) do
+            destroyAdjacentModelPlasma(self, g, mapSize)
+        end
+    end
+end
+
+local function destroyAdjacentViewPlasma(self)
+    if (self.m_PlasmaGridsToDestroy) then
+        for _, gridIndex in pairs(self.m_PlasmaGridsToDestroy) do
+            self:getModelTile(gridIndex):destroyViewTileObject()
+        end
+        self.m_PlasmaGridsToDestroy = nil
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtDestroyModelTile(self, event)
-    self:getModelTile(event.gridIndex):destroyModelTileObject()
+    local gridIndex = event.gridIndex
+    local modelTile = self:getModelTile(gridIndex)
+    if (modelTile:getTileType() == "Meteor") then
+        destroyAdjacentViewPlasma(self)
+        self.m_PlasmaGridsToDestroy = {}
+
+        local mapSize = self:getMapSize()
+        for _, g in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, mapSize)) do
+            destroyAdjacentModelPlasma(self, g, mapSize)
+        end
+    end
+
+    modelTile:destroyModelTileObject()
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
 end
 
 local function onEvtDestroyViewTile(self, event)
     self:getModelTile(event.gridIndex):destroyViewTileObject()
+    destroyAdjacentViewPlasma(self)
 end
 
 local function onEvtDestroyModelUnit(self, event)
@@ -298,17 +333,11 @@ function ModelTileMap:getMapSize()
     return self.m_MapSize
 end
 
-function ModelTileMap:getActorTile(gridIndex)
-    if (GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize())) then
-        return self.m_ActorTilesMap[gridIndex.x][gridIndex.y]
-    else
-        return nil
-    end
-end
-
 function ModelTileMap:getModelTile(gridIndex)
-    local tileActor = self:getActorTile(gridIndex)
-    return tileActor and tileActor:getModel() or nil
+    assert(GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize()),
+        "ModelTileMap-getModelTile() invalid param gridIndex: " .. toErrMsg(gridIndex))
+
+    return self.m_ActorTilesMap[gridIndex.x][gridIndex.y]:getModel()
 end
 
 function ModelTileMap:forEachModelTile(func)

@@ -11,8 +11,9 @@
 
 local GridIndexFunctions = {}
 
-local GRID_SIZE = require("src.app.utilities.GameConstantFunctions").getGridSize()
-local ADJACENT_GRIDS_OFFSET = {
+local GRID_SIZE               = require("src.app.utilities.GameConstantFunctions").getGridSize()
+local GRID_WIDTH, GRID_HEIGHT = GRID_SIZE.width, GRID_SIZE.height
+local ADJACENT_GRIDS_OFFSET   = {
     {x = -1, y =  0, direction = "left",  clockwiseOffset = {x =  1, y =  1},},
     {x =  1, y =  0, direction = "right", clockwiseOffset = {x = -1, y = -1},},
     {x =  0, y = -1, direction = "down",  clockwiseOffset = {x = -1, y =  1},},
@@ -25,9 +26,12 @@ function GridIndexFunctions.toGridIndex(pos)
     }
 end
 
+function GridIndexFunctions.toPositionWithXY(x, y)
+    return (x - 1) * GRID_WIDTH, (y - 1) * GRID_HEIGHT
+end
+
 function GridIndexFunctions.toPosition(gridIndex)
-    return	(gridIndex.x - 1) * GRID_SIZE.width,
-            (gridIndex.y - 1) * GRID_SIZE.height
+    return GridIndexFunctions.toPositionWithXY(gridIndex.x, gridIndex.y)
 end
 
 function GridIndexFunctions.toPositionTable(gridIndex)

@@ -15,11 +15,12 @@
 
 local AttackDoer = require("src.global.functions.class")("AttackDoer")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
+
+local COMMAND_TOWER_ATTACK_BONUS = GameConstantFunctions.getCommandTowerAttackBonus()
 
 AttackDoer.EXPORTED_METHODS = {
     "hasPrimaryWeapon",
@@ -28,14 +29,12 @@ AttackDoer.EXPORTED_METHODS = {
     "getPrimaryWeaponCurrentAmmo",
     "getPrimaryWeaponFatalList",
     "getPrimaryWeaponStrongList",
-    "getPrimaryWeaponBaseDamage",
 
     "hasSecondaryWeapon",
     "getSecondaryWeaponFullName",
     "getSecondaryWeaponFatalList",
     "getSecondaryWeaponStrongList",
 
-    "canAttackTarget",
     "getEstimatedBattleDamage",
     "getUltimateBattleDamage",
     "getAttackRangeMinMax",
@@ -48,8 +47,16 @@ AttackDoer.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getAttackDoer(owner)
+    return ComponentManager.getComponent(owner, "AttackDoer")
+end
+
 local function getNormalizedHP(hp)
     return math.ceil(hp / 10)
+end
+
+local function round(num)
+    return math.floor(num + 0.5)
 end
 
 local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, maxRange)
@@ -57,6 +64,13 @@ local function isInAttackRange(attackerGridIndex, targetGridIndex, minRange, max
     return (distance >= minRange) and (distance <= maxRange)
 end
 
+local function getPrimaryWeaponBaseDamage(self, defenseType)
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        return self.m_Template.primaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
+end
 
 local function getSecondaryWeaponBaseDamage(self, defenseType)
     if (self:hasSecondaryWeapon()) then
@@ -67,83 +81,110 @@ local function getSecondaryWeaponBaseDamage(self, defenseType)
 end
 
 local function getBaseDamage(self, defenseType)
-    if (not self) then
-        return nil
-    end
-
-    return self:getPrimaryWeaponBaseDamage(defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
+    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
 end
 
-local function getAttackBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    -- TODO: Calculate the bonus with co skills and so on.
-    local bonus = 0
+local function canAttackTarget(self, attackerGridIndex, target, targetGridIndex)
+    local attacker  = self.m_Owner
+    targetGridIndex = targetGridIndex or target:getGridIndex()
+    return (target)                                                                                           and
+        (target.getDefenseType)                                                                               and
+        (attacker:getPlayerIndex() ~= target:getPlayerIndex())                                                and
+        (isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax()))                    and
+        (self:canAttackAfterMove() or GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)) and
+        (getBaseDamage(self, target:getDefenseType()))
+end
+
+local function getAttackBonusMultiplier(self, attackerGridIndex, target, targetGridIndex, modelTileMap)
+    local attacker    = self.m_Owner
+    local playerIndex = attacker:getPlayerIndex()
+    local bonus       = 0
+
     bonus = bonus + ((attacker.getPromotionAttackBonus) and (attacker:getPromotionAttackBonus()) or 0)
-
-    return bonus
-end
-
-local function getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-    local targetTypeName = GameConstantFunctions.getUnitTypeWithTiledId(target:getTiledID())
-    local bonus = 0
-    bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetTypeName)) or 0)
-    bonus = bonus + ((target.getPromotionDefenseBonus) and (target:getPromotionDefenseBonus()) or 0)
+    modelTileMap:forEachModelTile(function(modelTile)
+        if ((modelTile:getPlayerIndex() == playerIndex) and
+            (modelTile:getTileType() == "CommandTower")) then
+            bonus = bonus + COMMAND_TOWER_ATTACK_BONUS
+        end
+    end)
     -- TODO: Calculate the bonus with co skills and so on.
 
-    return bonus
+    return 1 + bonus / 100
 end
 
-local function getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
-    if (attackerHP <= 0) then
-        return 0
+local function getDefenseBonusMultiplier(self, attackerGridIndex, target, targetGridIndex, modelTileMap)
+    if (not target.getUnitType) then
+        return 1
     end
 
-    local baseAttackDamage = getBaseDamage(ComponentManager.getComponent(attacker, "AttackDoer"), target:getDefenseType())
+    local targetType = target:getUnitType()
+    local targetTile = modelTileMap:getModelTile(targetGridIndex)
+    local bonus      = 0
+
+    bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetType)) or (0))
+    bonus = bonus + ((target.getPromotionDefenseBonus)  and (target:getPromotionDefenseBonus())            or (0))
+    -- TODO: Calculate the bonus with co skills and so on.
+
+    if (bonus >= 0) then
+        return 1 / (1 + bonus / 100)
+    else
+        return 1 - bonus / 100
+    end
+end
+
+local function getAttackLuckMultiplier(self, attackerHP)
+    -- TODO: take the player skills into account.
+    return 1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 10) / 100
+end
+
+local function getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
+    local baseAttackDamage = getBaseDamage(self, target:getDefenseType())
     if (not baseAttackDamage) then
         return nil
     else
-        local attackBonus  = getAttackBonus( attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-        local defenseBonus = getDefenseBonus(attacker, attackerTile, target, targetTile, modelPlayerManager, weather)
-        attackerHP = math.max(attackerHP, 0)
-
-        return math.floor(baseAttackDamage * (getNormalizedHP(attackerHP) / 10) * (1 + attackBonus / 100) / (1 + defenseBonus / 100) + 0.5)
-    end
-end
-
-local function getUltimateAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
-    if (attackerHP <= 0) then
-        return 0
-    end
-
-    local estimatedAttackDamage = getEstimatedAttackDamage(attacker, attackerTile, attackerHP, target, targetTile, modelPlayerManager, weather)
-    if (not estimatedAttackDamage) then
-        return nil
-    else
-        if (not target:isAffectedByLuck()) then
-            return estimatedAttackDamage
+        if (attackerHP <= 0) then
+            return 0
         else
-            return math.floor(estimatedAttackDamage * (1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 9) / 100) + 0.5)
+            return round(
+                baseAttackDamage
+                * (getNormalizedHP(attackerHP) / 10)
+                * getAttackBonusMultiplier( self, attackerGridIndex, target, targetGridIndex, modelTileMap)
+                * getDefenseBonusMultiplier(self, attackerGridIndex, target, targetGridIndex, modelTileMap)
+            )
         end
     end
 end
 
-local function getBattleDamage(self, attackerTile, target, targetTile, weather, getAttackDamage)
-    local attackerGridIndex, targetGridIndex = attackerTile:getGridIndex(), targetTile:getGridIndex()
-    if (not self:canAttackTarget(attackerGridIndex, target, targetGridIndex)) then
+local function getUltimateAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
+    local estimatedAttackDamage = getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
+    if ((not estimatedAttackDamage)      or
+        (estimatedAttackDamage == 0)     or
+        (not target:isAffectedByLuck())) then
+        return estimatedAttackDamage
+    else
+        return round(estimatedAttackDamage * getAttackLuckMultiplier(self, attackerHP))
+    end
+end
+
+local function getBattleDamage(self, attackerGridIndex, target, modelTileMap, getAttackDamage)
+    local targetGridIndex = target:getGridIndex()
+    if (not canAttackTarget(self, attackerGridIndex, target, targetGridIndex)) then
         return nil, nil
     end
 
-    local attacker           = self.m_Owner
-    local modelPlayerManager = self.m_ModelPlayerManager
-    local attackDamage       = getAttackDamage(attacker, attackerTile, attacker:getCurrentHP(), target, targetTile, modelPlayerManager, weather)
+    local attacker     = self.m_Owner
+    local attackDamage = getAttackDamage(self, attackerGridIndex, attacker:getCurrentHP(), target, targetGridIndex, modelTileMap)
     assert(attackDamage, "AttackDoer-getBattleDamage() failed to get the attack damage.")
 
-    if ((target.canAttackTarget) and
-        (target:canAttackTarget(targetGridIndex, attacker, attackerGridIndex)) and
-        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1) then
-        return attackDamage, getAttackDamage(target, targetTile, target:getCurrentHP() - attackDamage, attacker, attackerTile, modelPlayerManager, weather)
-    else
-        return attackDamage, nil
+    local counterDamage
+    local targetAttackDoer = getAttackDoer(target)
+    if ((targetAttackDoer)                                                                and
+        (canAttackTarget(targetAttackDoer, targetGridIndex, attacker, attackerGridIndex)) and
+        (GridIndexFunctions.getDistance(attackerGridIndex, targetGridIndex)) == 1)        then
+        counterDamage = getAttackDamage(targetAttackDoer, targetGridIndex, target:getCurrentHP() - attackDamage, attacker, attackerGridIndex, modelTileMap)
     end
+
+    return attackDamage, counterDamage
 end
 
 --------------------------------------------------------------------------------
@@ -169,7 +210,7 @@ end
 
 function AttackDoer:loadInstantialData(data)
     if (data.primaryWeapon) then
-        self.m_PrimaryWeaponCurrentAmmo = data.primaryWeapon.currentAmmo
+        self:setPrimaryWeaponCurrentAmmo(data.primaryWeapon.currentAmmo)
     end
 
     return self
@@ -178,6 +219,13 @@ end
 function AttackDoer:setModelPlayerManager(model)
     assert(self.m_ModelPlayerManager == nil, "AttackDoer:setModelPlayerManager() the model has been set.")
     self.m_ModelPlayerManager = model
+
+    return self
+end
+
+function AttackDoer:setModelWeatherManager(model)
+    assert(self.m_ModelWeatherManager == nil, "AttackDoer:setModelWeatherManager() the model has been set.")
+    self.m_ModelWeatherManager = model
 
     return self
 end
@@ -200,13 +248,14 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function AttackDoer:doActionAttack(action, attackTarget)
-    if (self:getPrimaryWeaponBaseDamage(attackTarget:getDefenseType())) then
+function AttackDoer:doActionAttack(action, target)
+    if (getPrimaryWeaponBaseDamage(self, target:getDefenseType())) then
         self:setPrimaryWeaponCurrentAmmo(self:getPrimaryWeaponCurrentAmmo() - 1)
     end
 
-    if ((action.counterDamage) and (attackTarget:getPrimaryWeaponBaseDamage(self.m_Owner:getDefenseType()))) then
-        attackTarget:setPrimaryWeaponCurrentAmmo(attackTarget:getPrimaryWeaponCurrentAmmo() - 1)
+    if ((action.counterDamage)                                                              and
+        (getPrimaryWeaponBaseDamage(getAttackDoer(target), self.m_Owner:getDefenseType()))) then
+        target:setPrimaryWeaponCurrentAmmo(target:getPrimaryWeaponCurrentAmmo() - 1)
     end
 
     return self
@@ -255,14 +304,6 @@ function AttackDoer:getPrimaryWeaponStrongList()
     return self.m_Template.primaryWeapon.strong
 end
 
-function AttackDoer:getPrimaryWeaponBaseDamage(defenseType)
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        return self.m_Template.primaryWeapon.baseDamage[defenseType]
-    else
-        return nil
-    end
-end
-
 function AttackDoer:hasSecondaryWeapon()
     return self.m_Template.secondaryWeapon ~= nil
 end
@@ -282,27 +323,16 @@ function AttackDoer:getSecondaryWeaponStrongList()
     return self.m_Template.secondaryWeapon.strong
 end
 
-function AttackDoer:canAttackTarget(attackerGridIndex, target, targetGridIndex)
-    if ((not target) or
-        (not target.getDefenseType) or
-        (not isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax())) or
-        ((not GridIndexFunctions.isEqual(self.m_Owner:getGridIndex(), attackerGridIndex) and (not self:canAttackAfterMove()))) or
-        (self.m_Owner:getPlayerIndex() == target:getPlayerIndex())) then
-        return false
-    end
-
-    return (getBaseDamage(self, target:getDefenseType()) ~= nil)
+function AttackDoer:getEstimatedBattleDamage(target, attackerGridIndex, modelTileMap)
+    return getBattleDamage(self, attackerGridIndex, target, modelTileMap, getEstimatedAttackDamage)
 end
 
-function AttackDoer:getEstimatedBattleDamage(attackerTile, target, targetTile, weather)
-    return getBattleDamage(self, attackerTile, target, targetTile, weather, getEstimatedAttackDamage)
-end
-
-function AttackDoer:getUltimateBattleDamage(attackerTile, target, targetTile, weather)
-    return getBattleDamage(self, attackerTile, target, targetTile, weather, getUltimateAttackDamage)
+function AttackDoer:getUltimateBattleDamage(target, attackerGridIndex, modelTileMap)
+    return getBattleDamage(self, attackerGridIndex, target, modelTileMap, getUltimateAttackDamage)
 end
 
 function AttackDoer:getAttackRangeMinMax()
+    -- TODO: take the player skills into account.
     return self.m_Template.minAttackRange, self.m_Template.maxAttackRange
 end
 
