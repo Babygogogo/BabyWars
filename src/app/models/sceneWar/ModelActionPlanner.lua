@@ -188,6 +188,18 @@ end
 --------------------------------------------------------------------------------
 -- The functions for dispatching EvtPlayerRequestDoAction.
 --------------------------------------------------------------------------------
+local function dispatchEvtPreviewBattleDamage(self, attackDamage, counterDamage)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name          = "EvtPreviewBattleDamage",
+        attackDamage  = attackDamage,
+        counterDamage = counterDamage,
+    })
+end
+
+local function dispatchEvtPreviewNoBattleDatame(self)
+    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
+end
+
 local function dispatchEventJoinModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
@@ -839,13 +851,9 @@ local function onEvtMapCursorMoved(self, event)
     elseif (state == "choosingAttackTarget") then
         local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
         if (listNode) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name          = "EvtPreviewBattleDamage",
-                attackDamage  = listNode.estimatedAttackDamage,
-                counterDamage = listNode.estimatedCounterDamage
-            })
+            dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
         else
-            self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
+            dispatchEvtPreviewNoBattleDatame(self)
         end
     elseif (state == "choosingDropDestination") then
         if (self.m_View) then
@@ -897,10 +905,15 @@ local function onEvtGridSelected(self, event)
     elseif (state == "choosingAction") then
         setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)
     elseif (state == "choosingAttackTarget") then
-        if (AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)) then
-            dispatchEventAttack(self, gridIndex)
-        else
+        local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
+        if (not listNode) then
             setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+        else
+            if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, gridIndex)) then
+                dispatchEventAttack(self, gridIndex)
+            else
+                dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
+            end
         end
     elseif (state == "choosingSiloTarget") then
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
