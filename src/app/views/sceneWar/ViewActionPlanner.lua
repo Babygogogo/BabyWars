@@ -12,8 +12,10 @@ local ATTACKABLE_GRIDS_Z_ORDER         = 0
 local MOVE_PATH_DESTINATION_Z_ORDER    = 0
 local DROPPABLE_GRIDS_Z_ORDER          = 0
 local PREVIEW_ATTACKABLE_AREA_Z_ORDER  = 0
+local DROP_DESTIONATIONS_UNIT_Z_ORDER  = 0
 
-local DROP_DESTIONATIONS_UNIT_Z_ORDER = 0
+local ATTACKABLE_GRIDS_OPACITY = 140
+local REACHABLE_GRIDS_OPACITY  = 150
 
 local SPRITE_FRAME_NAME_EMPTY             = nil
 local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c03_t02_s01_f01.png"
@@ -30,22 +32,30 @@ local SPRITE_FRAME_NAME_CORNER_UP_RIGHT   = "c03_t02_s10_f01.png"
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createViewSingleReachableGrid(gridIndex)
+local function createViewSingleReachableGridWithXY(x, y)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
-        :setPosition(GridIndexFunctions.toPosition(gridIndex))
+        :setPosition(GridIndexFunctions.toPositionWithXY(x, y))
         :playAnimationForever(display.getAnimationCache("ReachableGrid"))
 
     return view
 end
 
-local function createViewSingleAttackableGrid(gridIndex)
+local function createViewSingleReachableGrid(gridIndex)
+    return createViewSingleReachableGridWithXY(gridIndex.x, gridIndex.y)
+end
+
+local function createViewSingleAttackableGridWithXY(x, y)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
-        :setPosition(GridIndexFunctions.toPosition(gridIndex))
+        :setPosition(GridIndexFunctions.toPositionWithXY(x, y))
         :playAnimationForever(display.getAnimationCache("AttackableGrid"))
 
     return view
+end
+
+local function createViewSingleAttackableGrid(gridIndex)
+    return createViewSingleAttackableGridWithXY(gridIndex.x, gridIndex.y)
 end
 
 local function getSpriteFrameName(prevDirection, nextDirection)
@@ -119,7 +129,7 @@ end
 --------------------------------------------------------------------------------
 local function initViewReachableGrids(self)
     local view = cc.Node:create()
-    view:setOpacity(160)
+    view:setOpacity(REACHABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewReachableGrids = view
@@ -128,7 +138,7 @@ end
 
 local function initViewAttackableGrids(self)
     local view = cc.Node:create()
-    view:setOpacity(180)
+    view:setOpacity(ATTACKABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewAttackableGrids = view
@@ -138,7 +148,7 @@ end
 local function initViewMovePathDestination(self)
     local view = cc.Sprite:create()
     view:ignoreAnchorPointForPosition(true)
-        :setOpacity(160)
+        :setOpacity(REACHABLE_GRIDS_OPACITY)
         :setVisible(false)
         :playAnimationForever(display.getAnimationCache("ReachableGrid"))
 
@@ -156,7 +166,7 @@ end
 local function initViewPreviewDropDestination(self)
     local view = Actor.createView("sceneWar.ViewUnit")
     view:setVisible(false)
-        :setOpacity(150)
+        :setOpacity(REACHABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewPreviewDropDestination = view
@@ -167,7 +177,7 @@ local function initViewDropDestinations(self)
     local view = cc.Node:create()
     view:ignoreAnchorPointForPosition(true)
         :setVisible(false)
-        :setOpacity(150)
+        :setOpacity(REACHABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewDropDestinations = view
@@ -176,7 +186,7 @@ end
 
 local function initViewDroppableGrids(self)
     local view = cc.Node:create()
-    view:setOpacity(160)
+    view:setOpacity(REACHABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
     self.m_ViewDroppableGrids = view
@@ -185,15 +195,29 @@ end
 
 local function initViewPreviewAttackableArea(self)
     local view = cc.Node:create()
-    view:setOpacity(180)
+    view:setOpacity(ATTACKABLE_GRIDS_OPACITY)
         :setCascadeOpacityEnabled(true)
 
+    local grids = {}
+    local width, height = self.m_MapSize.width, self.m_MapSize.height
+    for x = 1, width do
+        grids[x] = {}
+        for y = 1, height do
+            local grid = createViewSingleAttackableGridWithXY(x, y)
+            grid:setVisible(false)
+
+            view:addChild(grid)
+            grids[x][y] = grid
+        end
+    end
+
     self.m_ViewPreviewAttackableArea = view
+    self.m_ViewPreviewAttackableGrids = grids
     self:addChild(view, PREVIEW_ATTACKABLE_AREA_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewActionPlanner:ctor(param)
     initViewReachableGrids(        self)
@@ -203,6 +227,13 @@ function ViewActionPlanner:ctor(param)
     initViewPreviewDropDestination(self)
     initViewDropDestinations(      self)
     initViewDroppableGrids(        self)
+
+    return self
+end
+
+function ViewActionPlanner:setMapSize(size)
+    assert(self.m_MapSize == nil, "ViewActionPlanner:setMapSize() the size has been set already.")
+    self.m_MapSize = size
     initViewPreviewAttackableArea( self)
 
     return self
@@ -217,7 +248,7 @@ function ViewActionPlanner:setReachableGrids(grids)
     for x, column in pairs(grids) do
         if (type(column) == "table") then
             for y, _ in pairs(column) do
-                self.m_ViewReachableGrids:addChild(createViewSingleReachableGrid({x = x, y = y}))
+                self.m_ViewReachableGrids:addChild(createViewSingleReachableGridWithXY(x, y))
             end
         end
     end
@@ -331,14 +362,11 @@ function ViewActionPlanner:setDropDestinationsVisible(visible)
 end
 
 function ViewActionPlanner:setPreviewAttackableArea(area)
-    local view = self.m_ViewPreviewAttackableArea
-    view:removeAllChildren()
-
-    for x, column in pairs(area) do
-        if (type(column) == "table") then
-            for y, _ in pairs(column) do
-                view:addChild(createViewSingleAttackableGrid({x = x, y = y}))
-            end
+    local width, height = self.m_MapSize.width, self.m_MapSize.height
+    local grids         = self.m_ViewPreviewAttackableGrids
+    for x = 1, width do
+        for y = 1, height do
+            grids[x][y]:setVisible(area[x] and area[x][y])
         end
     end
 

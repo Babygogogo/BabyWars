@@ -619,14 +619,15 @@ setStateIdle = function(self, resetUnitAnimation)
         if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
             self.m_FocusModelUnit:showNormalAnimation()
         end
-        if (self.m_PreviewModelUnit) then
-            self.m_PreviewModelUnit:showNormalAnimation()
+        for _, modelUnit in pairs(self.m_PreviewAttackModelUnits) do
+            modelUnit:showNormalAnimation()
         end
     end
 
     self.m_State                    = "idle"
     self.m_FocusModelUnit           = nil
-    self.m_PreviewModelUnit         = nil
+    self.m_PreviewAttackModelUnits  = {}
+    self.m_PreviewAttackableArea    = {}
     self.m_LaunchUnitID             = nil
     self.m_SelectedDropDestinations = {}
 
@@ -641,14 +642,21 @@ local function canSetStatePreviewingAttackableArea(self, gridIndex)
 end
 
 setStatePreviewAttackableArea = function(self, gridIndex)
-    self.m_State            = "previewingAttackableArea"
-    self.m_PreviewModelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    self.m_State = "previewingAttackableArea"
+    local modelUnit = self.m_ModelUnitMap:getModelUnit(gridIndex)
+    for _, existingModelUnit in pairs(self.m_PreviewAttackModelUnits) do
+        if (modelUnit == existingModelUnit) then
+            return
+        end
+    end
+
+    self.m_PreviewAttackModelUnits[#self.m_PreviewAttackModelUnits + 1] = modelUnit
+    self.m_PreviewAttackableArea = AttackableGridListFunctions.createAttackableArea(gridIndex, self.m_ModelTileMap, self.m_ModelUnitMap, self.m_PreviewAttackableArea)
 
     if (self.m_View) then
-        local area = AttackableGridListFunctions.createAttackableArea(gridIndex, self.m_ModelTileMap, self.m_ModelUnitMap)
-        self.m_View:setPreviewAttackableArea(area)
+        self.m_View:setPreviewAttackableArea(self.m_PreviewAttackableArea)
             :setPreviewAttackableAreaVisible(true)
-        self.m_PreviewModelUnit:showMovingAnimation()
+        modelUnit:showMovingAnimation()
     end
 end
 
@@ -918,7 +926,11 @@ local function onEvtGridSelected(self, event)
     elseif (state == "choosingAdditionalDropAction") then
         setStateChoosingDropDestination(self, popBackDropDestination(self.m_SelectedDropDestinations).unitID)
     elseif (state == "previewingAttackableArea") then
-        setStateIdle(self, true)
+        if (canSetStatePreviewingAttackableArea(self, gridIndex)) then
+            setStatePreviewAttackableArea(self, gridIndex)
+        else
+            setStateIdle(self, true)
+        end
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
@@ -932,14 +944,13 @@ end
 function ModelActionPlanner:ctor(param)
     self.m_State                      = "idle"
     self.m_IsWaitingForServerResponse = false
+    self.m_PreviewAttackModelUnits    = {}
     self.m_SelectedDropDestinations   = {}
 
     return self
 end
 
 function ModelActionPlanner:initView()
-    assert(self.m_View, "ModelActionPlanner:initView() no view is attached to the owner actor of the model.")
-
     return self
 end
 
@@ -953,6 +964,10 @@ end
 function ModelActionPlanner:setModelTileMap(model)
     assert(self.m_ModelTileMap == nil, "ModelActionPlanner:setModelTileMap() the model has been set already.")
     self.m_ModelTileMap = model
+
+    if (self.m_View) then
+        self.m_View:setMapSize(model:getMapSize())
+    end
 
     return self
 end

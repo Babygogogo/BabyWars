@@ -77,17 +77,17 @@ function AttackableGridListFunctions.createList(attacker, attackerGridIndex, mod
     )
 end
 
-function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, modelTileMap, modelUnitMap)
+function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, modelTileMap, modelUnitMap, existingArea)
     local attacker            = modelUnitMap:getModelUnit(attackerGridIndex)
     local attackerPlayerIndex = attacker:getPlayerIndex()
     local attackerMoveType    = attacker:getMoveType()
     local mapSize             = modelTileMap:getMapSize()
     local minRange, maxRange  = attacker:getAttackRangeMinMax()
+    existingArea              = existingArea or {}
 
     if (not attacker:canAttackAfterMove()) then
-        local area = {}
-        updateAttackableArea(area, mapSize, attackerGridIndex.x, attackerGridIndex.y, minRange, maxRange)
-        return area
+        updateAttackableArea(existingArea, mapSize, attackerGridIndex.x, attackerGridIndex.y, minRange, maxRange)
+        return existingArea
     else
         local reachableArea = ReachableAreaFunctions.createArea(
             attackerGridIndex,
@@ -106,20 +106,19 @@ function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, mod
                 end
             end
         )
-        local area             = {}
         local originX, originY = attackerGridIndex.x, attackerGridIndex.y
         for x, column in pairs(reachableArea) do
             if (type(column) == "table") then
                 for y, _ in pairs(column) do
                     if (((x == originX) and (y == originY))              or
                         (not modelUnitMap:getModelUnit({x = x, y = y}))) then
-                        updateAttackableArea(area, mapSize, x, y, minRange, maxRange)
+                        updateAttackableArea(existingArea, mapSize, x, y, minRange, maxRange)
                     end
                 end
             end
         end
 
-        return area
+        return existingArea
     end
 end
 
