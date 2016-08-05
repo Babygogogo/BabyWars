@@ -12,6 +12,7 @@ local ATTACKABLE_GRIDS_Z_ORDER         = 0
 local MOVE_PATH_DESTINATION_Z_ORDER    = 0
 local DROPPABLE_GRIDS_Z_ORDER          = 0
 local PREVIEW_ATTACKABLE_AREA_Z_ORDER  = 0
+local PREVIEW_REACHABLE_AREA_Z_ORDER   = 0
 local DROP_DESTIONATIONS_UNIT_Z_ORDER  = 0
 
 local ATTACKABLE_GRIDS_OPACITY = 140
@@ -56,6 +57,35 @@ end
 
 local function createViewSingleAttackableGrid(gridIndex)
     return createViewSingleAttackableGridWithXY(gridIndex.x, gridIndex.y)
+end
+
+local function createViewAreaAndGrids(mapSize, gridCreator, opacity)
+    local area = cc.Node:create()
+    area:setOpacity(opacity)
+        :setCascadeOpacityEnabled(true)
+
+    local grids = {}
+    local width, height = mapSize.width, mapSize.height
+    for x = 1, width do
+        grids[x] = {}
+        for y = 1, height do
+            local grid = gridCreator(x, y)
+            grid:setVisible(false)
+
+            area:addChild(grid)
+            grids[x][y] = grid
+        end
+    end
+
+    return area, grids
+end
+
+local function setGridsVisibleWithArea(grids, area)
+    for x = 1, #grids do
+        for y = 1, #grids[x] do
+            grids[x][y]:setVisible((area[x]) and (area[x][y] ~= nil))
+        end
+    end
 end
 
 local function getSpriteFrameName(prevDirection, nextDirection)
@@ -185,49 +215,30 @@ local function initViewDroppableGrids(self)
 end
 
 local function initViewReachableArea(self)
-    local view = cc.Node:create()
-    view:setOpacity(REACHABLE_GRIDS_OPACITY)
-        :setCascadeOpacityEnabled(true)
-
-    local grids = {}
-    local width, height = self.m_MapSize.width, self.m_MapSize.height
-    for x = 1, width do
-        grids[x] = {}
-        for y = 1, height do
-            local grid = createViewSingleReachableGridWithXY(x, y)
-            grid:setVisible(false)
-
-            view:addChild(grid)
-            grids[x][y] = grid
-        end
-    end
-
-    self.m_ViewReachableArea  = view
-    self.m_ViewReachableGrids = grids
-    self:addChild(view, REACHABLE_GRIDS_Z_ORDER)
+    self.m_ViewReachableArea, self.m_ViewReachableGrids = createViewAreaAndGrids(
+        self.m_MapSize,
+        createViewSingleReachableGridWithXY,
+        REACHABLE_GRIDS_OPACITY
+    )
+    self:addChild(self.m_ViewReachableArea, REACHABLE_GRIDS_Z_ORDER)
 end
 
 local function initViewPreviewAttackableArea(self)
-    local view = cc.Node:create()
-    view:setOpacity(ATTACKABLE_GRIDS_OPACITY)
-        :setCascadeOpacityEnabled(true)
+    self.m_ViewPreviewAttackableArea, self.m_ViewPreviewAttackableGrids = createViewAreaAndGrids(
+        self.m_MapSize,
+        createViewSingleAttackableGridWithXY,
+        ATTACKABLE_GRIDS_OPACITY
+    )
+    self:addChild(self.m_ViewPreviewAttackableArea, PREVIEW_ATTACKABLE_AREA_Z_ORDER)
+end
 
-    local grids = {}
-    local width, height = self.m_MapSize.width, self.m_MapSize.height
-    for x = 1, width do
-        grids[x] = {}
-        for y = 1, height do
-            local grid = createViewSingleAttackableGridWithXY(x, y)
-            grid:setVisible(false)
-
-            view:addChild(grid)
-            grids[x][y] = grid
-        end
-    end
-
-    self.m_ViewPreviewAttackableArea  = view
-    self.m_ViewPreviewAttackableGrids = grids
-    self:addChild(view, PREVIEW_ATTACKABLE_AREA_Z_ORDER)
+local function initViewPreviewReachableArea(self)
+    self.m_ViewPreviewReachableArea, self.m_ViewPreviewReachableGrids = createViewAreaAndGrids(
+        self.m_MapSize,
+        createViewSingleReachableGridWithXY,
+        REACHABLE_GRIDS_OPACITY
+    )
+    self:addChild(self.m_ViewPreviewReachableArea, PREVIEW_REACHABLE_AREA_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
@@ -249,6 +260,7 @@ function ViewActionPlanner:setMapSize(size)
     self.m_MapSize = size
     initViewReachableArea(        self)
     initViewPreviewAttackableArea(self)
+    initViewPreviewReachableArea( self)
 
     return self
 end
@@ -256,24 +268,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewActionPlanner:setReachableArea(area)
-    local width, height = self.m_MapSize.width, self.m_MapSize.height
-    local grids         = self.m_ViewReachableGrids
-    for x = 1, width do
-        for y = 1, height do
-            grids[x][y]:setVisible((area[x]) and (area[x][y] ~= nil))
-        end
-    end
-
-    return self
-end
-
-function ViewActionPlanner:setReachableAreaVisible(visible)
-    self.m_ViewReachableArea:setVisible(visible)
-
-    return self
-end
-
 function ViewActionPlanner:setAttackableGrids(grids)
     self.m_ViewAttackableGrids:removeAllChildren()
 
@@ -373,20 +367,38 @@ function ViewActionPlanner:setDropDestinationsVisible(visible)
     return self
 end
 
+function ViewActionPlanner:setReachableArea(area)
+    setGridsVisibleWithArea(self.m_ViewReachableGrids, area)
+
+    return self
+end
+
+function ViewActionPlanner:setReachableAreaVisible(visible)
+    self.m_ViewReachableArea:setVisible(visible)
+
+    return self
+end
+
 function ViewActionPlanner:setPreviewAttackableArea(area)
-    local width, height = self.m_MapSize.width, self.m_MapSize.height
-    local grids         = self.m_ViewPreviewAttackableGrids
-    for x = 1, width do
-        for y = 1, height do
-            grids[x][y]:setVisible((area[x]) and (area[x][y] ~= nil))
-        end
-    end
+    setGridsVisibleWithArea(self.m_ViewPreviewAttackableGrids, area)
 
     return self
 end
 
 function ViewActionPlanner:setPreviewAttackableAreaVisible(visible)
     self.m_ViewPreviewAttackableArea:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewReachableArea(area)
+    setGridsVisibleWithArea(self.m_ViewPreviewReachableGrids, area)
+
+    return self
+end
+
+function ViewActionPlanner:setPreviewReachableAreaVisible(visible)
+    self.m_ViewPreviewReachableArea:setVisible(visible)
 
     return self
 end
