@@ -14,25 +14,10 @@ local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local FONT_OUTLINE_WIDTH = 2
 
-local VERSION_INDICATOR_WIDTH  = 250
-local VERSION_INDICATOR_HEIGHT = 40
-local VERSION_INDICATOR_POS_X  = display.width - 250
+local VERSION_INDICATOR_POS_X  = 15
 local VERSION_INDICATOR_POS_Y  = 10
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function createLabel(posX, posY, width, height, text)
-    local label = cc.Label:createWithTTF(text or "", FONT_NAME, FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(posX, posY)
-        :setDimensions(width, height)
-
-        :setTextColor(FONT_COLOR)
-        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
-
-    return label
-end
+local VERSION_INDICATOR_WIDTH  = display.width  - VERSION_INDICATOR_POS_X * 2
+local VERSION_INDICATOR_HEIGHT = display.height - VERSION_INDICATOR_POS_Y * 2
 
 --------------------------------------------------------------------------------
 -- The composition elements.
@@ -46,7 +31,16 @@ local function initBackground(self)
 end
 
 local function initVersionIndicator(self)
-    local indicator = createLabel(VERSION_INDICATOR_POS_X, VERSION_INDICATOR_POS_Y, VERSION_INDICATOR_WIDTH, VERSION_INDICATOR_HEIGHT)
+    local indicator = cc.Label:createWithTTF("", FONT_NAME, FONT_SIZE)
+    indicator:ignoreAnchorPointForPosition(true)
+        :setPosition(VERSION_INDICATOR_POS_X, VERSION_INDICATOR_POS_Y)
+
+        :setDimensions(VERSION_INDICATOR_WIDTH, VERSION_INDICATOR_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_RIGHT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
     self.m_VersionIndicator = indicator
     self:addChild(indicator, VERSION_INDICATOR_Z_ORDER)
