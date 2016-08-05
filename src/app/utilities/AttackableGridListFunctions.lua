@@ -110,10 +110,7 @@ function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, mod
         for x, column in pairs(reachableArea) do
             if (type(column) == "table") then
                 for y, _ in pairs(column) do
-                    if (((x == originX) and (y == originY))              or
-                        (not modelUnitMap:getModelUnit({x = x, y = y}))) then
-                        updateAttackableArea(existingArea, mapSize, x, y, minRange, maxRange)
-                    end
+                    updateAttackableArea(existingArea, mapSize, x, y, minRange, maxRange)
                 end
             end
         end

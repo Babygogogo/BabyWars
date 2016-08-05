@@ -181,7 +181,7 @@ local function resetReachableArea(self, focusModelUnit)
     )
 
     if (self.m_View) then
-        self.m_View:setReachableGrids(self.m_ReachableArea)
+        self.m_View:setReachableArea(self.m_ReachableArea)
     end
 end
 
@@ -606,7 +606,7 @@ end
 --------------------------------------------------------------------------------
 setStateIdle = function(self, resetUnitAnimation)
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible( false)
+        self.m_View:setReachableAreaVisible( false)
             :setAttackableGridsVisible(       false)
             :setMovePathVisible(              false)
             :setMovePathDestinationVisible(   false)
@@ -702,7 +702,7 @@ setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
 
     focusModelUnit:showMovingAnimation()
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible(true)
+        self.m_View:setReachableAreaVisible(true)
             :setAttackableGridsVisible(false)
             :setMovePathVisible(true)
             :setMovePathDestinationVisible(false)
@@ -733,7 +733,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
     updateMovePathWithDestinationGrid(self, destination)
 
     if (self.m_View) then
-        self.m_View:setReachableGridsVisible(false)
+        self.m_View:setReachableAreaVisible(false)
             :setAttackableGridsVisible(false)
             :setMovePathVisible(true)
             :setMovePathDestination(destination)
