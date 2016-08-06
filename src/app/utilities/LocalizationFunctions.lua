@@ -19,6 +19,7 @@ local s_LongText1_1 = [[
 2. 选中您所希望加入的战局，再选择回合顺序、密码等设定，并确认加入战局（注意，游戏不会自动进入战局画面）。
 3. 回到主菜单选择“继续”，里面会出现该战局（前提是该战局已经满员。若未满员，则该战局不会出现，您仍需等候他人加入）。点击相应选项即可进入战局。
 ]]
+local s_LongText1_2 = "Untranslated"
 
 local s_LongText2_1 = [[
 --- 战局操作 ---
@@ -31,6 +32,7 @@ local s_LongText2_1 = [[
 
 您可以预览战斗的预估伤害值：在为部队选择攻击目标时，把光标拖拽到目标之上即可（请不要直接点击目标，这将被游戏解读为直接对该目标进行攻击，而不预览战斗伤害值）。
 ]]
+local s_LongText2_2 = "Untranslated"
 
 local s_LongText3_1 = [[
 --- 关于本作 ---
@@ -48,19 +50,63 @@ local s_LongText3_1 = [[
 原作：《Advanced Wars》系列
 原作开发商：Intelligent Systems
 ]]
+local s_LongText3_2 = "Untranslated"
 
 --------------------------------------------------------------------------------
 -- The private functions.
 --------------------------------------------------------------------------------
 local s_Texts = {
     [1] = {
-        [1] = function(...) return "主  菜  单" end,
-        [2] = function(...) return "Main Menu" end,
+        [1] = function(textType)
+            if     (textType == "MainMenu")     then return "主  菜  单"
+            elseif (textType == "NewGame")      then return "新 建 战 局"
+            elseif (textType == "Continue")     then return "继 续"
+            elseif (textType == "JoinWar")      then return "参 战"
+            elseif (textType == "ConfigSkills") then return "配 置 技 能"
+            elseif (textType == "Login")        then return "注 册 / 登 陆"
+            elseif (textType == "Help")         then return "帮 助"
+            elseif (textType == "Back")         then return "返 回"
+            elseif (textType == "Exit")         then return "退 出"
+            elseif (textType == "GameFlow")     then return "游 戏 流 程"
+            elseif (textType == "WarControl")   then return "战 局 操 作"
+            elseif (textType == "About")        then return "关 于 本 作"
+            else                                     return "未知[1]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "MainMenu")     then return "Main Menu"
+            elseif (textType == "NewGame")      then return "New Game"
+            elseif (textType == "Continue")     then return "Continue"
+            elseif (textType == "JoinWar")      then return "Join"
+            elseif (textType == "ConfigSkills") then return "Config Skills"
+            elseif (textType == "Login")        then return "Login"
+            elseif (textType == "Help")         then return "Help"
+            elseif (textType == "Back")         then return "Back"
+            elseif (textType == "Exit")         then return "Exit"
+            elseif (textType == "GameFlow")     then return "Game Flow"
+            elseif (textType == "WarControl")   then return "Controlling"
+            elseif (textType == "About")        then return "About"
+            else                                     return "Unknown[1]: " .. (textType or "")
+            end
+        end,
     },
     [2] = {
-        [1] = function(...) return "新 建 战 局"  end,
-        [2] = function(...) return "New Game" end,
+        [1] = function(textCode)
+            if     (textCode == 1) then return s_LongText1_1
+            elseif (textCode == 2) then return s_LongText2_1
+            elseif (textCode == 3) then return s_LongText3_1
+            else                        return "未知[2]: " .. (textCode or "")
+            end
+        end,
+        [2] = function(textCode)
+            if     (textCode == 1) then return s_LongText1_2
+            elseif (textCode == 2) then return s_LongText2_2
+            elseif (textCode == 3) then return s_LongText3_2
+            else                        return "Unknown[2]: " .. (textCode or "")
+            end
+        end,
     },
+    --[[
     [3] = {
         [1] = function(...) return "继 续"    end,
         [2] = function(...) return "Continue" end,
@@ -119,6 +165,7 @@ local s_Texts = {
         [1] = function(...) return s_LongText3_1     end,
         [2] = function(...) return "Untranslated..." end,
     },
+    --]]
     [15] = {
         [1] = function(...) return "账 号："  end,
         [2] = function(...) return "Account:" end,

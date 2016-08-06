@@ -148,7 +148,7 @@ end
 
 local function initLabelTitle(self)
     local label = createLabel(LABEL_TITLE_POS_X, LABEL_TITLE_POS_Y, LABEL_TITLE_WIDTH, LABEL_TITLE_HEIGHT,
-        LocalizationFunctions.getLocalizedText(6))
+        LocalizationFunctions.getLocalizedText(1, "Login"))
     label:setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
 

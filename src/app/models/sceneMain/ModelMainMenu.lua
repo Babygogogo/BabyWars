@@ -99,7 +99,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemNewWar(self)
     local item = {
-        name = LocalizationFunctions.getLocalizedText(2),
+        name     = LocalizationFunctions.getLocalizedText(1, "NewGame"),
         callback = function()
             self:setMenuEnabled(false)
             getActorNewWarCreator(self):getModel():setEnabled(true)
@@ -111,7 +111,7 @@ end
 
 local function initItemContinue(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(3),
+        name     = LocalizationFunctions.getLocalizedText(1, "Continue"),
         callback = function()
             self:setMenuEnabled(false)
             getActorContinueWarSelector(self):getModel():setEnabled(true)
@@ -123,7 +123,7 @@ end
 
 local function initItemJoinWar(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(4),
+        name     = LocalizationFunctions.getLocalizedText(1, "JoinWar"),
         callback = function()
             self:setMenuEnabled(false)
             getActorJoinWarSelector(self):getModel():setEnabled(true)
@@ -135,7 +135,7 @@ end
 
 local function initItemConfigSkills(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(5),
+        name     = LocalizationFunctions.getLocalizedText(1, "ConfigSkills"),
         callback = function()
             self.m_ModelMessageIndicator:showMessage("Sorry, the Config Skills feature is not implemented.")
         end,
@@ -146,7 +146,7 @@ end
 
 local function initItemLogin(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(6),
+        name     = LocalizationFunctions.getLocalizedText(1, "Login"),
         callback = function()
             self:setMenuEnabled(false)
             getActorLoginPanel(self):getModel():setEnabled(true)
@@ -158,7 +158,7 @@ end
 
 local function initItemHelp(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(7),
+        name     = LocalizationFunctions.getLocalizedText(1, "Help"),
         callback = function()
             self:setMenuEnabled(false)
             getActorGameHelper(self):getModel():setEnabled(true)
@@ -175,7 +175,7 @@ function ModelMainMenu:ctor(param)
     initItemNewWar(      self)
     initItemContinue(    self)
     initItemJoinWar(     self)
-    -- initItemConfigSkills(self)
+    initItemConfigSkills(self)
     initItemLogin(       self)
     initItemHelp(        self)
 
@@ -290,7 +290,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemNewWar,
                 self.m_ItemContinue,
                 self.m_ItemJoinWar,
-                -- self.m_ItemConfigSkills,
+                self.m_ItemConfigSkills,
                 self.m_ItemLogin,
                 self.m_ItemHelp
             )

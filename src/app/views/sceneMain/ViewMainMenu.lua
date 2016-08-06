@@ -105,7 +105,7 @@ local function initMenuListView(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1, "MainMenu"), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -133,7 +133,7 @@ local function initButtonExit(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor({r = 240, g = 80, b = 56})
-        :setTitleText(LocalizationFunctions.getLocalizedText(8, "Exit"))
+        :setTitleText(LocalizationFunctions.getLocalizedText(1, "Exit"))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
