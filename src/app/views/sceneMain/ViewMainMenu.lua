@@ -6,6 +6,7 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
+local SKILL_CONFIGURATOR_Z_ORDER     = 3
 local LOGIN_PANEL_Z_ORDER            = 3
 local GAME_HELPER_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
@@ -179,6 +180,14 @@ function ViewMainMenu:setViewJoinWarSelector(view)
     assert(self.m_ViewJoinWarSelector == nil, "ViewMainMenu:setViewJoinWarSelector() the view has been set.")
     self.m_ViewJoinWarSelector = view
     self:addChild(view, JOIN_WAR_SELECTOR_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewSkillConfigurator(view)
+    assert(self.m_ViewSkillConfigurator == nil, "ViewMainMenu:setViewSkillConfigurator() the view has been set already.")
+    self.m_ViewSkillConfigurator = view
+    self:addChild(view, SKILL_CONFIGURATOR_Z_ORDER)
 
     return self
 end

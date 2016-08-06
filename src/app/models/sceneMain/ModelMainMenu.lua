@@ -66,6 +66,18 @@ local function getActorJoinWarSelector(self)
     return self.m_ActorJoinWarSelector
 end
 
+local function getActorSkillConfigurator(self)
+    if (not self.m_ActorSkillConfigurator) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
+        actor:getModel():setModelMainMenu(self)
+
+        self.m_ActorSkillConfigurator = actor
+        self.m_View:setViewSkillConfigurator(actor:getView())
+    end
+
+    return self.m_ActorSkillConfigurator
+end
+
 local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
@@ -137,7 +149,8 @@ local function initItemConfigSkills(self)
     local item = {
         name     = LocalizationFunctions.getLocalizedText(1, "ConfigSkills"),
         callback = function()
-            self.m_ModelMessageIndicator:showMessage("Sorry, the Config Skills feature is not implemented.")
+            self:setMenuEnabled(false)
+            getActorSkillConfigurator(self):getModel():setEnabled(true)
         end,
     }
 
