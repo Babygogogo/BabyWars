@@ -106,11 +106,23 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [3] = {
-        [1] = function(...) return "继 续"    end,
-        [2] = function(...) return "Continue" end,
+        [1] = function(textType)
+            if     (textType == "Configuration") then return "配 置"
+            elseif (textType == "PassiveSkill")  then return "日 常 技 能"
+            elseif (textType == "ActiveSkill")   then return "主 动 技 能"
+            else                                      return "未知[3]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Configuration") then return "Configuration"
+            elseif (textType == "PassiveSkill")  then return "Passive"
+            elseif (textType == "ActiveSkill")   then return "Active"
+            else                                      return "Unknown[3]: " .. (textType or "")
+            end
+        end,
     },
+    --[[
     [4] = {
         [1] = function(...) return "参 战" end,
         [2] = function(...) return "Join" end,

@@ -36,11 +36,47 @@ local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
 local MENU_LIST_VIEW_POS_Y        = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN = 10
 
+local ITEM_WIDTH              = 230
+local ITEM_HEIGHT             = 50
+local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local ITEM_FONT_SIZE          = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function createViewItem(item)
+    local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(ITEM_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(ITEM_CAPINSETS)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
+
+    return view
+end
 
 --------------------------------------------------------------------------------
 -- The composition elements.
@@ -57,7 +93,7 @@ local function initMenuBackground(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1, "ConfigSkills"), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF("", ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -126,6 +162,23 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ViewSkillConfigurator:setMenuTitle(text)
+    self.m_MenuTitle:setString(text)
+
+    return self
+end
+
+function ViewSkillConfigurator:setMenuItems(items)
+    local listView = self.m_MenuListView
+    listView:removeAllChildren()
+
+    for _, item in ipairs(items) do
+        listView:pushBackCustomItem(createViewItem(item))
+    end
+
+    return self
+end
+
 function ViewSkillConfigurator:setEnabled(enabled)
     self:setVisible(enabled)
 
