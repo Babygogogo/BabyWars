@@ -62,6 +62,11 @@ end
 local function initItemsOverview(self)
     local items = {
         {
+            name     = LocalizationFunctions.getLocalizedText(3, "SetSkillPoint"),
+            callback = function()
+            end,
+        },
+        {
             name     = LocalizationFunctions.getLocalizedText(3, "PassiveSkill"),
             callback = function()
             end,

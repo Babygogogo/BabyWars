@@ -109,6 +109,7 @@ local s_Texts = {
     [3] = {
         [1] = function(textType)
             if     (textType == "Configuration") then return "配 置"
+            elseif (textType == "SetSkillPoint") then return "设定技能点数上限"
             elseif (textType == "PassiveSkill")  then return "日 常 技 能"
             elseif (textType == "ActiveSkill")   then return "主 动 技 能"
             else                                      return "未知[3]: " .. (textType or "")
@@ -116,17 +117,26 @@ local s_Texts = {
         end,
         [2] = function(textType)
             if     (textType == "Configuration") then return "Configuration"
+            elseif (textType == "SetSkillPoint") then return "SetSkillPoint"
             elseif (textType == "PassiveSkill")  then return "Passive"
             elseif (textType == "ActiveSkill")   then return "Active"
             else                                      return "Unknown[3]: " .. (textType or "")
             end
         end,
     },
-    --[[
     [4] = {
-        [1] = function(...) return "参 战" end,
-        [2] = function(...) return "Join" end,
+        [1] = function(skillType)
+            if     (skillType == "globalAttackModifier")  then return "改变我方全体部队的攻击力。"
+            elseif (skillType == "globalDefenseModifier") then return "改变我方全体部队的防御力。"
+            elseif (skillType == "globalCostModifier")    then return "改变我方全体部队的造价。"
+            else                                               return "未知[4]: " .. (skillType or "")
+            end
+        end,
+        [2] = function(skillType)
+            return "Untranslated..."
+        end,
     },
+    --[[
     [5] = {
         [1] = function(...) return "配 置 技 能"    end,
         [2] = function(...) return "Config Skills" end,
