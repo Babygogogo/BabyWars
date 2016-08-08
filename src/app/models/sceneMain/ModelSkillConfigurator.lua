@@ -30,7 +30,9 @@ local function setStateDisabled(self)
 end
 
 local function setStateOverviewConfiguration(self, configurationID)
-    self.m_State = "stateOverviewConfiguration"
+    self.m_State           = "stateOverviewConfiguration"
+    self.m_ConfigurationID = configurationID
+
     if (self.m_View) then
         self.m_View:setMenuTitle(getConfigurationTitle(configurationID))
             :setMenuItems(self.m_ItemsOverview)
