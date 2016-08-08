@@ -3,10 +3,12 @@ local ViewSkillConfigurator = class("ViewSkillConfigurator", cc.Node)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local MENU_TITLE_Z_ORDER      = 1
-local BUTTON_BACK_Z_ORDER     = 1
-local MENU_LIST_VIEW_Z_ORDER  = 1
-local MENU_BACKGROUND_Z_ORDER = 0
+local MENU_TITLE_Z_ORDER          = 1
+local BUTTON_BACK_Z_ORDER         = 1
+local MENU_LIST_VIEW_Z_ORDER      = 1
+local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
+local MENU_BACKGROUND_Z_ORDER     = 0
+local OVERVIEW_BACKGROUND_Z_ORDER = 0
 
 local BACKGROUND_NAME      = "c03_t01_s01_f01.png"
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
@@ -35,6 +37,18 @@ local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTO
 local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
 local MENU_LIST_VIEW_POS_Y        = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN = 10
+
+local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT
+local OVERVIEW_BACKGROUND_POS_X  = display.width - 30 - OVERVIEW_BACKGROUND_WIDTH
+local OVERVIEW_BACKGROUND_POS_Y  = 30
+
+local OVERVIEW_SCROLLVIEW_WIDTH  = OVERVIEW_BACKGROUND_WIDTH  - 7
+local OVERVIEW_SCROLLVIEW_HEIGHT = OVERVIEW_BACKGROUND_HEIGHT - 11
+local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
+local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
+
+local OVERVIEW_FONT_SIZE = 20
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 50
@@ -147,6 +161,31 @@ local function initMenuListView(self)
     self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
 end
 
+local function initOverview(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setPosition(OVERVIEW_BACKGROUND_POS_X, OVERVIEW_BACKGROUND_POS_Y)
+        :setContentSize(OVERVIEW_BACKGROUND_WIDTH, OVERVIEW_BACKGROUND_HEIGHT)
+        :setOpacity(BACKGROUND_OPACITY)
+
+    local scrollView = ccui.ScrollView:create()
+    scrollView:setContentSize(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(OVERVIEW_SCROLLVIEW_POS_X, OVERVIEW_SCROLLVIEW_POS_Y)
+
+    local label = cc.Label:createWithTTF("", ITEM_FONT_NAME, OVERVIEW_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+    scrollView:addChild(label)
+
+    self.m_OverviewBackground = background
+    self.m_OverviewScrollView = scrollView
+    self.m_OverviewLabel      = label
+    self:addChild(background, OVERVIEW_BACKGROUND_Z_ORDER)
+        :addChild(scrollView, OVERVIEW_SCROLLVIEW_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -155,6 +194,7 @@ function ViewSkillConfigurator:ctor()
     initMenuTitle(     self)
     initButtonBack(    self)
     initMenuListView(  self)
+    initOverview(      self)
 
     return self
 end
@@ -162,6 +202,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ViewSkillConfigurator:setEnabled(enabled)
+    self:setVisible(enabled)
+
+    return self
+end
+
 function ViewSkillConfigurator:setMenuTitle(text)
     self.m_MenuTitle:setString(text)
 
@@ -179,8 +225,20 @@ function ViewSkillConfigurator:setMenuItems(items)
     return self
 end
 
-function ViewSkillConfigurator:setEnabled(enabled)
-    self:setVisible(enabled)
+function ViewSkillConfigurator:setOverviewVisible(visible)
+    self.m_OverviewBackground:setVisible(visible)
+    self.m_OverviewScrollView:setVisible(visible)
+
+    return self
+end
+
+function ViewSkillConfigurator:setOverviewString(text)
+    local label = self.m_OverviewLabel
+    label:setString(text)
+
+    local height = math.max(label:getLineHeight() * label:getStringNumLines(), OVERVIEW_SCROLLVIEW_HEIGHT)
+    label:setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, height)
+    self.m_OverviewScrollView:setInnerContainerSize({width = OVERVIEW_SCROLLVIEW_WIDTH, height = height})
 
     return self
 end

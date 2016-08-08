@@ -18,6 +18,7 @@ local function setStateMain(self)
     if (self.m_View) then
         self.m_View:setMenuTitle(LocalizationFunctions.getLocalizedText(1, "ConfigSkills"))
             :setMenuItems(self.m_ItemsMain)
+            :setOverviewVisible(false)
             :setEnabled(true)
     end
 end
@@ -36,6 +37,7 @@ local function setStateOverviewConfiguration(self, configurationID)
     if (self.m_View) then
         self.m_View:setMenuTitle(getConfigurationTitle(configurationID))
             :setMenuItems(self.m_ItemsOverview)
+            :setOverviewVisible(true)
             :setEnabled(true)
     end
 end
