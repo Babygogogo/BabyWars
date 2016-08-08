@@ -70,6 +70,8 @@ local function getActorSkillConfigurator(self)
     if (not self.m_ActorSkillConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
         actor:getModel():setModelMainMenu(self)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+            :setEnabled(false)
 
         self.m_ActorSkillConfigurator = actor
         self.m_View:setViewSkillConfigurator(actor:getView())
@@ -273,6 +275,12 @@ end
 
 function ModelMainMenu:doActionGetSceneWarData(action)
     getActorContinueWarSelector(self):getModel():doActionGetSceneWarData(action)
+
+    return self
+end
+
+function ModelMainMenu:doActionGetSkillConfiguration(action)
+    getActorSkillConfigurator(self):getModel():doActionGetSkillConfiguration(action)
 
     return self
 end

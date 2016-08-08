@@ -3617,6 +3617,9 @@ GameConstant.templateModelUnits = {
     },
 }
 
+GameConstant.passiveSkillSlotsCount = 4
+GameConstant.activeSkillSlotsCount  = 4
+
 GameConstant.skills = {
     globalAttackModifier = {
         levels = {

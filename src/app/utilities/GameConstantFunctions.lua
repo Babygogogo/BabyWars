@@ -189,6 +189,22 @@ function GameConstantFunctions.getPromotionBonus()
     return GAME_CONSTANT.promotionBonus
 end
 
+function GameConstantFunctions.getPassiveSkillSlotsCount()
+    return GAME_CONSTANT.passiveSkillSlotsCount
+end
+
+function GameConstantFunctions.getActiveSkillSlotsCount()
+    return GAME_CONSTANT.activeSkillSlotsCount
+end
+
+function GameConstantFunctions.getSkillPoints(skillName, level)
+    return GAME_CONSTANT.skills[skillName].levels[level].points
+end
+
+function GameConstantFunctions.getSkillModifier(skillName, level)
+    return GAME_CONSTANT.skills[skillName].levels[level].modifier
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if ((index.name == name) and

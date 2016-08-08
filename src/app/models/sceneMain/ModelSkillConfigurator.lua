@@ -1,7 +1,8 @@
 
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
+local LocalizationFunctions   = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -52,6 +53,15 @@ local function initItemsMain(self)
             name     = getConfigurationTitle(i),
             callback = function()
                 setStateOverviewConfiguration(self, i)
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name            = "EvtPlayerRequestDoAction",
+                    actionName      = "GetSkillConfiguration",
+                    configurationID = i,
+                })
+
+                if (self.m_View) then
+                    self.m_View:setOverviewString(LocalizationFunctions.getLocalizedText(3, "GettingConfiguration"))
+                end
             end,
         }
     end
@@ -90,7 +100,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:ctor()
-    self.m_State = "stateDisabled"
+    self.m_State                   = "stateDisabled"
+    self.m_ModelSkillConfituration = ModelSkillConfiguration:create()
+
     initItemsMain(    self)
     initItemsOverview(self)
 
@@ -104,6 +116,28 @@ end
 function ModelSkillConfigurator:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelSkillConfigurator:setModelMainMenu() the model has been set already.")
     self.m_ModelMainMenu = model
+
+    return self
+end
+
+function ModelSkillConfigurator:setRootScriptEventDispatcher(dispatcher)
+    assert(self.m_RootScriptEventDispatcher == nil,
+        "ModelSkillConfigurator:setRootScriptEventDispatcher() the model has been set already.")
+    self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
+    if ((self.m_State == "stateOverviewConfiguration")      and
+        (self.m_ConfigurationID == action.configurationID)) then
+        self.m_ModelSkillConfituration:ctor(action.configuration)
+        self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
+
+    end
 
     return self
 end
