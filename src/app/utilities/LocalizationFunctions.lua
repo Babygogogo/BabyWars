@@ -112,6 +112,7 @@ local s_Texts = {
             elseif (textType == "SetSkillPoint")        then return "设定技能点数上限"
             elseif (textType == "PassiveSkill")         then return "日 常 技 能"
             elseif (textType == "ActiveSkill")          then return "主 动 技 能"
+            elseif (textType == "Skill")                then return "技 能"
             elseif (textType == "MaxPoints")            then return "最大技能点"
             elseif (textType == "TotalPoints")          then return "合计技能点"
             elseif (textType == "SkillPoints")          then return "技能点"
@@ -127,6 +128,7 @@ local s_Texts = {
             elseif (textType == "SetSkillPoint")        then return "SetSkillPoint"
             elseif (textType == "PassiveSkill")         then return "Passive"
             elseif (textType == "ActiveSkill")          then return "Active"
+            elseif (textType == "Skill")                then return "Skill"
             elseif (textType == "MaxPoints")            then return "Max Skill Points"
             elseif (textType == "TotalPoints")          then return "Total Points"
             elseif (textType == "SkillPoints")          then return "Points"
@@ -140,9 +142,9 @@ local s_Texts = {
     },
     [4] = {
         [1] = function(skillType)
-            if     (skillType == "globalAttackModifier")  then return "改变我方全体部队的攻击力。"
-            elseif (skillType == "globalDefenseModifier") then return "改变我方全体部队的防御力。"
-            elseif (skillType == "globalCostModifier")    then return "改变我方全体部队的造价。"
+            if     (skillType == "GlobalAttackModifier")  then return "改变我方全体部队的攻击力。"
+            elseif (skillType == "GlobalDefenseModifier") then return "改变我方全体部队的防御力。"
+            elseif (skillType == "GlobalCostModifier")    then return "改变我方全体部队的造价。"
             else                                               return "未知[4]: " .. (skillType or "")
             end
         end,
@@ -152,9 +154,9 @@ local s_Texts = {
     },
     [5] = {
         [1] = function(skillType)
-            if     (skillType == "globalAttackModifier")  then return "全军攻击力"
-            elseif (skillType == "globalDefenseModifier") then return "全军防御力"
-            elseif (skillType == "globalCostModifier")    then return "全军造价"
+            if     (skillType == "GlobalAttackModifier")  then return "全军攻击力"
+            elseif (skillType == "GlobalDefenseModifier") then return "全军防御力"
+            elseif (skillType == "GlobalCostModifier")    then return "全军造价"
             else                                               return "未知[5]: " .. (skillType or "")
             end
         end,
@@ -162,11 +164,23 @@ local s_Texts = {
             return "Untranslated..."
         end,
     },
-    --[[
     [6] = {
-        [1] = function(...) return "注 册 / 登 陆" end,
-        [2] = function(...) return "Login"        end,
+        [1] = function(skillCategory)
+            if     (skillCategory == "SkillCategoryAttack")  then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryDefense") then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryCost")    then return "造 价 类"
+            else                                                  return "未知[6]: " .. (skillCategory or "")
+            end
+        end,
+        [2] = function(skillCategory)
+            if     (skillCategory == "SkillCategoryAttack")  then return "Attack"
+            elseif (skillCategory == "SkillCategoryDefense") then return "Defense"
+            elseif (skillCategory == "SkillCategoryCost")    then return "Cost"
+            else                                                  return "Unknown[6]: " .. (skillCategory or "")
+            end
+        end,
     },
+    --[[
     [7] = {
         [1] = function(...) return "帮 助" end,
         [2] = function(...) return "Help" end,
