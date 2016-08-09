@@ -11,9 +11,28 @@ local PASSIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCoun
 local ACTIVE_SKILL_SLOTS_COUNT  = GameConstantFunctions.getActiveSkillSlotsCount()
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
 
+local ID_PASSIVE_SKILL  = 0
+local ID_ACTIVE_SKILL_1 = 1
+local ID_ACTIVE_SKILL_2 = 2
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getSkillWithId(self, skillID)
+    if (skillID == ID_PASSIVE_SKILL) then
+        self.m_Passive = self.m_Passive or {}
+        return self.m_Passive
+    elseif (skillID == ID_ACTIVE_SKILL_1) then
+        self.m_Active1 = self.m_Active1 or {}
+        return self.m_Active1
+    elseif (skillID == ID_ACTIVE_SKILL_2) then
+        self.m_Active2 = self.m_Active2
+        return self.m_Active2
+    else
+        error("ModelSkillConfiguration-getSkillWithId() the param skillID is invalid.")
+    end
+end
+
 local function getDescriptionForMaxPoints(self)
     return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), self.m_MaxPoints)
 end
@@ -78,6 +97,18 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelSkillConfiguration.getSkillIdPassive()
+    return ID_PASSIVE_SKILL
+end
+
+function ModelSkillConfiguration.getSkillIdActive1()
+    return ID_ACTIVE_SKILL_1
+end
+
+function ModelSkillConfiguration.getSkillIdActive2()
+    return ID_ACTIVE_SKILL_2
+end
+
 function ModelSkillConfiguration:isEmpty()
     return not ((self.m_MaxPoints) and (self.m_Passive) and (self.m_Active1) and (self.m_Active2))
 end
@@ -85,6 +116,21 @@ end
 function ModelSkillConfiguration:setMaxPoints(points)
     assert((points >= MIN_POINTS) and (points <= MAX_POINTS) and ((points - MIN_POINTS) % POINTS_PER_STEP == 0))
     self.m_MaxPoints = points
+
+    return self
+end
+
+function ModelSkillConfiguration:setSkillSlot(skillID, slotIndex, skillName, level)
+    getSkillWithId(self, skillID)[slotIndex] = {
+        name  = skillName,
+        level = level,
+    }
+
+    return self
+end
+
+function ModelSkillConfiguration:clearSkillSlot(skillID, slotIndex)
+    getSkillWithId(self, skillID)[slotIndex] = nil
 
     return self
 end

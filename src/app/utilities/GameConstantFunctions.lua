@@ -209,6 +209,11 @@ function GameConstantFunctions.getSkillModifier(skillName, level)
     return GAME_CONSTANT.skills[skillName].levels[level].modifier
 end
 
+function GameConstantFunctions.getSkillLevelMinMax(skillName)
+    local skill = GAME_CONSTANT.skills[skillName]
+    return skill.minLevel, skill.maxLevel
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if ((index.name == name) and

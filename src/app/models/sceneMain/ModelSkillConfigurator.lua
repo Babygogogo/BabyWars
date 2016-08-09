@@ -7,9 +7,9 @@ local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions
 local getLocalizedText        = LocalizationFunctions.getLocalizedText
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local ID_PASSIVE_SKILL  = 0
-local ID_ACTIVE_SKILL_1 = 1
-local ID_ACTIVE_SKILL_2 = 2
+local ID_PASSIVE_SKILL  = ModelSkillConfiguration.getSkillIdPassive()
+local ID_ACTIVE_SKILL_1 = ModelSkillConfiguration.getSkillIdActive1()
+local ID_ACTIVE_SKILL_2 = ModelSkillConfiguration.getSkillIdActive2()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -98,6 +98,15 @@ local function setStateSelectSkill(self, categoryName)
     end
 end
 
+local function setStateSelectSkillLevel(self, skillName)
+    self.m_State     = "stateSelectSkillLevel"
+    self.m_SkillName = skillName
+
+    if (self.m_View) then
+        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillName])
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -179,7 +188,19 @@ local function initItemsPassiveSkillSlots(self)
 end
 
 local function initItemsSkillCategories(self)
-    local items = {}
+    local items = {
+        {
+            name     = getLocalizedText(3, "Clear"),
+            callback = function()
+                self.m_ModelSkillConfituration:clearSkillSlot(self.m_SkillID, self.m_SlotIndex)
+
+                if (self.m_View) then
+                    self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
+                end
+            end,
+        }
+    }
+
     for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
@@ -200,6 +221,7 @@ local function initItemsSkills(self)
             subItems[#subItems + 1] = {
                 name     = getLocalizedText(5, skillName),
                 callback = function()
+                    setStateSelectSkillLevel(self, skillName)
                 end,
             }
         end
@@ -207,6 +229,35 @@ local function initItemsSkills(self)
     end
 
     self.m_ItemsSkills = items
+end
+
+local function initItemsSkillLevels(self)
+    local items = {}
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+        for _, skillName in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+            if (items[skillName]) then
+                break
+            end
+
+            local subItems = {}
+            local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillName)
+            for i = maxLevel, minLevel, -1 do
+                subItems[#subItems + 1] = {
+                    name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
+                    callback = function()
+                        self.m_ModelSkillConfituration:setSkillSlot(self.m_SkillID, self.m_SlotIndex, self.m_SkillName, i)
+                        if (self.m_View) then
+                            self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
+                        end
+                    end,
+                }
+            end
+
+            items[skillName] = subItems
+        end
+    end
+
+    self.m_ItemsSkillLevels = items
 end
 
 --------------------------------------------------------------------------------
@@ -222,6 +273,7 @@ function ModelSkillConfigurator:ctor()
     initItemsPassiveSkillSlots(self)
     initItemsSkillCategories(  self)
     initItemsSkills(           self)
+    initItemsSkillLevels(      self)
 
     return self
 end
@@ -289,6 +341,8 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateOverviewPassiveSkill(self)
     elseif (state == "stateSelectSkill") then
         setStateSelectSkillCategory(self, self.m_SkillID, self.m_SlotIndex)
+    elseif (state == "stateSelectSkillLevel") then
+        setStateSelectSkill(self, self.m_CategoryName)
     else
         error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
     end

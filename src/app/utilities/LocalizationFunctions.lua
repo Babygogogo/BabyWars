@@ -118,6 +118,7 @@ local s_Texts = {
             elseif (textType == "SkillPoints")          then return "技能点"
             elseif (textType == "Level")                then return "等级"
             elseif (textType == "Modifier")             then return "幅度"
+            elseif (textType == "Clear")                then return "清 空"
             elseif (textType == "None")                 then return "无"
             elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。\n若长时间没有反应，请返回并重试。"
             else                                             return "未知[3]: " .. (textType or "")
@@ -134,6 +135,7 @@ local s_Texts = {
             elseif (textType == "SkillPoints")          then return "Points"
             elseif (textType == "Level")                then return "Level"
             elseif (textType == "Modifier")             then return "Modifier"
+            elseif (textType == "Clear")                then return "Clear"
             elseif (textType == "None")                 then return "None"
             elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
             else                                             return "Unknown[3]: " .. (textType or "")
