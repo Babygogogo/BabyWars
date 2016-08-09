@@ -197,6 +197,10 @@ function GameConstantFunctions.getActiveSkillSlotsCount()
     return GAME_CONSTANT.activeSkillSlotsCount
 end
 
+function GameConstantFunctions.getSkillPointsMinMaxStep()
+    return GAME_CONSTANT.minSkillPoints, GAME_CONSTANT.maxSkillPoints, GAME_CONSTANT.skillPointsPerStep
+end
+
 function GameConstantFunctions.getSkillPoints(skillName, level)
     return GAME_CONSTANT.skills[skillName].levels[level].points
 end
