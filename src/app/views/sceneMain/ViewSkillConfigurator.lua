@@ -5,6 +5,7 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local MENU_TITLE_Z_ORDER          = 1
 local BUTTON_BACK_Z_ORDER         = 1
+local BUTTON_SAVE_Z_ORDER         = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
@@ -27,16 +28,24 @@ local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 35
 
 local BUTTON_BACK_WIDTH      = MENU_BACKGROUND_WIDTH
-local BUTTON_BACK_HEIGHT     = 50
+local BUTTON_BACK_HEIGHT     = 40
 local BUTTON_BACK_POS_X      = MENU_BACKGROUND_POS_X
-local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y
+local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y + 5
 local BUTTON_BACK_FONT_COLOR = {r = 240, g = 80, b = 56}
 
-local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH
-local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
-local MENU_LIST_VIEW_POS_Y        = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_ITEMS_MARGIN = 10
+local BUTTON_SAVE_WIDTH      = BUTTON_BACK_WIDTH
+local BUTTON_SAVE_HEIGHT     = BUTTON_BACK_HEIGHT
+local BUTTON_SAVE_POS_X      = BUTTON_BACK_POS_X
+local BUTTON_SAVE_POS_Y      = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local BUTTON_SAVE_FONT_COLOR = MENU_TITLE_FONT_COLOR
+
+local MENU_LIST_VIEW_WIDTH               = MENU_BACKGROUND_WIDTH
+local MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_HEIGHT_WITH_SAVE    = MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE - BUTTON_SAVE_HEIGHT
+local MENU_LIST_VIEW_POS_X               = MENU_BACKGROUND_POS_X
+local MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_POS_Y_WITH_SAVE     = MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE + BUTTON_SAVE_HEIGHT
+local MENU_LIST_VIEW_ITEMS_MARGIN        = 10
 
 local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
 local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT
@@ -149,11 +158,39 @@ local function initButtonBack(self)
     self:addChild(button, BUTTON_BACK_Z_ORDER)
 end
 
+local function initButtonSave(self)
+    local button = ccui.Button:create()
+    button:ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_SAVE_POS_X, BUTTON_SAVE_POS_Y)
+
+        :setScale9Enabled(true)
+        :setContentSize(BUTTON_SAVE_WIDTH, BUTTON_SAVE_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor(BUTTON_SAVE_FONT_COLOR)
+        :setTitleText(LocalizationFunctions.getLocalizedText(1, "Save"))
+
+        :setVisible(false)
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonSaveTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonSave = button
+    self:addChild(button, BUTTON_SAVE_Z_ORDER)
+end
+
 local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
-        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE)
         :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
@@ -193,6 +230,7 @@ function ViewSkillConfigurator:ctor()
     initMenuBackground(self)
     initMenuTitle(     self)
     initButtonBack(    self)
+    initButtonSave(    self)
     initMenuListView(  self)
     initOverview(      self)
 
@@ -228,6 +266,20 @@ end
 function ViewSkillConfigurator:setOverviewVisible(visible)
     self.m_OverviewBackground:setVisible(visible)
     self.m_OverviewScrollView:setVisible(visible)
+
+    return self
+end
+
+function ViewSkillConfigurator:setButtonSaveVisible(visible)
+    if (visible) then
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_SAVE)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITH_SAVE)
+    else
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE)
+    end
+
+    self.m_ButtonSave:setVisible(visible)
 
     return self
 end

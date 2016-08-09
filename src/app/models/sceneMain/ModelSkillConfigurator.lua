@@ -29,6 +29,7 @@ local function setStateMain(self)
         self.m_View:setMenuTitle(getLocalizedText(1, "ConfigSkills"))
             :setMenuItems(self.m_ItemsAllConfigurations)
             :setOverviewVisible(false)
+            :setButtonSaveVisible(false)
             :setEnabled(true)
     end
 end
@@ -49,6 +50,7 @@ local function setStateOverviewConfiguration(self, configurationID)
         view:setMenuTitle(getConfigurationTitle(configurationID))
             :setMenuItems(self.m_ItemsOverview)
             :setOverviewVisible(true)
+            :setButtonSaveVisible(true)
             :setEnabled(true)
 
         local configuration = self.m_ModelSkillConfituration
@@ -66,6 +68,7 @@ local function setStateSelectMaxPoint(self)
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "MaxPoints"))
             :setMenuItems(self.m_ItemsMaxPoints)
+            :setButtonSaveVisible(false)
     end
 end
 
@@ -75,6 +78,7 @@ local function setStateOverviewPassiveSkill(self)
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "PassiveSkill"))
             :setMenuItems(self.m_ItemsPassiveSkillSlots)
+            :setButtonSaveVisible(false)
     end
 end
 
