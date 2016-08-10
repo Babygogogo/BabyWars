@@ -15,24 +15,27 @@ local function getWarFieldName(fileName)
     return require("res.data.templateWarField." .. fileName).warFieldName
 end
 
+local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
+    local options = {}
+    for i = 1, playersCount do
+        options[#options + 1] = {
+            data = i,
+            text = "" .. i,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
+        :setOptions(options)
+end
+
 local function resetModelWarConfigurator(model, warFieldFileName)
-    local warField = require("res.data.templateWarField." .. warFieldFileName)
     model:setWarFieldFileName(warFieldFileName)
         :setEnabled(true)
 
-    local playerIndexOptions = {}
-    for i = 1, warField.playersCount do
-        playerIndexOptions[i] = {data = i, text = "" .. i}
-    end
-    model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
-        :setOptions(playerIndexOptions)
-
-    model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
-        :setOptions({
-            {data = 1, text = getLocalizedText(45),},
-        })
-
+    local warField = require("res.data.templateWarField." .. warFieldFileName)
+    resetSelectorPlayerIndex(model, warField.playersCount)
     model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(5)
+    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(1)
 end
 
 --------------------------------------------------------------------------------
@@ -70,13 +73,13 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             self.m_ModelMessageIndicator:showMessage(getLocalizedText(61))
         else
             self.m_RootScriptEventDispatcher:dispatchEvent({
-                name             = "EvtPlayerRequestDoAction",
-                actionName       = "NewWar",
-                warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
-                playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
-                skillIndex       = 1,
-                warPassword      = password,
-                maxSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                name                 = "EvtPlayerRequestDoAction",
+                actionName           = "NewWar",
+                warPassword          = password,
+                warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                maxSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
             })
         end
     end)
@@ -94,6 +97,20 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
         :setCurrentOptionIndex(5)
+        :setButtonsEnabled(true)
+end
+
+local function initSelectorSkill(modelWarConfigurator)
+    local options = {}
+    local prefix  = getLocalizedText(3, "Configuration") .. " "
+    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+        options[#options + 1] = {
+            text = prefix .. i,
+            data = i,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
         :setButtonsEnabled(true)
 end
 
@@ -122,6 +139,7 @@ local function getActorWarConfigurator(self)
         initCallbackOnButtonConfirmTouched(self, model)
         initCallbackOnButtonBackTouched(   self, model)
         initSelectorMaxSkillPoints(model)
+        initSelectorSkill(         model)
         initSelectorFog(           model)
         initSelectorWeather(       model)
 

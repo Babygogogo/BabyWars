@@ -184,6 +184,10 @@ function ModelSkillConfiguration:setMaxPoints(points)
     return self
 end
 
+function ModelSkillConfiguration:getMaxPoints()
+    return self.m_MaxPoints
+end
+
 function ModelSkillConfiguration:setSkillSlot(skillID, slotIndex, skillName, level)
     getSkillWithId(self, skillID)[slotIndex] = {
         name  = skillName,

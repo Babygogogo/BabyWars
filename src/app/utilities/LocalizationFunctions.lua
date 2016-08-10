@@ -596,6 +596,7 @@ local s_Texts = {
             elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
+            elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
             else                                                      return "未知错误类型[81] " .. text
             end
         end,
@@ -608,6 +609,7 @@ local s_Texts = {
             elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
+            elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
             else                                                      return "Unknown errType[81]" .. text
             end
         end,
