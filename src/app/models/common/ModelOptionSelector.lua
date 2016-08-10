@@ -54,26 +54,27 @@ function ModelOptionSelector:getCurrentOption()
     return (self.m_Options) and (self.m_Options[self.m_OptionIndex].data) or nil
 end
 
-function ModelOptionSelector:onButtonPrevTouched()
-    if (self.m_Options) then
-        self.m_OptionIndex = getPrevOptionIndex(self.m_Options, self.m_OptionIndex)
+function ModelOptionSelector:setCurrentOptionIndex(index)
+    local options = self.m_Options
+    assert((index > 0) and (index <= #options) and (index == math.floor(index)),
+        "ModelOptionSelector:setCurrentOptionIndex() the param index is invalid.")
 
-        if (self.m_View) then
-            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex].text)
-        end
+    self.m_OptionIndex = index
+    if (self.m_View) then
+        self.m_View:setOptionText(options[index].text)
     end
 
     return self
 end
 
-function ModelOptionSelector:onButtonNextTouched()
-    if (self.m_Options) then
-        self.m_OptionIndex = getNextOptionIndex(self.m_Options, self.m_OptionIndex)
+function ModelOptionSelector:onButtonPrevTouched()
+    self:setCurrentOptionIndex(getPrevOptionIndex(self.m_Options, self.m_OptionIndex))
 
-        if (self.m_View) then
-            self.m_View:setOptionText(self.m_Options[self.m_OptionIndex].text)
-        end
-    end
+    return self
+end
+
+function ModelOptionSelector:onButtonNextTouched()
+    self:setCurrentOptionIndex(getNextOptionIndex(self.m_Options, self.m_OptionIndex))
 
     return self
 end

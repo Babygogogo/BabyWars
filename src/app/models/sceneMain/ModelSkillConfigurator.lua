@@ -375,6 +375,10 @@ function ModelSkillConfigurator:onButtonSaveTouched()
             configurationID = self.m_ConfigurationID,
             configuration   = self.m_ModelSkillConfituration:toSerializableTable(),
         })
+
+        if (self.m_View) then
+            self.m_View:disableButtonSaveForSecs()
+        end
     end
 
     return self

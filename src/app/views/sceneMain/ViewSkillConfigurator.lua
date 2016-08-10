@@ -68,6 +68,9 @@ local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 
+local BUTTON_COLOR_ENABLED  = {r = 255, g = 255, b = 255}
+local BUTTON_COLOR_DISABLED = {r = 160, g = 160, b = 160}
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -174,6 +177,8 @@ local function initButtonSave(self)
         :setTitleText(LocalizationFunctions.getLocalizedText(1, "Save"))
 
         :setVisible(false)
+        :setCascadeColorEnabled(true)
+
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
                 self.m_Model:onButtonSaveTouched()
@@ -266,6 +271,21 @@ end
 function ViewSkillConfigurator:setOverviewVisible(visible)
     self.m_OverviewBackground:setVisible(visible)
     self.m_OverviewScrollView:setVisible(visible)
+
+    return self
+end
+
+function ViewSkillConfigurator:disableButtonSaveForSecs(secs)
+    self.m_ButtonSave:setColor(BUTTON_COLOR_DISABLED)
+        :setEnabled(false)
+        :stopAllActions()
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(secs or 3),
+            cc.CallFunc:create(function()
+                self.m_ButtonSave:setColor(BUTTON_COLOR_ENABLED)
+                    :setEnabled(true)
+            end)
+        ))
 
     return self
 end
