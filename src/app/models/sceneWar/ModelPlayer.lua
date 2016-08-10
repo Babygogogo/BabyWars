@@ -22,7 +22,7 @@
 
 local ModelPlayer = require("src.global.functions.class")("ModelPlayer")
 
-local TableFunctions = require("src.app.utilities.TableFunctions")
+local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
 
 --------------------------------------------------------------------------------
 -- The constructor.
@@ -34,9 +34,7 @@ function ModelPlayer:ctor(param)
     self.m_IsAlive       = param.isAlive
     self.m_CurrentEnergy = param.currentEnergy
 
-    self.m_PassiveSkill = param.passiveSkill
-    self.m_ActiveSkill1 = param.activeSkill1
-    self.m_ActiveSkill2 = param.activeSkill2
+    self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
 
     return self
 end
@@ -46,19 +44,12 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toSerializableTable()
     return {
-        account       = self:getAccount(),
-        nickname      = self:getNickname(),
-        fund          = self:getFund(),
-        isAlive       = self:isAlive(),
-        currentEnergy = self:getEnergy(),
-        -- TODO: serialize the skills.
-        passiveSkill  = {},
-        activeSkill1  = {
-            energyRequirement = 3,
-        },
-        activeSkill2  = {
-            energyRequirement = 6,
-        },
+        account            = self:getAccount(),
+        nickname           = self:getNickname(),
+        fund               = self:getFund(),
+        isAlive            = self:isAlive(),
+        currentEnergy      = self:getEnergy(),
+        skillConfiguration = self:getModelSkillConfiguration():toSerializableTable(),
     }
 end
 
@@ -94,17 +85,12 @@ function ModelPlayer:setFund(fund)
 end
 
 function ModelPlayer:getEnergy()
-    return self.m_CurrentEnergy, self:getActiveSkillEnergyRequirement(1), self:getActiveSkillEnergyRequirement(2)
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    return self.m_CurrentEnergy, self:getModelSkillConfiguration():getEnergyRequirement()
 end
 
-function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
-    assert((skillIndex == 1) or (skillIndex == 2), "ModelPlayer:getActiveSkillEnergyRequirement() the param skillIndex is invalid.")
-
-    if (skillIndex == 1) then
-        return self.m_ActiveSkill1.energyRequirement or 0
-    else
-        return self.m_ActiveSkill2.energyRequirement or 0
-    end
+function ModelPlayer:getModelSkillConfiguration()
+    return self.m_ModelSkillConfiguration
 end
 
 return ModelPlayer

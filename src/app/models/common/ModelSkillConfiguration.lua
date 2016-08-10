@@ -203,6 +203,11 @@ function ModelSkillConfiguration:clearSkillSlot(skillID, slotIndex)
     return self
 end
 
+function ModelSkillConfiguration:getEnergyRequirement()
+    return self.m_Active1.energyRequirement or 0,
+        self.m_Active2.energyRequirement or 0
+end
+
 function ModelSkillConfiguration:getDescription()
     return string.format("%s\n\n%s\n\n%s\n\n%s",
         getDescriptionForMaxPoints(self),
