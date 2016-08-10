@@ -122,7 +122,8 @@ local s_Texts = {
             elseif (textType == "Modifier")             then return "幅度"
             elseif (textType == "Clear")                then return "清 空"
             elseif (textType == "None")                 then return "无"
-            elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。\n若长时间没有反应，请返回并重试。"
+            elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
+            elseif (textType == "SettingConfiguration") then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
             else                                             return "未知[3]: " .. (textType or "")
             end
         end,
@@ -140,6 +141,7 @@ local s_Texts = {
             elseif (textType == "Clear")                then return "Clear"
             elseif (textType == "None")                 then return "None"
             elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
+            elseif (textType == "SettingConfiguration") then return "Transfering data to the server. Please wait."
             else                                             return "Unknown[3]: " .. (textType or "")
             end
         end,
@@ -184,11 +186,19 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [7] = {
-        [1] = function(...) return "帮 助" end,
-        [2] = function(...) return "Help" end,
+        [1] = function(errType)
+            if     (errType == "ReduplicatedPassiveSkills")    then return "日常技能中有重复的技能。请修改后重试。"
+            elseif (errType == "OverloadedPassiveSkillPoints") then return "日常技能的合计技能点超出上限。请修改后重试。"
+            end
+        end,
+        [2] = function(errType)
+            if     (errType == "ReduplicatedPassiveSkills")    then return "Some skills among the passive skills are duplicated."
+            elseif (errType == "OverloadedPassiveSkillPoints") then return "The skill points of passive skills are overloaded."
+            end
+        end,
     },
+    --[[
     [8] = {
         [1] = function(commandType)
             if     (commandType == "Back") then return "返 回"
@@ -579,22 +589,26 @@ local s_Texts = {
     [81] = {
         [1] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")             then return "网络传输出现错误。将自动刷新场景。" .. text
-            elseif (errType == "InvalidWarFileName")          then return "战局不存在，或已结束。将自动回到主界面。" .. text
-            elseif (errType == "InvalidAccount")              then return "账号/密码不正确。将自动回到主界面。" .. text
-            elseif (errType == "OutOfSync")                   then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
-            elseif (errType == "FailToGetSkillConfiguration") then return "无法获取技能配置，请重试。\n" .. text
-            else                                                   return "未知错误类型[81] " .. text
+            if     (errType == "CorruptedAction")                then return "网络传输出现错误。将自动刷新场景。" .. text
+            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。将自动回到主界面。" .. text
+            elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
+            elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
+            elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
+            else                                                      return "未知错误类型[81] " .. text
             end
         end,
         [2] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")             then return "Data transfer error." .. text
-            elseif (errType == "InvalidWarFileName")          then return "The war is ended or invalid." .. text
-            elseif (errType == "InvalidAccount")              then return "Invalid account/password." .. text
-            elseif (errType == "OutOfSync")                   then return "The war data is out of sync." .. text
-            elseif (errType == "FailToGetSkillConfiguration") then return "Failed to get the skill configuration. Please retry.\n" .. text
-            else                                                   return "Unknown errType[81]" .. text
+            if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
+            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
+            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
+            elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
+            elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
+            else                                                      return "Unknown errType[81]" .. text
             end
         end,
     },

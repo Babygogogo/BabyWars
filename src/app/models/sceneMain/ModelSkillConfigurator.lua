@@ -116,7 +116,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemsAllConfigurations(self)
     local items = {}
-    for i = 1, 10 do
+    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
         items[#items + 1] = {
             name     = getConfigurationTitle(i),
             callback = function()
@@ -301,6 +301,14 @@ function ModelSkillConfigurator:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
+function ModelSkillConfigurator:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil,
+        "ModelSkillConfigurator:setModelMessageIndicator() the model has been set already.")
+    self.m_ModelMessageIndicator = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
@@ -349,6 +357,24 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateSelectSkill(self, self.m_CategoryName)
     else
         error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
+    end
+
+    return self
+end
+
+function ModelSkillConfigurator:onButtonSaveTouched()
+    assert(self.m_State == "stateOverviewConfiguration")
+    local isConfigurationValid, err = self.m_ModelSkillConfituration:isValid()
+    if (not isConfigurationValid) then
+        self.m_ModelMessageIndicator:showMessage(err)
+    else
+        self.m_ModelMessageIndicator:showMessage(getLocalizedText(3, "SettingConfiguration"))
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name            = "EvtPlayerRequestDoAction",
+            actionName      = "SetSkillConfiguration",
+            configurationID = self.m_ConfigurationID,
+            configuration   = self.m_ModelSkillConfituration:toSerializableTable(),
+        })
     end
 
     return self

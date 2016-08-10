@@ -71,6 +71,7 @@ local function getActorSkillConfigurator(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
         actor:getModel():setModelMainMenu(self)
             :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
             :setEnabled(false)
 
         self.m_ActorSkillConfigurator = actor

@@ -3635,11 +3635,12 @@ GameConstant.templateModelUnits = {
     },
 }
 
-GameConstant.minSkillPoints         = 0
-GameConstant.maxSkillPoints         = 500
-GameConstant.skillPointsPerStep     = 25
-GameConstant.passiveSkillSlotsCount = 4
-GameConstant.activeSkillSlotsCount  = 4
+GameConstant.minSkillPoints           = 0
+GameConstant.maxSkillPoints           = 500
+GameConstant.skillPointsPerStep       = 25
+GameConstant.skillConfigurationsCount = 10
+GameConstant.passiveSkillSlotsCount   = 4
+GameConstant.activeSkillSlotsCount    = 4
 
 GameConstant.skills = {
     GlobalAttackModifier = {

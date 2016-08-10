@@ -75,6 +75,48 @@ local function getDescriptionForActiveSkill(activeSkill, index)
     return string.format("主动技能%d正在开发中，敬请期待。", index)
 end
 
+local function isPassiveSkillValid(self)
+    local maxPoints     = self.m_MaxPoints
+    local passivePoints = 0
+    local passiveSkills = self.m_Passive
+
+    for i = 1, PASSIVE_SKILL_SLOTS_COUNT do
+        local skill = passiveSkills[i]
+        if (skill) then
+            local name    = skill.name
+            passivePoints = passivePoints + getSkillPoints(name, skill.level)
+
+            for j = i + 1, PASSIVE_SKILL_SLOTS_COUNT do
+                if ((passiveSkills[j]) and (passiveSkills[j].name == name)) then
+                    return false, getLocalizedText(7, "ReduplicatedPassiveSkills")
+                end
+            end
+        end
+    end
+
+    if (passivePoints > maxPoints) then
+        return false, getLocalizedText(7, "OverloadedPassiveSkillPoints")
+    else
+        return true, nil, maxPoints - passivePoints
+    end
+end
+
+local function toSerializableTableFromPassiveSkill(self)
+    local t             = {}
+    local passiveSkills = self.m_Passive
+    for i = 1, PASSIVE_SKILL_SLOTS_COUNT do
+        local skill = passiveSkills[i]
+        if (skill) then
+            t[#t + 1] = {
+                name  = skill.name,
+                level = skill.level,
+            }
+        end
+    end
+
+    return t
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -95,6 +137,19 @@ function ModelSkillConfiguration:ctor(param)
 end
 
 --------------------------------------------------------------------------------
+-- The functions for serialization.
+--------------------------------------------------------------------------------
+function ModelSkillConfiguration:toSerializableTable()
+    -- TODO: serialize the active skills.
+    return {
+        maxPoints = self.m_MaxPoints,
+        passive   = toSerializableTableFromPassiveSkill(self),
+        active1   = {},
+        active2   = {},
+    }
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillConfiguration.getSkillIdPassive()
@@ -111,6 +166,15 @@ end
 
 function ModelSkillConfiguration:isEmpty()
     return not ((self.m_MaxPoints) and (self.m_Passive) and (self.m_Active1) and (self.m_Active2))
+end
+
+function ModelSkillConfiguration:isValid()
+    if (self:isEmpty()) then
+        return false
+    end
+
+    -- TODO: validate the active skills.
+    return isPassiveSkillValid(self)
 end
 
 function ModelSkillConfiguration:setMaxPoints(points)
