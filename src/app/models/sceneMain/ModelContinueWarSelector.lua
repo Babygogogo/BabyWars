@@ -15,11 +15,14 @@ local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local WarFieldList          = require("res.data.templateWarField.WarFieldList")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getWarFieldName(fileName)
+    return require("res.data.templateWarField." .. fileName).warFieldName
+end
+
 local function configModelWarConfigurator(model, sceneWarFileName, configuration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
@@ -108,7 +111,7 @@ local function createOngoingWarList(self, list)
         local warFieldFileName = configuration.warFieldFileName
         warList[#warList + 1] = {
             sceneWarFileName = sceneWarFileName,
-            warFieldName     = WarFieldList[warFieldFileName],
+            warFieldName     = getWarFieldName(warFieldFileName),
             isInTurn         = item.isInTurn,
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)

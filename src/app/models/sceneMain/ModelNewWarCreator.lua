@@ -11,6 +11,10 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getWarFieldName(fileName)
+    return require("res.data.templateWarField." .. fileName).warFieldName
+end
+
 local function resetModelWarConfigurator(model, warFieldFileName)
     local warField = require("res.data.templateWarField." .. warFieldFileName)
     model:setWarFieldFileName(warFieldFileName)
@@ -132,9 +136,9 @@ end
 
 local function initWarFieldList(self, list)
     local list = {}
-    for warFieldFileName, warFieldName in pairs(WarFieldList) do
+    for _, warFieldFileName in ipairs(WarFieldList) do
         list[#list + 1] = {
-            name     = warFieldName,
+            name     = getWarFieldName(warFieldFileName),
             callback = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
