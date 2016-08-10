@@ -343,9 +343,26 @@ local s_Texts = {
         [2] = function() return "Password (optional)" end,
     },
     [40] = {
-        [1] = function() return "正 常" end,
-        [2] = function() return "Clear" end,
+        [1] = function(weatherType)
+            if     (weatherType == "Clear")  then return "正 常"
+            elseif (weatherType == "Random") then return "随 机"
+            elseif (weatherType == "Rainy")  then return "雨 天"
+            elseif (weatherType == "Snowy")  then return "雪 天"
+            elseif (weatherType == "Sandy")  then return "沙 尘 暴"
+            else                                  return "未知[40]: " .. (weatherType or "")
+            end
+        end,
+        [2] = function(weatherType)
+            if     (weatherType == "Clear")  then return "Clear"
+            elseif (weatherType == "Random") then return "Random"
+            elseif (weatherType == "Rainy")  then return "Rainy"
+            elseif (weatherType == "Snowy")  then return "Snowy"
+            elseif (weatherType == "Sandy")  then return "Sandy"
+            else                                  return "Unknown[40]: " .. (weatherType or "")
+            end
+        end,
     },
+    --[[
     [41] = {
         [1] = function() return "随 机"  end,
         [2] = function() return "Random" end,
@@ -362,6 +379,7 @@ local s_Texts = {
         [1] = function() return "沙 尘 暴" end,
         [2] = function() return "Sandy"    end,
     },
+    --]]
     [45] = {
         [1] = function() return "暂 不 可 用"  end,
         [2] = function() return "Unavailable" end,

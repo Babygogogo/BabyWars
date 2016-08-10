@@ -126,7 +126,7 @@ local function initSelectorWeather(modelWarConfigurator)
     -- TODO: enable the selector.
     modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
         :setOptions({
-            {data = "clear", text = getLocalizedText(40),},
+            {data = "Clear", text = getLocalizedText(40, "Clear"),},
         })
 end
 
