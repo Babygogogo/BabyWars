@@ -27,7 +27,7 @@ end
 --------------------------------------------------------------------------------
 function Joinable:canJoinModelUnit(modelUnit)
     local owner = self.m_Owner
-    if (owner:getTiledID() ~= modelUnit:getTiledID()) then
+    if (owner:getTiledId() ~= modelUnit:getTiledId()) then
         return false
     end
 

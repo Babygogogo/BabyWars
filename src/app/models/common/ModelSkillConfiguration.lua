@@ -145,4 +145,11 @@ function ModelSkillConfiguration:getDescription()
     )
 end
 
+function ModelSkillConfiguration:getProductionCostModifier(tiledID)
+    local modifier = self.m_ModelPassiveSkill:getProductionCostModifier(tiledID)
+    -- TODO: take the active skills into account.
+
+    return modifier
+end
+
 return ModelSkillConfiguration

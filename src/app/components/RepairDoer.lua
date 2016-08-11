@@ -72,7 +72,7 @@ function RepairDoer:getRepairTargetCategory()
 end
 
 function RepairDoer:canRepairTarget(target)
-    local targetTiledID = target:getTiledID()
+    local targetTiledID = target:getTiledId()
     if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Owner:getPlayerIndex()) then
         return false
     end

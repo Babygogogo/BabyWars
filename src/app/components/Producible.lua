@@ -8,23 +8,31 @@ Producible.EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
+--------------------------------------------------------------------------------
 -- The static functions.
 --------------------------------------------------------------------------------
-function Producible.getProductionCostWithTemplateProducible(template, modelPlayerManager, playerIndex)
-    local baseCost = template.productionCost
-    -- TODO: take the player skills into account.
-
-    return baseCost
-end
-
 function Producible.getProductionCostWithTiledId(tiledID, modelPlayerManager)
-    local templateUnit = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
-    return Producible.getProductionCostWithTemplateProducible(
-        templateUnit.Producible,
-        modelPlayerManager,
-        GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
-    )
+    local playerIndex = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
+    local modifier    = modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration():getProductionCostModifier()
+    -- TODO: take the skills of the opponents into account.
+
+    local baseCost = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).Producible.productionCost
+    if (modifier > 0) then
+        return round(baseCost * (1 + modifier / 100))
+    else
+        return round(baseCost / (1 - modifier / 100))
+    end
 end
+
+--------------------------------------------------------------------------------
+-- The static functions.
+--------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -56,11 +64,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Producible:getProductionCost()
-    return Producible.getProductionCostWithTemplateProducible(
-        self.m_Template,
-        self.m_ModelPlayerManager,
-        self.m_Owner:getPlayerIndex()
-    )
+    return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), self.m_ModelPlayerManager)
 end
 
 return Producible

@@ -159,4 +159,19 @@ function ModelPassiveSkill:clearSkill(slotIndex)
     return self
 end
 
+function ModelPassiveSkill:getProductionCostModifier(tiledID)
+    local slots    = self.m_Slots
+    local modifier = 0
+
+    for i = 1, SLOTS_COUNT do
+        local skill = slots[i]
+        if ((skill)                               and
+            (skill.name == "GlobalCostModifier")) then
+            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 return ModelPassiveSkill

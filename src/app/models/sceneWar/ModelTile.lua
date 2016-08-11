@@ -213,7 +213,7 @@ function ModelTile:updateView()
     return self
 end
 
-function ModelTile:getTiledID()
+function ModelTile:getTiledId()
     return (self.m_ObjectID > 0) and (self.m_ObjectID) or (self.m_BaseID)
 end
 
@@ -222,7 +222,7 @@ function ModelTile:getObjectAndBaseId()
 end
 
 function ModelTile:getPlayerIndex()
-    return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledID())
+    return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledId())
 end
 
 function ModelTile:getTileType()

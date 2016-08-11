@@ -245,7 +245,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    local tiledID = unit:getTiledID()
+    local tiledID = unit:getTiledId()
     local state   = unit:getState()
     updateUnitSprite(    self,                  tiledID)
     updateUnitState(     self,                  state)

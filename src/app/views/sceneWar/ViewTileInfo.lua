@@ -202,7 +202,7 @@ end
 --------------------------------------------------------------------------------
 local function updateTileIconWithModelTile(self, tile)
     self.m_TileIcon:stopAllActions()
-        :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tile:getTiledID()))
+        :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(tile:getTiledId()))
 end
 
 local function updateTileLabelWithModelTile(self, tile)

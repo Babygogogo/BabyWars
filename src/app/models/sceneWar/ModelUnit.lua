@@ -189,7 +189,7 @@ function ModelUnit:toSerializableTable()
         end
     end
 
-    t.tiledID = self:getTiledID()
+    t.tiledID = self:getTiledId()
     t.unitID  = self:getUnitId()
     local state = self:getState()
     if (state ~= "idle") then
@@ -527,7 +527,7 @@ function ModelUnit:showMovingAnimation()
     return self
 end
 
-function ModelUnit:getTiledID()
+function ModelUnit:getTiledId()
     return self.m_TiledID
 end
 
@@ -550,7 +550,7 @@ function ModelUnit:setStateActioned()
 end
 
 function ModelUnit:getUnitType()
-    return GameConstantFunctions.getUnitTypeWithTiledId(self:getTiledID())
+    return GameConstantFunctions.getUnitTypeWithTiledId(self:getTiledId())
 end
 
 function ModelUnit:getDescription()
