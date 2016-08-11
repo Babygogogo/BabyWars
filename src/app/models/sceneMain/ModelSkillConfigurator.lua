@@ -249,7 +249,7 @@ local function initItemsSkillLevels(self)
                 subItems[#subItems + 1] = {
                     name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
                     callback = function()
-                        self.m_ModelSkillConfituration:setSkillSlot(self.m_SkillID, self.m_SlotIndex, self.m_SkillName, i)
+                        self.m_ModelSkillConfituration:setSkill(self.m_SkillID, self.m_SlotIndex, self.m_SkillName, i)
                         if (self.m_View) then
                             self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
                         end
