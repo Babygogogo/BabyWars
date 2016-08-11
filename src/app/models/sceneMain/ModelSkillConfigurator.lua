@@ -196,7 +196,7 @@ local function initItemsSkillCategories(self)
         {
             name     = getLocalizedText(3, "Clear"),
             callback = function()
-                self.m_ModelSkillConfituration:clearSkillSlot(self.m_SkillID, self.m_SlotIndex)
+                self.m_ModelSkillConfituration:clearSkill(self.m_SkillID, self.m_SlotIndex)
 
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
