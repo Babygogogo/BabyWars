@@ -269,4 +269,10 @@ function ModelWarCommandMenu:setEnabled(enabled)
     return self
 end
 
+function ModelWarCommandMenu:onButtonBackTouched()
+    self:setEnabled(false)
+
+    return self
+end
+
 return ModelWarCommandMenu

@@ -67,6 +67,7 @@ local s_Texts = {
             elseif (textType == "Help")         then return "帮 助"
             elseif (textType == "Save")         then return "保 存"
             elseif (textType == "Back")         then return "返 回"
+            elseif (textType == "Close")        then return "关 闭"
             elseif (textType == "Exit")         then return "退 出"
             elseif (textType == "GameFlow")     then return "游 戏 流 程"
             elseif (textType == "WarControl")   then return "战 局 操 作"
@@ -84,6 +85,7 @@ local s_Texts = {
             elseif (textType == "Help")         then return "Help"
             elseif (textType == "Save")         then return "Save"
             elseif (textType == "Back")         then return "Back"
+            elseif (textType == "Close")        then return "Close"
             elseif (textType == "Exit")         then return "Exit"
             elseif (textType == "GameFlow")     then return "Game Flow"
             elseif (textType == "WarControl")   then return "Controlling"
@@ -464,7 +466,8 @@ local s_Texts = {
     },
     [65] = {
         [1] = function(textType)
-            if     (textType == "QuitWar")   then return "退 出"
+            if     (textType == "WarMenu")   then return "战 场 菜 单"
+            elseif (textType == "QuitWar")   then return "退 出"
             elseif (textType == "HideUI")    then return "隐 藏 界 面"
             elseif (textType == "Surrender") then return "投 降"
             elseif (textType == "ReloadWar") then return "重 新 载 入"
@@ -473,7 +476,8 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "QuitWar")   then return "Quit"
+            if     (textType == "WarMenu")   then return "War Menu"
+            elseif (textType == "QuitWar")   then return "Quit"
             elseif (textType == "HideUI")    then return "Hide UI"
             elseif (textType == "Surrender") then return "Surrender"
             elseif (textType == "ReloadWar") then return "Reload"
