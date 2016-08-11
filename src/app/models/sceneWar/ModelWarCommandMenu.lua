@@ -26,18 +26,8 @@ local ActorManager          = require("src.global.actors.ActorManager")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
--- The private callback functions on script events.
+-- The util functions.
 --------------------------------------------------------------------------------
-local function onEvtPlayerIndexUpdated(self, event)
-    self.m_PlayerIndex    = event.playerIndex
-    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
-end
-
-local function onEvtIsWaitingForServerResponse(self, event)
-    self:setEnabled(false)
-    self.m_IsWaitingForServerResponse = event.waiting
-end
-
 local function getEmptyProducersCount(self)
     local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
     local count        = 0
@@ -66,6 +56,86 @@ local function getIdleUnitsCount(self)
     return count
 end
 
+local function updateStringWarInfo(self)
+    local modelPlayerManager = self.m_ModelPlayerManager
+    local data               = {}
+
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:isAlive()) then
+            local energy, require1, require2 = modelPlayer:getEnergy()
+            data[playerIndex] = {
+                fund       = modelPlayer:getFund(),
+                energy     = energy,
+                require1   = require1,
+                require2   = require2,
+                unitsCount = 0,
+                tilesCount = 0,
+            }
+        end
+    end)
+
+    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        local unitsCount = 1
+        if (modelUnit.getCurrentLoadCount) then
+            unitsCount = unitsCount + modelUnit:getCurrentLoadCount()
+        end
+
+        local playerIndex = modelUnit:getPlayerIndex()
+        data[playerIndex].unitsCount = data[playerIndex].unitsCount + unitsCount
+    end)
+
+    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+        local playerIndex = modelTile:getPlayerIndex()
+        if (playerIndex ~= 0) then
+            data[playerIndex].tilesCount = data[playerIndex].tilesCount + 1
+        end
+    end)
+
+    local playersCount = modelPlayerManager:getPlayersCount()
+    local stringList   = {}
+    for i = 1, playersCount do
+        if (not data[i]) then
+            stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
+        else
+            local d = data[i]
+            stringList[i] = string.format("%s %d:\n%s: %d\n%s: %.2f / %d / %d\n%s: %d\n%s: %d",
+                getLocalizedText(65, "Player"),     i,
+                getLocalizedText(65, "Fund"),       d.fund,
+                getLocalizedText(65, "Energy"),     d.energy,    d.require1, d.require2,
+                getLocalizedText(65, "UnitsCount"), d.unitsCount,
+                getLocalizedText(65, "TilesCount"), d.tilesCount
+            )
+        end
+    end
+
+    self.m_StringWarInfo = table.concat(stringList, "\n--------------------\n")
+end
+
+local function updateStringSkillInfo(self)
+    local stringList = {}
+    self.m_ModelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        stringList[#stringList + 1] = string.format("%s %d: %s",
+            getLocalizedText(65, "Player"), playerIndex,
+            modelPlayer:getModelSkillConfiguration():getDescription()
+        )
+    end)
+
+    self.m_StringSkillInfo = table.concat(stringList, "\n--------------------\n")
+end
+
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtPlayerIndexUpdated(self, event)
+    self.m_PlayerIndex    = event.playerIndex
+    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+end
+
+local function onEvtIsWaitingForServerResponse(self, event)
+    self:setEnabled(false)
+    self.m_IsWaitingForServerResponse = event.waiting
+end
+
 --------------------------------------------------------------------------------
 -- The composition items.
 --------------------------------------------------------------------------------
@@ -84,6 +154,32 @@ local function initItemQuit(self)
     }
 
     self.m_ItemQuit = item
+end
+
+local function initItemWarInfo(self)
+    local item = {
+        name     = getLocalizedText(65, "WarInfo"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(self.m_StringWarInfo)
+            end
+        end,
+    }
+
+    self.m_ItemWarInfo = item
+end
+
+local function initItemSkillInfo(self)
+    local item = {
+        name     = getLocalizedText(65, "SkillInfo"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(self.m_StringSkillInfo)
+            end
+        end,
+    }
+
+    self.m_ItemSkillInfo = item
 end
 
 local function initItemHideUI(self)
@@ -158,6 +254,8 @@ end
 local function generateItems(self)
     local items = {
         self.m_ItemQuit,
+        self.m_ItemWarInfo,
+        self.m_ItemSkillInfo,
         self.m_ItemHideUI,
         self.m_ItemReload,
     }
@@ -176,6 +274,8 @@ function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
     initItemQuit(     self)
+    initItemWarInfo(  self)
+    initItemSkillInfo(self)
     initItemHideUI(   self)
     initItemReload(   self)
     initItemSurrender(self)
@@ -208,6 +308,13 @@ end
 function ModelWarCommandMenu:setModelWarField(model)
     assert(self.m_ModelWarField == nil, "ModelWarCommandMenu:setModelWarField() the model has been set.")
     self.m_ModelWarField = model
+
+    return self
+end
+
+function ModelWarCommandMenu:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelWarCommandMenu:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
 
     return self
 end
@@ -260,7 +367,11 @@ function ModelWarCommandMenu:setEnabled(enabled)
     local view = self.m_View
     if (view) then
         if (enabled) then
+            updateStringWarInfo(  self)
+            updateStringSkillInfo(self)
+
             view:setItems(generateItems(self))
+                :setOverviewString(self.m_StringWarInfo)
         end
 
         view:setEnabled(enabled)
