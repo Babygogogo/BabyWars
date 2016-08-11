@@ -53,6 +53,16 @@ local function onEvtMapCursorMoved(self, event)
     updateWithModelUnitMap(self)
 end
 
+local function onEvtWarCommandMenuActivated(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(false)
+    end
+end
+
+local function onEvtWarCommandMenuDectivated(self, event)
+    updateWithModelUnitMap(self)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -83,9 +93,11 @@ function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtModelUnitMapUpdated", self)
-        :addEventListener("EvtTurnPhaseMain",       self)
-        :addEventListener("EvtGridSelected",        self)
-        :addEventListener("EvtMapCursorMoved",      self)
+        :addEventListener("EvtTurnPhaseMain",             self)
+        :addEventListener("EvtGridSelected",              self)
+        :addEventListener("EvtMapCursorMoved",            self)
+        :addEventListener("EvtWarCommandMenuActivated",   self)
+        :addEventListener("EvtWarCommandMenuDeactivated", self)
 
     return self
 end
@@ -93,10 +105,12 @@ end
 function ModelUnitInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
-        :removeEventListener("EvtGridSelected",        self)
-        :removeEventListener("EvtTurnPhaseMain",       self)
-        :removeEventListener("EvtModelUnitMapUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuDeactivated", self)
+        :removeEventListener("EvtWarCommandMenuActivated", self)
+        :removeEventListener("EvtMapCursorMoved",          self)
+        :removeEventListener("EvtGridSelected",            self)
+        :removeEventListener("EvtTurnPhaseMain",           self)
+        :removeEventListener("EvtModelUnitMapUpdated",     self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -107,10 +121,12 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelUnitMapUpdated") then onEvtModelUnitMapUpdated(self, event)
-    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
-    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(       self, event)
-    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
+    if     (eventName == "EvtModelUnitMapUpdated") then onEvtModelUnitMapUpdated(           self, event)
+    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(                 self, event)
+    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(                  self, event)
+    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(                self, event)
+    elseif (eventName == "EvtWarCommandMenuActivated") then onEvtWarCommandMenuActivated(   self, event)
+    elseif (eventName == "EvtWarCommandMenuDeactivated") then onEvtWarCommandMenuDectivated(self, event)
     end
 
     return self

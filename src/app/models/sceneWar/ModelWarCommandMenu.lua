@@ -18,10 +18,12 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -69,9 +71,9 @@ end
 --------------------------------------------------------------------------------
 local function initItemQuit(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "QuitWar"),
+        name     = getLocalizedText(65, "QuitWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "QuitWar"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "QuitWar"))
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
                     WebSocketManager.setOwner(actorSceneMain:getModel())
@@ -84,11 +86,24 @@ local function initItemQuit(self)
     self.m_ItemQuit = item
 end
 
+local function initItemHideUI(self)
+    local item = {
+        name     = getLocalizedText(65, "HideUI"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setEnabled(false)
+            end
+        end,
+    }
+
+    self.m_ItemHideUI = item
+end
+
 local function initItemReload(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "ReloadWar"),
+        name     = getLocalizedText(65, "ReloadWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "ReloadWar"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "ReloadWar"))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtReloadSceneWar"})
@@ -102,9 +117,9 @@ end
 
 local function initItemSurrender(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "Surrender"),
+        name     = getLocalizedText(65, "Surrender"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "Surrender"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "Surrender"))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -122,9 +137,9 @@ end
 
 local function initItemEndTurn(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "EndTurn"),
+        name     = getLocalizedText(65, "EndTurn"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -143,6 +158,7 @@ end
 local function generateItems(self)
     local items = {
         self.m_ItemQuit,
+        self.m_ItemHideUI,
         self.m_ItemReload,
     }
     if ((self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)) then
@@ -160,6 +176,7 @@ function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
     initItemQuit(     self)
+    initItemHideUI(   self)
     initItemReload(   self)
     initItemSurrender(self)
     initItemEndTurn(  self)
@@ -231,12 +248,22 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:setEnabled(enabled)
-    if (self.m_View) then
+    local dispatcher = self.m_RootScriptEventDispatcher
+    if (dispatcher) then
         if (enabled) then
-            self.m_View:setItems(generateItems(self))
+            dispatcher:dispatchEvent({name = "EvtWarCommandMenuActivated"})
+        else
+            dispatcher:dispatchEvent({name = "EvtWarCommandMenuDeactivated"})
+        end
+    end
+
+    local view = self.m_View
+    if (view) then
+        if (enabled) then
+            view:setItems(generateItems(self))
         end
 
-        self.m_View:setEnabled(enabled)
+        view:setEnabled(enabled)
     end
 
     return self

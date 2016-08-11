@@ -465,6 +465,7 @@ local s_Texts = {
     [65] = {
         [1] = function(textType)
             if     (textType == "QuitWar")   then return "退 出"
+            elseif (textType == "HideUI")    then return "隐 藏 界 面"
             elseif (textType == "Surrender") then return "投 降"
             elseif (textType == "ReloadWar") then return "重 新 载 入"
             elseif (textType == "EndTurn")   then return "结 束 回 合"
@@ -473,6 +474,7 @@ local s_Texts = {
         end,
         [2] = function(textType)
             if     (textType == "QuitWar")   then return "Quit"
+            elseif (textType == "HideUI")    then return "Hide UI"
             elseif (textType == "Surrender") then return "Surrender"
             elseif (textType == "ReloadWar") then return "Reload"
             elseif (textType == "EndTurn")   then return "End Turn"

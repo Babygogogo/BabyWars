@@ -103,7 +103,9 @@ local function initTouchListener(self)
     end, cc.Handler.EVENT_TOUCH_BEGAN)
 
     touchListener:registerScriptHandler(function()
-        self:setEnabled(false)
+        if (self.m_Model) then
+            self.m_Model:setEnabled(false)
+        end
     end, cc.Handler.EVENT_TOUCH_ENDED)
 
     self.m_TouchListener = touchListener

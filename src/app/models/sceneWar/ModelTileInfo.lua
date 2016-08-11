@@ -34,6 +34,10 @@ local function onEvtModelTileMapUpdated(self, event)
 end
 
 local function onEvtMapCursorMoved(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(true)
+    end
+
     local gridIndex = event.gridIndex
     if (not GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
         self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
@@ -48,6 +52,18 @@ end
 local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
     updateWithModelTile(self, self.m_ModelTileMap:getModelTile(self.m_CursorGridIndex))
+end
+
+local function onEvtWarCommandMenuActivated(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(false)
+    end
+end
+
+local function onEvtWarCommandMenuDeactivated(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(true)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -80,9 +96,11 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtModelTileMapUpdated", self)
-        :addEventListener("EvtMapCursorMoved", self)
-        :addEventListener("EvtGridSelected",   self)
-        :addEventListener("EvtTurnPhaseMain",  self)
+        :addEventListener("EvtMapCursorMoved",            self)
+        :addEventListener("EvtGridSelected",              self)
+        :addEventListener("EvtTurnPhaseMain",             self)
+        :addEventListener("EvtWarCommandMenuActivated",   self)
+        :addEventListener("EvtWarCommandMenuDeactivated", self)
 
     return self
 end
@@ -90,10 +108,12 @@ end
 function ModelTileInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
-        :removeEventListener("EvtGridSelected",        self)
-        :removeEventListener("EvtMapCursorMoved",      self)
-        :removeEventListener("EvtModelTileMapUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuDeactivated", self)
+        :removeEventListener("EvtWarCommandMenuActivated", self)
+        :removeEventListener("EvtTurnPhaseMain",           self)
+        :removeEventListener("EvtGridSelected",            self)
+        :removeEventListener("EvtMapCursorMoved",          self)
+        :removeEventListener("EvtModelTileMapUpdated",     self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -104,10 +124,12 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelTileMapUpdated") then onEvtModelTileMapUpdated(self, event)
-    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(     self, event)
-    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(       self, event)
-    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(      self, event)
+    if     (eventName == "EvtModelTileMapUpdated")       then onEvtModelTileMapUpdated(      self, event)
+    elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(           self, event)
+    elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(             self, event)
+    elseif (eventName == "EvtTurnPhaseMain")             then onEvtTurnPhaseMain(            self, event)
+    elseif (eventName == "EvtWarCommandMenuActivated")   then onEvtWarCommandMenuActivated(  self, event)
+    elseif (eventName == "EvtWarCommandMenuDeactivated") then onEvtWarCommandMenuDeactivated(self, event)
     end
 
     return self
