@@ -174,4 +174,34 @@ function ModelPassiveSkill:getProductionCostModifier(tiledID)
     return modifier
 end
 
+function ModelPassiveSkill:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    local slots    = self.m_Slots
+    local modifier = 0
+
+    for i = 1, SLOTS_COUNT do
+        local skill = slots[i]
+        if ((skill)                                 and
+            (skill.name == "GlobalAttackModifier")) then
+            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        end
+    end
+
+    return modifier
+end
+
+function ModelPassiveSkill:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    local slots    = self.m_Slots
+    local modifier = 0
+
+    for i = 1, SLOTS_COUNT do
+        local skill = slots[i]
+        if ((skill)                                  and
+            (skill.name == "GlobalDefenseModifier")) then
+            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 return ModelPassiveSkill

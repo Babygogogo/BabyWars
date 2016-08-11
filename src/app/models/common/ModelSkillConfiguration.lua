@@ -152,4 +152,20 @@ function ModelSkillConfiguration:getProductionCostModifier(tiledID)
     return modifier
 end
 
+function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    local modifier = self.m_ModelPassiveSkill:getAttackModifier(
+        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    -- TODO: take the active skills into account.
+
+    return modifier
+end
+
+function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    local modifier = self.m_ModelPassiveSkill:getDefenseModifier(
+        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    -- TODO: take the active skills into account.
+
+    return modifier
+end
+
 return ModelSkillConfiguration

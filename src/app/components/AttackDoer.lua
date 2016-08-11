@@ -107,7 +107,12 @@ local function getAttackBonusMultiplier(self, attackerGridIndex, target, targetG
             bonus = bonus + COMMAND_TOWER_ATTACK_BONUS
         end
     end)
-    -- TODO: Calculate the bonus with co skills and so on.
+
+    local modelWeatherManager = self.m_ModelWeatherManager
+    local modelPlayerManager  = self.m_ModelPlayerManager
+    bonus = bonus + modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration():getAttackModifier(
+        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    -- TODO: take the skills of the opponent into account.
 
     return 1 + bonus / 100
 end
@@ -124,6 +129,14 @@ local function getDefenseBonusMultiplier(self, attackerGridIndex, target, target
     bonus = bonus + ((targetTile.getDefenseBonusAmount) and (targetTile:getDefenseBonusAmount(targetType)) or (0))
     bonus = bonus + ((target.getPromotionDefenseBonus)  and (target:getPromotionDefenseBonus())            or (0))
     -- TODO: Calculate the bonus with co skills and so on.
+
+    local modelWeatherManager = self.m_ModelWeatherManager
+    local modelPlayerManager  = self.m_ModelPlayerManager
+    local attacker            = self.m_Owner
+    local targetPlayerIndex   = target:getPlayerIndex()
+    bonus = bonus + modelPlayerManager:getModelPlayer(targetPlayerIndex):getModelSkillConfiguration():getDefenseModifier(
+        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    -- TODO: take the skills of the opponent into account.
 
     if (bonus >= 0) then
         return 1 / (1 + bonus / 100)
