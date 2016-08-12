@@ -74,6 +74,15 @@ local BUTTON_COLOR_DISABLED = {r = 160, g = 160, b = 160}
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function setButtonEnabled(button, enabled)
+    button:setEnabled(enabled)
+    if (enabled) then
+        button:setColor(BUTTON_COLOR_ENABLED)
+    else
+        button:setColor(BUTTON_COLOR_DISABLED)
+    end
+end
+
 local function createViewItem(item)
     local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
@@ -93,13 +102,19 @@ local function createViewItem(item)
         :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
 
         :setZoomScale(-0.05)
+        :setCascadeColorEnabled(true)
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 item.callback()
             end
         end)
-    view:getRendererNormal():addChild(label)
+    view:getRendererNormal():setCascadeColorEnabled(true)
+        :addChild(label)
+
+    if (item.available == false) then
+        setButtonEnabled(view, false)
+    end
 
     return view
 end
@@ -251,6 +266,12 @@ function ViewSkillConfigurator:setEnabled(enabled)
     return self
 end
 
+function ViewSkillConfigurator:setItemEnabled(itemIndex, enabled)
+    setButtonEnabled(self.m_MenuListView:getItem(itemIndex - 1), enabled)
+
+    return self
+end
+
 function ViewSkillConfigurator:setMenuTitle(text)
     self.m_MenuTitle:setString(text)
 
@@ -276,14 +297,14 @@ function ViewSkillConfigurator:setOverviewVisible(visible)
 end
 
 function ViewSkillConfigurator:disableButtonSaveForSecs(secs)
-    self.m_ButtonSave:setColor(BUTTON_COLOR_DISABLED)
-        :setEnabled(false)
-        :stopAllActions()
+    local button = self.m_ButtonSave
+    setButtonEnabled(button, false)
+
+    button:stopAllActions()
         :runAction(cc.Sequence:create(
             cc.DelayTime:create(secs or 3),
             cc.CallFunc:create(function()
-                self.m_ButtonSave:setColor(BUTTON_COLOR_ENABLED)
-                    :setEnabled(true)
+                setButtonEnabled(button, true)
             end)
         ))
 

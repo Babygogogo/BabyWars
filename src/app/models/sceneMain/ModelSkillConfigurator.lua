@@ -7,9 +7,10 @@ local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions
 local getLocalizedText        = LocalizationFunctions.getLocalizedText
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local SKILL_GROUP_ID_PASSIVE  = ModelSkillConfiguration.getSkillGroupIdPassive()
-local SKILL_GROUP_ID_ACTIVE_1 = ModelSkillConfiguration.getSkillGroupIdActive1()
-local SKILL_GROUP_ID_ACTIVE_2 = ModelSkillConfiguration.getSkillGroupIdActive2()
+local SKILL_GROUP_ID_PASSIVE   = ModelSkillConfiguration.getSkillGroupIdPassive()
+local SKILL_GROUP_ID_ACTIVE_1  = ModelSkillConfiguration.getSkillGroupIdActive1()
+local SKILL_GROUP_ID_ACTIVE_2  = ModelSkillConfiguration.getSkillGroupIdActive2()
+local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -72,12 +73,22 @@ local function setStateSelectMaxPoint(self)
     end
 end
 
-local function setStateOverviewPassiveSkill(self)
-    self.m_State = "stateOverviewPassiveSkill"
+local function setStateOverviewSkillGroupPassive(self)
+    self.m_State = "stateOverviewSkillGroupPassive"
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "PassiveSkill"))
-            :setMenuItems(self.m_ItemsPassiveSkillSlots)
+            :setMenuItems(self.m_ItemsSkillGroupPassive)
+            :setButtonSaveVisible(false)
+    end
+end
+
+local function setStateOverviewSkillGroupActive1(self)
+    self.m_State = "stateOverviewSkillGroupActive1"
+
+    if (self.m_View) then
+        self.m_View:setMenuTitle(getLocalizedText(3, "ActiveSkill") .. " 1")
+            :setMenuItems(self.m_ItemsSkillGroupActive1)
             :setButtonSaveVisible(false)
     end
 end
@@ -144,12 +155,13 @@ local function initItemsOverview(self)
         {
             name     = getLocalizedText(3, "PassiveSkill"),
             callback = function()
-                setStateOverviewPassiveSkill(self)
+                setStateOverviewSkillGroupPassive(self)
             end,
         },
         {
             name     = getLocalizedText(3, "ActiveSkill") .. " 1",
             callback = function()
+                setStateOverviewSkillGroupActive1(self)
             end,
         },
         {
@@ -177,7 +189,7 @@ local function initItemsMaxPoints(self)
     self.m_ItemsMaxPoints = items
 end
 
-local function initItemsPassiveSkillSlots(self)
+local function initItemsSkillGroupPassive(self)
     local items = {}
     for i = 1, GameConstantFunctions.getPassiveSkillSlotsCount() do
         items[#items + 1] = {
@@ -188,7 +200,46 @@ local function initItemsPassiveSkillSlots(self)
         }
     end
 
-    self.m_ItemsPassiveSkillSlots = items
+    self.m_ItemsSkillGroupPassive = items
+end
+
+local function initItemsSkillGroupActive1(self)
+    local items = {
+        {
+            name      = getLocalizedText(3, "Enable"),
+            callback  = function()
+                local view = self.m_View
+                if (view) then
+                    view:setItemEnabled(1, false)
+                    for i = 2, 2 + ACTIVE_SKILL_SLOTS_COUNT do
+                        view:setItemEnabled(i, true)
+                    end
+                end
+            end,
+        },
+        {
+            name     = getLocalizedText(3, "Disable"),
+            callback = function()
+                local view = self.m_View
+                if (view) then
+                    view:setItemEnabled(1, true)
+                    for i = 2, 2 + ACTIVE_SKILL_SLOTS_COUNT do
+                        view:setItemEnabled(i, false)
+                    end
+                end
+            end,
+        }
+    }
+    for i = 1, ACTIVE_SKILL_SLOTS_COUNT do
+        items[#items + 1] = {
+            name     = string.format("%s %d", getLocalizedText(3, "Skill"), i),
+            callback = function()
+                -- TODO:
+            end
+        }
+    end
+
+    self.m_ItemsSkillGroupActive1 = items
 end
 
 local function initItemsSkillCategories(self)
@@ -274,7 +325,8 @@ function ModelSkillConfigurator:ctor()
     initItemsAllConfigurations(self)
     initItemsOverview(         self)
     initItemsMaxPoints(        self)
-    initItemsPassiveSkillSlots(self)
+    initItemsSkillGroupPassive(self)
+    initItemsSkillGroupActive1(self)
     initItemsSkillCategories(  self)
     initItemsSkills(           self)
     initItemsSkillLevels(      self)
@@ -343,20 +395,14 @@ function ModelSkillConfigurator:onButtonBackTouched()
     if (state == "stateMain") then
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
-    elseif (state == "stateOverviewConfiguration") then
-        setStateMain(self)
-    elseif (state == "stateSelectMaxPoint") then
-        setStateOverviewConfiguration(self, self.m_ConfigurationID)
-    elseif (state == "stateOverviewPassiveSkill") then
-        setStateOverviewConfiguration(self, self.m_ConfigurationID)
-    elseif (state == "stateSelectSkillCategory") then
-        setStateOverviewPassiveSkill(self)
-    elseif (state == "stateSelectSkill") then
-        setStateSelectSkillCategory(self, self.m_SkillGroupID, self.m_SlotIndex)
-    elseif (state == "stateSelectSkillLevel") then
-        setStateSelectSkill(self, self.m_CategoryName)
-    else
-        error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
+    elseif (state == "stateOverviewConfiguration")      then setStateMain(                 self)
+    elseif (state == "stateSelectMaxPoint")             then setStateOverviewConfiguration(self, self.m_ConfigurationID)
+    elseif (state == "stateOverviewSkillGroupPassive")  then setStateOverviewConfiguration(self, self.m_ConfigurationID)
+    elseif (state == "stateOverviewSkillGroupActive1")  then setStateOverviewConfiguration(self, self.m_ConfigurationID)
+    elseif (state == "stateSelectSkillCategory")        then setStateOverviewSkillGroupPassive( self)
+    elseif (state == "stateSelectSkill")                then setStateSelectSkillCategory(  self, self.m_SkillGroupID, self.m_SlotIndex)
+    elseif (state == "stateSelectSkillLevel")           then setStateSelectSkill(          self, self.m_CategoryName)
+    else   error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
     end
 
     return self
