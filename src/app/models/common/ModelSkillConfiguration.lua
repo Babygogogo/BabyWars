@@ -42,11 +42,17 @@ end
 -- The functions for serialization.
 --------------------------------------------------------------------------------
 function ModelSkillConfiguration:toSerializableTable()
+    local active1 = self.m_ModelSkillGroupActive1
+    local active2 = self.m_ModelSkillGroupActive2
+    if (active1:getEnergyRequirement() > active2:getEnergyRequirement()) then
+        active1, active2 = active2, active1
+    end
+
     return {
         maxPoints = self.m_MaxPoints,
         passive   = self.m_ModelSkillGroupPassive:toSerializableTable(),
-        active1   = self.m_ModelSkillGroupActive1:toSerializableTable(),
-        active2   = self.m_ModelSkillGroupActive2:toSerializableTable(),
+        active1   = active1:toSerializableTable(),
+        active2   = active2:toSerializableTable(),
     }
 end
 
