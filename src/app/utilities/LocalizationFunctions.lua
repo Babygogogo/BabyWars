@@ -151,26 +151,26 @@ local s_Texts = {
         end,
     },
     [4] = {
-        [1] = function(skillType)
-            if     (skillType == "GlobalAttackModifier")  then return "改变我方全体部队的攻击力。"
-            elseif (skillType == "GlobalDefenseModifier") then return "改变我方全体部队的防御力。"
-            elseif (skillType == "GlobalCostModifier")    then return "改变我方全体部队的造价。"
-            else                                               return "未知[4]: " .. (skillType or "")
+        [1] = function(skillID)
+            if     (skillID == 1) then return "改变我方全体部队的攻击力。"
+            elseif (skillID == 2) then return "改变我方全体部队的防御力。"
+            elseif (skillID == 3) then return "改变我方全体部队的造价。"
+            else                       return "未知[4]: " .. (skillID or "")
             end
         end,
-        [2] = function(skillType)
+        [2] = function(skillID)
             return "Untranslated..."
         end,
     },
     [5] = {
-        [1] = function(skillType)
-            if     (skillType == "GlobalAttackModifier")  then return "全军攻击力"
-            elseif (skillType == "GlobalDefenseModifier") then return "全军防御力"
-            elseif (skillType == "GlobalCostModifier")    then return "全军造价"
-            else                                               return "未知[5]: " .. (skillType or "")
+        [1] = function(skillID)
+            if     (skillID == 1) then return "全军攻击力"
+            elseif (skillID == 2) then return "全军防御力"
+            elseif (skillID == 3) then return "全军造价"
+            else                       return "未知[5]: " .. (skillID or "")
             end
         end,
-        [2] = function(skillType)
+        [2] = function(skillID)
             return "Untranslated..."
         end,
     },

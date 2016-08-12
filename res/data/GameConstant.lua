@@ -700,15 +700,15 @@ GameConstant.categories = {
     },
 
     ["SkillCategoryAttack"] = {
-        "GlobalAttackModifier",
+        1,
     },
 
     ["SkillCategoryDefense"] = {
-        "GlobalDefenseModifier",
+        2,
     },
 
     ["SkillCategoryCost"] = {
-        "GlobalCostModifier",
+        3,
     },
 }
 
@@ -3643,7 +3643,8 @@ GameConstant.passiveSkillSlotsCount   = 4
 GameConstant.activeSkillSlotsCount    = 4
 
 GameConstant.skills = {
-    GlobalAttackModifier = {
+    -- Modify the attack power for all units of a player.
+    [1] = {
         minLevel = -30,
         maxLevel = 30,
         levels = {
@@ -3711,7 +3712,8 @@ GameConstant.skills = {
         },
     },
 
-    GlobalDefenseModifier = {
+    -- Modify the defense power for all units of a player.
+    [2] = {
         minLevel = -30,
         maxLevel = 30,
         levels = {
@@ -3779,7 +3781,8 @@ GameConstant.skills = {
         },
     },
 
-    GlobalCostModifier = {
+    -- Modify the production cost for all units of a player.
+    [3] = {
         minLevel = -30,
         maxLevel = 30,
         levels = {

@@ -13,16 +13,16 @@ local SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForSingleSkill(name, level, points, modifier)
+local function getDescriptionForSingleSkill(id, level, points, modifier)
     return string.format("%s  %s: %d  %s: %.2f  %s: %s%%\n%s",
-        getLocalizedText(5, name),
+        getLocalizedText(5, id),
         getLocalizedText(3, "Level"),
         level,
         getLocalizedText(3, "SkillPoints"),
         points,
         getLocalizedText(3, "Modifier"),
         (modifier) and ("" .. modifier) or ("--"),
-        getLocalizedText(4, name)
+        getLocalizedText(4, id)
     )
 end
 
@@ -44,7 +44,7 @@ local function resetSkillPoints(self)
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            local point = getSkillPoints(skill.name, skill.level)
+            local point = getSkillPoints(skill.id, skill.level)
             assert(type(point) == "number", "ModelSkillGroupPassive-resetSkillPoints() a skill is invalid: " .. i)
             totalPoints = totalPoints + point
         end
@@ -58,9 +58,9 @@ local function resetIsValid(self)
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            local name = skill.name
+            local id = skill.id
             for j = i + 1, SLOTS_COUNT do
-                if ((slots[j]) and (slots[j].name == name)) then
+                if ((slots[j]) and (slots[j].id == id)) then
                     self.m_IsValid = false
                     return
                 end
@@ -93,7 +93,7 @@ function ModelSkillGroupPassive:toSerializableTable()
         local skill = slots[i]
         if (skill) then
             t[#t + 1] = {
-                name  = skill.name,
+                id    = skill.id,
                 level = skill.level,
             }
         end
@@ -122,10 +122,10 @@ function ModelSkillGroupPassive:getDescription()
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            local name, level = skill.name, skill.level
-            local modifier    = getSkillModifier(name, level)
-            local points      = getSkillPoints(  name, level)
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(name, level, points, modifier))
+            local id, level = skill.id, skill.level
+            local modifier  = getSkillModifier(id, level)
+            local points    = getSkillPoints(  id, level)
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(id, level, points, modifier))
         else
             descriptions[#descriptions + 1] = string.format("%d. %s", i, getLocalizedText(3, "None"))
         end
@@ -134,12 +134,12 @@ function ModelSkillGroupPassive:getDescription()
     return table.concat(descriptions, "\n")
 end
 
-function ModelSkillGroupPassive:setSkill(slotIndex, skillName, skillLevel)
+function ModelSkillGroupPassive:setSkill(slotIndex, skillID, skillLevel)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
         "ModelSkillGroupPassive:setSkill() the param slotIndex is invalid.")
 
     self.m_Slots[slotIndex] = {
-        name  = skillName,
+        id    = skillID,
         level = skillLevel,
     }
     resetSkillPoints(self)
@@ -165,9 +165,9 @@ function ModelSkillGroupPassive:getProductionCostModifier(tiledID)
 
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
-        if ((skill)                               and
-            (skill.name == "GlobalCostModifier")) then
-            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        if ((skill)          and
+            (skill.id == 3)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
         end
     end
 
@@ -180,9 +180,9 @@ function ModelSkillGroupPassive:getAttackModifier(attacker, attackerGridIndex, t
 
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
-        if ((skill)                                 and
-            (skill.name == "GlobalAttackModifier")) then
-            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        if ((skill)          and
+            (skill.id == 1)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
         end
     end
 
@@ -195,9 +195,9 @@ function ModelSkillGroupPassive:getDefenseModifier(attacker, attackerGridIndex, 
 
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
-        if ((skill)                                  and
-            (skill.name == "GlobalDefenseModifier")) then
-            modifier = modifier + getSkillModifier(skill.name, skill.level)
+        if ((skill)          and
+            (skill.id == 2)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
         end
     end
 

@@ -102,12 +102,12 @@ local function setStateSelectSkill(self, categoryName)
     end
 end
 
-local function setStateSelectSkillLevel(self, skillName)
-    self.m_State     = "stateSelectSkillLevel"
-    self.m_SkillName = skillName
+local function setStateSelectSkillLevel(self, skillID)
+    self.m_State   = "stateSelectSkillLevel"
+    self.m_SkillID = skillID
 
     if (self.m_View) then
-        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillName])
+        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID])
     end
 end
 
@@ -221,11 +221,11 @@ local function initItemsSkills(self)
     local items = {}
     for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
         local subItems = {}
-        for _, skillName in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             subItems[#subItems + 1] = {
-                name     = getLocalizedText(5, skillName),
+                name     = getLocalizedText(5, skillID),
                 callback = function()
-                    setStateSelectSkillLevel(self, skillName)
+                    setStateSelectSkillLevel(self, skillID)
                 end,
             }
         end
@@ -238,18 +238,18 @@ end
 local function initItemsSkillLevels(self)
     local items = {}
     for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
-        for _, skillName in ipairs(GameConstantFunctions.getCategory(categoryName)) do
-            if (items[skillName]) then
+        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+            if (items[skillID]) then
                 break
             end
 
             local subItems = {}
-            local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillName)
+            local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
             for i = maxLevel, minLevel, -1 do
                 subItems[#subItems + 1] = {
                     name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
                     callback = function()
-                        self.m_ModelSkillConfituration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillName, i)
+                        self.m_ModelSkillConfituration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
                         if (self.m_View) then
                             self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
                         end
@@ -257,7 +257,7 @@ local function initItemsSkillLevels(self)
                 }
             end
 
-            items[skillName] = subItems
+            items[skillID] = subItems
         end
     end
 

@@ -119,8 +119,8 @@ function ModelSkillConfiguration:getMaxPoints()
     return self.m_MaxPoints
 end
 
-function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillName, level)
-    getSkillGroupWithId(self, skillGroupID):setSkill(slotIndex, skillName, level)
+function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillID, level)
+    getSkillGroupWithId(self, skillGroupID):setSkill(slotIndex, skillID, level)
 
     return self
 end
