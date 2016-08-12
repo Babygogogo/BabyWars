@@ -205,6 +205,10 @@ function GameConstantFunctions.getSkillPointsMinMaxStep()
     return GAME_CONSTANT.minSkillPoints, GAME_CONSTANT.maxSkillPoints, GAME_CONSTANT.skillPointsPerStep
 end
 
+function GameConstantFunctions.getEnergyRequirementMinMax()
+    return GAME_CONSTANT.minEnergyRequirement, GAME_CONSTANT.maxEnergyRequirement
+end
+
 function GameConstantFunctions.getSkillPointsPerEnergyRequirement()
     return GAME_CONSTANT.skillPointsPerEnergyRequirement
 end

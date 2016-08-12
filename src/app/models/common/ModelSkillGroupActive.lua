@@ -110,7 +110,7 @@ function ModelSkillGroupActive:isValid()
         end
     end
 
-    return totalPoints <= self:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
+    return totalPoints <= self:getMaxSkillPoints()
 end
 
 function ModelSkillGroupActive:setEnergyRequirement(requirement)
@@ -137,15 +137,20 @@ function ModelSkillGroupActive:getSkillPoints()
     return totalPoints
 end
 
+function ModelSkillGroupActive:getMaxSkillPoints()
+    return self:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
+end
+
 function ModelSkillGroupActive:getDescription()
     if (not self:isEnabled()) then
         return string.format("%s : %s", getLocalizedText(3, "ActiveSkill"), getLocalizedText(3, "Disabled"))
     end
 
     local descriptions = {
-        string.format("%s (%s: %.2f)\n%s: %d",
+        string.format("%s (%s: %.2f  %s: %.2f)\n%s: %d",
             getLocalizedText(3, "ActiveSkill"),
             getLocalizedText(3, "TotalPoints"),       self:getSkillPoints(),
+            getLocalizedText(3, "MaxPoints"),         self:getMaxSkillPoints(),
             getLocalizedText(3, "EnergyRequirement"), self:getEnergyRequirement()
         )
     }

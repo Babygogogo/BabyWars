@@ -3637,6 +3637,8 @@ GameConstant.templateModelUnits = {
 
 GameConstant.minSkillPoints                  = 0
 GameConstant.maxSkillPoints                  = 500
+GameConstant.minEnergyRequirement            = 1
+GameConstant.maxEnergyRequirement            = 15
 GameConstant.skillPointsPerStep              = 25
 GameConstant.skillPointsPerEnergyRequirement = 100
 GameConstant.skillConfigurationsCount        = 10
