@@ -17,7 +17,6 @@
 
 local RepairDoer = require("src.global.functions.class")("RepairDoer")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
@@ -29,6 +28,13 @@ RepairDoer.EXPORTED_METHODS = {
     "getRepairAmountAndCost",
     "getNormalizedRepairAmount",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -96,7 +102,8 @@ function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
         math.floor(modelPlayer:getFund() * 10 / productionCost)
     )
 
-    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - target:getCurrentHP(), normalizedRepairAmount * productionCost / 10
+    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - target:getCurrentHP(),
+        round(normalizedRepairAmount * productionCost / 10)
 end
 
 function RepairDoer:getNormalizedRepairAmount(modelPlayer)

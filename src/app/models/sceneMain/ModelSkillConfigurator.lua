@@ -7,9 +7,9 @@ local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions
 local getLocalizedText        = LocalizationFunctions.getLocalizedText
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local ID_PASSIVE_SKILL  = ModelSkillConfiguration.getSkillIdPassive()
-local ID_ACTIVE_SKILL_1 = ModelSkillConfiguration.getSkillIdActive1()
-local ID_ACTIVE_SKILL_2 = ModelSkillConfiguration.getSkillIdActive2()
+local SKILL_GROUP_ID_PASSIVE  = ModelSkillConfiguration.getSkillGroupIdPassive()
+local SKILL_GROUP_ID_ACTIVE_1 = ModelSkillConfiguration.getSkillGroupIdActive1()
+local SKILL_GROUP_ID_ACTIVE_2 = ModelSkillConfiguration.getSkillGroupIdActive2()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -82,10 +82,10 @@ local function setStateOverviewPassiveSkill(self)
     end
 end
 
-local function setStateSelectSkillCategory(self, skillID, slotIndex)
-    self.m_State     = "stateSelectSkillCategory"
-    self.m_SlotIndex = slotIndex
-    self.m_SkillID   = skillID
+local function setStateSelectSkillCategory(self, skillGroupID, slotIndex)
+    self.m_State        = "stateSelectSkillCategory"
+    self.m_SkillGroupID = skillGroupID
+    self.m_SlotIndex    = slotIndex
 
     if (self.m_View) then
         self.m_View:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
@@ -183,7 +183,7 @@ local function initItemsPassiveSkillSlots(self)
         items[#items + 1] = {
             name     = string.format("%s %d", getLocalizedText(3, "Skill"), i),
             callback = function()
-                setStateSelectSkillCategory(self, ID_PASSIVE_SKILL, i)
+                setStateSelectSkillCategory(self, SKILL_GROUP_ID_PASSIVE, i)
             end,
         }
     end
@@ -196,7 +196,7 @@ local function initItemsSkillCategories(self)
         {
             name     = getLocalizedText(3, "Clear"),
             callback = function()
-                self.m_ModelSkillConfituration:clearSkill(self.m_SkillID, self.m_SlotIndex)
+                self.m_ModelSkillConfituration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
 
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
@@ -249,7 +249,7 @@ local function initItemsSkillLevels(self)
                 subItems[#subItems + 1] = {
                     name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
                     callback = function()
-                        self.m_ModelSkillConfituration:setSkill(self.m_SkillID, self.m_SlotIndex, self.m_SkillName, i)
+                        self.m_ModelSkillConfituration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillName, i)
                         if (self.m_View) then
                             self.m_View:setOverviewString(self.m_ModelSkillConfituration:getDescription())
                         end
@@ -352,7 +352,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
     elseif (state == "stateSelectSkillCategory") then
         setStateOverviewPassiveSkill(self)
     elseif (state == "stateSelectSkill") then
-        setStateSelectSkillCategory(self, self.m_SkillID, self.m_SlotIndex)
+        setStateSelectSkillCategory(self, self.m_SkillGroupID, self.m_SlotIndex)
     elseif (state == "stateSelectSkillLevel") then
         setStateSelectSkill(self, self.m_CategoryName)
     else

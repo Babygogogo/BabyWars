@@ -1,33 +1,33 @@
 
 local ModelSkillConfiguration = require("src.global.functions.class")("ModelSkillConfiguration")
 
-local ModelPassiveSkill     = require("src.app.models.common.ModelPassiveSkill")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local ModelSkillGroupPassive = require("src.app.models.common.ModelSkillGroupPassive")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
 
-local ID_PASSIVE_SKILL  = 0
-local ID_ACTIVE_SKILL_1 = 1
-local ID_ACTIVE_SKILL_2 = 2
+local SKILL_GROUP_ID_PASSIVE  = 0
+local SKILL_GROUP_ID_ACTIVE_1 = 1
+local SKILL_GROUP_ID_ACTIVE_2 = 2
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getSkillWithId(self, skillID)
-    if (skillID == ID_PASSIVE_SKILL) then
-        return self.m_ModelPassiveSkill
-    elseif (skillID == ID_ACTIVE_SKILL_1) then
+local function getSkillGroupWithId(self, skillGroupID)
+    if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
+        return self.m_ModelSkillGroupPassive
+    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_1) then
         self.m_Active1 = self.m_Active1 or {}
         return self.m_Active1
-    elseif (skillID == ID_ACTIVE_SKILL_2) then
+    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) then
         self.m_Active2 = self.m_Active2
         return self.m_Active2
     else
-        error("ModelSkillConfiguration-getSkillWithId() the param skillID is invalid.")
+        error("ModelSkillConfiguration-getSkillGroupWithId() the param skillGroupID is invalid.")
     end
 end
 
@@ -43,8 +43,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSkillConfiguration:ctor(param)
-    self.m_ModelPassiveSkill = self.m_ModelPassiveSkill or ModelPassiveSkill:create()
-    self.m_ModelPassiveSkill:ctor((param) and (param.passive) or (nil))
+    self.m_ModelSkillGroupPassive = self.m_ModelSkillGroupPassive or ModelSkillGroupPassive:create()
+    self.m_ModelSkillGroupPassive:ctor((param) and (param.passive) or (nil))
 
     if (param) then
         self.m_MaxPoints = param.maxPoints
@@ -66,7 +66,7 @@ function ModelSkillConfiguration:toSerializableTable()
     -- TODO: serialize the active skills.
     return {
         maxPoints = self.m_MaxPoints,
-        passive   = self.m_ModelPassiveSkill:toSerializableTable(),
+        passive   = self.m_ModelSkillGroupPassive:toSerializableTable(),
         active1   = {},
         active2   = {},
     }
@@ -75,16 +75,16 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelSkillConfiguration.getSkillIdPassive()
-    return ID_PASSIVE_SKILL
+function ModelSkillConfiguration.getSkillGroupIdPassive()
+    return SKILL_GROUP_ID_PASSIVE
 end
 
-function ModelSkillConfiguration.getSkillIdActive1()
-    return ID_ACTIVE_SKILL_1
+function ModelSkillConfiguration.getSkillGroupIdActive1()
+    return SKILL_GROUP_ID_ACTIVE_1
 end
 
-function ModelSkillConfiguration.getSkillIdActive2()
-    return ID_ACTIVE_SKILL_2
+function ModelSkillConfiguration.getSkillGroupIdActive2()
+    return SKILL_GROUP_ID_ACTIVE_2
 end
 
 function ModelSkillConfiguration:isEmpty()
@@ -97,7 +97,7 @@ function ModelSkillConfiguration:isValid()
     end
 
     local maxPoints         = self.m_MaxPoints
-    local modelPassiveSkill = self.m_ModelPassiveSkill
+    local modelPassiveSkill = self.m_ModelSkillGroupPassive
     if (not modelPassiveSkill:isValid()) then
         return false, getLocalizedText(7, "ReduplicatedPassiveSkills")
     elseif (modelPassiveSkill:getSkillPoints() > maxPoints) then
@@ -119,14 +119,14 @@ function ModelSkillConfiguration:getMaxPoints()
     return self.m_MaxPoints
 end
 
-function ModelSkillConfiguration:setSkill(skillID, slotIndex, skillName, level)
-    getSkillWithId(self, skillID):setSkill(slotIndex, skillName, level)
+function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillName, level)
+    getSkillGroupWithId(self, skillGroupID):setSkill(slotIndex, skillName, level)
 
     return self
 end
 
-function ModelSkillConfiguration:clearSkill(skillID, slotIndex)
-    getSkillWithId(self, skillID):clearSkill(slotIndex)
+function ModelSkillConfiguration:clearSkill(skillGroupID, slotIndex)
+    getSkillGroupWithId(self, skillGroupID):clearSkill(slotIndex)
 
     return self
 end
@@ -139,21 +139,21 @@ end
 function ModelSkillConfiguration:getDescription()
     return string.format("%s\n\n%s\n\n%s\n\n%s",
         getDescriptionForMaxPoints(self),
-        self.m_ModelPassiveSkill:getDescription(),
+        self.m_ModelSkillGroupPassive:getDescription(),
         getDescriptionForActiveSkill(self.m_Active1, 1),
         getDescriptionForActiveSkill(self.m_Active2, 2)
     )
 end
 
 function ModelSkillConfiguration:getProductionCostModifier(tiledID)
-    local modifier = self.m_ModelPassiveSkill:getProductionCostModifier(tiledID)
+    local modifier = self.m_ModelSkillGroupPassive:getProductionCostModifier(tiledID)
     -- TODO: take the active skills into account.
 
     return modifier
 end
 
 function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelPassiveSkill:getAttackModifier(
+    local modifier = self.m_ModelSkillGroupPassive:getAttackModifier(
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     -- TODO: take the active skills into account.
 
@@ -161,7 +161,7 @@ function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, 
 end
 
 function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelPassiveSkill:getDefenseModifier(
+    local modifier = self.m_ModelSkillGroupPassive:getDefenseModifier(
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     -- TODO: take the active skills into account.
 

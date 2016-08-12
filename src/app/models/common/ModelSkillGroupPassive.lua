@@ -1,5 +1,5 @@
 
-local ModelPassiveSkill = require("src.global.functions.class")("ModelPassiveSkill")
+local ModelSkillGroupPassive = require("src.global.functions.class")("ModelSkillGroupPassive")
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
@@ -45,7 +45,7 @@ local function resetSkillPoints(self)
         local skill = slots[i]
         if (skill) then
             local point = getSkillPoints(skill.name, skill.level)
-            assert(type(point) == "number", "ModelPassiveSkill-resetSkillPoints() a skill is invalid: " .. i)
+            assert(type(point) == "number", "ModelSkillGroupPassive-resetSkillPoints() a skill is invalid: " .. i)
             totalPoints = totalPoints + point
         end
     end
@@ -74,7 +74,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
-function ModelPassiveSkill:ctor(param)
+function ModelSkillGroupPassive:ctor(param)
     initSlots(       self, param)
     resetSkillPoints(self)
     resetIsValid(    self)
@@ -85,7 +85,7 @@ end
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
-function ModelPassiveSkill:toSerializableTable()
+function ModelSkillGroupPassive:toSerializableTable()
     local t     = {}
     local slots = self.m_Slots
 
@@ -105,15 +105,15 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelPassiveSkill:isValid()
+function ModelSkillGroupPassive:isValid()
     return self.m_IsValid
 end
 
-function ModelPassiveSkill:getSkillPoints()
+function ModelSkillGroupPassive:getSkillPoints()
     return self.m_SkillPoints
 end
 
-function ModelPassiveSkill:getDescription()
+function ModelSkillGroupPassive:getDescription()
     local descriptions = {
         string.format("%s (%s: %.2f)", getLocalizedText(3, "PassiveSkill"), getLocalizedText(3, "TotalPoints"), self:getSkillPoints())
     }
@@ -134,9 +134,9 @@ function ModelPassiveSkill:getDescription()
     return table.concat(descriptions, "\n")
 end
 
-function ModelPassiveSkill:setSkill(slotIndex, skillName, skillLevel)
+function ModelSkillGroupPassive:setSkill(slotIndex, skillName, skillLevel)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
-        "ModelPassiveSkill:setSkill() the param slotIndex is invalid.")
+        "ModelSkillGroupPassive:setSkill() the param slotIndex is invalid.")
 
     self.m_Slots[slotIndex] = {
         name  = skillName,
@@ -148,9 +148,9 @@ function ModelPassiveSkill:setSkill(slotIndex, skillName, skillLevel)
     return self
 end
 
-function ModelPassiveSkill:clearSkill(slotIndex)
+function ModelSkillGroupPassive:clearSkill(slotIndex)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
-        "ModelPassiveSkill:clearSkill() the param slotIndex is invalid.")
+        "ModelSkillGroupPassive:clearSkill() the param slotIndex is invalid.")
 
     self.m_Slots[slotIndex] = nil
     resetSkillPoints(self)
@@ -159,7 +159,7 @@ function ModelPassiveSkill:clearSkill(slotIndex)
     return self
 end
 
-function ModelPassiveSkill:getProductionCostModifier(tiledID)
+function ModelSkillGroupPassive:getProductionCostModifier(tiledID)
     local slots    = self.m_Slots
     local modifier = 0
 
@@ -174,7 +174,7 @@ function ModelPassiveSkill:getProductionCostModifier(tiledID)
     return modifier
 end
 
-function ModelPassiveSkill:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+function ModelSkillGroupPassive:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     local slots    = self.m_Slots
     local modifier = 0
 
@@ -189,7 +189,7 @@ function ModelPassiveSkill:getAttackModifier(attacker, attackerGridIndex, target
     return modifier
 end
 
-function ModelPassiveSkill:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+function ModelSkillGroupPassive:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     local slots    = self.m_Slots
     local modifier = 0
 
@@ -204,4 +204,4 @@ function ModelPassiveSkill:getDefenseModifier(attacker, attackerGridIndex, targe
     return modifier
 end
 
-return ModelPassiveSkill
+return ModelSkillGroupPassive
