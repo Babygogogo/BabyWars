@@ -42,9 +42,9 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:ctor(param)
-    self.m_IsEnabled = param.isEnabled or false
+    self.m_IsEnabled = (param) and (param.isEnabled) or (false)
     initSlots(self, param)
-    self:setEnergyRequirement(param.energyRequirement or 0)
+    self:setEnergyRequirement((param) and (param.energyRequirement) or (0))
 
     return self
 end
@@ -137,15 +137,15 @@ function ModelSkillGroupActive:getSkillPoints()
     return totalPoints
 end
 
-function ModelSkillGroupActive:getDescription(index)
+function ModelSkillGroupActive:getDescription()
     if (not self:isEnabled()) then
-        return string.format("%s %d: %s", getLocalizedText(3, "ActiveSkill"), index, getLocalizedText(3, "Disabled"))
+        return string.format("%s : %s", getLocalizedText(3, "ActiveSkill"), getLocalizedText(3, "Disabled"))
     end
 
     local descriptions = {
         string.format("%s (%s: %.2f)\n%s: %d",
             getLocalizedText(3, "ActiveSkill"),
-            getLocalizedText(3, "TotalPoints"),       self:getSkillPoints()
+            getLocalizedText(3, "TotalPoints"),       self:getSkillPoints(),
             getLocalizedText(3, "EnergyRequirement"), self:getEnergyRequirement()
         )
     }
