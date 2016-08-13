@@ -82,7 +82,7 @@ function ModelSkillGroupActive:setEnabled(enabled)
         if (enabled) then
             self:setEnergyRequirement(1)
         else
-            self:setEnergyRequirement(0)
+            self:setEnergyRequirement(nil)
             self.m_Slots = {}
         end
     end

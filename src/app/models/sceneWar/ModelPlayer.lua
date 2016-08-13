@@ -60,6 +60,23 @@ function ModelPlayer:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelPlayer:doActionActivateSkillGroup(action)
+    local skillGroupID            = action.skillGroupID
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    local req1, req2              = modelSkillConfiguration:getEnergyRequirement()
+    local requirement             = (skillGroupID == 1) and (req1) or (req2)
+
+    modelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
+    self.m_ActivatingSkillGroupID = skillGroupID
+    self.m_DamageCost             = self.m_DamageCost - requirement * self:getCurrentDamageCostPerEnergyRequirement()
+    self.m_SkillActivatedCount    = self.m_SkillActivatedCount + 1
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelPlayer:getAccount()
@@ -108,10 +125,12 @@ end
 function ModelPlayer:addDamageCost(cost)
     if (self:getActivatingSkillGroupId() == 0) then
         local _, maxEnergyRequirement = self:getModelSkillConfiguration():getEnergyRequirement()
-        self.m_DamageCost = math.min(
-            self.m_DamageCost + cost,
-            maxEnergyRequirement * self:getCurrentDamageCostPerEnergyRequirement()
-        )
+        if (maxEnergyRequirement) then
+            self.m_DamageCost = math.min(
+                self.m_DamageCost + cost,
+                maxEnergyRequirement * self:getCurrentDamageCostPerEnergyRequirement()
+            )
+        end
     end
 
     return self

@@ -175,6 +175,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
+function ModelPlayerManager:doActionActivateSkillGroup(action, playerIndex)
+    local modelPlayer = self:getModelPlayer(playerIndex)
+    modelPlayer:doActionActivateSkillGroup(action)
+    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+
+    return self
+end
+
 function ModelPlayerManager:doActionAttack(action)
     if (action.lostPlayerIndex) then
         local modelPlayer = self:getModelPlayer(action.lostPlayerIndex)

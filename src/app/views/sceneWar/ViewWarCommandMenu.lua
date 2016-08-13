@@ -251,6 +251,7 @@ function ViewWarCommandMenu:setOverviewString(text)
     local height = math.max(label:getLineHeight() * label:getStringNumLines(), OVERVIEW_SCROLLVIEW_HEIGHT)
     label:setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, height)
     self.m_OverviewScrollView:setInnerContainerSize({width = OVERVIEW_SCROLLVIEW_WIDTH, height = height})
+        :jumpToTop()
 
     return self
 end

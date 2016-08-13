@@ -86,6 +86,14 @@ function ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID)
     end
 end
 
+function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
+    assert(not (self.m_ActivatingSkillGroupID and skillGroupID))
+    assert((skillGroupID == SKILL_GROUP_ID_ACTIVE_1) or (skillGroupID == SKILL_GROUP_ID_ACTIVE_2))
+    self.m_ActivatingSkillGroupID = skillGroupID
+
+    return self
+end
+
 function ModelSkillConfiguration:isEmpty()
     return not self.m_MaxPoints
 end
@@ -149,7 +157,9 @@ end
 
 function ModelSkillConfiguration:getProductionCostModifier(tiledID)
     local modifier = self.m_ModelSkillGroupPassive:getProductionCostModifier(tiledID)
-    -- TODO: take the active skills into account.
+    if (self.m_ActivatingSkillGroupID) then
+        modifier = modifier + self:getModelSkillGroupWithId(self.m_ActivatingSkillGroupID):getProductionCostModifier(tiledID)
+    end
 
     return modifier
 end
@@ -157,7 +167,10 @@ end
 function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     local modifier = self.m_ModelSkillGroupPassive:getAttackModifier(
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    -- TODO: take the active skills into account.
+    if (self.m_ActivatingSkillGroupID) then
+        modifier = modifier + self:getModelSkillGroupWithId(self.m_ActivatingSkillGroupID):getAttackModifier(
+            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    end
 
     return modifier
 end
@@ -165,7 +178,10 @@ end
 function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     local modifier = self.m_ModelSkillGroupPassive:getDefenseModifier(
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    -- TODO: take the active skills into account.
+    if (self.m_ActivatingSkillGroupID) then
+        modifier = modifier + self:getModelSkillGroupWithId(self.m_ActivatingSkillGroupID):getDefenseModifier(
+            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    end
 
     return modifier
 end
