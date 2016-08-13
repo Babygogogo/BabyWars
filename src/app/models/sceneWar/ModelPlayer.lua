@@ -30,15 +30,16 @@ local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGr
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_Account                = param.account
-    self.m_Nickname               = param.nickname
-    self.m_Fund                   = param.fund
-    self.m_IsAlive                = param.isAlive
-    self.m_DamageCost             = param.damageCost
-    self.m_SkillActivatedCount    = param.skillActivatedCount
-    self.m_ActivatingSkillGroupID = param.activatingSkillGroupID
-
+    self.m_Account                 = param.account
+    self.m_Nickname                = param.nickname
+    self.m_Fund                    = param.fund
+    self.m_IsAlive                 = param.isAlive
+    self.m_DamageCost              = param.damageCost
+    self.m_SkillActivatedCount     = param.skillActivatedCount
+    self.m_ActivatingSkillGroupID  = param.activatingSkillGroupID
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
+
+    self.m_ModelSkillConfiguration:setActivatingSkillGroupId(self.m_ActivatingSkillGroupID)
 
     return self
 end
@@ -112,7 +113,7 @@ function ModelPlayer:getActivatingSkillGroupId()
 end
 
 function ModelPlayer:canActivateSkillGroup(skillGroupID)
-    if (self:getActivatingSkillGroupId() ~= 0) then
+    if (self:getActivatingSkillGroupId()) then
         return false
     end
 
@@ -122,8 +123,15 @@ function ModelPlayer:canActivateSkillGroup(skillGroupID)
         (   (skillGroupID == 2) and (modelSkillConfiguration:getModelSkillGroupWithId(2):isEnabled()) and (energy >= req2))
 end
 
+function ModelPlayer:deactivateSkillGroup()
+    self.m_ActivatingSkillGroupID = nil
+    self.m_ModelSkillConfiguration:setActivatingSkillGroupId(nil)
+
+    return self
+end
+
 function ModelPlayer:addDamageCost(cost)
-    if (self:getActivatingSkillGroupId() == 0) then
+    if (not self:getActivatingSkillGroupId()) then
         local _, maxEnergyRequirement = self:getModelSkillConfiguration():getEnergyRequirement()
         if (maxEnergyRequirement) then
             self.m_DamageCost = math.min(

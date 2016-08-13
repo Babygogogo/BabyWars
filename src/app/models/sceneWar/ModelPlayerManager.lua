@@ -68,6 +68,11 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtTurnPhaseResetSkillState(self, event)
+    local playerIndex = event.playerIndex
+    self:getModelPlayer(playerIndex):deactivateSkillGroup()
+end
+
 local function onEvtTurnPhaseGetFund(self, event)
     local playerIndex = event.playerIndex
     local modelPlayer = self:getModelPlayer(playerIndex)
@@ -132,7 +137,8 @@ function ModelPlayerManager:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelPlayerManager:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseGetFund", self)
+    dispatcher:addEventListener("EvtTurnPhaseResetSkillState", self)
+        :addEventListener("EvtTurnPhaseGetFund",    self)
         :addEventListener("EvtTurnPhaseRepairUnit", self)
 
     return self
@@ -142,7 +148,8 @@ function ModelPlayerManager:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelPlayerManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseRepairUnit", self)
-        :removeEventListener("EvtTurnPhaseGetFund", self)
+        :removeEventListener("EvtTurnPhaseGetFund",         self)
+        :removeEventListener("EvtTurnPhaseResetSkillState", self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -165,8 +172,9 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayerManager:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtTurnPhaseGetFund")    then onEvtTurnPhaseGetFund(self, event)
-    elseif (eventName == "EvtTurnPhaseRepairUnit") then onEvtTurnPhaseRepairUnit(self, event)
+    if     (eventName == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
+    elseif (eventName == "EvtTurnPhaseGetFund")         then onEvtTurnPhaseGetFund(        self, event)
+    elseif (eventName == "EvtTurnPhaseRepairUnit")      then onEvtTurnPhaseRepairUnit(     self, event)
     end
 
     return self

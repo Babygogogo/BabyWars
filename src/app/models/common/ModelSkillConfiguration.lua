@@ -88,7 +88,7 @@ end
 
 function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     assert(not (self.m_ActivatingSkillGroupID and skillGroupID))
-    assert((skillGroupID == SKILL_GROUP_ID_ACTIVE_1) or (skillGroupID == SKILL_GROUP_ID_ACTIVE_2))
+    assert((skillGroupID == SKILL_GROUP_ID_ACTIVE_1) or (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) or (skillGroupID == nil))
     self.m_ActivatingSkillGroupID = skillGroupID
 
     return self
