@@ -527,6 +527,14 @@ function ModelUnit:showMovingAnimation()
     return self
 end
 
+function ModelUnit:setActivatingSkillGroupId(skillGroupId)
+    if (self.m_View) then
+        self.m_View:setActivatingSkillGroupId(skillGroupId)
+    end
+
+    return self
+end
+
 function ModelUnit:getTiledId()
     return self.m_TiledID
 end

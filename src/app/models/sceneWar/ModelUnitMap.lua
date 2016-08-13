@@ -153,6 +153,39 @@ local function onEvtDestroyModelUnit(self, event)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
+local function onEvtTurnPhaseResetSkillState(self, event)
+    if (self.m_View) then
+        local playerIndex = event.playerIndex
+        self:forEachModelUnitOnMap(function(modelUnit)
+                if (modelUnit:getPlayerIndex() == playerIndex) then
+                    modelUnit:setActivatingSkillGroupId(nil)
+                end
+            end)
+            :forEachModelUnitLoaded(function(modelUnit)
+                if (modelUnit:getPlayerIndex() == playerIndex) then
+                    modelUnit:setActivatingSkillGroupId(nil)
+                end
+            end)
+    end
+end
+
+local function onEvtSkillGroupActivated(self, event)
+    if (self.m_View) then
+        local playerIndex  = event.playerIndex
+        local skillGroupID = event.skillGroupID
+        self:forEachModelUnitOnMap(function(modelUnit)
+                if (modelUnit:getPlayerIndex() == playerIndex) then
+                    modelUnit:setActivatingSkillGroupId(skillGroupID)
+                end
+            end)
+            :forEachModelUnitLoaded(function(modelUnit)
+                if (modelUnit:getPlayerIndex() == playerIndex) then
+                    modelUnit:setActivatingSkillGroupId(skillGroupID)
+                end
+            end)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
@@ -244,7 +277,8 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelUnit",   self)
-        :addEventListener("EvtTurnPhaseMain",      self)
+        :addEventListener("EvtTurnPhaseResetSkillState", self)
+        :addEventListener("EvtSkillGroupActivated",      self)
 
     local setEventDispatcher = function(modelUnit)
         modelUnit:setRootScriptEventDispatcher(dispatcher)
@@ -258,8 +292,10 @@ end
 function ModelUnitMap:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseMain", self)
-        :removeEventListener("EvtDestroyModelUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSkillGroupActivated", self)
+        :removeEventListener("EvtTurnPhaseResetSkillState", self)
+        :removeEventListener("EvtDestroyModelUnit",         self)
+
     self.m_RootScriptEventDispatcher = nil
 
     local unsetEventDispatcher = function(modelUnit)
@@ -326,8 +362,9 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if (name == "EvtDestroyModelUnit") then
-        onEvtDestroyModelUnit(self, event)
+    if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)
+    elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
+    elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
     end
 
     return self

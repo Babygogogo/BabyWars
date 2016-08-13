@@ -65,6 +65,14 @@ local function dispatchEvtSupplyViewUnit(self, gridIndex)
     })
 end
 
+local function dispatchEvtSkillGroupActivated(self, playerIndex, skillGroupID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtSkillGroupActivated",
+        playerIndex  = playerIndex,
+        skillGroupID = skillGroupID,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -121,6 +129,18 @@ local function onEvtTurnPhaseRepairUnit(self, event)
     dispatchEvtModelPlayerUpdated(eventDispatcher, modelPlayer, playerIndex)
 end
 
+local function onEvtSceneWarStarted(self, event)
+    local dispatcher = self.m_RootScriptEventDispatcher
+    self:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:isAlive()) then
+            local activatingSkillGroupID = modelPlayer:getActivatingSkillGroupId()
+            if (activatingSkillGroupID) then
+                dispatchEvtSkillGroupActivated(self, playerIndex, activatingSkillGroupID)
+            end
+        end
+    end)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -140,6 +160,7 @@ function ModelPlayerManager:setRootScriptEventDispatcher(dispatcher)
     dispatcher:addEventListener("EvtTurnPhaseResetSkillState", self)
         :addEventListener("EvtTurnPhaseGetFund",    self)
         :addEventListener("EvtTurnPhaseRepairUnit", self)
+        :addEventListener("EvtSceneWarStarted",     self)
 
     return self
 end
@@ -147,7 +168,8 @@ end
 function ModelPlayerManager:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelPlayerManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseRepairUnit", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
+        :removeEventListener("EvtTurnPhaseRepairUnit",      self)
         :removeEventListener("EvtTurnPhaseGetFund",         self)
         :removeEventListener("EvtTurnPhaseResetSkillState", self)
     self.m_RootScriptEventDispatcher = nil
@@ -175,6 +197,7 @@ function ModelPlayerManager:onEvent(event)
     if     (eventName == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
     elseif (eventName == "EvtTurnPhaseGetFund")         then onEvtTurnPhaseGetFund(        self, event)
     elseif (eventName == "EvtTurnPhaseRepairUnit")      then onEvtTurnPhaseRepairUnit(     self, event)
+    elseif (eventName == "EvtSceneWarStarted")          then onEvtSceneWarStarted(         self, event)
     end
 
     return self
@@ -187,6 +210,7 @@ function ModelPlayerManager:doActionActivateSkillGroup(action, playerIndex)
     local modelPlayer = self:getModelPlayer(playerIndex)
     modelPlayer:doActionActivateSkillGroup(action)
     dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+    dispatchEvtSkillGroupActivated(self, playerIndex, action.skillGroupID)
 
     return self
 end
