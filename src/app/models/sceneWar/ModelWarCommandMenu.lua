@@ -64,6 +64,7 @@ local function updateStringWarInfo(self)
         if (modelPlayer:isAlive()) then
             local energy, require1, require2 = modelPlayer:getEnergy()
             data[playerIndex] = {
+                nickname   = modelPlayer:getNickname(),
                 fund       = modelPlayer:getFund(),
                 energy     = energy,
                 require1   = require1,
@@ -98,8 +99,9 @@ local function updateStringWarInfo(self)
             stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
             local d = data[i]
-            stringList[i] = string.format("%s %d:\n%s: %d\n%s: %.2f / %d / %d\n%s: %d\n%s: %d",
+            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %.2f / %d / %d\n%s: %d\n%s: %d",
                 getLocalizedText(65, "Player"),     i,
+                getLocalizedText(65, "Nickname"),   d.nickname,
                 getLocalizedText(65, "Fund"),       d.fund,
                 getLocalizedText(65, "Energy"),     d.energy,    d.require1, d.require2,
                 getLocalizedText(65, "UnitsCount"), d.unitsCount,

@@ -213,6 +213,14 @@ function GameConstantFunctions.getSkillPointsPerEnergyRequirement()
     return GAME_CONSTANT.skillPointsPerEnergyRequirement
 end
 
+function GameConstantFunctions.getDamageCostPerEnergyRequirement()
+    return GAME_CONSTANT.damageCostPerEnergyRequirement
+end
+
+function GameConstantFunctions.getDamageCostGrowthRates()
+    return GAME_CONSTANT.damageCostGrowthRates
+end
+
 function GameConstantFunctions.getSkillPoints(id, level)
     return GAME_CONSTANT.skills[id].levels[level].points
 end

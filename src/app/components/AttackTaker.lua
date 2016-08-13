@@ -35,6 +35,26 @@ AttackTaker.EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
+-- The util function.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
+local function getNormalizedHP(hp)
+    return math.ceil(hp / 10)
+end
+
+local function getDamageCost(target, damage)
+    if (not target.getProductionCost) then
+        return 0
+    end
+
+    local remainingHP = math.max(0, target:getCurrentHP() - damage)
+    return round(target:getProductionCost() * (target:getNormalizedCurrentHP() - getNormalizedHP(remainingHP)) / 10)
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function AttackTaker:ctor(param)
@@ -100,8 +120,29 @@ end
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function AttackTaker:doActionAttack(action, attackTarget)
-    self        :setCurrentHP(math.max(0, self:getCurrentHP() - (action.counterDamage or 0)))
-    attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - action.attackDamage))
+    local attackDamage     = action.attackDamage
+    local counterDamage    = action.counterDamage or 0
+    local selfDamageCost   = getDamageCost(self,         counterDamage)
+    local targetDamageCost = getDamageCost(attackTarget, attackDamage)
+
+    self        :setCurrentHP(math.max(0, self:getCurrentHP()         - counterDamage))
+    attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - attackDamage))
+
+    if (attackTarget.getProductionCost) then
+        local modelPlayerManager = self.m_ModelPlayerManager
+        local selfPlayerIndex    = self.m_Owner:getPlayerIndex()
+        local selfModelPlayer    = modelPlayerManager:getModelPlayer(selfPlayerIndex)
+        local targetModelPlayer  = modelPlayerManager:getModelPlayer(attackTarget:getPlayerIndex())
+
+        selfModelPlayer  :addDamageCost(selfDamageCost   * 2 + targetDamageCost)
+        targetModelPlayer:addDamageCost(targetDamageCost * 2 + selfDamageCost)
+
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name        = "EvtModelPlayerUpdated",
+            playerIndex = selfPlayerIndex,
+            modelPlayer = selfModelPlayer,
+        })
+    end
 
     return self.m_Owner
 end
@@ -142,7 +183,7 @@ function AttackTaker:setCurrentHP(hp)
 end
 
 function AttackTaker:getNormalizedCurrentHP()
-    return math.ceil(self.m_CurrentHP / 10)
+    return getNormalizedHP(self.m_CurrentHP)
 end
 
 function AttackTaker:getDefenseType()
