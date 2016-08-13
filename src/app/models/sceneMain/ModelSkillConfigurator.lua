@@ -104,7 +104,7 @@ local function setStateOverviewSkillGroupActive(self, skillGroupID)
             :setMenuItems(self.m_ItemsSkillGroupActive)
             :setButtonSaveVisible(false)
 
-        setItemsSkillGroupActiveState(self, self.m_ModelSkillConfiguration:getSkillGroupWithId(skillGroupID):isEnabled())
+        setItemsSkillGroupActiveState(self, self.m_ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID):isEnabled())
     end
 end
 
@@ -221,7 +221,7 @@ local function initItemsEnergyRequirement(self)
         items[#items + 1] = {
             name     = "" .. requirement,
             callback = function()
-                self.m_ModelSkillConfiguration:getSkillGroupWithId(self.m_SkillGroupID):setEnergyRequirement(requirement)
+                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnergyRequirement(requirement)
 
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
@@ -252,7 +252,7 @@ local function initItemsSkillGroupActive(self)
         {
             name      = getLocalizedText(3, "Enable"),
             callback  = function()
-                self.m_ModelSkillConfiguration:getSkillGroupWithId(self.m_SkillGroupID):setEnabled(true)
+                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
                     setItemsSkillGroupActiveState(self, true)
@@ -262,7 +262,7 @@ local function initItemsSkillGroupActive(self)
         {
             name     = getLocalizedText(3, "Disable"),
             callback = function()
-                self.m_ModelSkillConfiguration:getSkillGroupWithId(self.m_SkillGroupID):setEnabled(false)
+                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnabled(false)
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
                     setItemsSkillGroupActiveState(self, false)

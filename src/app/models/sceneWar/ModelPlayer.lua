@@ -94,6 +94,17 @@ function ModelPlayer:getActivatingSkillGroupId()
     return self.m_ActivatingSkillGroupID
 end
 
+function ModelPlayer:canActivateSkillGroup(skillGroupID)
+    if (self:getActivatingSkillGroupId() ~= 0) then
+        return false
+    end
+
+    local energy, req1, req2      = self:getEnergy()
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    return ((skillGroupID == 1) and (modelSkillConfiguration:getModelSkillGroupWithId(1):isEnabled()) and (energy >= req1)) or
+        (   (skillGroupID == 2) and (modelSkillConfiguration:getModelSkillGroupWithId(2):isEnabled()) and (energy >= req2))
+end
+
 function ModelPlayer:addDamageCost(cost)
     if (self:getActivatingSkillGroupId() == 0) then
         local _, maxEnergyRequirement = self:getModelSkillConfiguration():getEnergyRequirement()
@@ -107,8 +118,7 @@ function ModelPlayer:addDamageCost(cost)
 end
 
 function ModelPlayer:getEnergy()
-    local currentEnergy           = self.m_DamageCost / self:getCurrentDamageCostPerEnergyRequirement()
-    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    local currentEnergy = self.m_DamageCost / self:getCurrentDamageCostPerEnergyRequirement()
     return currentEnergy, self:getModelSkillConfiguration():getEnergyRequirement()
 end
 

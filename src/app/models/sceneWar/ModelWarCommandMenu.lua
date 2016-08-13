@@ -28,6 +28,23 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function dispatchEvtActivateSkillGroup(self, skillGroupID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "ActivateSkillGroup",
+        skillGroupID = skillGroupID,
+    })
+end
+
+local function createItemActivateSkill(self, skillGroupID)
+    return {
+        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
+        callback = function()
+            dispatchEvtActivateSkillGroup(self, skillGroupID)
+        end,
+    }
+end
+
 local function getEmptyProducersCount(self)
     local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
     local count        = 0
@@ -62,13 +79,13 @@ local function updateStringWarInfo(self)
 
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:isAlive()) then
-            local energy, require1, require2 = modelPlayer:getEnergy()
+            local energy, req1, req2 = modelPlayer:getEnergy()
             data[playerIndex] = {
                 nickname   = modelPlayer:getNickname(),
                 fund       = modelPlayer:getFund(),
                 energy     = energy,
-                require1   = require1,
-                require2   = require2,
+                req1       = req1,
+                req2       = req2,
                 unitsCount = 0,
                 tilesCount = 0,
             }
@@ -99,11 +116,11 @@ local function updateStringWarInfo(self)
             stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
             local d = data[i]
-            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %.2f / %d / %d\n%s: %d\n%s: %d",
+            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %.2f / %s / %s\n%s: %d\n%s: %d",
                 getLocalizedText(65, "Player"),     i,
                 getLocalizedText(65, "Nickname"),   d.nickname,
                 getLocalizedText(65, "Fund"),       d.fund,
-                getLocalizedText(65, "Energy"),     d.energy,    d.require1, d.require2,
+                getLocalizedText(65, "Energy"),     d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "UnitsCount"), d.unitsCount,
                 getLocalizedText(65, "TilesCount"), d.tilesCount
             )
@@ -184,6 +201,14 @@ local function initItemSkillInfo(self)
     self.m_ItemSkillInfo = item
 end
 
+local function initItemActivateSkill1(self)
+    self.m_ItemActiveSkill1 = createItemActivateSkill(self, 1)
+end
+
+local function initItemActivateSkill2(self)
+    self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
+end
+
 local function initItemHideUI(self)
     local item = {
         name     = getLocalizedText(65, "HideUI"),
@@ -253,7 +278,7 @@ local function initItemEndTurn(self)
     self.m_ItemEndTurn = item
 end
 
-local function generateItems(self)
+local function getAvailableItems(self)
     local items = {
         self.m_ItemQuit,
         self.m_ItemWarInfo,
@@ -261,7 +286,16 @@ local function generateItems(self)
         self.m_ItemHideUI,
         self.m_ItemReload,
     }
+
     if ((self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)) then
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        if (modelPlayer:canActivateSkillGroup(1)) then
+            items[#items + 1] = self.m_ItemActiveSkill1
+        end
+        if (modelPlayer:canActivateSkillGroup(2)) then
+            items[#items + 1] = self.m_ItemActiveSkill2
+        end
+
         items[#items + 1] = self.m_ItemSurrender
         items[#items + 1] = self.m_ItemEndTurn
     end
@@ -275,13 +309,15 @@ end
 function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
-    initItemQuit(     self)
-    initItemWarInfo(  self)
-    initItemSkillInfo(self)
-    initItemHideUI(   self)
-    initItemReload(   self)
-    initItemSurrender(self)
-    initItemEndTurn(  self)
+    initItemQuit(          self)
+    initItemWarInfo(       self)
+    initItemSkillInfo(     self)
+    initItemActivateSkill1(self)
+    initItemActivateSkill2(self)
+    initItemHideUI(        self)
+    initItemReload(        self)
+    initItemSurrender(     self)
+    initItemEndTurn(       self)
 
     if (self.m_View) then
         self:initView()
@@ -372,7 +408,7 @@ function ModelWarCommandMenu:setEnabled(enabled)
             updateStringWarInfo(  self)
             updateStringSkillInfo(self)
 
-            view:setItems(generateItems(self))
+            view:setItems(getAvailableItems(self))
                 :setOverviewString(self.m_StringWarInfo)
         end
 

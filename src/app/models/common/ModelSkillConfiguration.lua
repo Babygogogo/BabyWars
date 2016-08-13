@@ -44,8 +44,11 @@ end
 function ModelSkillConfiguration:toSerializableTable()
     local active1 = self.m_ModelSkillGroupActive1
     local active2 = self.m_ModelSkillGroupActive2
-    if (active1:getEnergyRequirement() > active2:getEnergyRequirement()) then
-        active1, active2 = active2, active1
+    if (active1:isEnabled()) then
+        if ((not active2:isEnabled()) or
+            (active1:getEnergyRequirement() > active2:getEnergyRequirement())) then
+            active1, active2 = active2, active1
+        end
     end
 
     return {
@@ -71,7 +74,7 @@ function ModelSkillConfiguration.getSkillGroupIdActive2()
     return SKILL_GROUP_ID_ACTIVE_2
 end
 
-function ModelSkillConfiguration:getSkillGroupWithId(skillGroupID)
+function ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID)
     if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
         return self.m_ModelSkillGroupPassive
     elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_1) then
@@ -79,7 +82,7 @@ function ModelSkillConfiguration:getSkillGroupWithId(skillGroupID)
     elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) then
         return self.m_ModelSkillGroupActive2
     else
-        error("ModelSkillConfiguration:getSkillGroupWithId() the param skillGroupID is invalid.")
+        error("ModelSkillConfiguration:getModelSkillGroupWithId() the param skillGroupID is invalid.")
     end
 end
 
@@ -119,13 +122,13 @@ function ModelSkillConfiguration:getMaxPoints()
 end
 
 function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillID, level)
-    self:getSkillGroupWithId(skillGroupID):setSkill(slotIndex, skillID, level)
+    self:getModelSkillGroupWithId(skillGroupID):setSkill(slotIndex, skillID, level)
 
     return self
 end
 
 function ModelSkillConfiguration:clearSkill(skillGroupID, slotIndex)
-    self:getSkillGroupWithId(skillGroupID):clearSkill(slotIndex)
+    self:getModelSkillGroupWithId(skillGroupID):clearSkill(slotIndex)
 
     return self
 end

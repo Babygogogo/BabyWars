@@ -29,7 +29,7 @@ end
 
 local function initSlots(self, param)
     local slots = {}
-    if ((self.m_IsEnabled) and (param)) then
+    if ((self:isEnabled()) and (param)) then
         for i = 1, SLOTS_COUNT do
             slots[#slots + 1] = param[i]
         end
@@ -42,9 +42,8 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:ctor(param)
-    self.m_IsEnabled = (param) and (param.isEnabled) or (false)
+    self:setEnergyRequirement((param) and (param.energyRequirement) or (nil))
     initSlots(self, param)
-    self:setEnergyRequirement((param) and (param.energyRequirement) or (0))
 
     return self
 end
@@ -53,9 +52,12 @@ end
 -- The functions for serialization.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:toSerializableTable()
+    if (not self:isEnabled()) then
+        return {}
+    end
+
     local t = {
-        isEnabled         = self.m_IsEnabled         or false,
-        energyRequirement = self.m_EnergyRequirement or 0,
+        energyRequirement = self:getEnergyRequirement(),
     }
 
     local slots = self.m_Slots
@@ -76,17 +78,20 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:setEnabled(enabled)
-    self.m_IsEnabled = enabled
-    if (not enabled) then
-        self.m_Slots = {}
-        self:setEnergyRequirement(0)
+    if (self:isEnabled() ~= enabled) then
+        if (enabled) then
+            self:setEnergyRequirement(1)
+        else
+            self:setEnergyRequirement(0)
+            self.m_Slots = {}
+        end
     end
 
     return self
 end
 
 function ModelSkillGroupActive:isEnabled()
-    return self.m_IsEnabled
+    return self:getEnergyRequirement() ~= nil
 end
 
 function ModelSkillGroupActive:isValid()
@@ -114,7 +119,8 @@ function ModelSkillGroupActive:isValid()
 end
 
 function ModelSkillGroupActive:setEnergyRequirement(requirement)
-    assert((requirement >= 0) and (math.floor(requirement) == requirement))
+    assert((requirement == nil) or
+        ((requirement >= 1) and (math.floor(requirement) == requirement)))
     self.m_EnergyRequirement = requirement
 
     return self
