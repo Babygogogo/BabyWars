@@ -33,7 +33,8 @@ end
 -- The functions for setting state.
 --------------------------------------------------------------------------------
 local function setStateMain(self)
-    self.m_State = "stateMain"
+    self.m_State           = "stateMain"
+    self.m_ConfigurationID = nil
     self.m_ModelSkillConfiguration:ctor()
 
     if (self.m_View) then
@@ -47,6 +48,7 @@ end
 
 local function setStateDisabled(self)
     self.m_State = "stateDisabled"
+
     if (self.m_View) then
         self.m_View:setEnabled(false)
     end
@@ -67,6 +69,10 @@ local function setStateOverviewConfiguration(self, configurationID)
         local configuration = self.m_ModelSkillConfiguration
         if (configuration:isEmpty()) then
             view:setOverviewString(getLocalizedText(3, "GettingConfiguration"))
+                :setButtonSaveEnabled(false)
+            for i = 1, #self.m_ItemsOverview do
+                view:setItemEnabled(i, false)
+            end
         else
             view:setOverviewString(configuration:getDescription())
         end
@@ -412,12 +418,17 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
-    if ((self.m_State ~= "stateDisabled")                   and
-        (self.m_ConfigurationID == action.configurationID)) then
+    if ((self.m_State           == "stateOverviewConfiguration") and
+        (self.m_ConfigurationID == action.configurationID))      then
         self.m_ModelSkillConfiguration:ctor(action.configuration)
 
-        if (self.m_View) then
-            self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+        local view = self.m_View
+        if (view) then
+            view:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                :setButtonSaveEnabled(true)
+            for i = 1, #self.m_ItemsOverview do
+                view:setItemEnabled(i, true)
+            end
         end
     end
 

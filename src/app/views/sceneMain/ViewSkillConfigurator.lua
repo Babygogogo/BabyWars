@@ -311,6 +311,14 @@ function ViewSkillConfigurator:disableButtonSaveForSecs(secs)
     return self
 end
 
+function ViewSkillConfigurator:setButtonSaveEnabled(enabled)
+    local button = self.m_ButtonSave
+    button:stopAllActions()
+    setButtonEnabled(button, enabled)
+
+    return self
+end
+
 function ViewSkillConfigurator:setButtonSaveVisible(visible)
     if (visible) then
         self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_SAVE)

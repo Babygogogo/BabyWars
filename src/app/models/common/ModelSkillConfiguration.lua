@@ -18,7 +18,7 @@ local SKILL_GROUP_ID_ACTIVE_2 = 2
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getDescriptionForMaxPoints(self)
-    return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), self.m_MaxPoints)
+    return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), self.m_MaxPoints or 0)
 end
 
 --------------------------------------------------------------------------------
