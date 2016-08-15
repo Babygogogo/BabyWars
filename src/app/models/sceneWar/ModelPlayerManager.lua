@@ -133,7 +133,7 @@ local function onEvtSceneWarStarted(self, event)
     local dispatcher = self.m_RootScriptEventDispatcher
     self:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:isAlive()) then
-            local activatingSkillGroupID = modelPlayer:getActivatingSkillGroupId()
+            local activatingSkillGroupID = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
             if (activatingSkillGroupID) then
                 dispatchEvtSkillGroupActivated(self, playerIndex, activatingSkillGroupID)
             end

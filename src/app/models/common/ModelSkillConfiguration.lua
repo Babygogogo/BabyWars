@@ -76,7 +76,9 @@ function ModelSkillConfiguration:ctor(param)
     self.m_ModelSkillGroupPassive:ctor(param.passive)
     self.m_ModelSkillGroupActive1:ctor(param.active1)
     self.m_ModelSkillGroupActive2:ctor(param.active2)
-    self:setMaxSkillPoints(param.maxPoints or 100)
+    self:setMaxSkillPoints(        param.maxPoints           or 100)
+        :setSkillActivatedCount(   param.skillActivatedCount or 0)
+        :setActivatingSkillGroupId(param.activatingSkillGroupId)
 
     return self
 end
@@ -95,10 +97,13 @@ function ModelSkillConfiguration:toSerializableTable()
     end
 
     return {
-        maxPoints = self:getMaxSkillPoints(),
-        passive   = self.m_ModelSkillGroupPassive:toSerializableTable(),
-        active1   = active1:toSerializableTable(),
-        active2   = active2:toSerializableTable(),
+        maxPoints              = self:getMaxSkillPoints(),
+        activatingSkillGroupId = self:getActivatingSkillGroupId(),
+        skillActivatedCount    = self:getSkillActivatedCount(),
+
+        passive                = self.m_ModelSkillGroupPassive:toSerializableTable(),
+        active1                = active1:toSerializableTable(),
+        active2                = active2:toSerializableTable(),
     }
 end
 
@@ -115,6 +120,33 @@ end
 
 function ModelSkillConfiguration.getSkillGroupIdActive2()
     return SKILL_GROUP_ID_ACTIVE_2
+end
+
+function ModelSkillConfiguration:isEmpty()
+    return not self:getMaxSkillPoints()
+end
+
+function ModelSkillConfiguration:isValid()
+    if (self:isEmpty()) then
+        return false
+    end
+
+    local valid, err = self.m_ModelSkillGroupPassive:isValid()
+    if (not valid) then
+        return false, getLocalizedText(7, "InvalidSkillGroupPassive", err)
+    end
+
+    valid, err = self.m_ModelSkillGroupActive1:isValid()
+    if (not valid) then
+        return false, getLocalizedText(7, "InvalidSkillGroupActive1", err)
+    end
+
+    valid, err = self.m_ModelSkillGroupActive2:isValid()
+    if (not valid) then
+        return false, getLocalizedText(7, "InvalidSkillGroupActive2", err)
+    end
+
+    return true
 end
 
 function ModelSkillConfiguration:getDescription()
@@ -149,6 +181,10 @@ function ModelSkillConfiguration:setEnergyRequirement(skillGroupID, requirement)
     return self
 end
 
+function ModelSkillConfiguration:getActivatingSkillGroupId()
+    return self.m_ActivatingSkillGroupID
+end
+
 function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     assert(not (self.m_ActivatingSkillGroupID and skillGroupID))
     assert((skillGroupID == SKILL_GROUP_ID_ACTIVE_1) or (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) or (skillGroupID == nil))
@@ -157,31 +193,15 @@ function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     return self
 end
 
-function ModelSkillConfiguration:isEmpty()
-    return not self:getMaxSkillPoints()
+function ModelSkillConfiguration:getSkillActivatedCount()
+    return self.m_SkillActivatedCount
 end
 
-function ModelSkillConfiguration:isValid()
-    if (self:isEmpty()) then
-        return false
-    end
+function ModelSkillConfiguration:setSkillActivatedCount(count)
+    assert((count >= 0) and (math.floor(count) == count))
+    self.m_SkillActivatedCount = count
 
-    local valid, err = self.m_ModelSkillGroupPassive:isValid()
-    if (not valid) then
-        return false, getLocalizedText(7, "InvalidSkillGroupPassive", err)
-    end
-
-    valid, err = self.m_ModelSkillGroupActive1:isValid()
-    if (not valid) then
-        return false, getLocalizedText(7, "InvalidSkillGroupActive1", err)
-    end
-
-    valid, err = self.m_ModelSkillGroupActive2:isValid()
-    if (not valid) then
-        return false, getLocalizedText(7, "InvalidSkillGroupActive2", err)
-    end
-
-    return true
+    return self
 end
 
 function ModelSkillConfiguration:setMaxSkillPoints(points)

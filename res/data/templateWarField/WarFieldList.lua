@@ -9,6 +9,7 @@ return {
     "JiangQi",
     "QianTanDengLu",
     "XiaoGuoZhengBaSai",
+    "YunShiQun",
 
     "FullTest",
 }
