@@ -46,10 +46,6 @@ local function getNormalizedHP(hp)
 end
 
 local function getDamageCost(target, damage)
-    if (not target.getProductionCost) then
-        return 0
-    end
-
     local remainingHP = math.max(0, target:getCurrentHP() - damage)
     return round(target:getProductionCost() * (target:getNormalizedCurrentHP() - getNormalizedHP(remainingHP)) / 10)
 end
@@ -122,15 +118,15 @@ end
 function AttackTaker:doActionAttack(action, attackTarget)
     local attackDamage     = action.attackDamage
     local counterDamage    = action.counterDamage or 0
-    local selfDamageCost   = getDamageCost(self,         counterDamage)
+    local attacker         = self.m_Owner
+    local selfDamageCost   = getDamageCost(attacker,     counterDamage)
     local targetDamageCost = getDamageCost(attackTarget, attackDamage)
-
     self        :setCurrentHP(math.max(0, self:getCurrentHP()         - counterDamage))
     attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - attackDamage))
 
-    if (attackTarget.getProductionCost) then
+    if (attackTarget.getUnitType) then
         local modelPlayerManager = self.m_ModelPlayerManager
-        local selfPlayerIndex    = self.m_Owner:getPlayerIndex()
+        local selfPlayerIndex    = attacker:getPlayerIndex()
         local selfModelPlayer    = modelPlayerManager:getModelPlayer(selfPlayerIndex)
         local targetModelPlayer  = modelPlayerManager:getModelPlayer(attackTarget:getPlayerIndex())
 
