@@ -37,47 +37,12 @@ local function initSlots(self, param)
     self.m_Slots = slots
 end
 
-local function resetSkillPoints(self)
-    local totalPoints = 0
-    local slots       = self.m_Slots
-
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if (skill) then
-            local point = getSkillPoints(skill.id, skill.level)
-            assert(type(point) == "number", "ModelSkillGroupPassive-resetSkillPoints() a skill is invalid: " .. i)
-            totalPoints = totalPoints + point
-        end
-    end
-
-    self.m_SkillPoints = totalPoints
-end
-
-local function resetIsValid(self)
-    local slots = self.m_Slots
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if (skill) then
-            local id = skill.id
-            for j = i + 1, SLOTS_COUNT do
-                if ((slots[j]) and (slots[j].id == id)) then
-                    self.m_IsValid = false
-                    return
-                end
-            end
-        end
-    end
-
-    self.m_IsValid = true
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelSkillGroupPassive:ctor(param)
-    initSlots(       self, param)
-    resetSkillPoints(self)
-    resetIsValid(    self)
+    self:setMaxSkillPoints(0)
+    initSlots(self, param)
 
     return self
 end
@@ -106,16 +71,62 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillGroupPassive:isValid()
-    return self.m_IsValid
+    local slots       = self.m_Slots
+    local totalPoints = 0
+    local maxPoints   = self:getMaxSkillPoints()
+
+    for i = 1, SLOTS_COUNT do
+        local skill = slots[i]
+        if (skill) then
+            local id    = skill.id
+            totalPoints = totalPoints + getSkillPoints(id, skill.level)
+
+            for j = i + 1, SLOTS_COUNT do
+                if ((slots[j]) and (slots[j].id == id)) then
+                    return false, getLocalizedText(7, "ReduplicatedSkills")
+                end
+            end
+        end
+    end
+
+    if (totalPoints > self:getMaxSkillPoints()) then
+        return false, getLocalizedText(7, "SkillPointsExceedsLimit")
+    else
+        return true
+    end
 end
 
 function ModelSkillGroupPassive:getSkillPoints()
-    return self.m_SkillPoints
+    local totalPoints = 0
+    local slots       = self.m_Slots
+
+    for i = 1, SLOTS_COUNT do
+        local skill = slots[i]
+        if (skill) then
+            totalPoints = totalPoints + getSkillPoints(skill.id, skill.level)
+        end
+    end
+
+    return totalPoints
+end
+
+function ModelSkillGroupPassive:getMaxSkillPoints()
+    return self.m_MaxSkillPoints
+end
+
+function ModelSkillGroupPassive:setMaxSkillPoints(points)
+    assert(points >= 0)
+    self.m_MaxSkillPoints = points
+
+    return self
 end
 
 function ModelSkillGroupPassive:getDescription()
     local descriptions = {
-        string.format("%s (%s: %.2f)", getLocalizedText(3, "PassiveSkill"), getLocalizedText(3, "TotalPoints"), self:getSkillPoints())
+        string.format("%s (%s: %.2f  %s: %.2f)",
+            getLocalizedText(3, "PassiveSkill"),
+            getLocalizedText(3, "TotalPoints"), self:getSkillPoints(),
+            getLocalizedText(3, "MaxPoints"),   self:getMaxSkillPoints())
     }
 
     local slots = self.m_Slots
@@ -137,13 +148,10 @@ end
 function ModelSkillGroupPassive:setSkill(slotIndex, skillID, skillLevel)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
         "ModelSkillGroupPassive:setSkill() the param slotIndex is invalid.")
-
     self.m_Slots[slotIndex] = {
         id    = skillID,
         level = skillLevel,
     }
-    resetSkillPoints(self)
-    resetIsValid(    self)
 
     return self
 end
@@ -151,10 +159,7 @@ end
 function ModelSkillGroupPassive:clearSkill(slotIndex)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
         "ModelSkillGroupPassive:clearSkill() the param slotIndex is invalid.")
-
     self.m_Slots[slotIndex] = nil
-    resetSkillPoints(self)
-    resetIsValid(    self)
 
     return self
 end

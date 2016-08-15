@@ -284,10 +284,15 @@ local function getAvailableItems(self)
         self.m_ItemWarInfo,
         self.m_ItemSkillInfo,
         self.m_ItemHideUI,
-        self.m_ItemReload,
     }
 
-    if ((self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)) then
+    local shouldAddActionItems = (self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)
+    if (shouldAddActionItems) then
+        items[#items + 1] = self.m_ItemSurrender
+    end
+    items[#items + 1] = self.m_ItemReload
+
+    if (shouldAddActionItems) then
         local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
         if (modelPlayer:canActivateSkillGroup(1)) then
             items[#items + 1] = self.m_ItemActiveSkill1
@@ -296,7 +301,6 @@ local function getAvailableItems(self)
             items[#items + 1] = self.m_ItemActiveSkill2
         end
 
-        items[#items + 1] = self.m_ItemSurrender
         items[#items + 1] = self.m_ItemEndTurn
     end
 

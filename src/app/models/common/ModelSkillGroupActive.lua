@@ -8,8 +8,7 @@ local getSkillModifier = GameConstantFunctions.getSkillModifier
 local getSkillPoints   = GameConstantFunctions.getSkillPoints
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local SLOTS_COUNT                         = GameConstantFunctions.getActiveSkillSlotsCount()
-local SKILL_POINTS_PER_ENERGY_REQUIREMENT = GameConstantFunctions.getSkillPointsPerEnergyRequirement()
+local SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -109,13 +108,17 @@ function ModelSkillGroupActive:isValid()
 
             for j = i + 1, SLOTS_COUNT do
                 if ((slots[j]) and (slots[j].id == id)) then
-                    return false
+                    return false, getLocalizedText(7, "ReduplicatedSkills")
                 end
             end
         end
     end
 
-    return totalPoints <= self:getMaxSkillPoints()
+    if (totalPoints > self:getMaxSkillPoints()) then
+        return false, getLocalizedText(7, "SkillPointsExceedsLimit")
+    else
+        return true
+    end
 end
 
 function ModelSkillGroupActive:setEnergyRequirement(requirement)
@@ -144,7 +147,14 @@ function ModelSkillGroupActive:getSkillPoints()
 end
 
 function ModelSkillGroupActive:getMaxSkillPoints()
-    return self:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
+    return self.m_MaxSkillPoints
+end
+
+function ModelSkillGroupActive:setMaxSkillPoints(points)
+    assert(points >= 0)
+    self.m_MaxSkillPoints = points
+
+    return self
 end
 
 function ModelSkillGroupActive:getDescription()

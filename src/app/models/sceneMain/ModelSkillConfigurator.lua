@@ -23,7 +23,7 @@ local function setItemsSkillGroupActiveState(self, isSkillEnabled)
     local view = self.m_View
     if (view) then
         view:setItemEnabled(1, not isSkillEnabled)
-        for i = 2, 2 + ACTIVE_SKILL_SLOTS_COUNT do
+        for i = 2, 3 + ACTIVE_SKILL_SLOTS_COUNT do
             view:setItemEnabled(i, isSkillEnabled)
         end
     end
@@ -110,7 +110,7 @@ local function setStateOverviewSkillGroupActive(self, skillGroupID)
             :setMenuItems(self.m_ItemsSkillGroupActive)
             :setButtonSaveVisible(false)
 
-        setItemsSkillGroupActiveState(self, self.m_ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID):isEnabled())
+        setItemsSkillGroupActiveState(self, self.m_ModelSkillConfiguration:isModelSkillGroupEnabled(skillGroupID))
     end
 end
 
@@ -211,7 +211,7 @@ local function initItemsMaxPoints(self)
         items[#items + 1] = {
             name     = "" .. points,
             callback = function()
-                self.m_ModelSkillConfiguration:setMaxPoints(points)
+                self.m_ModelSkillConfiguration:setMaxSkillPoints(points)
                 setStateOverviewConfiguration(self, self.m_ConfigurationID)
             end,
         }
@@ -227,7 +227,7 @@ local function initItemsEnergyRequirement(self)
         items[#items + 1] = {
             name     = "" .. requirement,
             callback = function()
-                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnergyRequirement(requirement)
+                self.m_ModelSkillConfiguration:setEnergyRequirement(self.m_SkillGroupID, requirement)
 
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
@@ -258,7 +258,7 @@ local function initItemsSkillGroupActive(self)
         {
             name      = getLocalizedText(3, "Enable"),
             callback  = function()
-                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnabled(true)
+                self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, true)
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
                     setItemsSkillGroupActiveState(self, true)
@@ -268,7 +268,7 @@ local function initItemsSkillGroupActive(self)
         {
             name     = getLocalizedText(3, "Disable"),
             callback = function()
-                self.m_ModelSkillConfiguration:getModelSkillGroupWithId(self.m_SkillGroupID):setEnabled(false)
+                self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, false)
                 if (self.m_View) then
                     self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
                     setItemsSkillGroupActiveState(self, false)

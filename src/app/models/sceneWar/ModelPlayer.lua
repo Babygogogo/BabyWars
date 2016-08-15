@@ -119,8 +119,8 @@ function ModelPlayer:canActivateSkillGroup(skillGroupID)
 
     local energy, req1, req2      = self:getEnergy()
     local modelSkillConfiguration = self:getModelSkillConfiguration()
-    return ((skillGroupID == 1) and (modelSkillConfiguration:getModelSkillGroupWithId(1):isEnabled()) and (energy >= req1)) or
-        (   (skillGroupID == 2) and (modelSkillConfiguration:getModelSkillGroupWithId(2):isEnabled()) and (energy >= req2))
+    return ((skillGroupID == 1) and (modelSkillConfiguration:isModelSkillGroupEnabled(1)) and (energy >= req1)) or
+        (   (skillGroupID == 2) and (modelSkillConfiguration:isModelSkillGroupEnabled(2)) and (energy >= req2))
 end
 
 function ModelPlayer:deactivateSkillGroup()

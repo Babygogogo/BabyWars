@@ -202,17 +202,22 @@ local s_Texts = {
     },
     [7] = {
         [1] = function(errType, text)
-            if     (errType == "ReduplicatedPassiveSkills")    then return "日常技能中有重复的技能。请修改后重试。"
-            elseif (errType == "OverloadedPassiveSkillPoints") then return "日常技能的合计技能点超出上限。请修改后重试。"
-            elseif (errType == "InvalidActiveSkill")           then return "主动技能 " .. (text or "") .. " 无效，原因可能是有重复技能，或技能点超限。"
-            else                                                    return "未知[7]: " .. (errType or "")
+            text = text or ""
+            if     (errType == "InvalidSkillGroupPassive") then return "日常技能不合法。" .. text
+            elseif (errType == "InvalidSkillGroupActive1") then return "主动技能 1 不合法。" .. text
+            elseif (errType == "InvalidSkillGroupActive2") then return "主动技能 2 不合法。" .. text
+            elseif (errType == "ReduplicatedSkills")       then return "同一组别中，不能多次使用同名技能。"
+            elseif (errType == "SkillPointsExceedsLimit")  then return "技能点数超出上限。"
+            else                                                return "未知[7]: " .. (errType or "")
             end
         end,
         [2] = function(errType)
-            if     (errType == "ReduplicatedPassiveSkills")    then return "Some skills among the passive skills are duplicated."
-            elseif (errType == "OverloadedPassiveSkillPoints") then return "The skill points of passive skills are overloaded."
-            elseif (errType == "InvalidActiveSkill")           then return "The active skill " .. (text or "") .. " is invalid."
-            else                                                    return "Unknown[7]: " .. (errType or "")
+            if     (errType == "InvalidSkillGroupPassive") then return "Invalid Passive Skills."
+            elseif (errType == "InvalidSkillGroupActive1") then return "Invalid Active Skills 1."
+            elseif (errType == "InvalidSkillGroupActive2") then return "Invalid Active Skills 2."
+            elseif (errType == "ReduplicatedSkills")       then return "Some skills are reduplicated."
+            elseif (errType == "SkillPointsExceedsLimit")  then return "The skill points is beyond the limit."
+            else                                                return "Unknown[7]: " .. (errType or "")
             end
         end,
     },
