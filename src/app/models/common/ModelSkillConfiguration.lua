@@ -53,7 +53,7 @@ local function resetMaxSkillPoints(self)
     local totalPointsForPassive = self:getMaxSkillPoints() + extraPointsForPassive
     skillPassive:setMaxSkillPoints(totalPointsForPassive)
 
-    local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()) * 2)
+    local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()))
     if (isEnabledActive1) then
         local basePoints = skillActive1:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
         skillActive1:setMaxSkillPoints(basePoints + extraPointsForActive)
@@ -76,8 +76,7 @@ function ModelSkillConfiguration:ctor(param)
     self.m_ModelSkillGroupPassive:ctor(param.passive)
     self.m_ModelSkillGroupActive1:ctor(param.active1)
     self.m_ModelSkillGroupActive2:ctor(param.active2)
-    self:setMaxSkillPoints(        param.maxPoints           or 100)
-        :setSkillActivatedCount(   param.skillActivatedCount or 0)
+    self:setMaxSkillPoints(        param.maxPoints or 100)
         :setActivatingSkillGroupId(param.activatingSkillGroupId)
 
     return self
@@ -99,7 +98,6 @@ function ModelSkillConfiguration:toSerializableTable()
     return {
         maxPoints              = self:getMaxSkillPoints(),
         activatingSkillGroupId = self:getActivatingSkillGroupId(),
-        skillActivatedCount    = self:getSkillActivatedCount(),
 
         passive                = self.m_ModelSkillGroupPassive:toSerializableTable(),
         active1                = active1:toSerializableTable(),
@@ -189,17 +187,6 @@ function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     assert(not (self.m_ActivatingSkillGroupID and skillGroupID))
     assert((skillGroupID == SKILL_GROUP_ID_ACTIVE_1) or (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) or (skillGroupID == nil))
     self.m_ActivatingSkillGroupID = skillGroupID
-
-    return self
-end
-
-function ModelSkillConfiguration:getSkillActivatedCount()
-    return self.m_SkillActivatedCount
-end
-
-function ModelSkillConfiguration:setSkillActivatedCount(count)
-    assert((count >= 0) and (math.floor(count) == count))
-    self.m_SkillActivatedCount = count
 
     return self
 end

@@ -42,6 +42,7 @@ function ModelPlayer:ctor(param)
     self.m_Fund                    = param.fund
     self.m_IsAlive                 = param.isAlive
     self.m_DamageCost              = param.damageCost
+    self.m_SkillActivatedCount     = param.skillActivatedCount
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
 
     return self
@@ -52,12 +53,13 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toSerializableTable()
     return {
-        account            = self:getAccount(),
-        nickname           = self:getNickname(),
-        fund               = self:getFund(),
-        isAlive            = self:isAlive(),
-        damageCost         = self.m_DamageCost,
-        skillConfiguration = self:getModelSkillConfiguration():toSerializableTable(),
+        account             = self:getAccount(),
+        nickname            = self:getNickname(),
+        fund                = self:getFund(),
+        isAlive             = self:isAlive(),
+        damageCost          = self.m_DamageCost,
+        skillActivatedCount = self.m_SkillActivatedCount,
+        skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
     }
 end
 
@@ -71,9 +73,8 @@ function ModelPlayer:doActionActivateSkillGroup(action)
     local requirement             = (skillGroupID == 1) and (req1) or (req2)
 
     modelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
-    self.m_ActivatingSkillGroupID = skillGroupID
-    self.m_DamageCost             = self.m_DamageCost - requirement * getCurrentDamageCostPerEnergyRequirement(self)
-    self.m_SkillActivatedCount    = self.m_SkillActivatedCount + 1
+    self.m_DamageCost          = self.m_DamageCost - requirement * getCurrentDamageCostPerEnergyRequirement(self)
+    self.m_SkillActivatedCount = self.m_SkillActivatedCount + 1
 
     return self
 end
