@@ -229,6 +229,10 @@ function GameConstantFunctions.getSkillModifier(id, level)
     return GAME_CONSTANT.skills[id].levels[level].modifier
 end
 
+function GameConstantFunctions.getSkillModifierUnit(id)
+    return GAME_CONSTANT.skills[id].modifierUnit
+end
+
 function GameConstantFunctions.getSkillLevelMinMax(id)
     local skill = GAME_CONSTANT.skills[id]
     return skill.minLevel, skill.maxLevel

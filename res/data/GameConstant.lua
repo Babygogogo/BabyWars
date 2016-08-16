@@ -3650,8 +3650,9 @@ GameConstant.activeSkillSlotsCount           = 4
 GameConstant.skills = {
     -- Modify the attack power for all units of a player.
     [1] = {
-        minLevel = -50,
-        maxLevel = 50,
+        minLevel     = -50,
+        maxLevel     = 50,
+        modifierUnit = "%",
         levels = {
             [-50] = {modifier = -50, points = -500,},
             [-49] = {modifier = -49, points = -490,},
@@ -3759,8 +3760,9 @@ GameConstant.skills = {
 
     -- Modify the defense power for all units of a player.
     [2] = {
-        minLevel = -50,
-        maxLevel = 50,
+        minLevel     = -50,
+        maxLevel     = 50,
+        modifierUnit = "%",
         levels = {
             [-50] = {modifier = -50, points = -500,},
             [-49] = {modifier = -49, points = -490,},
@@ -3868,8 +3870,9 @@ GameConstant.skills = {
 
     -- Modify the production cost for all units of a player.
     [3] = {
-        minLevel = -50,
-        maxLevel = 50,
+        minLevel     = -50,
+        maxLevel     = 50,
+        modifierUnit = "%",
         levels = {
             [-50] = {modifier = 50,  points = -500,},
             [-49] = {modifier = 49,  points = -490,},

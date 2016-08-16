@@ -4,24 +4,31 @@ local ModelSkillGroupPassive = require("src.global.functions.class")("ModelSkill
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local getSkillModifier = GameConstantFunctions.getSkillModifier
-local getSkillPoints   = GameConstantFunctions.getSkillPoints
-local getLocalizedText = LocalizationFunctions.getLocalizedText
+local getSkillModifier     = GameConstantFunctions.getSkillModifier
+local getSkillModifierUnit = GameConstantFunctions.getSkillModifierUnit
+local getSkillPoints       = GameConstantFunctions.getSkillPoints
+local getLocalizedText     = LocalizationFunctions.getLocalizedText
 
 local SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForSingleSkill(id, level, points, modifier)
-    return string.format("%s  %s: %d  %s: %.2f  %s: %s%%\n%s",
+local function getDescriptionForSingleSkill(id, level)
+    local modifier     = getSkillModifier(id, level)
+    local modifierUnit = getSkillModifierUnit(id)
+    if (not modifier) then
+        modifier = "--"
+    else
+        local prefix = (modifier > 0) and ("+") or ("")
+        modifier = prefix .. modifier .. modifierUnit
+    end
+
+    return string.format("%s  %s: %d  %s: %.2f  %s: %s\n%s",
         getLocalizedText(5, id),
-        getLocalizedText(3, "Level"),
-        level,
-        getLocalizedText(3, "SkillPoints"),
-        points,
-        getLocalizedText(3, "Modifier"),
-        (modifier) and ("" .. modifier) or ("--"),
+        getLocalizedText(3, "Level"),       level,
+        getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level),
+        getLocalizedText(3, "Modifier"),    modifier,
         getLocalizedText(4, id)
     )
 end
@@ -133,10 +140,7 @@ function ModelSkillGroupPassive:getDescription()
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            local id, level = skill.id, skill.level
-            local modifier  = getSkillModifier(id, level)
-            local points    = getSkillPoints(  id, level)
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(id, level, points, modifier))
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(skill.id, skill.level))
         else
             descriptions[#descriptions + 1] = string.format("%d. %s", i, getLocalizedText(3, "None"))
         end

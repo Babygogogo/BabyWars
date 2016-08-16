@@ -28,6 +28,7 @@ local ModelSceneWar = class("ModelSceneWar")
 local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
 local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
@@ -183,6 +184,9 @@ local function doActionSurrender(self, action)
 end
 
 local function doActionActivateSkillGroup(self, action)
+    InstantSkillExecutor.doActionActivateSkillGroup(action,
+        getModelWarField(self), getModelPlayerManager(self), getModelTurnManager(self), getModelWeatherManager(self))
+
     local playerIndex = getModelTurnManager(self):getPlayerIndex()
     getModelPlayerManager(self):doActionActivateSkillGroup(action, playerIndex)
 end
