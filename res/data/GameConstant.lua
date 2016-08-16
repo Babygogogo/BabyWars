@@ -720,6 +720,7 @@ GameConstant.categories = {
 
     ["SkillCategoryInstant"] = {
         4,
+        5,
     },
 }
 
@@ -3992,8 +3993,8 @@ GameConstant.skills = {
     -- Instant: Modify HPs of all units of the currently-in-turn player.
     [4] = {
         isInstant    = true,
-        minLevel     = -9,
-        maxLevel     = 9,
+        minLevel     = -5,
+        maxLevel     = 5,
         modifierUnit = "HP",
         levels = {
             [-9] = {modifier = -9, points = -900,},
@@ -4015,6 +4016,34 @@ GameConstant.skills = {
             [7]  = {modifier = 7,  points = 700,},
             [8]  = {modifier = 8,  points = 800,},
             [9]  = {modifier = 9,  points = 900,},
+        },
+    },
+
+    [5] = {
+        isInstant    = true,
+        minLevel     = -5,
+        maxLevel     = 5,
+        modifierUnit = "HP",
+        levels = {
+            [-9] = {modifier = 9,  points = -1800,},
+            [-8] = {modifier = 8,  points = -1600,},
+            [-7] = {modifier = 7,  points = -1400,},
+            [-6] = {modifier = 6,  points = -1200,},
+            [-5] = {modifier = 5,  points = -1000,},
+            [-4] = {modifier = 4,  points = -800,},
+            [-3] = {modifier = 3,  points = -600,},
+            [-2] = {modifier = 2,  points = -400,},
+            [-1] = {modifier = 1,  points = -200,},
+            [0] =  {modifier = 0,  points = 0,},
+            [1] =  {modifier = -1, points = 200,},
+            [2] =  {modifier = -2, points = 400,},
+            [3] =  {modifier = -3, points = 600,},
+            [4] =  {modifier = -4, points = 800,},
+            [5] =  {modifier = -5, points = 1000,},
+            [6] =  {modifier = -6, points = 1200,},
+            [7] =  {modifier = -7, points = 1400,},
+            [8] =  {modifier = -8, points = 1600,},
+            [9] =  {modifier = -9, points = 1800,},
         },
     },
 }

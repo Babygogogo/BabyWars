@@ -36,6 +36,21 @@ s_Executors.execute4 = function(level, modelWarField, modelPlayerManager, modelT
     dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
+s_Executors.execute5 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local modifier     = getSkillModifier(5, level) * 10
+    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local func         = function(modelUnit)
+        if (modelUnit:getPlayerIndex() ~= playerIndex) then
+            modifyModelUnitHp(modelUnit, modifier)
+        end
+    end
+
+    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

@@ -166,7 +166,8 @@ local s_Texts = {
             elseif (skillID == 2) then return "改变我方全体部队的防御力。"
             elseif (skillID == 3) then return "改变我方全体部队的造价。"
             elseif (skillID == 4) then return "改变我方全体部队的HP。"
-            else                       return "未知[4]: " .. (skillID or "")
+            elseif (skillID == 5) then return "改变对方全体部队的HP。"
+            else                       return "未知4:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
@@ -179,7 +180,8 @@ local s_Texts = {
             elseif (skillID == 2) then return "全军防御力"
             elseif (skillID == 3) then return "全军造价"
             elseif (skillID == 4) then return "全军HP"
-            else                       return "未知[5]: " .. (skillID or "")
+            elseif (skillID == 5) then return "对方全军HP"
+            else                       return "未知5:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
