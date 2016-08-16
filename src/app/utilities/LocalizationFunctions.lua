@@ -19,6 +19,7 @@ local s_LongText1_1 = [[
 2. 选中您所希望加入的战局，再选择回合顺序、密码等设定，并确认加入战局（注意，游戏不会自动进入战局画面）。
 3. 回到主菜单选择“继续”，里面会出现该战局（前提是该战局已经满员。若未满员，则该战局不会出现，您仍需等候他人加入）。点击相应选项即可进入战局。
 ]]
+local s_LongText1_2 = "Untranslated"
 
 local s_LongText2_1 = [[
 --- 战局操作 ---
@@ -29,8 +30,9 @@ local s_LongText2_1 = [[
 
 您可以随意拖动地图（使用单个手指滑动画面）和缩放地图（使用两个手指滑动画面）。
 
-您可以预览战斗的预估伤害值：在为部队选择攻击目标时，把光标拖拽到目标之上即可（请不要直接点击目标，这将被游戏解读为直接对该目标进行攻击，而不预览战斗伤害值）。
+您可以预览对手部队的移动/攻击范围：点击对方部队即可。可以同时预览多个部队的攻击范围。
 ]]
+local s_LongText2_2 = "Untranslated"
 
 local s_LongText3_1 = [[
 --- 关于本作 ---
@@ -48,39 +50,178 @@ local s_LongText3_1 = [[
 原作：《Advanced Wars》系列
 原作开发商：Intelligent Systems
 ]]
+local s_LongText3_2 = "Untranslated"
 
 --------------------------------------------------------------------------------
 -- The private functions.
 --------------------------------------------------------------------------------
 local s_Texts = {
     [1] = {
-        [1] = function(...) return "主  菜  单" end,
-        [2] = function(...) return "Main Menu" end,
+        [1] = function(textType)
+            if     (textType == "MainMenu")     then return "主  菜  单"
+            elseif (textType == "NewGame")      then return "新 建 战 局"
+            elseif (textType == "Continue")     then return "继 续"
+            elseif (textType == "JoinWar")      then return "参 战"
+            elseif (textType == "ConfigSkills") then return "配 置 技 能"
+            elseif (textType == "Login")        then return "注 册 / 登 陆"
+            elseif (textType == "Help")         then return "帮 助"
+            elseif (textType == "Save")         then return "保 存"
+            elseif (textType == "Back")         then return "返 回"
+            elseif (textType == "Close")        then return "关 闭"
+            elseif (textType == "Exit")         then return "退 出"
+            elseif (textType == "GameFlow")     then return "游 戏 流 程"
+            elseif (textType == "WarControl")   then return "战 局 操 作"
+            elseif (textType == "About")        then return "关 于 本 作"
+            else                                     return "未知[1]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "MainMenu")     then return "Main Menu"
+            elseif (textType == "NewGame")      then return "New Game"
+            elseif (textType == "Continue")     then return "Continue"
+            elseif (textType == "JoinWar")      then return "Join"
+            elseif (textType == "ConfigSkills") then return "Config Skills"
+            elseif (textType == "Login")        then return "Login"
+            elseif (textType == "Help")         then return "Help"
+            elseif (textType == "Save")         then return "Save"
+            elseif (textType == "Back")         then return "Back"
+            elseif (textType == "Close")        then return "Close"
+            elseif (textType == "Exit")         then return "Exit"
+            elseif (textType == "GameFlow")     then return "Game Flow"
+            elseif (textType == "WarControl")   then return "Controlling"
+            elseif (textType == "About")        then return "About"
+            else                                     return "Unknown[1]: " .. (textType or "")
+            end
+        end,
     },
     [2] = {
-        [1] = function(...) return "新 建 战 局"  end,
-        [2] = function(...) return "New Game" end,
+        [1] = function(textCode)
+            if     (textCode == 1) then return s_LongText1_1
+            elseif (textCode == 2) then return s_LongText2_1
+            elseif (textCode == 3) then return s_LongText3_1
+            else                        return "未知[2]: " .. (textCode or "")
+            end
+        end,
+        [2] = function(textCode)
+            if     (textCode == 1) then return s_LongText1_2
+            elseif (textCode == 2) then return s_LongText2_2
+            elseif (textCode == 3) then return s_LongText3_2
+            else                        return "Unknown[2]: " .. (textCode or "")
+            end
+        end,
     },
     [3] = {
-        [1] = function(...) return "继 续"    end,
-        [2] = function(...) return "Continue" end,
+        [1] = function(textType)
+            if     (textType == "Configuration")        then return "配 置"
+            elseif (textType == "SetSkillPoint")        then return "设定技能点数上限"
+            elseif (textType == "PassiveSkill")         then return "日 常 技 能"
+            elseif (textType == "ActiveSkill")          then return "主 动 技 能"
+            elseif (textType == "Skill")                then return "技 能"
+            elseif (textType == "MaxPoints")            then return "最大技能点"
+            elseif (textType == "TotalPoints")          then return "合计技能点"
+            elseif (textType == "SkillPoints")          then return "技能点"
+            elseif (textType == "EnergyRequirement")    then return "能量槽长度"
+            elseif (textType == "SetEnergyRequirement") then return "设定能量槽长度"
+            elseif (textType == "Level")                then return "等级"
+            elseif (textType == "Modifier")             then return "幅度"
+            elseif (textType == "Clear")                then return "清 空"
+            elseif (textType == "Enable")               then return "启 用"
+            elseif (textType == "Disable")              then return "禁 用"
+            elseif (textType == "Disabled")             then return "已 禁 用"
+            elseif (textType == "Selected")             then return "已 选 定"
+            elseif (textType == "None")                 then return "无"
+            elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
+            elseif (textType == "SettingConfiguration") then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
+            else                                             return "未知[3]: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Configuration")        then return "Configuration"
+            elseif (textType == "SetSkillPoint")        then return "SetSkillPoint"
+            elseif (textType == "PassiveSkill")         then return "Passive"
+            elseif (textType == "ActiveSkill")          then return "Active"
+            elseif (textType == "Skill")                then return "Skill"
+            elseif (textType == "MaxPoints")            then return "Max Skill Points"
+            elseif (textType == "TotalPoints")          then return "Total Points"
+            elseif (textType == "SkillPoints")          then return "Points"
+            elseif (textType == "EnergyRequirement")    then return "Energy Requirement"
+            elseif (textType == "SetEnergyRequirement") then return "Set Energy"
+            elseif (textType == "Level")                then return "Level"
+            elseif (textType == "Modifier")             then return "Modifier"
+            elseif (textType == "Clear")                then return "Clear"
+            elseif (textType == "Enable")               then return "Enable"
+            elseif (textType == "Disable")              then return "Disable"
+            elseif (textType == "Disabled")             then return "Disabled"
+            elseif (textType == "Selected")             then return "Selected"
+            elseif (textType == "None")                 then return "None"
+            elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
+            elseif (textType == "SettingConfiguration") then return "Transfering data to the server. Please wait."
+            else                                             return "Unknown[3]: " .. (textType or "")
+            end
+        end,
     },
     [4] = {
-        [1] = function(...) return "参 战" end,
-        [2] = function(...) return "Join" end,
+        [1] = function(skillID)
+            if     (skillID == 1) then return "改变我方全体部队的攻击力。"
+            elseif (skillID == 2) then return "改变我方全体部队的防御力。"
+            elseif (skillID == 3) then return "改变我方全体部队的造价。"
+            else                       return "未知[4]: " .. (skillID or "")
+            end
+        end,
+        [2] = function(skillID)
+            return "Untranslated..."
+        end,
     },
     [5] = {
-        [1] = function(...) return "配 置 技 能"    end,
-        [2] = function(...) return "Config Skills" end,
+        [1] = function(skillID)
+            if     (skillID == 1) then return "全军攻击力"
+            elseif (skillID == 2) then return "全军防御力"
+            elseif (skillID == 3) then return "全军造价"
+            else                       return "未知[5]: " .. (skillID or "")
+            end
+        end,
+        [2] = function(skillID)
+            return "Untranslated..."
+        end,
     },
     [6] = {
-        [1] = function(...) return "注 册 / 登 陆" end,
-        [2] = function(...) return "Login"        end,
+        [1] = function(skillCategory)
+            if     (skillCategory == "SkillCategoryAttack")  then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryDefense") then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryCost")    then return "造 价 类"
+            else                                                  return "未知[6]: " .. (skillCategory or "")
+            end
+        end,
+        [2] = function(skillCategory)
+            if     (skillCategory == "SkillCategoryAttack")  then return "Attack"
+            elseif (skillCategory == "SkillCategoryDefense") then return "Defense"
+            elseif (skillCategory == "SkillCategoryCost")    then return "Cost"
+            else                                                  return "Unknown[6]: " .. (skillCategory or "")
+            end
+        end,
     },
     [7] = {
-        [1] = function(...) return "帮 助" end,
-        [2] = function(...) return "Help" end,
+        [1] = function(errType, text)
+            text = text or ""
+            if     (errType == "InvalidSkillGroupPassive") then return "日常技能不合法。" .. text
+            elseif (errType == "InvalidSkillGroupActive1") then return "主动技能 1 不合法。" .. text
+            elseif (errType == "InvalidSkillGroupActive2") then return "主动技能 2 不合法。" .. text
+            elseif (errType == "ReduplicatedSkills")       then return "同一组别中，不能多次使用同名技能。"
+            elseif (errType == "SkillPointsExceedsLimit")  then return "技能点数超出上限。"
+            else                                                return "未知[7]: " .. (errType or "")
+            end
+        end,
+        [2] = function(errType)
+            if     (errType == "InvalidSkillGroupPassive") then return "Invalid Passive Skills."
+            elseif (errType == "InvalidSkillGroupActive1") then return "Invalid Active Skills 1."
+            elseif (errType == "InvalidSkillGroupActive2") then return "Invalid Active Skills 2."
+            elseif (errType == "ReduplicatedSkills")       then return "Some skills are reduplicated."
+            elseif (errType == "SkillPointsExceedsLimit")  then return "The skill points is beyond the limit."
+            else                                                return "Unknown[7]: " .. (errType or "")
+            end
+        end,
     },
+    --[[
     [8] = {
         [1] = function(commandType)
             if     (commandType == "Back") then return "返 回"
@@ -119,6 +260,7 @@ local s_Texts = {
         [1] = function(...) return s_LongText3_1     end,
         [2] = function(...) return "Untranslated..." end,
     },
+    --]]
     [15] = {
         [1] = function(...) return "账 号："  end,
         [2] = function(...) return "Account:" end,
@@ -224,9 +366,26 @@ local s_Texts = {
         [2] = function() return "Password (optional)" end,
     },
     [40] = {
-        [1] = function() return "正 常" end,
-        [2] = function() return "Clear" end,
+        [1] = function(weatherType)
+            if     (weatherType == "Clear")  then return "正 常"
+            elseif (weatherType == "Random") then return "随 机"
+            elseif (weatherType == "Rainy")  then return "雨 天"
+            elseif (weatherType == "Snowy")  then return "雪 天"
+            elseif (weatherType == "Sandy")  then return "沙 尘 暴"
+            else                                  return "未知[40]: " .. (weatherType or "")
+            end
+        end,
+        [2] = function(weatherType)
+            if     (weatherType == "Clear")  then return "Clear"
+            elseif (weatherType == "Random") then return "Random"
+            elseif (weatherType == "Rainy")  then return "Rainy"
+            elseif (weatherType == "Snowy")  then return "Snowy"
+            elseif (weatherType == "Sandy")  then return "Sandy"
+            else                                  return "Unknown[40]: " .. (weatherType or "")
+            end
+        end,
     },
+    --[[
     [41] = {
         [1] = function() return "随 机"  end,
         [2] = function() return "Random" end,
@@ -243,6 +402,7 @@ local s_Texts = {
         [1] = function() return "沙 尘 暴" end,
         [2] = function() return "Sandy"    end,
     },
+    --]]
     [45] = {
         [1] = function() return "暂 不 可 用"  end,
         [2] = function() return "Unavailable" end,
@@ -325,19 +485,43 @@ local s_Texts = {
     },
     [65] = {
         [1] = function(textType)
-            if     (textType == "QuitWar")   then return "退 出"
-            elseif (textType == "Surrender") then return "投 降"
-            elseif (textType == "ReloadWar") then return "重 新 载 入"
-            elseif (textType == "EndTurn")   then return "结 束 回 合"
-            else                                  return "未知[65]: " .. (textType or "")
+            if     (textType == "WarMenu")       then return "战 场 菜 单"
+            elseif (textType == "QuitWar")       then return "退 出"
+            elseif (textType == "WarInfo")       then return "战 场 信 息"
+            elseif (textType == "SkillInfo")     then return "技 能 信 息"
+            elseif (textType == "ActivateSkill") then return "发 动 技 能"
+            elseif (textType == "HideUI")        then return "隐 藏 界 面"
+            elseif (textType == "Surrender")     then return "投 降"
+            elseif (textType == "ReloadWar")     then return "重 新 载 入"
+            elseif (textType == "EndTurn")       then return "结 束 回 合"
+            elseif (textType == "Player")        then return "玩 家"
+            elseif (textType == "Nickname")      then return "昵 称"
+            elseif (textType == "Fund")          then return "资 金"
+            elseif (textType == "Energy")        then return "能 量"
+            elseif (textType == "UnitsCount")    then return "部队数量"
+            elseif (textType == "TilesCount")    then return "据点数量"
+            elseif (textType == "Lost")          then return "已战败"
+            else                                      return "未知[65]: " .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "QuitWar")   then return "Quit"
-            elseif (textType == "Surrender") then return "Surrender"
-            elseif (textType == "ReloadWar") then return "Reload"
-            elseif (textType == "EndTurn")   then return "End Turn"
-            else                                  return "Unknown[65]: " .. (textType or "")
+            if     (textType == "WarMenu")       then return "War Menu"
+            elseif (textType == "QuitWar")       then return "Quit"
+            elseif (textType == "WarInfo")       then return "War Info"
+            elseif (textType == "SkillInfo")     then return "Skill Info"
+            elseif (textType == "ActivateSkill") then return "ActivateSkill"
+            elseif (textType == "HideUI")        then return "Hide UI"
+            elseif (textType == "Surrender")     then return "Surrender"
+            elseif (textType == "ReloadWar")     then return "Reload"
+            elseif (textType == "EndTurn")       then return "End Turn"
+            elseif (textType == "Player")        then return "Player"
+            elseif (textType == "Nickname")      then return "Nickname"
+            elseif (textType == "Fund")          then return "Fund"
+            elseif (textType == "Energy")        then return "Energy"
+            elseif (textType == "UnitsCount")    then return "Num of units"
+            elseif (textType == "TilesCount")    then return "Num of bases"
+            elseif (textType == "Lost")          then return "Lost"
+            else                                      return "Unknown[65]: " .. (textType or "")
             end
         end,
     },
@@ -470,20 +654,28 @@ local s_Texts = {
     [81] = {
         [1] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")    then return "网络传输出现错误。将自动刷新场景。" .. text
-            elseif (errType == "InvalidWarFileName") then return "战局不存在，或已结束。将自动回到主界面。" .. text
-            elseif (errType == "InvalidAccount")     then return "账号/密码不正确。将自动回到主界面。" .. text
-            elseif (errType == "OutOfSync")          then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
-            else                                          return "未知错误类型[81] " .. text
+            if     (errType == "CorruptedAction")                then return "网络传输出现错误。将自动刷新场景。" .. text
+            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。将自动回到主界面。" .. text
+            elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
+            elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
+            elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
+            elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
+            else                                                      return "未知错误类型[81] " .. text
             end
         end,
         [2] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")    then return "Data transfer error." .. text
-            elseif (errType == "InvalidWarFileName") then return "The war is ended or invalid." .. text
-            elseif (errType == "InvalidAccount")     then return "Invalid account/password." .. text
-            elseif (errType == "OutOfSync")          then return "The war data is out of sync." .. text
-            else                                          return "Unknown errType[81]" .. text
+            if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
+            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
+            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
+            elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
+            elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
+            elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
+            else                                                      return "Unknown errType[81]" .. text
             end
         end,
     },

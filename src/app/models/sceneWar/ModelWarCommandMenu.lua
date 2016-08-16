@@ -18,22 +18,31 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
--- The private callback functions on script events.
+-- The util functions.
 --------------------------------------------------------------------------------
-local function onEvtPlayerIndexUpdated(self, event)
-    self.m_PlayerIndex    = event.playerIndex
-    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+local function dispatchEvtActivateSkillGroup(self, skillGroupID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "ActivateSkillGroup",
+        skillGroupID = skillGroupID,
+    })
 end
 
-local function onEvtIsWaitingForServerResponse(self, event)
-    self:setEnabled(false)
-    self.m_IsWaitingForServerResponse = event.waiting
+local function createItemActivateSkill(self, skillGroupID)
+    return {
+        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
+        callback = function()
+            dispatchEvtActivateSkillGroup(self, skillGroupID)
+        end,
+    }
 end
 
 local function getEmptyProducersCount(self)
@@ -64,14 +73,96 @@ local function getIdleUnitsCount(self)
     return count
 end
 
+local function updateStringWarInfo(self)
+    local modelPlayerManager = self.m_ModelPlayerManager
+    local data               = {}
+
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:isAlive()) then
+            local energy, req1, req2 = modelPlayer:getEnergy()
+            data[playerIndex] = {
+                nickname   = modelPlayer:getNickname(),
+                fund       = modelPlayer:getFund(),
+                energy     = energy,
+                req1       = req1,
+                req2       = req2,
+                unitsCount = 0,
+                tilesCount = 0,
+            }
+        end
+    end)
+
+    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        local unitsCount = 1
+        if (modelUnit.getCurrentLoadCount) then
+            unitsCount = unitsCount + modelUnit:getCurrentLoadCount()
+        end
+
+        local playerIndex = modelUnit:getPlayerIndex()
+        data[playerIndex].unitsCount = data[playerIndex].unitsCount + unitsCount
+    end)
+
+    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+        local playerIndex = modelTile:getPlayerIndex()
+        if (playerIndex ~= 0) then
+            data[playerIndex].tilesCount = data[playerIndex].tilesCount + 1
+        end
+    end)
+
+    local playersCount = modelPlayerManager:getPlayersCount()
+    local stringList   = {}
+    for i = 1, playersCount do
+        if (not data[i]) then
+            stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
+        else
+            local d = data[i]
+            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %.2f / %s / %s\n%s: %d\n%s: %d",
+                getLocalizedText(65, "Player"),     i,
+                getLocalizedText(65, "Nickname"),   d.nickname,
+                getLocalizedText(65, "Fund"),       d.fund,
+                getLocalizedText(65, "Energy"),     d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
+                getLocalizedText(65, "UnitsCount"), d.unitsCount,
+                getLocalizedText(65, "TilesCount"), d.tilesCount
+            )
+        end
+    end
+
+    self.m_StringWarInfo = table.concat(stringList, "\n--------------------\n")
+end
+
+local function updateStringSkillInfo(self)
+    local stringList = {}
+    self.m_ModelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        stringList[#stringList + 1] = string.format("%s %d: %s",
+            getLocalizedText(65, "Player"), playerIndex,
+            modelPlayer:getModelSkillConfiguration():getDescription()
+        )
+    end)
+
+    self.m_StringSkillInfo = table.concat(stringList, "\n--------------------\n")
+end
+
+--------------------------------------------------------------------------------
+-- The private callback functions on script events.
+--------------------------------------------------------------------------------
+local function onEvtPlayerIndexUpdated(self, event)
+    self.m_PlayerIndex    = event.playerIndex
+    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+end
+
+local function onEvtIsWaitingForServerResponse(self, event)
+    self:setEnabled(false)
+    self.m_IsWaitingForServerResponse = event.waiting
+end
+
 --------------------------------------------------------------------------------
 -- The composition items.
 --------------------------------------------------------------------------------
 local function initItemQuit(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "QuitWar"),
+        name     = getLocalizedText(65, "QuitWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "QuitWar"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "QuitWar"))
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
                     WebSocketManager.setOwner(actorSceneMain:getModel())
@@ -84,11 +175,58 @@ local function initItemQuit(self)
     self.m_ItemQuit = item
 end
 
+local function initItemWarInfo(self)
+    local item = {
+        name     = getLocalizedText(65, "WarInfo"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(self.m_StringWarInfo)
+            end
+        end,
+    }
+
+    self.m_ItemWarInfo = item
+end
+
+local function initItemSkillInfo(self)
+    local item = {
+        name     = getLocalizedText(65, "SkillInfo"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(self.m_StringSkillInfo)
+            end
+        end,
+    }
+
+    self.m_ItemSkillInfo = item
+end
+
+local function initItemActivateSkill1(self)
+    self.m_ItemActiveSkill1 = createItemActivateSkill(self, 1)
+end
+
+local function initItemActivateSkill2(self)
+    self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
+end
+
+local function initItemHideUI(self)
+    local item = {
+        name     = getLocalizedText(65, "HideUI"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setEnabled(false)
+            end
+        end,
+    }
+
+    self.m_ItemHideUI = item
+end
+
 local function initItemReload(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "ReloadWar"),
+        name     = getLocalizedText(65, "ReloadWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "ReloadWar"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "ReloadWar"))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtReloadSceneWar"})
@@ -102,9 +240,9 @@ end
 
 local function initItemSurrender(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "Surrender"),
+        name     = getLocalizedText(65, "Surrender"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "Surrender"))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "Surrender"))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -122,9 +260,9 @@ end
 
 local function initItemEndTurn(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(65, "EndTurn"),
+        name     = getLocalizedText(65, "EndTurn"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
@@ -140,13 +278,29 @@ local function initItemEndTurn(self)
     self.m_ItemEndTurn = item
 end
 
-local function generateItems(self)
+local function getAvailableItems(self)
     local items = {
         self.m_ItemQuit,
-        self.m_ItemReload,
+        self.m_ItemWarInfo,
+        self.m_ItemSkillInfo,
+        self.m_ItemHideUI,
     }
-    if ((self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)) then
+
+    local shouldAddActionItems = (self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)
+    if (shouldAddActionItems) then
         items[#items + 1] = self.m_ItemSurrender
+    end
+    items[#items + 1] = self.m_ItemReload
+
+    if (shouldAddActionItems) then
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        if (modelPlayer:canActivateSkillGroup(1)) then
+            items[#items + 1] = self.m_ItemActiveSkill1
+        end
+        if (modelPlayer:canActivateSkillGroup(2)) then
+            items[#items + 1] = self.m_ItemActiveSkill2
+        end
+
         items[#items + 1] = self.m_ItemEndTurn
     end
 
@@ -159,10 +313,15 @@ end
 function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
-    initItemQuit(     self)
-    initItemReload(   self)
-    initItemSurrender(self)
-    initItemEndTurn(  self)
+    initItemQuit(          self)
+    initItemWarInfo(       self)
+    initItemSkillInfo(     self)
+    initItemActivateSkill1(self)
+    initItemActivateSkill2(self)
+    initItemHideUI(        self)
+    initItemReload(        self)
+    initItemSurrender(     self)
+    initItemEndTurn(       self)
 
     if (self.m_View) then
         self:initView()
@@ -191,6 +350,13 @@ end
 function ModelWarCommandMenu:setModelWarField(model)
     assert(self.m_ModelWarField == nil, "ModelWarCommandMenu:setModelWarField() the model has been set.")
     self.m_ModelWarField = model
+
+    return self
+end
+
+function ModelWarCommandMenu:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "ModelWarCommandMenu:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
 
     return self
 end
@@ -231,13 +397,33 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:setEnabled(enabled)
-    if (self.m_View) then
+    local dispatcher = self.m_RootScriptEventDispatcher
+    if (dispatcher) then
         if (enabled) then
-            self.m_View:setItems(generateItems(self))
+            dispatcher:dispatchEvent({name = "EvtWarCommandMenuActivated"})
+        else
+            dispatcher:dispatchEvent({name = "EvtWarCommandMenuDeactivated"})
+        end
+    end
+
+    local view = self.m_View
+    if (view) then
+        if (enabled) then
+            updateStringWarInfo(  self)
+            updateStringSkillInfo(self)
+
+            view:setItems(getAvailableItems(self))
+                :setOverviewString(self.m_StringWarInfo)
         end
 
-        self.m_View:setEnabled(enabled)
+        view:setEnabled(enabled)
     end
+
+    return self
+end
+
+function ModelWarCommandMenu:onButtonBackTouched()
+    self:setEnabled(false)
 
     return self
 end

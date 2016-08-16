@@ -15,28 +15,35 @@
 --    举例而言，每个可用技能都将消耗特定的技能点数，玩家可以任意组合技能，但技能总点数不能超过100点。
 --    通过响应玩家的反馈，不断调整技能消耗点数，应该能够使得技能系统达到相对平衡的状态。这样一来，玩家的自由度也会得到提升，而不是局限于数量固定的、而且实力不平衡的co。
 --
---  - 目前本类的功能还很少，待日后补充。
---
 --  - 本类目前没有对应的view，因为暂时还不用显示。
 --]]--------------------------------------------------------------------------------
 
 local ModelPlayer = require("src.global.functions.class")("ModelPlayer")
 
-local TableFunctions = require("src.app.utilities.TableFunctions")
+local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
+local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
+
+local DAMAGE_COST_PER_ENERGY_REQUIREMENT = GameConstantFunctions.getDamageCostPerEnergyRequirement()
+local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGrowthRates()
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function getCurrentDamageCostPerEnergyRequirement(self)
+    return DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100)
+end
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_Account       = param.account
-    self.m_Nickname      = param.nickname
-    self.m_Fund          = param.fund
-    self.m_IsAlive       = param.isAlive
-    self.m_CurrentEnergy = param.currentEnergy
-
-    self.m_PassiveSkill = param.passiveSkill
-    self.m_ActiveSkill1 = param.activeSkill1
-    self.m_ActiveSkill2 = param.activeSkill2
+    self.m_Account                 = param.account
+    self.m_Nickname                = param.nickname
+    self.m_Fund                    = param.fund
+    self.m_IsAlive                 = param.isAlive
+    self.m_DamageCost              = param.damageCost
+    self.m_SkillActivatedCount     = param.skillActivatedCount
+    self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
 
     return self
 end
@@ -46,20 +53,30 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toSerializableTable()
     return {
-        account       = self:getAccount(),
-        nickname      = self:getNickname(),
-        fund          = self:getFund(),
-        isAlive       = self:isAlive(),
-        currentEnergy = self:getEnergy(),
-        -- TODO: serialize the skills.
-        passiveSkill  = {},
-        activeSkill1  = {
-            energyRequirement = 3,
-        },
-        activeSkill2  = {
-            energyRequirement = 6,
-        },
+        account             = self:getAccount(),
+        nickname            = self:getNickname(),
+        fund                = self:getFund(),
+        isAlive             = self:isAlive(),
+        damageCost          = self.m_DamageCost,
+        skillActivatedCount = self.m_SkillActivatedCount,
+        skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
     }
+end
+
+--------------------------------------------------------------------------------
+-- The functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelPlayer:doActionActivateSkillGroup(action)
+    local skillGroupID            = action.skillGroupID
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    local req1, req2              = modelSkillConfiguration:getEnergyRequirement()
+    local requirement             = (skillGroupID == 1) and (req1) or (req2)
+
+    modelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
+    self.m_DamageCost          = self.m_DamageCost - requirement * getCurrentDamageCostPerEnergyRequirement(self)
+    self.m_SkillActivatedCount = self.m_SkillActivatedCount + 1
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -93,18 +110,45 @@ function ModelPlayer:setFund(fund)
     return self
 end
 
-function ModelPlayer:getEnergy()
-    return self.m_CurrentEnergy, self:getActiveSkillEnergyRequirement(1), self:getActiveSkillEnergyRequirement(2)
+function ModelPlayer:canActivateSkillGroup(skillGroupID)
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    if (modelSkillConfiguration:getActivatingSkillGroupId()) then
+        return false
+    end
+
+    local energy, req1, req2 = self:getEnergy()
+    return ((skillGroupID == 1) and (modelSkillConfiguration:isModelSkillGroupEnabled(1)) and (energy >= req1)) or
+        (   (skillGroupID == 2) and (modelSkillConfiguration:isModelSkillGroupEnabled(2)) and (energy >= req2))
 end
 
-function ModelPlayer:getActiveSkillEnergyRequirement(skillIndex)
-    assert((skillIndex == 1) or (skillIndex == 2), "ModelPlayer:getActiveSkillEnergyRequirement() the param skillIndex is invalid.")
+function ModelPlayer:deactivateSkillGroup()
+    self:getModelSkillConfiguration():setActivatingSkillGroupId(nil)
 
-    if (skillIndex == 1) then
-        return self.m_ActiveSkill1.energyRequirement or 0
-    else
-        return self.m_ActiveSkill2.energyRequirement or 0
+    return self
+end
+
+function ModelPlayer:addDamageCost(cost)
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    if (not modelSkillConfiguration:getActivatingSkillGroupId()) then
+        local _, maxEnergyRequirement = modelSkillConfiguration:getEnergyRequirement()
+        if (maxEnergyRequirement) then
+            self.m_DamageCost = math.min(
+                self.m_DamageCost + cost,
+                maxEnergyRequirement * getCurrentDamageCostPerEnergyRequirement(self)
+            )
+        end
     end
+
+    return self
+end
+
+function ModelPlayer:getEnergy()
+    local currentEnergy = self.m_DamageCost / getCurrentDamageCostPerEnergyRequirement(self)
+    return currentEnergy, self:getModelSkillConfiguration():getEnergyRequirement()
+end
+
+function ModelPlayer:getModelSkillConfiguration()
+    return self.m_ModelSkillConfiguration
 end
 
 return ModelPlayer

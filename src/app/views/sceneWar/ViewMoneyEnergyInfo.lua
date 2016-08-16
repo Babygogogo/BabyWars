@@ -3,6 +3,8 @@ local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 local LABEL_Z_ORDER      = 1
 local BACKGROUND_Z_ORDER = 0
 
@@ -144,9 +146,12 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
-    self.m_LabelPlayer:setString(LocalizationFunctions.getLocalizedText(62, modelPlayer:getNickname()))
-    self.m_LabelFund:setString(LocalizationFunctions.getLocalizedText(63, modelPlayer:getFund()))
-    self.m_LabelEnergy:setString(LocalizationFunctions.getLocalizedText(64, string.format("%.2f/%d/%d", modelPlayer:getEnergy())))
+    self.m_LabelPlayer:setString(getLocalizedText(62, modelPlayer:getNickname()))
+    self.m_LabelFund  :setString(getLocalizedText(63, modelPlayer:getFund()))
+
+    local energy, req1, req2 = modelPlayer:getEnergy()
+    self.m_LabelEnergy:setString(getLocalizedText(64, string.format("%.2f/%s/%s",
+        energy, "" .. (req1 or "--"), "" .. (req2 or "--"))))
 
     return self
 end

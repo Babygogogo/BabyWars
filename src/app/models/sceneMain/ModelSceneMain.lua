@@ -74,6 +74,10 @@ local function doActionGetSceneWarData(self, action)
     self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
 end
 
+local function doActionGetSkillConfiguration(self, action)
+    self.m_ActorMainMenu:getModel():doActionGetSkillConfiguration(action)
+end
+
 local function doActionMessage(self, action)
     self.m_ActorMessageIndicator:getModel():showMessage(action.message)
 end
@@ -83,26 +87,17 @@ end
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
-    if (actionName == "Login") then
-        doActionLogin(self, event)
-    elseif (actionName == "Logout") then
-        doActionLogout(self, event)
-    elseif (actionName == "Register") then
-        doActionRegister(self, event)
-    elseif (actionName == "NewWar") then
-        doActionNewWar(self, event)
-    elseif (actionName == "GetJoinableWarList") then
-        doActionGetJoinableWarList(self, event)
-    elseif (actionName == "JoinWar") then
-        doActionJoinWar(self, event)
-    elseif (actionName == "GetOngoingWarList") then
-        doActionGetOngoingWarList(self, event)
-    elseif (actionName == "GetSceneWarData") then
-        doActionGetSceneWarData(self, event)
-    elseif (actionName == "Message") then
-        doActionMessage(self, event)
-    elseif (actionName == "Error") then
-        error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
+    if     (actionName == "Login")                 then doActionLogin(                self, event)
+    elseif (actionName == "Logout")                then doActionLogout(               self, event)
+    elseif (actionName == "Register")              then doActionRegister(             self, event)
+    elseif (actionName == "NewWar")                then doActionNewWar(               self, event)
+    elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, event)
+    elseif (actionName == "JoinWar")               then doActionJoinWar(              self, event)
+    elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, event)
+    elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, event)
+    elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, event)
+    elseif (actionName == "Message")               then doActionMessage(              self, event)
+    elseif (actionName == "Error")                 then error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
         print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action.")
     end
@@ -223,24 +218,18 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneMain:onEvent(event)
     local eventName = event.name
-    if (eventName == "EvtPlayerRequestDoAction") then
-        onEvtPlayerRequestDoAction(self, event)
-    elseif (eventName == "EvtSystemRequestDoAction") then
-        onEvtSystemRequestDoAction(self, event)
+    if     (eventName == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
+    elseif (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
     end
 
     return self
 end
 
 function ModelSceneMain:onWebSocketEvent(eventName, param)
-    if (eventName == "open") then
-        onWebSocketOpen(self, param)
-    elseif (eventName == "message") then
-        onWebSocketMessage(self, param)
-    elseif (eventName == "close") then
-        onWebSocketClose(self, param)
-    elseif (eventName == "error") then
-        onWebSocketError(self, param)
+    if     (eventName == "open")    then onWebSocketOpen(   self, param)
+    elseif (eventName == "message") then onWebSocketMessage(self, param)
+    elseif (eventName == "close")   then onWebSocketClose(  self, param)
+    elseif (eventName == "error")   then onWebSocketError(  self, param)
     end
 
     return self

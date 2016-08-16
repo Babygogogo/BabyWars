@@ -3,42 +3,39 @@ local ModelNewWarCreator = class("ModelNewWarCreator")
 
 local Actor                 = require("src.global.actors.Actor")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local WarFieldList          = require("res.data.templateWarField.WarFieldList")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function configModelWarConfigurator(model, warFieldFileName)
-    local warField = require("res.data.templateWarField." .. warFieldFileName)
+local function getWarFieldName(fileName)
+    return require("res.data.templateWarField." .. fileName).warFieldName
+end
+
+local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
+    local options = {}
+    for i = 1, playersCount do
+        options[#options + 1] = {
+            data = i,
+            text = "" .. i,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
+        :setOptions(options)
+end
+
+local function resetModelWarConfigurator(model, warFieldFileName)
     model:setWarFieldFileName(warFieldFileName)
         :setEnabled(true)
 
-    local playerIndexOptions = {}
-    for i = 1, warField.playersCount do
-        playerIndexOptions[i] = {data = i, text = "" .. i}
-    end
-    model:getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(true)
-        :setOptions(playerIndexOptions)
-
-    model:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
-        :setOptions({
-            {data = false, text = LocalizationFunctions.getLocalizedText(29),},
-        })
-
-    model:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
-        :setOptions({
-            {data = "clear", text = LocalizationFunctions.getLocalizedText(40),},
-        })
-
-    model:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(false)
-        :setOptions({
-            {data = 1, text = LocalizationFunctions.getLocalizedText(45),},
-        })
-
-    model:getModelOptionSelectorWithName("MaxSkillPoints"):setButtonsEnabled(false)
-        :setOptions({
-            {data = 100, text = LocalizationFunctions.getLocalizedText(45),},
-        })
+    local warField = require("res.data.templateWarField." .. warFieldFileName)
+    resetSelectorPlayerIndex(model, warField.playersCount)
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(5)
+    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(1)
 end
 
 --------------------------------------------------------------------------------
@@ -57,40 +54,98 @@ local function getActorWarFieldPreviewer(self)
     return self.m_ActorWarFieldPreviewer
 end
 
+local function initCallbackOnButtonBackTouched(self, modelWarConfigurator)
+    modelWarConfigurator:setOnButtonBackTouched(function()
+        modelWarConfigurator:setEnabled(false)
+        getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+
+        if (self.m_View) then
+            self.m_View:setMenuVisible(true)
+                :setButtonNextVisible(false)
+        end
+    end)
+end
+
+local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
+    modelWarConfigurator:setOnButtonConfirmTouched(function()
+        local password = modelWarConfigurator:getPassword()
+        if ((#password ~= 0) and (#password ~= 4)) then
+            self.m_ModelMessageIndicator:showMessage(getLocalizedText(61))
+        else
+            self.m_RootScriptEventDispatcher:dispatchEvent({
+                name                 = "EvtPlayerRequestDoAction",
+                actionName           = "NewWar",
+                warPassword          = password,
+                warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                maxSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+            })
+        end
+    end)
+end
+
+local function initSelectorMaxSkillPoints(modelWarConfigurator)
+    local options = {}
+    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
+    for points = minPoints, maxPoints, pointsPerStep do
+        options[#options + 1] = {
+            data = points,
+            text = "" .. points,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
+        :setCurrentOptionIndex(5)
+        :setButtonsEnabled(true)
+end
+
+local function initSelectorSkill(modelWarConfigurator)
+    local options = {}
+    local prefix  = getLocalizedText(3, "Configuration") .. " "
+    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+        options[#options + 1] = {
+            text = prefix .. i,
+            data = i,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
+        :setButtonsEnabled(true)
+end
+
+local function initSelectorFog(modelWarConfigurator)
+    -- TODO: enable the selector.
+    modelWarConfigurator:getModelOptionSelectorWithName("Fog"):setButtonsEnabled(false)
+        :setOptions({
+            {data = false, text = getLocalizedText(29),},
+        })
+end
+
+local function initSelectorWeather(modelWarConfigurator)
+    -- TODO: enable the selector.
+    modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
+        :setOptions({
+            {data = "Clear", text = getLocalizedText(40, "Clear"),},
+        })
+end
+
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
-        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
-        actor:getModel():setEnabled(false)
+        local model = Actor.createModel("sceneMain.ModelWarConfigurator")
+        local view  = Actor.createView("sceneMain.ViewWarConfigurator")
 
-            :setOnButtonBackTouched(function()
-                getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                getActorWarConfigurator(self):getModel():setEnabled(false)
-                if (self.m_View) then
-                    self.m_View:setMenuVisible(true)
-                        :setButtonNextVisible(false)
-                end
-            end)
+        model:setEnabled(false)
+        initCallbackOnButtonConfirmTouched(self, model)
+        initCallbackOnButtonBackTouched(   self, model)
+        initSelectorMaxSkillPoints(model)
+        initSelectorSkill(         model)
+        initSelectorFog(           model)
+        initSelectorWeather(       model)
 
-            :setOnButtonConfirmTouched(function()
-                local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-                local password             = modelWarConfigurator:getPassword()
-                if ((#password ~= 0) and (#password ~= 4)) then
-                    self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(61))
-                else
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name             = "EvtPlayerRequestDoAction",
-                        actionName       = "NewWar",
-                        warFieldFileName = modelWarConfigurator:getWarFieldFileName(),
-                        playerIndex      = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
-                        skillIndex       = 1,
-                        warPassword      = password,
-                    })
-                end
-            end)
-
-        self.m_ActorWarConfigurator = actor
+        self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
         if (self.m_View) then
-            self.m_View:setViewWarConfigurator(actor:getView())
+            self.m_View:setViewWarConfigurator(view)
         end
     end
 
@@ -99,9 +154,9 @@ end
 
 local function initWarFieldList(self, list)
     local list = {}
-    for warFieldFileName, warFieldName in pairs(WarFieldList) do
+    for _, warFieldFileName in ipairs(WarFieldList) do
         list[#list + 1] = {
-            name     = warFieldName,
+            name     = getWarFieldName(warFieldFileName),
             callback = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
@@ -111,7 +166,7 @@ local function initWarFieldList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    configModelWarConfigurator(getActorWarConfigurator(self):getModel(), warFieldFileName)
+                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warFieldFileName)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)

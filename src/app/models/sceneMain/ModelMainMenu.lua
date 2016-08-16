@@ -66,6 +66,21 @@ local function getActorJoinWarSelector(self)
     return self.m_ActorJoinWarSelector
 end
 
+local function getActorSkillConfigurator(self)
+    if (not self.m_ActorSkillConfigurator) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
+        actor:getModel():setModelMainMenu(self)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+            :setModelMessageIndicator(self.m_ModelMessageIndicator)
+            :setEnabled(false)
+
+        self.m_ActorSkillConfigurator = actor
+        self.m_View:setViewSkillConfigurator(actor:getView())
+    end
+
+    return self.m_ActorSkillConfigurator
+end
+
 local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
@@ -99,7 +114,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemNewWar(self)
     local item = {
-        name = LocalizationFunctions.getLocalizedText(2),
+        name     = LocalizationFunctions.getLocalizedText(1, "NewGame"),
         callback = function()
             self:setMenuEnabled(false)
             getActorNewWarCreator(self):getModel():setEnabled(true)
@@ -111,7 +126,7 @@ end
 
 local function initItemContinue(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(3),
+        name     = LocalizationFunctions.getLocalizedText(1, "Continue"),
         callback = function()
             self:setMenuEnabled(false)
             getActorContinueWarSelector(self):getModel():setEnabled(true)
@@ -123,7 +138,7 @@ end
 
 local function initItemJoinWar(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(4),
+        name     = LocalizationFunctions.getLocalizedText(1, "JoinWar"),
         callback = function()
             self:setMenuEnabled(false)
             getActorJoinWarSelector(self):getModel():setEnabled(true)
@@ -135,9 +150,10 @@ end
 
 local function initItemConfigSkills(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(5),
+        name     = LocalizationFunctions.getLocalizedText(1, "ConfigSkills"),
         callback = function()
-            self.m_ModelMessageIndicator:showMessage("Sorry, the Config Skills feature is not implemented.")
+            self:setMenuEnabled(false)
+            getActorSkillConfigurator(self):getModel():setEnabled(true)
         end,
     }
 
@@ -146,7 +162,7 @@ end
 
 local function initItemLogin(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(6),
+        name     = LocalizationFunctions.getLocalizedText(1, "Login"),
         callback = function()
             self:setMenuEnabled(false)
             getActorLoginPanel(self):getModel():setEnabled(true)
@@ -158,7 +174,7 @@ end
 
 local function initItemHelp(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(7),
+        name     = LocalizationFunctions.getLocalizedText(1, "Help"),
         callback = function()
             self:setMenuEnabled(false)
             getActorGameHelper(self):getModel():setEnabled(true)
@@ -175,7 +191,7 @@ function ModelMainMenu:ctor(param)
     initItemNewWar(      self)
     initItemContinue(    self)
     initItemJoinWar(     self)
-    -- initItemConfigSkills(self)
+    initItemConfigSkills(self)
     initItemLogin(       self)
     initItemHelp(        self)
 
@@ -264,6 +280,12 @@ function ModelMainMenu:doActionGetSceneWarData(action)
     return self
 end
 
+function ModelMainMenu:doActionGetSkillConfiguration(action)
+    getActorSkillConfigurator(self):getModel():doActionGetSkillConfiguration(action)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -290,7 +312,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemNewWar,
                 self.m_ItemContinue,
                 self.m_ItemJoinWar,
-                -- self.m_ItemConfigSkills,
+                self.m_ItemConfigSkills,
                 self.m_ItemLogin,
                 self.m_ItemHelp
             )

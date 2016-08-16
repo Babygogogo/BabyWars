@@ -52,6 +52,17 @@ local function createActionMoveAlongPath(self, path, callback)
     return cc.Sequence:create(unpack(steps))
 end
 
+local function getSkillIndicatorFrame(self)
+    local id = self.m_ActivatingSkillGroupID
+    if (not id) then
+        return nil
+    elseif (id == 1) then
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s08_f0" .. self.m_PlayerIndex .. ".png")
+    else
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s07_f0" .. self.m_PlayerIndex .. ".png")
+    end
+end
+
 local function getLevelIndicatorFrame(unit)
     if ((unit.getCurrentPromotion) and (unit:getCurrentPromotion() > 0)) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s05_f0" .. unit:getCurrentPromotion() .. ".png")
@@ -206,8 +217,9 @@ local function initWithStateIndicator(self, indicator)
     self:addChild(indicator, STATE_INDICATOR_Z_ORDER)
 end
 
-local function updateStateIndicator(indicator, unit)
+local function updateStateIndicator(self, unit)
     local frames = {}
+    frames[#frames + 1] = getSkillIndicatorFrame(    self)
     frames[#frames + 1] = getLevelIndicatorFrame(    unit)
     frames[#frames + 1] = getFuelIndicatorFrame(     unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
@@ -217,6 +229,7 @@ local function updateStateIndicator(indicator, unit)
     frames[#frames + 1] = getLoadIndicatorFrame(     unit)
     frames[#frames + 1] = getMaterialIndicatorFrame( unit)
 
+    local indicator = self.m_StateIndicator
     indicator:stopAllActions()
     if (#frames == 0) then
         indicator:setVisible(false)
@@ -245,12 +258,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    local tiledID = unit:getTiledID()
+    local tiledID = unit:getTiledId()
     local state   = unit:getState()
     updateUnitSprite(    self,                  tiledID)
     updateUnitState(     self,                  state)
     updateHpIndicator(   self.m_HpIndicator,    unit:getNormalizedCurrentHP())
-    updateStateIndicator(self.m_StateIndicator, unit)
+    updateStateIndicator(self,                  unit)
 
     self.m_PlayerIndex = unit:getPlayerIndex()
     self.m_TiledID     = tiledID
@@ -276,6 +289,13 @@ function ViewUnit:showMovingAnimation()
 
         self.m_IsShowingNormalAnimation = false
     end
+
+    return self
+end
+
+function ViewUnit:setActivatingSkillGroupId(skillGroupId)
+    self.m_ActivatingSkillGroupID = skillGroupId
+    updateStateIndicator(self, self.m_Model)
 
     return self
 end

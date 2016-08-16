@@ -189,6 +189,51 @@ function GameConstantFunctions.getPromotionBonus()
     return GAME_CONSTANT.promotionBonus
 end
 
+function GameConstantFunctions.getSkillConfigurationsCount()
+    return GAME_CONSTANT.skillConfigurationsCount
+end
+
+function GameConstantFunctions.getPassiveSkillSlotsCount()
+    return GAME_CONSTANT.passiveSkillSlotsCount
+end
+
+function GameConstantFunctions.getActiveSkillSlotsCount()
+    return GAME_CONSTANT.activeSkillSlotsCount
+end
+
+function GameConstantFunctions.getSkillPointsMinMaxStep()
+    return GAME_CONSTANT.minSkillPoints, GAME_CONSTANT.maxSkillPoints, GAME_CONSTANT.skillPointsPerStep
+end
+
+function GameConstantFunctions.getEnergyRequirementMinMax()
+    return GAME_CONSTANT.minEnergyRequirement, GAME_CONSTANT.maxEnergyRequirement
+end
+
+function GameConstantFunctions.getSkillPointsPerEnergyRequirement()
+    return GAME_CONSTANT.skillPointsPerEnergyRequirement
+end
+
+function GameConstantFunctions.getDamageCostPerEnergyRequirement()
+    return GAME_CONSTANT.damageCostPerEnergyRequirement
+end
+
+function GameConstantFunctions.getDamageCostGrowthRates()
+    return GAME_CONSTANT.damageCostGrowthRates
+end
+
+function GameConstantFunctions.getSkillPoints(id, level)
+    return GAME_CONSTANT.skills[id].levels[level].points
+end
+
+function GameConstantFunctions.getSkillModifier(id, level)
+    return GAME_CONSTANT.skills[id].levels[level].modifier
+end
+
+function GameConstantFunctions.getSkillLevelMinMax(id)
+    local skill = GAME_CONSTANT.skills[id]
+    return skill.minLevel, skill.maxLevel
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if ((index.name == name) and

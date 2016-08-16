@@ -866,6 +866,10 @@ local function onEvtIsWaitingForServerResponse(self, event)
     self.m_IsWaitingForServerResponse = event.waiting
 end
 
+local function onEvtWarCommandMenuActivated(self, event)
+    setStateIdle(self, not self.m_IsWaitingForServerResponse)
+end
+
 local function onEvtMapCursorMoved(self, event)
     if ((self.m_IsWaitingForServerResponse)                       or
         (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
@@ -1046,6 +1050,7 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtPlayerIndexUpdated",         self)
         :addEventListener("EvtModelWeatherUpdated",        self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
+        :addEventListener("EvtWarCommandMenuActivated",    self)
 
     return self
 end
@@ -1053,11 +1058,12 @@ end
 function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtIsWaitingForServerResponse", self)
-        :removeEventListener("EvtModelWeatherUpdated", self)
-        :removeEventListener("EvtPlayerIndexUpdated",  self)
-        :removeEventListener("EvtMapCursorMoved",      self)
-        :removeEventListener("EvtGridSelected",        self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuActivated", self)
+        :removeEventListener("EvtIsWaitingForServerResponse", self)
+        :removeEventListener("EvtModelWeatherUpdated",        self)
+        :removeEventListener("EvtPlayerIndexUpdated",         self)
+        :removeEventListener("EvtMapCursorMoved",             self)
+        :removeEventListener("EvtGridSelected",               self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -1073,6 +1079,7 @@ function ModelActionPlanner:onEvent(event)
     elseif (name == "EvtModelWeatherUpdated")        then onEvtModelWeatherUpdated(       self, event)
     elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
+    elseif (name == "EvtWarCommandMenuActivated")    then onEvtWarCommandMenuActivated(   self, event)
     end
 
     return self

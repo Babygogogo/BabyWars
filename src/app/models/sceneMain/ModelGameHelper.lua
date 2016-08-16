@@ -8,11 +8,11 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 --------------------------------------------------------------------------------
 local function initItemGameFlow(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(9),
+        name     = LocalizationFunctions.getLocalizedText(1, "GameFlow"),
         callback = function()
             if (self.m_View) then
                 self.m_View:setHelpVisible(true)
-                    :setHelpText(LocalizationFunctions.getLocalizedText(12))
+                    :setHelpText(LocalizationFunctions.getLocalizedText(2, 1))
             end
         end,
     }
@@ -22,10 +22,10 @@ end
 
 local function initItemWarControl(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(10),
+        name     = LocalizationFunctions.getLocalizedText(1, "WarControl"),
         callback = function()
             self.m_View:setHelpVisible(true)
-                :setHelpText(LocalizationFunctions.getLocalizedText(13))
+                :setHelpText(LocalizationFunctions.getLocalizedText(2, 2))
         end,
     }
 
@@ -34,10 +34,10 @@ end
 
 local function initItemAbout(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(11),
+        name     = LocalizationFunctions.getLocalizedText(1, "About"),
         callback = function()
             self.m_View:setHelpVisible(true)
-                :setHelpText(LocalizationFunctions.getLocalizedText(14))
+                :setHelpText(LocalizationFunctions.getLocalizedText(2, 3))
         end,
     }
 

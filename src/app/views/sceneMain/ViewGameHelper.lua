@@ -119,7 +119,7 @@ local function initMenuListView(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(7), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(1, "Help"), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -147,7 +147,7 @@ local function initButtonBack(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(BUTTON_BACK_FONT_COLOR)
-        :setTitleText(LocalizationFunctions.getLocalizedText(8, "Back"))
+        :setTitleText(LocalizationFunctions.getLocalizedText(1, "Back"))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -172,24 +172,24 @@ local function initHelpBackground(self)
     self:addChild(background, HELP_BACKGROUND_Z_ORDER)
 end
 
-local function initHelpListView(self)
-    local listView = ccui.ListView:create()
-    listView:setPosition(HELP_LIST_VIEW_POS_X, HELP_LIST_VIEW_POS_Y)
+local function initHelpScrollView(self)
+    local scrollView = ccui.ScrollView:create()
+    scrollView:setPosition(HELP_LIST_VIEW_POS_X, HELP_LIST_VIEW_POS_Y)
         :setContentSize(HELP_LIST_VIEW_WIDTH, HELP_LIST_VIEW_HEIGHT)
 
-    self.m_HelpListView = listView
-    self:addChild(listView, HELP_LIST_VIEW_Z_ORDER)
+    self.m_HelpScrollView = scrollView
+    self:addChild(scrollView, HELP_LIST_VIEW_Z_ORDER)
 end
 
-local function initHelpText(self)
-    local text = ccui.Text:create("", ITEM_FONT_NAME, HELP_TEXT_FONT_SIZE)
-    text:ignoreContentAdaptWithSize(false)
-        :setTextAreaSize({width = HELP_TEXT_WIDTH, height = HELP_TEXT_HEIGHT})
+local function initHelpLabel(self)
+    local label = cc.Label:createWithTTF("", ITEM_FONT_NAME, HELP_TEXT_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setDimensions(HELP_TEXT_WIDTH, HELP_TEXT_HEIGHT)
 
         :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
-    self.m_HelpText = text
-    self.m_HelpListView:pushBackCustomItem(text)
+    self.m_HelpLabel = label
+    self.m_HelpScrollView:addChild(label)
 end
 
 --------------------------------------------------------------------------------
@@ -201,8 +201,8 @@ function ViewGameHelper:ctor(param)
     initMenuTitle(     self)
     initButtonBack(    self)
     initHelpBackground(self)
-    initHelpListView(  self)
-    initHelpText(      self)
+    initHelpScrollView(self)
+    initHelpLabel(     self)
 
     return self
 end
@@ -234,14 +234,19 @@ end
 
 function ViewGameHelper:setHelpVisible(visible)
     self.m_HelpBackground:setVisible(visible)
-    self.m_HelpListView  :setVisible(visible)
+    self.m_HelpScrollView:setVisible(visible)
         :jumpToTop()
 
     return self
 end
 
 function ViewGameHelper:setHelpText(text)
-    self.m_HelpText:setString(text)
+    local label = self.m_HelpLabel
+    label:setString(text)
+
+    local height = math.max(label:getLineHeight() * label:getStringNumLines(), HELP_LIST_VIEW_HEIGHT)
+    label:setDimensions(HELP_TEXT_WIDTH, height)
+    self.m_HelpScrollView:setInnerContainerSize({width = HELP_TEXT_WIDTH, height = height})
 
     return self
 end

@@ -182,6 +182,11 @@ local function doActionSurrender(self, action)
     end
 end
 
+local function doActionActivateSkillGroup(self, action)
+    local playerIndex = getModelTurnManager(self):getPlayerIndex()
+    getModelPlayerManager(self):doActionActivateSkillGroup(action, playerIndex)
+end
+
 local function doActionWait(self, action)
     getModelWarField(self):doActionWait(action)
 end
@@ -307,6 +312,7 @@ local function doAction(self, action)
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
     elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
     elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
+    elseif (actionName == "ActivateSkillGroup")     then doActionActivateSkillGroup(    self, action)
     elseif (actionName == "Wait")                   then doActionWait(                  self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
@@ -416,6 +422,7 @@ local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :setModelWarField(getModelWarField(self))
+        :setModelPlayerManager(getModelPlayerManager(self))
 
     self.m_ActorWarHud = actor
 end
