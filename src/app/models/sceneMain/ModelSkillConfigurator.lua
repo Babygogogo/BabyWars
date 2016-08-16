@@ -128,9 +128,14 @@ local function setStateSelectSkillCategory(self, slotIndex)
     self.m_State        = "stateSelectSkillCategory"
     self.m_SlotIndex    = slotIndex
 
-    if (self.m_View) then
-        self.m_View:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
-            :setMenuItems(self.m_ItemsSkillCategories)
+    local view = self.m_View
+    if (view) then
+        view:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
+        if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
+            view:setMenuItems(self.m_ItemsSkillCategoriesForPassive)
+        else
+            view:setMenuItems(self.m_ItemsSkillCategoriesForActive)
+        end
     end
 end
 
@@ -294,7 +299,7 @@ local function initItemsSkillGroupActive(self)
     self.m_ItemsSkillGroupActive = items
 end
 
-local function initItemsSkillCategories(self)
+local function initItemsSkillCategoriesForPassive(self)
     local items = {
         {
             name     = getLocalizedText(3, "Clear"),
@@ -308,7 +313,7 @@ local function initItemsSkillCategories(self)
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -317,12 +322,38 @@ local function initItemsSkillCategories(self)
         }
     end
 
-    self.m_ItemsSkillCategories = items
+    self.m_ItemsSkillCategoriesForPassive = items
+end
+
+local function initItemsSkillCategoriesForActive(self)
+    local items = {
+        {
+            name     = getLocalizedText(3, "Clear"),
+            callback = function()
+                self.m_ModelSkillConfiguration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
+
+                if (self.m_View) then
+                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                end
+            end,
+        }
+    }
+
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+        items[#items + 1] = {
+            name     = getLocalizedText(6, categoryName),
+            callback = function()
+                setStateSelectSkill(self, categoryName)
+            end,
+        }
+    end
+
+    self.m_ItemsSkillCategoriesForActive = items
 end
 
 local function initItemsSkills(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
         local subItems = {}
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             subItems[#subItems + 1] = {
@@ -340,7 +371,7 @@ end
 
 local function initItemsSkillLevels(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             if (items[skillID]) then
                 break
@@ -374,15 +405,16 @@ function ModelSkillConfigurator:ctor()
     self.m_State                   = "stateDisabled"
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create()
 
-    initItemsAllConfigurations(self)
-    initItemsOverview(         self)
-    initItemsMaxPoints(        self)
-    initItemsEnergyRequirement(self)
-    initItemsSkillGroupPassive(self)
-    initItemsSkillGroupActive( self)
-    initItemsSkillCategories(  self)
-    initItemsSkills(           self)
-    initItemsSkillLevels(      self)
+    initItemsAllConfigurations(        self)
+    initItemsOverview(                 self)
+    initItemsMaxPoints(                self)
+    initItemsEnergyRequirement(        self)
+    initItemsSkillGroupPassive(        self)
+    initItemsSkillGroupActive(         self)
+    initItemsSkillCategoriesForPassive(self)
+    initItemsSkillCategoriesForActive( self)
+    initItemsSkills(                   self)
+    initItemsSkillLevels(              self)
 
     return self
 end

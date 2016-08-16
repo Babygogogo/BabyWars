@@ -204,6 +204,10 @@ function ModelSkillConfiguration:getMaxSkillPoints()
     return self.m_MaxPoints
 end
 
+function ModelSkillConfiguration:getAllSkillsInGroup(skillGroupID)
+    return getModelSkillGroupWithId(self, skillGroupID):getAllSkills()
+end
+
 function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillID, level)
     getModelSkillGroupWithId(self, skillGroupID):setSkill(slotIndex, skillID, level)
     resetMaxSkillPoints(self)

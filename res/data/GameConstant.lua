@@ -693,10 +693,17 @@ GameConstant.categories = {
         "TransportCopter",
     },
 
-    ["SkillCategories"] = {
+    ["SkillCategoriesForPassive"] = {
         "SkillCategoryAttack",
         "SkillCategoryDefense",
         "SkillCategoryCost",
+    },
+
+    ["SkillCategoriesForActive"] = {
+        "SkillCategoryAttack",
+        "SkillCategoryDefense",
+        "SkillCategoryCost",
+        "SkillCategoryInstant",
     },
 
     ["SkillCategoryAttack"] = {
@@ -709,6 +716,10 @@ GameConstant.categories = {
 
     ["SkillCategoryCost"] = {
         3,
+    },
+
+    ["SkillCategoryInstant"] = {
+        4,
     },
 }
 
@@ -3975,6 +3986,35 @@ GameConstant.skills = {
             [48]  = {modifier = -48, points = 480,},
             [49]  = {modifier = -49, points = 490,},
             [50]  = {modifier = -50, points = 500,},
+        },
+    },
+
+    -- Instant: Modify HPs of all units of the currently-in-turn player.
+    [4] = {
+        isInstant    = true,
+        minLevel     = -9,
+        maxLevel     = 9,
+        modifierUnit = "HP",
+        levels = {
+            [-9] = {modifier = -9, points = -900,},
+            [-8] = {modifier = -8, points = -800,},
+            [-7] = {modifier = -7, points = -700,},
+            [-6] = {modifier = -6, points = -600,},
+            [-5] = {modifier = -5, points = -500,},
+            [-4] = {modifier = -4, points = -400,},
+            [-3] = {modifier = -3, points = -300,},
+            [-2] = {modifier = -2, points = -200,},
+            [-1] = {modifier = -1, points = -100,},
+            [0]  = {modifier = 0,  points = 0,},
+            [1]  = {modifier = 1,  points = 100,},
+            [2]  = {modifier = 2,  points = 200,},
+            [3]  = {modifier = 3,  points = 300,},
+            [4]  = {modifier = 4,  points = 400,},
+            [5]  = {modifier = 5,  points = 500,},
+            [6]  = {modifier = 6,  points = 600,},
+            [7]  = {modifier = 7,  points = 700,},
+            [8]  = {modifier = 8,  points = 800,},
+            [9]  = {modifier = 9,  points = 900,},
         },
     },
 }

@@ -165,6 +165,7 @@ local s_Texts = {
             if     (skillID == 1) then return "改变我方全体部队的攻击力。"
             elseif (skillID == 2) then return "改变我方全体部队的防御力。"
             elseif (skillID == 3) then return "改变我方全体部队的造价。"
+            elseif (skillID == 4) then return "改变我方全体部队的HP。"
             else                       return "未知[4]: " .. (skillID or "")
             end
         end,
@@ -177,6 +178,7 @@ local s_Texts = {
             if     (skillID == 1) then return "全军攻击力"
             elseif (skillID == 2) then return "全军防御力"
             elseif (skillID == 3) then return "全军造价"
+            elseif (skillID == 4) then return "全军HP"
             else                       return "未知[5]: " .. (skillID or "")
             end
         end,
@@ -189,14 +191,16 @@ local s_Texts = {
             if     (skillCategory == "SkillCategoryAttack")  then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryDefense") then return "防 御 类"
             elseif (skillCategory == "SkillCategoryCost")    then return "造 价 类"
-            else                                                  return "未知[6]: " .. (skillCategory or "")
+            elseif (skillCategory == "SkillCategoryInstant") then return "瞬 时 类"
+            else                                                  return "未知6:" .. (skillCategory or "")
             end
         end,
         [2] = function(skillCategory)
             if     (skillCategory == "SkillCategoryAttack")  then return "Attack"
             elseif (skillCategory == "SkillCategoryDefense") then return "Defense"
             elseif (skillCategory == "SkillCategoryCost")    then return "Cost"
-            else                                                  return "Unknown[6]: " .. (skillCategory or "")
+            elseif (skillCategory == "SkillCategoryInstant") then return "Instant"
+            else                                                  return "Unknown6:" .. (skillCategory or "")
             end
         end,
     },
@@ -662,7 +666,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
-            else                                                      return "未知错误类型[81] " .. text
+            else                                                      return "未知81:" .. (errType or "")
             end
         end,
         [2] = function(errType, text)
@@ -675,7 +679,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
-            else                                                      return "Unknown errType[81]" .. text
+            else                                                      return "Unknown81:" .. (errType or "")
             end
         end,
     },

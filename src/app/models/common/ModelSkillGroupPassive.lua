@@ -149,6 +149,10 @@ function ModelSkillGroupPassive:getDescription()
     return table.concat(descriptions, "\n")
 end
 
+function ModelSkillGroupPassive:getAllSkills()
+    return self.m_Slots
+end
+
 function ModelSkillGroupPassive:setSkill(slotIndex, skillID, skillLevel)
     assert((slotIndex > 0) and (slotIndex <= SLOTS_COUNT) and (slotIndex == math.floor(slotIndex)),
         "ModelSkillGroupPassive:setSkill() the param slotIndex is invalid.")
