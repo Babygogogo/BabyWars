@@ -486,20 +486,20 @@ local function getSingleActionDropModelUnit(self, unitID)
 end
 
 local function getActionsDropModelUnit(self)
-    local focusModelUnit   = self.m_FocusModelUnit
-    local dropDestinations = self.m_SelectedDropDestinations
+    local focusModelUnit        = self.m_FocusModelUnit
+    local dropDestinations      = self.m_SelectedDropDestinations
+    local modelTileMap          = self.m_ModelTileMap
+    local loaderEndingGridIndex = getMovePathDestination(self.m_MovePath)
 
-    if ((not focusModelUnit.getCurrentLoadCount) or
-        (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) or
-        (not focusModelUnit:canDropModelUnit())) then
+    if ((not focusModelUnit.getCurrentLoadCount)                                                               or
+        (focusModelUnit:getCurrentLoadCount() <= #dropDestinations)                                            or
+        (not focusModelUnit:canDropModelUnit(modelTileMap:getModelTile(loaderEndingGridIndex):getTileType()))) then
         return {}
     end
 
     local actions = {}
     local loaderBeginningGridIndex = self.m_FocusModelUnit:getGridIndex()
-    local loaderEndingGridIndex    = getMovePathDestination(self.m_MovePath)
     local modelUnitMap             = self.m_ModelUnitMap
-    local modelTileMap             = self.m_ModelTileMap
 
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         if (not isModelUnitDropped(unitID, dropDestinations)) then

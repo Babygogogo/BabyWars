@@ -217,8 +217,8 @@ function UnitLoader:canLoadModelUnit(modelUnit, tileType)
         (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), self.m_Template.targetCategoryType))
 end
 
-function UnitLoader:canDropModelUnit()
-    return self.m_Template.canDrop
+function UnitLoader:canDropModelUnit(tileType)
+    return (self.m_Template.canDrop) and (isValidTargetTileType(self, tileType))
 end
 
 function UnitLoader:canLaunchModelUnit()
