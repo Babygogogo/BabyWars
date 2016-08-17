@@ -27,7 +27,7 @@ local function getDescriptionForSingleSkill(id, level)
     return string.format("%s  %s: %d  %s: %.2f  %s: %s\n%s",
         getLocalizedText(5, id),
         getLocalizedText(3, "Level"),       level,
-        getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level),
+        getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, true),
         getLocalizedText(3, "Modifier"),    modifier,
         getLocalizedText(4, id)
     )
@@ -111,7 +111,7 @@ function ModelSkillGroupActive:isValid()
         local skill = slots[i]
         if (skill) then
             local id = skill.id
-            totalPoints = totalPoints + getSkillPoints(id, skill.level)
+            totalPoints = totalPoints + getSkillPoints(id, skill.level, true)
 
             for j = i + 1, SLOTS_COUNT do
                 if ((slots[j]) and (slots[j].id == id)) then
@@ -146,7 +146,7 @@ function ModelSkillGroupActive:getSkillPoints()
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            totalPoints = totalPoints + getSkillPoints(skill.id, skill.level)
+            totalPoints = totalPoints + getSkillPoints(skill.id, skill.level, true)
         end
     end
 

@@ -221,8 +221,12 @@ function GameConstantFunctions.getDamageCostGrowthRates()
     return GAME_CONSTANT.damageCostGrowthRates
 end
 
-function GameConstantFunctions.getSkillPoints(id, level)
-    return GAME_CONSTANT.skills[id].levels[level].points
+function GameConstantFunctions.getSkillPoints(id, level, isActive)
+    if (isActive) then
+        return GAME_CONSTANT.skills[id].levels[level].pointsActive
+    else
+        return GAME_CONSTANT.skills[id].levels[level].pointsPassive
+    end
 end
 
 function GameConstantFunctions.getSkillModifier(id, level)
