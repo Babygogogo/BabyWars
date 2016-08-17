@@ -40,6 +40,21 @@ local function getRemainingUnitIdsOnDrop(currentList, dropDestinations)
     return remainingUnitIds
 end
 
+local function isValidTargetTileType(self, tileType)
+    local targetTileTypes = self.m_Template.targetTileTypes
+    if (not targetTileTypes) then
+        return true
+    else
+        for _, target in pairs(targetTileTypes) do
+            if (target == tileType) then
+                return true
+            end
+        end
+
+        return false
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -195,10 +210,11 @@ function UnitLoader:hasLoadUnitId(unitID)
     return false
 end
 
-function UnitLoader:canLoadModelUnit(modelUnit)
-    return ((self:getCurrentLoadCount() < self:getMaxLoadCount()) and
-        (self.m_Owner:getPlayerIndex() == modelUnit:getPlayerIndex()) and
-        (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), self.m_Template.targetCategoryType)))
+function UnitLoader:canLoadModelUnit(modelUnit, tileType)
+    return (isValidTargetTileType(self, tileType))                                                            and
+        (self:getCurrentLoadCount() < self:getMaxLoadCount())                                                 and
+        (self.m_Owner:getPlayerIndex() == modelUnit:getPlayerIndex())                                         and
+        (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), self.m_Template.targetCategoryType))
 end
 
 function UnitLoader:canDropModelUnit()

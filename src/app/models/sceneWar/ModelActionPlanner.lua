@@ -44,14 +44,15 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
     end
 end
 
-local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
+local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap, modelTileMap)
     if (GridIndexFunctions.isEqual(modelUnit:getGridIndex(), gridIndex)) then
         return true
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        return (not existingModelUnit)                                                            or
-            (modelUnit:canJoinModelUnit(existingModelUnit))                                       or
-            (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit))
+        local tileType          = modelTileMap:getModelTile(gridIndex):getTileType()
+        return (not existingModelUnit)                                                                       or
+            (modelUnit:canJoinModelUnit(existingModelUnit))                                                  or
+            (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit, tileType))
     end
 end
 
@@ -329,9 +330,10 @@ local function getActionLoadModelUnit(self)
         return nil
     else
         local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((loaderModelUnit)                                          and
-            (loaderModelUnit.canLoadModelUnit)                         and
-            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+        local tileType        = self.m_ModelTileMap:getModelTile(destination):getTileType()
+        if ((loaderModelUnit)                                                    and
+            (loaderModelUnit.canLoadModelUnit)                                   and
+            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit, tileType))) then
             return {
                 name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
                 callback = function()
@@ -934,7 +936,7 @@ local function onEvtGridSelected(self, event)
             else
                 setStateIdle(self, true)
             end
-        elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
+        elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap, self.m_ModelTileMap)) then
             if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
                 setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
             else

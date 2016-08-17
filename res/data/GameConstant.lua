@@ -3547,6 +3547,11 @@ GameConstant.templateModelUnits = {
         UnitLoader = {
             maxLoadCount       = 2,
             targetCategoryType = "GroundUnits",
+            targetTileTypes    = {
+                "Beach",
+                "Seaport",
+                "TempSeaport",
+            },
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
@@ -3628,6 +3633,11 @@ GameConstant.templateModelUnits = {
         UnitLoader = {
             maxLoadCount       = 1,
             targetCategoryType = "FootUnits",
+            targetTileTypes    = {
+                "Beach",
+                "Seaport",
+                "TempSeaport",
+            },
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
