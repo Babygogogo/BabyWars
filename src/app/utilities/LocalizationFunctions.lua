@@ -130,6 +130,7 @@ local s_Texts = {
             elseif (textType == "Disabled")             then return "已 禁 用"
             elseif (textType == "Selected")             then return "已 选 定"
             elseif (textType == "None")                 then return "无"
+            elseif (textType == "NoSkills")             then return "没有任何技能"
             elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
             elseif (textType == "SettingConfiguration") then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
             else                                             return "未知[3]: " .. (textType or "")
@@ -154,6 +155,7 @@ local s_Texts = {
             elseif (textType == "Disabled")             then return "Disabled"
             elseif (textType == "Selected")             then return "Selected"
             elseif (textType == "None")                 then return "None"
+            elseif (textType == "NoSkills")             then return "No skills"
             elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
             elseif (textType == "SettingConfiguration") then return "Transfering data to the server. Please wait."
             else                                             return "Unknown[3]: " .. (textType or "")
@@ -162,11 +164,11 @@ local s_Texts = {
     },
     [4] = {
         [1] = function(skillID)
-            if     (skillID == 1) then return "改变我方全体部队的攻击力。"
-            elseif (skillID == 2) then return "改变我方全体部队的防御力。"
-            elseif (skillID == 3) then return "改变我方全体部队的造价。"
-            elseif (skillID == 4) then return "改变我方全体部队的HP。"
-            elseif (skillID == 5) then return "改变对方全体部队的HP。"
+            if     (skillID == 1) then return "使我方全体部队造成的攻击伤害变为基础的"
+            elseif (skillID == 2) then return "使我方全体部队受到的攻击伤害变为基础的"
+            elseif (skillID == 3) then return "使我方全体部队的造价变为基础的"
+            elseif (skillID == 4) then return "改变我方全体部队的当前HP，幅度为"
+            elseif (skillID == 5) then return "改变对方全体部队的当前HP，幅度为"
             else                       return "未知4:" .. (skillID or "")
             end
         end,

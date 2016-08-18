@@ -14,25 +14,6 @@ local SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForSingleSkill(id, level)
-    local modifier     = getSkillModifier(id, level)
-    local modifierUnit = getSkillModifierUnit(id)
-    if (not modifier) then
-        modifier = "--"
-    else
-        local prefix = (modifier > 0) and ("+") or ("")
-        modifier = prefix .. modifier .. modifierUnit
-    end
-
-    return string.format("%s  %s: %d  %s: %.2f  %s: %s\n%s",
-        getLocalizedText(5, id),
-        getLocalizedText(3, "Level"),       level,
-        getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, true),
-        getLocalizedText(3, "Modifier"),    modifier,
-        getLocalizedText(4, id)
-    )
-end
-
 local function initSlots(self, param)
     local slots = {}
     if ((self:isEnabled()) and (param)) then
@@ -162,33 +143,6 @@ function ModelSkillGroupActive:setMaxSkillPoints(points)
     self.m_MaxSkillPoints = points
 
     return self
-end
-
-function ModelSkillGroupActive:getDescription()
-    if (not self:isEnabled()) then
-        return string.format("%s : %s", getLocalizedText(3, "ActiveSkill"), getLocalizedText(3, "Disabled"))
-    end
-
-    local descriptions = {
-        string.format("%s (%s: %.2f  %s: %.2f)\n%s: %d",
-            getLocalizedText(3, "ActiveSkill"),
-            getLocalizedText(3, "TotalPoints"),       self:getSkillPoints(),
-            getLocalizedText(3, "MaxPoints"),         self:getMaxSkillPoints(),
-            getLocalizedText(3, "EnergyRequirement"), self:getEnergyRequirement()
-        )
-    }
-
-    local slots = self.m_Slots
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if (skill) then
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(skill.id, skill.level))
-        else
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getLocalizedText(3, "None"))
-        end
-    end
-
-    return table.concat(descriptions, "\n")
 end
 
 function ModelSkillGroupActive:getAllSkills()

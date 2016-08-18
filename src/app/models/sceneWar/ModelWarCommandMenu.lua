@@ -18,10 +18,11 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local Actor                     = require("src.global.actors.Actor")
+local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -135,7 +136,7 @@ local function updateStringSkillInfo(self)
     self.m_ModelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         stringList[#stringList + 1] = string.format("%s %d: %s",
             getLocalizedText(65, "Player"), playerIndex,
-            modelPlayer:getModelSkillConfiguration():getDescription()
+            SkillDescriptionFunctions.getDescription(modelPlayer:getModelSkillConfiguration())
         )
     end)
 

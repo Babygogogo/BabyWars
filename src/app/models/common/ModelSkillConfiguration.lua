@@ -18,14 +18,6 @@ local SKILL_GROUP_ID_ACTIVE_2 = 2
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForMaxPoints(self)
-    if (self:isEmpty()) then
-        return string.format("%s: %s", getLocalizedText(3, "MaxPoints"), getLocalizedText(3, "None"))
-    else
-        return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), self:getMaxSkillPoints())
-    end
-end
-
 local function getModelSkillGroupWithId(self, skillGroupID)
     if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
         return self.m_ModelSkillGroupPassive
@@ -120,6 +112,18 @@ function ModelSkillConfiguration.getSkillGroupIdActive2()
     return SKILL_GROUP_ID_ACTIVE_2
 end
 
+function ModelSkillConfiguration:getModelSkillGroupPassive()
+    return self.m_ModelSkillGroupPassive
+end
+
+function ModelSkillConfiguration:getModelSkillGroupActive1()
+    return self.m_ModelSkillGroupActive1
+end
+
+function ModelSkillConfiguration:getModelSkillGroupActive2()
+    return self.m_ModelSkillGroupActive2
+end
+
 function ModelSkillConfiguration:isEmpty()
     return not self:getMaxSkillPoints()
 end
@@ -145,15 +149,6 @@ function ModelSkillConfiguration:isValid()
     end
 
     return true
-end
-
-function ModelSkillConfiguration:getDescription()
-    return string.format("%s\n\n%s\n\n%s\n\n%s",
-        getDescriptionForMaxPoints(self),
-        self.m_ModelSkillGroupPassive:getDescription(),
-        self.m_ModelSkillGroupActive1:getDescription(),
-        self.m_ModelSkillGroupActive2:getDescription()
-    )
 end
 
 function ModelSkillConfiguration:isModelSkillGroupEnabled(skillGroupID)

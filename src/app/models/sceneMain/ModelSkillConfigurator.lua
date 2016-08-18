@@ -1,10 +1,13 @@
 
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
-local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
-local LocalizationFunctions   = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
-local getLocalizedText        = LocalizationFunctions.getLocalizedText
+local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+local getDescription   = SkillDescriptionFunctions.getDescription
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
 local SKILL_GROUP_ID_PASSIVE   = ModelSkillConfiguration.getSkillGroupIdPassive()
@@ -74,7 +77,7 @@ local function setStateOverviewConfiguration(self, configurationID)
                 view:setItemEnabled(i, false)
             end
         else
-            view:setOverviewString(configuration:getDescription())
+            view:setOverviewString(getDescription(configuration))
         end
     end
 end
@@ -235,7 +238,7 @@ local function initItemsEnergyRequirement(self)
                 self.m_ModelSkillConfiguration:setEnergyRequirement(self.m_SkillGroupID, requirement)
 
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 end
             end,
         }
@@ -265,7 +268,7 @@ local function initItemsSkillGroupActive(self)
             callback  = function()
                 self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, true)
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                     setItemsSkillGroupActiveState(self, true)
                 end
             end,
@@ -275,7 +278,7 @@ local function initItemsSkillGroupActive(self)
             callback = function()
                 self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, false)
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                     setItemsSkillGroupActiveState(self, false)
                 end
             end,
@@ -307,7 +310,7 @@ local function initItemsSkillCategoriesForPassive(self)
                 self.m_ModelSkillConfiguration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
 
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 end
             end,
         }
@@ -333,7 +336,7 @@ local function initItemsSkillCategoriesForActive(self)
                 self.m_ModelSkillConfiguration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
 
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 end
             end,
         }
@@ -385,7 +388,7 @@ local function initItemsSkillLevels(self)
                     callback = function()
                         self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
                         if (self.m_View) then
-                            self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                            self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                         end
                     end,
                 }
@@ -456,7 +459,7 @@ function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
 
         local view = self.m_View
         if (view) then
-            view:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+            view:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 :setButtonSaveEnabled(true)
             for i = 1, #self.m_ItemsOverview do
                 view:setItemEnabled(i, true)
