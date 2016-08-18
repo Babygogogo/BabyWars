@@ -4,11 +4,11 @@ return {
     "ChaZuoShanMai",
     "DuiChenDaoYu",
     "GaoLaMiJia",
+    "HaiAnTuJi",
     "HuanXingShanMai",
     "HuiXingDeMaiDong",
     "JiangQi",
     "ManShouXueXing",
-    "QianTanDengLu",
     "XiaoGuoZhengBaSai",
     "YunShiQun",
 

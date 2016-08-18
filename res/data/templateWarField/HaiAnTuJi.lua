@@ -1,6 +1,6 @@
 return {
-  warFieldName = "浅 滩 登 陆",
-  authorName   = "电玩小子",
+  warFieldName = "海 岸 突 击",
+  authorName   = "Divva/电玩小子",
   playersCount = 2,
 
   width = 15,
