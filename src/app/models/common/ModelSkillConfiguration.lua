@@ -248,4 +248,13 @@ function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex,
     return modifier
 end
 
+function ModelSkillConfiguration:getMoveRangeModifier()
+    local modifier = self.m_ModelSkillGroupPassive:getMoveRangeModifier()
+    if (self.m_ActivatingSkillGroupID) then
+        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getMoveRangeModifier()
+    end
+
+    return modifier
+end
+
 return ModelSkillConfiguration

@@ -78,7 +78,8 @@ end
 --------------------------------------------------------------------------------
 function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
-    return self.m_Template.range
+    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    return math.max(1, self.m_Template.range + modelPlayer:getModelSkillConfiguration():getMoveRangeModifier())
 end
 
 function MoveDoer:getMoveType()

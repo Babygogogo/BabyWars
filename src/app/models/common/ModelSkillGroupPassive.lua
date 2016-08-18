@@ -177,4 +177,18 @@ function ModelSkillGroupPassive:getDefenseModifier(attacker, attackerGridIndex, 
     return modifier
 end
 
+function ModelSkillGroupPassive:getMoveRangeModifier()
+    local skills   = self:getAllSkills()
+    local modifier = 0
+    for i = 1, SLOTS_COUNT do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 6)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 return ModelSkillGroupPassive

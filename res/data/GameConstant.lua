@@ -697,12 +697,14 @@ GameConstant.categories = {
         "SkillCategoryAttack",
         "SkillCategoryDefense",
         "SkillCategoryCost",
+        "SkillCategoryMovement",
     },
 
     ["SkillCategoriesForActive"] = {
         "SkillCategoryAttack",
         "SkillCategoryDefense",
         "SkillCategoryCost",
+        "SkillCategoryMovement",
         "SkillCategoryInstant",
     },
 
@@ -716,6 +718,10 @@ GameConstant.categories = {
 
     ["SkillCategoryCost"] = {
         3,
+    },
+
+    ["SkillCategoryMovement"] = {
+        6,
     },
 
     ["SkillCategoryInstant"] = {
@@ -4003,8 +4009,8 @@ GameConstant.skills = {
     -- Instant: Modify HPs of all units of the currently-in-turn player.
     [4] = {
         isInstant    = true,
-        minLevel     = -9,
-        maxLevel     = 9,
+        minLevel     = -5,
+        maxLevel     = 5,
         modifierUnit = "HP",
         levels = {
             [-9] = {modifier = -9, pointsPassive = nil, pointsActive = -810},
@@ -4032,8 +4038,8 @@ GameConstant.skills = {
     -- Instant: Modify HPs of all units of the opponents.
     [5] = {
         isInstant    = true,
-        minLevel     = -9,
-        maxLevel     = 9,
+        minLevel     = -2,
+        maxLevel     = 2,
         modifierUnit = "HP",
         levels = {
             [-9] = {modifier = 9, pointsPassive = nil, pointsActive = -810},
@@ -4055,6 +4061,20 @@ GameConstant.skills = {
             [7] = {modifier = -7, pointsPassive = nil, pointsActive = 1680},
             [8] = {modifier = -8, pointsPassive = nil, pointsActive = 1840},
             [9] = {modifier = -9, pointsPassive = nil, pointsActive = 1980},
+        },
+    },
+
+    -- Modify movements of all units of the owner player.
+    [6] = {
+        minLevel     = -2,
+        maxLevel     = 2,
+        modifierUnit = "",
+        levels = {
+            [-2] = {modifier = -2, pointsPassive = -500, pointsActive = -250},
+            [-1] = {modifier = -1, pointsPassive = -200, pointsActive = -150},
+            [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0},
+            [1] = {modifier = 1, pointsPassive = 1000, pointsActive = 150},
+            [2] = {modifier = 2, pointsPassive = 2500, pointsActive = 400},
         },
     },
 }
