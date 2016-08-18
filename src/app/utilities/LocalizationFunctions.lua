@@ -170,6 +170,7 @@ local s_Texts = {
             elseif (skillID == 4) then return "改变我方全体部队的当前HP，幅度为"
             elseif (skillID == 5) then return "改变对方全体部队的当前HP，幅度为"
             elseif (skillID == 6) then return "改变我方全体部队的移动力，幅度为"
+            elseif (skillID == 7) then return "改变我方全体远程部队的射程上限，幅度为"
             else                       return "未知4:" .. (skillID or "")
             end
         end,
@@ -185,6 +186,7 @@ local s_Texts = {
             elseif (skillID == 4) then return "全军HP"
             elseif (skillID == 5) then return "对方全军HP"
             elseif (skillID == 6) then return "全军移动力"
+            elseif (skillID == 7) then return "远程部队射程"
             else                       return "未知5:" .. (skillID or "")
             end
         end,
@@ -194,21 +196,23 @@ local s_Texts = {
     },
     [6] = {
         [1] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")   then return "攻 击 类"
-            elseif (skillCategory == "SkillCategoryDefense")  then return "防 御 类"
-            elseif (skillCategory == "SkillCategoryCost")     then return "造 价 类"
-            elseif (skillCategory == "SkillCategoryMovement") then return "移 动 类"
-            elseif (skillCategory == "SkillCategoryInstant")  then return "瞬 时 类"
-            else                                                   return "未知6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")      then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryDefense")     then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryCost")        then return "造 价 类"
+            elseif (skillCategory == "SkillCategoryMovement")    then return "移 动 类"
+            elseif (skillCategory == "SkillCategoryAttackRange") then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryInstant")     then return "瞬 时 类"
+            else                                                      return "未知6:" .. (skillCategory or "")
             end
         end,
         [2] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")   then return "Attack"
-            elseif (skillCategory == "SkillCategoryDefense")  then return "Defense"
-            elseif (skillCategory == "SkillCategoryCost")     then return "Cost"
-            elseif (skillCategory == "SkillCategoryMovement") then return "Movement"
-            elseif (skillCategory == "SkillCategoryInstant")  then return "Instant"
-            else                                                   return "Unknown6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")      then return "Attack"
+            elseif (skillCategory == "SkillCategoryDefense")     then return "Defense"
+            elseif (skillCategory == "SkillCategoryCost")        then return "Cost"
+            elseif (skillCategory == "SkillCategoryMovement")    then return "Movement"
+            elseif (skillCategory == "SkillCategoryAttackRange") then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryInstant")     then return "Instant"
+            else                                                      return "Unknown6:" .. (skillCategory or "")
             end
         end,
     },

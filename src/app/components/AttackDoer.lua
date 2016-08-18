@@ -346,7 +346,15 @@ end
 
 function AttackDoer:getAttackRangeMinMax()
     -- TODO: take the player skills into account.
-    return self.m_Template.minAttackRange, self.m_Template.maxAttackRange
+    local minRange = self.m_Template.minAttackRange
+    local maxRange = self.m_Template.maxAttackRange
+    if (maxRange <= 1) then
+        return minRange, maxRange
+    else
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        return minRange,
+            math.max(minRange, maxRange + modelPlayer:getModelSkillConfiguration():getAttackRangeModifier())
+    end
 end
 
 function AttackDoer:canAttackAfterMove()

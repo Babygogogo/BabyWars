@@ -257,4 +257,13 @@ function ModelSkillConfiguration:getMoveRangeModifier()
     return modifier
 end
 
+function ModelSkillConfiguration:getAttackRangeModifier()
+    local modifier = self.m_ModelSkillGroupPassive:getAttackRangeModifier()
+    if (self.m_ActivatingSkillGroupID) then
+        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getAttackRangeModifier()
+    end
+
+    return modifier
+end
+
 return ModelSkillConfiguration
