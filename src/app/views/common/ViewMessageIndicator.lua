@@ -49,6 +49,12 @@ local function initPersistentLabels(self)
     labels.m_Container = cc.Node:create()
     labels.m_Container:ignoreAnchorPointForPosition(true)
         :setPosition(CONTAINER_POS_X, CONTAINER_POS_Y)
+        :setCascadeOpacityEnabled(true)
+        :runAction(cc.RepeatForever:create(cc.Sequence:create(
+            cc.DelayTime:create(2),
+            cc.FadeOut:create(1),
+            cc.FadeIn:create(1)
+        )))
 
     labels.removeMessage = function(self, msg)
         for i, label in ipairs(self) do

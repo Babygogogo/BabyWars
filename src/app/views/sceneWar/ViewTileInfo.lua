@@ -12,8 +12,9 @@ local BACKGROUND_Z_ORDER = 0
 
 local GRID_SIZE = GameConstantFunctions.getGridSize()
 
-local BACKGROUND_WIDTH  = 75
-local BACKGROUND_HEIGHT = 130
+local BACKGROUND_WIDTH     = 75
+local BACKGROUND_HEIGHT    = 130
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 local LEFT_POS_X  = 10
 local LEFT_POS_Y  = 10
@@ -100,28 +101,31 @@ local function moveToRightSide(self)
     self:setPosition(RIGHT_POS_X, RIGHT_POS_Y)
 end
 
+local function resetBackground(background, playerIndex)
+    background:loadTextureNormal("c03_t01_s0" .. playerIndex .. "_f01.png", ccui.TextureResType.plistType)
+        :ignoreAnchorPointForPosition(true)
+
+        :setScale9Enabled(true)
+        :setCapInsets(BACKGROUND_CAPINSETS)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(200)
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initBackground(self)
     local background = ccui.Button:create()
-    background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-
-        :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
-        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-
-        :setZoomScale(-0.05)
-        :setOpacity(200)
-        :ignoreAnchorPointForPosition(true)
-
-        :addTouchEventListener(function(sender, eventType)
+    background:addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 if (self.m_Model) then
                     self.m_Model:onPlayerTouch()
                 end
             end
         end)
+    resetBackground(background, 1)
 
     self.m_Background = background
     self:addChild(background, BACKGROUND_Z_ORDER)
@@ -285,6 +289,12 @@ function ViewTileInfo:updateWithModelTile(modelTile)
     updateDefenseInfoWithModelTile(self, modelTile)
     updateCaptureInfoWithModelTile(self, modelTile)
     updateHPInfoWithModelTile(     self, modelTile)
+
+    return self
+end
+
+function ViewTileInfo:updateWithPlayerIndex(playerIndex)
+    resetBackground(self.m_Background, playerIndex)
 
     return self
 end

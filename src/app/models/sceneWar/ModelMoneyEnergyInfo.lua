@@ -19,6 +19,7 @@ local function onEvtPlayerIndexUpdated(self, event)
 
     if (self.m_View) then
         self.m_View:updateWithModelPlayer(event.modelPlayer)
+            :updateWithPlayerIndex(event.playerIndex)
     end
 end
 

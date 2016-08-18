@@ -57,6 +57,18 @@ local function createLabel(posX, posY, width, height)
     return label
 end
 
+local function resetBackground(background, playerIndex)
+    background:loadTextureNormal("c03_t01_s0" .. playerIndex .. "_f01.png", ccui.TextureResType.plistType)
+        :ignoreAnchorPointForPosition(true)
+
+        :setScale9Enabled(true)
+        :setCapInsets(BACKGROUND_CAPINSETS)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(200)
+end
+
 --------------------------------------------------------------------------------
 -- The functions that adjust the position of the view.
 --------------------------------------------------------------------------------
@@ -73,21 +85,12 @@ end
 --------------------------------------------------------------------------------
 local function initBackground(self)
     local background = ccui.Button:create()
-    background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-        :ignoreAnchorPointForPosition(true)
-
-        :setScale9Enabled(true)
-        :setCapInsets(BACKGROUND_CAPINSETS)
-        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-
-        :setZoomScale(-0.05)
-        :setOpacity(200)
-
-        :addTouchEventListener(function(sender, eventType)
+    background:addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
                 self.m_Model:onPlayerTouch()
             end
         end)
+    resetBackground(background, 1)
 
     self.m_Background = background
     self:addChild(background, BACKGROUND_Z_ORDER)
@@ -152,6 +155,12 @@ function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
     local energy, req1, req2 = modelPlayer:getEnergy()
     self.m_LabelEnergy:setString(getLocalizedText(64, string.format("%.2f/%s/%s",
         energy, "" .. (req1 or "--"), "" .. (req2 or "--"))))
+
+    return self
+end
+
+function ViewMoneyEnergyInfo:updateWithPlayerIndex(playerIndex)
+    resetBackground(self.m_Background, playerIndex)
 
     return self
 end

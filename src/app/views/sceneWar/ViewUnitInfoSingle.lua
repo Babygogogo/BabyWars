@@ -11,8 +11,9 @@ local UNIT_ICON_Z_ORDER  = 1
 local INFO_ICON_Z_ORDER  = 0
 local BACKGROUND_Z_ORDER = 0
 
-local BACKGROUND_WIDTH  = 75
-local BACKGROUND_HEIGHT = 130
+local BACKGROUND_WIDTH     = 75
+local BACKGROUND_HEIGHT    = 130
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 local GRID_SIZE       = GameConstantFunctions.getGridSize()
 local UNIT_ICON_SCALE = 0.5
@@ -87,21 +88,24 @@ local function createInfoLabel(posX, posY)
     return label
 end
 
+local function resetBackground(background, playerIndex)
+    background:loadTextureNormal("c03_t01_s0" .. playerIndex .. "_f01.png", ccui.TextureResType.plistType)
+        :ignoreAnchorPointForPosition(true)
+
+        :setScale9Enabled(true)
+        :setCapInsets(BACKGROUND_CAPINSETS)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(200)
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initBackground(self)
     local background = ccui.Button:create()
-    background:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
-
-        :ignoreAnchorPointForPosition(true)
-
-        :setScale9Enabled(true)
-        :setCapInsets({x = 4, y = 6, width = 1, height = 1})
-        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-
-        :setOpacity(200)
-        :setZoomScale(-0.05)
+    resetBackground(background, 1)
 
     self.m_Background = background
     self:addChild(background, BACKGROUND_Z_ORDER)
@@ -267,6 +271,12 @@ function ViewUnitInfoSingle:updateWithModelUnit(modelUnit)
     updateFuelInfoWithModelUnit(    self, modelUnit)
     updateAmmoInfoWithModelUnit(    self, modelUnit)
     updateMaterialInfoWithModelUnit(self, modelUnit)
+
+    return self
+end
+
+function ViewUnitInfoSingle:updateWithPlayerIndex(playerIndex)
+    resetBackground(self.m_Background, playerIndex)
 
     return self
 end

@@ -66,6 +66,12 @@ local function onEvtWarCommandMenuDeactivated(self, event)
     end
 end
 
+local function onEvtPlayerIndexUpdated(self, event)
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(event.playerIndex)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
@@ -101,6 +107,7 @@ function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtTurnPhaseMain",             self)
         :addEventListener("EvtWarCommandMenuActivated",   self)
         :addEventListener("EvtWarCommandMenuDeactivated", self)
+        :addEventListener("EvtPlayerIndexUpdated",        self)
 
     return self
 end
@@ -108,12 +115,13 @@ end
 function ModelTileInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuDeactivated", self)
-        :removeEventListener("EvtWarCommandMenuActivated", self)
-        :removeEventListener("EvtTurnPhaseMain",           self)
-        :removeEventListener("EvtGridSelected",            self)
-        :removeEventListener("EvtMapCursorMoved",          self)
-        :removeEventListener("EvtModelTileMapUpdated",     self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
+        :removeEventListener("EvtWarCommandMenuDeactivated", self)
+        :removeEventListener("EvtWarCommandMenuActivated",   self)
+        :removeEventListener("EvtTurnPhaseMain",             self)
+        :removeEventListener("EvtGridSelected",              self)
+        :removeEventListener("EvtMapCursorMoved",            self)
+        :removeEventListener("EvtModelTileMapUpdated",       self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -130,6 +138,7 @@ function ModelTileInfo:onEvent(event)
     elseif (eventName == "EvtTurnPhaseMain")             then onEvtTurnPhaseMain(            self, event)
     elseif (eventName == "EvtWarCommandMenuActivated")   then onEvtWarCommandMenuActivated(  self, event)
     elseif (eventName == "EvtWarCommandMenuDeactivated") then onEvtWarCommandMenuDeactivated(self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")        then onEvtPlayerIndexUpdated(       self, event)
     end
 
     return self

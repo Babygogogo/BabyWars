@@ -63,6 +63,12 @@ local function onEvtWarCommandMenuDectivated(self, event)
     updateWithModelUnitMap(self)
 end
 
+local function onEvtPlayerIndexUpdated(self, event)
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(event.playerIndex)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -98,6 +104,7 @@ function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtMapCursorMoved",            self)
         :addEventListener("EvtWarCommandMenuActivated",   self)
         :addEventListener("EvtWarCommandMenuDeactivated", self)
+        :addEventListener("EvtPlayerIndexUpdated",        self)
 
     return self
 end
@@ -105,12 +112,13 @@ end
 function ModelUnitInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuDeactivated", self)
-        :removeEventListener("EvtWarCommandMenuActivated", self)
-        :removeEventListener("EvtMapCursorMoved",          self)
-        :removeEventListener("EvtGridSelected",            self)
-        :removeEventListener("EvtTurnPhaseMain",           self)
-        :removeEventListener("EvtModelUnitMapUpdated",     self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
+        :removeEventListener("EvtWarCommandMenuDeactivated", self)
+        :removeEventListener("EvtWarCommandMenuActivated",   self)
+        :removeEventListener("EvtMapCursorMoved",            self)
+        :removeEventListener("EvtGridSelected",              self)
+        :removeEventListener("EvtTurnPhaseMain",             self)
+        :removeEventListener("EvtModelUnitMapUpdated",       self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -121,12 +129,13 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelUnitMapUpdated") then onEvtModelUnitMapUpdated(           self, event)
-    elseif (eventName == "EvtTurnPhaseMain")       then onEvtTurnPhaseMain(                 self, event)
-    elseif (eventName == "EvtGridSelected")        then onEvtGridSelected(                  self, event)
-    elseif (eventName == "EvtMapCursorMoved")      then onEvtMapCursorMoved(                self, event)
-    elseif (eventName == "EvtWarCommandMenuActivated") then onEvtWarCommandMenuActivated(   self, event)
+    if     (eventName == "EvtModelUnitMapUpdated")       then onEvtModelUnitMapUpdated(     self, event)
+    elseif (eventName == "EvtTurnPhaseMain")             then onEvtTurnPhaseMain(           self, event)
+    elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(            self, event)
+    elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(          self, event)
+    elseif (eventName == "EvtWarCommandMenuActivated")   then onEvtWarCommandMenuActivated( self, event)
     elseif (eventName == "EvtWarCommandMenuDeactivated") then onEvtWarCommandMenuDectivated(self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")        then onEvtPlayerIndexUpdated(      self, event)
     end
 
     return self

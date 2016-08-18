@@ -21,7 +21,7 @@ local AUTHOR_NAME_LABEL_POS_Y         = CLIPPING_NODE_POS_Y
 local AUTHOR_NAME_LABEL_WIDTH         = CLIPPING_NODE_WIDTH
 local AUTHOR_NAME_LABEL_HEIGHT        = CLIPPING_NODE_HEIGHT
 local AUTHOR_NAME_LABEL_FONT_NAME     = "res/fonts/msyhbd.ttc"
-local AUTHOR_NAME_LABEL_FONT_SIZE     = 25
+local AUTHOR_NAME_LABEL_FONT_SIZE     = 20
 local AUTHOR_NAME_LABEL_FONT_COLOR    = {r = 255, g = 255, b = 255}
 local AUTHOR_NAME_LABEL_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local AUTHOR_NAME_LABEL_OUTLINE_WIDTH = 2
@@ -117,6 +117,12 @@ end
 
 function ViewWarFieldPreviewer:setAuthorName(name)
     self.m_LabelAuthorName:setString(LocalizationFunctions.getLocalizedText(48) .. name)
+        :stopAllActions()
+        :setOpacity(255)
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(3),
+            cc.FadeOut:create(1)
+        ))
 
     return self
 end
