@@ -15,10 +15,11 @@
 
 local AttackDoer = require("src.global.functions.class")("AttackDoer")
 
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 local COMMAND_TOWER_ATTACK_BONUS = GameConstantFunctions.getCommandTowerAttackBonus()
 
@@ -110,7 +111,7 @@ local function getAttackBonusMultiplier(self, attackerGridIndex, target, targetG
 
     local modelWeatherManager = self.m_ModelWeatherManager
     local modelPlayerManager  = self.m_ModelPlayerManager
-    bonus = bonus + modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration():getAttackModifier(
+    bonus = bonus + SkillModifierFunctions.getAttackModifier(modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration(),
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     -- TODO: take the skills of the opponent into account.
 
@@ -134,7 +135,7 @@ local function getDefenseBonusMultiplier(self, attackerGridIndex, target, target
     local modelPlayerManager  = self.m_ModelPlayerManager
     local attacker            = self.m_Owner
     local targetPlayerIndex   = target:getPlayerIndex()
-    bonus = bonus + modelPlayerManager:getModelPlayer(targetPlayerIndex):getModelSkillConfiguration():getDefenseModifier(
+    bonus = bonus + SkillModifierFunctions.getDefenseModifier(modelPlayerManager:getModelPlayer(targetPlayerIndex):getModelSkillConfiguration(),
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     -- TODO: take the skills of the opponent into account.
 

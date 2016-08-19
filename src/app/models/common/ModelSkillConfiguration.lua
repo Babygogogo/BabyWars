@@ -186,6 +186,15 @@ function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     return self
 end
 
+function ModelSkillConfiguration:getActivatingModelSkillGroup()
+    local id = self.m_ActivatingSkillGroupID
+    if (not id) then
+        return nil
+    else
+        return getModelSkillGroupWithId(id)
+    end
+end
+
 function ModelSkillConfiguration:setMaxSkillPoints(points)
     assert((points >= MIN_POINTS) and (points <= MAX_POINTS) and ((points - MIN_POINTS) % POINTS_PER_STEP == 0))
 
@@ -221,28 +230,6 @@ function ModelSkillConfiguration:getProductionCostModifier(tiledID)
     local modifier = self.m_ModelSkillGroupPassive:getProductionCostModifier(tiledID)
     if (self.m_ActivatingSkillGroupID) then
         modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getProductionCostModifier(tiledID)
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelSkillGroupPassive:getAttackModifier(
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getAttackModifier(
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelSkillGroupPassive:getDefenseModifier(
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getDefenseModifier(
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     end
 
     return modifier

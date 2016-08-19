@@ -184,36 +184,6 @@ function ModelSkillGroupActive:getProductionCostModifier(tiledID)
     return modifier
 end
 
-function ModelSkillGroupActive:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local slots    = self.m_Slots
-    local modifier = 0
-
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if ((skill)          and
-            (skill.id == 1)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
-        end
-    end
-
-    return modifier
-end
-
-function ModelSkillGroupActive:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local slots    = self.m_Slots
-    local modifier = 0
-
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if ((skill)          and
-            (skill.id == 2)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
-        end
-    end
-
-    return modifier
-end
-
 function ModelSkillGroupActive:getMoveRangeModifier()
     local skills   = self:getAllSkills()
     local modifier = 0
