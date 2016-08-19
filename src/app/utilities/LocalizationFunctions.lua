@@ -64,6 +64,7 @@ local s_Texts = {
             elseif (textType == "JoinWar")      then return "参 战"
             elseif (textType == "ConfigSkills") then return "配 置 技 能"
             elseif (textType == "Login")        then return "注 册 / 登 陆"
+            elseif (textType == "SetMusic")     then return "开 / 关 音 乐"
             elseif (textType == "Help")         then return "帮 助"
             elseif (textType == "Save")         then return "保 存"
             elseif (textType == "Back")         then return "返 回"
@@ -72,7 +73,7 @@ local s_Texts = {
             elseif (textType == "GameFlow")     then return "游 戏 流 程"
             elseif (textType == "WarControl")   then return "战 局 操 作"
             elseif (textType == "About")        then return "关 于 本 作"
-            else                                     return "未知[1]: " .. (textType or "")
+            else                                     return "未知1:" .. (textType or "")
             end
         end,
         [2] = function(textType)
@@ -82,6 +83,7 @@ local s_Texts = {
             elseif (textType == "JoinWar")      then return "Join"
             elseif (textType == "ConfigSkills") then return "Config Skills"
             elseif (textType == "Login")        then return "Login"
+            elseif (textType == "SetMusic")     then return "Set Music"
             elseif (textType == "Help")         then return "Help"
             elseif (textType == "Save")         then return "Save"
             elseif (textType == "Back")         then return "Back"
@@ -90,7 +92,7 @@ local s_Texts = {
             elseif (textType == "GameFlow")     then return "Game Flow"
             elseif (textType == "WarControl")   then return "Controlling"
             elseif (textType == "About")        then return "About"
-            else                                     return "Unknown[1]: " .. (textType or "")
+            else                                     return "Unknown1:" .. (textType or "")
             end
         end,
     },

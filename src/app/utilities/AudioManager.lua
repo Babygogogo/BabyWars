@@ -11,6 +11,7 @@ local WAR_BGM_LIST = {
 }
 
 local s_IsInitialized = false
+local s_IsEnabled     = true
 local playMusic       = audio.playMusic
 
 --------------------------------------------------------------------------------
@@ -41,20 +42,40 @@ function AudioManager.init()
     return AudioManager
 end
 
+function AudioManager.isEnabled()
+    return s_IsEnabled
+end
+
+function AudioManager.setEnabled(enabled)
+    s_IsEnabled = enabled
+    if (not enabled) then
+        audio.stopMusic(false)
+        audio.stopAllSounds()
+    end
+
+    return AudioManager
+end
+
 function AudioManager.playMainMusic()
-    playMusic(MAIN_BGM)
+    if (AudioManager.isEnabled()) then
+        playMusic(MAIN_BGM)
+    end
 
     return AudioManager
 end
 
 function AudioManager.playRandomWarMusic()
-    playMusic(WAR_BGM_LIST[math.random(#WAR_BGM_LIST)])
+    if (AudioManager.isEnabled()) then
+        playMusic(WAR_BGM_LIST[math.random(#WAR_BGM_LIST)])
+    end
 
     return AudioManager
 end
 
 function AudioManager.playPowerMusic()
-    playMusic(POWER_BGM)
+    if (AudioManager.isEnabled()) then
+        playMusic(POWER_BGM)
+    end
 
     return AudioManager
 end

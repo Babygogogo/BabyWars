@@ -18,6 +18,7 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
+local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
@@ -223,6 +224,21 @@ local function initItemHideUI(self)
     self.m_ItemHideUI = item
 end
 
+local function initItemSetMusic(self)
+    local item = {
+        name     = getLocalizedText(1, "SetMusic"),
+        callback = function()
+            local isEnabled = not AudioManager.isEnabled()
+            AudioManager.setEnabled(isEnabled)
+            if (isEnabled) then
+                AudioManager.playRandomWarMusic()
+            end
+        end,
+    }
+
+    self.m_ItemSetMusic = item
+end
+
 local function initItemReload(self)
     local item = {
         name     = getLocalizedText(65, "ReloadWar"),
@@ -285,6 +301,7 @@ local function getAvailableItems(self)
         self.m_ItemWarInfo,
         self.m_ItemSkillInfo,
         self.m_ItemHideUI,
+        self.m_ItemSetMusic,
     }
 
     local shouldAddActionItems = (self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)
@@ -320,6 +337,7 @@ function ModelWarCommandMenu:ctor(param)
     initItemActivateSkill1(self)
     initItemActivateSkill2(self)
     initItemHideUI(        self)
+    initItemSetMusic(      self)
     initItemReload(        self)
     initItemSurrender(     self)
     initItemEndTurn(       self)
