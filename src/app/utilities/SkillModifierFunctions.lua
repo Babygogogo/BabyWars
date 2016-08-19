@@ -65,6 +65,8 @@ local function getProductionCostModifierForSkillGroup(modelSkillGroup, slotsCoun
             modifier = modifier + getSkillModifier(skill.id, skill.level)
         end
     end
+
+    return modifier
 end
 
 local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
