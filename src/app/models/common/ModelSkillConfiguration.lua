@@ -37,15 +37,17 @@ local function resetMaxSkillPoints(self)
     local skillActive2     = self.m_ModelSkillGroupActive2
     local isEnabledActive1 = skillActive1:isEnabled()
     local isEnabledActive2 = skillActive2:isEnabled()
+    local maxPoints        = self:getMaxSkillPoints()
 
     local extraPointsForPassive = 0
-    if (not isEnabledActive1) then extraPointsForPassive = extraPointsForPassive + 50 end
-    if (not isEnabledActive2) then extraPointsForPassive = extraPointsForPassive + 50 end
+    if (not isEnabledActive1) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
+    if (not isEnabledActive2) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
 
-    local totalPointsForPassive = self:getMaxSkillPoints() + extraPointsForPassive
+    local totalPointsForPassive = maxPoints + extraPointsForPassive
     skillPassive:setMaxSkillPoints(totalPointsForPassive)
 
     local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()))
+    extraPointsForActive       = math.min(extraPointsForActive, totalPointsForPassive)
     if (isEnabledActive1) then
         local basePoints = skillActive1:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
         skillActive1:setMaxSkillPoints(basePoints + extraPointsForActive)
