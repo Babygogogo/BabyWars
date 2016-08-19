@@ -15,13 +15,14 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
+local AudioManager           = require("src.app.utilities.AudioManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
@@ -209,6 +210,12 @@ function ModelSceneMain:initView()
         :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
 
         :setGameVersion(GameConstantFunctions.getGameVersion())
+
+    return self
+end
+
+function ModelSceneMain:onStartRunning()
+    AudioManager.playMainMusic()
 
     return self
 end

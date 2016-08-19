@@ -25,10 +25,11 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local AudioManager           = require("src.app.utilities.AudioManager")
 local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
@@ -494,6 +495,7 @@ function ModelSceneWar:onStartRunning()
         })
 
     modelTurnManager:runTurn()
+    AudioManager.playRandomWarMusic()
 
     return self
 end
