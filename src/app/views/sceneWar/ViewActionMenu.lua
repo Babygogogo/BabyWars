@@ -217,15 +217,18 @@ local function adjustPositionOnShowingList(self, isShowingActionList)
     end
 end
 
+local function resetBackground(background, playerIndex)
+    background:initWithSpriteFrameName("c03_t01_s0" .. playerIndex .. "_f01.png", MENU_BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setOpacity(200)
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initMenuBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", MENU_BACKGROUND_CAPINSETS)
-    background:ignoreAnchorPointForPosition(true)
-        :setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
-
-        :setOpacity(200)
+    resetBackground(background, 1)
 
     self.m_MenuBackground = background
     self:addChild(background)
@@ -300,6 +303,12 @@ function ViewActionMenu:adjustPositionOnTouch(touch)
     else
         moveToRightSide(self)
     end
+
+    return self
+end
+
+function ViewActionMenu:updateWithPlayerIndex(playerIndex)
+    resetBackground(self.m_MenuBackground, playerIndex)
 
     return self
 end

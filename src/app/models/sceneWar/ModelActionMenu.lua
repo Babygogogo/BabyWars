@@ -14,6 +14,12 @@ local ModelActionMenu = class("ModelActionMenu")
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtPlayerIndexUpdated(self, event)
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(event.playerIndex)
+    end
+end
+
 local function onEvtActionPlannerChoosingAction(self, event)
     self:setEnabled(true)
 
@@ -43,7 +49,8 @@ function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelActionMenu:setRootScriptEventDispatcher() the dispatcher has been set already.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtActionPlannerIdle",               self)
+    dispatcher:addEventListener("EvtPlayerIndexUpdated",              self)
+        :addEventListener("EvtActionPlannerIdle",                     self)
         :addEventListener("EvtActionPlannerChoosingProductionTarget", self)
         :addEventListener("EvtActionPlannerMakingMovePath",           self)
         :addEventListener("EvtActionPlannerChoosingAction",           self)
@@ -64,6 +71,7 @@ function ModelActionMenu:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtActionPlannerMakingMovePath",           self)
         :removeEventListener("EvtActionPlannerChoosingProductionTarget", self)
         :removeEventListener("EvtActionPlannerIdle",                     self)
+        :removeEventListener("EvtPlayerIndexUpdated",                    self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -74,7 +82,8 @@ end
 --------------------------------------------------------------------------------
 function ModelActionMenu:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtActionPlannerIdle")                     then self:setEnabled(false)
+    if     (eventName == "EvtPlayerIndexUpdated")                    then onEvtPlayerIndexUpdated(self, event)
+    elseif (eventName == "EvtActionPlannerIdle")                     then self:setEnabled(false)
     elseif (eventName == "EvtActionPlannerMakingMovePath")           then self:setEnabled(false)
     elseif (eventName == "EvtActionPlannerChoosingAttackTarget")     then self:setEnabled(false)
     elseif (eventName == "EvtActionPlannerChoosingDropDestination")  then self:setEnabled(false)
