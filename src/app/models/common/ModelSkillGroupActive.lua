@@ -169,47 +169,4 @@ function ModelSkillGroupActive:clearSkill(slotIndex)
     return self
 end
 
-function ModelSkillGroupActive:getProductionCostModifier(tiledID)
-    local slots    = self.m_Slots
-    local modifier = 0
-
-    for i = 1, SLOTS_COUNT do
-        local skill = slots[i]
-        if ((skill)          and
-            (skill.id == 3)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
-        end
-    end
-
-    return modifier
-end
-
-function ModelSkillGroupActive:getMoveRangeModifier()
-    local skills   = self:getAllSkills()
-    local modifier = 0
-    for i = 1, SLOTS_COUNT do
-        local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 6)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
-        end
-    end
-
-    return modifier
-end
-
-function ModelSkillGroupActive:getAttackRangeModifier()
-    local skills   = self:getAllSkills()
-    local modifier = 0
-    for i = 1, SLOTS_COUNT do
-        local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 7)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
-        end
-    end
-
-    return modifier
-end
-
 return ModelSkillGroupActive

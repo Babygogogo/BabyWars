@@ -191,7 +191,7 @@ function ModelSkillConfiguration:getActivatingModelSkillGroup()
     if (not id) then
         return nil
     else
-        return getModelSkillGroupWithId(id)
+        return getModelSkillGroupWithId(self, id)
     end
 end
 
@@ -224,33 +224,6 @@ function ModelSkillConfiguration:clearSkill(skillGroupID, slotIndex)
     resetMaxSkillPoints(self)
 
     return self
-end
-
-function ModelSkillConfiguration:getProductionCostModifier(tiledID)
-    local modifier = self.m_ModelSkillGroupPassive:getProductionCostModifier(tiledID)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getProductionCostModifier(tiledID)
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getMoveRangeModifier()
-    local modifier = self.m_ModelSkillGroupPassive:getMoveRangeModifier()
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getMoveRangeModifier()
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getAttackRangeModifier()
-    local modifier = self.m_ModelSkillGroupPassive:getAttackRangeModifier()
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getAttackRangeModifier()
-    end
-
-    return modifier
 end
 
 return ModelSkillConfiguration

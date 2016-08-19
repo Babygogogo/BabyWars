@@ -354,7 +354,7 @@ function AttackDoer:getAttackRangeMinMax()
     else
         local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
         return minRange,
-            math.max(minRange, maxRange + modelPlayer:getModelSkillConfiguration():getAttackRangeModifier())
+            math.max(minRange, maxRange + SkillModifierFunctions.getAttackRangeModifier(modelPlayer:getModelSkillConfiguration()))
     end
 end
 

@@ -1,7 +1,8 @@
 
 local Producible = require("src.global.functions.class")("Producible")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
 Producible.EXPORTED_METHODS = {
     "getProductionCost",
@@ -19,7 +20,7 @@ end
 --------------------------------------------------------------------------------
 function Producible.getProductionCostWithTiledId(tiledID, modelPlayerManager)
     local playerIndex = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
-    local modifier    = modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration():getProductionCostModifier()
+    local modifier    = SkillModifierFunctions.getProductionCostModifier(modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration())
     -- TODO: take the skills of the opponents into account.
 
     local baseCost = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).Producible.productionCost

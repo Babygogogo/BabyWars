@@ -13,9 +13,10 @@
 
 local MoveDoer = require("src.global.functions.class")("MoveDoer")
 
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 local MOVE_TYPES = require("res.data.GameConstant").moveTypes
 
@@ -79,7 +80,7 @@ end
 function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
     local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
-    return math.max(1, self.m_Template.range + modelPlayer:getModelSkillConfiguration():getMoveRangeModifier())
+    return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration()))
 end
 
 function MoveDoer:getMoveType()
