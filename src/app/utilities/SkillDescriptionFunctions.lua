@@ -85,6 +85,10 @@ local function getDescriptionForSkillGroup(skillGroup, skillGroupID)
             getLocalizedText(3, "MaxPoints"),   skillGroup:getMaxSkillPoints()
         )
     }
+    if (not isPassive) then
+        descriptions[#descriptions + 1] = string.format("%s:   %d",
+            getLocalizedText(3, "EnergyRequirement"), skillGroup:getEnergyRequirement())
+    end
 
     local slotsCount = (isPassive) and (PASSIVE_SLOTS_COUNT) or (ACTIVE_SLOTS_COUNT)
     local skills     = skillGroup:getAllSkills()
