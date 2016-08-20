@@ -1,9 +1,11 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 
+local GAME_VERSION      = GameConstantFunctions.getGameVersion()
 local WRITABLE_PATH     = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/"
 local ACCOUNT_FILE_PATH = WRITABLE_PATH  .. "LoggedInAccount.lua"
 
@@ -119,6 +121,7 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
                 self.m_RootScriptEventDispatcher:dispatchEvent({
                     name       = "EvtPlayerRequestDoAction",
                     actionName = "Register",
+                    version    = GAME_VERSION,
                     account    = account,
                     password   = password
                 })
@@ -143,6 +146,7 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
         self.m_RootScriptEventDispatcher:dispatchEvent({
             name       = "EvtPlayerRequestDoAction",
             actionName = "Login",
+            version    = GAME_VERSION,
             account    = account,
             password   = password
         })
