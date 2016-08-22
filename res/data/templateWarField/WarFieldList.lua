@@ -1,5 +1,6 @@
 
 return {
+    "BeiZhong",
     "BiFengGang",
     "ChaZuoShanMai",
     "DuiChenDaoYu",
