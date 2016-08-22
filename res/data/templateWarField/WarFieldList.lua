@@ -9,6 +9,7 @@ return {
     "HuiXingDeMaiDong",
     "JiangQi",
     "ManShouXueXing",
+    "SanHeGu",
     "TanXinWan",
     "XiaoGuoZhengBaSai",
     "YunShiQun",

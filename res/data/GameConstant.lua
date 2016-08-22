@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.0.7"
+GameConstant.version = "0.1.6.0.8"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -741,7 +741,7 @@ GameConstant.maxBuildPoint           = 20
 GameConstant.unitMaxHP               = 100
 GameConstant.tileMaxHP               = 99
 GameConstant.incomePerTurn           = 1000
-GameConstant.commandTowerAttackBonus = 8
+GameConstant.commandTowerAttackBonus = 10
 
 GameConstant.maxPromotion   = 3
 GameConstant.promotionBonus = {
@@ -3394,7 +3394,7 @@ GameConstant.templateModelUnits = {
         },
 
         MoveDoer = {
-            range    = 5,
+            range    = 6,
             type     = "Ship",
         },
 
