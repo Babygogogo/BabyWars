@@ -17,6 +17,10 @@ local function modifyModelUnitHp(modelUnit, modifier)
         :updateView()
 end
 
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
 --------------------------------------------------------------------------------
 -- The functions for executing instant skills.
 --------------------------------------------------------------------------------
@@ -57,6 +61,23 @@ s_Executors.execute8 = function(level, modelWarField, modelPlayerManager, modelT
         if ((modelUnit:getPlayerIndex() == playerIndex)                                             and
             (not GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "InfantryUnits"))) then
             modelUnit:setStateIdle()
+                :updateView()
+        end
+    end
+
+    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
+s_Executors.execute9 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local baseModifier = getSkillModifier(9, level)
+    local modifier     = (baseModifier >= 0) and ((100 + baseModifier) / 100) or (100 / (100 - baseModifier))
+    local func         = function(modelUnit)
+        if (modelUnit:getPlayerIndex() ~= playerIndex) then
+            modelUnit:setCurrentFuel(math.min(modelUnit:getMaxFuel(), round(modelUnit:getCurrentFuel() * modifier)))
                 :updateView()
         end
     end

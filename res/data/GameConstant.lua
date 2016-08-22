@@ -747,6 +747,7 @@ GameConstant.categories = {
         4,
         5,
         8,
+        9,
     },
 }
 
@@ -4095,8 +4096,8 @@ GameConstant.skills = {
             [-1] = {modifier = -1, pointsPassive = -500, pointsActive = -75, minEnergy = 1},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 800, pointsActive = 150, minEnergy = 2},
-            [2] = {modifier = 2, pointsPassive = 1700, pointsActive = 400, minEnergy = 4},
-            [3] = {modifier = 3, pointsPassive = 2700, pointsActive = 750, minEnergy = 6},
+            [2] = {modifier = 2, pointsPassive = 1700, pointsActive = 350, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = 2700, pointsActive = 600, minEnergy = 6},
         },
     },
 
@@ -4124,6 +4125,46 @@ GameConstant.skills = {
             [1] = {modifier = nil, pointsPassive = nil, pointsActive = 700, minEnergy = 8},
         },
     },
+
+    -- Instant: Modify the fuel of the opponents' units.
+    [9] = {
+        minLevel     = -15,
+        maxLevel     = 15,
+        modifierUnit = "%",
+        levels       = {
+            [-15] = {modifier = 150, pointsPassive = nil, pointsActive = -45, minEnergy = 8},
+            [-14] = {modifier = 140, pointsPassive = nil, pointsActive = -42, minEnergy = 7},
+            [-13] = {modifier = 130, pointsPassive = nil, pointsActive = -39, minEnergy = 7},
+            [-12] = {modifier = 120, pointsPassive = nil, pointsActive = -36, minEnergy = 6},
+            [-11] = {modifier = 110, pointsPassive = nil, pointsActive = -33, minEnergy = 6},
+            [-10] = {modifier = 100, pointsPassive = nil, pointsActive = -30, minEnergy = 5},
+            [-9] = {modifier = 90, pointsPassive = nil, pointsActive = -27, minEnergy = 5},
+            [-8] = {modifier = 80, pointsPassive = nil, pointsActive = -24, minEnergy = 4},
+            [-7] = {modifier = 70, pointsPassive = nil, pointsActive = -21, minEnergy = 4},
+            [-6] = {modifier = 60, pointsPassive = nil, pointsActive = -18, minEnergy = 3},
+            [-5] = {modifier = 50, pointsPassive = nil, pointsActive = -15, minEnergy = 3},
+            [-4] = {modifier = 40, pointsPassive = nil, pointsActive = -12, minEnergy = 2},
+            [-3] = {modifier = 30, pointsPassive = nil, pointsActive = -9, minEnergy = 2},
+            [-2] = {modifier = 20, pointsPassive = nil, pointsActive = -6, minEnergy = 1},
+            [-1] = {modifier = 10, pointsPassive = nil, pointsActive = -3, minEnergy = 1},
+            [0] = {modifier = 0, pointsPassive = nil, pointsActive = 0, minEnergy = 0},
+            [1] = {modifier = -10, pointsPassive = nil, pointsActive = 15, minEnergy = 1},
+            [2] = {modifier = -20, pointsPassive = nil, pointsActive = 30, minEnergy = 1},
+            [3] = {modifier = -30, pointsPassive = nil, pointsActive = 45, minEnergy = 2},
+            [4] = {modifier = -40, pointsPassive = nil, pointsActive = 60, minEnergy = 2},
+            [5] = {modifier = -50, pointsPassive = nil, pointsActive = 75, minEnergy = 3},
+            [6] = {modifier = -60, pointsPassive = nil, pointsActive = 90, minEnergy = 3},
+            [7] = {modifier = -70, pointsPassive = nil, pointsActive = 105, minEnergy = 4},
+            [8] = {modifier = -80, pointsPassive = nil, pointsActive = 120, minEnergy = 4},
+            [9] = {modifier = -90, pointsPassive = nil, pointsActive = 135, minEnergy = 5},
+            [10] = {modifier = -100, pointsPassive = nil, pointsActive = 150, minEnergy = 5},
+            [11] = {modifier = -110, pointsPassive = nil, pointsActive = 165, minEnergy = 6},
+            [12] = {modifier = -120, pointsPassive = nil, pointsActive = 180, minEnergy = 6},
+            [13] = {modifier = -130, pointsPassive = nil, pointsActive = 195, minEnergy = 7},
+            [14] = {modifier = -140, pointsPassive = nil, pointsActive = 210, minEnergy = 7},
+            [15] = {modifier = -150, pointsPassive = nil, pointsActive = 225, minEnergy = 8},
+        },
+    }
 }
 
 return GameConstant
