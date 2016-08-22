@@ -39,7 +39,7 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
         if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
             return nil
         else
-            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType())
+            return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(modelUnit)
         end
     end
 end
@@ -77,17 +77,16 @@ local function isDropGridSelected(gridIndex, selectedDropDestinations)
 end
 
 local function getAvailableDropGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations)
-    local moveType = droppingModelUnit:getMoveType()
-    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCost(moveType)) then
+    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCostWithModelUnit(droppingModelUnit)) then
         return {}
     end
 
-    local mapSize = modelTileMap:getMapSize()
-    local grids   = {}
+    local mapSize  = modelTileMap:getMapSize()
+    local grids    = {}
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(loaderEndingGridIndex)) do
-        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize))         and
-            (modelTileMap:getModelTile(gridIndex):getMoveCost(moveType)) and
-            (not isDropGridSelected(gridIndex, dropDestinations))) then
+        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize))                               and
+            (modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(droppingModelUnit)) and
+            (not isDropGridSelected(gridIndex, dropDestinations)))                             then
 
             if ((not modelUnitMap:getModelUnit(gridIndex))                         or
                 (GridIndexFunctions.isEqual(gridIndex, loaderBeginningGridIndex))) then
@@ -462,8 +461,8 @@ local function getActionsLaunchModelUnit(self)
     local modelTile    = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-        if ((launchModelUnit:getState() == "idle")                  and
-            (modelTile:getMoveCost(launchModelUnit:getMoveType()))) then
+        if ((launchModelUnit:getState() == "idle")                 and
+            (modelTile:getMoveCostWithModelUnit(launchModelUnit))) then
             actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
         end
     end

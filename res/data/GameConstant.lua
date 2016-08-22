@@ -694,6 +694,13 @@ GameConstant.categories = {
         "Bike",
     },
 
+    ["LargeNavalUnits"] = {
+        "Battleship",
+        "Carrier",
+        "Submarine",
+        "Cruiser",
+    },
+
     ["CopterUnits"] = {
         "BattleCopter",
         "TransportCopter",

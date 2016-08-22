@@ -228,7 +228,7 @@ end
 
 local function updateMoveCostInfoWithModelTile(self, tile, modelPlayer)
     for key, label in pairs(self.m_MoveCostDetails) do
-        label:setString(LocalizationFunctions.getLocalizedText(111, key, tile:getMoveCost(key, modelPlayer)))
+        label:setString(LocalizationFunctions.getLocalizedText(111, key, tile:getMoveCostWithMoveType(key, modelPlayer)))
     end
 end
 
