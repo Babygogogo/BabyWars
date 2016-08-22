@@ -175,6 +175,7 @@ local s_Texts = {
             elseif (skillID == 5) then return "改变对方全体部队的当前HP，幅度为"
             elseif (skillID == 6) then return "改变我方全体部队的移动力，幅度为"
             elseif (skillID == 7) then return "改变我方全体远程部队的射程上限，幅度为"
+            elseif (skillID == 8) then return "使我方步兵系以外的全体部队变为未行动的状态。"
             else                       return "未知4:" .. (skillID or "")
             end
         end,
@@ -191,6 +192,7 @@ local s_Texts = {
             elseif (skillID == 5) then return "对方全军HP"
             elseif (skillID == 6) then return "全军移动力"
             elseif (skillID == 7) then return "远程部队射程"
+            elseif (skillID == 8) then return "再动"
             else                       return "未知5:" .. (skillID or "")
             end
         end,

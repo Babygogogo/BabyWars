@@ -22,10 +22,6 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function setStateIdle(self)
-    self.m_State = "idle"
-end
-
 local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtDestroyModelUnit",
@@ -73,7 +69,7 @@ end
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseResetUnitState(self, event)
     if (self:getPlayerIndex() == event.playerIndex) then
-        setStateIdle(self)
+        self:setStateIdle()
 
         if (self.m_View) then
             self.m_View:updateWithModelUnit(self)
@@ -549,6 +545,12 @@ end
 
 function ModelUnit:getState()
     return self.m_State
+end
+
+function ModelUnit:setStateIdle()
+    self.m_State = "idle"
+
+    return self
 end
 
 function ModelUnit:setStateActioned()

@@ -688,6 +688,12 @@ GameConstant.categories = {
         "Mech"
     },
 
+    ["InfantryUnits"] = {
+        "Infantry",
+        "Mech",
+        "Bike",
+    },
+
     ["CopterUnits"] = {
         "BattleCopter",
         "TransportCopter",
@@ -733,6 +739,7 @@ GameConstant.categories = {
     ["SkillCategoryInstant"] = {
         4,
         5,
+        8,
     },
 }
 
@@ -4098,6 +4105,16 @@ GameConstant.skills = {
             [1] = {modifier = 1, pointsPassive = 300, pointsActive = 200, minEnergy = 3},
             [2] = {modifier = 2, pointsPassive = 700, pointsActive = 400, minEnergy = 6},
             [3] = {modifier = 3, pointsPassive = 1200, pointsActive = 600, minEnergy = 9},
+        },
+    },
+
+    -- Instant: Set all units, except inf units (Infantry, Mech, Bike), as idle (i.e. move again).
+    [8] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = nil, pointsPassive = nil, pointsActive = 700, minEnergy = 8},
         },
     },
 }
