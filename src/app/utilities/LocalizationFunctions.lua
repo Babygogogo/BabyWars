@@ -123,6 +123,7 @@ local s_Texts = {
             elseif (textType == "TotalPoints")          then return "合计技能点"
             elseif (textType == "SkillPoints")          then return "技能点"
             elseif (textType == "EnergyRequirement")    then return "能量槽长度"
+            elseif (textType == "MinEnergy")            then return "最小能量槽"
             elseif (textType == "SetEnergyRequirement") then return "设定能量槽长度"
             elseif (textType == "Level")                then return "等级"
             elseif (textType == "Modifier")             then return "幅度"
@@ -148,6 +149,7 @@ local s_Texts = {
             elseif (textType == "TotalPoints")          then return "Total Points"
             elseif (textType == "SkillPoints")          then return "Points"
             elseif (textType == "EnergyRequirement")    then return "Energy Requirement"
+            elseif (textType == "MinEnergy")            then return "Min Energy"
             elseif (textType == "SetEnergyRequirement") then return "Set Energy"
             elseif (textType == "Level")                then return "Level"
             elseif (textType == "Modifier")             then return "Modifier"
@@ -225,6 +227,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillGroupActive1") then return "主动技能 1 不合法。" .. text
             elseif (errType == "InvalidSkillGroupActive2") then return "主动技能 2 不合法。" .. text
             elseif (errType == "ReduplicatedSkills")       then return "同一组别中，不能多次使用同名技能。"
+            elseif (errType == "InvalidEnergyRequirement") then return "未满足技能所需的能量槽长度。"
             elseif (errType == "SkillPointsExceedsLimit")  then return "技能点数超出上限。"
             else                                                return "未知[7]: " .. (errType or "")
             end
@@ -234,6 +237,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillGroupActive1") then return "Invalid Active Skills 1."
             elseif (errType == "InvalidSkillGroupActive2") then return "Invalid Active Skills 2."
             elseif (errType == "ReduplicatedSkills")       then return "Some skills are reduplicated."
+            elseif (errType == "InvalidEnergyRequirement") then return "The energy requirement is not large enough for some skills."
             elseif (errType == "SkillPointsExceedsLimit")  then return "The skill points is beyond the limit."
             else                                                return "Unknown[7]: " .. (errType or "")
             end

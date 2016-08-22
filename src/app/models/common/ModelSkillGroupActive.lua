@@ -4,10 +4,11 @@ local ModelSkillGroupActive = require("src.global.functions.class")("ModelSkillG
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local getSkillModifier     = GameConstantFunctions.getSkillModifier
-local getSkillModifierUnit = GameConstantFunctions.getSkillModifierUnit
-local getSkillPoints       = GameConstantFunctions.getSkillPoints
-local getLocalizedText     = LocalizationFunctions.getLocalizedText
+local getSkillEnergyRequirement = GameConstantFunctions.getSkillEnergyRequirement
+local getSkillModifier          = GameConstantFunctions.getSkillModifier
+local getSkillModifierUnit      = GameConstantFunctions.getSkillModifierUnit
+local getSkillPoints            = GameConstantFunctions.getSkillPoints
+local getLocalizedText          = LocalizationFunctions.getLocalizedText
 
 local SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
 
@@ -86,13 +87,18 @@ function ModelSkillGroupActive:isValid()
         return true
     end
 
-    local slots       = self.m_Slots
-    local totalPoints = 0
+    local slots             = self.m_Slots
+    local totalPoints       = 0
+    local energyRequirement = self:getEnergyRequirement()
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            local id = skill.id
-            totalPoints = totalPoints + getSkillPoints(id, skill.level, true)
+            local id, level = skill.id, skill.level
+            if (getSkillEnergyRequirement(id, level) > energyRequirement) then
+                return false, getLocalizedText(7, "InvalidEnergyRequirement")
+            end
+
+            totalPoints = totalPoints + getSkillPoints(id, level, true)
 
             for j = i + 1, SLOTS_COUNT do
                 if ((slots[j]) and (slots[j].id == id)) then

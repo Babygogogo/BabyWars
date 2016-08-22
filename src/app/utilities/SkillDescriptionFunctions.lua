@@ -5,10 +5,11 @@ local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfigu
 local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions   = require("src.app.utilities.LocalizationFunctions")
 
-local getSkillPoints       = GameConstantFunctions.getSkillPoints
-local getSkillModifier     = GameConstantFunctions.getSkillModifier
-local getSkillModifierUnit = GameConstantFunctions.getSkillModifierUnit
-local getLocalizedText     = LocalizationFunctions.getLocalizedText
+local getSkillPoints            = GameConstantFunctions.getSkillPoints
+local getSkillEnergyRequirement = GameConstantFunctions.getSkillEnergyRequirement
+local getSkillModifier          = GameConstantFunctions.getSkillModifier
+local getSkillModifierUnit      = GameConstantFunctions.getSkillModifierUnit
+local getLocalizedText          = LocalizationFunctions.getLocalizedText
 
 local PASSIVE_SLOTS_COUNT    = GameConstantFunctions.getPassiveSkillSlotsCount()
 local ACTIVE_SLOTS_COUNT     = GameConstantFunctions.getActiveSkillSlotsCount()
@@ -59,13 +60,22 @@ local function getSkillModifierForDisplay(id, level)
 end
 
 local function getDescriptionForSingleSkill(id, level, isPassive)
-    print(id, level, getSkillPoints(id, level))
-    return string.format("%s        %s: %d        %s: %.2f\n%s %s",
-        getLocalizedText(5, id),
-        getLocalizedText(3, "Level"),       level,
-        getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, not isPassive),
-        getLocalizedText(4, id),            getSkillModifierForDisplay(id, level)
-    )
+    if (isPassive) then
+        return string.format("%s      %s: %d      %s: %.2f\n%s %s",
+            getLocalizedText(5, id),
+            getLocalizedText(3, "Level"),       level,
+            getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, false),
+            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level)
+        )
+    else
+        return string.format("%s      %s: %d      %s: %.2f      %s: %d\n%s %s",
+            getLocalizedText(5, id),
+            getLocalizedText(3, "Level"),       level,
+            getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, true),
+            getLocalizedText(3, "MinEnergy"),   getSkillEnergyRequirement(id, level),
+            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level)
+        )
+    end
 end
 
 local function getDescriptionForSkillGroup(skillGroup, skillGroupID)
