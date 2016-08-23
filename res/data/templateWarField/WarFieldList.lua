@@ -4,6 +4,7 @@ return {
     "BiFengGang",
     "ChaZuoShanMai",
     "DuiChenDaoYu",
+    "DuoYanPingYuan",
     "GaoLaMiJia",
     "HaiAnTuJi",
     "HuanXingShanMai",
