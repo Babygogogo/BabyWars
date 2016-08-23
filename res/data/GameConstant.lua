@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.0.8"
+GameConstant.version = "0.1.6.0.9"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -22,7 +22,7 @@ GameConstant.indexesForTileOrUnit = {
     {name = "Rough",           firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Mist",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Reef",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
-    {name = "Plasma",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "Plasma",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 16, },
     {name = "Meteor",          firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "Silo",            firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
     {name = "EmptySilo",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
@@ -35,7 +35,7 @@ GameConstant.indexesForTileOrUnit = {
     {name = "Seaport",         firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
     {name = "TempAirport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
     {name = "TempSeaport",     firstPlayerIndex = 0, isSamePlayerIndex = false, shapesCount = 5,  },
-    {name = "RedPlasma",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 1,  },
+    {name = "RedPlasma",       firstPlayerIndex = 0, isSamePlayerIndex = true,  shapesCount = 16, },
 
     {name = "Infantry",        firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
     {name = "Mech",            firstPlayerIndex = 1, isSamePlayerIndex = false, shapesCount = 4,  },
@@ -80,7 +80,7 @@ GameConstant.tileAnimations = {
     Rough        = {typeIndex = 12, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
     Mist         = {typeIndex = 13, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
     Reef         = {typeIndex = 14, shapesCount = 1,  framesCount = 8, durationPerFrame = 0.2,    fillsGrid = true,  },
-    Plasma       = {typeIndex = 15, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
+    Plasma       = {typeIndex = 15, shapesCount = 16, framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
     Meteor       = {typeIndex = 16, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
     Silo         = {typeIndex = 17, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
     EmptySilo    = {typeIndex = 18, shapesCount = 1,  framesCount = 1, durationPerFrame = 999999, fillsGrid = true,  },
@@ -93,7 +93,7 @@ GameConstant.tileAnimations = {
     Seaport      = {typeIndex = 25, shapesCount = 5,  framesCount = 2, durationPerFrame = 0.5,    fillsGrid = false, },
     TempAirport  = {typeIndex = 26, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
     TempSeaport  = {typeIndex = 27, shapesCount = 5,  framesCount = 1, durationPerFrame = 999999, fillsGrid = false, },
-    RedPlasma    = {typeIndex = 28, shapesCount = 1,  framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
+    RedPlasma    = {typeIndex = 28, shapesCount = 16, framesCount = 3, durationPerFrame = 0.1,    fillsGrid = false, },
 }
 
 GameConstant.unitAnimations = {
