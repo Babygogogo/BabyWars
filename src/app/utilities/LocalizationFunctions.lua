@@ -1052,7 +1052,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "迷雾"
             elseif (tileType == "Reef")          then return "礁石"
             elseif (tileType == "Plasma")        then return "等离子体"
-            elseif (tileType == "RedPlasma")     then return "红色等离子"
+            elseif (tileType == "GreenPlasma")   then return "红色等离子"
             elseif (tileType == "Meteor")        then return "陨石"
             elseif (tileType == "Silo")          then return "导弹发射塔"
             elseif (tileType == "EmptySilo")     then return "空发射塔"
@@ -1065,7 +1065,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "海港"
             elseif (tileType == "TempAirport")   then return "临时机场"
             elseif (tileType == "TempSeaport")   then return "临时海港"
-            else                                      return "未知"
+            else                                      return "未知116: " .. (tileType or "")
             end
         end,
         [2] = function(tileType)
@@ -1085,7 +1085,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mist"
             elseif (tileType == "Reef")          then return "Reef"
             elseif (tileType == "Plasma")        then return "Plasma"
-            elseif (tileType == "RedPlasma")     then return "Plasma"
+            elseif (tileType == "GreenPlasma")   then return "Plasma"
             elseif (tileType == "Meteor")        then return "Meteor"
             elseif (tileType == "Silo")          then return "Silo"
             elseif (tileType == "EmptySilo")     then return "Silo"
@@ -1098,7 +1098,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "SPort"
             elseif (tileType == "TempAirport")   then return "TempAP"
             elseif (tileType == "TempSeaport")   then return "TempSP"
-            else                                      return "Unknown"
+            else                                      return "Unknown116: " (tileType or "")
             end
         end,
     },
@@ -1119,8 +1119,8 @@ local s_Texts = {
             elseif (tileType == "Rough")         then return "巨浪：允许空军和海军通过，但会减缓海军的移动。"
             elseif (tileType == "Mist")          then return "迷雾：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。"
             elseif (tileType == "Reef")          then return "礁石：允许空军和海军通过，但会减缓海军的移动。在雾战时，为海军提供隐蔽场所。"
-            elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。"
-            elseif (tileType == "RedPlasma")     then return "红色等离子：不允许任何部队通过。"
+            elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。若直接或间接相连的陨石被击破则消失。"
+            elseif (tileType == "GreenPlasma")   then return "绿色等离子：不允许任何部队通过。"
             elseif (tileType == "Meteor")        then return "陨石：不允许任何部队通过。可以被部队攻击和破坏。"
             elseif (tileType == "Silo")          then return "导弹发射塔：步兵系可以在这里发射一次导弹，用来打击任意位置的小范围的部队。"
             elseif (tileType == "EmptySilo")     then return "空发射塔：使用过的导弹发射塔，无法再次发射导弹。允许空军和陆军通过。"
@@ -1133,7 +1133,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "海港：可以提供资金、生产和维修海军。"
             elseif (tileType == "TempAirport")   then return "临时机场：可以维修空军。不提供资金，也不能生产部队。"
             elseif (tileType == "TempSeaport")   then return "临时海港：可以维修海军。不提供资金，也不能生产部队。"
-            else                                      return "未知"
+            else                                      return "未知117: " .. (tileType or "")
             end
         end,
         [2] = function(tileType)
@@ -1153,7 +1153,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mists provide hiding places for naval units in Fog of War."
             elseif (tileType == "Reef")          then return "Reefs provide hiding places for naval units in Fog of War."
             elseif (tileType == "Plasma")        then return "Plasma is impassable."
-            elseif (tileType == "RedPlasma")     then return "Red Plasma is impassable."
+            elseif (tileType == "GreenPlasma")   then return "Green Plasma is impassable."
             elseif (tileType == "Meteor")        then return "Meteors are impassable but can be destroyed."
             elseif (tileType == "Silo")          then return "Silos can be launched by infantry units and damage a 13-square area."
             elseif (tileType == "EmptySilo")     then return "Empty Silos can't be launched."
@@ -1166,7 +1166,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "Seaports can be used to resupply and produce naval units once captured."
             elseif (tileType == "TempAirport")   then return "Temp airports provide resupply for air units."
             elseif (tileType == "TempSeaport")   then return "Temp seaports provide resupply for naval units."
-            else                                      return "未知"
+            else                                      return "Unknown117: " .. (tileType or "")
             end
         end,
     },
