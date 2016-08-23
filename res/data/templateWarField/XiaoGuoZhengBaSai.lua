@@ -13,7 +13,7 @@ return {
       y = 0,
       width = 17,
       height = 19,
-      visible = false,
+      visible = true,
       opacity = 1,
       offsetx = 0,
       offsety = 0,

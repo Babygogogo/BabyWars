@@ -873,7 +873,7 @@
    <image width="24" height="24" source="textures/units/c02_t26_s04_f01.png"/>
   </tile>
  </tileset>
- <layer name="TileBase" width="17" height="19" visible="0">
+ <layer name="TileBase" width="17" height="19">
   <data encoding="csv">
 47,1,1,1,68,1,1,1,1,1,1,1,1,1,1,1,49,
 1,1,1,1,72,70,1,1,1,1,1,1,1,1,1,1,1,
