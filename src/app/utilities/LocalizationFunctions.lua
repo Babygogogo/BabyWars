@@ -1098,7 +1098,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "SPort"
             elseif (tileType == "TempAirport")   then return "TempAP"
             elseif (tileType == "TempSeaport")   then return "TempSP"
-            else                                      return "Unknown116: " (tileType or "")
+            else                                      return "Unknown116: " .. (tileType or "")
             end
         end,
     },

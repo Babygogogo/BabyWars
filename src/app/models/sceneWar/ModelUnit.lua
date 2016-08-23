@@ -83,7 +83,7 @@ end
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, tiledID)
     local template = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
-    assert(template, "ModelUnit-initWithTiledID() failed to get the template self unit with param tiledID.")
+    assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID." .. tiledID)
 
     self.m_TiledID = tiledID
     if (template == self.m_Template) then
