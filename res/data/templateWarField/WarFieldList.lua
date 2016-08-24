@@ -11,9 +11,11 @@ return {
     "HuiXingDeMaiDong",
     "JiangQi",
     "ManShouXueXing",
+    "QiuLongJuShu",
     "SanHeGu",
     "TanXinWan",
     "XiaoGuoZhengBaSai",
+    "YiTuanZao",
     "YunShiQun",
 
     "FullTest",
