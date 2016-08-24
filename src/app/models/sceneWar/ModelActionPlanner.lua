@@ -707,10 +707,14 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
-    return (not self.m_ModelUnitMap:getModelUnit(gridIndex))       and
-        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
-        (modelTile.getProductionList)
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+        return false
+    else
+        local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
+        return (not self.m_ModelUnitMap:getModelUnit(gridIndex))       and
+            (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+            (modelTile.getProductionList)
+    end
 end
 
 setStateChoosingProductionTarget = function(self, gridIndex)
@@ -731,8 +735,12 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
-    return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+        return false
+    else
+        local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+        return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+    end
 end
 
 setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
@@ -908,8 +916,7 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtGridSelected(self, event)
-    if ((self.m_IsWaitingForServerResponse)                       or
-        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
+    if (self.m_IsWaitingForServerResponse) then
         return
     end
 
@@ -917,14 +924,10 @@ local function onEvtGridSelected(self, event)
     local gridIndex = event.gridIndex
 
     if (state == "idle") then
-        if (canSetStateMakingMovePath(self, gridIndex)) then
-            setStateMakingMovePath(self, gridIndex)
-        elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then
-            setStateChoosingProductionTarget(self, gridIndex)
-        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then
-            setStatePreviewingAttackableArea(self, gridIndex)
-        elseif (canSetStatePreviewingReachableArea(self, gridIndex)) then
-            setStatePreviewingReachableArea(self, gridIndex)
+        if     (canSetStateMakingMovePath(          self, gridIndex)) then setStateMakingMovePath(          self, gridIndex)
+        elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then setStateChoosingProductionTarget(self, gridIndex)
+        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then setStatePreviewingAttackableArea(self, gridIndex)
+        elseif (canSetStatePreviewingReachableArea( self, gridIndex)) then setStatePreviewingReachableArea( self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
         setStateIdle(self, true)
