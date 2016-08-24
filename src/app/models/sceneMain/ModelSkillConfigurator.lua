@@ -32,6 +32,21 @@ local function setItemsSkillGroupActiveState(self, isSkillEnabled)
     end
 end
 
+local setStateSelectSkillLevel
+local function createItemsSkillSubCategory(self, categoryName)
+    local items = {}
+    for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+        items[#items + 1] = {
+            name     = getLocalizedText(5, skillID),
+            callback = function()
+                setStateSelectSkillLevel(self, skillID)
+            end,
+        }
+    end
+
+    return items
+end
+
 --------------------------------------------------------------------------------
 -- The functions for setting state.
 --------------------------------------------------------------------------------
@@ -151,7 +166,7 @@ local function setStateSelectSkill(self, categoryName)
     end
 end
 
-local function setStateSelectSkillLevel(self, skillID)
+setStateSelectSkillLevel = function(self, skillID)
     self.m_State   = "stateSelectSkillLevel"
     self.m_SkillID = skillID
 
@@ -356,17 +371,16 @@ end
 
 local function initItemsSkills(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
-        local subItems = {}
-        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
-            subItems[#subItems + 1] = {
-                name     = getLocalizedText(5, skillID),
-                callback = function()
-                    setStateSelectSkillLevel(self, skillID)
-                end,
-            }
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+        if (not items[categoryName]) then
+            print(categoryName)
+            items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
-        items[categoryName] = subItems
+    end
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+        if (not items[categoryName]) then
+            items[categoryName] = createItemsSkillSubCategory(self, categoryName)
+        end
     end
 
     self.m_ItemsSkills = items
@@ -374,7 +388,7 @@ end
 
 local function initItemsSkillLevels(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+    for categoryName, _ in pairs(self.m_ItemsSkills) do
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             if (items[skillID]) then
                 break
@@ -383,15 +397,17 @@ local function initItemsSkillLevels(self)
             local subItems = {}
             local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
             for i = maxLevel, minLevel, -1 do
-                subItems[#subItems + 1] = {
-                    name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
-                    callback = function()
-                        self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
-                        if (self.m_View) then
-                            self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
-                        end
-                    end,
-                }
+                if (i ~= 0) then
+                    subItems[#subItems + 1] = {
+                        name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
+                        callback = function()
+                            self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
+                            if (self.m_View) then
+                                self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
+                            end
+                        end,
+                    }
+                end
             end
 
             items[skillID] = subItems

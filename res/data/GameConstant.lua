@@ -712,6 +712,7 @@ GameConstant.categories = {
         "SkillCategoryCost",
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
+        "SkillCategoryRepair",
     },
 
     ["SkillCategoriesForActive"] = {
@@ -741,6 +742,10 @@ GameConstant.categories = {
 
     ["SkillCategoryAttackRange"] = {
         7,
+    },
+
+    ["SkillCategoryRepair"] = {
+        10,
     },
 
     ["SkillCategoryInstant"] = {
@@ -4029,7 +4034,6 @@ GameConstant.skills = {
 
     -- Instant: Modify HPs of all units of the currently-in-turn player.
     [4] = {
-        isInstant    = true,
         minLevel     = -9,
         maxLevel     = 9,
         modifierUnit = "HP",
@@ -4058,7 +4062,6 @@ GameConstant.skills = {
 
     -- Instant: Modify HPs of all units of the opponents.
     [5] = {
-        isInstant    = true,
         minLevel     = -9,
         maxLevel     = 9,
         modifierUnit = "HP",
@@ -4164,7 +4167,26 @@ GameConstant.skills = {
             [14] = {modifier = -140, pointsPassive = nil, pointsActive = 210, minEnergy = 7},
             [15] = {modifier = -150, pointsPassive = nil, pointsActive = 225, minEnergy = 8},
         },
-    }
+    },
+
+    -- Modify the repair amount of buildings of the owner player.
+    [10] = {
+        minLevel     = -2,
+        maxLevel     = 7,
+        modifierUnit = "HP",
+        levels       = {
+            [-2] = {modifier = -2, pointsPassive = -50, pointsActive = nil, minEnergy = nil},
+            [-1] = {modifier = -1, pointsPassive = -25, pointsActive = nil, minEnergy = nil},
+            [0] = {modifier = 0, pointsPassive = 0, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = 1, pointsPassive = 25, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 2, pointsPassive = 50, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 3, pointsPassive = 75, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 4, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 5, pointsPassive = 125, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 6, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 7, pointsPassive = 175, pointsActive = nil, minEnergy = nil},
+        },
+    },
 }
 
 return GameConstant

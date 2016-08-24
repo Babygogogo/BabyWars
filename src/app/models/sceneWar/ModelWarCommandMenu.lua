@@ -153,7 +153,6 @@ local function onEvtPlayerIndexUpdated(self, event)
 end
 
 local function onEvtIsWaitingForServerResponse(self, event)
-    self:setEnabled(false)
     self.m_IsWaitingForServerResponse = event.waiting
 end
 

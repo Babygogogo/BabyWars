@@ -37,8 +37,9 @@ local function transformModifier2(modifier, unit)
 end
 
 local function transformModifier3(modifier, unit)
-    if (modifier > 0) then return "+" .. modifier
-    else                   return modifier
+    unit = unit or ""
+    if (modifier > 0) then return "+" .. modifier .. unit
+    else                   return        modifier .. unit
     end
 end
 
@@ -49,14 +50,15 @@ local function getSkillModifierForDisplay(id, level)
     end
 
     local modifierUnit = getSkillModifierUnit(id)
-    if     (id == 1) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 2) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 3) then return transformModifier2(-modifier, modifierUnit)
-    elseif (id == 4) then return transformModifier3(modifier,  modifierUnit)
-    elseif (id == 5) then return transformModifier3(modifier,  modifierUnit)
-    elseif (id == 6) then return transformModifier3(modifier,  modifierUnit)
-    elseif (id == 7) then return transformModifier3(modifier,  modifierUnit)
-    elseif (id == 9) then return transformModifier2(-modifier, modifierUnit)
+    if     (id == 1)  then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 2)  then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 3)  then return transformModifier2(-modifier, modifierUnit)
+    elseif (id == 4)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 5)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 6)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 7)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 9)  then return transformModifier2(-modifier, modifierUnit)
+    elseif (id == 10) then return transformModifier3(modifier,  modifierUnit)
     end
 end
 

@@ -105,6 +105,24 @@ local function getAttackRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
     return modifier
 end
 
+local function getRepairAmountModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 10)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -139,6 +157,10 @@ end
 function SkillModifierFunctions.getAttackRangeModifier(configuration)
     return getAttackRangeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
         getAttackRangeModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.getRepairAmountModifier(configuration)
+    return getRepairAmountModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT)
 end
 
 return SkillModifierFunctions

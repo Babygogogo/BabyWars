@@ -168,16 +168,17 @@ local s_Texts = {
     },
     [4] = {
         [1] = function(skillID)
-            if     (skillID == 1) then return "使我方全体部队造成的攻击伤害变为基础的"
-            elseif (skillID == 2) then return "使我方全体部队受到的攻击伤害变为基础的"
-            elseif (skillID == 3) then return "使我方全体部队的造价变为基础的"
-            elseif (skillID == 4) then return "改变我方全体部队的当前HP，幅度为"
-            elseif (skillID == 5) then return "改变对方全体部队的当前HP，幅度为"
-            elseif (skillID == 6) then return "改变我方全体部队的移动力，幅度为"
-            elseif (skillID == 7) then return "改变我方全体远程部队的射程上限，幅度为"
-            elseif (skillID == 8) then return "使我方步兵系以外的全体部队变为未行动的状态。"
-            elseif (skillID == 9) then return "使对方全体部队的燃料值变为当前值的"
-            else                       return "未知4:" .. (skillID or "")
+            if     (skillID == 1)  then return "使我方全体部队造成的攻击伤害变为基础的"
+            elseif (skillID == 2)  then return "使我方全体部队受到的攻击伤害变为基础的"
+            elseif (skillID == 3)  then return "使我方全体部队的造价变为基础的"
+            elseif (skillID == 4)  then return "改变我方全体部队的当前HP，幅度为"
+            elseif (skillID == 5)  then return "改变对方全体部队的当前HP，幅度为"
+            elseif (skillID == 6)  then return "改变我方全体部队的移动力，幅度为"
+            elseif (skillID == 7)  then return "改变我方全体远程部队的射程上限，幅度为"
+            elseif (skillID == 8)  then return "使我方步兵系以外的全体部队变为未行动的状态。"
+            elseif (skillID == 9)  then return "使对方全体部队的燃料值变为当前值的"
+            elseif (skillID == 10) then return "额外改变我方具有维修能力的据点的维修量，幅度为"
+            else                        return "未知4:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
@@ -186,16 +187,17 @@ local s_Texts = {
     },
     [5] = {
         [1] = function(skillID)
-            if     (skillID == 1) then return "全军攻击力"
-            elseif (skillID == 2) then return "全军防御力"
-            elseif (skillID == 3) then return "全军造价"
-            elseif (skillID == 4) then return "全军HP"
-            elseif (skillID == 5) then return "对方全军HP"
-            elseif (skillID == 6) then return "全军移动力"
-            elseif (skillID == 7) then return "远程部队射程"
-            elseif (skillID == 8) then return "再动"
-            elseif (skillID == 9) then return "对方全军燃料"
-            else                       return "未知5:" .. (skillID or "")
+            if     (skillID == 1)  then return "全军攻击力"
+            elseif (skillID == 2)  then return "全军防御力"
+            elseif (skillID == 3)  then return "全军造价"
+            elseif (skillID == 4)  then return "全军HP"
+            elseif (skillID == 5)  then return "对方全军HP"
+            elseif (skillID == 6)  then return "全军移动力"
+            elseif (skillID == 7)  then return "远程部队射程"
+            elseif (skillID == 8)  then return "再动"
+            elseif (skillID == 9)  then return "对方全军燃料"
+            elseif (skillID == 10) then return "我方维修量"
+            else                        return "未知5:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
@@ -209,6 +211,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryCost")        then return "造 价 类"
             elseif (skillCategory == "SkillCategoryMovement")    then return "移 动 类"
             elseif (skillCategory == "SkillCategoryAttackRange") then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryRepair")      then return "维 修 类"
             elseif (skillCategory == "SkillCategoryInstant")     then return "瞬 时 类"
             else                                                      return "未知6:" .. (skillCategory or "")
             end
@@ -219,6 +222,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryCost")        then return "Cost"
             elseif (skillCategory == "SkillCategoryMovement")    then return "Movement"
             elseif (skillCategory == "SkillCategoryAttackRange") then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryRepair")      then return "Repair"
             elseif (skillCategory == "SkillCategoryInstant")     then return "Instant"
             else                                                      return "Unknown6:" .. (skillCategory or "")
             end
