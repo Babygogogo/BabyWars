@@ -746,6 +746,7 @@ GameConstant.categories = {
 
     ["SkillCategoryRepair"] = {
         10,
+        11,
     },
 
     ["SkillCategoryInstant"] = {
@@ -3695,7 +3696,7 @@ GameConstant.minEnergyRequirement            = 1
 GameConstant.maxEnergyRequirement            = 15
 GameConstant.skillPointsPerStep              = 25
 GameConstant.skillPointsPerEnergyRequirement = 100
-GameConstant.damageCostPerEnergyRequirement  = 9000
+GameConstant.damageCostPerEnergyRequirement  = 18000
 GameConstant.damageCostGrowthRates           = 20
 GameConstant.skillConfigurationsCount        = 10
 GameConstant.passiveSkillSlotsCount          = 4
@@ -4094,8 +4095,8 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels = {
-            [-3] = {modifier = -3, pointsPassive = -1800, pointsActive = -150, minEnergy = 3},
-            [-2] = {modifier = -2, pointsPassive = -1100, pointsActive = -125, minEnergy = 2},
+            [-3] = {modifier = -3, pointsPassive = -1500, pointsActive = -150, minEnergy = 3},
+            [-2] = {modifier = -2, pointsPassive = -1000, pointsActive = -125, minEnergy = 2},
             [-1] = {modifier = -1, pointsPassive = -500, pointsActive = -75, minEnergy = 1},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 800, pointsActive = 150, minEnergy = 2},
@@ -4178,13 +4179,43 @@ GameConstant.skills = {
             [-2] = {modifier = -2, pointsPassive = -50, pointsActive = nil, minEnergy = nil},
             [-1] = {modifier = -1, pointsPassive = -25, pointsActive = nil, minEnergy = nil},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = nil, minEnergy = nil},
-            [1] = {modifier = 1, pointsPassive = 25, pointsActive = nil, minEnergy = nil},
-            [2] = {modifier = 2, pointsPassive = 50, pointsActive = nil, minEnergy = nil},
-            [3] = {modifier = 3, pointsPassive = 75, pointsActive = nil, minEnergy = nil},
-            [4] = {modifier = 4, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
-            [5] = {modifier = 5, pointsPassive = 125, pointsActive = nil, minEnergy = nil},
-            [6] = {modifier = 6, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
-            [7] = {modifier = 7, pointsPassive = 175, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = 1, pointsPassive = 35, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 2, pointsPassive = 70, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 3, pointsPassive = 105, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 4, pointsPassive = 140, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 5, pointsPassive = 175, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 6, pointsPassive = 210, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 7, pointsPassive = 245, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- Modify the repair cost of the owner player.
+    [11] = {
+        minLevel     = -10,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [-10] = {modifier = 100, pointsPassive = -20, pointsActive = nil, minEnergy = nil},
+            [-9] = {modifier = 90, pointsPassive = -18, pointsActive = nil, minEnergy = nil},
+            [-8] = {modifier = 80, pointsPassive = -16, pointsActive = nil, minEnergy = nil},
+            [-7] = {modifier = 70, pointsPassive = -14, pointsActive = nil, minEnergy = nil},
+            [-6] = {modifier = 60, pointsPassive = -12, pointsActive = nil, minEnergy = nil},
+            [-5] = {modifier = 50, pointsPassive = -10, pointsActive = nil, minEnergy = nil},
+            [-4] = {modifier = 40, pointsPassive = -8, pointsActive = nil, minEnergy = nil},
+            [-3] = {modifier = 30, pointsPassive = -6, pointsActive = nil, minEnergy = nil},
+            [-2] = {modifier = 20, pointsPassive = -4, pointsActive = nil, minEnergy = nil},
+            [-1] = {modifier = 10, pointsPassive = -2, pointsActive = nil, minEnergy = nil},
+            [0] = {modifier = 0, pointsPassive = 0, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = -10, pointsPassive = 6, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = -20, pointsPassive = 12, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = -30, pointsPassive = 18, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = -40, pointsPassive = 24, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = -50, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = -60, pointsPassive = 36, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = -70, pointsPassive = 42, pointsActive = nil, minEnergy = nil},
+            [8] = {modifier = -80, pointsPassive = 48, pointsActive = nil, minEnergy = nil},
+            [9] = {modifier = -90, pointsPassive = 54, pointsActive = nil, minEnergy = nil},
+            [10] = {modifier = -100, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
         },
     },
 }

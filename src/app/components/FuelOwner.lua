@@ -185,6 +185,8 @@ end
 function FuelOwner:setCurrentFuel(fuelAmount)
     assert(isFuelAmount(fuelAmount), "FuelOwner:setCurrentFuel() the param fuelAmount is expected to be a non-negative integer.")
     self.m_CurrentFuel = fuelAmount
+
+    return self.m_Owner
 end
 
 return FuelOwner

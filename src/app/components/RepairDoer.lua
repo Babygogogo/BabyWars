@@ -95,8 +95,14 @@ function RepairDoer:canRepairTarget(target)
 end
 
 function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
+    local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
+    local productionCost = round(
+        (costModifier >= 0)                                       and
+        (target:getProductionCost() * (100 + costModifier) / 100) or
+        (target:getProductionCost() * 100 / (100 - costModifier))
+    )
     local normalizedCurrentHP    = target:getNormalizedCurrentHP()
-    local productionCost         = target:getProductionCost()
     local normalizedRepairAmount = math.min(
         10 - normalizedCurrentHP,
         self:getNormalizedRepairAmount(),
