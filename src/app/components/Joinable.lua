@@ -9,6 +9,13 @@ Joinable.EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
+--------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function Joinable:ctor(param)
@@ -48,8 +55,8 @@ function Joinable:getJoinIncome(modelUnit)
     else
         -- TODO: take the player skills into account.
         local joinedNormalizedHP = self.m_Owner:getNormalizedCurrentHP() + modelUnit:getNormalizedCurrentHP()
-        return (joinedNormalizedHP > 10)                                        and
-            ((joinedNormalizedHP - 10) * self.m_Owner:getProductionCost() / 10) or
+        return (joinedNormalizedHP > 10)                                               and
+            (round((joinedNormalizedHP - 10) * self.m_Owner:getProductionCost() / 10)) or
             (0)
     end
 end
