@@ -105,7 +105,7 @@ local function onEvtTurnPhaseRepairUnit(self, event)
     local eventDispatcher = self.m_RootScriptEventDispatcher
     for _, unit in ipairs(getRepairableModelUnits(event.modelUnitMap, modelTileMap, playerIndex)) do
         local gridIndex                = unit:getGridIndex()
-        local repairAmount, repairCost = modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(unit, modelPlayer)
+        local repairAmount, repairCost = modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(unit)
         local shouldSupply             = unit:getCurrentFuel() < unit:getMaxFuel()
 
         unit:setCurrentHP(unit:getCurrentHP() + repairAmount)

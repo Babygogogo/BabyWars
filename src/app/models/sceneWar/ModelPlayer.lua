@@ -22,6 +22,7 @@ local ModelPlayer = require("src.global.functions.class")("ModelPlayer")
 
 local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
 local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
+local SerializationFunctions  = require("src.app.utilities.SerializationFunctions")
 
 local DAMAGE_COST_PER_ENERGY_REQUIREMENT = GameConstantFunctions.getDamageCostPerEnergyRequirement()
 local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGrowthRates()
@@ -105,6 +106,8 @@ function ModelPlayer:getFund()
 end
 
 function ModelPlayer:setFund(fund)
+    assert((fund >= 0) and (math.floor(fund) == fund),
+        "ModelPlayer:setFund() the param is invalid. " .. SerializationFunctions.toErrorMessage(fund))
     self.m_Fund = fund
 
     return self

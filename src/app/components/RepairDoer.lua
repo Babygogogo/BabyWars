@@ -94,7 +94,7 @@ function RepairDoer:canRepairTarget(target)
     return false
 end
 
-function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
+function RepairDoer:getRepairAmountAndCost(target)
     local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
     local productionCost = round(
@@ -114,8 +114,13 @@ function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
 end
 
 function RepairDoer:getNormalizedRepairAmount()
-    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
-    return self.m_Template.amount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    if (playerIndex < 1) then
+        return self.m_Template.amount
+    else
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        return self.m_Template.amount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
+    end
 end
 
 return RepairDoer
