@@ -177,7 +177,7 @@ local s_Texts = {
             elseif (skillID == 7)  then return "改变我方全体远程部队的射程上限，幅度为"
             elseif (skillID == 8)  then return "使我方步兵系以外的全体部队变为未行动的状态。"
             elseif (skillID == 9)  then return "使对方全体部队的燃料值变为当前值的"
-            elseif (skillID == 10) then return "额外改变我方具有维修能力的据点的维修量，幅度为"
+            elseif (skillID == 10) then return "额外改变我方具有维修能力的据点及部队的维修量，幅度为"
             elseif (skillID == 11) then return "使我方维修费用变为基础的"
             else                        return "未知4:" .. (skillID or "")
             end

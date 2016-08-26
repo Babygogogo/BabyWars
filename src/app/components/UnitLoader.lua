@@ -1,8 +1,9 @@
 
 local UnitLoader = require("src.global.functions.class")("UnitLoader")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 UnitLoader.EXPORTED_METHODS = {
     "getMaxLoadCount",
@@ -12,7 +13,9 @@ UnitLoader.EXPORTED_METHODS = {
     "canLoadModelUnit",
     "canDropModelUnit",
     "canLaunchModelUnit",
+    "canRepairLoadedModelUnit",
     "canSupplyLoadedModelUnit",
+    "getRepairAmountAndCostForLoadedModelUnit",
 
     "addLoadUnitId",
 }
@@ -20,6 +23,10 @@ UnitLoader.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
 local function getRemainingUnitIdsOnDrop(currentList, dropDestinations)
     local remainingUnitIds = {}
     for _, unitID in ipairs(currentList) do
@@ -55,13 +62,25 @@ local function isValidTargetTileType(self, tileType)
     end
 end
 
+local function getNormalizedRepairAmount(self)
+    local baseAmount  = self.m_Template.repairAmount
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    if ((not baseAmount) or (playerIndex < 1)) then
+        return baseAmount
+    else
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        return baseAmount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtTurnPhaseSupplyUnit(self, event)
-    local modelUnitMap = event.modelUnitMap
     if ((self.m_Owner:getPlayerIndex() == event.playerIndex) and
+        (not self:canRepairLoadedModelUnit())                and
         (self:canSupplyLoadedModelUnit()))                   then
+        local modelUnitMap = event.modelUnitMap
         for _, unitID in pairs(self:getLoadUnitIdList()) do
             local modelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
             assert(modelUnit, "UnitLoader-onEvtTurnPhaseSupplyUnit() a unit is loaded in the loader, while is not loaded in ModelUnitMap.")
@@ -112,6 +131,20 @@ function UnitLoader:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseSupplyUnit", self)
     self.m_RootScriptEventDispatcher = nil
+
+    return self
+end
+
+function UnitLoader:setModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager == nil, "UnitLoader:setModelPlayerManager() the model has been set already.")
+    self.m_ModelPlayerManager = model
+
+    return self
+end
+
+function UnitLoader:unsetModelPlayerManager(model)
+    assert(self.m_ModelPlayerManager, "UnitLoader:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
 
     return self
 end
@@ -225,8 +258,34 @@ function UnitLoader:canLaunchModelUnit()
     return self.m_Template.canLaunch
 end
 
+function UnitLoader:canRepairLoadedModelUnit()
+    return self.m_Template.canRepair
+end
+
 function UnitLoader:canSupplyLoadedModelUnit()
     return self.m_Template.canSupply
+end
+
+function UnitLoader:getRepairAmountAndCostForLoadedModelUnit(modelUnit)
+    assert(self:hasLoadUnitId(modelUnit:getUnitId()),
+        "UnitLoader:getRepairAmountAndCostForLoadedModelUnit() the param modelUnit is not loaded by self.")
+
+    local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
+    local productionCost = round(
+        (costModifier >= 0)                                          and
+        (modelUnit:getProductionCost() * (100 + costModifier) / 100) or
+        (modelUnit:getProductionCost() * 100 / (100 - costModifier))
+    )
+    local normalizedCurrentHP    = modelUnit:getNormalizedCurrentHP()
+    local normalizedRepairAmount = math.min(
+        10 - normalizedCurrentHP,
+        getNormalizedRepairAmount(self),
+        math.floor(modelPlayer:getFund() * 10 / productionCost)
+    )
+
+    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - modelUnit:getCurrentHP(),
+        round(normalizedRepairAmount * productionCost / 10)
 end
 
 function UnitLoader:addLoadUnitId(unitID)

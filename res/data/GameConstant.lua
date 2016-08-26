@@ -2713,6 +2713,7 @@ GameConstant.templateModelUnits = {
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
+            canRepair          = false,
         },
 
         UnitSupplier = {},
@@ -3105,6 +3106,7 @@ GameConstant.templateModelUnits = {
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
+            canRepair          = false,
         },
 
         Producible = {
@@ -3338,6 +3340,8 @@ GameConstant.templateModelUnits = {
             canLaunch          = true,
             canDrop            = false,
             canSupply          = true,
+            canRepair          = true,
+            repairAmount       = 2,
         },
 
         Promotable = {
@@ -3541,9 +3545,10 @@ GameConstant.templateModelUnits = {
         UnitLoader = {
             maxLoadCount       = 2,
             targetCategoryType = "CopterUnits",
-            canLaunch          = true,
-            canDrop            = false,
+            canLaunch          = false,
+            canDrop            = true,
             canSupply          = true,
+            canRepair          = false,
         },
 
         Producible = {
@@ -3588,6 +3593,7 @@ GameConstant.templateModelUnits = {
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
+            canRepair          = false,
         },
 
         Producible = {
@@ -3674,6 +3680,7 @@ GameConstant.templateModelUnits = {
             canLaunch          = false,
             canDrop            = true,
             canSupply          = false,
+            canRepair          = false,
         },
 
         Promotable = {
