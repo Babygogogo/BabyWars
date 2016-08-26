@@ -67,6 +67,13 @@ function MoveDoer:setModelPlayerManager(model)
     return self
 end
 
+function MoveDoer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "MoveDoer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 function MoveDoer:setModelWeatherManager(model)
     assert(self.m_ModelWeatherManager == nil, "MoveDoer:setModelWeatherManager() the model has been set already.")
     self.m_ModelWeatherManager = model

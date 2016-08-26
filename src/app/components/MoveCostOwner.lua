@@ -49,6 +49,13 @@ function MoveCostOwner:setModelPlayerManager(model)
     return self
 end
 
+function MoveCostOwner:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "MoveCostOwner:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

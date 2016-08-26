@@ -766,8 +766,8 @@ GameConstant.commandTowerAttackBonus = 10
 
 GameConstant.maxPromotion   = 3
 GameConstant.promotionBonus = {
-    {attack = 5,  defense = 5 },
-    {attack = 10, defense = 10},
+    {attack = 5,  defense = 0 },
+    {attack = 10, defense = 0 },
     {attack = 20, defense = 20},
 }
 
@@ -4095,9 +4095,9 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels = {
-            [-3] = {modifier = -3, pointsPassive = -1500, pointsActive = -150, minEnergy = 3},
-            [-2] = {modifier = -2, pointsPassive = -1000, pointsActive = -125, minEnergy = 2},
-            [-1] = {modifier = -1, pointsPassive = -500, pointsActive = -75, minEnergy = 1},
+            [-3] = {modifier = -3, pointsPassive = -1050, pointsActive = -150, minEnergy = 3},
+            [-2] = {modifier = -2, pointsPassive = -750, pointsActive = -125, minEnergy = 2},
+            [-1] = {modifier = -1, pointsPassive = -400, pointsActive = -75, minEnergy = 1},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 800, pointsActive = 150, minEnergy = 2},
             [2] = {modifier = 2, pointsPassive = 1700, pointsActive = 350, minEnergy = 4},

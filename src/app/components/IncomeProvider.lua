@@ -48,6 +48,13 @@ function IncomeProvider:setModelPlayerManager(model)
     return self
 end
 
+function IncomeProvider:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "IncomeProvider:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

@@ -57,6 +57,13 @@ function Producible:setModelPlayerManager(model)
     return self
 end
 
+function Producible:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "Producible:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------

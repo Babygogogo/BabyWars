@@ -67,6 +67,13 @@ function RepairDoer:setModelPlayerManager(model)
     return self
 end
 
+function RepairDoer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "RepairDoer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------

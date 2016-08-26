@@ -146,6 +146,14 @@ function ModelTile:setModelPlayerManager(model)
     return self
 end
 
+function ModelTile:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "ModelTile:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+    ComponentManager.callMethodForAllComponents(self, "unsetModelPlayerManager")
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -238,13 +246,17 @@ function ModelTile:getDescription()
 end
 
 function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
-    local gridIndex, dispatcher = self:getGridIndex(), self.m_RootScriptEventDispatcher
-    baseID                      = baseID or self.m_BaseID
+    local gridIndex          = self:getGridIndex()
+    local dispatcher         = self.m_RootScriptEventDispatcher
+    local modelPlayerManager = self.m_ModelPlayerManager
+    baseID                   = baseID or self.m_BaseID
 
     self:unsetRootScriptEventDispatcher()
+        :unsetModelPlayerManager()
     initWithTiledID(self, objectID, baseID)
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
-    self:setRootScriptEventDispatcher(dispatcher)
+    self:setModelPlayerManager(modelPlayerManager)
+        :setRootScriptEventDispatcher(dispatcher)
 
     return self
 end
@@ -269,16 +281,20 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
     if (tileName ~= "Headquarters") then
         self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileName, playerIndex)
     else
-        local gridIndex, currentCapturePoint = self:getGridIndex(), self:getCurrentCapturePoint()
-        local dispatcher = self.m_RootScriptEventDispatcher
+        local gridIndex           = self:getGridIndex()
+        local currentCapturePoint = self:getCurrentCapturePoint()
+        local dispatcher          = self.m_RootScriptEventDispatcher
+        local modelPlayerManager  = self.m_ModelPlayerManager
 
         self:unsetRootScriptEventDispatcher()
+            :unsetModelPlayerManager()
         initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
-        self:setRootScriptEventDispatcher(dispatcher)
+        self:setModelPlayerManager(modelPlayerManager)
+            :setRootScriptEventDispatcher(dispatcher)
     end
 
     return self
