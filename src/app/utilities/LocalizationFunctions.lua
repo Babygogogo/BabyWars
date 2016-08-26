@@ -448,8 +448,20 @@ local s_Texts = {
         [2] = function() return "input 0 or 4 digits" end,
     },
     [48] = {
-        [1] = function() return "作者："   end,
-        [2] = function() return "Author: " end,
+        [1] = function(textType)
+            if     (textType == "Author")  then return "作者: "
+            elseif (textType == "Players") then return "已参战玩家: "
+            elseif (textType == "Empty")   then return "(空缺)"
+            else                                return "未知48:" .. (textType or "")
+            end
+        end,
+        [2] = function()
+            if     (textType == "Author")  then return "Author: "
+            elseif (textType == "Players") then return "Players: "
+            elseif (textType == "Empty")   then return "(Empty)"
+            else                                return "Unknown48:" .. (textType or "")
+            end
+        end,
     },
     [49] = {
         [1] = function() return "回 合 内"   end,

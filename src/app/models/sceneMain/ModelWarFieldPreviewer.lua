@@ -36,6 +36,14 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
     return self
 end
 
+function ModelWarFieldPreviewer:setPlayerNicknames(names, count)
+    if (self.m_View) then
+        self.m_View:setPlayerNicknames(names, count)
+    end
+
+    return self
+end
+
 function ModelWarFieldPreviewer:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setEnabled(enabled)
