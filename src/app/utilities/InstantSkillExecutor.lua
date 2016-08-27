@@ -88,6 +88,23 @@ s_Executors.execute9 = function(level, modelWarField, modelPlayerManager, modelT
     dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
+s_Executors.execute12 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local modelPlayer  = modelPlayerManager:getModelPlayer(playerIndex)
+    local baseModifier = getSkillModifier(12, level)
+    if (baseModifier >= 0) then
+        modelPlayer:setFund(round(modelPlayer:getFund() * (baseModifier + 100) / 100))
+    else
+        modelPlayer:setFund(round(modelPlayer:getFund() * 100 / (100 - baseModifier)))
+    end
+
+    dispatcher:dispatchEvent({
+        name        = "EvtModelPlayerUpdated",
+        modelPlayer = modelPlayer,
+        playerIndex = playerIndex,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
