@@ -146,9 +146,9 @@ local function getDefenseBonusMultiplier(self, attackerGridIndex, target, target
     end
 end
 
-local function getAttackLuckMultiplier(self, attackerHP)
+local function getLuckDamage(self, attackerHP)
     -- TODO: take the player skills into account.
-    return 1 + (getNormalizedHP(attackerHP) / 10) * math.random(0, 10) / 100
+    return math.random(0, getNormalizedHP(attackerHP))
 end
 
 local function getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
@@ -176,7 +176,7 @@ local function getUltimateAttackDamage(self, attackerGridIndex, attackerHP, targ
         (not target:isAffectedByLuck())) then
         return estimatedAttackDamage
     else
-        return round(estimatedAttackDamage * getAttackLuckMultiplier(self, attackerHP))
+        return estimatedAttackDamage + getLuckDamage(self, attackerHP)
     end
 end
 
