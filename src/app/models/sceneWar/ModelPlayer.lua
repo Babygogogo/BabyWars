@@ -34,6 +34,10 @@ local function getCurrentDamageCostPerEnergyRequirement(self)
     return DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100)
 end
 
+local function round(num)
+    return math.floor(num + 0.5)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -135,11 +139,23 @@ function ModelPlayer:addDamageCost(cost)
     if (not modelSkillConfiguration:getActivatingSkillGroupId()) then
         local _, maxEnergyRequirement = modelSkillConfiguration:getEnergyRequirement()
         if (maxEnergyRequirement) then
-            self.m_DamageCost = math.min(
+            self.m_DamageCost = round(math.min(
                 self.m_DamageCost + cost,
                 maxEnergyRequirement * getCurrentDamageCostPerEnergyRequirement(self)
-            )
+            ))
         end
+    end
+
+    return self
+end
+
+function ModelPlayer:updateDamageCostWithModifier(modifier)
+    local _, maxEnergyRequirement = self:getModelSkillConfiguration():getEnergyRequirement()
+    if (maxEnergyRequirement) then
+        self.m_DamageCost = round(math.min(
+            maxEnergyRequirement * getCurrentDamageCostPerEnergyRequirement(self),
+            math.max(self.m_DamageCost * modifier, 0)
+        ))
     end
 
     return self

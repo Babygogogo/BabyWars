@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.0.11"
+GameConstant.version = "0.1.6.0.12"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -755,6 +755,7 @@ GameConstant.categories = {
         8,
         9,
         12,
+        13,
     },
 }
 
@@ -4274,6 +4275,56 @@ GameConstant.skills = {
             [18] = {modifier = 180, pointsPassive = nil, pointsActive = 900, minEnergy = 9},
             [19] = {modifier = 190, pointsPassive = nil, pointsActive = 950, minEnergy = 10},
             [20] = {modifier = 200, pointsPassive = nil, pointsActive = 1000, minEnergy = 10},
+        },
+    },
+
+    -- Instant: Modify the energy of the opponent player.
+    [13] = {
+        minLevel     = -20,
+        maxLevel     = 20,
+        modifierUnit = "%",
+        levels       = {
+            [-20] = {modifier = 100, pointsPassive = nil, pointsActive = -100, minEnergy = 10},
+            [-19] = {modifier = 95, pointsPassive = nil, pointsActive = -95, minEnergy = 10},
+            [-18] = {modifier = 90, pointsPassive = nil, pointsActive = -90, minEnergy = 9},
+            [-17] = {modifier = 85, pointsPassive = nil, pointsActive = -85, minEnergy = 9},
+            [-16] = {modifier = 80, pointsPassive = nil, pointsActive = -80, minEnergy = 8},
+            [-15] = {modifier = 75, pointsPassive = nil, pointsActive = -75, minEnergy = 8},
+            [-14] = {modifier = 70, pointsPassive = nil, pointsActive = -70, minEnergy = 7},
+            [-13] = {modifier = 65, pointsPassive = nil, pointsActive = -65, minEnergy = 7},
+            [-12] = {modifier = 60, pointsPassive = nil, pointsActive = -60, minEnergy = 6},
+            [-11] = {modifier = 55, pointsPassive = nil, pointsActive = -55, minEnergy = 6},
+            [-10] = {modifier = 50, pointsPassive = nil, pointsActive = -50, minEnergy = 5},
+            [-9] = {modifier = 45, pointsPassive = nil, pointsActive = -45, minEnergy = 5},
+            [-8] = {modifier = 40, pointsPassive = nil, pointsActive = -40, minEnergy = 4},
+            [-7] = {modifier = 35, pointsPassive = nil, pointsActive = -35, minEnergy = 4},
+            [-6] = {modifier = 30, pointsPassive = nil, pointsActive = -30, minEnergy = 3},
+            [-5] = {modifier = 25, pointsPassive = nil, pointsActive = -25, minEnergy = 3},
+            [-4] = {modifier = 20, pointsPassive = nil, pointsActive = -20, minEnergy = 2},
+            [-3] = {modifier = 15, pointsPassive = nil, pointsActive = -15, minEnergy = 2},
+            [-2] = {modifier = 10, pointsPassive = nil, pointsActive = -10, minEnergy = 1},
+            [-1] = {modifier = 5, pointsPassive = nil, pointsActive = -5, minEnergy = 1},
+            [0] = {modifier = 0, pointsPassive = nil, pointsActive = 0, minEnergy = 0},
+            [1] = {modifier = -5, pointsPassive = nil, pointsActive = 50, minEnergy = 1},
+            [2] = {modifier = -10, pointsPassive = nil, pointsActive = 100, minEnergy = 1},
+            [3] = {modifier = -15, pointsPassive = nil, pointsActive = 150, minEnergy = 2},
+            [4] = {modifier = -20, pointsPassive = nil, pointsActive = 200, minEnergy = 2},
+            [5] = {modifier = -25, pointsPassive = nil, pointsActive = 250, minEnergy = 3},
+            [6] = {modifier = -30, pointsPassive = nil, pointsActive = 300, minEnergy = 3},
+            [7] = {modifier = -35, pointsPassive = nil, pointsActive = 350, minEnergy = 4},
+            [8] = {modifier = -40, pointsPassive = nil, pointsActive = 400, minEnergy = 4},
+            [9] = {modifier = -45, pointsPassive = nil, pointsActive = 450, minEnergy = 5},
+            [10] = {modifier = -50, pointsPassive = nil, pointsActive = 500, minEnergy = 5},
+            [11] = {modifier = -55, pointsPassive = nil, pointsActive = 550, minEnergy = 6},
+            [12] = {modifier = -60, pointsPassive = nil, pointsActive = 600, minEnergy = 6},
+            [13] = {modifier = -65, pointsPassive = nil, pointsActive = 650, minEnergy = 7},
+            [14] = {modifier = -70, pointsPassive = nil, pointsActive = 700, minEnergy = 7},
+            [15] = {modifier = -75, pointsPassive = nil, pointsActive = 750, minEnergy = 8},
+            [16] = {modifier = -80, pointsPassive = nil, pointsActive = 800, minEnergy = 8},
+            [17] = {modifier = -85, pointsPassive = nil, pointsActive = 850, minEnergy = 9},
+            [18] = {modifier = -90, pointsPassive = nil, pointsActive = 900, minEnergy = 9},
+            [19] = {modifier = -95, pointsPassive = nil, pointsActive = 950, minEnergy = 10},
+            [20] = {modifier = -100, pointsPassive = nil, pointsActive = 1000, minEnergy = 10},
         },
     },
 }
