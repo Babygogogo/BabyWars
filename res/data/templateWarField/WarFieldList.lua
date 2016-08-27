@@ -14,6 +14,7 @@ return {
     "ManShouXueXing",
     "QiuLongJuShu",
     "SanHeGu",
+    "ShenSeYanCaoZhanZheng",
     "TanXinWan",
     "XiaoGuoZhengBaSai",
     "YiTuanZao",
