@@ -181,6 +181,7 @@ local s_Texts = {
             elseif (skillID == 11) then return "使我方维修费用变为基础的"
             elseif (skillID == 12) then return "使我方资金变为当前的"
             elseif (skillID == 13) then return "根据我方资金来改变对方能量值，幅度为每10000资金"
+            elseif (skillID == 14) then return "额外改变我方全体部队的幸运伤害值上限，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -203,6 +204,7 @@ local s_Texts = {
             elseif (skillID == 11) then return "我方维修费用"
             elseif (skillID == 12) then return "我方当前资金"
             elseif (skillID == 13) then return "对方能量值"
+            elseif (skillID == 14) then return "我方幸运上限"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -217,6 +219,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryCost")        then return "造 价 类"
             elseif (skillCategory == "SkillCategoryMovement")    then return "移 动 类"
             elseif (skillCategory == "SkillCategoryAttackRange") then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryLuck")        then return "幸 运 类"
             elseif (skillCategory == "SkillCategoryRepair")      then return "维 修 类"
             elseif (skillCategory == "SkillCategoryInstant")     then return "瞬 时 类"
             else                                                      return "未知6:" .. (skillCategory or "")
@@ -228,6 +231,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryCost")        then return "Cost"
             elseif (skillCategory == "SkillCategoryMovement")    then return "Movement"
             elseif (skillCategory == "SkillCategoryAttackRange") then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryLuck")        then return "Luck"
             elseif (skillCategory == "SkillCategoryRepair")      then return "Repair"
             elseif (skillCategory == "SkillCategoryInstant")     then return "Instant"
             else                                                      return "Unknown6:" .. (skillCategory or "")

@@ -141,6 +141,24 @@ local function getRepairCostModifierForSkillGroup(modelSkillGroup, slotsCount)
     return modifier
 end
 
+local function getLuckDamageUpperModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 14)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -183,6 +201,11 @@ end
 
 function SkillModifierFunctions.getRepairCostModifier(configuration)
     return getRepairCostModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.getLuckDamageUpperModifier(configuration)
+    return getLuckDamageUpperModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        getLuckDamageUpperModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
 return SkillModifierFunctions

@@ -148,7 +148,12 @@ end
 
 local function getLuckDamage(self, attackerHP)
     -- TODO: take the player skills into account.
-    return math.random(0, getNormalizedHP(attackerHP))
+    local playerIndex             = self.m_Owner:getPlayerIndex()
+    local modelSkillConfiguration = self.modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration()
+    local upperModifier           = SkillModifierFunctions.getLuckDamageUpperModifier(modelSkillConfiguration)
+    local upperBound              = math.max(0, upperModifier + 10)
+
+    return math.random(0, getNormalizedHP(attackerHP) * upperBound / 10)
 end
 
 local function getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)

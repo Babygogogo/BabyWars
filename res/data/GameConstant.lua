@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.0.12"
+GameConstant.version = "0.1.6.0.13"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -712,6 +712,7 @@ GameConstant.categories = {
         "SkillCategoryCost",
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
+        "SkillCategoryLuck",
         "SkillCategoryRepair",
     },
 
@@ -721,6 +722,7 @@ GameConstant.categories = {
         "SkillCategoryCost",
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
+        "SkillCategoryLuck",
         "SkillCategoryInstant",
     },
 
@@ -742,6 +744,10 @@ GameConstant.categories = {
 
     ["SkillCategoryAttackRange"] = {
         7,
+    },
+
+    ["SkillCategoryLuck"] = {
+        14,
     },
 
     ["SkillCategoryRepair"] = {
@@ -4315,6 +4321,38 @@ GameConstant.skills = {
             [18] = {modifier = -90, pointsPassive = nil, pointsActive = 900, minEnergy = 9},
             [19] = {modifier = -95, pointsPassive = nil, pointsActive = 950, minEnergy = 10},
             [20] = {modifier = -100, pointsPassive = nil, pointsActive = 1000, minEnergy = 10},
+        },
+    },
+
+    -- Modify the upper limit of the luck damage of the owner player.
+    [14] = {
+        minLevel = -2,
+        maxLevel = 20,
+        modifierUnit = "%",
+        levels       = {
+            [-2] = {modifier = -10, pointsPassive = -40, pointsActive = -10, minEnergy = 1},
+            [-1] = {modifier = -5, pointsPassive = -20, pointsActive = -5, minEnergy = 1},
+            [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
+            [1] = {modifier = 5, pointsPassive = 40, pointsActive = 40, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
+            [3] = {modifier = 15, pointsPassive = 120, pointsActive = 120, minEnergy = 1},
+            [4] = {modifier = 20, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
+            [5] = {modifier = 25, pointsPassive = 200, pointsActive = 200, minEnergy = 2},
+            [6] = {modifier = 30, pointsPassive = 240, pointsActive = 240, minEnergy = 2},
+            [7] = {modifier = 35, pointsPassive = 280, pointsActive = 280, minEnergy = 3},
+            [8] = {modifier = 40, pointsPassive = 320, pointsActive = 320, minEnergy = 3},
+            [9] = {modifier = 45, pointsPassive = 360, pointsActive = 360, minEnergy = 3},
+            [10] = {modifier = 50, pointsPassive = 400, pointsActive = 400, minEnergy = 4},
+            [11] = {modifier = 55, pointsPassive = 440, pointsActive = 440, minEnergy = 4},
+            [12] = {modifier = 60, pointsPassive = 480, pointsActive = 480, minEnergy = 4},
+            [13] = {modifier = 65, pointsPassive = 520, pointsActive = 520, minEnergy = 5},
+            [14] = {modifier = 70, pointsPassive = 560, pointsActive = 560, minEnergy = 5},
+            [15] = {modifier = 75, pointsPassive = 600, pointsActive = 600, minEnergy = 5},
+            [16] = {modifier = 80, pointsPassive = 640, pointsActive = 640, minEnergy = 6},
+            [17] = {modifier = 85, pointsPassive = 680, pointsActive = 680, minEnergy = 6},
+            [18] = {modifier = 90, pointsPassive = 720, pointsActive = 720, minEnergy = 6},
+            [19] = {modifier = 95, pointsPassive = 760, pointsActive = 760, minEnergy = 7},
+            [20] = {modifier = 100, pointsPassive = 800, pointsActive = 800, minEnergy = 7},
         },
     },
 }
