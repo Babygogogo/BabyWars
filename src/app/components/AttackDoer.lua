@@ -149,7 +149,7 @@ end
 local function getLuckDamage(self, attackerHP)
     -- TODO: take the player skills into account.
     local playerIndex             = self.m_Owner:getPlayerIndex()
-    local modelSkillConfiguration = self.modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration()
+    local modelSkillConfiguration = self.m_ModelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration()
     local upperModifier           = SkillModifierFunctions.getLuckDamageUpperModifier(modelSkillConfiguration)
     local upperBound              = math.max(0, upperModifier + 10)
 
