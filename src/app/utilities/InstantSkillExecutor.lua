@@ -92,11 +92,7 @@ s_Executors.execute12 = function(level, modelWarField, modelPlayerManager, model
     local playerIndex  = modelTurnManager:getPlayerIndex()
     local modelPlayer  = modelPlayerManager:getModelPlayer(playerIndex)
     local baseModifier = getSkillModifier(12, level)
-    if (baseModifier >= 0) then
-        modelPlayer:setFund(round(modelPlayer:getFund() * (baseModifier + 100) / 100))
-    else
-        modelPlayer:setFund(round(modelPlayer:getFund() * 100 / (100 - baseModifier)))
-    end
+    modelPlayer:setFund(round(modelPlayer:getFund() * (baseModifier + 100) / 100))
 
     dispatcher:dispatchEvent({
         name        = "EvtModelPlayerUpdated",
