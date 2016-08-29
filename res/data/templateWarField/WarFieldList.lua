@@ -1,5 +1,6 @@
 
 return {
+    "BaZhenTuEr",
     "BeiPan",
     "BeiZhong",
     "BiFengGang",
@@ -7,6 +8,7 @@ return {
     "DuiChenDaoYu",
     "DuoYanPingYuan",
     "GaoLaMiJia",
+    "GanKeZhiJing",
     "GeBiTan",
     "HaiAnTuJi",
     "HuanXingShanMai",
@@ -19,6 +21,7 @@ return {
     "ShenSeYanCaoZhanZheng",
     "SiTongBaDa",
     "TanXinWan",
+    "WangPaiKongJun",
     "XiaoGuoZhengBaSai",
     "XiaoZhenWeiJi",
     "YiTuanZao",
