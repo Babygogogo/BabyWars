@@ -1,6 +1,6 @@
 
 return {
-    "BaZhenTuEr"
+    "BaZhenTuEr",
     "BeiPan",
     "BeiZhong",
     "BiFengGang",
