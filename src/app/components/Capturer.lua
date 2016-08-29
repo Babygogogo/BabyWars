@@ -12,11 +12,20 @@
 
 local Capturer = require("src.global.functions.class")("Capturer")
 
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+
 Capturer.EXPORTED_METHODS = {
     "isCapturingModelTile",
     "canCaptureModelTile",
     "getCaptureAmount",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -90,8 +99,10 @@ function Capturer:canCaptureModelTile(modelTile)
 end
 
 function Capturer:getCaptureAmount()
-    -- TODO: take the player skills into account.
-    return self.m_Owner:getNormalizedCurrentHP()
+    local capturer    = self.m_Owner
+    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(capturer:getPlayerIndex())
+    local modifier    = SkillModifierFunctions.getCaptureAmountModifier(modelPlayer:getModelSkillConfiguration())
+    return round(capturer:getNormalizedCurrentHP() * (100 + modifier) / 100)
 end
 
 return Capturer

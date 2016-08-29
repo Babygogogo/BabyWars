@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.0.13"
+GameConstant.version = "0.1.6.0.14"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -713,6 +713,7 @@ GameConstant.categories = {
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
         "SkillCategoryLuck",
+        "SkillCategoryCapture",
         "SkillCategoryRepair",
     },
 
@@ -723,6 +724,7 @@ GameConstant.categories = {
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
         "SkillCategoryLuck",
+        "SkillCategoryCapture",
         "SkillCategoryInstant",
     },
 
@@ -748,6 +750,10 @@ GameConstant.categories = {
 
     ["SkillCategoryLuck"] = {
         14,
+    },
+
+    ["SkillCategoryCapture"] = {
+        15,
     },
 
     ["SkillCategoryRepair"] = {
@@ -4353,6 +4359,17 @@ GameConstant.skills = {
             [18] = {modifier = 90, pointsPassive = 720, pointsActive = 720, minEnergy = 6},
             [19] = {modifier = 95, pointsPassive = 760, pointsActive = 760, minEnergy = 7},
             [20] = {modifier = 100, pointsPassive = 800, pointsActive = 800, minEnergy = 7},
+        },
+    },
+
+    -- Modify the capture speed of the owner player.
+    [15] = {
+        minLevel     = 1,
+        maxLevel     = 2,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 50, pointsPassive = 100, pointsActive = 100, minEnergy = 4},
+            [2] = {modifier = 2000, pointsPassive = 2000, pointsActive = 400, minEnergy = 8},
         },
     },
 }
