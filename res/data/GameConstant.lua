@@ -768,6 +768,7 @@ GameConstant.categories = {
         9,
         12,
         13,
+        16,
     },
 }
 
@@ -4381,6 +4382,16 @@ GameConstant.skills = {
             [11] = {modifier = 2000, pointsPassive = 1500, pointsActive = 400, minEnergy = 8},
         },
     },
+
+    -- Instant: Fills the ammo, fuel, material of all units of the owner player.
+    [16] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = nil, pointsPassive = nil, pointsActive = 150, minEnergy = 3},
+        }
+    }
 }
 
 return GameConstant

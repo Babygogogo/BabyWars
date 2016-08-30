@@ -113,6 +113,26 @@ s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, model
     end)
 end
 
+s_Executors.execute16 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex = modelTurnManager:getPlayerIndex()
+    local func        = function(modelUnit)
+        if (modelUnit:getPlayerIndex() == playerIndex) then
+            modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
+            if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
+                modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
+            end
+            if (modelUnit.setCurrentMaterial) then
+                modelUnit:setCurrentMaterial(modelUnit:getMaxMaterial())
+            end
+        end
+    end
+
+    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

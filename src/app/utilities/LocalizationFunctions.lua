@@ -183,6 +183,7 @@ local s_Texts = {
             elseif (skillID == 13) then return "根据我方资金来改变对方能量值，幅度为每10000资金"
             elseif (skillID == 14) then return "额外改变我方全体部队的幸运伤害值上限，幅度为"
             elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
+            elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -207,6 +208,7 @@ local s_Texts = {
             elseif (skillID == 13) then return "对方能量值"
             elseif (skillID == 14) then return "我方幸运上限"
             elseif (skillID == 15) then return "我军占领速度"
+            elseif (skillID == 16) then return "全面补给"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
