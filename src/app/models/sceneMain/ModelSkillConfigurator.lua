@@ -1,10 +1,13 @@
 
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
-local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
-local LocalizationFunctions   = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
-local getLocalizedText        = LocalizationFunctions.getLocalizedText
+local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+local getDescription   = SkillDescriptionFunctions.getDescription
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
 local SKILL_GROUP_ID_PASSIVE   = ModelSkillConfiguration.getSkillGroupIdPassive()
@@ -27,6 +30,21 @@ local function setItemsSkillGroupActiveState(self, isSkillEnabled)
             view:setItemEnabled(i, isSkillEnabled)
         end
     end
+end
+
+local setStateSelectSkillLevel
+local function createItemsSkillSubCategory(self, categoryName)
+    local items = {}
+    for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+        items[#items + 1] = {
+            name     = getLocalizedText(5, skillID),
+            callback = function()
+                setStateSelectSkillLevel(self, skillID)
+            end,
+        }
+    end
+
+    return items
 end
 
 --------------------------------------------------------------------------------
@@ -74,7 +92,7 @@ local function setStateOverviewConfiguration(self, configurationID)
                 view:setItemEnabled(i, false)
             end
         else
-            view:setOverviewString(configuration:getDescription())
+            view:setOverviewString(getDescription(configuration))
         end
     end
 end
@@ -128,9 +146,14 @@ local function setStateSelectSkillCategory(self, slotIndex)
     self.m_State        = "stateSelectSkillCategory"
     self.m_SlotIndex    = slotIndex
 
-    if (self.m_View) then
-        self.m_View:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
-            :setMenuItems(self.m_ItemsSkillCategories)
+    local view = self.m_View
+    if (view) then
+        view:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
+        if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
+            view:setMenuItems(self.m_ItemsSkillCategoriesForPassive)
+        else
+            view:setMenuItems(self.m_ItemsSkillCategoriesForActive)
+        end
     end
 end
 
@@ -143,7 +166,7 @@ local function setStateSelectSkill(self, categoryName)
     end
 end
 
-local function setStateSelectSkillLevel(self, skillID)
+setStateSelectSkillLevel = function(self, skillID)
     self.m_State   = "stateSelectSkillLevel"
     self.m_SkillID = skillID
 
@@ -230,7 +253,7 @@ local function initItemsEnergyRequirement(self)
                 self.m_ModelSkillConfiguration:setEnergyRequirement(self.m_SkillGroupID, requirement)
 
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 end
             end,
         }
@@ -260,7 +283,7 @@ local function initItemsSkillGroupActive(self)
             callback  = function()
                 self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, true)
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                     setItemsSkillGroupActiveState(self, true)
                 end
             end,
@@ -270,7 +293,7 @@ local function initItemsSkillGroupActive(self)
             callback = function()
                 self.m_ModelSkillConfiguration:setModelSkillGroupEnabled(self.m_SkillGroupID, false)
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                     setItemsSkillGroupActiveState(self, false)
                 end
             end,
@@ -294,7 +317,7 @@ local function initItemsSkillGroupActive(self)
     self.m_ItemsSkillGroupActive = items
 end
 
-local function initItemsSkillCategories(self)
+local function initItemsSkillCategoriesForPassive(self)
     local items = {
         {
             name     = getLocalizedText(3, "Clear"),
@@ -302,13 +325,13 @@ local function initItemsSkillCategories(self)
                 self.m_ModelSkillConfiguration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
 
                 if (self.m_View) then
-                    self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 end
             end,
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -317,22 +340,47 @@ local function initItemsSkillCategories(self)
         }
     end
 
-    self.m_ItemsSkillCategories = items
+    self.m_ItemsSkillCategoriesForPassive = items
+end
+
+local function initItemsSkillCategoriesForActive(self)
+    local items = {
+        {
+            name     = getLocalizedText(3, "Clear"),
+            callback = function()
+                self.m_ModelSkillConfiguration:clearSkill(self.m_SkillGroupID, self.m_SlotIndex)
+
+                if (self.m_View) then
+                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
+                end
+            end,
+        }
+    }
+
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+        items[#items + 1] = {
+            name     = getLocalizedText(6, categoryName),
+            callback = function()
+                setStateSelectSkill(self, categoryName)
+            end,
+        }
+    end
+
+    self.m_ItemsSkillCategoriesForActive = items
 end
 
 local function initItemsSkills(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
-        local subItems = {}
-        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
-            subItems[#subItems + 1] = {
-                name     = getLocalizedText(5, skillID),
-                callback = function()
-                    setStateSelectSkillLevel(self, skillID)
-                end,
-            }
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+        if (not items[categoryName]) then
+            print(categoryName)
+            items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
-        items[categoryName] = subItems
+    end
+    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+        if (not items[categoryName]) then
+            items[categoryName] = createItemsSkillSubCategory(self, categoryName)
+        end
     end
 
     self.m_ItemsSkills = items
@@ -340,7 +388,7 @@ end
 
 local function initItemsSkillLevels(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategories")) do
+    for categoryName, _ in pairs(self.m_ItemsSkills) do
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             if (items[skillID]) then
                 break
@@ -349,15 +397,17 @@ local function initItemsSkillLevels(self)
             local subItems = {}
             local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
             for i = maxLevel, minLevel, -1 do
-                subItems[#subItems + 1] = {
-                    name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
-                    callback = function()
-                        self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
-                        if (self.m_View) then
-                            self.m_View:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
-                        end
-                    end,
-                }
+                if (i ~= 0) then
+                    subItems[#subItems + 1] = {
+                        name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
+                        callback = function()
+                            self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
+                            if (self.m_View) then
+                                self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
+                            end
+                        end,
+                    }
+                end
             end
 
             items[skillID] = subItems
@@ -374,15 +424,16 @@ function ModelSkillConfigurator:ctor()
     self.m_State                   = "stateDisabled"
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create()
 
-    initItemsAllConfigurations(self)
-    initItemsOverview(         self)
-    initItemsMaxPoints(        self)
-    initItemsEnergyRequirement(self)
-    initItemsSkillGroupPassive(self)
-    initItemsSkillGroupActive( self)
-    initItemsSkillCategories(  self)
-    initItemsSkills(           self)
-    initItemsSkillLevels(      self)
+    initItemsAllConfigurations(        self)
+    initItemsOverview(                 self)
+    initItemsMaxPoints(                self)
+    initItemsEnergyRequirement(        self)
+    initItemsSkillGroupPassive(        self)
+    initItemsSkillGroupActive(         self)
+    initItemsSkillCategoriesForPassive(self)
+    initItemsSkillCategoriesForActive( self)
+    initItemsSkills(                   self)
+    initItemsSkillLevels(              self)
 
     return self
 end
@@ -424,7 +475,7 @@ function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
 
         local view = self.m_View
         if (view) then
-            view:setOverviewString(self.m_ModelSkillConfiguration:getDescription())
+            view:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
                 :setButtonSaveEnabled(true)
             for i = 1, #self.m_ItemsOverview do
                 view:setItemEnabled(i, true)

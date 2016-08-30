@@ -400,7 +400,7 @@ end
 
 function ModelUnitMap:doActionWait(action)
     local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
     moveActorUnitOnAction(self, action)
     focusModelUnit:doActionWait(action)
 
@@ -411,7 +411,7 @@ end
 
 function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
     moveActorUnitOnAction(self, action)
     focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
 
@@ -436,7 +436,7 @@ function ModelUnitMap:doActionJoinModelUnit(action)
     end
 
     local focusModelUnit = focusActorUnit:getModel()
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
         :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
 
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
@@ -446,7 +446,7 @@ end
 
 function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer))
+    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer, true))
     moveActorUnitOnAction(self, action)
     capturer:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
 
@@ -457,7 +457,7 @@ end
 
 function ModelUnitMap:doActionLaunchSilo(action, silo)
     local launcher = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    launcher:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(launcher))
+    launcher:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(launcher, true))
     moveActorUnitOnAction(self, action)
     launcher:doActionLaunchSilo(action, self, silo)
 
@@ -468,7 +468,7 @@ end
 
 function ModelUnitMap:doActionBuildModelTile(action, target)
     local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder))
+    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder, true))
     moveActorUnitOnAction(self, action)
     builder:doActionBuildModelTile(action, target)
 
@@ -481,7 +481,7 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
     local path              = action.path
     local gridIndex         = path[#path]
     local focusModelUnit    = self:getFocusModelUnit(path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
     moveActorUnitOnAction(self, action)
 
     local producedUnitID    = self.m_AvailableUnitID
@@ -506,7 +506,7 @@ end
 
 function ModelUnitMap:doActionSupplyModelUnit(action)
     local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier))
+    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier, true))
     moveActorUnitOnAction(self, action)
     supplier:doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, supplier))
 
@@ -521,7 +521,7 @@ function ModelUnitMap:doActionLoadModelUnit(action)
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
     local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
     if (launchUnitID) then
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
     else
@@ -540,7 +540,7 @@ function ModelUnitMap:doActionDropModelUnit(action)
     local beginningGridIndex, endingGridIndex = path[1], path[#path]
     local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit))
+    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
     moveActorUnitOnAction(self, action)
 
     local dropActorUnits = {}
@@ -602,7 +602,7 @@ function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
         (self:getModelUnit(gridIndex))
 end
 
-function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
+function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive)
     if (not loaderModelUnit.getLoadUnitIdList) then
         return nil
     else
@@ -610,8 +610,19 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit)
         for _, unitID in ipairs(loaderModelUnit:getLoadUnitIdList()) do
             list[#list + 1] = self:getLoadedModelUnitWithUnitId(unitID)
         end
-
         assert(#list == loaderModelUnit:getCurrentLoadCount())
+
+        if (isRecursive) then
+            for _, loader in ipairs(list) do
+                local subList = self:getLoadedModelUnitsWithLoader(loader, true)
+                if (subList) then
+                    for _, subItem in ipairs(subList) do
+                        list[#list + 1] = subItem
+                    end
+                end
+            end
+        end
+
         return list
     end
 end

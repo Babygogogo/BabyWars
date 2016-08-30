@@ -13,9 +13,10 @@
 
 local MoveDoer = require("src.global.functions.class")("MoveDoer")
 
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 local MOVE_TYPES = require("res.data.GameConstant").moveTypes
 
@@ -66,6 +67,13 @@ function MoveDoer:setModelPlayerManager(model)
     return self
 end
 
+function MoveDoer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "MoveDoer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 function MoveDoer:setModelWeatherManager(model)
     assert(self.m_ModelWeatherManager == nil, "MoveDoer:setModelWeatherManager() the model has been set already.")
     self.m_ModelWeatherManager = model
@@ -78,7 +86,8 @@ end
 --------------------------------------------------------------------------------
 function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
-    return self.m_Template.range
+    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration()))
 end
 
 function MoveDoer:getMoveType()

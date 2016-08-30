@@ -44,6 +44,13 @@ function UnitProducer:setModelPlayerManager(model)
     return self
 end
 
+function UnitProducer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "UnitProducer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

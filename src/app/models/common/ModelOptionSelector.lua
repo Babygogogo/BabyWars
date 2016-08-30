@@ -40,12 +40,8 @@ function ModelOptionSelector:setButtonsEnabled(enabled)
 end
 
 function ModelOptionSelector:setOptions(options)
-    self.m_OptionIndex = 1
-    self.m_Options     = options
-
-    if (self.m_View) then
-        self.m_View:setOptionText(options[1].text)
-    end
+    self.m_Options = options
+    self:setCurrentOptionIndex(1)
 
     return self
 end
@@ -60,8 +56,12 @@ function ModelOptionSelector:setCurrentOptionIndex(index)
         "ModelOptionSelector:setCurrentOptionIndex() the param index is invalid.")
 
     self.m_OptionIndex = index
+    local option = options[index]
+    if (option.callback) then
+        option.callback()
+    end
     if (self.m_View) then
-        self.m_View:setOptionText(options[index].text)
+        self.m_View:setOptionText(option.text)
     end
 
     return self

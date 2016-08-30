@@ -102,6 +102,13 @@ function AttackTaker:setModelPlayerManager(model)
     return self
 end
 
+function AttackTaker:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "AttackTaker:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

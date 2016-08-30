@@ -17,9 +17,10 @@
 
 local RepairDoer = require("src.global.functions.class")("RepairDoer")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 RepairDoer.EXPORTED_METHODS = {
     "getRepairTargetCategoryFullName",
@@ -66,6 +67,13 @@ function RepairDoer:setModelPlayerManager(model)
     return self
 end
 
+function RepairDoer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "RepairDoer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------
@@ -93,12 +101,18 @@ function RepairDoer:canRepairTarget(target)
     return false
 end
 
-function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
+function RepairDoer:getRepairAmountAndCost(target)
+    local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
+    local productionCost = round(
+        (costModifier >= 0)                                       and
+        (target:getProductionCost() * (100 + costModifier) / 100) or
+        (target:getProductionCost() * 100 / (100 - costModifier))
+    )
     local normalizedCurrentHP    = target:getNormalizedCurrentHP()
-    local productionCost         = target:getProductionCost()
     local normalizedRepairAmount = math.min(
         10 - normalizedCurrentHP,
-        self:getNormalizedRepairAmount(modelPlayer),
+        self:getNormalizedRepairAmount(),
         math.floor(modelPlayer:getFund() * 10 / productionCost)
     )
 
@@ -106,12 +120,13 @@ function RepairDoer:getRepairAmountAndCost(target, modelPlayer)
         round(normalizedRepairAmount * productionCost / 10)
 end
 
-function RepairDoer:getNormalizedRepairAmount(modelPlayer)
-    if (not modelPlayer) then
+function RepairDoer:getNormalizedRepairAmount()
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    if (playerIndex < 1) then
         return self.m_Template.amount
     else
-        -- TODO: take the abilities of the player into account.
-        return self.m_Template.amount
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        return self.m_Template.amount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
     end
 end
 

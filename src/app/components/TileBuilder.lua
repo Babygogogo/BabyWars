@@ -40,6 +40,13 @@ function TileBuilder:setModelPlayerManager(model)
     return self
 end
 
+function TileBuilder:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "TileBuilder:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

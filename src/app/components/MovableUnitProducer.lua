@@ -33,6 +33,13 @@ function MovableUnitProducer:setModelPlayerManager(model)
     return self
 end
 
+function MovableUnitProducer:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "MovableUnitProducer:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------

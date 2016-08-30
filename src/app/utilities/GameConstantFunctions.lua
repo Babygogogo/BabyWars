@@ -217,16 +217,28 @@ function GameConstantFunctions.getDamageCostPerEnergyRequirement()
     return GAME_CONSTANT.damageCostPerEnergyRequirement
 end
 
+function GameConstantFunctions.getSkillEnergyRequirement(id, level)
+    return GAME_CONSTANT.skills[id].levels[level].minEnergy
+end
+
 function GameConstantFunctions.getDamageCostGrowthRates()
     return GAME_CONSTANT.damageCostGrowthRates
 end
 
-function GameConstantFunctions.getSkillPoints(id, level)
-    return GAME_CONSTANT.skills[id].levels[level].points
+function GameConstantFunctions.getSkillPoints(id, level, isActive)
+    if (isActive) then
+        return GAME_CONSTANT.skills[id].levels[level].pointsActive
+    else
+        return GAME_CONSTANT.skills[id].levels[level].pointsPassive
+    end
 end
 
 function GameConstantFunctions.getSkillModifier(id, level)
     return GAME_CONSTANT.skills[id].levels[level].modifier
+end
+
+function GameConstantFunctions.getSkillModifierUnit(id)
+    return GAME_CONSTANT.skills[id].modifierUnit
 end
 
 function GameConstantFunctions.getSkillLevelMinMax(id)

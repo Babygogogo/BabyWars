@@ -26,21 +26,38 @@ local TableFunctions = require("src.app.utilities.TableFunctions")
 local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
     local units = {}
     modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
-        if (modelUnit:getPlayerIndex() == playerIndex) then
-            local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
-            if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
-                units[#units + 1] = modelUnit
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
+                if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
+                    units[#units + 1] = modelUnit
+                end
             end
-        end
-    end)
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                local loader = modelUnitMap:getModelUnit(modelUnit:getGridIndex())
+                if (loader:canRepairLoadedModelUnit()) then
+                    units[#units + 1] = modelUnit
+                end
+            end
+        end)
 
     table.sort(units, function(unit1, unit2)
         local cost1, cost2 = unit1:getProductionCost(), unit2:getProductionCost()
-        return ((cost1 > cost2) or
-                (cost1 == cost2) and (unit1:getUnitId() < unit2:getUnitId()))
+        return (cost1 > cost2)                                             or
+            ((cost1 == cost2) and (unit1:getUnitId() < unit2:getUnitId()))
     end)
 
     return units
+end
+
+local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
+    local gridIndex = modelUnit:getGridIndex()
+    if (modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId())) then
+        return modelUnitMap:getModelUnit(gridIndex):getRepairAmountAndCostForLoadedModelUnit(modelUnit)
+    else
+        return modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(modelUnit)
+    end
 end
 
 local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerIndex)
@@ -99,13 +116,15 @@ local function onEvtTurnPhaseGetFund(self, event)
 end
 
 local function onEvtTurnPhaseRepairUnit(self, event)
+    local modelUnitMap    = event.modelUnitMap
     local modelTileMap    = event.modelTileMap
     local playerIndex     = event.playerIndex
     local modelPlayer     = self.m_ModelPlayers[playerIndex]
     local eventDispatcher = self.m_RootScriptEventDispatcher
-    for _, unit in ipairs(getRepairableModelUnits(event.modelUnitMap, modelTileMap, playerIndex)) do
+
+    for _, unit in ipairs(getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)) do
         local gridIndex                = unit:getGridIndex()
-        local repairAmount, repairCost = modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(unit, modelPlayer)
+        local repairAmount, repairCost = getRepairAmountAndCostForModelUnit(unit, modelUnitMap, modelTileMap)
         local shouldSupply             = unit:getCurrentFuel() < unit:getMaxFuel()
 
         unit:setCurrentHP(unit:getCurrentHP() + repairAmount)

@@ -3,7 +3,12 @@ local ViewWarFieldPreviewer = class("ViewWarFieldPreviewer", cc.Node)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 local GRID_SIZE = require("src.app.utilities.GameConstantFunctions").getGridSize()
+
+local AUTHOR_NAME_LABEL_Z_ORDER = 1
+local LABEL_NICKNAMES_Z_ORDER   = 1
 
 local BACKGROUND_POS_X  = 30 + 250 + 30 -- These numbers are the width/posX of the menu of the JoinWarSelector.
 local BACKGROUND_POS_Y  = 30 + 60 + 30
@@ -15,16 +20,25 @@ local CLIPPING_NODE_POS_Y  = BACKGROUND_POS_Y + 7
 local CLIPPING_NODE_WIDTH  = BACKGROUND_POS_X + BACKGROUND_WIDTH  - 5 - CLIPPING_NODE_POS_X
 local CLIPPING_NODE_HEIGHT = BACKGROUND_POS_Y + BACKGROUND_HEIGHT - 6 - CLIPPING_NODE_POS_Y
 
-local AUTHOR_NAME_LABEL_Z_ORDER       = 1
 local AUTHOR_NAME_LABEL_POS_X         = CLIPPING_NODE_POS_X
 local AUTHOR_NAME_LABEL_POS_Y         = CLIPPING_NODE_POS_Y
 local AUTHOR_NAME_LABEL_WIDTH         = CLIPPING_NODE_WIDTH
 local AUTHOR_NAME_LABEL_HEIGHT        = CLIPPING_NODE_HEIGHT
 local AUTHOR_NAME_LABEL_FONT_NAME     = "res/fonts/msyhbd.ttc"
-local AUTHOR_NAME_LABEL_FONT_SIZE     = 25
+local AUTHOR_NAME_LABEL_FONT_SIZE     = 20
 local AUTHOR_NAME_LABEL_FONT_COLOR    = {r = 255, g = 255, b = 255}
 local AUTHOR_NAME_LABEL_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local AUTHOR_NAME_LABEL_OUTLINE_WIDTH = 2
+
+local LABEL_NICKNAMES_POS_X         = CLIPPING_NODE_POS_X
+local LABEL_NICKNAMES_POS_Y         = CLIPPING_NODE_POS_Y
+local LABEL_NICKNAMES_WIDTH         = CLIPPING_NODE_WIDTH
+local LABEL_NICKNAMES_HEIGHT        = CLIPPING_NODE_HEIGHT
+local LABEL_NICKNAMES_FONT_NAME     = AUTHOR_NAME_LABEL_FONT_NAME
+local LABEL_NICKNAMES_FONT_SIZE     = 18
+local LABEL_NICKNAMES_FONT_COLOR    = AUTHOR_NAME_LABEL_FONT_COLOR
+local LABEL_NICKNAMES_OUTLINE_COLOR = AUTHOR_NAME_LABEL_OUTLINE_COLOR
+local LABEL_NICKNAMES_OUTLINE_WIDTH = 2
 
 local CLIPPING_RECT = {
     x      = 0,
@@ -69,7 +83,7 @@ local function initClippingNode(self)
     self:addChild(clippingNode, CLIPPING_NODE_Z_ORDER)
 end
 
-local function initAuthorNameLabel(self)
+local function initLabelAuthorName(self)
     local label = cc.Label:createWithTTF("", AUTHOR_NAME_LABEL_FONT_NAME, AUTHOR_NAME_LABEL_FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(AUTHOR_NAME_LABEL_POS_X, AUTHOR_NAME_LABEL_POS_Y)
@@ -84,13 +98,29 @@ local function initAuthorNameLabel(self)
     self:addChild(label, AUTHOR_NAME_LABEL_Z_ORDER)
 end
 
+local function initLabelNicknames(self)
+    local label = cc.Label:createWithTTF("", LABEL_NICKNAMES_FONT_NAME, LABEL_NICKNAMES_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(LABEL_NICKNAMES_POS_X, LABEL_NICKNAMES_POS_Y)
+
+        :enableOutline(LABEL_NICKNAMES_OUTLINE_COLOR, LABEL_NICKNAMES_OUTLINE_WIDTH)
+
+        :setDimensions(LABEL_NICKNAMES_WIDTH, LABEL_NICKNAMES_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+    self.m_LabelNicknames = label
+    self:addChild(label, LABEL_NICKNAMES_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ViewWarFieldPreviewer:ctor(param)
     initBackground(     self)
     initClippingNode(   self)
-    initAuthorNameLabel(self)
+    initLabelAuthorName(self)
+    initLabelNicknames( self)
 
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
@@ -116,7 +146,30 @@ function ViewWarFieldPreviewer:setViewTileMap(view, mapSize)
 end
 
 function ViewWarFieldPreviewer:setAuthorName(name)
-    self.m_LabelAuthorName:setString(LocalizationFunctions.getLocalizedText(48) .. name)
+    self.m_LabelAuthorName:setString(getLocalizedText(48, "Author") .. name)
+        :stopAllActions()
+        :setOpacity(255)
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(3),
+            cc.FadeOut:create(1)
+        ))
+
+    return self
+end
+
+function ViewWarFieldPreviewer:setPlayerNicknames(names, count)
+    local text = getLocalizedText(48, "Players")
+    for i = 1, count do
+        text = string.format("%s\n%d. %s", text, i, names[i] or getLocalizedText(48, "Empty"))
+    end
+
+    self.m_LabelNicknames:setString(text)
+        :stopAllActions()
+        :setOpacity(255)
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(3),
+            cc.FadeOut:create(1)
+        ))
 
     return self
 end

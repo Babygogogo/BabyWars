@@ -1,8 +1,11 @@
 
 local ModelMainMenu = class("ModelMainMenu")
 
-local Actor                 = require("src.global.actors.Actor")
+local AudioManager          = require("src.app.utilities.AudioManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -114,7 +117,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemNewWar(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "NewGame"),
+        name     = getLocalizedText(1, "NewGame"),
         callback = function()
             self:setMenuEnabled(false)
             getActorNewWarCreator(self):getModel():setEnabled(true)
@@ -126,7 +129,7 @@ end
 
 local function initItemContinue(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "Continue"),
+        name     = getLocalizedText(1, "Continue"),
         callback = function()
             self:setMenuEnabled(false)
             getActorContinueWarSelector(self):getModel():setEnabled(true)
@@ -138,7 +141,7 @@ end
 
 local function initItemJoinWar(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "JoinWar"),
+        name     = getLocalizedText(1, "JoinWar"),
         callback = function()
             self:setMenuEnabled(false)
             getActorJoinWarSelector(self):getModel():setEnabled(true)
@@ -150,7 +153,7 @@ end
 
 local function initItemConfigSkills(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "ConfigSkills"),
+        name     = getLocalizedText(1, "ConfigSkills"),
         callback = function()
             self:setMenuEnabled(false)
             getActorSkillConfigurator(self):getModel():setEnabled(true)
@@ -162,7 +165,7 @@ end
 
 local function initItemLogin(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "Login"),
+        name     = getLocalizedText(1, "Login"),
         callback = function()
             self:setMenuEnabled(false)
             getActorLoginPanel(self):getModel():setEnabled(true)
@@ -172,9 +175,24 @@ local function initItemLogin(self)
     self.m_ItemLogin = item
 end
 
+local function initItemSetMusic(self)
+    local item = {
+        name = getLocalizedText(1, "SetMusic"),
+        callback = function()
+            local isEnabled = not AudioManager.isEnabled()
+            AudioManager.setEnabled(isEnabled)
+            if (isEnabled) then
+                AudioManager.playMainMusic()
+            end
+        end,
+    }
+
+    self.m_ItemSetMusic = item
+end
+
 local function initItemHelp(self)
     local item = {
-        name     = LocalizationFunctions.getLocalizedText(1, "Help"),
+        name     = getLocalizedText(1, "Help"),
         callback = function()
             self:setMenuEnabled(false)
             getActorGameHelper(self):getModel():setEnabled(true)
@@ -193,6 +211,7 @@ function ModelMainMenu:ctor(param)
     initItemJoinWar(     self)
     initItemConfigSkills(self)
     initItemLogin(       self)
+    initItemSetMusic(    self)
     initItemHelp(        self)
 
     if (self.m_View) then
@@ -314,11 +333,13 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemJoinWar,
                 self.m_ItemConfigSkills,
                 self.m_ItemLogin,
+                self.m_ItemSetMusic,
                 self.m_ItemHelp
             )
         else
             showMenuItems(self,
                 self.m_ItemLogin,
+                self.m_ItemSetMusic,
                 self.m_ItemHelp
             )
         end
@@ -328,7 +349,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
 end
 
 function ModelMainMenu:onButtonExitTouched()
-    self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(66, "ExitGame"))
+    self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "ExitGame"))
         :setOnConfirmYes(function()
             cc.Director:getInstance():endToLua()
         end)

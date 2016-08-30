@@ -64,6 +64,7 @@ local s_Texts = {
             elseif (textType == "JoinWar")      then return "参 战"
             elseif (textType == "ConfigSkills") then return "配 置 技 能"
             elseif (textType == "Login")        then return "注 册 / 登 陆"
+            elseif (textType == "SetMusic")     then return "开 / 关 音 乐"
             elseif (textType == "Help")         then return "帮 助"
             elseif (textType == "Save")         then return "保 存"
             elseif (textType == "Back")         then return "返 回"
@@ -72,7 +73,7 @@ local s_Texts = {
             elseif (textType == "GameFlow")     then return "游 戏 流 程"
             elseif (textType == "WarControl")   then return "战 局 操 作"
             elseif (textType == "About")        then return "关 于 本 作"
-            else                                     return "未知[1]: " .. (textType or "")
+            else                                     return "未知1:" .. (textType or "")
             end
         end,
         [2] = function(textType)
@@ -82,6 +83,7 @@ local s_Texts = {
             elseif (textType == "JoinWar")      then return "Join"
             elseif (textType == "ConfigSkills") then return "Config Skills"
             elseif (textType == "Login")        then return "Login"
+            elseif (textType == "SetMusic")     then return "Set Music"
             elseif (textType == "Help")         then return "Help"
             elseif (textType == "Save")         then return "Save"
             elseif (textType == "Back")         then return "Back"
@@ -90,7 +92,7 @@ local s_Texts = {
             elseif (textType == "GameFlow")     then return "Game Flow"
             elseif (textType == "WarControl")   then return "Controlling"
             elseif (textType == "About")        then return "About"
-            else                                     return "Unknown[1]: " .. (textType or "")
+            else                                     return "Unknown1:" .. (textType or "")
             end
         end,
     },
@@ -121,6 +123,7 @@ local s_Texts = {
             elseif (textType == "TotalPoints")          then return "合计技能点"
             elseif (textType == "SkillPoints")          then return "技能点"
             elseif (textType == "EnergyRequirement")    then return "能量槽长度"
+            elseif (textType == "MinEnergy")            then return "最小能量槽"
             elseif (textType == "SetEnergyRequirement") then return "设定能量槽长度"
             elseif (textType == "Level")                then return "等级"
             elseif (textType == "Modifier")             then return "幅度"
@@ -130,6 +133,7 @@ local s_Texts = {
             elseif (textType == "Disabled")             then return "已 禁 用"
             elseif (textType == "Selected")             then return "已 选 定"
             elseif (textType == "None")                 then return "无"
+            elseif (textType == "NoSkills")             then return "没有任何技能"
             elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
             elseif (textType == "SettingConfiguration") then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
             else                                             return "未知[3]: " .. (textType or "")
@@ -145,6 +149,7 @@ local s_Texts = {
             elseif (textType == "TotalPoints")          then return "Total Points"
             elseif (textType == "SkillPoints")          then return "Points"
             elseif (textType == "EnergyRequirement")    then return "Energy Requirement"
+            elseif (textType == "MinEnergy")            then return "Min Energy"
             elseif (textType == "SetEnergyRequirement") then return "Set Energy"
             elseif (textType == "Level")                then return "Level"
             elseif (textType == "Modifier")             then return "Modifier"
@@ -154,6 +159,7 @@ local s_Texts = {
             elseif (textType == "Disabled")             then return "Disabled"
             elseif (textType == "Selected")             then return "Selected"
             elseif (textType == "None")                 then return "None"
+            elseif (textType == "NoSkills")             then return "No skills"
             elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
             elseif (textType == "SettingConfiguration") then return "Transfering data to the server. Please wait."
             else                                             return "Unknown[3]: " .. (textType or "")
@@ -162,10 +168,23 @@ local s_Texts = {
     },
     [4] = {
         [1] = function(skillID)
-            if     (skillID == 1) then return "改变我方全体部队的攻击力。"
-            elseif (skillID == 2) then return "改变我方全体部队的防御力。"
-            elseif (skillID == 3) then return "改变我方全体部队的造价。"
-            else                       return "未知[4]: " .. (skillID or "")
+            if     (skillID == 1)  then return "使我方全体部队造成的攻击伤害变为基础的"
+            elseif (skillID == 2)  then return "使我方全体部队受到的攻击伤害变为基础的"
+            elseif (skillID == 3)  then return "使我方全体部队的造价变为基础的"
+            elseif (skillID == 4)  then return "改变我方全体部队的当前HP，幅度为"
+            elseif (skillID == 5)  then return "改变对方全体部队的当前HP，幅度为"
+            elseif (skillID == 6)  then return "改变我方全体部队的移动力，幅度为"
+            elseif (skillID == 7)  then return "改变我方全体远程部队的射程上限，幅度为"
+            elseif (skillID == 8)  then return "使我方步兵系以外的全体部队变为未行动的状态。"
+            elseif (skillID == 9)  then return "使对方全体部队的燃料值变为当前值的"
+            elseif (skillID == 10) then return "额外改变我方具有维修能力的据点及部队的维修量，幅度为"
+            elseif (skillID == 11) then return "使我方维修费用变为基础的"
+            elseif (skillID == 12) then return "使我方资金变为当前的"
+            elseif (skillID == 13) then return "根据我方资金来改变对方能量值，幅度为每10000资金"
+            elseif (skillID == 14) then return "额外改变我方全体部队的幸运伤害值上限，幅度为"
+            elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
+            elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
+            else                        return "未知4:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
@@ -174,10 +193,23 @@ local s_Texts = {
     },
     [5] = {
         [1] = function(skillID)
-            if     (skillID == 1) then return "全军攻击力"
-            elseif (skillID == 2) then return "全军防御力"
-            elseif (skillID == 3) then return "全军造价"
-            else                       return "未知[5]: " .. (skillID or "")
+            if     (skillID == 1)  then return "全军攻击力"
+            elseif (skillID == 2)  then return "全军防御力"
+            elseif (skillID == 3)  then return "全军造价"
+            elseif (skillID == 4)  then return "全军HP"
+            elseif (skillID == 5)  then return "对方全军HP"
+            elseif (skillID == 6)  then return "全军移动力"
+            elseif (skillID == 7)  then return "远程部队射程"
+            elseif (skillID == 8)  then return "再动"
+            elseif (skillID == 9)  then return "对方全军燃料"
+            elseif (skillID == 10) then return "我方维修量"
+            elseif (skillID == 11) then return "我方维修费用"
+            elseif (skillID == 12) then return "我方当前资金"
+            elseif (skillID == 13) then return "对方能量值"
+            elseif (skillID == 14) then return "我方幸运上限"
+            elseif (skillID == 15) then return "我军占领速度"
+            elseif (skillID == 16) then return "全面补给"
+            else                        return "未知5:" .. (skillID or "")
             end
         end,
         [2] = function(skillID)
@@ -186,17 +218,29 @@ local s_Texts = {
     },
     [6] = {
         [1] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")  then return "攻 击 类"
-            elseif (skillCategory == "SkillCategoryDefense") then return "防 御 类"
-            elseif (skillCategory == "SkillCategoryCost")    then return "造 价 类"
-            else                                                  return "未知[6]: " .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")      then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryDefense")     then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryCost")        then return "造 价 类"
+            elseif (skillCategory == "SkillCategoryMovement")    then return "移 动 类"
+            elseif (skillCategory == "SkillCategoryAttackRange") then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryLuck")        then return "幸 运 类"
+            elseif (skillCategory == "SkillCategoryCapture")     then return "占 领 类"
+            elseif (skillCategory == "SkillCategoryRepair")      then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryInstant")     then return "瞬 时 类"
+            else                                                      return "未知6:" .. (skillCategory or "")
             end
         end,
         [2] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")  then return "Attack"
-            elseif (skillCategory == "SkillCategoryDefense") then return "Defense"
-            elseif (skillCategory == "SkillCategoryCost")    then return "Cost"
-            else                                                  return "Unknown[6]: " .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")      then return "Attack"
+            elseif (skillCategory == "SkillCategoryDefense")     then return "Defense"
+            elseif (skillCategory == "SkillCategoryCost")        then return "Cost"
+            elseif (skillCategory == "SkillCategoryMovement")    then return "Movement"
+            elseif (skillCategory == "SkillCategoryAttackRange") then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryLuck")        then return "Luck"
+            elseif (skillCategory == "SkillCategoryCapture")     then return "Capture"
+            elseif (skillCategory == "SkillCategoryRepair")      then return "Repair"
+            elseif (skillCategory == "SkillCategoryInstant")     then return "Instant"
+            else                                                      return "Unknown6:" .. (skillCategory or "")
             end
         end,
     },
@@ -207,6 +251,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillGroupActive1") then return "主动技能 1 不合法。" .. text
             elseif (errType == "InvalidSkillGroupActive2") then return "主动技能 2 不合法。" .. text
             elseif (errType == "ReduplicatedSkills")       then return "同一组别中，不能多次使用同名技能。"
+            elseif (errType == "InvalidEnergyRequirement") then return "未满足技能所需的能量槽长度。"
             elseif (errType == "SkillPointsExceedsLimit")  then return "技能点数超出上限。"
             else                                                return "未知[7]: " .. (errType or "")
             end
@@ -216,6 +261,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillGroupActive1") then return "Invalid Active Skills 1."
             elseif (errType == "InvalidSkillGroupActive2") then return "Invalid Active Skills 2."
             elseif (errType == "ReduplicatedSkills")       then return "Some skills are reduplicated."
+            elseif (errType == "InvalidEnergyRequirement") then return "The energy requirement is not large enough for some skills."
             elseif (errType == "SkillPointsExceedsLimit")  then return "The skill points is beyond the limit."
             else                                                return "Unknown[7]: " .. (errType or "")
             end
@@ -416,8 +462,20 @@ local s_Texts = {
         [2] = function() return "input 0 or 4 digits" end,
     },
     [48] = {
-        [1] = function() return "作者："   end,
-        [2] = function() return "Author: " end,
+        [1] = function(textType)
+            if     (textType == "Author")  then return "作者: "
+            elseif (textType == "Players") then return "已参战玩家: "
+            elseif (textType == "Empty")   then return "(空缺)"
+            else                                return "未知48:" .. (textType or "")
+            end
+        end,
+        [2] = function()
+            if     (textType == "Author")  then return "Author: "
+            elseif (textType == "Players") then return "Players: "
+            elseif (textType == "Empty")   then return "(Empty)"
+            else                                return "Unknown48:" .. (textType or "")
+            end
+        end,
     },
     [49] = {
         [1] = function() return "回 合 内"   end,
@@ -656,18 +714,20 @@ local s_Texts = {
             text = (text) and (" " .. text) or ("")
             if     (errType == "CorruptedAction")                then return "网络传输出现错误。将自动刷新场景。" .. text
             elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。将自动回到主界面。" .. text
+            elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
             elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
             elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
-            else                                                      return "未知错误类型[81] " .. text
+            else                                                      return "未知81:" .. (errType or "")
             end
         end,
         [2] = function(errType, text)
             text = (text) and (" " .. text) or ("")
             if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
+            elseif (errType == "InvalidGameVersion")             then return "Your game version is invalid. Please download the latest version:" .. text
             elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
             elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
             elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
@@ -675,7 +735,7 @@ local s_Texts = {
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
             elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
-            else                                                      return "Unknown errType[81]" .. text
+            else                                                      return "Unknown81:" .. (errType or "")
             end
         end,
     },
@@ -1024,7 +1084,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "迷雾"
             elseif (tileType == "Reef")          then return "礁石"
             elseif (tileType == "Plasma")        then return "等离子体"
-            elseif (tileType == "RedPlasma")     then return "红色等离子"
+            elseif (tileType == "GreenPlasma")   then return "红色等离子"
             elseif (tileType == "Meteor")        then return "陨石"
             elseif (tileType == "Silo")          then return "导弹发射塔"
             elseif (tileType == "EmptySilo")     then return "空发射塔"
@@ -1037,7 +1097,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "海港"
             elseif (tileType == "TempAirport")   then return "临时机场"
             elseif (tileType == "TempSeaport")   then return "临时海港"
-            else                                      return "未知"
+            else                                      return "未知116: " .. (tileType or "")
             end
         end,
         [2] = function(tileType)
@@ -1057,7 +1117,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mist"
             elseif (tileType == "Reef")          then return "Reef"
             elseif (tileType == "Plasma")        then return "Plasma"
-            elseif (tileType == "RedPlasma")     then return "Plasma"
+            elseif (tileType == "GreenPlasma")   then return "Plasma"
             elseif (tileType == "Meteor")        then return "Meteor"
             elseif (tileType == "Silo")          then return "Silo"
             elseif (tileType == "EmptySilo")     then return "Silo"
@@ -1070,7 +1130,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "SPort"
             elseif (tileType == "TempAirport")   then return "TempAP"
             elseif (tileType == "TempSeaport")   then return "TempSP"
-            else                                      return "Unknown"
+            else                                      return "Unknown116: " .. (tileType or "")
             end
         end,
     },
@@ -1091,8 +1151,8 @@ local s_Texts = {
             elseif (tileType == "Rough")         then return "巨浪：允许空军和海军通过，但会减缓海军的移动。"
             elseif (tileType == "Mist")          then return "迷雾：允许空军和海军通过。在雾战时，为海军提供隐蔽场所。"
             elseif (tileType == "Reef")          then return "礁石：允许空军和海军通过，但会减缓海军的移动。在雾战时，为海军提供隐蔽场所。"
-            elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。"
-            elseif (tileType == "RedPlasma")     then return "红色等离子：不允许任何部队通过。"
+            elseif (tileType == "Plasma")        then return "等离子体：不允许任何部队通过。若直接或间接相连的陨石被击破则消失。"
+            elseif (tileType == "GreenPlasma")   then return "绿色等离子：不允许任何部队通过。"
             elseif (tileType == "Meteor")        then return "陨石：不允许任何部队通过。可以被部队攻击和破坏。"
             elseif (tileType == "Silo")          then return "导弹发射塔：步兵系可以在这里发射一次导弹，用来打击任意位置的小范围的部队。"
             elseif (tileType == "EmptySilo")     then return "空发射塔：使用过的导弹发射塔，无法再次发射导弹。允许空军和陆军通过。"
@@ -1105,7 +1165,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "海港：可以提供资金、生产和维修海军。"
             elseif (tileType == "TempAirport")   then return "临时机场：可以维修空军。不提供资金，也不能生产部队。"
             elseif (tileType == "TempSeaport")   then return "临时海港：可以维修海军。不提供资金，也不能生产部队。"
-            else                                      return "未知"
+            else                                      return "未知117: " .. (tileType or "")
             end
         end,
         [2] = function(tileType)
@@ -1125,7 +1185,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "Mists provide hiding places for naval units in Fog of War."
             elseif (tileType == "Reef")          then return "Reefs provide hiding places for naval units in Fog of War."
             elseif (tileType == "Plasma")        then return "Plasma is impassable."
-            elseif (tileType == "RedPlasma")     then return "Red Plasma is impassable."
+            elseif (tileType == "GreenPlasma")   then return "Green Plasma is impassable."
             elseif (tileType == "Meteor")        then return "Meteors are impassable but can be destroyed."
             elseif (tileType == "Silo")          then return "Silos can be launched by infantry units and damage a 13-square area."
             elseif (tileType == "EmptySilo")     then return "Empty Silos can't be launched."
@@ -1138,7 +1198,7 @@ local s_Texts = {
             elseif (tileType == "Seaport")       then return "Seaports can be used to resupply and produce naval units once captured."
             elseif (tileType == "TempAirport")   then return "Temp airports provide resupply for air units."
             elseif (tileType == "TempSeaport")   then return "Temp seaports provide resupply for naval units."
-            else                                      return "未知"
+            else                                      return "Unknown117: " .. (tileType or "")
             end
         end,
     },

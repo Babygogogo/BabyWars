@@ -13,11 +13,12 @@
 
 local MoveCostOwner = require("src.global.functions.class")("MoveCostOwner")
 
-local TypeChecker        = require("src.app.utilities.TypeChecker")
-local ComponentManager   = require("src.global.components.ComponentManager")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local ComponentManager      = require("src.global.components.ComponentManager")
 
 MoveCostOwner.EXPORTED_METHODS = {
-    "getMoveCost",
+    "getMoveCostWithMoveType",
+    "getMoveCostWithModelUnit",
 }
 
 --------------------------------------------------------------------------------
@@ -48,13 +49,32 @@ function MoveCostOwner:setModelPlayerManager(model)
     return self
 end
 
+function MoveCostOwner:unsetModelPlayerManager()
+    assert(self.m_ModelPlayerManager, "MoveCostOwner:unsetModelPlayerManager() the model hasn't been set.")
+    self.m_ModelPlayerManager = nil
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function MoveCostOwner:getMoveCost(moveType, modelPlayer)
-    -- TODO: take the modelPlayer into account.
+function MoveCostOwner:getMoveCostWithMoveType(moveType)
+    -- TODO: take the skills of the players into account.
 
     return self.m_Template[moveType]
+end
+
+function MoveCostOwner:getMoveCostWithModelUnit(modelUnit)
+    local owner    = self.m_Owner
+    local tileType = owner:getTileType()
+    if (((tileType == "Seaport") or (tileType == "TempSeaport"))                              and
+        (owner:getPlayerIndex() ~= modelUnit:getPlayerIndex())                                and
+        (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "LargeNavalUnits"))) then
+        return nil
+    else
+        return self:getMoveCostWithMoveType(modelUnit:getMoveType())
+    end
 end
 
 return MoveCostOwner

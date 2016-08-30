@@ -39,19 +39,20 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
         if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
             return nil
         else
-            return modelTileMap:getModelTile(gridIndex):getMoveCost(modelUnit:getMoveType())
+            return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(modelUnit)
         end
     end
 end
 
-local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap)
+local function canUnitStayInGrid(modelUnit, gridIndex, modelUnitMap, modelTileMap)
     if (GridIndexFunctions.isEqual(modelUnit:getGridIndex(), gridIndex)) then
         return true
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        return (not existingModelUnit)                                                            or
-            (modelUnit:canJoinModelUnit(existingModelUnit))                                       or
-            (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit))
+        local tileType          = modelTileMap:getModelTile(gridIndex):getTileType()
+        return (not existingModelUnit)                                                                       or
+            (modelUnit:canJoinModelUnit(existingModelUnit))                                                  or
+            (existingModelUnit.canLoadModelUnit and existingModelUnit:canLoadModelUnit(modelUnit, tileType))
     end
 end
 
@@ -76,17 +77,16 @@ local function isDropGridSelected(gridIndex, selectedDropDestinations)
 end
 
 local function getAvailableDropGrids(droppingModelUnit, loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations)
-    local moveType = droppingModelUnit:getMoveType()
-    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCost(moveType)) then
+    if (not modelTileMap:getModelTile(loaderEndingGridIndex):getMoveCostWithModelUnit(droppingModelUnit)) then
         return {}
     end
 
-    local mapSize = modelTileMap:getMapSize()
-    local grids   = {}
+    local mapSize  = modelTileMap:getMapSize()
+    local grids    = {}
     for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(loaderEndingGridIndex)) do
-        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize))         and
-            (modelTileMap:getModelTile(gridIndex):getMoveCost(moveType)) and
-            (not isDropGridSelected(gridIndex, dropDestinations))) then
+        if ((GridIndexFunctions.isWithinMap(gridIndex, mapSize))                               and
+            (modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(droppingModelUnit)) and
+            (not isDropGridSelected(gridIndex, dropDestinations)))                             then
 
             if ((not modelUnitMap:getModelUnit(gridIndex))                         or
                 (GridIndexFunctions.isEqual(gridIndex, loaderBeginningGridIndex))) then
@@ -329,9 +329,10 @@ local function getActionLoadModelUnit(self)
         return nil
     else
         local loaderModelUnit = self.m_ModelUnitMap:getModelUnit(destination)
-        if ((loaderModelUnit)                                          and
-            (loaderModelUnit.canLoadModelUnit)                         and
-            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit))) then
+        local tileType        = self.m_ModelTileMap:getModelTile(destination):getTileType()
+        if ((loaderModelUnit)                                                    and
+            (loaderModelUnit.canLoadModelUnit)                                   and
+            (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit, tileType))) then
             return {
                 name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
                 callback = function()
@@ -460,8 +461,8 @@ local function getActionsLaunchModelUnit(self)
     local modelTile    = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-        if ((launchModelUnit:getState() == "idle")                  and
-            (modelTile:getMoveCost(launchModelUnit:getMoveType()))) then
+        if ((launchModelUnit:getState() == "idle")                 and
+            (modelTile:getMoveCostWithModelUnit(launchModelUnit))) then
             actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
         end
     end
@@ -484,20 +485,20 @@ local function getSingleActionDropModelUnit(self, unitID)
 end
 
 local function getActionsDropModelUnit(self)
-    local focusModelUnit   = self.m_FocusModelUnit
-    local dropDestinations = self.m_SelectedDropDestinations
+    local focusModelUnit        = self.m_FocusModelUnit
+    local dropDestinations      = self.m_SelectedDropDestinations
+    local modelTileMap          = self.m_ModelTileMap
+    local loaderEndingGridIndex = getMovePathDestination(self.m_MovePath)
 
-    if ((not focusModelUnit.getCurrentLoadCount) or
-        (focusModelUnit:getCurrentLoadCount() <= #dropDestinations) or
-        (not focusModelUnit:canDropModelUnit())) then
+    if ((not focusModelUnit.getCurrentLoadCount)                                                               or
+        (focusModelUnit:getCurrentLoadCount() <= #dropDestinations)                                            or
+        (not focusModelUnit:canDropModelUnit(modelTileMap:getModelTile(loaderEndingGridIndex):getTileType()))) then
         return {}
     end
 
     local actions = {}
     local loaderBeginningGridIndex = self.m_FocusModelUnit:getGridIndex()
-    local loaderEndingGridIndex    = getMovePathDestination(self.m_MovePath)
     local modelUnitMap             = self.m_ModelUnitMap
-    local modelTileMap             = self.m_ModelTileMap
 
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         if (not isModelUnitDropped(unitID, dropDestinations)) then
@@ -706,10 +707,14 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
-    return (not self.m_ModelUnitMap:getModelUnit(gridIndex))       and
-        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
-        (modelTile.getProductionList)
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+        return false
+    else
+        local modelTile = self.m_ModelTileMap:getModelTile(gridIndex)
+        return (not self.m_ModelUnitMap:getModelUnit(gridIndex))       and
+            (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+            (modelTile.getProductionList)
+    end
 end
 
 setStateChoosingProductionTarget = function(self, gridIndex)
@@ -730,8 +735,12 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
-    return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+        return false
+    else
+        local modelUnit = self.m_ModelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+        return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+    end
 end
 
 setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
@@ -907,8 +916,7 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtGridSelected(self, event)
-    if ((self.m_IsWaitingForServerResponse)                       or
-        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
+    if (self.m_IsWaitingForServerResponse) then
         return
     end
 
@@ -916,14 +924,10 @@ local function onEvtGridSelected(self, event)
     local gridIndex = event.gridIndex
 
     if (state == "idle") then
-        if (canSetStateMakingMovePath(self, gridIndex)) then
-            setStateMakingMovePath(self, gridIndex)
-        elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then
-            setStateChoosingProductionTarget(self, gridIndex)
-        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then
-            setStatePreviewingAttackableArea(self, gridIndex)
-        elseif (canSetStatePreviewingReachableArea(self, gridIndex)) then
-            setStatePreviewingReachableArea(self, gridIndex)
+        if     (canSetStateMakingMovePath(          self, gridIndex)) then setStateMakingMovePath(          self, gridIndex)
+        elseif (canSetStateChoosingProductionTarget(self, gridIndex)) then setStateChoosingProductionTarget(self, gridIndex)
+        elseif (canSetStatePreviewingAttackableArea(self, gridIndex)) then setStatePreviewingAttackableArea(self, gridIndex)
+        elseif (canSetStatePreviewingReachableArea( self, gridIndex)) then setStatePreviewingReachableArea( self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
         setStateIdle(self, true)
@@ -934,7 +938,7 @@ local function onEvtGridSelected(self, event)
             else
                 setStateIdle(self, true)
             end
-        elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap)) then
+        elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, self.m_ModelUnitMap, self.m_ModelTileMap)) then
             if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
                 setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
             else

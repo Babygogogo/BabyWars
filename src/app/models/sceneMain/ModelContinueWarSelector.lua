@@ -23,6 +23,20 @@ local function getWarFieldName(fileName)
     return require("res.data.templateWarField." .. fileName).warFieldName
 end
 
+local function getPlayerNicknames(warConfiguration)
+    local playersCount = require("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
+    local names = {}
+    local players = warConfiguration.players
+
+    for i = 1, playersCount do
+        if (players[i]) then
+            names[i] = players[i].account
+        end
+    end
+
+    return names, playersCount
+end
+
 local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
     local options         = {}
     local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
@@ -158,6 +172,7 @@ local function createOngoingWarList(self, list)
             isInTurn         = item.isInTurn,
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setPlayerNicknames(getPlayerNicknames(configuration))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)

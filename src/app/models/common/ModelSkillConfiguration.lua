@@ -18,14 +18,6 @@ local SKILL_GROUP_ID_ACTIVE_2 = 2
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForMaxPoints(self)
-    if (self:isEmpty()) then
-        return string.format("%s: %s", getLocalizedText(3, "MaxPoints"), getLocalizedText(3, "None"))
-    else
-        return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), self:getMaxSkillPoints())
-    end
-end
-
 local function getModelSkillGroupWithId(self, skillGroupID)
     if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
         return self.m_ModelSkillGroupPassive
@@ -45,15 +37,17 @@ local function resetMaxSkillPoints(self)
     local skillActive2     = self.m_ModelSkillGroupActive2
     local isEnabledActive1 = skillActive1:isEnabled()
     local isEnabledActive2 = skillActive2:isEnabled()
+    local maxPoints        = self:getMaxSkillPoints()
 
     local extraPointsForPassive = 0
-    if (not isEnabledActive1) then extraPointsForPassive = extraPointsForPassive + 50 end
-    if (not isEnabledActive2) then extraPointsForPassive = extraPointsForPassive + 50 end
+    if (not isEnabledActive1) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
+    if (not isEnabledActive2) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
 
-    local totalPointsForPassive = self:getMaxSkillPoints() + extraPointsForPassive
+    local totalPointsForPassive = maxPoints + extraPointsForPassive
     skillPassive:setMaxSkillPoints(totalPointsForPassive)
 
     local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()))
+    extraPointsForActive       = math.min(extraPointsForActive, totalPointsForPassive)
     if (isEnabledActive1) then
         local basePoints = skillActive1:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
         skillActive1:setMaxSkillPoints(basePoints + extraPointsForActive)
@@ -120,6 +114,18 @@ function ModelSkillConfiguration.getSkillGroupIdActive2()
     return SKILL_GROUP_ID_ACTIVE_2
 end
 
+function ModelSkillConfiguration:getModelSkillGroupPassive()
+    return self.m_ModelSkillGroupPassive
+end
+
+function ModelSkillConfiguration:getModelSkillGroupActive1()
+    return self.m_ModelSkillGroupActive1
+end
+
+function ModelSkillConfiguration:getModelSkillGroupActive2()
+    return self.m_ModelSkillGroupActive2
+end
+
 function ModelSkillConfiguration:isEmpty()
     return not self:getMaxSkillPoints()
 end
@@ -145,15 +151,6 @@ function ModelSkillConfiguration:isValid()
     end
 
     return true
-end
-
-function ModelSkillConfiguration:getDescription()
-    return string.format("%s\n\n%s\n\n%s\n\n%s",
-        getDescriptionForMaxPoints(self),
-        self.m_ModelSkillGroupPassive:getDescription(),
-        self.m_ModelSkillGroupActive1:getDescription(),
-        self.m_ModelSkillGroupActive2:getDescription()
-    )
 end
 
 function ModelSkillConfiguration:isModelSkillGroupEnabled(skillGroupID)
@@ -191,6 +188,15 @@ function ModelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
     return self
 end
 
+function ModelSkillConfiguration:getActivatingModelSkillGroup()
+    local id = self.m_ActivatingSkillGroupID
+    if (not id) then
+        return nil
+    else
+        return getModelSkillGroupWithId(self, id)
+    end
+end
+
 function ModelSkillConfiguration:setMaxSkillPoints(points)
     assert((points >= MIN_POINTS) and (points <= MAX_POINTS) and ((points - MIN_POINTS) % POINTS_PER_STEP == 0))
 
@@ -202,6 +208,10 @@ end
 
 function ModelSkillConfiguration:getMaxSkillPoints()
     return self.m_MaxPoints
+end
+
+function ModelSkillConfiguration:getAllSkillsInGroup(skillGroupID)
+    return getModelSkillGroupWithId(self, skillGroupID):getAllSkills()
 end
 
 function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillID, level)
@@ -216,37 +226,6 @@ function ModelSkillConfiguration:clearSkill(skillGroupID, slotIndex)
     resetMaxSkillPoints(self)
 
     return self
-end
-
-function ModelSkillConfiguration:getProductionCostModifier(tiledID)
-    local modifier = self.m_ModelSkillGroupPassive:getProductionCostModifier(tiledID)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getProductionCostModifier(tiledID)
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelSkillGroupPassive:getAttackModifier(
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getAttackModifier(
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    end
-
-    return modifier
-end
-
-function ModelSkillConfiguration:getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    local modifier = self.m_ModelSkillGroupPassive:getDefenseModifier(
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    if (self.m_ActivatingSkillGroupID) then
-        modifier = modifier + getModelSkillGroupWithId(self, self.m_ActivatingSkillGroupID):getDefenseModifier(
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    end
-
-    return modifier
 end
 
 return ModelSkillConfiguration

@@ -118,11 +118,12 @@ function ViewUnitInfo:updateWithModelUnit(modelUnit, loadedModelUnits)
     for i, loadedModelUnit in ipairs(loadedModelUnits or {}) do
         if (not subViewList[i + 1]) then
             local subView = Actor.createView("sceneWar.ViewUnitInfoSingle")
-            subView:setCallbackOnTouch(function()
-                if (self.m_Model) then
-                    self.m_Model:onPlayerTouch(i + 1)
-                end
-            end)
+            subView:updateWithPlayerIndex(self.m_PlayerIndex)
+                :setCallbackOnTouch(function()
+                    if (self.m_Model) then
+                        self.m_Model:onPlayerTouch(i + 1)
+                    end
+                end)
 
             self:addChild(subView, SUB_VIEW_Z_ORDER)
             subViewList[i + 1] = subView
@@ -133,6 +134,15 @@ function ViewUnitInfo:updateWithModelUnit(modelUnit, loadedModelUnits)
     end
 
     adjustPosition(self, self.m_IsLeftSide)
+
+    return self
+end
+
+function ViewUnitInfo:updateWithPlayerIndex(playerIndex)
+    self.m_PlayerIndex = playerIndex
+    for _, subView in ipairs(self.m_SubViewList) do
+        subView:updateWithPlayerIndex(playerIndex)
+    end
 
     return self
 end
