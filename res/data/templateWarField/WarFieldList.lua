@@ -12,7 +12,6 @@ return {
     "GeBiTan",
     "HaiAnTuJi",
     "HuanXingShanMai",
-    "HuiXingDeMaiDong",
     "JiangQi",
     "ManShouXueXing",
     "NaiLaoDao",
@@ -24,7 +23,6 @@ return {
     "WangPaiKongJun",
     "XiaoGuoZhengBaSai",
     "XiaoZhenWeiJi",
-    "YiTuanZao",
     "YunShiQun",
     "ZhengZhengFangFang",
 
