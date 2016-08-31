@@ -390,27 +390,25 @@ local function initItemsSkillLevels(self)
     local items = {}
     for categoryName, _ in pairs(self.m_ItemsSkills) do
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
-            if (items[skillID]) then
-                break
-            end
-
-            local subItems = {}
-            local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
-            for i = maxLevel, minLevel, -1 do
-                if (i ~= 0) then
-                    subItems[#subItems + 1] = {
-                        name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
-                        callback = function()
-                            self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
-                            if (self.m_View) then
-                                self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
-                            end
-                        end,
-                    }
+            if (not items[skillID]) then
+                local subItems = {}
+                local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
+                for i = maxLevel, minLevel, -1 do
+                    if (i ~= 0) then
+                        subItems[#subItems + 1] = {
+                            name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
+                            callback = function()
+                                self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
+                                if (self.m_View) then
+                                    self.m_View:setOverviewString(getDescription(self.m_ModelSkillConfiguration))
+                                end
+                            end,
+                        }
+                    end
                 end
-            end
 
-            items[skillID] = subItems
+                items[skillID] = subItems
+            end
         end
     end
 

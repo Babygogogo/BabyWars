@@ -90,6 +90,7 @@ local function updateStringWarInfo(self)
                 req2       = req2,
                 unitsCount = 0,
                 tilesCount = 0,
+                income     = 0,
             }
         end
     end)
@@ -108,6 +109,9 @@ local function updateStringWarInfo(self)
         local playerIndex = modelTile:getPlayerIndex()
         if (playerIndex ~= 0) then
             data[playerIndex].tilesCount = data[playerIndex].tilesCount + 1
+            if (modelTile.getIncomeAmount) then
+                data[playerIndex].income = data[playerIndex].income + (modelTile:getIncomeAmount() or 0)
+            end
         end
     end)
 
@@ -118,10 +122,11 @@ local function updateStringWarInfo(self)
             stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
             local d = data[i]
-            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %.2f / %s / %s\n%s: %d\n%s: %d",
+            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %d\n%s: %.2f / %s / %s\n%s: %d\n%s: %d",
                 getLocalizedText(65, "Player"),     i,
                 getLocalizedText(65, "Nickname"),   d.nickname,
                 getLocalizedText(65, "Fund"),       d.fund,
+                getLocalizedText(65, "Income"),     d.income,
                 getLocalizedText(65, "Energy"),     d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "UnitsCount"), d.unitsCount,
                 getLocalizedText(65, "TilesCount"), d.tilesCount

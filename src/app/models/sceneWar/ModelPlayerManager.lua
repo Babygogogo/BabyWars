@@ -105,8 +105,8 @@ local function onEvtTurnPhaseGetFund(self, event)
     if (modelPlayer:isAlive()) then
         local income = 0
         event.modelTileMap:forEachModelTile(function(modelTile)
-            if (modelTile.getIncomeAmount) then
-                income = income + (modelTile:getIncomeAmount(playerIndex) or 0)
+            if ((modelTile.getIncomeAmount) and (modelTile:getPlayerIndex() == playerIndex)) then
+                income = income + (modelTile:getIncomeAmount() or 0)
             end
         end)
 

@@ -184,6 +184,7 @@ local s_Texts = {
             elseif (skillID == 14) then return "额外改变我方全体部队的幸运伤害值上限，幅度为"
             elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
             elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
+            elseif (skillID == 17) then return "改变我方的金钱收入，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -209,6 +210,7 @@ local s_Texts = {
             elseif (skillID == 14) then return "我方幸运上限"
             elseif (skillID == 15) then return "我军占领速度"
             elseif (skillID == 16) then return "全面补给"
+            elseif (skillID == 17) then return "我方金钱收入"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -218,29 +220,31 @@ local s_Texts = {
     },
     [6] = {
         [1] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")      then return "攻 击 类"
-            elseif (skillCategory == "SkillCategoryDefense")     then return "防 御 类"
-            elseif (skillCategory == "SkillCategoryCost")        then return "造 价 类"
-            elseif (skillCategory == "SkillCategoryMovement")    then return "移 动 类"
-            elseif (skillCategory == "SkillCategoryAttackRange") then return "射 程 类"
-            elseif (skillCategory == "SkillCategoryLuck")        then return "幸 运 类"
-            elseif (skillCategory == "SkillCategoryCapture")     then return "占 领 类"
-            elseif (skillCategory == "SkillCategoryRepair")      then return "维 修 类"
-            elseif (skillCategory == "SkillCategoryInstant")     then return "瞬 时 类"
-            else                                                      return "未知6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")       then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryDefense")      then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryActiveMoney")  then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryPassiveMoney") then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryMovement")     then return "移 动 类"
+            elseif (skillCategory == "SkillCategoryAttackRange")  then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryLuck")         then return "幸 运 类"
+            elseif (skillCategory == "SkillCategoryCapture")      then return "占 领 类"
+            elseif (skillCategory == "SkillCategoryRepair")       then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryInstant")      then return "瞬 时 类"
+            else                                                       return "未知6:" .. (skillCategory or "")
             end
         end,
         [2] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")      then return "Attack"
-            elseif (skillCategory == "SkillCategoryDefense")     then return "Defense"
-            elseif (skillCategory == "SkillCategoryCost")        then return "Cost"
-            elseif (skillCategory == "SkillCategoryMovement")    then return "Movement"
-            elseif (skillCategory == "SkillCategoryAttackRange") then return "AttackRange"
-            elseif (skillCategory == "SkillCategoryLuck")        then return "Luck"
-            elseif (skillCategory == "SkillCategoryCapture")     then return "Capture"
-            elseif (skillCategory == "SkillCategoryRepair")      then return "Repair"
-            elseif (skillCategory == "SkillCategoryInstant")     then return "Instant"
-            else                                                      return "Unknown6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryAttack")       then return "Attack"
+            elseif (skillCategory == "SkillCategoryDefense")      then return "Defense"
+            elseif (skillCategory == "SkillCategoryActiveMoney")  then return "Money"
+            elseif (skillCategory == "SkillCategoryPassiveMoney") then return "Money"
+            elseif (skillCategory == "SkillCategoryMovement")     then return "Movement"
+            elseif (skillCategory == "SkillCategoryAttackRange")  then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryLuck")         then return "Luck"
+            elseif (skillCategory == "SkillCategoryCapture")      then return "Capture"
+            elseif (skillCategory == "SkillCategoryRepair")       then return "Repair"
+            elseif (skillCategory == "SkillCategoryInstant")      then return "Instant"
+            else                                                       return "Unknown6:" .. (skillCategory or "")
             end
         end,
     },
@@ -555,6 +559,7 @@ local s_Texts = {
             elseif (textType == "Player")        then return "玩 家"
             elseif (textType == "Nickname")      then return "昵 称"
             elseif (textType == "Fund")          then return "资 金"
+            elseif (textType == "Income")        then return "收 入"
             elseif (textType == "Energy")        then return "能 量"
             elseif (textType == "UnitsCount")    then return "部队数量"
             elseif (textType == "TilesCount")    then return "据点数量"
@@ -575,6 +580,7 @@ local s_Texts = {
             elseif (textType == "Player")        then return "Player"
             elseif (textType == "Nickname")      then return "Nickname"
             elseif (textType == "Fund")          then return "Fund"
+            elseif (textType == "Income")        then return "Income"
             elseif (textType == "Energy")        then return "Energy"
             elseif (textType == "UnitsCount")    then return "Num of units"
             elseif (textType == "TilesCount")    then return "Num of bases"
