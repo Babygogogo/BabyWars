@@ -19,20 +19,6 @@
       offsety = 0,
       properties = {},
       encoding = "lua",
-   layers = {
-    {
-      type = "tilelayer",
-      name = "TileBase",
-      x = 0,
-      y = 0,
-      width = 24,
-      height = 22,
-      visible = true,
-      opacity = 1,
-      offsetx = 0,
-      offsety = 0,
-      properties = {},
-      encoding = "lua",
       data = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 72, 22, 18, 18, 68, 1, 1,
         65, 70, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 72, 66, 22, 20, 70, 1,
@@ -135,3 +121,4 @@
       }
     }
   }
+}
