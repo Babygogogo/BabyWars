@@ -115,6 +115,8 @@ local function getAttackBonusMultiplier(self, attackerGridIndex, target, targetG
         attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
     -- TODO: take the skills of the opponent into account.
 
+    bonus = math.max(-100, bonus)
+
     return 1 + bonus / 100
 end
 

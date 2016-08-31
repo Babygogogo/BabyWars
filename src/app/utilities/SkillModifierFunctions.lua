@@ -177,6 +177,24 @@ local function getCaptureAmountModifierForSkillGroup(modelSkillGroup, slotsCount
     return modifier
 end
 
+local function getIncomeModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 17)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -229,6 +247,10 @@ end
 function SkillModifierFunctions.getCaptureAmountModifier(configuration)
     return getCaptureAmountModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
         getCaptureAmountModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.getIncomeModifier(configuration)
+    return getIncomeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT)
 end
 
 return SkillModifierFunctions

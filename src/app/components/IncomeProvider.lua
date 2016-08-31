@@ -13,12 +13,19 @@
 
 local IncomeProvider = require("src.global.functions.class")("IncomeProvider")
 
-local TypeChecker        = require("src.app.utilities.TypeChecker")
-local ComponentManager   = require("src.global.components.ComponentManager")
+local ComponentManager       = require("src.global.components.ComponentManager")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
 IncomeProvider.EXPORTED_METHODS = {
     "getIncomeAmount",
 }
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function round(num)
+    return math.floor(num + 0.5)
+end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -58,11 +65,15 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function IncomeProvider:getIncomeAmount(playerIndex)
-    if ((not playerIndex) or (self.m_Owner:getPlayerIndex() == playerIndex)) then
-        return self.m_Template.amount
+function IncomeProvider:getIncomeAmount()
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    local baseAmount  = self.m_Template.amount
+    if (playerIndex < 1) then
+        return baseAmount
     else
-        return nil
+        local modelSkillConfiguration = self.m_ModelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration()
+        local modifier                = SkillModifierFunctions.getIncomeModifier(modelSkillConfiguration)
+        return round(baseAmount * (100 + modifier) / 100)
     end
 end
 

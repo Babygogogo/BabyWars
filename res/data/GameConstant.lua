@@ -709,9 +709,8 @@ GameConstant.categories = {
     ["SkillCategoriesForPassive"] = {
         "SkillCategoryAttack",
         "SkillCategoryDefense",
-        "SkillCategoryCost",
+        "SkillCategoryPassiveMoney",
         "SkillCategoryAttackRange",
-        "SkillCategoryLuck",
         "SkillCategoryCapture",
         "SkillCategoryRepair",
     },
@@ -719,23 +718,28 @@ GameConstant.categories = {
     ["SkillCategoriesForActive"] = {
         "SkillCategoryAttack",
         "SkillCategoryDefense",
-        "SkillCategoryCost",
+        "SkillCategoryActiveMoney",
         "SkillCategoryMovement",
         "SkillCategoryAttackRange",
-        "SkillCategoryLuck",
         "SkillCategoryCapture",
         "SkillCategoryInstant",
     },
 
     ["SkillCategoryAttack"] = {
         1,
+        14,
     },
 
     ["SkillCategoryDefense"] = {
         2,
     },
 
-    ["SkillCategoryCost"] = {
+    ["SkillCategoryPassiveMoney"] = {
+        3,
+        17,
+    },
+
+    ["SkillCategoryActiveMoney"] = {
         3,
     },
 
@@ -745,10 +749,6 @@ GameConstant.categories = {
 
     ["SkillCategoryAttackRange"] = {
         7,
-    },
-
-    ["SkillCategoryLuck"] = {
-        14,
     },
 
     ["SkillCategoryCapture"] = {
@@ -4093,7 +4093,36 @@ GameConstant.skills = {
         levels       = {
             [1] = {modifier = nil, pointsPassive = nil, pointsActive = 150, minEnergy = 3},
         }
-    }
+    },
+
+    -- Modify the income of the owner player.
+    [17] = {
+        minLevel     = 1,
+        maxLevel     = 20,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 75, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 10, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 15, pointsPassive = 225, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 20, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 25, pointsPassive = 375, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 30, pointsPassive = 450, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 35, pointsPassive = 525, pointsActive = nil, minEnergy = nil},
+            [8] = {modifier = 40, pointsPassive = 600, pointsActive = nil, minEnergy = nil},
+            [9] = {modifier = 45, pointsPassive = 675, pointsActive = nil, minEnergy = nil},
+            [10] = {modifier = 50, pointsPassive = 750, pointsActive = nil, minEnergy = nil},
+            [11] = {modifier = 55, pointsPassive = 825, pointsActive = nil, minEnergy = nil},
+            [12] = {modifier = 60, pointsPassive = 900, pointsActive = nil, minEnergy = nil},
+            [13] = {modifier = 65, pointsPassive = 975, pointsActive = nil, minEnergy = nil},
+            [14] = {modifier = 70, pointsPassive = 1050, pointsActive = nil, minEnergy = nil},
+            [15] = {modifier = 75, pointsPassive = 1125, pointsActive = nil, minEnergy = nil},
+            [16] = {modifier = 80, pointsPassive = 1200, pointsActive = nil, minEnergy = nil},
+            [17] = {modifier = 85, pointsPassive = 1275, pointsActive = nil, minEnergy = nil},
+            [18] = {modifier = 90, pointsPassive = 1350, pointsActive = nil, minEnergy = nil},
+            [19] = {modifier = 95, pointsPassive = 1425, pointsActive = nil, minEnergy = nil},
+            [20] = {modifier = 100, pointsPassive = 1500, pointsActive = nil, minEnergy = nil},
+        },
+    },
 }
 
 return GameConstant
