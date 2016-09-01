@@ -179,7 +179,7 @@ end
 local function getUltimateAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
     local estimatedAttackDamage = getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
     if ((not estimatedAttackDamage)      or
-        (estimatedAttackDamage == 0)     or
+        (attackerHP <= 0)                or
         (not target:isAffectedByLuck())) then
         return estimatedAttackDamage
     else
