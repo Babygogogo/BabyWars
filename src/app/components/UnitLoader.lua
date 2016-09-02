@@ -272,7 +272,7 @@ function UnitLoader:getRepairAmountAndCostForLoadedModelUnit(modelUnit)
 
     local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
-    local productionCost = round(
+    local productionCost = math.floor(
         (costModifier >= 0)                                          and
         (modelUnit:getProductionCost() * (100 + costModifier) / 100) or
         (modelUnit:getProductionCost() * 100 / (100 - costModifier))

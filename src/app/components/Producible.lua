@@ -6,14 +6,8 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 
 Producible.EXPORTED_METHODS = {
     "getProductionCost",
+    "getBaseProductionCost",
 }
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function round(num)
-    return math.floor(num + 0.5)
-end
 
 --------------------------------------------------------------------------------
 -- The static functions.
@@ -25,15 +19,11 @@ function Producible.getProductionCostWithTiledId(tiledID, modelPlayerManager)
 
     local baseCost = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID).Producible.productionCost
     if (modifier > 0) then
-        return round(baseCost * (1 + modifier / 100))
+        return math.floor(baseCost * (1 + modifier / 100))
     else
-        return round(baseCost / (1 - modifier / 100))
+        return math.floor(baseCost / (1 - modifier / 100))
     end
 end
-
---------------------------------------------------------------------------------
--- The static functions.
---------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -65,14 +55,14 @@ function Producible:unsetModelPlayerManager()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Producible:getProductionCost()
     return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), self.m_ModelPlayerManager)
+end
+
+function Producible:getBaseProductionCost()
+    return self.m_Template.productionCost
 end
 
 return Producible

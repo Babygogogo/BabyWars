@@ -104,7 +104,7 @@ end
 function RepairDoer:getRepairAmountAndCost(target)
     local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
-    local productionCost = round(
+    local productionCost = math.floor(
         (costModifier >= 0)                                       and
         (target:getProductionCost() * (100 + costModifier) / 100) or
         (target:getProductionCost() * 100 / (100 - costModifier))

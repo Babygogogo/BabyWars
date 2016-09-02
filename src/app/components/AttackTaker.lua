@@ -50,7 +50,7 @@ local function getDamageCost(target, damage)
         return 0
     else
         local remainingHP = math.max(0, target:getCurrentHP() - damage)
-        return round(target:getProductionCost() * (target:getNormalizedCurrentHP() - getNormalizedHP(remainingHP)) / 10)
+        return math.floor(target:getBaseProductionCost() * (target:getNormalizedCurrentHP() - getNormalizedHP(remainingHP)) / 10)
     end
 end
 
