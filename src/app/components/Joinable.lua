@@ -63,7 +63,7 @@ function Joinable:getJoinIncome(modelUnit)
         -- TODO: take the player skills into account.
         local joinedNormalizedHP = self.m_Owner:getNormalizedCurrentHP() + modelUnit:getNormalizedCurrentHP()
         return (joinedNormalizedHP > 10)                                               and
-            (round((joinedNormalizedHP - 10) * self.m_Owner:getProductionCost() / 10)) or
+            (math.floor((joinedNormalizedHP - 10) * self.m_Owner:getProductionCost() / 10)) or
             (0)
     end
 end
