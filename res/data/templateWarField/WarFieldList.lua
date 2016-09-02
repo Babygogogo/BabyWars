@@ -12,6 +12,7 @@ return {
     "GeBiTan",
     "HaiAnTuJi",
     "HuanXingShanMai",
+    "HuiShengDao",
     "JiangQi",
     "ManShouXueXing",
     "NaiLaoDao",

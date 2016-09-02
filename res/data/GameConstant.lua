@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.3"
+GameConstant.version = "0.1.6.4"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -3797,22 +3797,22 @@ GameConstant.skills = {
             [2] = {modifier = -10, pointsPassive = 150, pointsActive = 30, minEnergy = 1},
             [3] = {modifier = -15, pointsPassive = 225, pointsActive = 45, minEnergy = 1},
             [4] = {modifier = -20, pointsPassive = 300, pointsActive = 60, minEnergy = 1},
-            [5] = {modifier = -25, pointsPassive = 375, pointsActive = 75, minEnergy = 2},
+            [5] = {modifier = -25, pointsPassive = 375, pointsActive = 75, minEnergy = 1},
             [6] = {modifier = -30, pointsPassive = 450, pointsActive = 90, minEnergy = 2},
             [7] = {modifier = -35, pointsPassive = 525, pointsActive = 105, minEnergy = 2},
             [8] = {modifier = -40, pointsPassive = 600, pointsActive = 120, minEnergy = 2},
-            [9] = {modifier = -45, pointsPassive = 675, pointsActive = 135, minEnergy = 3},
-            [10] = {modifier = -50, pointsPassive = 750, pointsActive = 150, minEnergy = 3},
+            [9] = {modifier = -45, pointsPassive = 675, pointsActive = 135, minEnergy = 2},
+            [10] = {modifier = -50, pointsPassive = 750, pointsActive = 150, minEnergy = 2},
             [11] = {modifier = -55, pointsPassive = 825, pointsActive = 165, minEnergy = 3},
             [12] = {modifier = -60, pointsPassive = 900, pointsActive = 180, minEnergy = 3},
-            [13] = {modifier = -65, pointsPassive = 975, pointsActive = 195, minEnergy = 4},
-            [14] = {modifier = -70, pointsPassive = 1050, pointsActive = 210, minEnergy = 4},
-            [15] = {modifier = -75, pointsPassive = 1125, pointsActive = 225, minEnergy = 4},
+            [13] = {modifier = -65, pointsPassive = 975, pointsActive = 195, minEnergy = 3},
+            [14] = {modifier = -70, pointsPassive = 1050, pointsActive = 210, minEnergy = 3},
+            [15] = {modifier = -75, pointsPassive = 1125, pointsActive = 225, minEnergy = 3},
             [16] = {modifier = -80, pointsPassive = 1200, pointsActive = 240, minEnergy = 4},
-            [17] = {modifier = -85, pointsPassive = 1275, pointsActive = 255, minEnergy = 5},
-            [18] = {modifier = -90, pointsPassive = 1350, pointsActive = 270, minEnergy = 5},
-            [19] = {modifier = -95, pointsPassive = 1425, pointsActive = 285, minEnergy = 5},
-            [20] = {modifier = -100, pointsPassive = 1500, pointsActive = 300, minEnergy = 5},
+            [17] = {modifier = -85, pointsPassive = 1275, pointsActive = 255, minEnergy = 4},
+            [18] = {modifier = -90, pointsPassive = 1350, pointsActive = 270, minEnergy = 4},
+            [19] = {modifier = -95, pointsPassive = 1425, pointsActive = 285, minEnergy = 4},
+            [20] = {modifier = -100, pointsPassive = 1500, pointsActive = 300, minEnergy = 4},
         },
     },
 
@@ -3872,7 +3872,7 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels = {
-            [-1] = {modifier = -1, pointsPassive = -100, pointsActive = -50, minEnergy = 2},
+            [-1] = {modifier = -1, pointsPassive = -100, pointsActive = -20, minEnergy = 2},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 300, pointsActive = 200, minEnergy = 3},
             [2] = {modifier = 2, pointsPassive = 700, pointsActive = 400, minEnergy = 6},
