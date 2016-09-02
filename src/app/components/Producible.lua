@@ -6,6 +6,7 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 
 Producible.EXPORTED_METHODS = {
     "getProductionCost",
+    "getBaseProductionCost",
 }
 
 --------------------------------------------------------------------------------
@@ -58,6 +59,10 @@ end
 --------------------------------------------------------------------------------
 function Producible:getProductionCost()
     return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), self.m_ModelPlayerManager)
+end
+
+function Producible:getBaseProductionCost()
+    return self.m_Template.productionCost
 end
 
 return Producible
