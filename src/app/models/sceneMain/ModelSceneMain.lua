@@ -29,14 +29,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
-local onWebSocketOpen, onWebSocketMessage, onWebSocketClose, onWebSocketError
-
-local function doActionConnectionHeartbeat(self, action)
-    if (self.m_HeartbeatID == action.heartbeatID) then
-        self.m_IsHeartbeatAnswered = true
-    end
-end
-
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
@@ -98,8 +90,7 @@ end
 --------------------------------------------------------------------------------
 local function onEvtSystemRequestDoAction(self, event)
     local actionName = event.actionName
-    if     (actionName == "ConnectionHeartbeat")   then doActionConnectionHeartbeat(  self, event)
-    elseif (actionName == "Login")                 then doActionLogin(                self, event)
+    if     (actionName == "Login")                 then doActionLogin(                self, event)
     elseif (actionName == "Logout")                then doActionLogout(               self, event)
     elseif (actionName == "Register")              then doActionRegister(             self, event)
     elseif (actionName == "NewWar")                then doActionNewWar(               self, event)
@@ -124,72 +115,29 @@ end
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
-onWebSocketOpen = function(self, param)
+local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
     self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(30))
-
-    local view = self.m_View
-    if (view) then
-        if (self.m_HeartbeatAction) then
-            view:stopAction(self.m_HeartbeatAction)
-        end
-
-        self.m_HeartbeatID         = 0
-        self.m_IsHeartbeatAnswered = true
-        self.m_HeartbeatAction     = cc.RepeatForever:create(cc.Sequence:create(
-            cc.CallFunc:create(function()
-                if (not self.m_IsHeartbeatAnswered) then
-                    onWebSocketClose(self)
-                else
-                    self.m_HeartbeatID         = self.m_HeartbeatID + 1
-                    self.m_IsHeartbeatAnswered = false
-                    self.m_ScriptEventDispatcher:dispatchEvent({
-                        name        = "EvtPlayerRequestDoAction",
-                        actionName  = "ConnectionHeartbeat",
-                        heartbeatID = self.m_HeartbeatID,
-                    })
-                end
-            end),
-            cc.DelayTime:create(20)
-        ))
-
-        view:runAction(self.m_HeartbeatAction)
-    end
 end
 
-onWebSocketMessage = function(self, param)
+local function onWebSocketMessage(self, param)
     print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
 
-    local action = assert(loadstring("return " .. param.message))()
-    onEvtSystemRequestDoAction(self, action)
+    onEvtSystemRequestDoAction(self, param.action)
 end
 
-onWebSocketClose = function(self, param)
+local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
     self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(31))
-
-    if (self.m_View) then
-        if (self.m_HeartbeatAction) then
-            self.m_View:stopAction(self.m_HeartbeatAction)
-            self.m_HeartbeatAction = nil
-        end
-    end
 
     WebSocketManager.close()
         .init()
         .setOwner(self)
 end
 
-onWebSocketError = function(self, param)
+local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
     self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(32, param.error))
-
-    if (self.m_View) then
-        if (self.m_HeartbeatAction) then
-            self.m_View:stopAction(self.m_HeartbeatAction)
-            self.m_HeartbeatAction = nil
-        end
-    end
 
     WebSocketManager.close()
         .init()

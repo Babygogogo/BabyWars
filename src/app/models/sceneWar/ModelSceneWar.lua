@@ -345,9 +345,7 @@ end
 local function onWebSocketMessage(self, param)
     print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
 
-    local action = assert(loadstring("return " .. param.message))()
-    -- print(SerializationFunctions.toString(action))
-    doAction(self, action)
+    doAction(self, param.action)
 end
 
 local function onWebSocketClose(self, param)
