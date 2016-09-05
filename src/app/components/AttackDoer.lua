@@ -36,6 +36,7 @@ AttackDoer.EXPORTED_METHODS = {
     "getSecondaryWeaponFatalList",
     "getSecondaryWeaponStrongList",
 
+    "getBaseDamage",
     "getEstimatedBattleDamage",
     "getUltimateBattleDamage",
     "getAttackRangeMinMax",
@@ -81,10 +82,6 @@ local function getSecondaryWeaponBaseDamage(self, defenseType)
     end
 end
 
-local function getBaseDamage(self, defenseType)
-    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
-end
-
 local function canAttackTarget(self, attackerGridIndex, target, targetGridIndex)
     local attacker  = self.m_Owner
     targetGridIndex = targetGridIndex or target:getGridIndex()
@@ -93,7 +90,7 @@ local function canAttackTarget(self, attackerGridIndex, target, targetGridIndex)
         (attacker:getPlayerIndex() ~= target:getPlayerIndex())                                                and
         (isInAttackRange(attackerGridIndex, targetGridIndex, self:getAttackRangeMinMax()))                    and
         (self:canAttackAfterMove() or GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)) and
-        (getBaseDamage(self, target:getDefenseType()))
+        (self:getBaseDamage(target:getDefenseType()))
 end
 
 local function getAttackBonusMultiplier(self, attackerGridIndex, target, targetGridIndex, modelTileMap)
@@ -160,7 +157,7 @@ local function getLuckDamage(self, attackerGridIndex, attackerHP, target, target
 end
 
 local function getEstimatedAttackDamage(self, attackerGridIndex, attackerHP, target, targetGridIndex, modelTileMap)
-    local baseAttackDamage = getBaseDamage(self, target:getDefenseType())
+    local baseAttackDamage = self:getBaseDamage(target:getDefenseType())
     if (not baseAttackDamage) then
         return nil
     else
@@ -343,6 +340,10 @@ end
 function AttackDoer:getSecondaryWeaponStrongList()
     assert(self:hasSecondaryWeapon(), "AttackDoer:getSecondaryWeaponStrongList() the attack doer has no secondary weapon.")
     return self.m_Template.secondaryWeapon.strong
+end
+
+function AttackDoer:getBaseDamage(defenseType)
+    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
 end
 
 function AttackDoer:getEstimatedBattleDamage(target, attackerGridIndex, modelTileMap)
