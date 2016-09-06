@@ -30,6 +30,12 @@ local function onEvtPreviewNoBattleDamage(self, event)
     end
 end
 
+local function onEvtPlayerIndexUpdated(self, event)
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(event.playerIndex)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -55,6 +61,7 @@ function ModelBattleInfo:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
         :addEventListener("EvtActionPlannerChoosingAction", self)
+        :addEventListener("EvtPlayerIndexUpdated",          self)
 
     return self
 end
@@ -62,7 +69,8 @@ end
 function ModelBattleInfo:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelBattleInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingAction", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
+        :removeEventListener("EvtActionPlannerChoosingAction", self)
         :removeEventListener("EvtActionPlannerMakingMovePath", self)
         :removeEventListener("EvtActionPlannerIdle",           self)
         :removeEventListener("EvtPreviewNoBattleDamage",       self)
@@ -77,13 +85,12 @@ end
 --------------------------------------------------------------------------------
 function ModelBattleInfo:onEvent(event)
     local eventName = event.name
-    if ((eventName == "EvtActionPlannerIdle") or
-        (eventName == "EvtActionPlannerMakingMovePath") or
-        (eventName == "EvtActionPlannerChoosingAction") or
-        (eventName == "EvtPreviewNoBattleDamage")) then
-        onEvtPreviewNoBattleDamage(self, event)
-    elseif (eventName == "EvtPreviewBattleDamage") then
-        onEvtPreviewBattleDamage(self, event)
+    if     (eventName == "EvtActionPlannerIdle")           then onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtActionPlannerMakingMovePath") then onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtActionPlannerChoosingAction") then onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtPreviewNoBattleDamage")       then onEvtPreviewNoBattleDamage(self, event)
+    elseif (eventName == "EvtPreviewBattleDamage")         then onEvtPreviewBattleDamage(  self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")          then onEvtPlayerIndexUpdated(   self, event)
     end
 
     return self
