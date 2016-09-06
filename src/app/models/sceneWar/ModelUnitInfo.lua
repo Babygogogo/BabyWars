@@ -54,7 +54,7 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (event.isVisible or event.isEnabled) then
+    if (event.isEnabled) then
         if (self.m_View) then
             self.m_View:setVisible(false)
         end

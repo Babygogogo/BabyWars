@@ -56,7 +56,7 @@ end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     if (self.m_View) then
-        self.m_View:setVisible(not (event.isEnabled or event.isVisible))
+        self.m_View:setVisible(not event.isEnabled)
     end
 end
 

@@ -549,6 +549,8 @@ local s_Texts = {
         [1] = function(textType)
             if     (textType == "WarMenu")       then return "战 场 菜 单"
             elseif (textType == "QuitWar")       then return "退 出"
+            elseif (textType == "FindIdleUnit")  then return "寻 找 空 闲 部 队"
+            elseif (textType == "FindIdleTile")  then return "寻 找 空 闲 建 筑"
             elseif (textType == "WarInfo")       then return "战 场 信 息"
             elseif (textType == "SkillInfo")     then return "技 能 信 息"
             elseif (textType == "ActivateSkill") then return "发 动 技 能"
@@ -573,6 +575,8 @@ local s_Texts = {
         [2] = function(textType)
             if     (textType == "WarMenu")       then return "War Menu"
             elseif (textType == "QuitWar")       then return "Quit"
+            elseif (textType == "FindIdleUnit")  then return "FindIdleUnit"
+            elseif (textType == "FindIdleTile")  then return "FildIdleTile"
             elseif (textType == "WarInfo")       then return "War Info"
             elseif (textType == "SkillInfo")     then return "Skill Info"
             elseif (textType == "ActivateSkill") then return "ActivateSkill"
@@ -596,20 +600,24 @@ local s_Texts = {
         end,
     },
     [66] = {
-        [1] = function(confirmType)
-            if     (confirmType == "QuitWar")   then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (confirmType == "Surrender") then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
-            elseif (confirmType == "ReloadWar") then return "是否确定要重新载入战局？"
-            elseif (confirmType == "ExitGame")  then return "是否确定退出游戏？"
-            else                                     return "未识别：[66]" .. confirmType
+        [1] = function(textType)
+            if     (textType == "QuitWar")    then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (textType == "Surrender")  then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            elseif (textType == "ReloadWar")  then return "是否确定要重新载入战局？"
+            elseif (textType == "ExitGame")   then return "是否确定退出游戏？"
+            elseif (textType == "NoIdleUnit") then return "您的所有部队均已行动。"
+            elseif (textType == "NoIdleTile") then return "您的所有建筑均已被占用。"
+            else                                   return "未知66:" .. (textType or "")
             end
         end,
-        [2] = function(confirmType)
-            if     (confirmType == "QuitWar")   then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (confirmType == "Surrender") then return "You will lose the game by surrendering!\nAre you sure?"
-            elseif (confirmType == "ReloadWar") then return "Are you sure to reload the war?"
-            elseif (confirmType == "ExitGame")  then return "Are you sure to exit the game?"
-            else                                     return "Unrecognized:[66]" .. confirmType
+        [2] = function(textType)
+            if     (textType == "QuitWar")    then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (textType == "Surrender")  then return "You will lose the game by surrendering!\nAre you sure?"
+            elseif (textType == "ReloadWar")  then return "Are you sure to reload the war?"
+            elseif (textType == "ExitGame")   then return "Are you sure to exit the game?"
+            elseif (textType == "NoIdleUnit") then return "None of your units is idle."
+            elseif (textType == "NoIdleTile") then return "None of your tiles is idle."
+            else                                   return "Unrecognized:[66]" .. textType
             end
         end,
     },

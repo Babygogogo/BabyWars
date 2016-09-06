@@ -35,7 +35,6 @@ local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 -- The util functions.
 --------------------------------------------------------------------------------
 local function dispatchEvtMapCursorMoved(self, gridIndex)
-    self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name      = "EvtMapCursorMoved",
         gridIndex = gridIndex,
@@ -43,7 +42,6 @@ local function dispatchEvtMapCursorMoved(self, gridIndex)
 end
 
 local function dispatchEvtGridSelected(self, gridIndex)
-    self:setGridIndex(gridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name      = "EvtGridSelected",
         gridIndex = gridIndex,
@@ -53,12 +51,12 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function setCursorAppearance(self, normalVisible, targetVisible, siloVisible)
-    if (self.m_View) then
-        self.m_View:setNormalCursorVisible(normalVisible)
-            :setTargetCursorVisible(targetVisible)
-            :setSiloCursorVisible(siloVisible)
-    end
+local function onEvtGridSelected(self, event)
+    self:setGridIndex(event.gridIndex)
+end
+
+local function onEvtMapCursorMoved(self, event)
+    self:setGridIndex(event.gridIndex)
 end
 
 local function onEvtSceneWarStarted(self, event)
@@ -67,6 +65,14 @@ end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     self.m_IsWarCommandMenuVisible = event.isEnabled and event.isVisible
+end
+
+local function setCursorAppearance(self, normalVisible, targetVisible, siloVisible)
+    if (self.m_View) then
+        self.m_View:setNormalCursorVisible(normalVisible)
+            :setTargetCursorVisible(targetVisible)
+            :setSiloCursorVisible(siloVisible)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -210,7 +216,9 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPreviewBattleDamage",       self)
+    dispatcher:addEventListener("EvtGridSelected",              self)
+        :addEventListener("EvtMapCursorMoved",                  self)
+        :addEventListener("EvtPreviewBattleDamage",             self)
         :addEventListener("EvtPreviewNoBattleDamage",           self)
         :addEventListener("EvtActionPlannerIdle",               self)
         :addEventListener("EvtActionPlannerMakingMovePath",     self)
@@ -225,7 +233,7 @@ end
 function ModelMapCursor:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:remove("EvtWarCommandMenuUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuUpdated", self)
         :removeEventListener("EvtSceneWarStarted",                 self)
         :removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
         :removeEventListener("EvtActionPlannerChoosingAction",     self)
@@ -233,6 +241,8 @@ function ModelMapCursor:unsetRootScriptEventDispatcher()
         :removeEventListener("EvtActionPlannerIdle",               self)
         :removeEventListener("EvtPreviewNoBattleDamage",           self)
         :removeEventListener("EvtPreviewBattleDamage",             self)
+        :removeEventListener("EvtMapCursorMoved",                  self)
+        :removeEventListener("EvtGridSelected",                    self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -243,14 +253,16 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
+    if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(         self, event)
+    elseif (eventName == "EvtMapCursorMoved")                  then onEvtMapCursorMoved(       self, event)
+    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(      self, event)
+    elseif (eventName == "EvtWarCommandMenuUpdated")           then onEvtWarCommandMenuUpdated(self, event)
+    elseif (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerMakingMovePath")     then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerChoosingAction")     then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerChoosingSiloTarget") then setCursorAppearance(self, false, true,  true )
     elseif (eventName == "EvtPreviewNoBattleDamage")           then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtPreviewBattleDamage")             then setCursorAppearance(self, false, true,  false)
-    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(      self, event)
-    elseif (eventName == "EvtWarCommandMenuUpdated")           then onEvtWarCommandMenuUpdated(self, event)
     end
 
     return self

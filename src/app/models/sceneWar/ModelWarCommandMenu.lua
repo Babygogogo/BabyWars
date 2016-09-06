@@ -21,6 +21,7 @@ local ModelWarCommandMenu = class("ModelWarCommandMenu")
 local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
@@ -120,6 +121,8 @@ local function getAvailableMainItems(self)
         local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
         local items = {
             self.m_ItemQuit,
+            self.m_ItemFindIdleUnit,
+            self.m_ItemFindIdleTile,
             self.m_ItemSurrender,
             self.m_ItemWarInfo,
             self.m_ItemSkillInfo,
@@ -180,6 +183,13 @@ local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
             isVisible = isVisible,
         })
     end
+end
+
+local function dispatchEvtMapCursorMoved(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtMapCursorMoved",
+        gridIndex = gridIndex,
+    })
 end
 
 local function createItemActivateSkill(self, skillGroupID)
@@ -257,6 +267,14 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtGridSelected(self, event)
+    self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
+local function onEvtMapCursorMoved(self, event)
+    self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
 local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndex    = event.playerIndex
     self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
@@ -284,6 +302,87 @@ local function initItemQuit(self)
     }
 
     self.m_ItemQuit = item
+end
+
+local function initItemFindIdleUnit(self)
+    local item = {
+        name     = getLocalizedText(65, "FindIdleUnit"),
+        callback = function()
+            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
+            local mapSize          = modelUnitMap:getMapSize()
+            local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
+            local firstGridIndex
+
+            for y = 1, mapSize.height do
+                for x = 1, mapSize.width do
+                    local gridIndex = {x = x, y = y}
+                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+                    if ((modelUnit)                                                and
+                        (modelUnit:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (modelUnit:getState() == "idle"))                          then
+                        if ((y > cursorY)                       or
+                            ((y == cursorY) and (x > cursorX))) then
+                            dispatchEvtMapCursorMoved(self, gridIndex)
+                            self:setEnabled(false)
+                            return
+                        end
+
+                        firstGridIndex = firstGridIndex or gridIndex
+                    end
+                end
+            end
+
+            if (firstGridIndex) then
+                dispatchEvtMapCursorMoved(self, firstGridIndex)
+            else
+                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleUnit"))
+            end
+            self:setEnabled(false)
+        end,
+    }
+
+    self.m_ItemFindIdleUnit = item
+end
+
+local function initItemFindIdleTile(self)
+    local item = {
+        name     = getLocalizedText(65, "FindIdleTile"),
+        callback = function()
+            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
+            local modelTileMap     = self.m_ModelWarField:getModelTileMap()
+            local mapSize          = modelUnitMap:getMapSize()
+            local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
+            local firstGridIndex
+
+            for y = 1, mapSize.height do
+                for x = 1, mapSize.width do
+                    local gridIndex = {x = x, y = y}
+                    local modelTile = modelTileMap:getModelTile(gridIndex)
+                    if ((modelTile.getProductionList)                              and
+                        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (not modelUnitMap:getModelUnit(gridIndex)))                then
+                        if ((y > cursorY)                       or
+                            ((y == cursorY) and (x > cursorX))) then
+                            dispatchEvtMapCursorMoved(self, gridIndex)
+                            self:setEnabled(false)
+                            return
+                        end
+
+                        firstGridIndex = firstGridIndex or gridIndex
+                    end
+                end
+            end
+
+            if (firstGridIndex) then
+                dispatchEvtMapCursorMoved(self, firstGridIndex)
+            else
+                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleTile"))
+            end
+            self:setEnabled(false)
+        end,
+    }
+
+    self.m_ItemFindIdleTile = item
 end
 
 local function initItemWarInfo(self)
@@ -438,6 +537,8 @@ function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
     initItemQuit(          self)
+    initItemFindIdleUnit(  self)
+    initItemFindIdleTile(  self)
     initItemWarInfo(       self)
     initItemSkillInfo(     self)
     initItemActivateSkill1(self)
@@ -484,6 +585,18 @@ end
 function ModelWarCommandMenu:setModelPlayerManager(model)
     assert(self.m_ModelPlayerManager == nil, "ModelWarCommandMenu:setModelPlayerManager() the model has been set already.")
     self.m_ModelPlayerManager = model
+    model:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+            self.m_LoggedInPlayerIndex = playerIndex
+        end
+    end)
+
+    return self
+end
+
+function ModelWarCommandMenu:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelWarCommandMenu:setModelMessageIndicator() the model has been set already.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end
@@ -494,6 +607,8 @@ function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerIndexUpdated",   self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
+        :addEventListener("EvtGridSelected",               self)
+        :addEventListener("EvtMapCursorMoved",             self)
 
     return self
 end
@@ -501,8 +616,10 @@ end
 function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtIsWaitingForServerResponse", self)
-        :removeEventListener("EvtPlayerIndexUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
+        :removeEventListener("EvtGridSelected",               self)
+        :removeEventListener("EvtIsWaitingForServerResponse", self)
+        :removeEventListener("EvtPlayerIndexUpdated",         self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -513,7 +630,9 @@ end
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
+    if     (eventName == "EvtGridSelected")               then onEvtGridSelected(              self, event)
+    elseif (eventName == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
     elseif (eventName == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     end
 

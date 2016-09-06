@@ -410,6 +410,7 @@ local function initActorWarHud(self)
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
         :setModelWarField(self:getModelWarField())
         :setModelPlayerManager(self:getModelPlayerManager())
+        :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorWarHud = actor
 end
