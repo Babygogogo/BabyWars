@@ -31,133 +31,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getAvailableMainItems(self)
-    local items = {
-        self.m_ItemQuit,
-        self.m_ItemWarInfo,
-        self.m_ItemSkillInfo,
-        self.m_ItemHideUI,
-        self.m_ItemSetMusic,
-        self.m_ItemDamageChart,
-    }
-
-    local shouldAddActionItems = (self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)
-    if (shouldAddActionItems) then
-        items[#items + 1] = self.m_ItemSurrender
-    end
-    items[#items + 1] = self.m_ItemReload
-
-    if (shouldAddActionItems) then
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
-        if (modelPlayer:canActivateSkillGroup(1)) then
-            items[#items + 1] = self.m_ItemActiveSkill1
-        end
-        if (modelPlayer:canActivateSkillGroup(2)) then
-            items[#items + 1] = self.m_ItemActiveSkill2
-        end
-
-        items[#items + 1] = self.m_ItemEndTurn
-    end
-
-    return items
-end
-
-local function setStateDisabled(self)
-    self.m_State = "disabled"
-
-    if (self.m_View) then
-        self.m_View:setEnabled(false)
-    end
-end
-
-local function setStateMain(self)
-    self.m_State = "main"
-
-    if (self.m_View) then
-        self.m_View:setItems(getAvailableMainItems(self))
-            :setOverviewString(self.m_StringWarInfo)
-            :setEnabled(true)
-    end
-end
-
-local function setStateDamageChart(self)
-    self.m_State = "damageChart"
-
-    if (self.m_View) then
-        self.m_View:setItems(self.m_ItemsDamageDetail)
-    end
-end
-
-local function dispatchEvtActivateSkillGroup(self, skillGroupID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
-        actionName   = "ActivateSkillGroup",
-        skillGroupID = skillGroupID,
-    })
-end
-
-local function createItemActivateSkill(self, skillGroupID)
-    return {
-        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
-        callback = function()
-            dispatchEvtActivateSkillGroup(self, skillGroupID)
-            self:setEnabled(false)
-        end,
-    }
-end
-
-local function getEmptyProducersCount(self)
-    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
-    local count        = 0
-    local playerIndex  = self.m_PlayerIndex
-
-    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
-        if ((modelTile.getProductionList) and
-            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
-            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
-local function getIdleUnitsCount(self)
-    local count       = 0
-    local playerIndex = self.m_PlayerIndex
-    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
-local function createDamageText(unitType)
-    local baseDamage = GameConstantFunctions.getBaseDamageForAttackerUnitType(unitType)
-    if (not baseDamage) then
-        return string.format("%s : %s", getLocalizedText(113, unitType), getLocalizedText(3, "None"))
-    else
-        local subTexts  = {}
-        local primary   = baseDamage.primary or {}
-        local secondary = baseDamage.secondary  or {}
-        for _, targetType in ipairs(GameConstantFunctions.getCategory("AllUnits")) do
-            local targetTypeText = getLocalizedText(113, targetType)
-            local primaryText    = string.format("%s", primary[targetType]   or "--")
-            local secondaryText  = string.format("%s", secondary[targetType] or "--")
-
-            subTexts[#subTexts + 1] = string.format("%s:%s%s%s%s",
-                targetTypeText, string.rep(" ", 28 - string.len(targetTypeText) / 3 * 4),
-                primaryText,    string.rep(" ", 18 - string.len(primaryText) * 2),
-                secondaryText
-            )
-        end
-
-        return string.format("%s\n%s", getLocalizedText(113, unitType), table.concat(subTexts, "\n"))
-    end
-end
-
 local function updateStringWarInfo(self)
     local modelPlayerManager = self.m_ModelPlayerManager
     local data               = {}
@@ -230,6 +103,140 @@ local function updateStringSkillInfo(self)
     end)
 
     self.m_StringSkillInfo = table.concat(stringList, "\n--------------------\n")
+end
+
+local function getAvailableMainItems(self)
+    if ((not self.m_IsPlayerInTurn) or (self.m_IsWaitingForServerResponse)) then
+        return {
+            self.m_ItemQuit,
+            self.m_ItemWarInfo,
+            self.m_ItemSkillInfo,
+            self.m_ItemHideUI,
+            self.m_ItemSetMusic,
+            self.m_ItemReload,
+            self.m_ItemDamageChart,
+        }
+    else
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        local items = {
+            self.m_ItemQuit,
+            self.m_ItemSurrender,
+            self.m_ItemWarInfo,
+            self.m_ItemSkillInfo,
+        }
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
+        items[#items + 1] = self.m_ItemHideUI
+        items[#items + 1] = self.m_ItemSetMusic
+        items[#items + 1] = self.m_ItemReload
+        items[#items + 1] = self.m_ItemDamageChart
+        items[#items + 1] = self.m_ItemEndTurn
+
+        return items
+    end
+end
+
+local function setStateDisabled(self)
+    self.m_State = "disabled"
+
+    if (self.m_View) then
+        self.m_View:setEnabled(false)
+    end
+end
+
+local function setStateMain(self)
+    self.m_State = "main"
+    updateStringWarInfo(  self)
+    updateStringSkillInfo(self)
+
+    if (self.m_View) then
+        self.m_View:setItems(getAvailableMainItems(self))
+            :setOverviewString(self.m_StringWarInfo)
+            :setEnabled(true)
+    end
+end
+
+local function setStateDamageChart(self)
+    self.m_State = "damageChart"
+
+    if (self.m_View) then
+        self.m_View:setItems(self.m_ItemsDamageDetail)
+    end
+end
+
+local function dispatchEvtActivateSkillGroup(self, skillGroupID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "ActivateSkillGroup",
+        skillGroupID = skillGroupID,
+    })
+end
+
+local function createItemActivateSkill(self, skillGroupID)
+    return {
+        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
+        callback = function()
+            dispatchEvtActivateSkillGroup(self, skillGroupID)
+            self:setEnabled(false)
+        end,
+    }
+end
+
+local function getEmptyProducersCount(self)
+    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
+    local count        = 0
+    local playerIndex  = self.m_PlayerIndex
+
+    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+        if ((modelTile.getProductionList) and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
+            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function getIdleUnitsCount(self)
+    local count       = 0
+    local playerIndex = self.m_PlayerIndex
+    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function createDamageSubText(targetType, primaryDamage, secondaryDamage)
+    local targetTypeText = getLocalizedText(113, targetType)
+    local primaryText    = string.format("%s", primaryDamage[targetType]   or "--")
+    local secondaryText  = string.format("%s", secondaryDamage[targetType] or "--")
+
+    return string.format("%s:%s%s%s%s",
+        targetTypeText, string.rep(" ", 28 - string.len(targetTypeText) / 3 * 4),
+        primaryText,    string.rep(" ", 18 - string.len(primaryText) * 2),
+        secondaryText
+    )
+end
+
+local function createDamageText(unitType)
+    local baseDamage = GameConstantFunctions.getBaseDamageForAttackerUnitType(unitType)
+    if (not baseDamage) then
+        return string.format("%s : %s", getLocalizedText(113, unitType), getLocalizedText(3, "None"))
+    else
+        local subTexts  = {}
+        local primary   = baseDamage.primary or {}
+        local secondary = baseDamage.secondary  or {}
+        for _, targetType in ipairs(GameConstantFunctions.getCategory("AllUnits")) do
+            subTexts[#subTexts + 1] = createDamageSubText(targetType, primary, secondary)
+        end
+        subTexts[#subTexts + 1] = createDamageSubText("Meteor", primary, secondary)
+
+        return string.format("%s\n%s", getLocalizedText(113, unitType), table.concat(subTexts, "\n"))
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -513,10 +520,7 @@ function ModelWarCommandMenu:setEnabled(enabled)
         if (dispatcher) then
             dispatcher:dispatchEvent({name = "EvtWarCommandMenuActivated"})
         end
-
-        updateStringWarInfo(  self)
-        updateStringSkillInfo(self)
-        setStateMain(         self)
+        setStateMain(self)
     end
 
     return self

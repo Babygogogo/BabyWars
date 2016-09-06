@@ -942,6 +942,7 @@ local s_Texts = {
             elseif (unitType == "Cruiser")         then return "巡洋舰"
             elseif (unitType == "Lander")          then return "登陆舰"
             elseif (unitType == "Gunboat")         then return "炮舰"
+            elseif (unitType == "Meteor")          then return "陨石"
             else                                        return "未知"
             end
         end,
@@ -972,6 +973,7 @@ local s_Texts = {
             elseif (unitType == "Cruiser")         then return "Cruiser"
             elseif (unitType == "Lander")          then return "Lander"
             elseif (unitType == "Gunboat")         then return "GBoat"
+            elseif (unitType == "Meteor")          then return "Meteor"
             else                                        return "Unknown"
             end
         end,
