@@ -65,6 +65,10 @@ local function onEvtSceneWarStarted(self, event)
     dispatchEvtMapCursorMoved(self, self:getGridIndex())
 end
 
+local function onEvtWarCommandMenuUpdated(self, event)
+    self.m_IsWarCommandMenuVisible = event.isEnabled and event.isVisible
+end
+
 --------------------------------------------------------------------------------
 -- The touch/scroll event listeners.
 --------------------------------------------------------------------------------
@@ -74,6 +78,10 @@ local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
     local function onTouchesBegan(touches, event)
+        if (self.m_IsWarCommandMenuVisible) then
+            return
+        end
+
         isTouchBegan = true
         isTouchMoved = false
         initialTouchPosition = touches[1]:getLocation()
@@ -82,7 +90,8 @@ local function createTouchListener(self)
     end
 
     local function onTouchesMoved(touches, event)
-        if (not isTouchBegan) then --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+        if ((not isTouchBegan)                or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (self.m_IsWarCommandMenuVisible)) then
             return
         end
 
@@ -120,7 +129,8 @@ local function createTouchListener(self)
     end
 
     local function onTouchesEnded(touches, event)
-        if (not isTouchBegan) then --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+        if ((not isTouchBegan)                or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (self.m_IsWarCommandMenuVisible)) then
             return
         end
 
@@ -207,6 +217,7 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtActionPlannerChoosingAction",     self)
         :addEventListener("EvtActionPlannerChoosingSiloTarget", self)
         :addEventListener("EvtSceneWarStarted",                 self)
+        :addEventListener("EvtWarCommandMenuUpdated",           self)
 
     return self
 end
@@ -214,7 +225,8 @@ end
 function ModelMapCursor:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
+    self.m_RootScriptEventDispatcher:remove("EvtWarCommandMenuUpdated", self)
+        :removeEventListener("EvtSceneWarStarted",                 self)
         :removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
         :removeEventListener("EvtActionPlannerChoosingAction",     self)
         :removeEventListener("EvtActionPlannerMakingMovePath",     self)
@@ -237,7 +249,8 @@ function ModelMapCursor:onEvent(event)
     elseif (eventName == "EvtActionPlannerChoosingSiloTarget") then setCursorAppearance(self, false, true,  true )
     elseif (eventName == "EvtPreviewNoBattleDamage")           then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtPreviewBattleDamage")             then setCursorAppearance(self, false, true,  false)
-    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(self, event)
+    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(      self, event)
+    elseif (eventName == "EvtWarCommandMenuUpdated")           then onEvtWarCommandMenuUpdated(self, event)
     end
 
     return self

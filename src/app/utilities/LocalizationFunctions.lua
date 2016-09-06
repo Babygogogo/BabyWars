@@ -565,7 +565,9 @@ local s_Texts = {
             elseif (textType == "UnitsCount")    then return "部队数量"
             elseif (textType == "TilesCount")    then return "据点数量"
             elseif (textType == "Lost")          then return "已战败"
-            else                                      return "未知[65]: " .. (textType or "")
+            elseif (textType == "MainWeapon")    then return "主武器"
+            elseif (textType == "SubWeapon")     then return "副武器"
+            else                                      return "未知65:" .. (textType or "")
             end
         end,
         [2] = function(textType)
@@ -587,7 +589,9 @@ local s_Texts = {
             elseif (textType == "UnitsCount")    then return "Num of units"
             elseif (textType == "TilesCount")    then return "Num of bases"
             elseif (textType == "Lost")          then return "Lost"
-            else                                      return "Unknown[65]: " .. (textType or "")
+            elseif (textType == "MainWeapon")    then return "Main"
+            elseif (textType == "SubWeapon")     then return "Sub"
+            else                                      return "Unknown65:" .. (textType or "")
             end
         end,
     },

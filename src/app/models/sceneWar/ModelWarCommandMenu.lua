@@ -172,6 +172,16 @@ local function dispatchEvtActivateSkillGroup(self, skillGroupID)
     })
 end
 
+local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
+    if (self.m_RootScriptEventDispatcher) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name      = "EvtWarCommandMenuUpdated",
+            isEnabled = isEnabled,
+            isVisible = isVisible,
+        })
+    end
+end
+
 local function createItemActivateSkill(self, skillGroupID)
     return {
         name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
@@ -216,8 +226,8 @@ local function createDamageSubText(targetType, primaryDamage, secondaryDamage)
     local secondaryText  = string.format("%s", secondaryDamage[targetType] or "--")
 
     return string.format("%s:%s%s%s%s",
-        targetTypeText, string.rep(" ", 28 - string.len(targetTypeText) / 3 * 4),
-        primaryText,    string.rep(" ", 18 - string.len(primaryText) * 2),
+        targetTypeText, string.rep(" ", 30 - string.len(targetTypeText) / 3 * 4),
+        primaryText,    string.rep(" ", 22 - string.len(primaryText) * 2),
         secondaryText
     )
 end
@@ -235,7 +245,12 @@ local function createDamageText(unitType)
         end
         subTexts[#subTexts + 1] = createDamageSubText("Meteor", primary, secondary)
 
-        return string.format("%s\n%s", getLocalizedText(113, unitType), table.concat(subTexts, "\n"))
+        local unitTypeText = getLocalizedText(113, unitType)
+        return string.format("%s%s%s          %s\n%s",
+            unitTypeText, string.rep(" ", 28 - string.len(unitTypeText) / 3 * 4),
+            getLocalizedText(65, "MainWeapon"), getLocalizedText(65, "SubWeapon"),
+            table.concat(subTexts, "\n")
+        )
     end
 end
 
@@ -337,9 +352,8 @@ local function initItemHideUI(self)
     local item = {
         name     = getLocalizedText(65, "HideUI"),
         callback = function()
-            if (self.m_View) then
-                self.m_View:setEnabled(false)
-            end
+            setStateDisabled(self)
+            dispatchEvtWarCommandMenuUpdated(self, true, false)
         end,
     }
 
@@ -510,18 +524,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:setEnabled(enabled)
-    local dispatcher = self.m_RootScriptEventDispatcher
     if (not enabled) then
-        if (dispatcher) then
-            dispatcher:dispatchEvent({name = "EvtWarCommandMenuDeactivated"})
-        end
         setStateDisabled(self)
     else
-        if (dispatcher) then
-            dispatcher:dispatchEvent({name = "EvtWarCommandMenuActivated"})
-        end
         setStateMain(self)
     end
+    dispatchEvtWarCommandMenuUpdated(self, enabled, true)
 
     return self
 end
