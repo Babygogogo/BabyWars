@@ -463,6 +463,14 @@ function ModelSkillConfigurator:setModelMessageIndicator(model)
     return self
 end
 
+function ModelSkillConfigurator:setModelConfirmBox(model)
+    assert(self.m_ModelConfirmBox == nil,
+        "ModelSkillConfigurator:setModelConfirmBox() the model has been set already.")
+    self.m_ModelConfirmBox = model
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
@@ -502,11 +510,18 @@ function ModelSkillConfigurator:onButtonBackTouched()
     if (state == "stateMain") then
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
+    elseif (state == "stateOverviewConfiguration") then
+        self.m_ModelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
+            :setOnConfirmYes(
+                function()
+                    setStateMain(self)
+                    self.m_ModelConfirmBox:setEnabled(false)
+                end)
+            :setEnabled(true)
     elseif (state == "stateSelectSkillCategory") then
         if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then setStateOverviewSkillGroupPassive(self)
         else                                                    setStateOverviewSkillGroupActive(self, self.m_SkillGroupID)
         end
-    elseif (state == "stateOverviewConfiguration")     then setStateMain(                    self)
     elseif (state == "stateSelectMaxPoint")            then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupPassive") then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupActive")  then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
