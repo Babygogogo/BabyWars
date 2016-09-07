@@ -65,8 +65,8 @@ function ModelOptionSelector:setCurrentOptionIndex(index)
 
     self.m_OptionIndex = index
     local option = options[index]
-    if (option.callback) then
-        option.callback()
+    if (option.callbackOnSwitched) then
+        option.callbackOnSwitched()
     end
     if (self.m_View) then
         self.m_View:setOptionText(option.text)
@@ -88,7 +88,10 @@ function ModelOptionSelector:onButtonNextTouched()
 end
 
 function ModelOptionSelector:onOptionIndicatorTouched()
-    self.m_Options[self.m_OptionIndex].callbackOnOptionIndicatorTouched()
+    local callback = self.m_Options[self.m_OptionIndex].callbackOnOptionIndicatorTouched
+    if (callback) then
+        callback()
+    end
 
     return self
 end

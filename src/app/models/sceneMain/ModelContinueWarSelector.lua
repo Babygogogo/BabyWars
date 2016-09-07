@@ -77,7 +77,7 @@ local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguratio
     local maxSkillPoints = warConfiguration.maxSkillPoints
     local options = {{
         data = maxSkillPoints,
-        text = "" .. maxSkillPoints,
+        text = (maxSkillPoints) and ("" .. maxSkillPoints) or (getLocalizedText(3, "Disable")),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)

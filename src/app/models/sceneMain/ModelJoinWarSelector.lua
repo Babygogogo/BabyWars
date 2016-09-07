@@ -67,13 +67,51 @@ local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguratio
     local maxSkillPoints = warConfiguration.maxSkillPoints
     local options = {{
         data = maxSkillPoints,
-        text = "" .. maxSkillPoints,
+        text = (maxSkillPoints)              and
+            ("" .. maxSkillPoints)           or
+            (getLocalizedText(3, "Disable")),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
 end
 
-local function resetModelWarConfigurator(model, sceneWarFileName, configuration)
+local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
+    local options = {{
+        data = 0,
+        text = getLocalizedText(3, "Disable"),
+    }}
+    if (not warConfiguration.maxSkillPoints) then
+        modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
+            :setButtonsEnabled(false)
+            :setOptionIndicatorTouchEnabled(false)
+    else
+        local prefix  = getLocalizedText(3, "Configuration") .. " "
+        for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+            options[#options + 1] = {
+                data = i,
+                text = prefix .. i,
+                callbackOnOptionIndicatorTouched = function()
+                    modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
+                        :setPopUpPanelEnabled(true)
+                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                        name            = "EvtPlayerRequestDoAction",
+                        actionName      = "GetSkillConfiguration",
+                        configurationID = i,
+                    })
+                end,
+            }
+        end
+
+        modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
+            :setCurrentOptionIndex(2)
+            :setButtonsEnabled(true)
+            :setOptionIndicatorTouchEnabled(true)
+    end
+end
+
+local getActorWarConfigurator
+local function resetModelWarConfigurator(self, sceneWarFileName, configuration)
+    local model = getActorWarConfigurator(self):getModel()
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
 
@@ -81,6 +119,7 @@ local function resetModelWarConfigurator(model, sceneWarFileName, configuration)
     resetSelectorFog(           model, configuration)
     resetSelectorWeather(       model, configuration)
     resetSelectorMaxSkillPoints(model, configuration)
+    resetSelectorSkill(self,    model, configuration)
 end
 
 --------------------------------------------------------------------------------
@@ -129,31 +168,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     end)
 end
 
-local function initSelectorSkill(self, modelWarConfigurator)
-    local options = {}
-    local prefix  = getLocalizedText(3, "Configuration") .. " "
-    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
-        options[#options + 1] = {
-            data = i,
-            text = prefix .. i,
-            callbackOnOptionIndicatorTouched = function()
-                modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
-                    :setPopUpPanelEnabled(true)
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name            = "EvtPlayerRequestDoAction",
-                    actionName      = "GetSkillConfiguration",
-                    configurationID = i,
-                })
-            end,
-        }
-    end
-
-    modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
-        :setButtonsEnabled(true)
-        :setOptionIndicatorTouchEnabled(true)
-end
-
-local function getActorWarConfigurator(self)
+getActorWarConfigurator = function(self)
     if (not self.m_ActorWarConfigurator) then
         local model = Actor.createModel("sceneMain.ModelWarConfigurator")
         local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
@@ -161,7 +176,6 @@ local function getActorWarConfigurator(self)
         model:setEnabled(false)
         initCallbackOnButtonBackTouched(   self, model)
         initCallbackOnButtonConfirmTouched(self, model)
-        initSelectorSkill(                 self, model)
 
         self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
         if (self.m_View) then
@@ -190,7 +204,7 @@ local function createJoinableWarList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, configuration)
+                    resetModelWarConfigurator(self, sceneWarFileName, configuration)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)

@@ -35,8 +35,8 @@ local function resetModelWarConfigurator(model, warFieldFileName)
 
     local warField = require("res.data.templateWarField." .. warFieldFileName)
     resetSelectorPlayerIndex(model, warField.playersCount)
-    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(5)
-    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(1)
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(6)
+    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(2)
 end
 
 --------------------------------------------------------------------------------
@@ -86,23 +86,11 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     end)
 end
 
-local function initSelectorMaxSkillPoints(modelWarConfigurator)
-    local options = {}
-    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    for points = minPoints, maxPoints, pointsPerStep do
-        options[#options + 1] = {
-            data = points,
-            text = "" .. points,
-        }
-    end
-
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
-        :setCurrentOptionIndex(5)
-        :setButtonsEnabled(true)
-end
-
 local function initSelectorSkill(self, modelWarConfigurator)
-    local options = {}
+    local options = {{
+        data = 0,
+        text = getLocalizedText(3, "Disable"),
+    }}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
     for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
         options[#options + 1] = {
@@ -123,6 +111,33 @@ local function initSelectorSkill(self, modelWarConfigurator)
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
         :setButtonsEnabled(true)
         :setOptionIndicatorTouchEnabled(true)
+end
+
+local function initSelectorMaxSkillPoints(modelWarConfigurator)
+    local options = {{
+        data = nil,
+        text = getLocalizedText(3, "Disable"),
+        callbackOnSwitched = function()
+            modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setCurrentOptionIndex(1)
+                :setButtonsEnabled(false)
+                :setOptionIndicatorTouchEnabled(false)
+        end,
+    }}
+    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
+    for points = minPoints, maxPoints, pointsPerStep do
+        options[#options + 1] = {
+            data = points,
+            text = "" .. points,
+            callbackOnSwitched = function()
+                modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(true)
+                    :setOptionIndicatorTouchEnabled(true)
+            end,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
+        :setCurrentOptionIndex(5)
+        :setButtonsEnabled(true)
 end
 
 local function initSelectorFog(modelWarConfigurator)
