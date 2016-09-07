@@ -1,7 +1,12 @@
 
 local ViewWarConfigurator = class("ViewWarConfigurator", cc.Node)
 
+local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+
+local POPUP_SCROLLVIEW_Z_ORDER = 3
+local POPUP_BACKGROUND_Z_ORDER = 2
+local POPUP_GREY_MASK_Z_ORDER  = 1
 
 local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
 local EDIT_BOX_PASSWORD_HEIGHT = 60  -- The same as the height of the indicator of ViewOptionSelector
@@ -31,19 +36,30 @@ local FONT_NAME                         = "res/fonts/msyhbd.ttc"
 local FONT_COLOR                        = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR                = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH                = 2
+local POPUP_FONT_SIZE                   = 18
 local BUTTON_FONT_SIZE                  = 35
 local EDIT_BOX_PASSWORD_TITLE_FONT_SIZE = 20
 local EDIT_BOX_PASSWORD_FONT_SIZE       = 28
 
-local BUTTON_SPRITE_FRAME_NAME    = "c03_t01_s01_f01.png"
+local BUTTON_BACKGROUND_NAME      = "c03_t01_s01_f01.png"
 local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+
+local POPUP_BACKGROUND_WIDTH  = display.width  * 0.7
+local POPUP_BACKGROUND_HEIGHT = display.height * 0.7
+local POPUP_BACKGROUND_POS_X  = (display.width  - POPUP_BACKGROUND_WIDTH)  / 2
+local POPUP_BACKGROUND_POS_Y  = (display.height - POPUP_BACKGROUND_HEIGHT) / 2
+
+local POPUP_SCROLLVIEW_WIDTH  = POPUP_BACKGROUND_WIDTH  - 7
+local POPUP_SCROLLVIEW_HEIGHT = POPUP_BACKGROUND_HEIGHT - 11
+local POPUP_SCROLLVIEW_POS_X  = POPUP_BACKGROUND_POS_X + 5
+local POPUP_SCROLLVIEW_POS_Y  = POPUP_BACKGROUND_POS_Y + 5
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createButton(posX, posY, text)
     local button = ccui.Button:create()
-    button:loadTextureNormal(BUTTON_SPRITE_FRAME_NAME, ccui.TextureResType.plistType)
+    button:loadTextureNormal(BUTTON_BACKGROUND_NAME, ccui.TextureResType.plistType)
         :setScale9Enabled(true)
         :setCapInsets(BUTTON_BACKGROUND_CAPINSETS)
         :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -77,7 +93,7 @@ local function initEditBoxPassword(self)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
 
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_SPRITE_FRAME_NAME, BUTTON_BACKGROUND_CAPINSETS)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
     background:setOpacity(180)
 
     local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT), background, background, background)
@@ -124,6 +140,56 @@ local function initButtonConfirm(self)
     self:addChild(button)
 end
 
+local function initPopUpPanel(self)
+    local mask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
+    mask:setContentSize(display.width, display.height)
+        :ignoreAnchorPointForPosition(true)
+
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setPosition(POPUP_BACKGROUND_POS_X, POPUP_BACKGROUND_POS_Y)
+        :setContentSize(POPUP_BACKGROUND_WIDTH, POPUP_BACKGROUND_HEIGHT)
+
+    local scrollView = ccui.ScrollView:create()
+    scrollView:setContentSize(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(POPUP_SCROLLVIEW_POS_X, POPUP_SCROLLVIEW_POS_Y)
+
+    local label = cc.Label:createWithTTF("", FONT_NAME, POPUP_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setDimensions(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+    scrollView:addChild(label)
+
+    self.m_PopUpGreyMask   = mask
+    self.m_PopUpBackground = background
+    self.m_PopUpScrollView = scrollView
+    self.m_PopUpLabel      = label
+    self:addChild(mask,       POPUP_GREY_MASK_Z_ORDER)
+        :addChild(background, POPUP_BACKGROUND_Z_ORDER)
+        :addChild(scrollView, POPUP_SCROLLVIEW_Z_ORDER)
+end
+
+local function initPopUpTouchListener(self)
+    local listener = cc.EventListenerTouchOneByOne:create()
+    listener:setSwallowTouches(true)
+    local isTouchWithinBackground = false
+
+    listener:registerScriptHandler(function(touch, event)
+        isTouchWithinBackground = DisplayNodeFunctions.isTouchWithinNode(touch, self.m_PopUpBackground)
+        return true
+    end, cc.Handler.EVENT_TOUCH_BEGAN)
+
+    listener:registerScriptHandler(function(touch, event)
+        if (not isTouchWithinBackground) then
+            self:setPopUpPanelEnabled(false)
+        end
+    end, cc.Handler.EVENT_TOUCH_ENDED)
+
+    self.m_PopUpTouchListener = listener
+    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self.m_PopUpBackground)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -131,9 +197,13 @@ function ViewWarConfigurator:ctor()
     self:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
 
-    initEditBoxPassword(self)
-    initButtonBack(self)
-    initButtonConfirm(self)
+    initEditBoxPassword(   self)
+    initButtonBack(        self)
+    initButtonConfirm(     self)
+    initPopUpPanel(        self)
+    initPopUpTouchListener(self)
+
+    self:setPopUpPanelEnabled(false)
 
     return self
 end
@@ -213,6 +283,21 @@ end
 
 function ViewWarConfigurator:getEditBoxPassword()
     return self.m_EditBoxPassword
+end
+
+function ViewWarConfigurator:setPopUpPanelEnabled(enabled)
+    self.m_PopUpGreyMask  :setVisible(enabled)
+    self.m_PopUpBackground:setVisible(enabled)
+    self.m_PopUpScrollView:setVisible(enabled)
+    self.m_PopUpTouchListener:setEnabled(enabled)
+
+    return self
+end
+
+function ViewWarConfigurator:setPopUpPanelText(text)
+    self.m_PopUpLabel:setString(text)
+
+    return self
 end
 
 return ViewWarConfigurator

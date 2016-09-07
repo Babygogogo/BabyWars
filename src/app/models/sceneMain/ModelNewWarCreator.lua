@@ -107,11 +107,16 @@ local function initSelectorSkill(modelWarConfigurator)
         options[#options + 1] = {
             text = prefix .. i,
             data = i,
+            callbackOnOptionIndicatorTouched = function()
+                modelWarConfigurator:setPopUpPanelText("Test pop up panel")
+                    :setPopUpPanelEnabled(true)
+            end,
         }
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
         :setButtonsEnabled(true)
+        :setOptionIndicatorTouchEnabled(true)
 end
 
 local function initSelectorFog(modelWarConfigurator)

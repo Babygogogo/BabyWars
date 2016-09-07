@@ -98,11 +98,18 @@ local function initOptionIndicator(self)
         :setPosition(OPTION_INDICATOR_POS_X, OPTION_INDICATOR_POS_Y)
 
         :setOpacity(180)
-        :setZoomScale(0)
+        :setZoomScale(-0.05)
 
         :setTitleFontName(FONT_NAME)
         :setTitleFontSize(INDICATOR_FONT_SIZE)
         :setTitleColor(FONT_COLOR)
+
+        :setTouchEnabled(false)
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onOptionIndicatorTouched()
+            end
+        end)
 
     optionIndicator:getTitleRenderer():enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
@@ -131,6 +138,12 @@ end
 function ViewOptionSelector:setButtonsEnabled(enabled)
     self.m_ArrowLeft:setEnabled(enabled)
     self.m_ArrowRight:setEnabled(enabled)
+
+    return self
+end
+
+function ViewOptionSelector:setOptionIndicatorTouchEnabled(enabled)
+    self.m_OptionIndicator:setTouchEnabled(enabled)
 
     return self
 end
