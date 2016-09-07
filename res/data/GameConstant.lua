@@ -713,6 +713,7 @@ GameConstant.categories = {
         "SkillCategoryAttackRange",
         "SkillCategoryCapture",
         "SkillCategoryRepair",
+        "SkillCategoryEnergy",
     },
 
     ["SkillCategoriesForActive"] = {
@@ -758,6 +759,10 @@ GameConstant.categories = {
     ["SkillCategoryRepair"] = {
         10,
         11,
+    },
+
+    ["SkillCategoryEnergy"] = {
+        18,
     },
 
     ["SkillCategoryInstant"] = {
@@ -4073,6 +4078,16 @@ GameConstant.skills = {
             [19] = {modifier = 95, pointsPassive = 1520, pointsActive = nil, minEnergy = nil},
             [20] = {modifier = 100, pointsPassive = 1600, pointsActive = nil, minEnergy = nil},
         },
+    },
+
+    -- Stop the damage cost per the energy requirement from increasing as skills are activated.
+    [18] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = nil, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
+        }
     },
 }
 

@@ -23,6 +23,7 @@ local ModelPlayer = require("src.global.functions.class")("ModelPlayer")
 local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
 local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
 local SerializationFunctions  = require("src.app.utilities.SerializationFunctions")
+local SkillModifierFunctions  = require("src.app.utilities.SkillModifierFunctions")
 
 local DAMAGE_COST_PER_ENERGY_REQUIREMENT = GameConstantFunctions.getDamageCostPerEnergyRequirement()
 local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGrowthRates()
@@ -31,7 +32,11 @@ local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGr
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getCurrentDamageCostPerEnergyRequirement(self)
-    return DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100)
+    if (SkillModifierFunctions.isDamageCostPerEnergyRequirementLocked(self.m_ModelSkillConfiguration)) then
+        return DAMAGE_COST_PER_ENERGY_REQUIREMENT
+    else
+        return DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100)
+    end
 end
 
 local function round(num)

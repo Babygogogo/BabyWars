@@ -45,7 +45,7 @@ local BUTTON_BACKGROUND_NAME      = "c03_t01_s01_f01.png"
 local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 local POPUP_BACKGROUND_WIDTH  = display.width  * 0.7
-local POPUP_BACKGROUND_HEIGHT = display.height * 0.7
+local POPUP_BACKGROUND_HEIGHT = display.height * 0.8
 local POPUP_BACKGROUND_POS_X  = (display.width  - POPUP_BACKGROUND_WIDTH)  / 2
 local POPUP_BACKGROUND_POS_Y  = (display.height - POPUP_BACKGROUND_HEIGHT) / 2
 

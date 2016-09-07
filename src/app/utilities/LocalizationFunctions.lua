@@ -187,6 +187,7 @@ local s_Texts = {
             elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
             elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
             elseif (skillID == 17) then return "改变我方的金钱收入，幅度为"
+            elseif (skillID == 18) then return "锁定我方能量槽的实际长度，使能量增长不会随着主动技能的发动而变慢。"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -213,6 +214,7 @@ local s_Texts = {
             elseif (skillID == 15) then return "我军占领速度"
             elseif (skillID == 16) then return "全面补给"
             elseif (skillID == 17) then return "我方金钱收入"
+            elseif (skillID == 18) then return "锁定能量槽长度"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -231,6 +233,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryLuck")         then return "幸 运 类"
             elseif (skillCategory == "SkillCategoryCapture")      then return "占 领 类"
             elseif (skillCategory == "SkillCategoryRepair")       then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryEnergy")       then return "能 量 类"
             elseif (skillCategory == "SkillCategoryInstant")      then return "瞬 时 类"
             else                                                       return "未知6:" .. (skillCategory or "")
             end

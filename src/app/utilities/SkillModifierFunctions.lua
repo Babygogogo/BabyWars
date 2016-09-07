@@ -253,4 +253,16 @@ function SkillModifierFunctions.getIncomeModifier(configuration)
     return getIncomeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT)
 end
 
+function SkillModifierFunctions.isDamageCostPerEnergyRequirementLocked(configuration)
+    local skills = configuration:getModelSkillGroupPassive():getAllSkills()
+    for i = 1, PASSIVE_SLOTS_COUNT do
+        local skill = skills[i]
+        if ((skill) and (skill.id == 18)) then
+            return true
+        end
+    end
+
+    return false
+end
+
 return SkillModifierFunctions
