@@ -707,31 +707,42 @@ GameConstant.categories = {
     },
 
     ["SkillCategoriesForPassive"] = {
-        "SkillCategoryAttack",
-        "SkillCategoryDefense",
+        "SkillCategoryPassiveAttack",
+        "SkillCategoryPassiveDefense",
         "SkillCategoryPassiveMoney",
-        "SkillCategoryAttackRange",
-        "SkillCategoryCapture",
-        "SkillCategoryRepair",
-        "SkillCategoryEnergy",
+        "SkillCategoryPassiveAttackRange",
+        "SkillCategoryPassiveCapture",
+        "SkillCategoryPassiveRepair",
+        "SkillCategoryPassiveEnergy",
     },
 
     ["SkillCategoriesForActive"] = {
-        "SkillCategoryAttack",
-        "SkillCategoryDefense",
+        "SkillCategoryActiveAttack",
+        "SkillCategoryActiveDefense",
         "SkillCategoryActiveMoney",
-        "SkillCategoryMovement",
-        "SkillCategoryAttackRange",
-        "SkillCategoryCapture",
-        "SkillCategoryInstant",
+        "SkillCategoryActiveMovement",
+        "SkillCategoryActiveAttackRange",
+        "SkillCategoryActiveCapture",
+        "SkillCategoryActiveHP",
+        "SkillCategoryActiveEnergy",
+        "SkillCategoryActiveOthers",
     },
 
-    ["SkillCategoryAttack"] = {
+    ["SkillCategoryPassiveAttack"] = {
         1,
         14,
     },
 
-    ["SkillCategoryDefense"] = {
+    ["SkillCategoryActiveAttack"] = {
+        1,
+        14,
+    },
+
+    ["SkillCategoryPassiveDefense"] = {
+        2,
+    },
+
+    ["SkillCategoryActiveDefense"] = {
         2,
     },
 
@@ -742,37 +753,51 @@ GameConstant.categories = {
 
     ["SkillCategoryActiveMoney"] = {
         3,
+        12,
     },
 
-    ["SkillCategoryMovement"] = {
+    ["SkillCategoryActiveMovement"] = {
         6,
     },
 
-    ["SkillCategoryAttackRange"] = {
+    ["SkillCategoryPassiveAttackRange"] = {
         7,
     },
 
-    ["SkillCategoryCapture"] = {
+    ["SkillCategoryActiveAttackRange"] = {
+        7,
+    },
+
+    ["SkillCategoryPassiveCapture"] = {
         15,
     },
 
-    ["SkillCategoryRepair"] = {
+    ["SkillCategoryActiveCapture"] = {
+        15,
+    },
+
+    ["SkillCategoryPassiveRepair"] = {
         10,
         11,
     },
 
-    ["SkillCategoryEnergy"] = {
+    ["SkillCategoryPassiveEnergy"] = {
         18,
         19,
     },
 
-    ["SkillCategoryInstant"] = {
+    ["SkillCategoryActiveEnergy"] = {
+        13,
+    },
+
+    ["SkillCategoryActiveHP"] = {
         4,
         5,
+    },
+
+    ["SkillCategoryActiveOthers"] = {
         8,
         9,
-        12,
-        13,
         16,
     },
 }
