@@ -16,9 +16,9 @@
 
 local AttackTaker = require("src.global.functions.class")("AttackTaker")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local TypeChecker           = require("src.app.utilities.TypeChecker")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 local UNIT_MAX_HP = GameConstantFunctions.getUnitMaxHP()
 local TILE_MAX_HP = GameConstantFunctions.getTileMaxHP()
@@ -37,21 +37,22 @@ AttackTaker.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util function.
 --------------------------------------------------------------------------------
-local function round(num)
-    return math.floor(num + 0.5)
-end
-
 local function getNormalizedHP(hp)
     return math.ceil(hp / 10)
 end
 
-local function getDamageCost(target, damage)
+local function getDamageCostWithTargetAndDamage(target, damage)
     if (not target.getProductionCost) then
         return 0
     else
         local remainingHP = math.max(0, target:getCurrentHP() - damage)
         return math.floor(target:getBaseProductionCost() * (target:getNormalizedCurrentHP() - getNormalizedHP(remainingHP)) / 10)
     end
+end
+
+local function getModifiedDamageCost(cost, modelPlayer)
+    local modifier = SkillModifierFunctions.getEnergyGrowthRateModifier(modelPlayer:getModelSkillConfiguration())
+    return math.floor(cost * (100 + modifier) / 100)
 end
 
 --------------------------------------------------------------------------------
@@ -130,8 +131,8 @@ function AttackTaker:doActionAttack(action, attackTarget)
     local attackDamage     = action.attackDamage
     local counterDamage    = action.counterDamage or 0
     local attacker         = self.m_Owner
-    local selfDamageCost   = getDamageCost(attacker,     counterDamage)
-    local targetDamageCost = getDamageCost(attackTarget, attackDamage)
+    local selfDamageCost   = getDamageCostWithTargetAndDamage(attacker,     counterDamage)
+    local targetDamageCost = getDamageCostWithTargetAndDamage(attackTarget, attackDamage)
     self        :setCurrentHP(math.max(0, self:getCurrentHP()         - counterDamage))
     attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - attackDamage))
 
@@ -141,8 +142,8 @@ function AttackTaker:doActionAttack(action, attackTarget)
         local selfModelPlayer    = modelPlayerManager:getModelPlayer(selfPlayerIndex)
         local targetModelPlayer  = modelPlayerManager:getModelPlayer(attackTarget:getPlayerIndex())
 
-        selfModelPlayer  :addDamageCost(selfDamageCost   * 2 + targetDamageCost)
-        targetModelPlayer:addDamageCost(targetDamageCost * 2 + selfDamageCost)
+        selfModelPlayer  :addDamageCost(getModifiedDamageCost(selfDamageCost   * 2 + targetDamageCost, selfModelPlayer))
+        targetModelPlayer:addDamageCost(getModifiedDamageCost(targetDamageCost * 2 + selfDamageCost,   targetModelPlayer))
 
         self.m_RootScriptEventDispatcher:dispatchEvent({
             name        = "EvtModelPlayerUpdated",

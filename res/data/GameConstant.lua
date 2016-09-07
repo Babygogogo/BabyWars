@@ -763,6 +763,7 @@ GameConstant.categories = {
 
     ["SkillCategoryEnergy"] = {
         18,
+        19,
     },
 
     ["SkillCategoryInstant"] = {
@@ -4087,7 +4088,26 @@ GameConstant.skills = {
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
-        }
+        },
+    },
+
+    -- Modify the growth rate of the energy of the owner player.
+    [19] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 10, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 20, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 30, pointsPassive = 90, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 40, pointsPassive = 120, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 50, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 60, pointsPassive = 180, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 70, pointsPassive = 210, pointsActive = nil, minEnergy = nil},
+            [8] = {modifier = 80, pointsPassive = 240, pointsActive = nil, minEnergy = nil},
+            [9] = {modifier = 90, pointsPassive = 270, pointsActive = nil, minEnergy = nil},
+            [10] = {modifier = 100, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
+        },
     },
 }
 
