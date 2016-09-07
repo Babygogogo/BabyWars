@@ -135,8 +135,8 @@ local s_Texts = {
             elseif (textType == "None")                   then return "无"
             elseif (textType == "NoSkills")               then return "没有任何技能"
             elseif (textType == "ConfirmExitConfiguring") then return "是否确定要停止配置技能，并返回上层菜单？"
-            elseif (textType == "GettingConfiguration")   then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
-            elseif (textType == "SettingConfiguration")   then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
+            elseif (textType == "GettingConfiguration")   then return "正在从服务器获取配置数据，请稍候。若长时间没有反应，请返回并重试。"
+            elseif (textType == "SettingConfiguration")   then return "正在传输配置数据到服务器，请稍候。若长时间没有反应，请重试。"
             else                                               return "未知[3]: " .. (textType or "")
             end
         end,

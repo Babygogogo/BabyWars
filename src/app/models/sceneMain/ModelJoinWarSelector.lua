@@ -1,11 +1,12 @@
 
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local Actor                     = require("src.global.actors.Actor")
+local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -128,18 +129,28 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     end)
 end
 
-local function initSelectorSkill(modelWarConfigurator)
+local function initSelectorSkill(self, modelWarConfigurator)
     local options = {}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
     for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
         options[#options + 1] = {
             data = i,
             text = prefix .. i,
+            callbackOnOptionIndicatorTouched = function()
+                modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
+                    :setPopUpPanelEnabled(true)
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name            = "EvtPlayerRequestDoAction",
+                    actionName      = "GetSkillConfiguration",
+                    configurationID = i,
+                })
+            end,
         }
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
         :setButtonsEnabled(true)
+        :setOptionIndicatorTouchEnabled(true)
 end
 
 local function getActorWarConfigurator(self)
@@ -150,7 +161,7 @@ local function getActorWarConfigurator(self)
         model:setEnabled(false)
         initCallbackOnButtonBackTouched(   self, model)
         initCallbackOnButtonConfirmTouched(self, model)
-        initSelectorSkill(model)
+        initSelectorSkill(                 self, model)
 
         self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
         if (self.m_View) then
@@ -260,6 +271,19 @@ function ModelJoinWarSelector:doActionJoinWar(action)
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
     self.m_ModelMessageIndicator:showMessage(action.message)
+
+    return self
+end
+
+function ModelJoinWarSelector:doActionGetSkillConfiguration(action)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    if (modelWarConfigurator:isPopUpPanelEnabled()) then
+        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
+        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
+            getLocalizedText(3, "Configuration"), action.configurationID,
+            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+        ))
+    end
 
     return self
 end

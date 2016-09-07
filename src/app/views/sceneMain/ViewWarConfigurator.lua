@@ -285,6 +285,10 @@ function ViewWarConfigurator:getEditBoxPassword()
     return self.m_EditBoxPassword
 end
 
+function ViewWarConfigurator:isPopUpPanelEnabled(enabled)
+    return self.m_PopUpGreyMask:isVisible()
+end
+
 function ViewWarConfigurator:setPopUpPanelEnabled(enabled)
     self.m_PopUpGreyMask  :setVisible(enabled)
     self.m_PopUpBackground:setVisible(enabled)
@@ -295,7 +299,12 @@ function ViewWarConfigurator:setPopUpPanelEnabled(enabled)
 end
 
 function ViewWarConfigurator:setPopUpPanelText(text)
-    self.m_PopUpLabel:setString(text)
+    local label = self.m_PopUpLabel
+    label:setString(text)
+
+    local height = math.max(label:getLineHeight() * label:getStringNumLines(), POPUP_SCROLLVIEW_HEIGHT)
+    label:setDimensions(POPUP_SCROLLVIEW_WIDTH, height)
+    self.m_PopUpScrollView:setInnerContainerSize({width = POPUP_SCROLLVIEW_WIDTH, height = height})
 
     return self
 end

@@ -96,6 +96,14 @@ function ModelWarConfigurator:setEnabled(enabled)
     return self
 end
 
+function ModelWarConfigurator:isPopUpPanelEnabled()
+    if (self.m_View) then
+        return self.m_View:isPopUpPanelEnabled()
+    else
+        return false
+    end
+end
+
 function ModelWarConfigurator:setPopUpPanelEnabled(enabled)
     if (self.m_View) then
         self.m_View:setPopUpPanelEnabled(enabled)

@@ -302,6 +302,8 @@ end
 
 function ModelMainMenu:doActionGetSkillConfiguration(action)
     getActorSkillConfigurator(self):getModel():doActionGetSkillConfiguration(action)
+    getActorNewWarCreator(    self):getModel():doActionGetSkillConfiguration(action)
+    getActorJoinWarSelector(  self):getModel():doActionGetSkillConfiguration(action)
 
     return self
 end

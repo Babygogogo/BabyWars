@@ -1,10 +1,11 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
-local Actor                 = require("src.global.actors.Actor")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local WarFieldList          = require("res.data.templateWarField.WarFieldList")
+local WarFieldList              = require("res.data.templateWarField.WarFieldList")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -100,7 +101,7 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
         :setButtonsEnabled(true)
 end
 
-local function initSelectorSkill(modelWarConfigurator)
+local function initSelectorSkill(self, modelWarConfigurator)
     local options = {}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
     for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
@@ -108,8 +109,13 @@ local function initSelectorSkill(modelWarConfigurator)
             text = prefix .. i,
             data = i,
             callbackOnOptionIndicatorTouched = function()
-                modelWarConfigurator:setPopUpPanelText("Test pop up panel")
+                modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name            = "EvtPlayerRequestDoAction",
+                    actionName      = "GetSkillConfiguration",
+                    configurationID = i,
+                })
             end,
         }
     end
@@ -143,8 +149,8 @@ local function getActorWarConfigurator(self)
         model:setEnabled(false)
         initCallbackOnButtonConfirmTouched(self, model)
         initCallbackOnButtonBackTouched(   self, model)
+        initSelectorSkill(self,    model)
         initSelectorMaxSkillPoints(model)
-        initSelectorSkill(         model)
         initSelectorFog(           model)
         initSelectorWeather(       model)
 
@@ -224,6 +230,22 @@ end
 function ModelNewWarCreator:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelNewWarCreator:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelNewWarCreator:doActionGetSkillConfiguration(action)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    if (modelWarConfigurator:isPopUpPanelEnabled()) then
+        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
+        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
+            getLocalizedText(3, "Configuration"), action.configurationID,
+            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+        ))
+    end
 
     return self
 end
