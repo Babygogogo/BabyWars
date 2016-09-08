@@ -45,11 +45,7 @@ local function getAttackBonusMultiplier(attacker, attackerGridIndex, target, tar
         end
     end)
 
-    local modelWeatherManager = modelSceneWar:getModelWeatherManager()
-    local modelPlayerManager  = modelSceneWar:getModelPlayerManager()
-    bonus = bonus + SkillModifierFunctions.getAttackModifier(modelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration(),
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    -- TODO: take the skills of the opponent into account.
+    bonus = bonus + SkillModifierFunctions.getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 
     return math.max(1 + bonus / 100, 0)
 end

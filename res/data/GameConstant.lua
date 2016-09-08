@@ -731,11 +731,13 @@ GameConstant.categories = {
     ["SkillCategoryPassiveAttack"] = {
         1,
         14,
+        20,
     },
 
     ["SkillCategoryActiveAttack"] = {
         1,
         14,
+        20,
     },
 
     ["SkillCategoryPassiveDefense"] = {
@@ -4132,6 +4134,25 @@ GameConstant.skills = {
             [8] = {modifier = 80, pointsPassive = 240, pointsActive = nil, minEnergy = nil},
             [9] = {modifier = 90, pointsPassive = 270, pointsActive = nil, minEnergy = nil},
             [10] = {modifier = 100, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- Modify the growth rate of the energy of the owner player.
+    [20] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 400, minEnergy = 5},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 480, minEnergy = 6},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 560, minEnergy = 7},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
         },
     },
 }
