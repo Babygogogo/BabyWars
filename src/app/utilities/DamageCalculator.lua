@@ -55,9 +55,8 @@ local function getDefenseBonusMultiplier(attacker, attackerGridIndex, target, ta
         return 1
     end
 
-    local modelTileMap = modelSceneWar:getModelWarField():getModelTileMap()
-    local targetTile   = modelTileMap:getModelTile(targetGridIndex)
-    local bonus        = 0
+    local targetTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
+    local bonus      = 0
 
     bonus = bonus + ((targetTile.getDefenseBonusAmount)                                                 and
         (targetTile:getDefenseBonusAmount(target:getUnitType()) * target:getNormalizedCurrentHP() / 10) or
@@ -66,12 +65,7 @@ local function getDefenseBonusMultiplier(attacker, attackerGridIndex, target, ta
         (target:getPromotionDefenseBonus())            or
         (0))
 
-    local modelWeatherManager = modelSceneWar:getModelWeatherManager()
-    local modelPlayerManager  = modelSceneWar:getModelPlayerManager()
-    local targetPlayerIndex   = target:getPlayerIndex()
-    bonus = bonus + SkillModifierFunctions.getDefenseModifier(modelPlayerManager:getModelPlayer(targetPlayerIndex):getModelSkillConfiguration(),
-        attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-    -- TODO: take the skills of the opponent into account.
+    bonus = bonus + SkillModifierFunctions.getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex,modelSceneWar)
 
     if (bonus >= 0) then
         return 1 / (1 + bonus / 100)

@@ -37,7 +37,7 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
 end
 
 local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 
     if (not modelSkillGroup) then
         return 0
@@ -47,9 +47,14 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
     local skills   = modelSkillGroup:getAllSkills()
     for i = 1, slotsCount do
         local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 2)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        if (skill) then
+            local skillID = skill.id
+            if (skillID == 2) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif (skillID == 21) then
+                local fund = modelSceneWar:getModelPlayerManager():getModelPlayer(target:getPlayerIndex()):getFund()
+                modifier   = modifier + getSkillModifier(skillID, skill.level) * fund / 10000
+            end
         end
     end
 
@@ -211,13 +216,12 @@ function SkillModifierFunctions.getAttackModifier(attacker, attackerGridIndex, t
             attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 end
 
-function SkillModifierFunctions.getDefenseModifier(configuration,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-
+function SkillModifierFunctions.getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
+    local configuration = modelSceneWar:getModelPlayerManager():getModelPlayer(target:getPlayerIndex()):getModelSkillConfiguration()
     return getDefenseModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager) +
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar) +
         getDefenseModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 end
 
 function SkillModifierFunctions.getProductionCostModifier(configuration, tiledID)

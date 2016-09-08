@@ -190,6 +190,7 @@ local s_Texts = {
             elseif (skillID == 18) then return "锁定我方能量槽的实际长度，使能量增长不会随着主动技能的发动而变慢。"
             elseif (skillID == 19) then return "改变我方能量增长速度，幅度为"
             elseif (skillID == 20) then return "根据我方资金来改变全军攻击力，比例为每10000资金"
+            elseif (skillID == 21) then return "根据我方资金来改变全军防御力，比例为每10000资金"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -219,6 +220,7 @@ local s_Texts = {
             elseif (skillID == 18) then return "锁定能量槽长度"
             elseif (skillID == 19) then return "能量增速"
             elseif (skillID == 20) then return "金钱加成攻击"
+            elseif (skillID == 21) then return "金钱加成防御"
             else                        return "未知5:" .. (skillID or "")
             end
         end,

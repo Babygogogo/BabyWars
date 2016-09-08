@@ -742,20 +742,26 @@ GameConstant.categories = {
 
     ["SkillCategoryPassiveDefense"] = {
         2,
+        21,
     },
 
     ["SkillCategoryActiveDefense"] = {
         2,
+        21,
     },
 
     ["SkillCategoryPassiveMoney"] = {
         3,
         17,
+        20,
+        21,
     },
 
     ["SkillCategoryActiveMoney"] = {
         3,
         12,
+        20,
+        21,
     },
 
     ["SkillCategoryActiveMovement"] = {
@@ -4137,8 +4143,27 @@ GameConstant.skills = {
         },
     },
 
-    -- Modify the growth rate of the energy of the owner player.
+    -- Modify the attack power regarding to money of the owner player.
     [20] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 400, minEnergy = 5},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 480, minEnergy = 6},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 560, minEnergy = 7},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
+        },
+    },
+
+    -- Modify the defense power regarding to money of the owner player.
+    [21] = {
         minLevel     = 1,
         maxLevel     = 10,
         modifierUnit = "%",
