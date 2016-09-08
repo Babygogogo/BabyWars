@@ -65,7 +65,7 @@ local function getDefenseBonusMultiplier(attacker, attackerGridIndex, target, ta
         (target:getPromotionDefenseBonus())            or
         (0))
 
-    bonus = bonus + SkillModifierFunctions.getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex,modelSceneWar)
+    bonus = bonus + SkillModifierFunctions.getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 
     if (bonus >= 0) then
         return 1 / (1 + bonus / 100)

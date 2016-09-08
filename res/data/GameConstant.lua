@@ -755,6 +755,7 @@ GameConstant.categories = {
         17,
         20,
         21,
+        22,
     },
 
     ["SkillCategoryActiveMoney"] = {
@@ -762,6 +763,7 @@ GameConstant.categories = {
         12,
         20,
         21,
+        22,
     },
 
     ["SkillCategoryActiveMovement"] = {
@@ -4178,6 +4180,25 @@ GameConstant.skills = {
             [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
             [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
             [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
+        },
+    },
+
+    -- Get money according to the base damage cost that the owner player deal to the opponent with units' attack.
+    [22] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 10, pointsPassive = 140, pointsActive = 60, minEnergy = 1},
+            [2] = {modifier = 20, pointsPassive = 280, pointsActive = 120, minEnergy = 1},
+            [3] = {modifier = 30, pointsPassive = 420, pointsActive = 180, minEnergy = 2},
+            [4] = {modifier = 40, pointsPassive = 560, pointsActive = 240, minEnergy = 2},
+            [5] = {modifier = 50, pointsPassive = 700, pointsActive = 300, minEnergy = 3},
+            [6] = {modifier = 60, pointsPassive = 840, pointsActive = 360, minEnergy = 3},
+            [7] = {modifier = 70, pointsPassive = 980, pointsActive = 420, minEnergy = 4},
+            [8] = {modifier = 80, pointsPassive = 1120, pointsActive = 480, minEnergy = 4},
+            [9] = {modifier = 90, pointsPassive = 1260, pointsActive = 540, minEnergy = 5},
+            [10] = {modifier = 100, pointsPassive = 1400, pointsActive = 600, minEnergy = 5},
         },
     },
 }

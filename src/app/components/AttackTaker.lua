@@ -55,6 +55,13 @@ local function getModifiedDamageCost(cost, modelPlayer)
     return math.floor(cost * (100 + modifier) / 100)
 end
 
+local function addFundWithAttackDamageCost(modelPlayer, targetDamageCost)
+    local modifier = SkillModifierFunctions.getAttackDamageCostToFundModifier(modelPlayer:getModelSkillConfiguration())
+    if (modifier ~= 0) then
+        modelPlayer:setFund(modelPlayer:getFund() + math.floor(targetDamageCost * modifier / 100))
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -144,6 +151,9 @@ function AttackTaker:doActionAttack(action, attackTarget)
 
         selfModelPlayer  :addDamageCost(getModifiedDamageCost(selfDamageCost   * 2 + targetDamageCost, selfModelPlayer))
         targetModelPlayer:addDamageCost(getModifiedDamageCost(targetDamageCost * 2 + selfDamageCost,   targetModelPlayer))
+
+        addFundWithAttackDamageCost(selfModelPlayer, targetDamageCost)
+        addFundWithAttackDamageCost(targetModelPlayer, selfDamageCost)
 
         self.m_RootScriptEventDispatcher:dispatchEvent({
             name        = "EvtModelPlayerUpdated",
