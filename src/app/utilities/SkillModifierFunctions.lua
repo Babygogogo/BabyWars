@@ -175,6 +175,24 @@ local function getLuckDamageUpperModifierForSkillGroup(modelSkillGroup, slotsCou
     return modifier
 end
 
+local function getLuckDamageLowerModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 25)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 local function getCaptureAmountModifierForSkillGroup(modelSkillGroup, slotsCount)
     if (not modelSkillGroup) then
         return 0
@@ -274,6 +292,11 @@ end
 function SkillModifierFunctions.getLuckDamageUpperModifier(configuration)
     return getLuckDamageUpperModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
         getLuckDamageUpperModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.getLuckDamageLowerModifier(configuration)
+    return getLuckDamageLowerModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        getLuckDamageLowerModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
 function SkillModifierFunctions.getCaptureAmountModifier(configuration)

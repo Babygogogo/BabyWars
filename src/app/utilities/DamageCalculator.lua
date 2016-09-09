@@ -27,9 +27,11 @@ end
 local function getLuckValue(playerIndex, modelSceneWar)
     local modelSkillConfiguration = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex):getModelSkillConfiguration()
     local upperModifier           = SkillModifierFunctions.getLuckDamageUpperModifier(modelSkillConfiguration)
-    local upperBound              = math.max(0, upperModifier + 10)
+    local lowerModifier           = SkillModifierFunctions.getLuckDamageLowerModifier(modelSkillConfiguration)
+    local upperBound              = upperModifier + 10
+    local lowerBound              = math.min(lowerModifier, upperBound)
 
-    return math.random(0, upperBound)
+    return math.random(lowerBound, upperBound)
 end
 
 local function getAttackBonusMultiplier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)

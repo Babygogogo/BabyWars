@@ -730,16 +730,18 @@ GameConstant.categories = {
 
     ["SkillCategoryPassiveAttack"] = {
         1,
-        14,
         20,
         23,
+        14,
+        25,
     },
 
     ["SkillCategoryActiveAttack"] = {
         1,
-        14,
         20,
         23,
+        14,
+        25,
     },
 
     ["SkillCategoryPassiveDefense"] = {
@@ -4239,6 +4241,35 @@ GameConstant.skills = {
             [2] = {modifier = 10, pointsPassive = 150, pointsActive = 150, minEnergy = 2},
             [3] = {modifier = 15, pointsPassive = 225, pointsActive = 225, minEnergy = 3},
             [4] = {modifier = 20, pointsPassive = 300, pointsActive = 300, minEnergy = 4},
+        },
+    },
+
+    -- Modify the lower limit of the luck damage of the owner player.
+    [25] = {
+        minLevel = 1,
+        maxLevel = 20,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 40, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 160, minEnergy = 2},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 200, minEnergy = 2},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 240, minEnergy = 2},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 280, minEnergy = 3},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 320, minEnergy = 3},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 360, minEnergy = 3},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 400, minEnergy = 4},
+            [11] = {modifier = 55, pointsPassive = 880, pointsActive = 440, minEnergy = 4},
+            [12] = {modifier = 60, pointsPassive = 960, pointsActive = 480, minEnergy = 4},
+            [13] = {modifier = 65, pointsPassive = 1040, pointsActive = 520, minEnergy = 5},
+            [14] = {modifier = 70, pointsPassive = 1120, pointsActive = 560, minEnergy = 5},
+            [15] = {modifier = 75, pointsPassive = 1200, pointsActive = 600, minEnergy = 5},
+            [16] = {modifier = 80, pointsPassive = 1280, pointsActive = 640, minEnergy = 6},
+            [17] = {modifier = 85, pointsPassive = 1360, pointsActive = 680, minEnergy = 6},
+            [18] = {modifier = 90, pointsPassive = 1440, pointsActive = 720, minEnergy = 6},
+            [19] = {modifier = 95, pointsPassive = 1520, pointsActive = 760, minEnergy = 7},
+            [20] = {modifier = 100, pointsPassive = 1600, pointsActive = 800, minEnergy = 7},
         },
     },
 }
