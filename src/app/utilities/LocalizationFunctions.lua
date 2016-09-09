@@ -193,6 +193,7 @@ local s_Texts = {
             elseif (skillID == 21) then return "根据我方资金来改变全军防御力，比例为每10000资金"
             elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
+            elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -225,6 +226,7 @@ local s_Texts = {
             elseif (skillID == 21) then return "金钱加成防御"
             elseif (skillID == 22) then return "攻击掠夺金钱"
             elseif (skillID == 23) then return "地形加成攻击"
+            elseif (skillID == 24) then return "地形加成防御"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -249,7 +251,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "占 领 类"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP 类"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
-            elseif (skillCategory == "SkillCategoryActiveOthers")       then return "其 他"
+            elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
             else                                                        return "未知6:" .. (skillCategory or "")
             end
         end,
@@ -269,7 +271,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "Capture"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
-            elseif (skillCategory == "SkillCategoryActiveOthers")       then return "Others"
+            elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
             else                                                        return "Unknown6:" .. (skillCategory or "")
             end
         end,

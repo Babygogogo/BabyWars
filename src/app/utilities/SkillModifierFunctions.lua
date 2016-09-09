@@ -57,6 +57,9 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 21) then
                 local fund = modelSceneWar:getModelPlayerManager():getModelPlayer(target:getPlayerIndex()):getFund()
                 modifier   = modifier + getSkillModifier(skillID, skill.level) * fund / 10000
+            elseif (skillID == 24) then
+                local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
+                modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
             end
         end
     end

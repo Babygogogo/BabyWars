@@ -725,7 +725,7 @@ GameConstant.categories = {
         "SkillCategoryActiveCapture",
         "SkillCategoryActiveHP",
         "SkillCategoryActiveEnergy",
-        "SkillCategoryActiveOthers",
+        "SkillCategoryActiveLogistics",
     },
 
     ["SkillCategoryPassiveAttack"] = {
@@ -745,11 +745,13 @@ GameConstant.categories = {
     ["SkillCategoryPassiveDefense"] = {
         2,
         21,
+        24,
     },
 
     ["SkillCategoryActiveDefense"] = {
         2,
         21,
+        24,
     },
 
     ["SkillCategoryPassiveMoney"] = {
@@ -808,7 +810,7 @@ GameConstant.categories = {
         5,
     },
 
-    ["SkillCategoryActiveOthers"] = {
+    ["SkillCategoryActiveLogistics"] = {
         9,
         16,
     },
@@ -4214,8 +4216,21 @@ GameConstant.skills = {
         },
     },
 
-        -- Get money according to the base damage cost that the owner player deal to the opponent with units' attack.
+    -- Tiles offer addional attack power for units on it, according to the base defense bonus.
     [23] = {
+        minLevel     = 1,
+        maxLevel     = 4,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 75, pointsActive = 75, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 150, pointsActive = 150, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 225, pointsActive = 225, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 300, pointsActive = 300, minEnergy = 4},
+        },
+    },
+
+    -- Tiles offer addional defense power for units on it, according to the base defense bonus.
+    [24] = {
         minLevel     = 1,
         maxLevel     = 4,
         modifierUnit = "%",
