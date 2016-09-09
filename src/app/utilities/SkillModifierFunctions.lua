@@ -29,6 +29,9 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 20) then
                 local fund = modelSceneWar:getModelPlayerManager():getModelPlayer(attacker:getPlayerIndex()):getFund()
                 modifier = modifier + getSkillModifier(skillID, skill.level) * fund / 10000
+            elseif (skillID == 23) then
+                local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(attackerGridIndex)
+                modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
             end
         end
     end

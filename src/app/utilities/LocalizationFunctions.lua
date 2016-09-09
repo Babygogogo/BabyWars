@@ -192,6 +192,7 @@ local s_Texts = {
             elseif (skillID == 20) then return "根据我方资金来改变全军攻击力，比例为每10000资金"
             elseif (skillID == 21) then return "根据我方资金来改变全军防御力，比例为每10000资金"
             elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
+            elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -223,6 +224,7 @@ local s_Texts = {
             elseif (skillID == 20) then return "金钱加成攻击"
             elseif (skillID == 21) then return "金钱加成防御"
             elseif (skillID == 22) then return "攻击掠夺金钱"
+            elseif (skillID == 23) then return "地形加成攻击"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
