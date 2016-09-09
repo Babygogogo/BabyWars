@@ -39,6 +39,14 @@ function ModelOptionSelector:setButtonsEnabled(enabled)
     return self
 end
 
+function ModelOptionSelector:setOptionIndicatorTouchEnabled(enabled)
+    if (self.m_View) then
+        self.m_View:setOptionIndicatorTouchEnabled(enabled)
+    end
+
+    return self
+end
+
 function ModelOptionSelector:setOptions(options)
     self.m_Options = options
     self:setCurrentOptionIndex(1)
@@ -57,8 +65,8 @@ function ModelOptionSelector:setCurrentOptionIndex(index)
 
     self.m_OptionIndex = index
     local option = options[index]
-    if (option.callback) then
-        option.callback()
+    if (option.callbackOnSwitched) then
+        option.callbackOnSwitched()
     end
     if (self.m_View) then
         self.m_View:setOptionText(option.text)
@@ -75,6 +83,15 @@ end
 
 function ModelOptionSelector:onButtonNextTouched()
     self:setCurrentOptionIndex(getNextOptionIndex(self.m_Options, self.m_OptionIndex))
+
+    return self
+end
+
+function ModelOptionSelector:onOptionIndicatorTouched()
+    local callback = self.m_Options[self.m_OptionIndex].callbackOnOptionIndicatorTouched
+    if (callback) then
+        callback()
+    end
 
     return self
 end

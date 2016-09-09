@@ -77,7 +77,7 @@ local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguratio
     local maxSkillPoints = warConfiguration.maxSkillPoints
     local options = {{
         data = maxSkillPoints,
-        text = "" .. maxSkillPoints,
+        text = (maxSkillPoints) and ("" .. maxSkillPoints) or (getLocalizedText(3, "Disable")),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
@@ -140,8 +140,8 @@ end
 
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
-        local model = Actor.createModel("sceneMain.ModelWarConfigurator")
-        local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
+        local model = actor:getModel()
 
         model:setEnabled(false)
             :setPasswordEnabled(false)
@@ -150,9 +150,9 @@ local function getActorWarConfigurator(self)
         initCallbackOnButtonConfirmTouched(self, model)
         initSelectorSkill(model)
 
-        self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
+        self.m_ActorWarConfigurator = actor
         if (self.m_View) then
-            self.m_View:setViewWarConfigurator(view)
+            self.m_View:setViewWarConfigurator(actor:getView())
         end
     end
 

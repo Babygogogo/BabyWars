@@ -6,8 +6,9 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local LABEL_Z_ORDER      = 1
 local BACKGROUND_Z_ORDER = 0
 
-local BACKGROUND_WIDTH  = 150
-local BACKGROUND_HEIGHT = 70
+local BACKGROUND_WIDTH     = 150
+local BACKGROUND_HEIGHT    = 70
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
 local LEFT_POS_X = 10
 local LEFT_POS_Y = 10 + 130 -- This is the height of ViewTileInfo/ViewUnitInfo
@@ -25,14 +26,18 @@ local function moveToRightSide(self)
     self:setPosition(RIGHT_POS_X, RIGHT_POS_Y)
 end
 
+local function resetBackground(background, playerIndex)
+    background:initWithSpriteFrameName("c03_t01_s0" .. playerIndex .. "_f01.png", BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        :setOpacity(200)
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initBackground(self)
-    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", {x = 4, y = 6, width = 1, height = 1})
-    background:ignoreAnchorPointForPosition(true)
-        :setContentSize(BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-        :setOpacity(200)
+    local background = cc.Scale9Sprite:create()
 
     self.m_Background = background
     self:addChild(background, BACKGROUND_Z_ORDER)
@@ -84,6 +89,10 @@ function ViewBattleInfo:updateWithAttackAndCounterDamage(attack, counter)
     self.m_Label:setString(LocalizationFunctions.getLocalizedText(90, attack, counter))
 
     return self
+end
+
+function ViewBattleInfo:updateWithPlayerIndex(playerIndex)
+    resetBackground(self.m_Background, playerIndex)
 end
 
 return ViewBattleInfo

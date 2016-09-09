@@ -37,22 +37,6 @@ local EventDispatcher        = require("src.global.events.EventDispatcher")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getModelTurnManager(self)
-    return self.m_ActorTurnManager:getModel()
-end
-
-local function getModelPlayerManager(self)
-    return self.m_ActorPlayerManager:getModel()
-end
-
-local function getModelWeatherManager(self)
-    return self.m_ActorWeatherManager:getModel()
-end
-
-local function getModelWarField(self)
-    return self.m_ActorWarField:getModel()
-end
-
 local function getModelMessageIndicator(self)
     return self.m_ActorMessageIndicator:getModel()
 end
@@ -125,12 +109,12 @@ local function doActionGetSceneWarData(self, action)
 end
 
 local function doActionBeginTurn(self, action)
-    local modelTurnManager = getModelTurnManager(self)
+    local modelTurnManager = self:getModelTurnManager()
     local lostPlayerIndex  = action.lostPlayerIndex
 
     if (lostPlayerIndex) then
-        local modelWarField      = getModelWarField(self)
-        local modelPlayerManager = getModelPlayerManager(self)
+        local modelWarField      = self:getModelWarField()
+        local modelPlayerManager = self:getModelPlayerManager()
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         action.callbackOnEnterTurnPhaseMain = function()
@@ -158,15 +142,15 @@ local function doActionBeginTurn(self, action)
 end
 
 local function doActionEndTurn(self, action)
-    getModelTurnManager(self):doActionEndTurn(action)
+    self:getModelTurnManager():doActionEndTurn(action)
 end
 
 local function doActionSurrender(self, action)
-    local modelPlayerManager = getModelPlayerManager(self)
-    local modelTurnManager   = getModelTurnManager(self)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
     modelPlayerManager:doActionSurrender(action)
     modelTurnManager:doActionSurrender(action)
-    getModelWarField(self):doActionSurrender(action)
+    self:getModelWarField():doActionSurrender(action)
 
     local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
     if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
@@ -186,20 +170,20 @@ end
 
 local function doActionActivateSkillGroup(self, action)
     InstantSkillExecutor.doActionActivateSkillGroup(action,
-        getModelWarField(self), getModelPlayerManager(self), getModelTurnManager(self), getModelWeatherManager(self), self.m_ScriptEventDispatcher)
+        self:getModelWarField(), self:getModelPlayerManager(), self:getModelTurnManager(), self:getModelWeatherManager(), self.m_ScriptEventDispatcher)
 
-    local playerIndex = getModelTurnManager(self):getPlayerIndex()
-    getModelPlayerManager(self):doActionActivateSkillGroup(action, playerIndex)
+    local playerIndex = self:getModelTurnManager():getPlayerIndex()
+    self:getModelPlayerManager():doActionActivateSkillGroup(action, playerIndex)
 end
 
 local function doActionWait(self, action)
-    getModelWarField(self):doActionWait(action)
+    self:getModelWarField():doActionWait(action)
 end
 
 local function doActionAttack(self, action)
-    local modelPlayerManager = getModelPlayerManager(self)
-    local modelTurnManager   = getModelTurnManager(self)
-    local modelWarField      = getModelWarField(self)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local modelTurnManager   = self:getModelTurnManager()
+    local modelWarField      = self:getModelWarField()
     local lostPlayerIndex    = action.lostPlayerIndex
     local callbackOnAttackAnimationEnded
 
@@ -232,12 +216,12 @@ local function doActionAttack(self, action)
 end
 
 local function doActionJoinModelUnit(self, action)
-    getModelWarField(self):doActionJoinModelUnit(action)
+    self:getModelWarField():doActionJoinModelUnit(action)
 end
 
 local function doActionCaptureModelTile(self, action)
-    local modelWarField      = getModelWarField(self)
-    local modelPlayerManager = getModelPlayerManager(self)
+    local modelWarField      = self:getModelWarField()
+    local modelPlayerManager = self:getModelPlayerManager()
     local lostPlayerIndex    = action.lostPlayerIndex
     local callbackOnCaptureAnimationEnded
 
@@ -265,33 +249,33 @@ local function doActionCaptureModelTile(self, action)
 end
 
 local function doActionLaunchSilo(self, action)
-    getModelWarField(self):doActionLaunchSilo(action)
+    self:getModelWarField():doActionLaunchSilo(action)
 end
 
 local function doActionBuildModelTile(self, action)
-    getModelWarField(self):doActionBuildModelTile(action)
+    self:getModelWarField():doActionBuildModelTile(action)
 end
 
 local function doActionProduceModelUnitOnUnit(self, action)
-    getModelPlayerManager(self):doActionProduceModelUnitOnUnit(action, getModelTurnManager(self):getPlayerIndex())
-    getModelWarField(self):doActionProduceModelUnitOnUnit(action)
+    self:getModelPlayerManager():doActionProduceModelUnitOnUnit(action, self:getModelTurnManager():getPlayerIndex())
+    self:getModelWarField():doActionProduceModelUnitOnUnit(action)
 end
 
 local function doActionSupplyModelUnit(self, action)
-    getModelWarField(self):doActionSupplyModelUnit(action)
+    self:getModelWarField():doActionSupplyModelUnit(action)
 end
 
 local function doActionLoadModelUnit(self, action)
-    getModelWarField(self):doActionLoadModelUnit(action)
+    self:getModelWarField():doActionLoadModelUnit(action)
 end
 
 local function doActionDropModelUnit(self, action)
-    getModelWarField(self):doActionDropModelUnit(action)
+    self:getModelWarField():doActionDropModelUnit(action)
 end
 
 local function doActionProduceOnTile(self, action)
-    getModelPlayerManager(self):doActionProduceOnTile(action, getModelTurnManager(self):getPlayerIndex())
-    getModelWarField(self):doActionProduceOnTile(action)
+    self:getModelPlayerManager():doActionProduceOnTile(action, self:getModelTurnManager():getPlayerIndex())
+    self:getModelWarField():doActionProduceOnTile(action)
 end
 
 local function doAction(self, action)
@@ -361,9 +345,7 @@ end
 local function onWebSocketMessage(self, param)
     print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
 
-    local action = assert(loadstring("return " .. param.message))()
-    -- print(SerializationFunctions.toString(action))
-    doAction(self, action)
+    doAction(self, param.action)
 end
 
 local function onWebSocketClose(self, param)
@@ -417,8 +399,8 @@ end
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelPlayerManager(getModelPlayerManager(self))
-        :setModelWeatherManager(getModelWeatherManager(self))
+        :setModelPlayerManager(self:getModelPlayerManager())
+        :setModelWeatherManager(self:getModelWeatherManager())
 
     self.m_ActorWarField = actor
 end
@@ -426,8 +408,9 @@ end
 local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelWarField(getModelWarField(self))
-        :setModelPlayerManager(getModelPlayerManager(self))
+        :setModelWarField(self:getModelWarField())
+        :setModelPlayerManager(self:getModelPlayerManager())
+        :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorWarHud = actor
 end
@@ -435,8 +418,8 @@ end
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
     actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelPlayerManager(getModelPlayerManager(self))
-        :setModelWarField(getModelWarField(self))
+        :setModelPlayerManager(self:getModelPlayerManager())
+        :setModelWarField(self:getModelWarField())
         :setModelMessageIndicator(getModelMessageIndicator(self))
 
     self.m_ActorTurnManager = actor
@@ -479,11 +462,11 @@ end
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local modelTurnManager = getModelTurnManager(self)
+    local modelTurnManager = self:getModelTurnManager()
     local playerIndex      = modelTurnManager:getPlayerIndex()
     self.m_ScriptEventDispatcher:dispatchEvent({
             name         = "EvtModelWeatherUpdated",
-            modelWeather = getModelWeatherManager(self):getCurrentWeather()
+            modelWeather = self:getModelWeatherManager():getCurrentWeather()
         })
         :dispatchEvent({
             name = "EvtSceneWarStarted",
@@ -491,7 +474,7 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name        = "EvtPlayerIndexUpdated",
             playerIndex = playerIndex,
-            modelPlayer = getModelPlayerManager(self):getModelPlayer(playerIndex),
+            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
         })
 
     modelTurnManager:runTurn()
@@ -521,6 +504,25 @@ function ModelSceneWar:onWebSocketEvent(eventName, param)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneWar:getModelTurnManager()
+    return self.m_ActorTurnManager:getModel()
+end
+
+function ModelSceneWar:getModelPlayerManager()
+    return self.m_ActorPlayerManager:getModel()
+end
+
+function ModelSceneWar:getModelWeatherManager()
+    return self.m_ActorWeatherManager:getModel()
+end
+
+function ModelSceneWar:getModelWarField()
+    return self.m_ActorWarField:getModel()
 end
 
 return ModelSceneWar

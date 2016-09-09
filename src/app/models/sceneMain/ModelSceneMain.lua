@@ -24,13 +24,15 @@ local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(26, action.account))
+        self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(26, action.account))
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
@@ -49,7 +51,7 @@ end
 
 local function doActionRegister(self, action)
     WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(27, action.account))
+    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(27, action.account))
 
     self.m_ActorMainMenu:getModel():doActionRegister(action)
 end
@@ -115,20 +117,18 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(30))
+    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
 
-    local action = assert(loadstring("return " .. param.message))()
-    -- print(SerializationFunctions.serialize(action))
-    onEvtSystemRequestDoAction(self, action)
+    onEvtSystemRequestDoAction(self, param.action)
 end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
-    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(31))
+    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(31))
 
     WebSocketManager.close()
         .init()
@@ -137,7 +137,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
-    self.m_ActorMessageIndicator:getModel():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
+    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(32, param.error))
 
     WebSocketManager.close()
         .init()

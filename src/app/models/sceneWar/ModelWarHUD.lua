@@ -126,6 +126,12 @@ function ModelWarHUD:setModelPlayerManager(model)
     return self
 end
 
+function ModelWarHUD:setModelMessageIndicator(model)
+    self.m_ActorWarCommandMenu:getModel():setModelMessageIndicator(model)
+
+    return self
+end
+
 function ModelWarHUD:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
 

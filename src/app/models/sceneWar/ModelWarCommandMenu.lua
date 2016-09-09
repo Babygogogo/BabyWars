@@ -20,6 +20,8 @@ local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
 local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
@@ -30,51 +32,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtActivateSkillGroup(self, skillGroupID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
-        actionName   = "ActivateSkillGroup",
-        skillGroupID = skillGroupID,
-    })
-end
-
-local function createItemActivateSkill(self, skillGroupID)
-    return {
-        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
-        callback = function()
-            dispatchEvtActivateSkillGroup(self, skillGroupID)
-        end,
-    }
-end
-
-local function getEmptyProducersCount(self)
-    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
-    local count        = 0
-    local playerIndex  = self.m_PlayerIndex
-
-    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
-        if ((modelTile.getProductionList) and
-            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
-            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
-local function getIdleUnitsCount(self)
-    local count       = 0
-    local playerIndex = self.m_PlayerIndex
-    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
 local function updateStringWarInfo(self)
     local modelPlayerManager = self.m_ModelPlayerManager
     local data               = {}
@@ -149,9 +106,175 @@ local function updateStringSkillInfo(self)
     self.m_StringSkillInfo = table.concat(stringList, "\n--------------------\n")
 end
 
+local function getAvailableMainItems(self)
+    if ((not self.m_IsPlayerInTurn) or (self.m_IsWaitingForServerResponse)) then
+        return {
+            self.m_ItemQuit,
+            self.m_ItemWarInfo,
+            self.m_ItemSkillInfo,
+            self.m_ItemHideUI,
+            self.m_ItemSetMusic,
+            self.m_ItemReload,
+            self.m_ItemDamageChart,
+        }
+    else
+        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        local items = {
+            self.m_ItemQuit,
+            self.m_ItemFindIdleUnit,
+            self.m_ItemFindIdleTile,
+            self.m_ItemSurrender,
+            self.m_ItemWarInfo,
+            self.m_ItemSkillInfo,
+        }
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
+        items[#items + 1] = self.m_ItemHideUI
+        items[#items + 1] = self.m_ItemSetMusic
+        items[#items + 1] = self.m_ItemReload
+        items[#items + 1] = self.m_ItemDamageChart
+        items[#items + 1] = self.m_ItemEndTurn
+
+        return items
+    end
+end
+
+local function setStateDisabled(self)
+    self.m_State = "disabled"
+
+    if (self.m_View) then
+        self.m_View:setEnabled(false)
+    end
+end
+
+local function setStateMain(self)
+    self.m_State = "main"
+    updateStringWarInfo(  self)
+    updateStringSkillInfo(self)
+
+    if (self.m_View) then
+        self.m_View:setItems(getAvailableMainItems(self))
+            :setOverviewString(self.m_StringWarInfo)
+            :setEnabled(true)
+    end
+end
+
+local function setStateDamageChart(self)
+    self.m_State = "damageChart"
+
+    if (self.m_View) then
+        self.m_View:setItems(self.m_ItemsDamageDetail)
+    end
+end
+
+local function dispatchEvtActivateSkillGroup(self, skillGroupID)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name         = "EvtPlayerRequestDoAction",
+        actionName   = "ActivateSkillGroup",
+        skillGroupID = skillGroupID,
+    })
+end
+
+local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
+    if (self.m_RootScriptEventDispatcher) then
+        self.m_RootScriptEventDispatcher:dispatchEvent({
+            name      = "EvtWarCommandMenuUpdated",
+            isEnabled = isEnabled,
+            isVisible = isVisible,
+        })
+    end
+end
+
+local function dispatchEvtMapCursorMoved(self, gridIndex)
+    self.m_RootScriptEventDispatcher:dispatchEvent({
+        name      = "EvtMapCursorMoved",
+        gridIndex = gridIndex,
+    })
+end
+
+local function createItemActivateSkill(self, skillGroupID)
+    return {
+        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
+        callback = function()
+            dispatchEvtActivateSkillGroup(self, skillGroupID)
+            self:setEnabled(false)
+        end,
+    }
+end
+
+local function getEmptyProducersCount(self)
+    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
+    local count        = 0
+    local playerIndex  = self.m_PlayerIndex
+
+    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+        if ((modelTile.getProductionList) and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
+            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function getIdleUnitsCount(self)
+    local count       = 0
+    local playerIndex = self.m_PlayerIndex
+    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function createDamageSubText(targetType, primaryDamage, secondaryDamage)
+    local targetTypeText = getLocalizedText(113, targetType)
+    local primaryText    = string.format("%s", primaryDamage[targetType]   or "--")
+    local secondaryText  = string.format("%s", secondaryDamage[targetType] or "--")
+
+    return string.format("%s:%s%s%s%s",
+        targetTypeText, string.rep(" ", 30 - string.len(targetTypeText) / 3 * 4),
+        primaryText,    string.rep(" ", 22 - string.len(primaryText) * 2),
+        secondaryText
+    )
+end
+
+local function createDamageText(unitType)
+    local baseDamage = GameConstantFunctions.getBaseDamageForAttackerUnitType(unitType)
+    if (not baseDamage) then
+        return string.format("%s : %s", getLocalizedText(113, unitType), getLocalizedText(3, "None"))
+    else
+        local subTexts  = {}
+        local primary   = baseDamage.primary or {}
+        local secondary = baseDamage.secondary  or {}
+        for _, targetType in ipairs(GameConstantFunctions.getCategory("AllUnits")) do
+            subTexts[#subTexts + 1] = createDamageSubText(targetType, primary, secondary)
+        end
+        subTexts[#subTexts + 1] = createDamageSubText("Meteor", primary, secondary)
+
+        local unitTypeText = getLocalizedText(113, unitType)
+        return string.format("%s%s%s          %s\n%s",
+            unitTypeText, string.rep(" ", 28 - string.len(unitTypeText) / 3 * 4),
+            getLocalizedText(65, "MainWeapon"), getLocalizedText(65, "SubWeapon"),
+            table.concat(subTexts, "\n")
+        )
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtGridSelected(self, event)
+    self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
+local function onEvtMapCursorMoved(self, event)
+    self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+end
+
 local function onEvtPlayerIndexUpdated(self, event)
     self.m_PlayerIndex    = event.playerIndex
     self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
@@ -179,6 +302,87 @@ local function initItemQuit(self)
     }
 
     self.m_ItemQuit = item
+end
+
+local function initItemFindIdleUnit(self)
+    local item = {
+        name     = getLocalizedText(65, "FindIdleUnit"),
+        callback = function()
+            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
+            local mapSize          = modelUnitMap:getMapSize()
+            local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
+            local firstGridIndex
+
+            for y = 1, mapSize.height do
+                for x = 1, mapSize.width do
+                    local gridIndex = {x = x, y = y}
+                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+                    if ((modelUnit)                                                and
+                        (modelUnit:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (modelUnit:getState() == "idle"))                          then
+                        if ((y > cursorY)                       or
+                            ((y == cursorY) and (x > cursorX))) then
+                            dispatchEvtMapCursorMoved(self, gridIndex)
+                            self:setEnabled(false)
+                            return
+                        end
+
+                        firstGridIndex = firstGridIndex or gridIndex
+                    end
+                end
+            end
+
+            if (firstGridIndex) then
+                dispatchEvtMapCursorMoved(self, firstGridIndex)
+            else
+                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleUnit"))
+            end
+            self:setEnabled(false)
+        end,
+    }
+
+    self.m_ItemFindIdleUnit = item
+end
+
+local function initItemFindIdleTile(self)
+    local item = {
+        name     = getLocalizedText(65, "FindIdleTile"),
+        callback = function()
+            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
+            local modelTileMap     = self.m_ModelWarField:getModelTileMap()
+            local mapSize          = modelUnitMap:getMapSize()
+            local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
+            local firstGridIndex
+
+            for y = 1, mapSize.height do
+                for x = 1, mapSize.width do
+                    local gridIndex = {x = x, y = y}
+                    local modelTile = modelTileMap:getModelTile(gridIndex)
+                    if ((modelTile.getProductionList)                              and
+                        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (not modelUnitMap:getModelUnit(gridIndex)))                then
+                        if ((y > cursorY)                       or
+                            ((y == cursorY) and (x > cursorX))) then
+                            dispatchEvtMapCursorMoved(self, gridIndex)
+                            self:setEnabled(false)
+                            return
+                        end
+
+                        firstGridIndex = firstGridIndex or gridIndex
+                    end
+                end
+            end
+
+            if (firstGridIndex) then
+                dispatchEvtMapCursorMoved(self, firstGridIndex)
+            else
+                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleTile"))
+            end
+            self:setEnabled(false)
+        end,
+    }
+
+    self.m_ItemFindIdleTile = item
 end
 
 local function initItemWarInfo(self)
@@ -215,13 +419,40 @@ local function initItemActivateSkill2(self)
     self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
 end
 
+local function initItemDamageChart(self)
+    local item = {
+        name     = getLocalizedText(65, "DamageChart"),
+        callback = function()
+            setStateDamageChart(self)
+        end,
+    }
+
+    self.m_ItemDamageChart = item
+end
+
+local function initItemsDamageDetail(self)
+    local items    = {}
+    local allUnits = GameConstantFunctions.getCategory("AllUnits")
+    for _, unitType in ipairs(allUnits) do
+        items[#items + 1] = {
+            name     = getLocalizedText(113, unitType),
+            callback = function()
+                if (self.m_View) then
+                    self.m_View:setOverviewString(createDamageText(unitType))
+                end
+            end,
+        }
+    end
+
+    self.m_ItemsDamageDetail = items
+end
+
 local function initItemHideUI(self)
     local item = {
         name     = getLocalizedText(65, "HideUI"),
         callback = function()
-            if (self.m_View) then
-                self.m_View:setEnabled(false)
-            end
+            setStateDisabled(self)
+            dispatchEvtWarCommandMenuUpdated(self, true, false)
         end,
     }
 
@@ -299,36 +530,6 @@ local function initItemEndTurn(self)
     self.m_ItemEndTurn = item
 end
 
-local function getAvailableItems(self)
-    local items = {
-        self.m_ItemQuit,
-        self.m_ItemWarInfo,
-        self.m_ItemSkillInfo,
-        self.m_ItemHideUI,
-        self.m_ItemSetMusic,
-    }
-
-    local shouldAddActionItems = (self.m_IsPlayerInTurn) and (not self.m_IsWaitingForServerResponse)
-    if (shouldAddActionItems) then
-        items[#items + 1] = self.m_ItemSurrender
-    end
-    items[#items + 1] = self.m_ItemReload
-
-    if (shouldAddActionItems) then
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
-        if (modelPlayer:canActivateSkillGroup(1)) then
-            items[#items + 1] = self.m_ItemActiveSkill1
-        end
-        if (modelPlayer:canActivateSkillGroup(2)) then
-            items[#items + 1] = self.m_ItemActiveSkill2
-        end
-
-        items[#items + 1] = self.m_ItemEndTurn
-    end
-
-    return items
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -336,10 +537,14 @@ function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
     initItemQuit(          self)
+    initItemFindIdleUnit(  self)
+    initItemFindIdleTile(  self)
     initItemWarInfo(       self)
     initItemSkillInfo(     self)
     initItemActivateSkill1(self)
     initItemActivateSkill2(self)
+    initItemDamageChart(   self)
+    initItemsDamageDetail( self)
     initItemHideUI(        self)
     initItemSetMusic(      self)
     initItemReload(        self)
@@ -380,6 +585,18 @@ end
 function ModelWarCommandMenu:setModelPlayerManager(model)
     assert(self.m_ModelPlayerManager == nil, "ModelWarCommandMenu:setModelPlayerManager() the model has been set already.")
     self.m_ModelPlayerManager = model
+    model:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+            self.m_LoggedInPlayerIndex = playerIndex
+        end
+    end)
+
+    return self
+end
+
+function ModelWarCommandMenu:setModelMessageIndicator(model)
+    assert(self.m_ModelMessageIndicator == nil, "ModelWarCommandMenu:setModelMessageIndicator() the model has been set already.")
+    self.m_ModelMessageIndicator = model
 
     return self
 end
@@ -390,6 +607,8 @@ function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtPlayerIndexUpdated",   self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
+        :addEventListener("EvtGridSelected",               self)
+        :addEventListener("EvtMapCursorMoved",             self)
 
     return self
 end
@@ -397,8 +616,10 @@ end
 function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtIsWaitingForServerResponse", self)
-        :removeEventListener("EvtPlayerIndexUpdated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
+        :removeEventListener("EvtGridSelected",               self)
+        :removeEventListener("EvtIsWaitingForServerResponse", self)
+        :removeEventListener("EvtPlayerIndexUpdated",         self)
     self.m_RootScriptEventDispatcher = nil
 
     return self
@@ -409,7 +630,9 @@ end
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
+    if     (eventName == "EvtGridSelected")               then onEvtGridSelected(              self, event)
+    elseif (eventName == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
     elseif (eventName == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     end
 
@@ -420,33 +643,22 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:setEnabled(enabled)
-    local dispatcher = self.m_RootScriptEventDispatcher
-    if (dispatcher) then
-        if (enabled) then
-            dispatcher:dispatchEvent({name = "EvtWarCommandMenuActivated"})
-        else
-            dispatcher:dispatchEvent({name = "EvtWarCommandMenuDeactivated"})
-        end
+    if (not enabled) then
+        setStateDisabled(self)
+    else
+        setStateMain(self)
     end
-
-    local view = self.m_View
-    if (view) then
-        if (enabled) then
-            updateStringWarInfo(  self)
-            updateStringSkillInfo(self)
-
-            view:setItems(getAvailableItems(self))
-                :setOverviewString(self.m_StringWarInfo)
-        end
-
-        view:setEnabled(enabled)
-    end
+    dispatchEvtWarCommandMenuUpdated(self, enabled, true)
 
     return self
 end
 
 function ModelWarCommandMenu:onButtonBackTouched()
-    self:setEnabled(false)
+    local state = self.m_State
+    if     (state == "main")        then self:setEnabled(false)
+    elseif (state == "damageChart") then setStateMain(self)
+    else                                 error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
+    end
 
     return self
 end

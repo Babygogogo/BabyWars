@@ -24,6 +24,8 @@ local LocalizationFunctions       = require("src.app.utilities.LocalizationFunct
 local AnimationLoader             = require("src.app.utilities.AnimationLoader")
 local Actor                       = require("src.global.actors.Actor")
 
+local createPathForDispatch = MovePathFunctions.createPathForDispatch
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -204,7 +206,7 @@ local function dispatchEventJoinModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "JoinModelUnit",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -213,7 +215,7 @@ local function dispatchEventAttack(self, targetGridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",
         actionName      = "Attack",
-        path            = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path            = createPathForDispatch(self.m_MovePath),
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
         launchUnitID    = self.m_LaunchUnitID,
     })
@@ -223,7 +225,7 @@ local function dispatchEventCaptureModelTile(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "CaptureModelTile",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -232,7 +234,7 @@ local function dispatchEventBuildModelTile(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "BuildModelTile",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -241,7 +243,7 @@ local function dispatchEventProduceModelUnitOnUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name       = "EvtPlayerRequestDoAction",
         actionName = "ProduceModelUnitOnUnit",
-        path       = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path       = createPathForDispatch(self.m_MovePath),
     })
 end
 
@@ -249,7 +251,7 @@ local function dispatchEventSupplyModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "SupplyModelUnit",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -258,7 +260,7 @@ local function dispatchEventWait(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "Wait",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -276,7 +278,7 @@ local function dispatchEventLoadModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name         = "EvtPlayerRequestDoAction",
         actionName   = "LoadModelUnit",
-        path         = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -293,7 +295,7 @@ local function dispatchEventDropModelUnit(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name             = "EvtPlayerRequestDoAction",
         actionName       = "DropModelUnit",
-        path             = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path             = createPathForDispatch(self.m_MovePath),
         dropDestinations = dropDestinations,
         launchUnitID     = self.m_LaunchUnitID,
     })
@@ -303,7 +305,7 @@ local function dispatchEventLaunchSilo(self, targetGridIndex)
     self.m_RootScriptEventDispatcher:dispatchEvent({
         name            = "EvtPlayerRequestDoAction",
         actionName      = "LaunchSilo",
-        path            = MovePathFunctions.createPathForDispatch(self.m_MovePath),
+        path            = createPathForDispatch(self.m_MovePath),
         targetGridIndex = targetGridIndex,
         launchUnitID    = self.m_LaunchUnitID,
     })
@@ -781,10 +783,10 @@ setStateChoosingAction = function(self, destination, launchUnitID)
         resetReachableArea(self, focusModelUnit)
     end
 
-    self.m_State              = "choosingAction"
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_FocusModelUnit, destination, self.m_ModelTileMap, self.m_ModelUnitMap, self.m_ModelWeather)
-    self.m_LaunchUnitID       = launchUnitID
     updateMovePathWithDestinationGrid(self, destination)
+    self.m_State              = "choosingAction"
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(createPathForDispatch(self.m_MovePath), launchUnitID)
+    self.m_LaunchUnitID       = launchUnitID
 
     if (self.m_View) then
         self.m_View:setReachableAreaVisible(false)
@@ -875,8 +877,10 @@ local function onEvtIsWaitingForServerResponse(self, event)
     self.m_IsWaitingForServerResponse = event.waiting
 end
 
-local function onEvtWarCommandMenuActivated(self, event)
-    setStateIdle(self, not self.m_IsWaitingForServerResponse)
+local function onEvtWarCommandMenuUpdated(self, event)
+    if (event.isEnabled) then
+        setStateIdle(self, not self.m_IsWaitingForServerResponse)
+    end
 end
 
 local function onEvtMapCursorMoved(self, event)
@@ -1054,7 +1058,7 @@ function ModelActionPlanner:setRootScriptEventDispatcher(dispatcher)
         :addEventListener("EvtPlayerIndexUpdated",         self)
         :addEventListener("EvtModelWeatherUpdated",        self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
-        :addEventListener("EvtWarCommandMenuActivated",    self)
+        :addEventListener("EvtWarCommandMenuUpdated",      self)
 
     return self
 end
@@ -1062,7 +1066,7 @@ end
 function ModelActionPlanner:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelActionPlanner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuActivated", self)
+    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuUpdated", self)
         :removeEventListener("EvtIsWaitingForServerResponse", self)
         :removeEventListener("EvtModelWeatherUpdated",        self)
         :removeEventListener("EvtPlayerIndexUpdated",         self)
@@ -1083,7 +1087,7 @@ function ModelActionPlanner:onEvent(event)
     elseif (name == "EvtModelWeatherUpdated")        then onEvtModelWeatherUpdated(       self, event)
     elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
-    elseif (name == "EvtWarCommandMenuActivated")    then onEvtWarCommandMenuActivated(   self, event)
+    elseif (name == "EvtWarCommandMenuUpdated")      then onEvtWarCommandMenuUpdated(     self, event)
     end
 
     return self

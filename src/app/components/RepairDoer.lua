@@ -31,13 +31,6 @@ RepairDoer.EXPORTED_METHODS = {
 }
 
 --------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function round(num)
-    return math.floor(num + 0.5)
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function RepairDoer:ctor(param)
@@ -117,7 +110,7 @@ function RepairDoer:getRepairAmountAndCost(target)
     )
 
     return (normalizedRepairAmount + normalizedCurrentHP) * 10 - target:getCurrentHP(),
-        round(normalizedRepairAmount * productionCost / 10)
+        math.floor(normalizedRepairAmount * productionCost / 10)
 end
 
 function RepairDoer:getNormalizedRepairAmount()

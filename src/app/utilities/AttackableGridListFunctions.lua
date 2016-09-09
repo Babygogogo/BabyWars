@@ -13,8 +13,11 @@
 
 local AttackableGridListFunctions = {}
 
+local DamageCalculator       = require("src.app.utilities.DamageCalculator")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local ReachableAreaFunctions = require("src.app.utilities.ReachableAreaFunctions")
+local ActorManager           = require("src.global.actors.ActorManager")
+
 local isWithinMap            = GridIndexFunctions.isWithinMap
 
 --------------------------------------------------------------------------------
@@ -51,25 +54,29 @@ function AttackableGridListFunctions.getListNode(list, gridIndex)
     return nil
 end
 
-function AttackableGridListFunctions.createList(attacker, attackerGridIndex, modelTileMap, modelUnitMap)
-    if ((not attacker.getEstimatedBattleDamage)                                                                                 or
-        ((not attacker:canAttackAfterMove()) and (not GridIndexFunctions.isEqual(attacker:getGridIndex(), attackerGridIndex)))) then
+function AttackableGridListFunctions.createList(movePath, launchUnitID)
+    local modelSceneWar = ActorManager.getRootActor():getModel()
+    local modelWarField = modelSceneWar:getModelWarField()
+    local modelUnitMap  = modelWarField:getModelUnitMap()
+    local attacker      = modelUnitMap:getFocusModelUnit(movePath[1], launchUnitID)
+    if ((not attacker.canAttackAfterMove)                          or
+        ((not attacker:canAttackAfterMove()) and (#movePath > 1))) then
         return {}
     end
 
+    local modelTileMap       = modelWarField:getModelTileMap()
     local mapSize            = modelTileMap:getMapSize()
     local minRange, maxRange = attacker:getAttackRangeMinMax()
     return GridIndexFunctions.getGridsWithinDistance(
-        attackerGridIndex,
+        movePath[#movePath],
         minRange,
         maxRange,
         function(targetGridIndex)
             if (not isWithinMap(targetGridIndex, mapSize)) then
                 return false
             else
-                local targetTile = modelTileMap:getModelTile(targetGridIndex)
-                local target     = modelUnitMap:getModelUnit(targetGridIndex) or targetTile
-                targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage = attacker:getEstimatedBattleDamage(target, attackerGridIndex, modelTileMap)
+                targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage =
+                    DamageCalculator.getEstimatedBattleDamage(movePath, launchUnitID, targetGridIndex, modelSceneWar)
 
                 return targetGridIndex.estimatedAttackDamage ~= nil
             end

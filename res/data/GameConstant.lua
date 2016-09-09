@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.4"
+GameConstant.version = "0.1.6.5"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -707,66 +707,113 @@ GameConstant.categories = {
     },
 
     ["SkillCategoriesForPassive"] = {
-        "SkillCategoryAttack",
-        "SkillCategoryDefense",
+        "SkillCategoryPassiveAttack",
+        "SkillCategoryPassiveDefense",
         "SkillCategoryPassiveMoney",
-        "SkillCategoryAttackRange",
-        "SkillCategoryCapture",
-        "SkillCategoryRepair",
+        "SkillCategoryPassiveAttackRange",
+        "SkillCategoryPassiveCapture",
+        "SkillCategoryPassiveRepair",
+        "SkillCategoryPassiveEnergy",
     },
 
     ["SkillCategoriesForActive"] = {
-        "SkillCategoryAttack",
-        "SkillCategoryDefense",
+        "SkillCategoryActiveAttack",
+        "SkillCategoryActiveDefense",
         "SkillCategoryActiveMoney",
-        "SkillCategoryMovement",
-        "SkillCategoryAttackRange",
-        "SkillCategoryCapture",
-        "SkillCategoryInstant",
+        "SkillCategoryActiveMovement",
+        "SkillCategoryActiveAttackRange",
+        "SkillCategoryActiveCapture",
+        "SkillCategoryActiveHP",
+        "SkillCategoryActiveEnergy",
+        "SkillCategoryActiveLogistics",
     },
 
-    ["SkillCategoryAttack"] = {
+    ["SkillCategoryPassiveAttack"] = {
         1,
+        20,
+        23,
         14,
+        25,
     },
 
-    ["SkillCategoryDefense"] = {
+    ["SkillCategoryActiveAttack"] = {
+        1,
+        20,
+        23,
+        14,
+        25,
+    },
+
+    ["SkillCategoryPassiveDefense"] = {
         2,
+        21,
+        24,
+    },
+
+    ["SkillCategoryActiveDefense"] = {
+        2,
+        21,
+        24,
     },
 
     ["SkillCategoryPassiveMoney"] = {
         3,
         17,
+        20,
+        21,
+        22,
     },
 
     ["SkillCategoryActiveMoney"] = {
         3,
+        12,
+        20,
+        21,
+        22,
     },
 
-    ["SkillCategoryMovement"] = {
+    ["SkillCategoryActiveMovement"] = {
         6,
+        8,
     },
 
-    ["SkillCategoryAttackRange"] = {
+    ["SkillCategoryPassiveAttackRange"] = {
         7,
     },
 
-    ["SkillCategoryCapture"] = {
+    ["SkillCategoryActiveAttackRange"] = {
+        7,
+    },
+
+    ["SkillCategoryPassiveCapture"] = {
         15,
     },
 
-    ["SkillCategoryRepair"] = {
+    ["SkillCategoryActiveCapture"] = {
+        15,
+    },
+
+    ["SkillCategoryPassiveRepair"] = {
         10,
         11,
     },
 
-    ["SkillCategoryInstant"] = {
+    ["SkillCategoryPassiveEnergy"] = {
+        18,
+        19,
+    },
+
+    ["SkillCategoryActiveEnergy"] = {
+        13,
+    },
+
+    ["SkillCategoryActiveHP"] = {
         4,
         5,
-        8,
+    },
+
+    ["SkillCategoryActiveLogistics"] = {
         9,
-        12,
-        13,
         16,
     },
 }
@@ -4072,6 +4119,157 @@ GameConstant.skills = {
             [18] = {modifier = 90, pointsPassive = 1440, pointsActive = nil, minEnergy = nil},
             [19] = {modifier = 95, pointsPassive = 1520, pointsActive = nil, minEnergy = nil},
             [20] = {modifier = 100, pointsPassive = 1600, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- Stop the damage cost per the energy requirement from increasing as skills are activated.
+    [18] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = nil, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- Modify the growth rate of the energy of the owner player.
+    [19] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 10, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 20, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 30, pointsPassive = 90, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 40, pointsPassive = 120, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 50, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 60, pointsPassive = 180, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 70, pointsPassive = 210, pointsActive = nil, minEnergy = nil},
+            [8] = {modifier = 80, pointsPassive = 240, pointsActive = nil, minEnergy = nil},
+            [9] = {modifier = 90, pointsPassive = 270, pointsActive = nil, minEnergy = nil},
+            [10] = {modifier = 100, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- Modify the attack power regarding to money of the owner player.
+    [20] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 400, minEnergy = 5},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 480, minEnergy = 6},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 560, minEnergy = 7},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
+        },
+    },
+
+    -- Modify the defense power regarding to money of the owner player.
+    [21] = {
+        minLevel     = 1,
+        maxLevel     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 400, minEnergy = 5},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 480, minEnergy = 6},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 560, minEnergy = 7},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
+        },
+    },
+
+    -- Get money according to the base damage cost that the owner player deal to the opponent with units' attack.
+    [22] = {
+        minLevel     = 1,
+        maxLevel     = 20,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 70, pointsActive = 30, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 140, pointsActive = 60, minEnergy = 1},
+            [3] = {modifier = 15, pointsPassive = 210, pointsActive = 90, minEnergy = 1},
+            [4] = {modifier = 20, pointsPassive = 280, pointsActive = 120, minEnergy = 2},
+            [5] = {modifier = 25, pointsPassive = 350, pointsActive = 150, minEnergy = 2},
+            [6] = {modifier = 30, pointsPassive = 420, pointsActive = 180, minEnergy = 2},
+            [7] = {modifier = 35, pointsPassive = 490, pointsActive = 210, minEnergy = 3},
+            [8] = {modifier = 40, pointsPassive = 560, pointsActive = 240, minEnergy = 3},
+            [9] = {modifier = 45, pointsPassive = 630, pointsActive = 270, minEnergy = 3},
+            [10] = {modifier = 50, pointsPassive = 700, pointsActive = 300, minEnergy = 4},
+            [11] = {modifier = 55, pointsPassive = 770, pointsActive = 330, minEnergy = 4},
+            [12] = {modifier = 60, pointsPassive = 840, pointsActive = 360, minEnergy = 4},
+            [13] = {modifier = 65, pointsPassive = 910, pointsActive = 390, minEnergy = 5},
+            [14] = {modifier = 70, pointsPassive = 980, pointsActive = 420, minEnergy = 5},
+            [15] = {modifier = 75, pointsPassive = 1050, pointsActive = 450, minEnergy = 5},
+            [16] = {modifier = 80, pointsPassive = 1120, pointsActive = 480, minEnergy = 6},
+            [17] = {modifier = 85, pointsPassive = 1190, pointsActive = 510, minEnergy = 6},
+            [18] = {modifier = 90, pointsPassive = 1260, pointsActive = 540, minEnergy = 6},
+            [19] = {modifier = 95, pointsPassive = 1330, pointsActive = 570, minEnergy = 7},
+            [20] = {modifier = 100, pointsPassive = 1400, pointsActive = 600, minEnergy = 7},
+        },
+    },
+
+    -- Tiles offer addional attack power for units on it, according to the base defense bonus.
+    [23] = {
+        minLevel     = 1,
+        maxLevel     = 4,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 75, pointsActive = 75, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 150, pointsActive = 150, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 225, pointsActive = 225, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 300, pointsActive = 300, minEnergy = 4},
+        },
+    },
+
+    -- Tiles offer addional defense power for units on it, according to the base defense bonus.
+    [24] = {
+        minLevel     = 1,
+        maxLevel     = 4,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 75, pointsActive = 75, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 150, pointsActive = 150, minEnergy = 2},
+            [3] = {modifier = 15, pointsPassive = 225, pointsActive = 225, minEnergy = 3},
+            [4] = {modifier = 20, pointsPassive = 300, pointsActive = 300, minEnergy = 4},
+        },
+    },
+
+    -- Modify the lower limit of the luck damage of the owner player.
+    [25] = {
+        minLevel = 1,
+        maxLevel = 20,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 40, minEnergy = 1},
+            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 160, minEnergy = 2},
+            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 200, minEnergy = 2},
+            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 240, minEnergy = 2},
+            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 280, minEnergy = 3},
+            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 320, minEnergy = 3},
+            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 360, minEnergy = 3},
+            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 400, minEnergy = 4},
+            [11] = {modifier = 55, pointsPassive = 880, pointsActive = 440, minEnergy = 4},
+            [12] = {modifier = 60, pointsPassive = 960, pointsActive = 480, minEnergy = 4},
+            [13] = {modifier = 65, pointsPassive = 1040, pointsActive = 520, minEnergy = 5},
+            [14] = {modifier = 70, pointsPassive = 1120, pointsActive = 560, minEnergy = 5},
+            [15] = {modifier = 75, pointsPassive = 1200, pointsActive = 600, minEnergy = 5},
+            [16] = {modifier = 80, pointsPassive = 1280, pointsActive = 640, minEnergy = 6},
+            [17] = {modifier = 85, pointsPassive = 1360, pointsActive = 680, minEnergy = 6},
+            [18] = {modifier = 90, pointsPassive = 1440, pointsActive = 720, minEnergy = 6},
+            [19] = {modifier = 95, pointsPassive = 1520, pointsActive = 760, minEnergy = 7},
+            [20] = {modifier = 100, pointsPassive = 1600, pointsActive = 800, minEnergy = 7},
         },
     },
 }

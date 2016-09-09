@@ -12,7 +12,7 @@ local ACTIVE_SLOTS_COUNT  = GameConstantFunctions.getActiveSkillSlotsCount()
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 
     if (not modelSkillGroup) then
         return 0
@@ -22,9 +22,17 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
     local skills   = modelSkillGroup:getAllSkills()
     for i = 1, slotsCount do
         local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 1)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        if (skill) then
+            local skillID = skill.id
+            if (skillID == 1) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif (skillID == 20) then
+                local fund = modelSceneWar:getModelPlayerManager():getModelPlayer(attacker:getPlayerIndex()):getFund()
+                modifier = modifier + getSkillModifier(skillID, skill.level) * fund / 10000
+            elseif (skillID == 23) then
+                local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(attackerGridIndex)
+                modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            end
         end
     end
 
@@ -32,7 +40,7 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
 end
 
 local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+    attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 
     if (not modelSkillGroup) then
         return 0
@@ -42,9 +50,17 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
     local skills   = modelSkillGroup:getAllSkills()
     for i = 1, slotsCount do
         local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 2)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        if (skill) then
+            local skillID = skill.id
+            if (skillID == 2) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif (skillID == 21) then
+                local fund = modelSceneWar:getModelPlayerManager():getModelPlayer(target:getPlayerIndex()):getFund()
+                modifier   = modifier + getSkillModifier(skillID, skill.level) * fund / 10000
+            elseif (skillID == 24) then
+                local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
+                modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            end
         end
     end
 
@@ -159,6 +175,24 @@ local function getLuckDamageUpperModifierForSkillGroup(modelSkillGroup, slotsCou
     return modifier
 end
 
+local function getLuckDamageLowerModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 25)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 local function getCaptureAmountModifierForSkillGroup(modelSkillGroup, slotsCount)
     if (not modelSkillGroup) then
         return 0
@@ -195,25 +229,41 @@ local function getIncomeModifierForSkillGroup(modelSkillGroup, slotsCount)
     return modifier
 end
 
+local function getAttackDamageCostToFundModifierForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local modifier = 0
+    local skills   = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill)          and
+            (skill.id == 22)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function SkillModifierFunctions.getAttackModifier(configuration,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-
+function SkillModifierFunctions.getAttackModifier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
+    local configuration = modelSceneWar:getModelPlayerManager():getModelPlayer(attacker:getPlayerIndex()):getModelSkillConfiguration()
     return getAttackModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager) +
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar) +
         getAttackModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 end
 
-function SkillModifierFunctions.getDefenseModifier(configuration,
-    attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
-
+function SkillModifierFunctions.getDefenseModifier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
+    local configuration = modelSceneWar:getModelPlayerManager():getModelPlayer(target:getPlayerIndex()):getModelSkillConfiguration()
     return getDefenseModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager) +
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar) +
         getDefenseModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT,
-            attacker, attackerGridIndex, target, targetGridIndex, modelTileMap, modelWeatherManager)
+            attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
 end
 
 function SkillModifierFunctions.getProductionCostModifier(configuration, tiledID)
@@ -244,6 +294,11 @@ function SkillModifierFunctions.getLuckDamageUpperModifier(configuration)
         getLuckDamageUpperModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
+function SkillModifierFunctions.getLuckDamageLowerModifier(configuration)
+    return getLuckDamageLowerModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        getLuckDamageLowerModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
 function SkillModifierFunctions.getCaptureAmountModifier(configuration)
     return getCaptureAmountModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
         getCaptureAmountModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
@@ -251,6 +306,36 @@ end
 
 function SkillModifierFunctions.getIncomeModifier(configuration)
     return getIncomeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.isDamageCostPerEnergyRequirementLocked(configuration)
+    local skills = configuration:getModelSkillGroupPassive():getAllSkills()
+    for i = 1, PASSIVE_SLOTS_COUNT do
+        local skill = skills[i]
+        if ((skill) and (skill.id == 18)) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function SkillModifierFunctions.getEnergyGrowthRateModifier(configuration)
+    local skills   = configuration:getModelSkillGroupPassive():getAllSkills()
+    local modifier = 0
+    for i = 1, PASSIVE_SLOTS_COUNT do
+        local skill = skills[i]
+        if ((skill) and (skill.id == 19)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
+function SkillModifierFunctions.getAttackDamageCostToFundModifier(configuration)
+    return getAttackDamageCostToFundModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        getAttackDamageCostToFundModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
 return SkillModifierFunctions

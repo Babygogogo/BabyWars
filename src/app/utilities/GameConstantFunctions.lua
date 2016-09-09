@@ -189,6 +189,18 @@ function GameConstantFunctions.getPromotionBonus()
     return GAME_CONSTANT.promotionBonus
 end
 
+function GameConstantFunctions.getBaseDamageForAttackerUnitType(unitType)
+    local attackDoerData = TEMPLATE_MODEL_UNITS[unitType].AttackDoer
+    if (not attackDoerData) then
+        return nil
+    else
+        return {
+            primary   = attackDoerData.primaryWeapon   and attackDoerData.primaryWeapon.baseDamage,
+            secondary = attackDoerData.secondaryWeapon and attackDoerData.secondaryWeapon.baseDamage,
+        }
+    end
+end
+
 function GameConstantFunctions.getSkillConfigurationsCount()
     return GAME_CONSTANT.skillConfigurationsCount
 end

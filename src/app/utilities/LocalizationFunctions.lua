@@ -114,55 +114,57 @@ local s_Texts = {
     },
     [3] = {
         [1] = function(textType)
-            if     (textType == "Configuration")        then return "配 置"
-            elseif (textType == "SetSkillPoint")        then return "设定技能点数上限"
-            elseif (textType == "PassiveSkill")         then return "日 常 技 能"
-            elseif (textType == "ActiveSkill")          then return "主 动 技 能"
-            elseif (textType == "Skill")                then return "技 能"
-            elseif (textType == "MaxPoints")            then return "最大技能点"
-            elseif (textType == "TotalPoints")          then return "合计技能点"
-            elseif (textType == "SkillPoints")          then return "技能点"
-            elseif (textType == "EnergyRequirement")    then return "能量槽长度"
-            elseif (textType == "MinEnergy")            then return "最小能量槽"
-            elseif (textType == "SetEnergyRequirement") then return "设定能量槽长度"
-            elseif (textType == "Level")                then return "等级"
-            elseif (textType == "Modifier")             then return "幅度"
-            elseif (textType == "Clear")                then return "清 空"
-            elseif (textType == "Enable")               then return "启 用"
-            elseif (textType == "Disable")              then return "禁 用"
-            elseif (textType == "Disabled")             then return "已 禁 用"
-            elseif (textType == "Selected")             then return "已 选 定"
-            elseif (textType == "None")                 then return "无"
-            elseif (textType == "NoSkills")             then return "没有任何技能"
-            elseif (textType == "GettingConfiguration") then return "正在从服务器获取数据，请稍候。若长时间没有反应，请返回并重试。"
-            elseif (textType == "SettingConfiguration") then return "正在传输数据到服务器，请稍候。若长时间没有反应，请重试。"
-            else                                             return "未知[3]: " .. (textType or "")
+            if     (textType == "Configuration")          then return "配 置"
+            elseif (textType == "SetSkillPoint")          then return "设定技能点数上限"
+            elseif (textType == "PassiveSkill")           then return "日 常 技 能"
+            elseif (textType == "ActiveSkill")            then return "主 动 技 能"
+            elseif (textType == "Skill")                  then return "技 能"
+            elseif (textType == "MaxPoints")              then return "最大技能点"
+            elseif (textType == "TotalPoints")            then return "合计技能点"
+            elseif (textType == "SkillPoints")            then return "技能点"
+            elseif (textType == "EnergyRequirement")      then return "能量槽长度"
+            elseif (textType == "MinEnergy")              then return "最小能量槽"
+            elseif (textType == "SetEnergyRequirement")   then return "设定能量槽长度"
+            elseif (textType == "Level")                  then return "等级"
+            elseif (textType == "Modifier")               then return "幅度"
+            elseif (textType == "Clear")                  then return "清 空"
+            elseif (textType == "Enable")                 then return "启 用"
+            elseif (textType == "Disable")                then return "禁 用"
+            elseif (textType == "Disabled")               then return "已 禁 用"
+            elseif (textType == "Selected")               then return "已 选 定"
+            elseif (textType == "None")                   then return "无"
+            elseif (textType == "NoSkills")               then return "没有任何技能"
+            elseif (textType == "ConfirmExitConfiguring") then return "是否确定要停止配置技能，并返回上层菜单？"
+            elseif (textType == "GettingConfiguration")   then return "正在从服务器获取配置数据，请稍候。若长时间没有反应，请返回并重试。"
+            elseif (textType == "SettingConfiguration")   then return "正在传输配置数据到服务器，请稍候。若长时间没有反应，请重试。"
+            else                                               return "未知[3]: " .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "Configuration")        then return "Configuration"
-            elseif (textType == "SetSkillPoint")        then return "SetSkillPoint"
-            elseif (textType == "PassiveSkill")         then return "Passive"
-            elseif (textType == "ActiveSkill")          then return "Active"
-            elseif (textType == "Skill")                then return "Skill"
-            elseif (textType == "MaxPoints")            then return "Max Skill Points"
-            elseif (textType == "TotalPoints")          then return "Total Points"
-            elseif (textType == "SkillPoints")          then return "Points"
-            elseif (textType == "EnergyRequirement")    then return "Energy Requirement"
-            elseif (textType == "MinEnergy")            then return "Min Energy"
-            elseif (textType == "SetEnergyRequirement") then return "Set Energy"
-            elseif (textType == "Level")                then return "Level"
-            elseif (textType == "Modifier")             then return "Modifier"
-            elseif (textType == "Clear")                then return "Clear"
-            elseif (textType == "Enable")               then return "Enable"
-            elseif (textType == "Disable")              then return "Disable"
-            elseif (textType == "Disabled")             then return "Disabled"
-            elseif (textType == "Selected")             then return "Selected"
-            elseif (textType == "None")                 then return "None"
-            elseif (textType == "NoSkills")             then return "No skills"
-            elseif (textType == "GettingConfiguration") then return "Getting data from the server. Please wait."
-            elseif (textType == "SettingConfiguration") then return "Transfering data to the server. Please wait."
-            else                                             return "Unknown[3]: " .. (textType or "")
+            if     (textType == "Configuration")          then return "Configuration"
+            elseif (textType == "SetSkillPoint")          then return "SetSkillPoint"
+            elseif (textType == "PassiveSkill")           then return "Passive"
+            elseif (textType == "ActiveSkill")            then return "Active"
+            elseif (textType == "Skill")                  then return "Skill"
+            elseif (textType == "MaxPoints")              then return "Max Skill Points"
+            elseif (textType == "TotalPoints")            then return "Total Points"
+            elseif (textType == "SkillPoints")            then return "Points"
+            elseif (textType == "EnergyRequirement")      then return "Energy Requirement"
+            elseif (textType == "MinEnergy")              then return "Min Energy"
+            elseif (textType == "SetEnergyRequirement")   then return "Set Energy"
+            elseif (textType == "Level")                  then return "Level"
+            elseif (textType == "Modifier")               then return "Modifier"
+            elseif (textType == "Clear")                  then return "Clear"
+            elseif (textType == "Enable")                 then return "Enable"
+            elseif (textType == "Disable")                then return "Disable"
+            elseif (textType == "Disabled")               then return "Disabled"
+            elseif (textType == "Selected")               then return "Selected"
+            elseif (textType == "None")                   then return "None"
+            elseif (textType == "NoSkills")               then return "No skills"
+            elseif (textType == "ConfirmExitConfiguring") then return "Are you sure to quit the configuration?"
+            elseif (textType == "GettingConfiguration")   then return "Getting data from the server. Please wait."
+            elseif (textType == "SettingConfiguration")   then return "Transfering data to the server. Please wait."
+            else                                               return "Unknown[3]: " .. (textType or "")
             end
         end,
     },
@@ -177,7 +179,7 @@ local s_Texts = {
             elseif (skillID == 7)  then return "改变我方全体远程部队的射程上限，幅度为"
             elseif (skillID == 8)  then return "使我方步兵系以外的全体部队变为未行动的状态。"
             elseif (skillID == 9)  then return "使对方全体部队的燃料值变为当前值的"
-            elseif (skillID == 10) then return "额外改变我方具有维修能力的据点及部队的维修量，幅度为"
+            elseif (skillID == 10) then return "改变我方具有维修能力的据点及部队的维修量，幅度为额外"
             elseif (skillID == 11) then return "使我方维修费用变为基础的"
             elseif (skillID == 12) then return "使我方资金变为当前的"
             elseif (skillID == 13) then return "根据我方资金来改变对方能量值，幅度为每10000资金"
@@ -185,6 +187,14 @@ local s_Texts = {
             elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
             elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
             elseif (skillID == 17) then return "改变我方的金钱收入，幅度为"
+            elseif (skillID == 18) then return "锁定我方能量槽的实际长度，使能量增长不会随着主动技能的发动而变慢。"
+            elseif (skillID == 19) then return "改变我方能量增长速度，幅度为"
+            elseif (skillID == 20) then return "根据我方资金来改变全军攻击力，比例为每10000资金"
+            elseif (skillID == 21) then return "根据我方资金来改变全军防御力，比例为每10000资金"
+            elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
+            elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
+            elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
+            elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -211,6 +221,14 @@ local s_Texts = {
             elseif (skillID == 15) then return "我军占领速度"
             elseif (skillID == 16) then return "全面补给"
             elseif (skillID == 17) then return "我方金钱收入"
+            elseif (skillID == 18) then return "锁定能量槽长度"
+            elseif (skillID == 19) then return "能量增速"
+            elseif (skillID == 20) then return "金钱加成攻击"
+            elseif (skillID == 21) then return "金钱加成防御"
+            elseif (skillID == 22) then return "攻击掠夺金钱"
+            elseif (skillID == 23) then return "地形加成攻击"
+            elseif (skillID == 24) then return "地形加成防御"
+            elseif (skillID == 25) then return "我方幸运下限"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -220,31 +238,43 @@ local s_Texts = {
     },
     [6] = {
         [1] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")       then return "攻 击 类"
-            elseif (skillCategory == "SkillCategoryDefense")      then return "防 御 类"
-            elseif (skillCategory == "SkillCategoryActiveMoney")  then return "金 钱 类"
-            elseif (skillCategory == "SkillCategoryPassiveMoney") then return "金 钱 类"
-            elseif (skillCategory == "SkillCategoryMovement")     then return "移 动 类"
-            elseif (skillCategory == "SkillCategoryAttackRange")  then return "射 程 类"
-            elseif (skillCategory == "SkillCategoryLuck")         then return "幸 运 类"
-            elseif (skillCategory == "SkillCategoryCapture")      then return "占 领 类"
-            elseif (skillCategory == "SkillCategoryRepair")       then return "维 修 类"
-            elseif (skillCategory == "SkillCategoryInstant")      then return "瞬 时 类"
-            else                                                       return "未知6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryPassiveAttack")      then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "占 领 类"
+            elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "能 量 类"
+            elseif (skillCategory == "SkillCategoryActiveAttack")       then return "攻 击 类"
+            elseif (skillCategory == "SkillCategoryActiveDefense")      then return "防 御 类"
+            elseif (skillCategory == "SkillCategoryActiveMoney")        then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryActiveMovement")     then return "移 动 类"
+            elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "射 程 类"
+            elseif (skillCategory == "SkillCategoryActiveCapture")      then return "占 领 类"
+            elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP 类"
+            elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
+            elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
+            else                                                        return "未知6:" .. (skillCategory or "")
             end
         end,
         [2] = function(skillCategory)
-            if     (skillCategory == "SkillCategoryAttack")       then return "Attack"
-            elseif (skillCategory == "SkillCategoryDefense")      then return "Defense"
-            elseif (skillCategory == "SkillCategoryActiveMoney")  then return "Money"
-            elseif (skillCategory == "SkillCategoryPassiveMoney") then return "Money"
-            elseif (skillCategory == "SkillCategoryMovement")     then return "Movement"
-            elseif (skillCategory == "SkillCategoryAttackRange")  then return "AttackRange"
-            elseif (skillCategory == "SkillCategoryLuck")         then return "Luck"
-            elseif (skillCategory == "SkillCategoryCapture")      then return "Capture"
-            elseif (skillCategory == "SkillCategoryRepair")       then return "Repair"
-            elseif (skillCategory == "SkillCategoryInstant")      then return "Instant"
-            else                                                       return "Unknown6:" .. (skillCategory or "")
+            if     (skillCategory == "SkillCategoryPassiveAttack")      then return "Attack"
+            elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "Defense"
+            elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "Money"
+            elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "Capture"
+            elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"
+            elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "Energy"
+            elseif (skillCategory == "SkillCategoryActiveAttack")       then return "Attack"
+            elseif (skillCategory == "SkillCategoryActiveDefense")      then return "Defense"
+            elseif (skillCategory == "SkillCategoryActiveMoney")        then return "Money"
+            elseif (skillCategory == "SkillCategoryActiveMovement")     then return "Movement"
+            elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "AttackRange"
+            elseif (skillCategory == "SkillCategoryActiveCapture")      then return "Capture"
+            elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP"
+            elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
+            elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
+            else                                                        return "Unknown6:" .. (skillCategory or "")
             end
         end,
     },
@@ -549,10 +579,13 @@ local s_Texts = {
         [1] = function(textType)
             if     (textType == "WarMenu")       then return "战 场 菜 单"
             elseif (textType == "QuitWar")       then return "退 出"
+            elseif (textType == "FindIdleUnit")  then return "寻 找 空 闲 部 队"
+            elseif (textType == "FindIdleTile")  then return "寻 找 空 闲 建 筑"
             elseif (textType == "WarInfo")       then return "战 场 信 息"
             elseif (textType == "SkillInfo")     then return "技 能 信 息"
             elseif (textType == "ActivateSkill") then return "发 动 技 能"
             elseif (textType == "HideUI")        then return "隐 藏 界 面"
+            elseif (textType == "DamageChart")   then return "基 础 伤 害 表"
             elseif (textType == "Surrender")     then return "投 降"
             elseif (textType == "ReloadWar")     then return "重 新 载 入"
             elseif (textType == "EndTurn")       then return "结 束 回 合"
@@ -564,16 +597,21 @@ local s_Texts = {
             elseif (textType == "UnitsCount")    then return "部队数量"
             elseif (textType == "TilesCount")    then return "据点数量"
             elseif (textType == "Lost")          then return "已战败"
-            else                                      return "未知[65]: " .. (textType or "")
+            elseif (textType == "MainWeapon")    then return "主武器"
+            elseif (textType == "SubWeapon")     then return "副武器"
+            else                                      return "未知65:" .. (textType or "")
             end
         end,
         [2] = function(textType)
             if     (textType == "WarMenu")       then return "War Menu"
             elseif (textType == "QuitWar")       then return "Quit"
+            elseif (textType == "FindIdleUnit")  then return "FindIdleUnit"
+            elseif (textType == "FindIdleTile")  then return "FildIdleTile"
             elseif (textType == "WarInfo")       then return "War Info"
             elseif (textType == "SkillInfo")     then return "Skill Info"
             elseif (textType == "ActivateSkill") then return "ActivateSkill"
             elseif (textType == "HideUI")        then return "Hide UI"
+            elseif (textType == "DamageChart")   then return "DamageChart"
             elseif (textType == "Surrender")     then return "Surrender"
             elseif (textType == "ReloadWar")     then return "Reload"
             elseif (textType == "EndTurn")       then return "End Turn"
@@ -585,25 +623,31 @@ local s_Texts = {
             elseif (textType == "UnitsCount")    then return "Num of units"
             elseif (textType == "TilesCount")    then return "Num of bases"
             elseif (textType == "Lost")          then return "Lost"
-            else                                      return "Unknown[65]: " .. (textType or "")
+            elseif (textType == "MainWeapon")    then return "Main"
+            elseif (textType == "SubWeapon")     then return "Sub"
+            else                                      return "Unknown65:" .. (textType or "")
             end
         end,
     },
     [66] = {
-        [1] = function(confirmType)
-            if     (confirmType == "QuitWar")   then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (confirmType == "Surrender") then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
-            elseif (confirmType == "ReloadWar") then return "是否确定要重新载入战局？"
-            elseif (confirmType == "ExitGame")  then return "是否确定退出游戏？"
-            else                                     return "未识别：[66]" .. confirmType
+        [1] = function(textType)
+            if     (textType == "QuitWar")    then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (textType == "Surrender")  then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            elseif (textType == "ReloadWar")  then return "是否确定要重新载入战局？"
+            elseif (textType == "ExitGame")   then return "是否确定退出游戏？"
+            elseif (textType == "NoIdleUnit") then return "您的所有部队均已行动。"
+            elseif (textType == "NoIdleTile") then return "您的所有建筑均已被占用。"
+            else                                   return "未知66:" .. (textType or "")
             end
         end,
-        [2] = function(confirmType)
-            if     (confirmType == "QuitWar")   then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (confirmType == "Surrender") then return "You will lose the game by surrendering!\nAre you sure?"
-            elseif (confirmType == "ReloadWar") then return "Are you sure to reload the war?"
-            elseif (confirmType == "ExitGame")  then return "Are you sure to exit the game?"
-            else                                     return "Unrecognized:[66]" .. confirmType
+        [2] = function(textType)
+            if     (textType == "QuitWar")    then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (textType == "Surrender")  then return "You will lose the game by surrendering!\nAre you sure?"
+            elseif (textType == "ReloadWar")  then return "Are you sure to reload the war?"
+            elseif (textType == "ExitGame")   then return "Are you sure to exit the game?"
+            elseif (textType == "NoIdleUnit") then return "None of your units is idle."
+            elseif (textType == "NoIdleTile") then return "None of your tiles is idle."
+            else                                   return "Unrecognized:[66]" .. textType
             end
         end,
     },
@@ -940,6 +984,7 @@ local s_Texts = {
             elseif (unitType == "Cruiser")         then return "巡洋舰"
             elseif (unitType == "Lander")          then return "登陆舰"
             elseif (unitType == "Gunboat")         then return "炮舰"
+            elseif (unitType == "Meteor")          then return "陨石"
             else                                        return "未知"
             end
         end,
@@ -970,6 +1015,7 @@ local s_Texts = {
             elseif (unitType == "Cruiser")         then return "Cruiser"
             elseif (unitType == "Lander")          then return "Lander"
             elseif (unitType == "Gunboat")         then return "GBoat"
+            elseif (unitType == "Meteor")          then return "Meteor"
             else                                        return "Unknown"
             end
         end,

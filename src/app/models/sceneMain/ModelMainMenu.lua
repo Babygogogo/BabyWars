@@ -73,8 +73,9 @@ local function getActorSkillConfigurator(self)
     if (not self.m_ActorSkillConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
         actor:getModel():setModelMainMenu(self)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+            :setModelConfirmBox(self.m_ModelConfirmBox)
             :setModelMessageIndicator(self.m_ModelMessageIndicator)
+            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
             :setEnabled(false)
 
         self.m_ActorSkillConfigurator = actor
@@ -301,6 +302,8 @@ end
 
 function ModelMainMenu:doActionGetSkillConfiguration(action)
     getActorSkillConfigurator(self):getModel():doActionGetSkillConfiguration(action)
+    getActorNewWarCreator(    self):getModel():doActionGetSkillConfiguration(action)
+    getActorJoinWarSelector(  self):getModel():doActionGetSkillConfiguration(action)
 
     return self
 end

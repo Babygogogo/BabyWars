@@ -1,10 +1,11 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
-local Actor                 = require("src.global.actors.Actor")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local WarFieldList          = require("res.data.templateWarField.WarFieldList")
+local WarFieldList              = require("res.data.templateWarField.WarFieldList")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -34,8 +35,8 @@ local function resetModelWarConfigurator(model, warFieldFileName)
 
     local warField = require("res.data.templateWarField." .. warFieldFileName)
     resetSelectorPlayerIndex(model, warField.playersCount)
-    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(5)
-    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(1)
+    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(6)
+    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(2)
 end
 
 --------------------------------------------------------------------------------
@@ -85,32 +86,57 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     end)
 end
 
-local function initSelectorMaxSkillPoints(modelWarConfigurator)
-    local options = {}
-    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    for points = minPoints, maxPoints, pointsPerStep do
-        options[#options + 1] = {
-            data = points,
-            text = "" .. points,
-        }
-    end
-
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
-        :setCurrentOptionIndex(5)
-        :setButtonsEnabled(true)
-end
-
-local function initSelectorSkill(modelWarConfigurator)
-    local options = {}
+local function initSelectorSkill(self, modelWarConfigurator)
+    local options = {{
+        data = 0,
+        text = getLocalizedText(3, "Disable"),
+    }}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
     for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
         options[#options + 1] = {
             text = prefix .. i,
             data = i,
+            callbackOnOptionIndicatorTouched = function()
+                modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
+                    :setPopUpPanelEnabled(true)
+                self.m_RootScriptEventDispatcher:dispatchEvent({
+                    name            = "EvtPlayerRequestDoAction",
+                    actionName      = "GetSkillConfiguration",
+                    configurationID = i,
+                })
+            end,
         }
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
+        :setButtonsEnabled(true)
+        :setOptionIndicatorTouchEnabled(true)
+end
+
+local function initSelectorMaxSkillPoints(modelWarConfigurator)
+    local options = {{
+        data = nil,
+        text = getLocalizedText(3, "Disable"),
+        callbackOnSwitched = function()
+            modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setCurrentOptionIndex(1)
+                :setButtonsEnabled(false)
+                :setOptionIndicatorTouchEnabled(false)
+        end,
+    }}
+    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
+    for points = minPoints, maxPoints, pointsPerStep do
+        options[#options + 1] = {
+            data = points,
+            text = "" .. points,
+            callbackOnSwitched = function()
+                modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(true)
+                    :setOptionIndicatorTouchEnabled(true)
+            end,
+        }
+    end
+
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
+        :setCurrentOptionIndex(5)
         :setButtonsEnabled(true)
 end
 
@@ -138,8 +164,8 @@ local function getActorWarConfigurator(self)
         model:setEnabled(false)
         initCallbackOnButtonConfirmTouched(self, model)
         initCallbackOnButtonBackTouched(   self, model)
+        initSelectorSkill(self,    model)
         initSelectorMaxSkillPoints(model)
-        initSelectorSkill(         model)
         initSelectorFog(           model)
         initSelectorWeather(       model)
 
@@ -219,6 +245,22 @@ end
 function ModelNewWarCreator:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelNewWarCreator:setRootScriptEventDispatcher() the dispatcher has been set.")
     self.m_RootScriptEventDispatcher = dispatcher
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelNewWarCreator:doActionGetSkillConfiguration(action)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    if (modelWarConfigurator:isPopUpPanelEnabled()) then
+        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
+        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
+            getLocalizedText(3, "Configuration"), action.configurationID,
+            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+        ))
+    end
 
     return self
 end

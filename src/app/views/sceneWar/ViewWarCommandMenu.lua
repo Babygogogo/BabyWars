@@ -138,7 +138,7 @@ local function initButtonBack(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor({r = 240, g = 80, b = 56})
-        :setTitleText(LocalizationFunctions.getLocalizedText(1, "Close"))
+        :setTitleText(LocalizationFunctions.getLocalizedText(1, "Back"))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
@@ -191,18 +191,6 @@ local function initOverview(self)
         :addChild(scrollView, OVERVIEW_SCROLLVIEW_Z_ORDER)
 end
 
-local function initTouchListener(self)
-    local touchListener = cc.EventListenerTouchOneByOne:create()
-    touchListener:setSwallowTouches(true)
-
-    touchListener:registerScriptHandler(function()
-        return true
-    end, cc.Handler.EVENT_TOUCH_BEGAN)
-
-    self.m_TouchListener = touchListener
-    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(self.m_TouchListener, self)
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -212,7 +200,6 @@ function ViewWarCommandMenu:ctor(param)
     initButtonBack(    self)
     initMenuListView(  self)
     initOverview(      self)
-    initTouchListener( self)
 
     self:ignoreAnchorPointForPosition(true)
 
@@ -258,7 +245,6 @@ end
 
 function ViewWarCommandMenu:setEnabled(enabled)
     self:setVisible(enabled)
-    self.m_TouchListener:setEnabled(enabled)
 
     return self
 end

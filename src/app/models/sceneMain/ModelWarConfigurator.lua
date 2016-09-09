@@ -90,6 +90,31 @@ end
 function ModelWarConfigurator:setEnabled(enabled)
     if (self.m_View) then
         self.m_View:setVisible(enabled)
+            :setPopUpPanelEnabled(false)
+    end
+
+    return self
+end
+
+function ModelWarConfigurator:isPopUpPanelEnabled()
+    if (self.m_View) then
+        return self.m_View:isPopUpPanelEnabled()
+    else
+        return false
+    end
+end
+
+function ModelWarConfigurator:setPopUpPanelEnabled(enabled)
+    if (self.m_View) then
+        self.m_View:setPopUpPanelEnabled(enabled)
+    end
+
+    return self
+end
+
+function ModelWarConfigurator:setPopUpPanelText(text)
+    if (self.m_View) then
+        self.m_View:setPopUpPanelText(text)
     end
 
     return self
