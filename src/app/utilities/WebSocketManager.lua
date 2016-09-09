@@ -3,10 +3,10 @@ local WebSocketManager = {}
 
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 
---[[
 local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
---]]
+--[[
 local SERVER_URL = "localhost:19297/BabyWars"
+--]]
 
 local HEARTBEAT_INTERVAL = 20
 
