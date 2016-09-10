@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "八 阵 图 · 贰",
   authorName   = "RushFTK",
   playersCount = 2,
@@ -102,5 +102,3 @@
     }
   }
 }
-
-

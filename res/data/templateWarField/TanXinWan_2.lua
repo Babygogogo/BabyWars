@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "贪 心 湾",
   authorName   = "RushFTK",
   playersCount = 2,

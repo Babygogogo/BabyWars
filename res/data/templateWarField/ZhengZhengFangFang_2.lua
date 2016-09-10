@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "正 正 方 方",
   authorName   = "Cheshirecat",
   playersCount = 2,

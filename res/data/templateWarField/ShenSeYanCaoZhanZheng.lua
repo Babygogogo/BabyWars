@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "深色烟草战争",
   authorName   = "WalkerBoh/电玩小子",
   playersCount = 2,

@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "王 牌 空 军",
   authorName   = "DuelStriker/Cheshirecat",
   playersCount = 2,

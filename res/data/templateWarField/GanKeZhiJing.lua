@@ -1,4 +1,4 @@
-﻿return {
+return {
   warFieldName = "干 涸 之 境",
   authorName   = "3Au",
   playersCount = 2,
