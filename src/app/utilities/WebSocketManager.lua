@@ -25,7 +25,7 @@ local s_Scheduler = cc.Director:getInstance():getScheduler()
 local function heartbeat()
     print("WebSocketManager-heartbeat", s_HeartbeatCounter)
     if (not s_IsHeartbeatAnswered) then
-        s_Owner:onWebSocketEvent("close")
+        s_Socket:close()
     else
         s_HeartbeatCounter    = s_HeartbeatCounter + 1
         s_IsHeartbeatAnswered = false
