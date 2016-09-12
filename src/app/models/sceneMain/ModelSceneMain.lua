@@ -169,20 +169,17 @@ local function initActorConfirmBox(self, confirmText)
     self.m_ActorConfirmBox = actor
 end
 
-local function initActorMainMenu(self)
-    local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
-    actor:getModel():setModelConfirmBox(self:getModelConfirmBox())
-        :setModelMessageIndicator(      self:getModelMessageIndicator())
-        :setRootScriptEventDispatcher(  self:getScriptEventDispatcher())
-        :updateWithIsPlayerLoggedIn(    self.m_IsPlayerLoggedIn)
-
-    self.m_ActorMainMenu = actor
-end
-
 local function initActorMessageIndicator(self)
     local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
 
     self.m_ActorMessageIndicator = actor
+end
+
+local function initActorMainMenu(self)
+    local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
+    actor:getModel():updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
+
+    self.m_ActorMainMenu = actor
 end
 
 --------------------------------------------------------------------------------

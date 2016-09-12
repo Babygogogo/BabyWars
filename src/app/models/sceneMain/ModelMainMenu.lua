@@ -4,6 +4,7 @@ local ModelMainMenu = class("ModelMainMenu")
 local AudioManager          = require("src.app.utilities.AudioManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local Actor                 = require("src.global.actors.Actor")
+local ActorManager          = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -28,8 +29,6 @@ local function getActorNewWarCreator(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
-            :setModelMessageIndicator(self.m_ModelMessageIndicator)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorNewWarCreator = actor
         self.m_View:setViewNewWarCreator(actor:getView())
@@ -68,9 +67,6 @@ local function getActorSkillConfigurator(self)
     if (not self.m_ActorSkillConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
         actor:getModel():setModelMainMenu(self)
-            :setModelConfirmBox(self.m_ModelConfirmBox)
-            :setModelMessageIndicator(self.m_ModelMessageIndicator)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
             :setEnabled(false)
 
         self.m_ActorSkillConfigurator = actor
@@ -223,27 +219,6 @@ function ModelMainMenu:initView()
     return self
 end
 
-function ModelMainMenu:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil, "ModelMainMenu:setModelConfirmBox() the model has been set.")
-    self.m_ModelConfirmBox = model
-
-    return self
-end
-
-function ModelMainMenu:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelMainMenu:setModelMessageIndicator() the model has been set.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelMainMenu:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelMainMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
@@ -344,7 +319,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
 end
 
 function ModelMainMenu:onButtonExitTouched()
-    self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "ExitGame"))
+    ActorManager.getRootModelConfirmBox():setConfirmText(getLocalizedText(66, "ExitGame"))
         :setOnConfirmYes(function()
             cc.Director:getInstance():endToLua()
         end)

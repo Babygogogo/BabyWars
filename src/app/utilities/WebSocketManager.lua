@@ -30,7 +30,6 @@ local function heartbeat()
         s_HeartbeatCounter    = s_HeartbeatCounter + 1
         s_IsHeartbeatAnswered = false
         s_Socket:sendString(SerializationFunctions.toString({
-            name             = "EvtPlayerRequestDoAction",
             actionName       = "NetworkHeartbeat",
             heartbeatCounter = s_HeartbeatCounter,
             playerAccount    = s_Account,
