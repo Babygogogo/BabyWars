@@ -107,6 +107,15 @@ function WebSocketManager.sendString(str)
     return WebSocketManager
 end
 
+function WebSocketManager.sendAction(action)
+    action.playerAccount  = action.playerAccount  or s_Account
+    action.playerPassword = action.playerPassword or s_Password
+
+    WebSocketManager.sendString(SerializationFunctions.toString(action))
+
+    return WebSocketManager
+end
+
 function WebSocketManager.close()
     assert(WebSocketManager.isInitialized(), "WebSocketManager.close() the socket hasn't been initialized.")
     s_Socket:close()

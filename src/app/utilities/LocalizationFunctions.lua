@@ -301,21 +301,21 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [8] = {
-        [1] = function(commandType)
-            if     (commandType == "Back") then return "返 回"
-            elseif (commandType == "Exit") then return "退 出"
-            else                                return "未识别"
+        [1] = function(textType)
+            if     (textType == "TransferingData")  then return "正在传输数据。若长时间没有反应，请返回重试。"
+            elseif (textType == "NoContinuableWar") then return "您没有可以继续进行的战局。"
+            else                                         return "未知8:" .. (textType or "")
             end
         end,
-        [2] = function(commandType)
-            if     (commandType == "Back") then return "Back"
-            elseif (commandType == "Exit") then return "Exit"
-            else                                return "Unrecognized"
+        [2] = function(textType)
+            if     (textType == "TransferingData")  then return "Transfering data. If it's not responding, please retry."
+            elseif (textType == "NoContinuableWar") then return "No war is continuable currently."
+            else                                         return "Unknown8:"
             end
         end,
     },
+    --[[
     [9] = {
         [1] = function(...) return "游 戏 流 程" end,
         [2] = function(...) return "Game Flow"  end,

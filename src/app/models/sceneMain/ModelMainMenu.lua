@@ -43,8 +43,6 @@ local function getActorContinueWarSelector(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelContinueWarSelector", nil, "sceneMain.ViewContinueWarSelector")
         actor:getModel():setModelMainMenu(self)
             :setEnabled(false)
-            :setModelConfirmBox(self.m_ModelConfirmBox)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorContinueWarSelector = actor
         self.m_View:setViewContinueWarSelector(actor:getView())

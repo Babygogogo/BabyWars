@@ -32,7 +32,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(26, action.account))
+        self:getModelMessageIndicator():showMessage(getLocalizedText(26, action.account))
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
@@ -51,14 +51,14 @@ end
 
 local function doActionRegister(self, action)
     WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(27, action.account))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(27, action.account))
 
     self.m_ActorMainMenu:getModel():doActionRegister(action)
 end
 
 local function doActionNewWar(self, action)
     self.m_ActorMainMenu:getModel():doActionNewWar(action)
-    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
 end
 
 local function doActionGetJoinableWarList(self, action)
@@ -82,7 +82,7 @@ local function doActionGetSkillConfiguration(self, action)
 end
 
 local function doActionMessage(self, action)
-    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
 end
 
 --------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(30))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
@@ -131,7 +131,7 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(31))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(31))
 
     WebSocketManager.close()
         .init()
@@ -140,7 +140,7 @@ end
 
 local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(32, param.error))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(32, param.error))
 
     WebSocketManager.close()
         .init()
@@ -172,9 +172,9 @@ end
 local function initActorMainMenu(self)
     local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
     actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
-        :setModelMessageIndicator(self.m_ActorMessageIndicator:getModel())
-        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
+        :setModelMessageIndicator(    self:getModelMessageIndicator())
+        :setRootScriptEventDispatcher(self:getScriptEventDispatcher())
+        :updateWithIsPlayerLoggedIn(  self.m_IsPlayerLoggedIn)
 
     self.m_ActorMainMenu = actor
 end
@@ -243,6 +243,17 @@ function ModelSceneMain:onWebSocketEvent(eventName, param)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneMain:getModelMessageIndicator()
+    return self.m_ActorMessageIndicator:getModel()
+end
+
+function ModelSceneMain:getScriptEventDispatcher()
+    return self.m_ScriptEventDispatcher
 end
 
 return ModelSceneMain
