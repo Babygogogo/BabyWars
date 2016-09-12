@@ -45,7 +45,6 @@ local function doActionLogout(self, event)
     local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
     WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-        .setOwner(modelSceneMain)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
@@ -106,15 +105,6 @@ local function onEvtSystemRequestDoAction(self, event)
     end
 end
 
-local function onEvtPlayerRequestDoAction(self, event)
-    local request           = event
-    local account, password = WebSocketManager.getLoggedInAccountAndPassword()
-    request.playerAccount   = request.playerAccount  or account
-    request.playerPassword  = request.playerPassword or password
-
-    WebSocketManager.sendString(SerializationFunctions.toString(request))
-end
-
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
@@ -125,26 +115,17 @@ end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
-
     onEvtSystemRequestDoAction(self, param.action)
 end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
     self:getModelMessageIndicator():showMessage(getLocalizedText(31))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
 end
 
 local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
     self:getModelMessageIndicator():showMessage(getLocalizedText(32, param.error))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
 end
 
 --------------------------------------------------------------------------------
@@ -152,8 +133,7 @@ end
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
-    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtSystemRequestDoAction", self)
+    dispatcher:addEventListener("EvtSystemRequestDoAction", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -225,8 +205,7 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneMain:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
-    elseif (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
+    if (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
     end
 
     return self

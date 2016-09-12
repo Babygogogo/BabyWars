@@ -243,7 +243,6 @@ end
 function ModelContinueWarSelector:doActionGetSceneWarData(action)
     if (self.m_IsEnabled) then
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
-        WebSocketManager.setOwner(actorSceneWar:getModel())
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
 

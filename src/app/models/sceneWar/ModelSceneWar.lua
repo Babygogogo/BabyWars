@@ -46,7 +46,6 @@ local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
     WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
-        .setOwner(modelSceneMain)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
@@ -104,7 +103,6 @@ end
 
 local function doActionGetSceneWarData(self, action)
     local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
-    WebSocketManager.setOwner(actorSceneWar:getModel())
     ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
 end
 
@@ -351,19 +349,11 @@ end
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
     getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(31))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
 end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
     getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
 end
 
 --------------------------------------------------------------------------------
