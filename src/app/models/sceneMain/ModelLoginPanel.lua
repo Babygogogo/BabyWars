@@ -119,11 +119,11 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
         self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name       = "EvtPlayerRequestDoAction",
-                    actionName = "Register",
-                    version    = GAME_VERSION,
-                    account    = account,
-                    password   = password
+                    name           = "EvtPlayerRequestDoAction",
+                    actionName     = "Register",
+                    version        = GAME_VERSION,
+                    playerAccount  = account,
+                    playerPassword = password,
                 })
                 self.m_ModelConfirmBox:setEnabled(false)
             end)
@@ -144,11 +144,11 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
         end
 
         self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
-            actionName = "Login",
-            version    = GAME_VERSION,
-            account    = account,
-            password   = password
+            name           = "EvtPlayerRequestDoAction",
+            actionName     = "Login",
+            version        = GAME_VERSION,
+            playerAccount  = account,
+            playerPassword = password,
         })
     end
 

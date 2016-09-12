@@ -3,12 +3,12 @@ local WebSocketManager = {}
 
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 
-local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --[[
-local SERVER_URL = "localhost:19297/BabyWars"
+local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --]]
+local SERVER_URL = "localhost:19297/BabyWars"
 
-local HEARTBEAT_INTERVAL = 20
+local HEARTBEAT_INTERVAL = 15
 
 local s_Socket ,s_Owner
 local s_Account, s_Password
@@ -33,6 +33,8 @@ local function heartbeat()
             name             = "EvtPlayerRequestDoAction",
             actionName       = "NetworkHeartbeat",
             heartbeatCounter = s_HeartbeatCounter,
+            playerAccount    = s_Account,
+            playerPassword   = s_Password,
         }))
     end
 end
@@ -60,6 +62,7 @@ function WebSocketManager.setOwner(owner)
     s_Socket:registerScriptHandler(function()
         owner:onWebSocketEvent("open")
         s_HeartbeatScheduleID = s_Scheduler:scheduleScriptFunc(heartbeat, HEARTBEAT_INTERVAL, false)
+        heartbeat()
     end, cc.WEBSOCKET_OPEN)
 
     s_Socket:registerScriptHandler(function(msg)

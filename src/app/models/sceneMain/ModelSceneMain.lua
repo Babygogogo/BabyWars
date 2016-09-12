@@ -107,8 +107,11 @@ local function onEvtSystemRequestDoAction(self, event)
 end
 
 local function onEvtPlayerRequestDoAction(self, event)
-    local request = event
-    request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
+    local request           = event
+    local account, password = WebSocketManager.getLoggedInAccountAndPassword()
+    request.playerAccount   = request.playerAccount  or account
+    request.playerPassword  = request.playerPassword or password
+
     WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
 
