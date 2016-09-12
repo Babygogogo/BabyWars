@@ -230,10 +230,10 @@ end
 function ModelContinueWarSelector:doActionGetOngoingWarList(action)
     if ((self.m_View) and (self.m_IsEnabled)) then
         local warList = createOngoingWarList(self, action.list)
-        self.m_View:showWarList(warList)
-
         if (#warList == 0) then
             ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+        else
+            self.m_View:showWarList(warList)
         end
     end
 

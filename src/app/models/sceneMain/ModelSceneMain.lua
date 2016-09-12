@@ -171,10 +171,10 @@ end
 
 local function initActorMainMenu(self)
     local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
-    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
-        :setModelMessageIndicator(    self:getModelMessageIndicator())
-        :setRootScriptEventDispatcher(self:getScriptEventDispatcher())
-        :updateWithIsPlayerLoggedIn(  self.m_IsPlayerLoggedIn)
+    actor:getModel():setModelConfirmBox(self:getModelConfirmBox())
+        :setModelMessageIndicator(      self:getModelMessageIndicator())
+        :setRootScriptEventDispatcher(  self:getScriptEventDispatcher())
+        :updateWithIsPlayerLoggedIn(    self.m_IsPlayerLoggedIn)
 
     self.m_ActorMainMenu = actor
 end
@@ -248,6 +248,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelSceneMain:getModelConfirmBox()
+    return self.m_ActorConfirmBox:getModel()
+end
+
 function ModelSceneMain:getModelMessageIndicator()
     return self.m_ActorMessageIndicator:getModel()
 end

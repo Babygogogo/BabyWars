@@ -55,10 +55,7 @@ local function getActorJoinWarSelector(self)
     if (not self.m_ActorJoinWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
         actor:getModel():setModelMainMenu(self)
-            :setModelConfirmBox(self.m_ModelConfirmBox)
-            :setModelMessageIndicator(self.m_ModelMessageIndicator)
             :setEnabled(false)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorJoinWarSelector = actor
         self.m_View:setViewJoinWarSelector(actor:getView())
@@ -87,10 +84,7 @@ local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
         actor:getModel():setModelMainMenu(self)
-            :setModelMessageIndicator(self.m_ModelMessageIndicator)
-            :setModelConfirmBox(self.m_ModelConfirmBox)
             :setEnabled(false)
-            :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
 
         self.m_ActorLoginPanel = actor
         self.m_View:setViewLoginPanel(actor:getView())
