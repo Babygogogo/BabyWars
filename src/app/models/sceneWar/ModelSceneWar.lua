@@ -311,13 +311,6 @@ local function doAction(self, action)
 end
 
 --------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtReloadSceneWar(self, event)
-    requestReload(self)
-end
-
---------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
@@ -345,7 +338,6 @@ end
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
-    dispatcher:addEventListener("EvtReloadSceneWar", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -462,15 +454,6 @@ function ModelSceneWar:onStartRunning()
 end
 
 function ModelSceneWar:onStopRunning()
-    return self
-end
-
-function ModelSceneWar:onEvent(event)
-    local name = event.name
-    if (name == "EvtReloadSceneWar") then
-        onEvtReloadSceneWar(self, event)
-    end
-
     return self
 end
 

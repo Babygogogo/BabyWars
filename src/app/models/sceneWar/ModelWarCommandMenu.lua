@@ -168,9 +168,12 @@ local function setStateDamageChart(self)
     end
 end
 
-local function createAndSendAction(rawAction)
-    rawAction.actionID         = SingletonGetters.getActionId() + 1
-    rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+local function createAndSendAction(rawAction, needActionID)
+    if (needActionID) then
+        rawAction.actionID         = SingletonGetters.getActionId() + 1
+        rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    end
+
     WebSocketManager.sendAction(rawAction)
     SingletonGetters.getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
     SingletonGetters.getScriptEventDispatcher():dispatchEvent({
@@ -183,15 +186,22 @@ local function sendActionActivateSkillGroup(skillGroupID)
     createAndSendAction({
         actionName   = "ActivateSkillGroup",
         skillGroupID = skillGroupID,
-    })
+    }, true)
 end
 
 local function sendActionSurrender()
-    createAndSendAction({actionName = "Surrender"})
+    createAndSendAction({actionName = "Surrender"}, true)
 end
 
 local function sendActionEndTurn()
-    createAndSendAction({actionName = "EndTurn"})
+    createAndSendAction({actionName = "EndTurn"}, true)
+end
+
+local function sendActionGetSceneWarData()
+    createAndSendAction({
+        actionName = "GetSceneWarData",
+        fileName   = SingletonGetters.getSceneWarFileName(),
+    }, false)
 end
 
 local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
@@ -498,7 +508,8 @@ local function initItemReload(self)
             modelConfirmBox:setConfirmText(getLocalizedText(66, "ReloadWar"))
                 :setOnConfirmYes(function()
                     modelConfirmBox:setEnabled(false)
-                    SingletonGetters.getScriptEventDispatcher():dispatchEvent({name = "EvtReloadSceneWar"})
+                    self:setEnabled(false)
+                    sendActionGetSceneWarData()
                 end)
                 :setEnabled(true)
         end,
