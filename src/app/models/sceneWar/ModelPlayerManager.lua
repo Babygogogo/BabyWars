@@ -17,8 +17,8 @@
 
 local ModelPlayerManager = require("src.global.functions.class")("ModelPlayerManager")
 
-local ModelPlayer    = require("src.app.models.sceneWar.ModelPlayer")
-local TableFunctions = require("src.app.utilities.TableFunctions")
+local ModelPlayer      = require("src.app.models.sceneWar.ModelPlayer")
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -60,30 +60,30 @@ local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, model
     end
 end
 
-local function dispatchEvtModelPlayerUpdated(dispatcher, modelPlayer, playerIndex)
-    dispatcher:dispatchEvent({
+local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
         name        = "EvtModelPlayerUpdated",
         modelPlayer = modelPlayer,
         playerIndex = playerIndex,
     })
 end
 
-local function dispatchEvtRepairViewUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+local function dispatchEvtRepairViewUnit(sceneWarFileName, gridIndex)
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
         name      = "EvtRepairViewUnit",
         gridIndex = gridIndex,
     })
 end
 
-local function dispatchEvtSupplyViewUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+local function dispatchEvtSupplyViewUnit(sceneWarFileName, gridIndex)
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
         name      = "EvtSupplyViewUnit",
         gridIndex = gridIndex,
     })
 end
 
-local function dispatchEvtSkillGroupActivated(self, playerIndex, skillGroupID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+local function dispatchEvtSkillGroupActivated(sceneWarFileName, playerIndex, skillGroupID)
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
         name         = "EvtSkillGroupActivated",
         playerIndex  = playerIndex,
         skillGroupID = skillGroupID,
@@ -111,7 +111,7 @@ local function onEvtTurnPhaseGetFund(self, event)
         end)
 
         modelPlayer:setFund(modelPlayer:getFund() + income)
-        dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+        dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
     end
 end
 
@@ -120,7 +120,6 @@ local function onEvtTurnPhaseRepairUnit(self, event)
     local modelTileMap    = event.modelTileMap
     local playerIndex     = event.playerIndex
     local modelPlayer     = self.m_ModelPlayers[playerIndex]
-    local eventDispatcher = self.m_RootScriptEventDispatcher
 
     for _, unit in ipairs(getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)) do
         local gridIndex                = unit:getGridIndex()
@@ -139,22 +138,21 @@ local function onEvtTurnPhaseRepairUnit(self, event)
         modelPlayer:setFund(modelPlayer:getFund() - repairCost)
 
         if (repairAmount >= 10) then
-            dispatchEvtRepairViewUnit(self, gridIndex)
+            dispatchEvtRepairViewUnit(self.m_SceneWarFileName, gridIndex)
         elseif (shouldSupply) then
-            dispatchEvtSupplyViewUnit(self, gridIndex)
+            dispatchEvtSupplyViewUnit(self.m_SceneWarFileName, gridIndex)
         end
     end
 
-    dispatchEvtModelPlayerUpdated(eventDispatcher, modelPlayer, playerIndex)
+    dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
 end
 
 local function onEvtSceneWarStarted(self, event)
-    local dispatcher = self.m_RootScriptEventDispatcher
     self:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:isAlive()) then
             local activatingSkillGroupID = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
             if (activatingSkillGroupID) then
-                dispatchEvtSkillGroupActivated(self, playerIndex, activatingSkillGroupID)
+                dispatchEvtSkillGroupActivated(self.m_SceneWarFileName, playerIndex, activatingSkillGroupID)
             end
         end
     end)
@@ -172,30 +170,6 @@ function ModelPlayerManager:ctor(param)
     return self
 end
 
-function ModelPlayerManager:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelPlayerManager:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseResetSkillState", self)
-        :addEventListener("EvtTurnPhaseGetFund",    self)
-        :addEventListener("EvtTurnPhaseRepairUnit", self)
-        :addEventListener("EvtSceneWarStarted",     self)
-
-    return self
-end
-
-function ModelPlayerManager:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelPlayerManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtSceneWarStarted", self)
-        :removeEventListener("EvtTurnPhaseRepairUnit",      self)
-        :removeEventListener("EvtTurnPhaseGetFund",         self)
-        :removeEventListener("EvtTurnPhaseResetSkillState", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
@@ -209,8 +183,20 @@ function ModelPlayerManager:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelPlayerManager:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
+
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+        :addEventListener("EvtTurnPhaseResetSkillState", self)
+        :addEventListener("EvtTurnPhaseGetFund",         self)
+        :addEventListener("EvtTurnPhaseRepairUnit",      self)
+        :addEventListener("EvtSceneWarStarted",          self)
+
+    return self
+end
+
 function ModelPlayerManager:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
@@ -228,8 +214,8 @@ end
 function ModelPlayerManager:doActionActivateSkillGroup(action, playerIndex)
     local modelPlayer = self:getModelPlayer(playerIndex)
     modelPlayer:doActionActivateSkillGroup(action)
-    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
-    dispatchEvtSkillGroupActivated(self, playerIndex, action.skillGroupID)
+    dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
+    dispatchEvtSkillGroupActivated(self.m_SceneWarFileName, playerIndex, action.skillGroupID)
 
     return self
 end
@@ -255,7 +241,7 @@ end
 function ModelPlayerManager:doActionProduceModelUnitOnUnit(action, playerIndex)
     local modelPlayer = self:getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
-    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+    dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
 
     return self
 end
@@ -263,7 +249,7 @@ end
 function ModelPlayerManager:doActionProduceOnTile(action, playerIndex)
     local modelPlayer = self:getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
-    dispatchEvtModelPlayerUpdated(self.m_RootScriptEventDispatcher, modelPlayer, playerIndex)
+    dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
 
     return self
 end

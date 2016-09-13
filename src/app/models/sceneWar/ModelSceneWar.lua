@@ -365,7 +365,6 @@ end
 
 local function initActorPlayerManager(self, playersData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
-    actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
 
     self.m_ActorPlayerManager = actor
 end
@@ -393,7 +392,6 @@ end
 
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-    actor:getModel():setSceneWarFileName(self.m_FileName)
 
     self.m_ActorTurnManager = actor
 end
@@ -437,7 +435,10 @@ end
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    self.m_ActorWarHud:getModel():onStartRunning(self:getFileName())
+    local sceneWarFileName = self:getFileName()
+    self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
+    self:getModelTurnManager()   :onStartRunning(sceneWarFileName)
+    self:getModelPlayerManager() :onStartRunning(sceneWarFileName)
 
     local modelTurnManager = self:getModelTurnManager()
     local playerIndex      = modelTurnManager:getPlayerIndex()

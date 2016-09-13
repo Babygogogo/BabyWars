@@ -178,13 +178,6 @@ function ModelTurnManager:ctor(param)
     return self
 end
 
-function ModelTurnManager:setSceneWarFileName(name)
-    assert(string.len(name) == 16, "ModelTurnManager:setSceneWarFileName() invalid name: " .. (name or ""))
-    self.m_SceneWarFileName = name
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
@@ -194,6 +187,16 @@ function ModelTurnManager:toSerializableTable()
         playerIndex = self:getPlayerIndex(),
         phase       = self:getTurnPhase(),
     }
+end
+
+--------------------------------------------------------------------------------
+-- The public functions for doing actions.
+--------------------------------------------------------------------------------
+function ModelTurnManager:onStartRunning(sceneWarFileName)
+    assert(string.len(sceneWarFileName) == 16, "ModelTurnManager:onStartRunning() invalid name: " .. (sceneWarFileName or ""))
+    self.m_SceneWarFileName = sceneWarFileName
+
+    return self
 end
 
 --------------------------------------------------------------------------------
