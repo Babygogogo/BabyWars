@@ -37,10 +37,6 @@ local EventDispatcher        = require("src.global.events.EventDispatcher")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getModelMessageIndicator(self)
-    return self.m_ActorMessageIndicator:getModel()
-end
-
 local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
     local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
@@ -50,18 +46,18 @@ local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
 end
 
 local function dispatchEvtIsWaitingForServerResponse(self, waiting)
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self:getScriptEventDispatcher():dispatchEvent({
         name    = "EvtIsWaitingForServerResponse",
         waiting = waiting,
     })
 end
 
 local function requestReload(self, durationSec)
-    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
+    self:getModelMessageIndicator():showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtIsWaitingForServerResponse(self, true)
 
     local func = function()
-        self.m_ScriptEventDispatcher:dispatchEvent({
+        self:getScriptEventDispatcher():dispatchEvent({
             name       = "EvtPlayerRequestDoAction",
             actionName = "GetSceneWarData",
             fileName   = self.m_FileName,
@@ -90,7 +86,7 @@ local function doActionLogout(self, event)
 end
 
 local function doActionMessage(self, action)
-    getModelMessageIndicator(self):showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
     local additionalAction = action.additionalAction
     if     (additionalAction == "RunSceneMain")   then runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
     elseif (additionalAction == "ReloadSceneWar") then requestReload(self, 3)
@@ -123,7 +119,7 @@ local function doActionBeginTurn(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -155,7 +151,7 @@ local function doActionSurrender(self, action)
         self.m_IsWarEnded = true
         self.m_View:showEffectSurrender(callbackOnWarEnded)
     else
-        getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
+        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
 
         if (modelPlayerManager:getAlivePlayersCount() == 1) then
             self.m_IsWarEnded = true
@@ -168,7 +164,7 @@ end
 
 local function doActionActivateSkillGroup(self, action)
     InstantSkillExecutor.doActionActivateSkillGroup(action,
-        self:getModelWarField(), self:getModelPlayerManager(), self:getModelTurnManager(), self:getModelWeatherManager(), self.m_ScriptEventDispatcher)
+        self:getModelWarField(), self:getModelPlayerManager(), self:getModelTurnManager(), self:getModelWeatherManager(), self:getScriptEventDispatcher())
 
     local playerIndex = self:getModelTurnManager():getPlayerIndex()
     self:getModelPlayerManager():doActionActivateSkillGroup(action, playerIndex)
@@ -196,7 +192,7 @@ local function doActionAttack(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
@@ -233,7 +229,7 @@ local function doActionCaptureModelTile(self, action)
                 self.m_IsWarEnded = true
                 self.m_View:showEffectLose(callbackOnWarEnded)
             else
-                getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
+                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
                 if (modelPlayerManager:getAlivePlayersCount() == 1) then
                     self.m_IsWarEnded = true
                     self.m_View:showEffectWin(callbackOnWarEnded)
@@ -287,13 +283,13 @@ local function doAction(self, action)
     if ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
         return
     elseif (action.actionID ~= self.m_ActionID + 1) then
-        getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(81, "OutOfSync"))
+        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(81, "OutOfSync"))
         requestReload(self, 3)
         return
     end
 
     self.m_ActionID = action.actionID
-    getModelMessageIndicator(self):hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
+    self:getModelMessageIndicator():hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtIsWaitingForServerResponse(self, false)
 
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
@@ -323,7 +319,7 @@ local function onEvtPlayerRequestDoAction(self, event)
     request.playerAccount,    request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
     request.sceneWarFileName, request.actionID       = self.m_FileName, self.m_ActionID + 1
 
-    getModelMessageIndicator(self):showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
+    self:getModelMessageIndicator():showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtIsWaitingForServerResponse(self, true)
     WebSocketManager.sendString(SerializationFunctions.toString(request))
 end
@@ -337,7 +333,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(30))
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
@@ -347,12 +343,12 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(31))
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(31))
 end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
-    getModelMessageIndicator(self):showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
+    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
 end
 
 --------------------------------------------------------------------------------
@@ -374,7 +370,7 @@ end
 
 local function initActorPlayerManager(self, playersData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
-    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
 
     self.m_ActorPlayerManager = actor
 end
@@ -387,7 +383,7 @@ end
 
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
-    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
         :setModelPlayerManager(self:getModelPlayerManager())
         :setModelWeatherManager(self:getModelWeatherManager())
 
@@ -396,20 +392,17 @@ end
 
 local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
-    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
+    actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
         :setModelWarField(self:getModelWarField())
         :setModelPlayerManager(self:getModelPlayerManager())
-        :setModelMessageIndicator(getModelMessageIndicator(self))
+        :setModelMessageIndicator(self:getModelMessageIndicator())
 
     self.m_ActorWarHud = actor
 end
 
 local function initActorTurnManager(self, turnData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-    actor:getModel():setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :setModelPlayerManager(self:getModelPlayerManager())
-        :setModelWarField(self:getModelWarField())
-        :setModelMessageIndicator(getModelMessageIndicator(self))
+    actor:getModel():setSceneWarFileName(self.m_FileName)
 
     self.m_ActorTurnManager = actor
 end
@@ -453,7 +446,7 @@ end
 function ModelSceneWar:onStartRunning()
     local modelTurnManager = self:getModelTurnManager()
     local playerIndex      = modelTurnManager:getPlayerIndex()
-    self.m_ScriptEventDispatcher:dispatchEvent({
+    self:getScriptEventDispatcher():dispatchEvent({
             name         = "EvtModelWeatherUpdated",
             modelWeather = self:getModelWeatherManager():getCurrentWeather()
         })
@@ -498,6 +491,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelSceneWar:getActionId()
+    return self.m_ActionID
+end
+
+function ModelSceneWar:getModelMessageIndicator()
+    return self.m_ActorMessageIndicator:getModel()
+end
+
 function ModelSceneWar:getModelTurnManager()
     return self.m_ActorTurnManager:getModel()
 end
@@ -512,6 +513,10 @@ end
 
 function ModelSceneWar:getModelWarField()
     return self.m_ActorWarField:getModel()
+end
+
+function ModelSceneWar:getScriptEventDispatcher()
+    return self.m_ScriptEventDispatcher
 end
 
 return ModelSceneWar

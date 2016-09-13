@@ -19,13 +19,15 @@
 
 local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
+local IS_SERVER             = require("src.app.utilities.GameConstantFunctions").isServer()
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local WebSocketManager
-if (not GameConstantFunctions.isServer()) then
-    WebSocketManager = require("src.app.utilities.WebSocketManager")
-end
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+
+local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -34,7 +36,7 @@ local function isLoggedInPlayerInTurn(self)
     if (not WebSocketManager) then
         return false
     else
-        local modelPlayerInTurn = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        local modelPlayerInTurn = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
         return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
     end
 end
@@ -64,7 +66,7 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
-    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+    local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhase = "resetSkillState"
         self:runTurn()
@@ -78,7 +80,7 @@ local function runTurnPhaseBeginning(self)
 end
 
 local function runTurnPhaseResetSkillState(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name        = "EvtTurnPhaseResetSkillState",
         playerIndex = self.m_PlayerIndex,
     })
@@ -86,54 +88,54 @@ local function runTurnPhaseResetSkillState(self)
 end
 
 local function runTurnPhaseGetFund(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name         = "EvtTurnPhaseGetFund",
         playerIndex  = self.m_PlayerIndex,
-        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
     })
     self.m_TurnPhase = "consumeUnitFuel"
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name         = "EvtTurnPhaseConsumeUnitFuel",
         playerIndex  = self.m_PlayerIndex,
         turnIndex    = self.m_TurnIndex,
-        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
-        modelTileMap = self.m_ModelWarField:getModelTileMap(),
+        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
+        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
     })
     self.m_TurnPhase = "repairUnit"
 end
 
 local function runTurnPhaseRepairUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name         = "EvtTurnPhaseRepairUnit",
         playerIndex  = self.m_PlayerIndex,
-        modelTileMap = self.m_ModelWarField:getModelTileMap(),
-        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
+        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
+        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
     })
     self.m_TurnPhase = "supplyUnit"
 end
 
 local function runTurnPhaseSupplyUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name         = "EvtTurnPhaseSupplyUnit",
         playerIndex  = self.m_PlayerIndex,
-        modelUnitMap = self.m_ModelWarField:getModelUnitMap(),
+        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
     })
     self.m_TurnPhase = "main"
 end
 
 local function runTurnPhaseMain(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name        = "EvtTurnPhaseMain",
         playerIndex = self.m_PlayerIndex,
-        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
+        modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex),
     })
 end
 
 local function runTurnPhaseResetUnitState(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name        = "EvtTurnPhaseResetUnitState",
         playerIndex = self.m_PlayerIndex,
         turnIndex   = self.m_TurnIndex
@@ -142,11 +144,13 @@ local function runTurnPhaseResetUnitState(self)
 end
 
 local function runTurnPhaseTickTurnAndPlayerIndex(self)
-    self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, self.m_ModelPlayerManager)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    local modelPlayerManager = getModelPlayerManager(self.m_SceneWarFileName)
+    self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, modelPlayerManager)
+
+    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
         name        = "EvtPlayerIndexUpdated",
         playerIndex = self.m_PlayerIndex,
-        modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex),
+        modelPlayer = modelPlayerManager:getModelPlayer(self.m_PlayerIndex),
     })
 
     -- TODO: Change the vision, weather and so on.
@@ -154,10 +158,11 @@ local function runTurnPhaseTickTurnAndPlayerIndex(self)
 end
 
 local function runTurnPhaseRequestToBegin(self)
-    if (isLoggedInPlayerInTurn(self)) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
-            actionName = "BeginTurn",
+    if ((WebSocketManager) and (isLoggedInPlayerInTurn(self))) then
+        WebSocketManager.sendAction({
+            actionName       = "BeginTurn",
+            actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
+            sceneWarFileName = self.m_SceneWarFileName,
         })
     end
 end
@@ -173,37 +178,9 @@ function ModelTurnManager:ctor(param)
     return self
 end
 
-function ModelTurnManager:setModelPlayerManager(playerManager)
-    assert(self.m_ModelPlayerManager == nil, "ModelTurnManager:setModelPlayerManager() the manager has been set.")
-    self.m_ModelPlayerManager = playerManager
-
-    return self
-end
-
-function ModelTurnManager:setModelWarField(warField)
-    assert(self.m_ModelWarField == nil, "ModelTurnManager:setModelWarField() the model has been set.")
-    self.m_ModelWarField = warField
-
-    return self
-end
-
-function ModelTurnManager:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelTurnManager:setModelMessageIndicator() the model has been set.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelTurnManager:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelTurnManager:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function ModelTurnManager:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelTurnManager:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-    self.m_RootScriptEventDispatcher = nil
+function ModelTurnManager:setSceneWarFileName(name)
+    assert(string.len(name) == 16, "ModelTurnManager:setSceneWarFileName() invalid name: " .. (name or ""))
+    self.m_SceneWarFileName = name
 
     return self
 end
@@ -291,11 +268,12 @@ function ModelTurnManager:runTurn()
         self.m_CallbackOnEnterTurnPhaseMain = nil
     end
 
-    if (self.m_ModelMessageIndicator) then
+    if (not IS_SERVER) then
+        local modelMessageIndicator = SingletonGetters.getModelMessageIndicator()
         if (isLoggedInPlayerInTurn(self)) then
-            self.m_ModelMessageIndicator:hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
+            modelMessageIndicator:hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
         else
-            self.m_ModelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
+            modelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
         end
     end
 
