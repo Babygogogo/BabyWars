@@ -22,6 +22,7 @@ local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
@@ -167,12 +168,30 @@ local function setStateDamageChart(self)
     end
 end
 
-local function dispatchEvtActivateSkillGroup(self, skillGroupID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function createAndSendAction(rawAction)
+    rawAction.actionID         = SingletonGetters.getActionId() + 1
+    rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    WebSocketManager.sendAction(rawAction)
+    SingletonGetters.getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = true,
+    })
+end
+
+local function sendActionActivateSkillGroup(skillGroupID)
+    WebSocketManager.sendAction({
         actionName   = "ActivateSkillGroup",
         skillGroupID = skillGroupID,
     })
+end
+
+local function sendActionSurrender()
+    createAndSendAction({actionName = "Surrender"})
+end
+
+local function sendActionEndTurn()
+    createAndSendAction({actionName = "EndTurn"})
 end
 
 local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
@@ -196,7 +215,7 @@ local function createItemActivateSkill(self, skillGroupID)
     return {
         name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
         callback = function()
-            dispatchEvtActivateSkillGroup(self, skillGroupID)
+            sendActionActivateSkillGroup(skillGroupID)
             self:setEnabled(false)
         end,
     }
@@ -497,10 +516,7 @@ local function initItemSurrender(self)
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name       = "EvtPlayerRequestDoAction",
-                        actionName = "Surrender",
-                    })
+                    sendActionSurrender()
                 end)
                 :setEnabled(true)
         end,
@@ -517,10 +533,7 @@ local function initItemEndTurn(self)
                 :setOnConfirmYes(function()
                     self.m_ModelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name       = "EvtPlayerRequestDoAction",
-                        actionName = "EndTurn"
-                    })
+                    sendActionEndTurn()
                 end)
                 :setEnabled(true)
         end,

@@ -10,21 +10,23 @@
 --   - 本类生成的操作菜单均传给ModelActionMenu来显示，而移动范围、路径等由ViewActionPlanner显示。
 --
 --   - 在玩家确定行动前，无论如何操作，都不会改变战局的数据。
---     而一旦玩家确定行动，则发送“EvtPlayerRequestDoAction”事件，该事件最终会导致战局数据按玩家操作及游戏规则而改变。
+--     而一旦玩家确定行动，则发送action到服务器，该action通常会导致战局数据按玩家操作及游戏规则而改变。
 --]]--------------------------------------------------------------------------------
 
 local ModelActionPlanner = class("ModelActionPlanner")
 
-local GridIndexFunctions          = require("src.app.utilities.GridIndexFunctions")
-local ReachableAreaFunctions      = require("src.app.utilities.ReachableAreaFunctions")
-local MovePathFunctions           = require("src.app.utilities.MovePathFunctions")
-local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
-local WebSocketManager            = require("src.app.utilities.WebSocketManager")
-local LocalizationFunctions       = require("src.app.utilities.LocalizationFunctions")
 local AnimationLoader             = require("src.app.utilities.AnimationLoader")
+local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
+local GridIndexFunctions          = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions       = require("src.app.utilities.LocalizationFunctions")
+local MovePathFunctions           = require("src.app.utilities.MovePathFunctions")
+local ReachableAreaFunctions      = require("src.app.utilities.ReachableAreaFunctions")
+local SingletonGetters            = require("src.app.utilities.SingletonGetters")
+local WebSocketManager            = require("src.app.utilities.WebSocketManager")
 local Actor                       = require("src.global.actors.Actor")
 
 local createPathForDispatch = MovePathFunctions.createPathForDispatch
+local getLocalizedText      = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -188,7 +190,7 @@ local function resetReachableArea(self, focusModelUnit)
 end
 
 --------------------------------------------------------------------------------
--- The functions for dispatching EvtPlayerRequestDoAction.
+-- The functions for dispatching events.
 --------------------------------------------------------------------------------
 local function dispatchEvtPreviewBattleDamage(self, attackDamage, counterDamage)
     self.m_RootScriptEventDispatcher:dispatchEvent({
@@ -202,18 +204,31 @@ local function dispatchEvtPreviewNoBattleDatame(self)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtPreviewNoBattleDamage"})
 end
 
-local function dispatchEventJoinModelUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+--------------------------------------------------------------------------------
+-- The functions for sending actions to the server.
+--------------------------------------------------------------------------------
+local function createAndSendAction(rawAction)
+    rawAction.actionID         = SingletonGetters.getActionId() + 1
+    rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    WebSocketManager.sendAction(rawAction)
+
+    SingletonGetters.getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = true,
+    })
+end
+
+local function sendActionJoinModelUnit(self)
+    createAndSendAction({
         actionName   = "JoinModelUnit",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventAttack(self, targetGridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name            = "EvtPlayerRequestDoAction",
+local function sendActionAttack(self, targetGridIndex)
+    createAndSendAction({
         actionName      = "Attack",
         path            = createPathForDispatch(self.m_MovePath),
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
@@ -221,69 +236,62 @@ local function dispatchEventAttack(self, targetGridIndex)
     })
 end
 
-local function dispatchEventCaptureModelTile(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function sendActionCaptureModelTile(self)
+    createAndSendAction({
         actionName   = "CaptureModelTile",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventBuildModelTile(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function sendActionBuildModelTile(self)
+    createAndSendAction({
         actionName   = "BuildModelTile",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventProduceModelUnitOnUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
+local function sendActionProduceModelUnitOnUnit(self)
+    createAndSendAction({
         actionName = "ProduceModelUnitOnUnit",
         path       = createPathForDispatch(self.m_MovePath),
     })
 end
 
-local function dispatchEventSupplyModelUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function sendActionSupplyModelUnit(self)
+    createAndSendAction({
         actionName   = "SupplyModelUnit",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventWait(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function sendActionWait(self)
+    createAndSendAction({
         actionName   = "Wait",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventProduceOnTile(self, gridIndex, tiledID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name       = "EvtPlayerRequestDoAction",
+local function sendActionProduceOnTile(self, gridIndex, tiledID)
+    createAndSendAction({
         actionName = "ProduceOnTile",
         gridIndex  = GridIndexFunctions.clone(gridIndex),
         tiledID    = tiledID,
     })
 end
 
-local function dispatchEventLoadModelUnit(self)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
+local function sendActionLoadModelUnit(self)
+    createAndSendAction({
         actionName   = "LoadModelUnit",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
-local function dispatchEventDropModelUnit(self)
+local function sendActionDropModelUnit(self)
     local dropDestinations = {}
     for _, dropDestination in ipairs(self.m_SelectedDropDestinations) do
         dropDestinations[#dropDestinations + 1] = {
@@ -292,8 +300,7 @@ local function dispatchEventDropModelUnit(self)
         }
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name             = "EvtPlayerRequestDoAction",
+    createAndSendAction({
         actionName       = "DropModelUnit",
         path             = createPathForDispatch(self.m_MovePath),
         dropDestinations = dropDestinations,
@@ -301,9 +308,8 @@ local function dispatchEventDropModelUnit(self)
     })
 end
 
-local function dispatchEventLaunchSilo(self, targetGridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name            = "EvtPlayerRequestDoAction",
+local function sendActionLaunchSilo(self, targetGridIndex)
+    createAndSendAction({
         actionName      = "LaunchSilo",
         path            = createPathForDispatch(self.m_MovePath),
         targetGridIndex = targetGridIndex,
@@ -336,9 +342,9 @@ local function getActionLoadModelUnit(self)
             (loaderModelUnit.canLoadModelUnit)                                   and
             (loaderModelUnit:canLoadModelUnit(self.m_FocusModelUnit, tileType))) then
             return {
-                name     = LocalizationFunctions.getLocalizedText(78, "LoadModelUnit"),
+                name     = getLocalizedText(78, "LoadModelUnit"),
                 callback = function()
-                    dispatchEventLoadModelUnit(self)
+                    sendActionLoadModelUnit(self)
                 end
             }
         end
@@ -351,9 +357,9 @@ local function getActionJoinModelUnit(self)
         (existingModelUnit)                                          and
         (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "JoinModelUnit"),
+            name     = getLocalizedText(78, "JoinModelUnit"),
             callback = function()
-                dispatchEventJoinModelUnit(self)
+                sendActionJoinModelUnit(self)
             end
         }
     else
@@ -366,7 +372,7 @@ local function getActionAttack(self)
         return nil
     else
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "Attack"),
+            name     = getLocalizedText(78, "Attack"),
             callback = function()
                 setStateChoosingAttackTarget(self, getMovePathDestination(self.m_MovePath))
             end,
@@ -378,9 +384,9 @@ local function getActionCapture(self)
     local modelTile = self.m_ModelTileMap:getModelTile(getMovePathDestination(self.m_MovePath))
     if ((self.m_FocusModelUnit.canCaptureModelTile) and (self.m_FocusModelUnit:canCaptureModelTile(modelTile))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "CaptureModelTile"),
+            name     = getLocalizedText(78, "CaptureModelTile"),
             callback = function()
-                dispatchEventCaptureModelTile(self)
+                sendActionCaptureModelTile(self)
             end,
         }
     else
@@ -402,10 +408,10 @@ local function getActionBuildModelTile(self)
             :playAnimationForever(AnimationLoader.getTileAnimationWithTiledId(buildTiledId))
 
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "BuildModelTile"),
+            name     = getLocalizedText(78, "BuildModelTile"),
             icon     = icon,
             callback = function()
-                dispatchEventBuildModelTile(self)
+                sendActionBuildModelTile(self)
             end,
         }
     end
@@ -424,9 +430,9 @@ local function getActionSupplyModelUnit(self)
             (modelUnit ~= focusModelUnit)                   and
             (focusModelUnit:canSupplyModelUnit(modelUnit))) then
             return {
-                name     = LocalizationFunctions.getLocalizedText(78, "SupplyModelUnit"),
+                name     = getLocalizedText(78, "SupplyModelUnit"),
                 callback = function()
-                    dispatchEventSupplyModelUnit(self)
+                    sendActionSupplyModelUnit(self)
                 end,
             }
         end
@@ -442,7 +448,7 @@ local function getSingleActionLaunchModelUnit(self, unitID)
         :setScale(0.5)
 
     return {
-        name     = LocalizationFunctions.getLocalizedText(78, "LaunchModelUnit"),
+        name     = getLocalizedText(78, "LaunchModelUnit"),
         icon     = icon,
         callback = function()
             setStateMakingMovePath(self, beginningGridIndex, unitID)
@@ -478,7 +484,7 @@ local function getSingleActionDropModelUnit(self, unitID)
         :setScale(0.5)
 
     return {
-        name     = LocalizationFunctions.getLocalizedText(78, "DropModelUnit"),
+        name     = getLocalizedText(78, "DropModelUnit"),
         icon     = icon,
         callback = function()
             setStateChoosingDropDestination(self, unitID)
@@ -521,7 +527,7 @@ local function getActionLaunchSilo(self)
     if ((focusModelUnit.canLaunchSiloOnTileType) and
         (focusModelUnit:canLaunchSiloOnTileType(modelTile:getTileType()))) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "LaunchSilo"),
+            name     = getLocalizedText(78, "LaunchSilo"),
             callback = function()
                 setStateChoosingSiloTarget(self)
             end,
@@ -547,13 +553,13 @@ local function getActionProduceModelUnitOnUnit(self)
             :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(produceTiledId))
 
         return {
-            name        = LocalizationFunctions.getLocalizedText(78, "ProduceModelUnitOnUnit"),
+            name        = getLocalizedText(78, "ProduceModelUnitOnUnit"),
             icon        = icon,
             isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                                and
                 (focusModelUnit:getMovableProductionCost() <= self.m_LoggedInModelPlayer:getFund()) and
                 (focusModelUnit:getCurrentLoadCount() < focusModelUnit:getMaxLoadCount()),
             callback    = function()
-                dispatchEventProduceModelUnitOnUnit(self)
+                sendActionProduceModelUnitOnUnit(self)
             end,
         }
     end
@@ -563,9 +569,9 @@ local function getActionWait(self)
     local existingUnitModel = self.m_ModelUnitMap:getModelUnit(getMovePathDestination(self.m_MovePath))
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
-            name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
+            name     = getLocalizedText(78, "Wait"),
             callback = function()
-                dispatchEventWait(self)
+                sendActionWait(self)
             end
         }
     else
@@ -608,9 +614,9 @@ local function getAdditionalDropActionList(self)
         list[#list + 1] = action
     end
     list[#list + 1] = {
-        name     = LocalizationFunctions.getLocalizedText(78, "Wait"),
+        name     = getLocalizedText(78, "Wait"),
         callback = function()
-            dispatchEventDropModelUnit(self)
+            sendActionDropModelUnit(self)
         end,
     }
 
@@ -726,7 +732,7 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 
     for _, listItem in ipairs(productionList) do
         listItem.callback = function()
-            dispatchEventProduceOnTile(self, gridIndex, listItem.tiledID)
+            sendActionProduceOnTile(self, gridIndex, listItem.tiledID)
         end
     end
 
@@ -957,14 +963,14 @@ local function onEvtGridSelected(self, event)
             setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
         else
             if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, gridIndex)) then
-                dispatchEventAttack(self, gridIndex)
+                sendActionAttack(self, gridIndex)
             else
                 dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
             end
         end
     elseif (state == "choosingSiloTarget") then
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
-            dispatchEventLaunchSilo(self, gridIndex)
+            sendActionLaunchSilo(self, gridIndex)
         elseif (GridIndexFunctions.getDistance(gridIndex, self.m_CursorGridIndex) > 2) then
             setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
         end
@@ -972,7 +978,7 @@ local function onEvtGridSelected(self, event)
         if (isDropGridAvailable(gridIndex, self.m_AvailableDropGrids)) then
             pushBackDropDestination(self.m_SelectedDropDestinations, self.m_DroppingUnitID, gridIndex, self.m_ModelUnitMap:getLoadedModelUnitWithUnitId(self.m_DroppingUnitID))
             if (not canDoAdditionalDropAction(self)) then
-                dispatchEventDropModelUnit(self)
+                sendActionDropModelUnit(self)
             else
                 setStateChoosingAdditionalDropAction(self)
             end

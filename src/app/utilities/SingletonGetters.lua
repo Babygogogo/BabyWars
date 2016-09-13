@@ -11,6 +11,10 @@ function SingletonGetters.getModelSceneWar(sceneWarFileName)
         (SceneWarManager.getOngoingModelSceneWar(sceneWarFileName))
 end
 
+function SingletonGetters.getSceneWarFileName()
+    return SingletonGetters.getModelSceneWar():getFileName()
+end
+
 function SingletonGetters.getActionId(sceneWarFileName)
     return SingletonGetters.getModelSceneWar(sceneWarFileName):getActionId()
 end

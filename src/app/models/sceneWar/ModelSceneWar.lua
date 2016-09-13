@@ -57,8 +57,7 @@ local function requestReload(self, durationSec)
     dispatchEvtIsWaitingForServerResponse(self, true)
 
     local func = function()
-        self:getScriptEventDispatcher():dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
+        WebSocketManager.sendAction({
             actionName = "GetSceneWarData",
             fileName   = self.m_FileName,
         })
@@ -314,16 +313,6 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtPlayerRequestDoAction(self, event)
-    local request  = event
-    request.playerAccount,    request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
-    request.sceneWarFileName, request.actionID       = self.m_FileName, self.m_ActionID + 1
-
-    self:getModelMessageIndicator():showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtIsWaitingForServerResponse(self, true)
-    WebSocketManager.sendString(SerializationFunctions.toString(request))
-end
-
 local function onEvtReloadSceneWar(self, event)
     requestReload(self)
 end
@@ -356,8 +345,7 @@ end
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
-    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtReloadSceneWar", self)
+    dispatcher:addEventListener("EvtReloadSceneWar", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -471,8 +459,8 @@ end
 
 function ModelSceneWar:onEvent(event)
     local name = event.name
-    if     (name == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
-    elseif (name == "EvtReloadSceneWar")        then onEvtReloadSceneWar(       self, event)
+    if (name == "EvtReloadSceneWar") then
+        onEvtReloadSceneWar(self, event)
     end
 
     return self
@@ -493,6 +481,10 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:getActionId()
     return self.m_ActionID
+end
+
+function ModelSceneWar:getFileName()
+    return self.m_FileName
 end
 
 function ModelSceneWar:getModelMessageIndicator()
