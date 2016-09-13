@@ -43,16 +43,4 @@ function ActorManager.getRootActor()
     return s_RootActor
 end
 
-function ActorManager.getRootModelConfirmBox()
-    return s_RootActor:getModel():getModelConfirmBox()
-end
-
-function ActorManager.getRootModelMessageIndicator()
-    return s_RootActor:getModel():getModelMessageIndicator()
-end
-
-function ActorManager.getRootScriptEventDispatcher()
-    return s_RootActor:getModel():getScriptEventDispatcher()
-end
-
 return ActorManager

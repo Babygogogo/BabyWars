@@ -4,10 +4,10 @@ local ModelNewWarCreator = class("ModelNewWarCreator")
 local WarFieldList              = require("res.data.templateWarField.WarFieldList")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
-local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -73,7 +73,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
         local password = modelWarConfigurator:getPassword()
         if ((#password ~= 0) and (#password ~= 4)) then
-            ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(61))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
             WebSocketManager.sendAction({
                 actionName           = "NewWar",

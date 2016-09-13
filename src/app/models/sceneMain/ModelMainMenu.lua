@@ -3,8 +3,8 @@ local ModelMainMenu = class("ModelMainMenu")
 
 local AudioManager          = require("src.app.utilities.AudioManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -319,7 +319,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
 end
 
 function ModelMainMenu:onButtonExitTouched()
-    ActorManager.getRootModelConfirmBox():setConfirmText(getLocalizedText(66, "ExitGame"))
+    SingletonGetters.getModelConfirmBox():setConfirmText(getLocalizedText(66, "ExitGame"))
         :setOnConfirmYes(function()
             cc.Director:getInstance():endToLua()
         end)

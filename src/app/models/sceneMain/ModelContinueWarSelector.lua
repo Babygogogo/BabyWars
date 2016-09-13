@@ -11,6 +11,7 @@ local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
@@ -123,7 +124,7 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
         WebSocketManager.sendAction({
             actionName = "GetSceneWarData",
             fileName   = modelWarConfigurator:getSceneWarFileName(),
@@ -231,7 +232,7 @@ function ModelContinueWarSelector:doActionGetOngoingWarList(action)
     if ((self.m_View) and (self.m_IsEnabled)) then
         local warList = createOngoingWarList(self, action.list)
         if (#warList == 0) then
-            ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
         else
             self.m_View:showWarList(warList)
         end
@@ -256,7 +257,7 @@ function ModelContinueWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
         WebSocketManager.sendAction({
             actionName = "GetOngoingWarList",
         })

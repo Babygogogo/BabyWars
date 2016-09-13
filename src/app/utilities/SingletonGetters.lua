@@ -15,6 +15,10 @@ function SingletonGetters.getActionId(sceneWarFileName)
     return SingletonGetters.getModelSceneWar(sceneWarFileName):getActionId()
 end
 
+function SingletonGetters.getModelConfirmBox(sceneWarFileName)
+    return SingletonGetters.getModelSceneWar(sceneWarFileName):getModelConfirmBox()
+end
+
 function SingletonGetters.getModelMessageIndicator(sceneWarFileName)
     return SingletonGetters.getModelSceneWar(sceneWarFileName):getModelMessageIndicator()
 end

@@ -3,10 +3,10 @@ local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
-local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -153,7 +153,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
         local password = modelWarConfigurator:getPassword()
         if ((#password ~= 0) and (#password ~= 4)) then
-            ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(61))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
             WebSocketManager.sendAction({
                 actionName           = "JoinWar",
@@ -249,7 +249,7 @@ function ModelJoinWarSelector:doActionGetJoinableWarList(action)
     if ((self.m_View) and (self.m_IsEnabled)) then
         local warList = createJoinableWarList(self, action.list)
         if (#warList == 0) then
-            ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(60))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(60))
         else
             self.m_View:showWarList(warList)
         end
@@ -261,7 +261,7 @@ end
 function ModelJoinWarSelector:doActionJoinWar(action)
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
-    ActorManager.getRootModelMessageIndicator():showMessage(action.message)
+    SingletonGetters.getModelMessageIndicator():showMessage(action.message)
 
     return self
 end
@@ -306,7 +306,7 @@ end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
     if (#editBoxText ~= 4) then
-        ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(59))
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(59))
     else
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
         if (self.m_View) then

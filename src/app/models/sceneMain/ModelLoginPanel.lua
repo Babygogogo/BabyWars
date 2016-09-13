@@ -3,11 +3,11 @@ local ModelLoginPanel = class("ModelLoginPanel")
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local ActorManager          = require("src.global.actors.ActorManager")
 
-local getRootModelMessageIndicator = ActorManager.getRootModelMessageIndicator
-local getLocalizedText             = LocalizationFunctions.getLocalizedText
+local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
+local getLocalizedText         = LocalizationFunctions.getLocalizedText
 
 local GAME_VERSION      = GameConstantFunctions.getGameVersion()
 local WRITABLE_PATH     = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/"
@@ -91,15 +91,15 @@ end
 
 function ModelLoginPanel:onButtonRegisterTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        getRootModelMessageIndicator():showMessage(getLocalizedText(19))
+        getModelMessageIndicator():showMessage(getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        getRootModelMessageIndicator():showMessage(getLocalizedText(21, account))
+        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonRegisterForSecs(5)
         end
 
-        local modelConfirmBox = ActorManager.getRootModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 WebSocketManager.sendAction({
@@ -118,9 +118,9 @@ end
 
 function ModelLoginPanel:onButtonLoginTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        getRootModelMessageIndicator():showMessage(getLocalizedText(19))
+        getModelMessageIndicator():showMessage(getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        getRootModelMessageIndicator():showMessage(getLocalizedText(21, account))
+        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)

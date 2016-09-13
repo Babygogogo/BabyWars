@@ -4,9 +4,9 @@ local ModelSkillConfigurator = class("ModelSkillConfigurator")
 local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
-local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 local getDescription   = SkillDescriptionFunctions.getDescription
@@ -488,7 +488,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
     elseif (state == "stateOverviewConfiguration") then
-        local modelConfirmBox = ActorManager.getRootModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
         modelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
             :setOnConfirmYes(
                 function()
@@ -516,9 +516,9 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     assert(self.m_State == "stateOverviewConfiguration")
     local isConfigurationValid, err = self.m_ModelSkillConfiguration:isValid()
     if (not isConfigurationValid) then
-        ActorManager.getRootModelMessageIndicator():showMessage(err)
+        SingletonGetters.getModelMessageIndicator():showMessage(err)
     else
-        ActorManager.getRootModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
             actionName      = "SetSkillConfiguration",
             configurationID = self.m_ConfigurationID,
