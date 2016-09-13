@@ -91,55 +91,28 @@ function ModelWarHUD:initView()
     local view = self.m_View
     assert(view, "ModelWarHUD:initView() no view is attached to the actor of the model.")
 
-    view:setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
-        :setViewWarCommandMenu( self.m_ActorWarCommandMenu:getView())
-        :setViewActionMenu(     self.m_ActorActionMenu:getView())
-        :setViewTileInfo(       self.m_ActorTileInfo:getView())
-        :setViewTileDetail(     self.m_ActorTileDetail:getView())
-        :setViewUnitInfo(       self.m_ActorUnitInfo:getView())
-        :setViewUnitDetail(     self.m_ActorUnitDetail:getView())
-        :setViewBattleInfo(     self.m_ActorBattleInfo:getView())
+    view:setViewActionMenu(     self.m_ActorActionMenu:     getView())
+        :setViewBattleInfo(     self.m_ActorBattleInfo:     getView())
+        :setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
+        :setViewTileDetail(     self.m_ActorTileDetail:     getView())
+        :setViewTileInfo(       self.m_ActorTileInfo:       getView())
+        :setViewUnitDetail(     self.m_ActorUnitDetail:     getView())
+        :setViewUnitInfo(       self.m_ActorUnitInfo:       getView())
+        :setViewWarCommandMenu( self.m_ActorWarCommandMenu: getView())
 
     return self
 end
 
-function ModelWarHUD:setModelWarField(model)
-    self.m_ActorUnitInfo:getModel():setModelUnitMap(model:getModelUnitMap())
-    self.m_ActorTileInfo:getModel():setModelTileMap(model:getModelTileMap())
-
-    return self
-end
-
-function ModelWarHUD:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_ActorActionMenu     :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorMoneyEnergyInfo:getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorTileInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorUnitInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorBattleInfo     :getModel():setRootScriptEventDispatcher(dispatcher)
-
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function ModelWarHUD:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelWarHUD:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher = nil
-
-    self.m_ActorActionMenu     :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorMoneyEnergyInfo:getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorTileInfo       :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorUnitInfo       :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorBattleInfo     :getModel():unsetRootScriptEventDispatcher()
-
-    return self
-end
-
-function ModelWarHUD:onStartRunning()
-    self.m_ActorWarCommandMenu:getModel():onStartRunning()
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function ModelWarHUD:onStartRunning(sceneWarFileName)
+    self.m_ActorActionMenu     :getModel():onStartRunning(sceneWarFileName)
+    self.m_ActorBattleInfo     :getModel():onStartRunning(sceneWarFileName)
+    self.m_ActorMoneyEnergyInfo:getModel():onStartRunning(sceneWarFileName)
+    self.m_ActorTileInfo       :getModel():onStartRunning(sceneWarFileName)
+    self.m_ActorUnitInfo       :getModel():onStartRunning(sceneWarFileName)
+    self.m_ActorWarCommandMenu :getModel():onStartRunning(sceneWarFileName)
 
     return self
 end
