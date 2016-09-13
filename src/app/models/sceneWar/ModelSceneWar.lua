@@ -342,7 +342,6 @@ end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
-
     doAction(self, param.action)
 end
 
