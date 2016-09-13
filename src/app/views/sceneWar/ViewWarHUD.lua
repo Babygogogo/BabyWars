@@ -65,15 +65,6 @@ function ViewWarHUD:ctor(param)
     return self
 end
 
-function ViewWarHUD:setViewConfirmBox(view)
-    assert(self.m_ViewConfirmBox == nil, "ViewWarHUD:setViewConfirmBox() the view has been set.")
-
-    self.m_ViewConfirmBox = view
-    self:addChild(view, CONFIRM_BOX_Z_ORDER)
-
-    return self
-end
-
 function ViewWarHUD:setViewMoneyEnergyInfo(view)
     assert(self.m_ViewMoneyEnergyInfo == nil, "ViewWarHUD:setViewMoneyEnergyInfo() the view has been set.")
 

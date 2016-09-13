@@ -350,6 +350,13 @@ local function initScriptEventDispatcher(self)
     self.m_ScriptEventDispatcher = dispatcher
 end
 
+local function initActorConfirmBox(self)
+    local actor = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
+    actor:getModel():setEnabled(false)
+
+    self.m_ActorConfirmBox = actor
+end
+
 local function initActorMessageIndicator(self)
     local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
 
@@ -382,8 +389,6 @@ local function initActorWarHud(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
     actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
         :setModelWarField(self:getModelWarField())
-        :setModelPlayerManager(self:getModelPlayerManager())
-        :setModelMessageIndicator(self:getModelMessageIndicator())
 
     self.m_ActorWarHud = actor
 end
@@ -404,6 +409,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_ActionID   = sceneData.actionID
 
     initScriptEventDispatcher(self)
+    initActorConfirmBox(      self)
     initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
     initActorWeatherManager(  self, sceneData.weather)
@@ -420,10 +426,11 @@ end
 
 function ModelSceneWar:initView()
     assert(self.m_View, "ModelSceneWar:initView() no view is attached to the owner actor of the model.")
-    self.m_View:setViewWarField( self.m_ActorWarField        :getView())
-        :setViewWarHud(          self.m_ActorWarHud          :getView())
-        :setViewTurnManager(     self.m_ActorTurnManager     :getView())
-        :setViewMessageIndicator(self.m_ActorMessageIndicator:getView())
+    self.m_View:setViewConfirmBox(self.m_ActorConfirmBox      :getView())
+        :setViewWarField(         self.m_ActorWarField        :getView())
+        :setViewWarHud(           self.m_ActorWarHud          :getView())
+        :setViewTurnManager(      self.m_ActorTurnManager     :getView())
+        :setViewMessageIndicator( self.m_ActorMessageIndicator:getView())
 
     return self
 end
@@ -432,6 +439,8 @@ end
 -- The callback functions on start/stop running/script/web socket events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
+    self.m_ActorWarHud:getModel():onStartRunning(self:getFileName())
+
     local modelTurnManager = self:getModelTurnManager()
     local playerIndex      = modelTurnManager:getPlayerIndex()
     self:getScriptEventDispatcher():dispatchEvent({
@@ -485,6 +494,10 @@ end
 
 function ModelSceneWar:getFileName()
     return self.m_FileName
+end
+
+function ModelSceneWar:getModelConfirmBox()
+    return self.m_ActorConfirmBox:getModel()
 end
 
 function ModelSceneWar:getModelMessageIndicator()

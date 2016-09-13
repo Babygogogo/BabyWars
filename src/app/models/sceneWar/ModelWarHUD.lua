@@ -7,7 +7,6 @@
 --
 -- 其他：
 --  - ModelWarHUD目前由以下子actor组成：
---    - ConfirmBox
 --    - WarCommandMenu
 --    - MoneyEnergyInfo
 --    - ActionMenu
@@ -25,13 +24,8 @@ local Actor = require("src.global.actors.Actor")
 --------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
-local function initActorConfirmBox(self)
-    self.m_ActorConfirmBox = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
-end
-
 local function initActorWarCommandMenu(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarCommandMenu", nil, "sceneWar.ViewWarCommandMenu")
-    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
 
     self.m_ActorWarCommandMenu = actor
 end
@@ -77,7 +71,6 @@ end
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarHUD:ctor(param)
-    initActorConfirmBox(     self)
     initActorWarCommandMenu( self)
     initActorMoneyEnergyInfo(self)
     initActorActionMenu(     self)
@@ -98,8 +91,7 @@ function ModelWarHUD:initView()
     local view = self.m_View
     assert(view, "ModelWarHUD:initView() no view is attached to the actor of the model.")
 
-    view:setViewConfirmBox(     self.m_ActorConfirmBox:getView())
-        :setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
+    view:setViewMoneyEnergyInfo(self.m_ActorMoneyEnergyInfo:getView())
         :setViewWarCommandMenu( self.m_ActorWarCommandMenu:getView())
         :setViewActionMenu(     self.m_ActorActionMenu:getView())
         :setViewTileInfo(       self.m_ActorTileInfo:getView())
@@ -112,22 +104,8 @@ function ModelWarHUD:initView()
 end
 
 function ModelWarHUD:setModelWarField(model)
-    assert(self.m_ModelWarField == nil, "ModelWarHUD:setModelWarField() the model has been set.")
-    self.m_ActorWarCommandMenu:getModel():setModelWarField(model)
     self.m_ActorUnitInfo:getModel():setModelUnitMap(model:getModelUnitMap())
     self.m_ActorTileInfo:getModel():setModelTileMap(model:getModelTileMap())
-
-    return self
-end
-
-function ModelWarHUD:setModelPlayerManager(model)
-    self.m_ActorWarCommandMenu:getModel():setModelPlayerManager(model)
-
-    return self
-end
-
-function ModelWarHUD:setModelMessageIndicator(model)
-    self.m_ActorWarCommandMenu:getModel():setModelMessageIndicator(model)
 
     return self
 end
@@ -136,7 +114,6 @@ function ModelWarHUD:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarHUD:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self.m_ActorActionMenu     :getModel():setRootScriptEventDispatcher(dispatcher)
-    self.m_ActorWarCommandMenu :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorMoneyEnergyInfo:getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorTileInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
     self.m_ActorUnitInfo       :getModel():setRootScriptEventDispatcher(dispatcher)
@@ -153,11 +130,16 @@ function ModelWarHUD:unsetRootScriptEventDispatcher()
     self.m_RootScriptEventDispatcher = nil
 
     self.m_ActorActionMenu     :getModel():unsetRootScriptEventDispatcher()
-    self.m_ActorWarCommandMenu :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorMoneyEnergyInfo:getModel():unsetRootScriptEventDispatcher()
     self.m_ActorTileInfo       :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorUnitInfo       :getModel():unsetRootScriptEventDispatcher()
     self.m_ActorBattleInfo     :getModel():unsetRootScriptEventDispatcher()
+
+    return self
+end
+
+function ModelWarHUD:onStartRunning()
+    self.m_ActorWarCommandMenu:getModel():onStartRunning()
 
     return self
 end
