@@ -3,7 +3,7 @@ local MovableUnitProducer = require("src.global.functions.class")("MovableUnitPr
 
 local Producible            = require("src.app.components.Producible")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local Actor                 = require("src.global.actors.Actor")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 MovableUnitProducer.EXPORTED_METHODS = {
@@ -26,16 +26,11 @@ function MovableUnitProducer:loadTemplate(template)
     return self
 end
 
-function MovableUnitProducer:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "MovableUnitProducer:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function MovableUnitProducer:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "MovableUnitProducer:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function MovableUnitProducer:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -55,7 +50,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function MovableUnitProducer:getMovableProductionCost()
-    return Producible.getProductionCostWithTiledId(self:getMovableProductionTiledId(), self.m_ModelPlayerManager)
+    return Producible.getProductionCostWithTiledId(self:getMovableProductionTiledId(), SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName))
 end
 
 function MovableUnitProducer:getMovableProductionTiledId()

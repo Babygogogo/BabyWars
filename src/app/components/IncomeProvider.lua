@@ -13,8 +13,9 @@
 
 local IncomeProvider = require("src.global.functions.class")("IncomeProvider")
 
-local ComponentManager       = require("src.global.components.ComponentManager")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 IncomeProvider.EXPORTED_METHODS = {
     "getIncomeAmount",
@@ -48,16 +49,11 @@ function IncomeProvider:loadInstantialData(data)
     return self
 end
 
-function IncomeProvider:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "IncomeProvider:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function IncomeProvider:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "IncomeProvider:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function IncomeProvider:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -71,7 +67,7 @@ function IncomeProvider:getIncomeAmount()
     if (playerIndex < 1) then
         return baseAmount
     else
-        local modelSkillConfiguration = self.m_ModelPlayerManager:getModelPlayer(playerIndex):getModelSkillConfiguration()
+        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration()
         local modifier                = SkillModifierFunctions.getIncomeModifier(modelSkillConfiguration)
         return round(baseAmount * (100 + modifier) / 100)
     end
