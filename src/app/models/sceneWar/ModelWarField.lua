@@ -168,6 +168,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onStartRunning(sceneWarFileName)
+    self:getModelTileMap():onStartRunning(sceneWarFileName)
+    self:getModelUnitMap():onStartRunning(sceneWarFileName)
     if (not IS_SERVER) then
         self.m_ActorActionPlanner:getModel():onStartRunning(sceneWarFileName)
         self.m_ActorGridEffect   :getModel():onStartRunning(sceneWarFileName)

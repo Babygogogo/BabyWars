@@ -358,8 +358,18 @@ function ModelUnitMap:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelUnitMap:onStartRunning(sceneWarFileName)
+    local func = function(modelUnit)
+        modelUnit:onStartRunning(sceneWarFileName)
+    end
+    self:forEachModelUnitOnMap( func)
+        :forEachModelUnitLoaded(func)
+
+    return self
+end
+
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)

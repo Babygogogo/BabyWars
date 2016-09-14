@@ -182,6 +182,15 @@ function ModelTile:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function ModelTile:onStartRunning(sceneWarFileName)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelTile:doActionMoveModelUnit(action)

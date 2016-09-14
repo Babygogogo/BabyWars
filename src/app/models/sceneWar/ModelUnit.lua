@@ -196,8 +196,14 @@ function ModelUnit:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelUnit:onStartRunning(sceneWarFileName)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
+
+    return self
+end
+
 function ModelUnit:onEvent(event)
     local name = event.name
     if (name == "EvtTurnPhaseResetUnitState") then

@@ -247,8 +247,16 @@ function ModelTileMap:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelTileMap:onStartRunning(sceneWarFileName)
+    self:forEachModelTile(function(modelTile)
+        modelTile:onStartRunning(sceneWarFileName)
+    end)
+
+    return self
+end
+
 function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
