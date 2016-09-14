@@ -431,6 +431,7 @@ function ModelSceneWar:onStartRunning()
     self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
     self:getModelTurnManager()   :onStartRunning(sceneWarFileName)
     self:getModelPlayerManager() :onStartRunning(sceneWarFileName)
+    self:getModelWarField()      :onStartRunning(sceneWarFileName)
 
     local modelTurnManager = self:getModelTurnManager()
     local playerIndex      = modelTurnManager:getPlayerIndex()

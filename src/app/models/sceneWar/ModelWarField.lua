@@ -17,7 +17,6 @@
 local ModelWarField = require("src.global.functions.class")("ModelWarField")
 
 local Actor              = require("src.global.actors.Actor")
-local TypeChecker        = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
 local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
@@ -61,8 +60,6 @@ end
 
 local function initActorActionPlanner(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
-    actor:getModel():setModelTileMap(self:getModelTileMap())
-        :setModelUnitMap(self:getModelUnitMap())
 
     self.m_ActorActionPlanner = actor
 end
@@ -85,13 +82,16 @@ end
 function ModelWarField:ctor(warFieldData)
     initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
+
+    local tileMapSize = self:getModelTileMap():getMapSize()
+    local unitMapSize = self:getModelUnitMap():getMapSize()
+    assert((tileMapSize.width == unitMapSize.width) and (tileMapSize.height == unitMapSize.height))
+
     if (not IS_SERVER) then
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
         initActorGridEffect(   self)
     end
-
-    assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
 
     if (self.m_View) then
         self:initView()
@@ -120,7 +120,6 @@ function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
         self.m_ActorGridEffect   :getModel():setRootScriptEventDispatcher(dispatcher)
     end
 
@@ -139,7 +138,6 @@ function ModelWarField:unsetRootScriptEventDispatcher()
     self:getModelUnitMap():unsetRootScriptEventDispatcher()
     if (not IS_SERVER) then
         self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
         self.m_ActorGridEffect   :getModel():unsetRootScriptEventDispatcher()
     end
 
@@ -154,9 +152,6 @@ end
 function ModelWarField:setModelPlayerManager(model)
     self:getModelUnitMap():setModelPlayerManager(model)
     self:getModelTileMap():setModelPlayerManager(model)
-    if (not IS_SERVER) then
-        self.m_ActorActionPlanner:getModel():setModelPlayerManager(model)
-    end
 
     return self
 end
@@ -178,8 +173,16 @@ function ModelWarField:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelWarField:onStartRunning(sceneWarFileName)
+    if (not IS_SERVER) then
+        self.m_ActorActionPlanner:getModel():onStartRunning(sceneWarFileName)
+    end
+
+    return self
+end
+
 function ModelWarField:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDragField")            then onEvtDragField(           self, event)
