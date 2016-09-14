@@ -117,7 +117,6 @@ function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
     self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
-    self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDragField",      self)
@@ -142,14 +141,7 @@ function ModelWarField:unsetRootScriptEventDispatcher()
 end
 
 function ModelWarField:setModelPlayerManager(model)
-    self:getModelUnitMap():setModelPlayerManager(model)
     self:getModelTileMap():setModelPlayerManager(model)
-
-    return self
-end
-
-function ModelWarField:setModelWeatherManager(model)
-    self:getModelUnitMap():setModelWeatherManager(model)
 
     return self
 end

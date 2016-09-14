@@ -12,11 +12,10 @@
 
 local ModelUnit = require("src.global.functions.class")("ModelUnit")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 --------------------------------------------------------------------------------
@@ -62,20 +61,6 @@ local function dispatchEvtAttackViewTile(dispatcher, gridIndex)
         name      = "EvtAttackViewTile",
         gridIndex = gridIndex,
     })
-end
-
---------------------------------------------------------------------------------
--- The callback functions on EvtTurnPhaseResetUnitState.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseResetUnitState(self, event)
-    if (self:getPlayerIndex() == event.playerIndex) then
-        self:setStateIdle()
-
-        if (self.m_View) then
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-        end
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -140,40 +125,6 @@ function ModelUnit:initView()
         :updateView()
 end
 
-function ModelUnit:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnit:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseResetUnitState", self)
-    ComponentManager.callMethodForAllComponents(self, "setRootScriptEventDispatcher", dispatcher)
-
-    return self
-end
-
-function ModelUnit:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelUnit:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseResetUnitState", self)
-    self.m_RootScriptEventDispatcher = nil
-    ComponentManager.callMethodForAllComponents(self, "unsetRootScriptEventDispatcher")
-
-    return self
-end
-
-function ModelUnit:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "ModelUnit:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-    ComponentManager.callMethodForAllComponents(self, "setModelPlayerManager", model)
-
-    return self
-end
-
-function ModelUnit:setModelWeatherManager(model)
-    assert(self.m_ModelWeatherManager == nil, "ModelUnit:setModelWeatherManager() the model has been set already.")
-    self.m_ModelWeatherManager = model
-    ComponentManager.callMethodForAllComponents(self, "setModelWeatherManager", model)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -199,16 +150,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnit:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
-
-    return self
-end
-
-function ModelUnit:onEvent(event)
-    local name = event.name
-    if (name == "EvtTurnPhaseResetUnitState") then
-        onEvtTurnPhaseResetUnitState(self, event)
-    end
 
     return self
 end
@@ -268,7 +211,7 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
     local selfGridIndex       = self:getGridIndex()
     local targetGridIndex     = action.targetGridIndex
     local isTargetUnit        = attackTarget.getUnitType
-    local dispatcher          = self.m_RootScriptEventDispatcher
+    local dispatcher          = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
 
     if (shouldDestroySelf) then
         attackTarget:doActionPromoteModelUnit()
@@ -325,9 +268,9 @@ function ModelUnit:doActionJoinModelUnit(action, target)
     local joinIncome = self:getJoinIncome(target)
     if (joinIncome ~= 0) then
         local playerIndex = self:getPlayerIndex()
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(playerIndex)
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex)
         modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
-        self.m_RootScriptEventDispatcher:dispatchEvent({
+        SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
             name        = "EvtModelPlayerUpdated",
             modelPlayer = modelPlayer,
             playerIndex = playerIndex,
@@ -336,7 +279,6 @@ function ModelUnit:doActionJoinModelUnit(action, target)
 
     target:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
-    self:unsetRootScriptEventDispatcher()
 
     if (self.m_View) then
         self.m_View:moveAlongPath(action.path, function()
@@ -377,7 +319,7 @@ function ModelUnit:doActionLaunchSilo(action, modelUnitMap, silo)
                 :showNormalAnimation()
             silo:updateView()
 
-            local dispatcher  = self.m_RootScriptEventDispatcher
+            local dispatcher  = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
             local mapSize     = modelUnitMap:getMapSize()
             local isWithinMap = GridIndexFunctions.isWithinMap
             for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
@@ -437,7 +379,7 @@ function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
             self.m_View:updateWithModelUnit(self)
                 :showNormalAnimation()
 
-            local eventDispatcher = self.m_RootScriptEventDispatcher
+            local eventDispatcher = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
             for _, target in pairs(targetModelUnits) do
                 target:updateView()
                 eventDispatcher:dispatchEvent({

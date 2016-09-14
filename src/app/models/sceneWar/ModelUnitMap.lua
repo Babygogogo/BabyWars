@@ -138,7 +138,6 @@ local function onEvtDestroyModelUnit(self, event)
         for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
             local loadedActorUnit = self.m_LoadedActorUnits[unitID]
             self.m_LoadedActorUnits[unitID] = nil
-            loadedActorUnit:getModel():unsetRootScriptEventDispatcher()
 
             local loadedViewUnit = loadedActorUnit:getView()
             if (loadedViewUnit) then
@@ -149,7 +148,6 @@ local function onEvtDestroyModelUnit(self, event)
 
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
     modelUnit:doActionDestroyModelUnit(event)
-        :unsetRootScriptEventDispatcher()
 
     getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
@@ -207,6 +205,19 @@ local function onEvtTurnPhaseResetSkillState(self, event)
                 end
             end)
     end
+end
+
+local function onEvtTurnPhaseResetUnitState(self, event)
+    local playerIndex = event.playerIndex
+    local func = function(modelUnit)
+        if (modelUnit:getPlayerIndex() == playerIndex) then
+            modelUnit:setStateIdle()
+                :updateView()
+        end
+    end
+
+    self:forEachModelUnitOnMap( func)
+        :forEachModelUnitLoaded(func)
 end
 
 local function onEvtTurnPhaseSupplyUnit(self, event)
@@ -380,44 +391,6 @@ function ModelUnitMap:initView()
     return self
 end
 
-function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
-    local setEventDispatcher = function(modelUnit)
-        modelUnit:setRootScriptEventDispatcher(dispatcher)
-    end
-    self:forEachModelUnitOnMap(setEventDispatcher)
-        :forEachModelUnitLoaded(setEventDispatcher)
-
-    return self
-end
-
-function ModelUnitMap:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "ModelUnitMap:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-            modelUnit:setModelPlayerManager(model)
-        end)
-        :forEachModelUnitLoaded(function(modelUnit)
-            modelUnit:setModelPlayerManager(model)
-        end)
-
-    return self
-end
-
-function ModelUnitMap:setModelWeatherManager(model)
-    assert(self.m_ModelWeatherManager == nil, "ModelUnitMap:setModelWeatherManager() the model has been set already.")
-    self.m_ModelWeatherManager = model
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-            modelUnit:setModelWeatherManager(model)
-        end)
-        :forEachModelUnitLoaded(function(modelUnit)
-            modelUnit:setModelWeatherManager(model)
-        end)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -455,6 +428,7 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
         :addEventListener("EvtDestroyModelUnit",         self)
         :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :addEventListener("EvtTurnPhaseResetSkillState", self)
+        :addEventListener("EvtTurnPhaseResetUnitState",  self)
         :addEventListener("EvtTurnPhaseSupplyUnit",      self)
         :addEventListener("EvtSkillGroupActivated",      self)
 
@@ -466,6 +440,7 @@ function ModelUnitMap:onEvent(event)
     if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)
     elseif (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
     elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
+    elseif (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
     elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
     elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
     end
@@ -590,9 +565,6 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
     producedActorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
-        :setRootScriptEventDispatcher(getScriptEventDispatcher(self.m_SceneWarFileName))
-        :setModelPlayerManager(self.m_ModelPlayerManager)
-        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
 
     self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
@@ -667,9 +639,6 @@ function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
     actorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
-        :setRootScriptEventDispatcher(getScriptEventDispatcher(self.m_SceneWarFileName))
-        :setModelPlayerManager(self.m_ModelPlayerManager)
-        :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
         :updateView()
 

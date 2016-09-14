@@ -66,15 +66,14 @@ function UnitProducer:canProduceUnitWithTiledId(tiledID)
 end
 
 function UnitProducer:getProductionList()
-    local modelPlayerManager = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName)
-    local playerIndex        = self.m_Owner:getPlayerIndex()
-    local fund               = modelPlayerManager:getModelPlayer(playerIndex):getFund()
-    local list               = {}
+    local playerIndex = self.m_Owner:getPlayerIndex()
+    local fund        = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getFund()
+    local list        = {}
 
     for i, unitName in ipairs(self.m_Template.productionList) do
         local tiledID   = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
         local modelUnit = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID})
-        modelUnit:setModelPlayerManager(modelPlayerManager)
+        modelUnit:onStartRunning(self.m_SceneWarFileName)
         local cost      = modelUnit:getProductionCost()
 
         list[i] = {
