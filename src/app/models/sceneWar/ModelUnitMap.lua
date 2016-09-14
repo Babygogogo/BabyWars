@@ -18,9 +18,8 @@
 
 local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
-local TypeChecker        = require("src.app.utilities.TypeChecker")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local TableFunctions     = require("src.app.utilities.TableFunctions")
+local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local Actor              = require("src.global.actors.Actor")
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
@@ -153,6 +152,45 @@ local function onEvtDestroyModelUnit(self, event)
     self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
+local function onEvtTurnPhaseConsumeUnitFuel(self, event)
+    if (event.turnIndex <= 1) then
+        return
+    end
+
+    local playerIndex  = event.playerIndex
+    local modelTileMap = SingletonGetters.getModelTileMap(self.m_SceneWarFileName)
+    local dispatcher   = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
+
+    self:forEachModelUnitOnMap(function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and
+            (modelUnit.getCurrentFuel))                 then
+            local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
+            modelUnit:setCurrentFuel(newFuel)
+                :updateView()
+
+            if ((newFuel == 0) and (modelUnit:shouldDestroyOnOutOfFuel())) then
+                local gridIndex = modelUnit:getGridIndex()
+                local modelTile = modelTileMap:getModelTile(gridIndex)
+
+                if ((not modelTile.getRepairAmount) or (not modelTile:getRepairAmount(modelUnit))) then
+                    dispatcher:dispatchEvent({
+                            name      = "EvtDestroyModelUnit",
+                            gridIndex = gridIndex,
+                        })
+                        :dispatchEvent({
+                            name      = "EvtDestroyViewUnit",
+                            gridIndex = gridIndex,
+                        })
+
+                    if (modelUnit.m_View) then
+                        modelUnit.m_View:removeFromParent()
+                    end
+                end
+            end
+        end
+    end)
+end
+
 local function onEvtTurnPhaseResetSkillState(self, event)
     if (self.m_View) then
         local playerIndex = event.playerIndex
@@ -277,6 +315,7 @@ function ModelUnitMap:setRootScriptEventDispatcher(dispatcher)
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDestroyModelUnit",   self)
+        :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :addEventListener("EvtTurnPhaseResetSkillState", self)
         :addEventListener("EvtSkillGroupActivated",      self)
 
@@ -294,6 +333,7 @@ function ModelUnitMap:unsetRootScriptEventDispatcher()
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtSkillGroupActivated", self)
         :removeEventListener("EvtTurnPhaseResetSkillState", self)
+        :removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :removeEventListener("EvtDestroyModelUnit",         self)
 
     self.m_RootScriptEventDispatcher = nil
@@ -361,6 +401,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnitMap:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
     local func = function(modelUnit)
         modelUnit:onStartRunning(sceneWarFileName)
     end
@@ -373,6 +414,7 @@ end
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)
+    elseif (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
     elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
     elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
     end
@@ -496,7 +538,8 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
 
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
-    producedActorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+    producedActorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
+        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
         :setModelPlayerManager(self.m_ModelPlayerManager)
         :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()
@@ -572,7 +615,8 @@ end
 function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
-    actorUnit:getModel():setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
+    actorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
+        :setRootScriptEventDispatcher(self.m_RootScriptEventDispatcher)
         :setModelPlayerManager(self.m_ModelPlayerManager)
         :setModelWeatherManager(self.m_ModelWeatherManager)
         :setStateActioned()

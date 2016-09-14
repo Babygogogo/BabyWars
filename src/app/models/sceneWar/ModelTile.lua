@@ -185,6 +185,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function ModelTile:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
 
     return self
@@ -264,7 +265,8 @@ function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
         :unsetModelPlayerManager()
     initWithTiledID(self, objectID, baseID)
     loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
-    self:setModelPlayerManager(modelPlayerManager)
+    self:onStartRunning(self.m_SceneWarFileName)
+        :setModelPlayerManager(modelPlayerManager)
         :setRootScriptEventDispatcher(dispatcher)
 
     return self
@@ -302,7 +304,8 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
             GridIndexable = {gridIndex           = gridIndex},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
-        self:setModelPlayerManager(modelPlayerManager)
+        self:onStartRunning(self.m_SceneWarFileName)
+            :setModelPlayerManager(modelPlayerManager)
             :setRootScriptEventDispatcher(dispatcher)
     end
 
