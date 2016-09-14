@@ -27,7 +27,10 @@
 local ModelMapCursor = class("ModelMapCursor")
 
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local ComponentManager   = require("src.global.components.ComponentManager")
+
+local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 
@@ -35,14 +38,14 @@ local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 -- The util functions.
 --------------------------------------------------------------------------------
 local function dispatchEvtMapCursorMoved(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher():dispatchEvent({
         name      = "EvtMapCursorMoved",
         gridIndex = gridIndex,
     })
 end
 
 local function dispatchEvtGridSelected(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    getScriptEventDispatcher():dispatchEvent({
         name      = "EvtGridSelected",
         gridIndex = gridIndex,
     })
@@ -107,7 +110,7 @@ local function createTouchListener(self)
             (cc.pDistanceSQ(touches[1]:getLocation(), initialTouchPosition) > DRAG_FIELD_TRIGGER_DISTANCE_SQUARED)
 
         if (touchesCount >= 2) then
-            self.m_RootScriptEventDispatcher:dispatchEvent({
+            getScriptEventDispatcher():dispatchEvent({
                 name    = "EvtZoomFieldWithTouches",
                 touches = touches,
             })
@@ -121,7 +124,7 @@ local function createTouchListener(self)
                 end
             else
                 if (isTouchMoved) then
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
+                    getScriptEventDispatcher():dispatchEvent({
                         name             = "EvtDragField",
                         previousPosition = touches[1]:getPreviousLocation(),
                         currentPosition  = touches[1]:getLocation()
@@ -158,9 +161,9 @@ local function createTouchListener(self)
     return touchListener
 end
 
-local function createMouseListener(model)
+local function createMouseListener()
     local function onMouseScroll(event)
-        model.m_RootScriptEventDispatcher:dispatchEvent({
+        getScriptEventDispatcher():dispatchEvent({
             name        = "EvtZoomFieldWithScroll",
             scrollEvent = event
         })
@@ -180,8 +183,10 @@ function ModelMapCursor:ctor(param)
         ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {gridIndex = param.gridIndex or {x = 1, y = 1}}})
     end
 
-    assert(param.mapSize, "ModelMapCursor:ctor() param.mapSize expected.")
-    self:setMapSize(param.mapSize)
+    self.m_MapSize = {
+        width  = param.mapSize.width,
+        height = param.mapSize.height,
+    }
 
     if (self.m_View) then
         self:initView()
@@ -196,7 +201,7 @@ function ModelMapCursor:initView()
 
     self:setViewPositionWithGridIndex()
     view:setTouchListener(createTouchListener(self))
-        :setMouseListener(createMouseListener(self))
+        :setMouseListener(createMouseListener())
 
         :setNormalCursorVisible(true)
         :setTargetCursorVisible(false)
@@ -204,19 +209,12 @@ function ModelMapCursor:initView()
     return self
 end
 
-function ModelMapCursor:setMapSize(size)
-    self.m_MapSize = self.m_MapSize or {}
-    self.m_MapSize.width  = size.width
-    self.m_MapSize.height = size.height
-
-    return self
-end
-
-function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelMapCursor:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtGridSelected",              self)
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+function ModelMapCursor:onStartRunning(sceneWarFileName)
+    getScriptEventDispatcher()
+        :addEventListener("EvtGridSelected",                    self)
         :addEventListener("EvtMapCursorMoved",                  self)
         :addEventListener("EvtPreviewBattleDamage",             self)
         :addEventListener("EvtPreviewNoBattleDamage",           self)
@@ -230,27 +228,6 @@ function ModelMapCursor:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelMapCursor:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelMapCursor:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtWarCommandMenuUpdated", self)
-        :removeEventListener("EvtSceneWarStarted",                 self)
-        :removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
-        :removeEventListener("EvtActionPlannerChoosingAction",     self)
-        :removeEventListener("EvtActionPlannerMakingMovePath",     self)
-        :removeEventListener("EvtActionPlannerIdle",               self)
-        :removeEventListener("EvtPreviewNoBattleDamage",           self)
-        :removeEventListener("EvtPreviewBattleDamage",             self)
-        :removeEventListener("EvtMapCursorMoved",                  self)
-        :removeEventListener("EvtGridSelected",                    self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(         self, event)

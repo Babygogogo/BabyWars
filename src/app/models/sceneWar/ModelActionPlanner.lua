@@ -1045,7 +1045,8 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
             self.m_LoggedInPlayerIndex = playerIndex
         end
     end)
-    assert(self.m_LoggedInPlayerIndex)
+    assert(self.m_LoggedInPlayerIndex,
+        "ModelActionPlanner:onStartRunning() failed to find the player index for the logged-in player.")
 
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap():getMapSize())

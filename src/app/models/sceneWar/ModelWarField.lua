@@ -118,10 +118,6 @@ function ModelWarField:setRootScriptEventDispatcher(dispatcher)
 
     self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
     self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
-    if (not IS_SERVER) then
-        self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorGridEffect   :getModel():setRootScriptEventDispatcher(dispatcher)
-    end
 
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDragField",      self)
@@ -136,10 +132,6 @@ function ModelWarField:unsetRootScriptEventDispatcher()
 
     self:getModelTileMap():unsetRootScriptEventDispatcher()
     self:getModelUnitMap():unsetRootScriptEventDispatcher()
-    if (not IS_SERVER) then
-        self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorGridEffect   :getModel():unsetRootScriptEventDispatcher()
-    end
 
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
         :removeEventListener("EvtZoomFieldWithScroll", self)
@@ -178,6 +170,8 @@ end
 function ModelWarField:onStartRunning(sceneWarFileName)
     if (not IS_SERVER) then
         self.m_ActorActionPlanner:getModel():onStartRunning(sceneWarFileName)
+        self.m_ActorGridEffect   :getModel():onStartRunning(sceneWarFileName)
+        self.m_ActorMapCursor    :getModel():onStartRunning(sceneWarFileName)
     end
 
     return self
