@@ -216,15 +216,31 @@ local function onEvtTurnPhaseSupplyUnit(self, event)
     local dispatchEvtSupplyViewUnit = function(gridIndex)
         dispatcher:dispatchEvent({
             name      = "EvtSupplyViewUnit",
-            gridIndex = modelUnit:getGridIndex(),
+            gridIndex = gridIndex,
         })
     end
 
     local supply = function(modelUnit)
-        modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
-        if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-            modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
+        local hasSupplied = false
+        local maxFuel = modelUnit:getMaxFuel()
+        if (modelUnit:getCurrentFuel() < maxFuel) then
+            modelUnit:setCurrentFuel(maxFuel)
+            hasSupplied = true
         end
+
+        if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
+            local maxAmmo = modelUnit:getPrimaryWeaponMaxAmmo()
+            if (modelUnit:getPrimaryWeaponCurrentAmmo() < maxAmmo) then
+                modelUnit:setPrimaryWeaponCurrentAmmo(maxAmmo)
+                hasSupplied = true
+            end
+        end
+
+        if (hasSupplied) then
+            modelUnit:updateView()
+        end
+
+        return hasSupplied
     end
 
     local supplyLoadedModelUnits = function(modelUnit)
@@ -233,17 +249,31 @@ local function onEvtTurnPhaseSupplyUnit(self, event)
             (modelUnit:canSupplyLoadedModelUnit())      and
             (not modelUnit:canRepairLoadedModelUnit())) then
 
-            local unitIDs = modelUnit:getLoadUnitIdList()
-            for _, unitID in pairs(unitIDs) do
-                supply(self:getLoadedModelUnitWithUnitId(unitID))
+            local hasSupplied = false
+            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
+                hasSupplied = supply(self:getLoadedModelUnitWithUnitId(unitID)) or hasSupplied
             end
-            if (#unitIDs > 0) then
+            if (hasSupplied) then
                 dispatchEvtSupplyViewUnit(modelUnit:getGridIndex())
             end
         end
     end
 
-    self:forEachModelUnitOnMap( supplyLoadedModelUnits)
+    local supplyAdjacentModelUnits = function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and
+            (modelUnit.canSupplyModelUnit))             then
+
+            for _, target in pairs(getSupplyTargetModelUnits(self, modelUnit)) do
+                if (supply(target)) then
+                    target:updateView()
+                    dispatchEvtSupplyViewUnit(target:getGridIndex())
+                end
+            end
+        end
+    end
+
+    self:forEachModelUnitOnMap( supplyAdjacentModelUnits)
+        :forEachModelUnitOnMap( supplyLoadedModelUnits)
         :forEachModelUnitLoaded(supplyLoadedModelUnits)
 end
 

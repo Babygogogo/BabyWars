@@ -11,13 +11,6 @@ UnitSupplier.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtSupplyViewUnit(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name      = "EvtSupplyViewUnit",
-        gridIndex = gridIndex,
-    })
-end
-
 local function canSupplyFuel(modelUnit)
     return (modelUnit.getCurrentFuel)                         and
         (modelUnit:getCurrentFuel() < modelUnit:getMaxFuel())
@@ -39,57 +32,9 @@ local function supplyModelUnit(modelUnit)
 end
 
 --------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseSupplyUnit(self, event)
-    local modelUnitMap = event.modelUnitMap
-    local supplier     = self.m_Owner
-    if ((supplier:getPlayerIndex() == event.playerIndex)                       and
-        (not modelUnitMap:getLoadedModelUnitWithUnitId(supplier:getUnitId()))) then
-        for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), modelUnitMap:getMapSize())) do
-            local target = modelUnitMap:getModelUnit(gridIndex)
-            if ((target) and (self:canSupplyModelUnit(target))) then
-                supplyModelUnit(target)
-                target:updateView()
-                dispatchEvtSupplyViewUnit(self, gridIndex)
-            end
-        end
-    end
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function UnitSupplier:ctor(param)
-    return self
-end
-
-function UnitSupplier:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "UnitSupplier:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseSupplyUnit", self)
-
-    return self
-end
-
-function UnitSupplier:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "UnitSupplier:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseSupplyUnit", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
-function UnitSupplier:onEvent(event)
-    if (event.name == "EvtTurnPhaseSupplyUnit") then
-        onEvtTurnPhaseSupplyUnit(self, event)
-    end
-
     return self
 end
 
