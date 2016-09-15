@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.5.2"
+GameConstant.version = "0.1.6.6"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -782,6 +782,7 @@ GameConstant.categories = {
     ["SkillCategoryActiveMovement"] = {
         6,
         8,
+        28,
     },
 
     ["SkillCategoryPassiveAttackRange"] = {
