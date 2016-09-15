@@ -16,8 +16,8 @@
 
 local ModelWarField = require("src.global.functions.class")("ModelWarField")
 
-local Actor              = require("src.global.actors.Actor")
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local Actor            = require("src.global.actors.Actor")
 
 local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
 
@@ -113,28 +113,6 @@ function ModelWarField:initView()
     return self
 end
 
-function ModelWarField:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtDragField",      self)
-        :addEventListener("EvtZoomFieldWithScroll",  self)
-        :addEventListener("EvtZoomFieldWithTouches", self)
-
-    return self
-end
-
-function ModelWarField:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
-        :removeEventListener("EvtZoomFieldWithScroll", self)
-        :removeEventListener("EvtDragField",           self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
@@ -156,6 +134,11 @@ function ModelWarField:onStartRunning(sceneWarFileName)
         self.m_ActorGridEffect   :getModel():onStartRunning(sceneWarFileName)
         self.m_ActorMapCursor    :getModel():onStartRunning(sceneWarFileName)
     end
+
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+        :addEventListener("EvtDragField",            self)
+        :addEventListener("EvtZoomFieldWithScroll",  self)
+        :addEventListener("EvtZoomFieldWithTouches", self)
 
     return self
 end
