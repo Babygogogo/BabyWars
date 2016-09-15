@@ -197,6 +197,7 @@ local s_Texts = {
             elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
             elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
             elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
+            elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -233,6 +234,7 @@ local s_Texts = {
             elseif (skillID == 25) then return "我方幸运下限"
             elseif (skillID == 26) then return "全军晋升"
             elseif (skillID == 27) then return "全军自带晋升"
+            elseif (skillID == 28) then return "完美移动"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -245,6 +247,7 @@ local s_Texts = {
             if     (skillCategory == "SkillCategoryPassiveAttack")      then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "防 御 类"
             elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryPassiveMovement")    then return "移 动 类"
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "射 程 类"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "占 领 类"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
@@ -267,6 +270,7 @@ local s_Texts = {
             if     (skillCategory == "SkillCategoryPassiveAttack")      then return "Attack"
             elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "Defense"
             elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "Money"
+            elseif (skillCategory == "SkillCategoryPassiveMovement")    then return "Movement"
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "AttackRange"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "Capture"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"

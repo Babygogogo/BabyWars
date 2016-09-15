@@ -247,6 +247,22 @@ local function getAttackDamageCostToFundModifierForSkillGroup(modelSkillGroup, s
     return modifier
 end
 
+local function isPerfectMovementForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return false
+    end
+
+    local skills = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if ((skill) and (skill.id == 28)) then
+            return true
+        end
+    end
+
+    return false
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -349,6 +365,11 @@ function SkillModifierFunctions.getPassivePromotionModifier(configuration)
     end
 
     return modifier
+end
+
+function SkillModifierFunctions.isPerfectMovement(configuration)
+    return isPerfectMovementForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) or
+        isPerfectMovementForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
 return SkillModifierFunctions

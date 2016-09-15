@@ -710,6 +710,7 @@ GameConstant.categories = {
         "SkillCategoryPassiveAttack",
         "SkillCategoryPassiveDefense",
         "SkillCategoryPassiveMoney",
+        "SkillCategoryPassiveMovement",
         "SkillCategoryPassiveAttackRange",
         "SkillCategoryPassiveCapture",
         "SkillCategoryPassiveRepair",
@@ -772,6 +773,10 @@ GameConstant.categories = {
         20,
         21,
         22,
+    },
+
+    ["SkillCategoryPassiveMovement"] = {
+        28,
     },
 
     ["SkillCategoryActiveMovement"] = {
@@ -4317,7 +4322,7 @@ GameConstant.skills = {
         },
     },
 
-    -- Modify the promotion of the units of the owner player.
+    -- Modify the promotion of the newly produced units of the owner player.
     [27] = {
         minLevel     = 1,
         maxLevel     = 3,
@@ -4326,6 +4331,16 @@ GameConstant.skills = {
             [1] = {modifier = 1, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
             [2] = {modifier = 2, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
             [3] = {modifier = 3, pointsPassive = 450, pointsActive = nil, minEnergy = nil},
+        },
+    },
+
+    -- "Perfect Movement".
+    [28] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = nil, pointsPassive = 200, pointsActive = 100, minEnergy = 2},
         },
     },
 }
