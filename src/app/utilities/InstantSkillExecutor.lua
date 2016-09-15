@@ -133,6 +133,23 @@ s_Executors.execute16 = function(level, modelWarField, modelPlayerManager, model
     dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
+s_Executors.execute26 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local modifier     = getSkillModifier(26, level)
+    local maxPromotion = GameConstantFunctions.getMaxPromotion()
+    local func         = function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and
+            (modelUnit.getCurrentPromotion))            then
+            modelUnit:setCurrentPromotion(math.min(maxPromotion, modelUnit:getCurrentPromotion() + modifier))
+        end
+    end
+
+    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

@@ -195,6 +195,7 @@ local s_Texts = {
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
             elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
+            elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -229,6 +230,7 @@ local s_Texts = {
             elseif (skillID == 23) then return "地形加成攻击"
             elseif (skillID == 24) then return "地形加成防御"
             elseif (skillID == 25) then return "我方幸运下限"
+            elseif (skillID == 26) then return "全军晋升"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -252,6 +254,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "射 程 类"
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "占 领 类"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP 类"
+            elseif (skillCategory == "SkillCategoryActivePromotion")    then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
             else                                                        return "未知6:" .. (skillCategory or "")
@@ -272,6 +275,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "AttackRange"
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "Capture"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP"
+            elseif (skillCategory == "SkillCategoryActivePromotion")    then return "Promotion"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
             else                                                        return "Unknown6:" .. (skillCategory or "")

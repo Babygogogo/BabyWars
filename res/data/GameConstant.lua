@@ -724,6 +724,7 @@ GameConstant.categories = {
         "SkillCategoryActiveAttackRange",
         "SkillCategoryActiveCapture",
         "SkillCategoryActiveHP",
+        "SkillCategoryActivePromotion",
         "SkillCategoryActiveEnergy",
         "SkillCategoryActiveLogistics",
     },
@@ -810,6 +811,10 @@ GameConstant.categories = {
     ["SkillCategoryActiveHP"] = {
         4,
         5,
+    },
+
+    ["SkillCategoryActivePromotion"] = {
+        26,
     },
 
     ["SkillCategoryActiveLogistics"] = {
@@ -2784,6 +2789,10 @@ GameConstant.templateModelUnits = {
             current = 1,
         },
 
+        Promotable = {
+            current = 0,
+        },
+
         TileBuilder = {
             buildList = {
                 Plain = "TempAirport",
@@ -3168,6 +3177,10 @@ GameConstant.templateModelUnits = {
             canDrop            = true,
             canSupply          = false,
             canRepair          = false,
+        },
+
+        Promotable = {
+            current = 0,
         },
 
         Producible = {
@@ -3655,6 +3668,10 @@ GameConstant.templateModelUnits = {
             canDrop            = true,
             canSupply          = false,
             canRepair          = false,
+        },
+
+        Promotable = {
+            current = 0,
         },
 
         Producible = {
@@ -4256,8 +4273,8 @@ GameConstant.skills = {
 
     -- Modify the lower limit of the luck damage of the owner player.
     [25] = {
-        minLevel = 1,
-        maxLevel = 20,
+        minLevel     = 1,
+        maxLevel     = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 80, pointsActive = 40, minEnergy = 1},
@@ -4280,6 +4297,18 @@ GameConstant.skills = {
             [18] = {modifier = 90, pointsPassive = 1440, pointsActive = 720, minEnergy = 6},
             [19] = {modifier = 95, pointsPassive = 1520, pointsActive = 760, minEnergy = 7},
             [20] = {modifier = 100, pointsPassive = 1600, pointsActive = 800, minEnergy = 7},
+        },
+    },
+
+    -- Modify the promotion of the units of the owner player.
+    [26] = {
+        minLevel     = 1,
+        maxLevel     = 3,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 250, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 500, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 750, minEnergy = 6},
         },
     },
 }
