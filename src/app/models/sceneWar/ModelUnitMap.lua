@@ -18,9 +18,10 @@
 
 local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters   = require("src.app.utilities.SingletonGetters")
-local Actor              = require("src.global.actors.Actor")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local Actor                  = require("src.global.actors.Actor")
 
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
@@ -123,6 +124,14 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     }
 
     return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
+end
+
+local function promoteModelUnitOnProduce(self, modelUnit)
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+    local modifier = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
+    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
+        modelUnit:setCurrentPromotion(modifier)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -564,13 +573,15 @@ function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
 
     local producedUnitID    = self.m_AvailableUnitID
     local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
-    producedActorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
+    local producedModelUnit = producedActorUnit:getModel()
+    promoteModelUnitOnProduce(self, producedModelUnit)
+    producedModelUnit:onStartRunning(self.m_SceneWarFileName)
         :setStateActioned()
 
     self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
     self.m_LoadedActorUnits[producedUnitID] = producedActorUnit
     if (self.m_View) then
-        self.m_View:addViewUnit(producedActorUnit:getView(), producedActorUnit:getModel())
+        self.m_View:addViewUnit(producedActorUnit:getView(), producedModelUnit)
     end
 
     focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
@@ -638,14 +649,16 @@ end
 function ModelUnitMap:doActionProduceOnTile(action)
     local gridIndex = action.gridIndex
     local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
-    actorUnit:getModel():onStartRunning(self.m_SceneWarFileName)
+    local modelUnit = actorUnit:getModel()
+    promoteModelUnitOnProduce(self, modelUnit)
+    modelUnit:onStartRunning(self.m_SceneWarFileName)
         :setStateActioned()
         :updateView()
 
     self.m_AvailableUnitID = self.m_AvailableUnitID + 1
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
     if (self.m_View) then
-        self.m_View:addViewUnit(actorUnit:getView(), actorUnit:getModel())
+        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
     end
 
     getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})

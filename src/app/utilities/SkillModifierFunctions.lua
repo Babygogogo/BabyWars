@@ -338,4 +338,17 @@ function SkillModifierFunctions.getAttackDamageCostToFundModifier(configuration)
         getAttackDamageCostToFundModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
+function SkillModifierFunctions.getPassivePromotionModifier(configuration)
+    local skills   = configuration:getModelSkillGroupPassive():getAllSkills()
+    local modifier = 0
+    for i = 1, PASSIVE_SLOTS_COUNT do
+        local skill = skills[i]
+        if ((skill) and (skill.id == 27)) then
+            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        end
+    end
+
+    return modifier
+end
+
 return SkillModifierFunctions

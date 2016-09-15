@@ -713,6 +713,7 @@ GameConstant.categories = {
         "SkillCategoryPassiveAttackRange",
         "SkillCategoryPassiveCapture",
         "SkillCategoryPassiveRepair",
+        "SkillCategoryPassivePromotion",
         "SkillCategoryPassiveEnergy",
     },
 
@@ -811,6 +812,10 @@ GameConstant.categories = {
     ["SkillCategoryActiveHP"] = {
         4,
         5,
+    },
+
+    ["SkillCategoryPassivePromotion"] = {
+        27,
     },
 
     ["SkillCategoryActivePromotion"] = {
@@ -4306,9 +4311,21 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels       = {
-            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 250, minEnergy = 2},
-            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 500, minEnergy = 4},
-            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 750, minEnergy = 6},
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 150, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 300, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 450, minEnergy = 6},
+        },
+    },
+
+    -- Modify the promotion of the units of the owner player.
+    [27] = {
+        minLevel     = 1,
+        maxLevel     = 3,
+        modifierUnit = "",
+        levels       = {
+            [1] = {modifier = 1, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 2, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 3, pointsPassive = 450, pointsActive = nil, minEnergy = nil},
         },
     },
 }

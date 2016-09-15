@@ -73,6 +73,7 @@ local function getSkillModifierForDisplay(id, level)
     elseif (id == 24) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 25) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 26) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 27) then return transformModifier3(modifier,  modifierUnit)
     end
 end
 

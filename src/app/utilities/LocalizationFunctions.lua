@@ -196,6 +196,7 @@ local s_Texts = {
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
             elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
             elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
+            elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -231,6 +232,7 @@ local s_Texts = {
             elseif (skillID == 24) then return "地形加成防御"
             elseif (skillID == 25) then return "我方幸运下限"
             elseif (skillID == 26) then return "全军晋升"
+            elseif (skillID == 27) then return "全军自带晋升"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -246,6 +248,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "射 程 类"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "占 领 类"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "防 御 类"
@@ -267,6 +270,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "AttackRange"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "Capture"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"
+            elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "Promotion"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "Attack"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "Defense"
