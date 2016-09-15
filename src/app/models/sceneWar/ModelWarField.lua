@@ -116,8 +116,6 @@ end
 function ModelWarField:setRootScriptEventDispatcher(dispatcher)
     assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
 
-    self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
-
     self.m_RootScriptEventDispatcher = dispatcher
     dispatcher:addEventListener("EvtDragField",      self)
         :addEventListener("EvtZoomFieldWithScroll",  self)
@@ -129,19 +127,10 @@ end
 function ModelWarField:unsetRootScriptEventDispatcher()
     assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
 
-    self:getModelTileMap():unsetRootScriptEventDispatcher()
-    self:getModelUnitMap():unsetRootScriptEventDispatcher()
-
     self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
         :removeEventListener("EvtZoomFieldWithScroll", self)
         :removeEventListener("EvtDragField",           self)
     self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
-function ModelWarField:setModelPlayerManager(model)
-    self:getModelTileMap():setModelPlayerManager(model)
 
     return self
 end

@@ -370,7 +370,6 @@ end
 local function initActorWarField(self, warFieldData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
     actor:getModel():setRootScriptEventDispatcher(self:getScriptEventDispatcher())
-        :setModelPlayerManager(self:getModelPlayerManager())
 
     self.m_ActorWarField = actor
 end
