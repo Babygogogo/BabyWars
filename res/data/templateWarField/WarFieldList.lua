@@ -9,7 +9,7 @@ return {
     "DuoYanPingYuan",
     "FengBaoQianXian",
     "GaoLaMiJia",
-    "GanKeZhiJing_2",
+    "GanHeZhiJing",
     "GeBiTan",
     "HaiAnTuJi",
     "HuanXingShanMai",
