@@ -11,6 +11,8 @@
 
 local ModelMoneyEnergyInfo = class("ModelMoneyEnergyInfo")
 
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -74,35 +76,18 @@ function ModelMoneyEnergyInfo:setModelWarCommandMenu(model)
     return self
 end
 
-function ModelMoneyEnergyInfo:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelMoneyEnergyInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerIndexUpdated", self)
-        :addEventListener("EvtModelPlayerUpdated",       self)
-        :addEventListener("EvtWarCommandMenuUpdated",    self)
-        :addEventListener("EvtGridSelected",             self)
-        :addEventListener("EvtMapCursorMoved",           self)
-
-    return self
+--------------------------------------------------------------------------------
+-- The callback functions on start running/script events.
+--------------------------------------------------------------------------------
+function ModelMoneyEnergyInfo:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtPlayerIndexUpdated",    self)
+        :addEventListener("EvtModelPlayerUpdated",    self)
+        :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtGridSelected",          self)
+        :addEventListener("EvtMapCursorMoved",        self)
 end
 
-function ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelMoneyEnergyInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
-        :removeEventListener("EvtGridSelected",          self)
-        :removeEventListener("EvtWarCommandMenuUpdated", self)
-        :removeEventListener("EvtModelPlayerUpdated",    self)
-        :removeEventListener("EvtPlayerIndexUpdated",    self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)

@@ -16,9 +16,8 @@
 
 local ModelWarField = require("src.global.functions.class")("ModelWarField")
 
-local Actor              = require("src.global.actors.Actor")
-local TypeChecker        = require("src.app.utilities.TypeChecker")
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local Actor            = require("src.global.actors.Actor")
 
 local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
 
@@ -61,8 +60,6 @@ end
 
 local function initActorActionPlanner(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
-    actor:getModel():setModelTileMap(self:getModelTileMap())
-        :setModelUnitMap(self:getModelUnitMap())
 
     self.m_ActorActionPlanner = actor
 end
@@ -85,13 +82,16 @@ end
 function ModelWarField:ctor(warFieldData)
     initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
+
+    local tileMapSize = self:getModelTileMap():getMapSize()
+    local unitMapSize = self:getModelUnitMap():getMapSize()
+    assert((tileMapSize.width == unitMapSize.width) and (tileMapSize.height == unitMapSize.height))
+
     if (not IS_SERVER) then
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
         initActorGridEffect(   self)
     end
-
-    assert(TypeChecker.isSizeEqual(self:getModelTileMap():getMapSize(), self:getModelUnitMap():getMapSize()))
 
     if (self.m_View) then
         self:initView()
@@ -113,60 +113,6 @@ function ModelWarField:initView()
     return self
 end
 
-function ModelWarField:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarField:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self:getModelTileMap():setRootScriptEventDispatcher(dispatcher)
-    self:getModelUnitMap():setRootScriptEventDispatcher(dispatcher)
-    if (not IS_SERVER) then
-        self.m_ActorMapCursor    :getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorActionPlanner:getModel():setRootScriptEventDispatcher(dispatcher)
-        self.m_ActorGridEffect   :getModel():setRootScriptEventDispatcher(dispatcher)
-    end
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtDragField",      self)
-        :addEventListener("EvtZoomFieldWithScroll",  self)
-        :addEventListener("EvtZoomFieldWithTouches", self)
-
-    return self
-end
-
-function ModelWarField:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelWarField:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self:getModelTileMap():unsetRootScriptEventDispatcher()
-    self:getModelUnitMap():unsetRootScriptEventDispatcher()
-    if (not IS_SERVER) then
-        self.m_ActorMapCursor    :getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorActionPlanner:getModel():unsetRootScriptEventDispatcher()
-        self.m_ActorGridEffect   :getModel():unsetRootScriptEventDispatcher()
-    end
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtZoomFieldWithTouches", self)
-        :removeEventListener("EvtZoomFieldWithScroll", self)
-        :removeEventListener("EvtDragField",           self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
-function ModelWarField:setModelPlayerManager(model)
-    self:getModelUnitMap():setModelPlayerManager(model)
-    self:getModelTileMap():setModelPlayerManager(model)
-    if (not IS_SERVER) then
-        self.m_ActorActionPlanner:getModel():setModelPlayerManager(model)
-    end
-
-    return self
-end
-
-function ModelWarField:setModelWeatherManager(model)
-    self:getModelUnitMap():setModelWeatherManager(model)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
@@ -178,8 +124,25 @@ function ModelWarField:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelWarField:onStartRunning(sceneWarFileName)
+    self:getModelTileMap():onStartRunning(sceneWarFileName)
+    self:getModelUnitMap():onStartRunning(sceneWarFileName)
+    if (not IS_SERVER) then
+        self.m_ActorActionPlanner:getModel():onStartRunning(sceneWarFileName)
+        self.m_ActorGridEffect   :getModel():onStartRunning(sceneWarFileName)
+        self.m_ActorMapCursor    :getModel():onStartRunning(sceneWarFileName)
+    end
+
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+        :addEventListener("EvtDragField",            self)
+        :addEventListener("EvtZoomFieldWithScroll",  self)
+        :addEventListener("EvtZoomFieldWithTouches", self)
+
+    return self
+end
+
 function ModelWarField:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDragField")            then onEvtDragField(           self, event)

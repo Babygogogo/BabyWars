@@ -13,8 +13,10 @@
 
 local MoveCostOwner = require("src.global.functions.class")("MoveCostOwner")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = require("src.global.components.ComponentManager")
 
 MoveCostOwner.EXPORTED_METHODS = {
     "getMoveCostWithMoveType",
@@ -42,16 +44,11 @@ function MoveCostOwner:loadInstantialData(data)
     return self
 end
 
-function MoveCostOwner:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "MoveCostOwner:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function MoveCostOwner:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "MoveCostOwner:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function MoveCostOwner:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -73,7 +70,13 @@ function MoveCostOwner:getMoveCostWithModelUnit(modelUnit)
         (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "LargeNavalUnits"))) then
         return nil
     else
-        return self:getMoveCostWithMoveType(modelUnit:getMoveType())
+        local baseCost = self:getMoveCostWithMoveType(modelUnit:getMoveType())
+        if (not baseCost) then
+            return baseCost
+        else
+            local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+            return SkillModifierFunctions.isPerfectMovement(modelPlayer:getModelSkillConfiguration()) and (1) or (baseCost)
+        end
     end
 end
 

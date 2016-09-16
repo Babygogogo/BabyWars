@@ -14,7 +14,6 @@
 
 local GridIndexable = require("src.global.functions.class")("GridIndexable")
 
-local TypeChecker        = require("src.app.utilities.TypeChecker")
 local ComponentManager   = require("src.global.components.ComponentManager")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 

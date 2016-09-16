@@ -14,6 +14,8 @@
 
 local ModelBattleInfo = class("ModelBattleInfo")
 
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -52,11 +54,12 @@ function ModelBattleInfo:initView()
     return self
 end
 
-function ModelBattleInfo:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelBattleInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPreviewBattleDamage",   self)
+--------------------------------------------------------------------------------
+-- The callback functions on start running/script events.
+--------------------------------------------------------------------------------
+function ModelBattleInfo:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtPreviewBattleDamage",         self)
         :addEventListener("EvtPreviewNoBattleDamage",       self)
         :addEventListener("EvtActionPlannerIdle",           self)
         :addEventListener("EvtActionPlannerMakingMovePath", self)
@@ -66,23 +69,6 @@ function ModelBattleInfo:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelBattleInfo:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelBattleInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
-        :removeEventListener("EvtActionPlannerChoosingAction", self)
-        :removeEventListener("EvtActionPlannerMakingMovePath", self)
-        :removeEventListener("EvtActionPlannerIdle",           self)
-        :removeEventListener("EvtPreviewNoBattleDamage",       self)
-        :removeEventListener("EvtPreviewBattleDamage",         self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelBattleInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtActionPlannerIdle")           then onEvtPreviewNoBattleDamage(self, event)

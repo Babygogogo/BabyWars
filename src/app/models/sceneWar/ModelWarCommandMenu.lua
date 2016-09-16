@@ -22,6 +22,7 @@ local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
@@ -33,7 +34,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateStringWarInfo(self)
-    local modelPlayerManager = self.m_ModelPlayerManager
+    local modelPlayerManager = SingletonGetters.getModelPlayerManager()
     local data               = {}
 
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
@@ -52,7 +53,7 @@ local function updateStringWarInfo(self)
         end
     end)
 
-    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
         local unitsCount = 1
         if (modelUnit.getCurrentLoadCount) then
             unitsCount = unitsCount + modelUnit:getCurrentLoadCount()
@@ -62,7 +63,7 @@ local function updateStringWarInfo(self)
         data[playerIndex].unitsCount = data[playerIndex].unitsCount + unitsCount
     end)
 
-    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
+    SingletonGetters.getModelTileMap():forEachModelTile(function(modelTile)
         local playerIndex = modelTile:getPlayerIndex()
         if (playerIndex ~= 0) then
             data[playerIndex].tilesCount = data[playerIndex].tilesCount + 1
@@ -96,7 +97,7 @@ end
 
 local function updateStringSkillInfo(self)
     local stringList = {}
-    self.m_ModelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+    SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
         stringList[#stringList + 1] = string.format("%s %d: %s",
             getLocalizedText(65, "Player"), playerIndex,
             SkillDescriptionFunctions.getDescription(modelPlayer:getModelSkillConfiguration())
@@ -118,7 +119,7 @@ local function getAvailableMainItems(self)
             self.m_ItemDamageChart,
         }
     else
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_PlayerIndex)
+        local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndex)
         local items = {
             self.m_ItemQuit,
             self.m_ItemFindIdleUnit,
@@ -167,26 +168,52 @@ local function setStateDamageChart(self)
     end
 end
 
-local function dispatchEvtActivateSkillGroup(self, skillGroupID)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
-        name         = "EvtPlayerRequestDoAction",
-        actionName   = "ActivateSkillGroup",
-        skillGroupID = skillGroupID,
+local function createAndSendAction(rawAction, needActionID)
+    if (needActionID) then
+        rawAction.actionID         = SingletonGetters.getActionId() + 1
+        rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    end
+
+    WebSocketManager.sendAction(rawAction)
+    SingletonGetters.getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = true,
     })
 end
 
+local function sendActionActivateSkillGroup(skillGroupID)
+    createAndSendAction({
+        actionName   = "ActivateSkillGroup",
+        skillGroupID = skillGroupID,
+    }, true)
+end
+
+local function sendActionSurrender()
+    createAndSendAction({actionName = "Surrender"}, true)
+end
+
+local function sendActionEndTurn()
+    createAndSendAction({actionName = "EndTurn"}, true)
+end
+
+local function sendActionGetSceneWarData()
+    createAndSendAction({
+        actionName = "GetSceneWarData",
+        fileName   = SingletonGetters.getSceneWarFileName(),
+    }, false)
+end
+
 local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
-    if (self.m_RootScriptEventDispatcher) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name      = "EvtWarCommandMenuUpdated",
-            isEnabled = isEnabled,
-            isVisible = isVisible,
-        })
-    end
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        name      = "EvtWarCommandMenuUpdated",
+        isEnabled = isEnabled,
+        isVisible = isVisible,
+    })
 end
 
 local function dispatchEvtMapCursorMoved(self, gridIndex)
-    self.m_RootScriptEventDispatcher:dispatchEvent({
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
         name      = "EvtMapCursorMoved",
         gridIndex = gridIndex,
     })
@@ -196,20 +223,20 @@ local function createItemActivateSkill(self, skillGroupID)
     return {
         name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
         callback = function()
-            dispatchEvtActivateSkillGroup(self, skillGroupID)
+            sendActionActivateSkillGroup(skillGroupID)
             self:setEnabled(false)
         end,
     }
 end
 
 local function getEmptyProducersCount(self)
-    local modelUnitMap = self.m_ModelWarField:getModelUnitMap()
+    local modelUnitMap = SingletonGetters.getModelUnitMap()
     local count        = 0
     local playerIndex  = self.m_PlayerIndex
 
-    self.m_ModelWarField:getModelTileMap():forEachModelTile(function(modelTile)
-        if ((modelTile.getProductionList) and
-            (modelTile:getPlayerIndex() == self.m_PlayerIndex) and
+    SingletonGetters.getModelTileMap():forEachModelTile(function(modelTile)
+        if ((modelTile.getProductionList)                                 and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndex)            and
             (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
             count = count + 1
         end
@@ -221,7 +248,7 @@ end
 local function getIdleUnitsCount(self)
     local count       = 0
     local playerIndex = self.m_PlayerIndex
-    self.m_ModelWarField:getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
         if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
             count = count + 1
         end
@@ -291,10 +318,9 @@ local function initItemQuit(self)
     local item = {
         name     = getLocalizedText(65, "QuitWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "QuitWar"))
+            SingletonGetters.getModelConfirmBox():setConfirmText(getLocalizedText(66, "QuitWar"))
                 :setOnConfirmYes(function()
                     local actorSceneMain = Actor.createWithModelAndViewName("sceneMain.ModelSceneMain", {isPlayerLoggedIn = true}, "sceneMain.ViewSceneMain")
-                    WebSocketManager.setOwner(actorSceneMain:getModel())
                     ActorManager.setAndRunRootActor(actorSceneMain, "FADE", 1)
                 end)
                 :setEnabled(true)
@@ -308,7 +334,7 @@ local function initItemFindIdleUnit(self)
     local item = {
         name     = getLocalizedText(65, "FindIdleUnit"),
         callback = function()
-            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
+            local modelUnitMap     = SingletonGetters.getModelUnitMap()
             local mapSize          = modelUnitMap:getMapSize()
             local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
             local firstGridIndex
@@ -335,7 +361,7 @@ local function initItemFindIdleUnit(self)
             if (firstGridIndex) then
                 dispatchEvtMapCursorMoved(self, firstGridIndex)
             else
-                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleUnit"))
+                SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(66, "NoIdleUnit"))
             end
             self:setEnabled(false)
         end,
@@ -348,8 +374,8 @@ local function initItemFindIdleTile(self)
     local item = {
         name     = getLocalizedText(65, "FindIdleTile"),
         callback = function()
-            local modelUnitMap     = self.m_ModelWarField:getModelUnitMap()
-            local modelTileMap     = self.m_ModelWarField:getModelTileMap()
+            local modelUnitMap     = SingletonGetters.getModelUnitMap()
+            local modelTileMap     = SingletonGetters.getModelTileMap()
             local mapSize          = modelUnitMap:getMapSize()
             local cursorX, cursorY = self.m_MapCursorGridIndex.x, self.m_MapCursorGridIndex.y
             local firstGridIndex
@@ -376,7 +402,7 @@ local function initItemFindIdleTile(self)
             if (firstGridIndex) then
                 dispatchEvtMapCursorMoved(self, firstGridIndex)
             else
-                self.m_ModelMessageIndicator:showMessage(getLocalizedText(66, "NoIdleTile"))
+                SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(66, "NoIdleTile"))
             end
             self:setEnabled(false)
         end,
@@ -478,10 +504,12 @@ local function initItemReload(self)
     local item = {
         name     = getLocalizedText(65, "ReloadWar"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "ReloadWar"))
+            local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "ReloadWar"))
                 :setOnConfirmYes(function()
-                    self.m_ModelConfirmBox:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtReloadSceneWar"})
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    sendActionGetSceneWarData()
                 end)
                 :setEnabled(true)
         end,
@@ -494,14 +522,12 @@ local function initItemSurrender(self)
     local item = {
         name     = getLocalizedText(65, "Surrender"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(66, "Surrender"))
+            local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "Surrender"))
                 :setOnConfirmYes(function()
-                    self.m_ModelConfirmBox:setEnabled(false)
+                    modelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name       = "EvtPlayerRequestDoAction",
-                        actionName = "Surrender",
-                    })
+                    sendActionSurrender()
                 end)
                 :setEnabled(true)
         end,
@@ -514,14 +540,12 @@ local function initItemEndTurn(self)
     local item = {
         name     = getLocalizedText(65, "EndTurn"),
         callback = function()
-            self.m_ModelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+            local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
                 :setOnConfirmYes(function()
-                    self.m_ModelConfirmBox:setEnabled(false)
+                    modelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name       = "EvtPlayerRequestDoAction",
-                        actionName = "EndTurn"
-                    })
+                    sendActionEndTurn()
                 end)
                 :setEnabled(true)
         end,
@@ -567,67 +591,23 @@ function ModelWarCommandMenu:initView()
     return self
 end
 
-function ModelWarCommandMenu:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil, "ModelWarCommandMenu:setModelConfirmBox() the model has been set.")
-    self.m_ModelConfirmBox = model
-    model:setEnabled(false)
-
-    return self
-end
-
-function ModelWarCommandMenu:setModelWarField(model)
-    assert(self.m_ModelWarField == nil, "ModelWarCommandMenu:setModelWarField() the model has been set.")
-    self.m_ModelWarField = model
-
-    return self
-end
-
-function ModelWarCommandMenu:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "ModelWarCommandMenu:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-    model:forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-            self.m_LoggedInPlayerIndex = playerIndex
-        end
-    end)
-
-    return self
-end
-
-function ModelWarCommandMenu:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelWarCommandMenu:setModelMessageIndicator() the model has been set already.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelWarCommandMenu:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelWarCommandMenu:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerIndexUpdated",   self)
+--------------------------------------------------------------------------------
+-- The public callback function on start running or script events.
+--------------------------------------------------------------------------------
+function ModelWarCommandMenu:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtPlayerIndexUpdated",         self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)
 
-    return self
+    SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+            self.m_LoggedInPlayerIndex = playerIndex
+        end
+    end)
 end
 
-function ModelWarCommandMenu:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelWarCommandMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtMapCursorMoved", self)
-        :removeEventListener("EvtGridSelected",               self)
-        :removeEventListener("EvtIsWaitingForServerResponse", self)
-        :removeEventListener("EvtPlayerIndexUpdated",         self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The public callback function on script events.
---------------------------------------------------------------------------------
 function ModelWarCommandMenu:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtGridSelected")               then onEvtGridSelected(              self, event)

@@ -12,10 +12,6 @@
 
 local FuelOwner = require("src.global.functions.class")("FuelOwner")
 
-local TypeChecker        = require("src.app.utilities.TypeChecker")
-local ComponentManager   = require("src.global.components.ComponentManager")
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-
 FuelOwner.EXPORTED_METHODS = {
     "getCurrentFuel",
     "getMaxFuel",
@@ -32,39 +28,6 @@ FuelOwner.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 local function isFuelAmount(param)
     return (param >= 0) and (math.ceil(param) == param)
-end
-
---------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    local modelUnit = self.m_Owner
-    if ((event.turnIndex > 1)                                                         and
-        (modelUnit:getPlayerIndex() == event.playerIndex)                             and
-        (not event.modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId()))) then
-        self:setCurrentFuel(math.max(self:getCurrentFuel() - self:getFuelConsumptionPerTurn(), 0))
-        modelUnit:updateView()
-
-        if ((self:getCurrentFuel() == 0) and (self:shouldDestroyOnOutOfFuel())) then
-            local gridIndex = modelUnit:getGridIndex()
-            local tile = event.modelTileMap:getModelTile(gridIndex)
-
-            if ((not tile.getRepairAmount) or (not tile:getRepairAmount(modelUnit))) then
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name      = "EvtDestroyModelUnit",
-                        gridIndex = gridIndex,
-                    })
-                    :dispatchEvent({
-                        name      = "EvtDestroyViewUnit",
-                        viewUnit  = gridIndex,
-                    })
-
-                if (modelUnit.m_View) then
-                    modelUnit.m_View:removeFromParent()
-                end
-            end
-        end
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -94,24 +57,6 @@ function FuelOwner:loadInstantialData(data)
     return self
 end
 
-function FuelOwner:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "FuelOwner:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-
-    return self
-end
-
-function FuelOwner:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "FuelOwner:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -124,17 +69,6 @@ function FuelOwner:toSerializableTable()
             current = currentFuel,
         }
     end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
-function FuelOwner:onEvent(event)
-    if (event.name == "EvtTurnPhaseConsumeUnitFuel") then
-        onEvtTurnPhaseConsumeUnitFuel(self, event)
-    end
-
-    return self
 end
 
 --------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 local UnitProducer = require("src.global.functions.class")("UnitProducer")
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
@@ -37,16 +38,11 @@ function UnitProducer:loadTemplate(template)
     return self
 end
 
-function UnitProducer:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "UnitProducer:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function UnitProducer:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "UnitProducer:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback functions on start running.
+--------------------------------------------------------------------------------
+function UnitProducer:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -71,13 +67,13 @@ end
 
 function UnitProducer:getProductionList()
     local playerIndex = self.m_Owner:getPlayerIndex()
-    local fund        = self.m_ModelPlayerManager:getModelPlayer(playerIndex):getFund()
+    local fund        = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getFund()
     local list        = {}
 
     for i, unitName in ipairs(self.m_Template.productionList) do
         local tiledID   = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
         local modelUnit = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID})
-        modelUnit:setModelPlayerManager(self.m_ModelPlayerManager)
+        modelUnit:onStartRunning(self.m_SceneWarFileName)
         local cost      = modelUnit:getProductionCost()
 
         list[i] = {

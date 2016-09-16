@@ -3,9 +3,10 @@ local ViewSceneWar = class("ViewSceneWar", cc.Scene)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local MESSAGE_INDICATOR_Z_ORDER = 3
+local MESSAGE_INDICATOR_Z_ORDER = 4
 local END_WAR_EFFECT_Z_ORDER    = 3
-local TURN_MANAGER_Z_ORDER      = 2
+local TURN_MANAGER_Z_ORDER      = 3
+local CONFIRM_BOX_Z_ORDER       = 2
 local WAR_HUD_Z_ORDER           = 1
 local WAR_FIELD_Z_ORDER         = 0
 local BACKGROUND_Z_ORDER        = -1
@@ -124,6 +125,15 @@ end
 --------------------------------------------------------------------------------
 function ViewSceneWar:ctor(param)
     initSceneBackground(self)
+
+    return self
+end
+
+function ViewSceneWar:setViewConfirmBox(view)
+    assert(self.m_ViewConfirmBox == nil, "ViewSceneWar:setViewConfirmBox() the view has been set already.")
+
+    self.m_ViewConfirmBox = view
+    self:addChild(view, CONFIRM_BOX_Z_ORDER)
 
     return self
 end

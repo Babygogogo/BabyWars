@@ -12,7 +12,6 @@
 
 local DefenseBonusProvider = require("src.global.functions.class")("DefenseBonusProvider")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")

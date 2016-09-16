@@ -4,7 +4,9 @@ local ModelSkillConfigurator = class("ModelSkillConfigurator")
 local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 local getDescription   = SkillDescriptionFunctions.getDescription
@@ -185,8 +187,7 @@ local function initItemsAllConfigurations(self)
             name     = getConfigurationTitle(i),
             callback = function()
                 setStateOverviewConfiguration(self, i)
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name            = "EvtPlayerRequestDoAction",
+                WebSocketManager.sendAction({
                     actionName      = "GetSkillConfiguration",
                     configurationID = i,
                 })
@@ -447,30 +448,6 @@ function ModelSkillConfigurator:setModelMainMenu(model)
     return self
 end
 
-function ModelSkillConfigurator:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil,
-        "ModelSkillConfigurator:setRootScriptEventDispatcher() the model has been set already.")
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function ModelSkillConfigurator:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil,
-        "ModelSkillConfigurator:setModelMessageIndicator() the model has been set already.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelSkillConfigurator:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil,
-        "ModelSkillConfigurator:setModelConfirmBox() the model has been set already.")
-    self.m_ModelConfirmBox = model
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
@@ -511,11 +488,12 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
     elseif (state == "stateOverviewConfiguration") then
-        self.m_ModelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        modelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
             :setOnConfirmYes(
                 function()
                     setStateMain(self)
-                    self.m_ModelConfirmBox:setEnabled(false)
+                    modelConfirmBox:setEnabled(false)
                 end)
             :setEnabled(true)
     elseif (state == "stateSelectSkillCategory") then
@@ -538,11 +516,10 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     assert(self.m_State == "stateOverviewConfiguration")
     local isConfigurationValid, err = self.m_ModelSkillConfiguration:isValid()
     if (not isConfigurationValid) then
-        self.m_ModelMessageIndicator:showMessage(err)
+        SingletonGetters.getModelMessageIndicator():showMessage(err)
     else
-        self.m_ModelMessageIndicator:showMessage(getLocalizedText(3, "SettingConfiguration"))
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name            = "EvtPlayerRequestDoAction",
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
+        WebSocketManager.sendAction({
             actionName      = "SetSkillConfiguration",
             configurationID = self.m_ConfigurationID,
             configuration   = self.m_ModelSkillConfiguration:toSerializableTable(),

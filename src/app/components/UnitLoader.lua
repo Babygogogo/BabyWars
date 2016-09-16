@@ -2,6 +2,7 @@
 local UnitLoader = require("src.global.functions.class")("UnitLoader")
 
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
@@ -68,28 +69,8 @@ local function getNormalizedRepairAmount(self)
     if ((not baseAmount) or (playerIndex < 1)) then
         return baseAmount
     else
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
         return baseAmount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
-    end
-end
-
---------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtTurnPhaseSupplyUnit(self, event)
-    if ((self.m_Owner:getPlayerIndex() == event.playerIndex) and
-        (not self:canRepairLoadedModelUnit())                and
-        (self:canSupplyLoadedModelUnit()))                   then
-        local modelUnitMap = event.modelUnitMap
-        for _, unitID in pairs(self:getLoadUnitIdList()) do
-            local modelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-            assert(modelUnit, "UnitLoader-onEvtTurnPhaseSupplyUnit() a unit is loaded in the loader, while is not loaded in ModelUnitMap.")
-
-            modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
-            if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-                modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
-            end
-        end
     end
 end
 
@@ -117,38 +98,6 @@ function UnitLoader:loadInstantialData(data)
     return self
 end
 
-function UnitLoader:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "UnitLoader:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtTurnPhaseSupplyUnit", self)
-
-    return self
-end
-
-function UnitLoader:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "UnitLoader:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtTurnPhaseSupplyUnit", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
-function UnitLoader:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "UnitLoader:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function UnitLoader:unsetModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager, "UnitLoader:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -163,12 +112,10 @@ function UnitLoader:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The public callback function on start running.
 --------------------------------------------------------------------------------
-function UnitLoader:onEvent(event)
-    if (event.name == "EvtTurnPhaseSupplyUnit") then
-        onEvtTurnPhaseSupplyUnit(self, event)
-    end
+function UnitLoader:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -270,7 +217,7 @@ function UnitLoader:getRepairAmountAndCostForLoadedModelUnit(modelUnit)
     assert(self:hasLoadUnitId(modelUnit:getUnitId()),
         "UnitLoader:getRepairAmountAndCostForLoadedModelUnit() the param modelUnit is not loaded by self.")
 
-    local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
     local productionCost = math.floor(
         (costModifier >= 0)                                          and

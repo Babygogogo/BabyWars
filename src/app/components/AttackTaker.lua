@@ -17,6 +17,7 @@
 local AttackTaker = require("src.global.functions.class")("AttackTaker")
 
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
@@ -89,34 +90,6 @@ function AttackTaker:loadInstantialData(data)
     return self
 end
 
-function AttackTaker:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "AttackTaker:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
-
-    return self
-end
-
-function AttackTaker:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "AttackTaker:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
-function AttackTaker:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "AttackTaker:setModelPlayerManager() the model has been set.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function AttackTaker:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "AttackTaker:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -132,6 +105,15 @@ function AttackTaker:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The public callback function for start running.
+--------------------------------------------------------------------------------
+function AttackTaker:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
 function AttackTaker:doActionAttack(action, attackTarget)
@@ -144,7 +126,7 @@ function AttackTaker:doActionAttack(action, attackTarget)
     attackTarget:setCurrentHP(math.max(0, attackTarget:getCurrentHP() - attackDamage))
 
     if (attackTarget.getUnitType) then
-        local modelPlayerManager = self.m_ModelPlayerManager
+        local modelPlayerManager = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName)
         local selfPlayerIndex    = attacker:getPlayerIndex()
         local selfModelPlayer    = modelPlayerManager:getModelPlayer(selfPlayerIndex)
         local targetModelPlayer  = modelPlayerManager:getModelPlayer(attackTarget:getPlayerIndex())
@@ -155,7 +137,7 @@ function AttackTaker:doActionAttack(action, attackTarget)
         addFundWithAttackDamageCost(selfModelPlayer, targetDamageCost)
         addFundWithAttackDamageCost(targetModelPlayer, selfDamageCost)
 
-        self.m_RootScriptEventDispatcher:dispatchEvent({
+        SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
             name        = "EvtModelPlayerUpdated",
             playerIndex = selfPlayerIndex,
             modelPlayer = selfModelPlayer,

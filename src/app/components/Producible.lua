@@ -2,6 +2,7 @@
 local Producible = require("src.global.functions.class")("Producible")
 
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
 Producible.EXPORTED_METHODS = {
@@ -40,16 +41,11 @@ function Producible:loadTemplate(template)
     return self
 end
 
-function Producible:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "Producible:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function Producible:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "Producible:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function Producible:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -58,7 +54,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Producible:getProductionCost()
-    return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), self.m_ModelPlayerManager)
+    return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName))
 end
 
 function Producible:getBaseProductionCost()

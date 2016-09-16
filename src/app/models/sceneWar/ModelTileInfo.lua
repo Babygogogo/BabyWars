@@ -13,6 +13,7 @@
 local ModelTileInfo = class("ModelTileInfo")
 
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -30,7 +31,7 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtModelTileMapUpdated(self, event)
-    updateWithModelTile(self, self.m_ModelTileMap:getModelTile(self.m_CursorGridIndex))
+    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
 end
 
 local function onEvtMapCursorMoved(self, event)
@@ -41,7 +42,7 @@ local function onEvtMapCursorMoved(self, event)
     local gridIndex = event.gridIndex
     if (not GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
         self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
-        updateWithModelTile(self, self.m_ModelTileMap:getModelTile(gridIndex))
+        updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(gridIndex))
     end
 end
 
@@ -51,7 +52,7 @@ end
 
 local function onEvtTurnPhaseMain(self, event)
     self.m_ModelPlayer = event.modelPlayer
-    updateWithModelTile(self, self.m_ModelTileMap:getModelTile(self.m_CursorGridIndex))
+    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
@@ -82,46 +83,23 @@ function ModelTileInfo:setModelTileDetail(model)
     return self
 end
 
-function ModelTileInfo:setModelTileMap(model)
-    assert(self.m_ModelTileMap == nil, "ModelTileInfo:setModelTileMap() the model has been set.")
-    self.m_ModelTileMap = model
-
-    updateWithModelTile(self, model:getModelTile(self.m_CursorGridIndex))
-
-    return self
-end
-
-function ModelTileInfo:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelTileInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtModelTileMapUpdated", self)
-        :addEventListener("EvtMapCursorMoved",            self)
-        :addEventListener("EvtGridSelected",              self)
-        :addEventListener("EvtTurnPhaseMain",             self)
-        :addEventListener("EvtWarCommandMenuUpdated",     self)
-        :addEventListener("EvtPlayerIndexUpdated",        self)
-
-    return self
-end
-
-function ModelTileInfo:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelTileInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
-        :removeEventListener("EvtWarCommandMenuUpdated", self)
-        :removeEventListener("EvtTurnPhaseMain",         self)
-        :removeEventListener("EvtGridSelected",          self)
-        :removeEventListener("EvtMapCursorMoved",        self)
-        :removeEventListener("EvtModelTileMapUpdated",   self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelTileInfo:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtModelTileMapUpdated",   self)
+        :addEventListener("EvtMapCursorMoved",        self)
+        :addEventListener("EvtGridSelected",          self)
+        :addEventListener("EvtTurnPhaseMain",         self)
+        :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtPlayerIndexUpdated",    self)
+
+    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
+
+    return self
+end
+
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtModelTileMapUpdated")       then onEvtModelTileMapUpdated(      self, event)

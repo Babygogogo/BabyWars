@@ -3,7 +3,11 @@ local ModelLoginPanel = class("ModelLoginPanel")
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+
+local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
+local getLocalizedText         = LocalizationFunctions.getLocalizedText
 
 local GAME_VERSION      = GameConstantFunctions.getGameVersion()
 local WRITABLE_PATH     = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/"
@@ -37,27 +41,6 @@ end
 function ModelLoginPanel:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelLoginPanel:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
-
-    return self
-end
-
-function ModelLoginPanel:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelLoginPanel:setModelMessageIndicator() the model has been set.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelLoginPanel:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil, "ModelLoginPanel:setModelConfirmBox() the model has been set.")
-    self.m_ModelConfirmBox = model
-
-    return self
-end
-
-function ModelLoginPanel:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelLoginPanel:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end
@@ -108,24 +91,24 @@ end
 
 function ModelLoginPanel:onButtonRegisterTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(19))
+        getModelMessageIndicator():showMessage(getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(21, account))
+        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonRegisterForSecs(5)
         end
 
-        self.m_ModelConfirmBox:setConfirmText(LocalizationFunctions.getLocalizedText(24, account, password))
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name       = "EvtPlayerRequestDoAction",
-                    actionName = "Register",
-                    version    = GAME_VERSION,
-                    account    = account,
-                    password   = password
+                WebSocketManager.sendAction({
+                    actionName     = "Register",
+                    version        = GAME_VERSION,
+                    playerAccount  = account,
+                    playerPassword = password,
                 })
-                self.m_ModelConfirmBox:setEnabled(false)
+                modelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
     end
@@ -135,20 +118,18 @@ end
 
 function ModelLoginPanel:onButtonLoginTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(19))
+        getModelMessageIndicator():showMessage(getLocalizedText(19))
     elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
-        self.m_ModelMessageIndicator:showMessage(LocalizationFunctions.getLocalizedText(21, account))
+        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)
         end
-
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
-            actionName = "Login",
-            version    = GAME_VERSION,
-            account    = account,
-            password   = password
+        WebSocketManager.sendAction({
+            actionName     = "Login",
+            version        = GAME_VERSION,
+            playerAccount  = account,
+            playerPassword = password,
         })
     end
 

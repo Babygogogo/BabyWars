@@ -11,6 +11,8 @@
 
 local ModelGridEffect = class("ModelGridEffect")
 
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -55,11 +57,16 @@ function ModelGridEffect:ctor()
     return self
 end
 
-function ModelGridEffect:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelGridEffect:setRootScriptEventDispatcher() the dispatcher has been set.")
+function ModelGridEffect:initView()
+    return self
+end
 
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtDestroyViewUnit", self)
+--------------------------------------------------------------------------------
+-- The callback functions on start running/script events.
+--------------------------------------------------------------------------------
+function ModelGridEffect:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtDestroyViewUnit", self)
         :addEventListener("EvtDestroyViewTile", self)
         :addEventListener("EvtAttackViewUnit",  self)
         :addEventListener("EvtAttackViewTile",  self)
@@ -70,24 +77,6 @@ function ModelGridEffect:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelGridEffect:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelGridEffect:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtSiloAttackGrid", self)
-        :removeEventListener("EvtRepairViewUnit", self)
-        :removeEventListener("EvtSupplyViewUnit", self)
-        :removeEventListener("EvtAttackViewTile",  self)
-        :removeEventListener("EvtAttackViewUnit",  self)
-        :removeEventListener("EvtDestroyViewTile", self)
-        :removeEventListener("EvtDestroyViewUnit", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelGridEffect:onEvent(event)
     local name      = event.name
     local gridIndex = event.gridIndex
