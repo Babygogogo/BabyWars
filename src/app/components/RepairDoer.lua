@@ -19,6 +19,7 @@ local RepairDoer = require("src.global.functions.class")("RepairDoer")
 
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
@@ -53,16 +54,11 @@ function RepairDoer:loadInstantialData(data)
     return self
 end
 
-function RepairDoer:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "RepairDoer:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function RepairDoer:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "RepairDoer:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function RepairDoer:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -95,7 +91,7 @@ function RepairDoer:canRepairTarget(target)
 end
 
 function RepairDoer:getRepairAmountAndCost(target)
-    local modelPlayer    = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
     local productionCost = math.floor(
         (costModifier >= 0)                                       and
@@ -118,7 +114,7 @@ function RepairDoer:getNormalizedRepairAmount()
     if (playerIndex < 1) then
         return self.m_Template.amount
     else
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
         return self.m_Template.amount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
     end
 end

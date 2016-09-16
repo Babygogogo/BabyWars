@@ -32,7 +32,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 local function doActionLogin(self, action)
     if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(26, action.account))
+        self:getModelMessageIndicator():showMessage(getLocalizedText(26, action.account))
     end
 
     self.m_ActorMainMenu:getModel():doActionLogin(action)
@@ -45,20 +45,19 @@ local function doActionLogout(self, event)
     local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
 
     WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-        .setOwner(modelSceneMain)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
 local function doActionRegister(self, action)
     WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(27, action.account))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(27, action.account))
 
     self.m_ActorMainMenu:getModel():doActionRegister(action)
 end
 
 local function doActionNewWar(self, action)
     self.m_ActorMainMenu:getModel():doActionNewWar(action)
-    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
 end
 
 local function doActionGetJoinableWarList(self, action)
@@ -82,7 +81,7 @@ local function doActionGetSkillConfiguration(self, action)
 end
 
 local function doActionMessage(self, action)
-    self.m_ActorMessageIndicator:getModel():showMessage(action.message)
+    self:getModelMessageIndicator():showMessage(action.message)
 end
 
 --------------------------------------------------------------------------------
@@ -106,42 +105,27 @@ local function onEvtSystemRequestDoAction(self, event)
     end
 end
 
-local function onEvtPlayerRequestDoAction(self, event)
-    local request = event
-    request.playerAccount, request.playerPassword = WebSocketManager.getLoggedInAccountAndPassword()
-    WebSocketManager.sendString(SerializationFunctions.toString(request))
-end
-
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(30))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(30))
 end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
-
     onEvtSystemRequestDoAction(self, param.action)
 end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneMain-onWebSocketClose()")
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(31))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
+    self:getModelMessageIndicator():showMessage(getLocalizedText(31))
 end
 
 local function onWebSocketError(self, param)
     print("ModelSceneMain-onWebSocketError() " .. param.error)
-    self.m_ActorMessageIndicator:getModel():showMessage(getLocalizedText(32, param.error))
-
-    WebSocketManager.close()
-        .init()
-        .setOwner(self)
+    self:getModelMessageIndicator():showMessage(getLocalizedText(32, param.error))
 end
 
 --------------------------------------------------------------------------------
@@ -149,8 +133,7 @@ end
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
-    dispatcher:addEventListener("EvtPlayerRequestDoAction", self)
-        :addEventListener("EvtSystemRequestDoAction", self)
+    dispatcher:addEventListener("EvtSystemRequestDoAction", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -166,20 +149,17 @@ local function initActorConfirmBox(self, confirmText)
     self.m_ActorConfirmBox = actor
 end
 
-local function initActorMainMenu(self)
-    local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
-    actor:getModel():setModelConfirmBox(self.m_ActorConfirmBox:getModel())
-        :setModelMessageIndicator(self.m_ActorMessageIndicator:getModel())
-        :setRootScriptEventDispatcher(self.m_ScriptEventDispatcher)
-        :updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
-
-    self.m_ActorMainMenu = actor
-end
-
 local function initActorMessageIndicator(self)
     local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
 
     self.m_ActorMessageIndicator = actor
+end
+
+local function initActorMainMenu(self)
+    local actor = Actor.createWithModelAndViewName("sceneMain.ModelMainMenu", nil, "sceneMain.ViewMainMenu")
+    actor:getModel():updateWithIsPlayerLoggedIn(self.m_IsPlayerLoggedIn)
+
+    self.m_ActorMainMenu = actor
 end
 
 --------------------------------------------------------------------------------
@@ -225,8 +205,7 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneMain:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPlayerRequestDoAction") then onEvtPlayerRequestDoAction(self, event)
-    elseif (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
+    if (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
     end
 
     return self
@@ -240,6 +219,21 @@ function ModelSceneMain:onWebSocketEvent(eventName, param)
     end
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelSceneMain:getModelConfirmBox()
+    return self.m_ActorConfirmBox:getModel()
+end
+
+function ModelSceneMain:getModelMessageIndicator()
+    return self.m_ActorMessageIndicator:getModel()
+end
+
+function ModelSceneMain:getScriptEventDispatcher()
+    return self.m_ScriptEventDispatcher
 end
 
 return ModelSceneMain

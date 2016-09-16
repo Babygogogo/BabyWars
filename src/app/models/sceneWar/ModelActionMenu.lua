@@ -11,6 +11,8 @@
 
 local ModelActionMenu = class("ModelActionMenu")
 
+local SingletonGetters = require("src.app.utilities.SingletonGetters")
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -45,11 +47,16 @@ function ModelActionMenu:ctor(param)
     return self
 end
 
-function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelActionMenu:setRootScriptEventDispatcher() the dispatcher has been set already.")
+function ModelActionMenu:initView()
+    return self
+end
 
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtPlayerIndexUpdated",              self)
+--------------------------------------------------------------------------------
+-- The callback functions on script events.
+--------------------------------------------------------------------------------
+function ModelActionMenu:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtPlayerIndexUpdated",                    self)
         :addEventListener("EvtActionPlannerIdle",                     self)
         :addEventListener("EvtActionPlannerChoosingProductionTarget", self)
         :addEventListener("EvtActionPlannerMakingMovePath",           self)
@@ -61,25 +68,6 @@ function ModelActionMenu:setRootScriptEventDispatcher(dispatcher)
     return self
 end
 
-function ModelActionMenu:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelActionMenu:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtActionPlannerChoosingSiloTarget", self)
-        :removeEventListener("EvtActionPlannerChoosingDropDestination",  self)
-        :removeEventListener("EvtActionPlannerChoosingAttackTarget",     self)
-        :removeEventListener("EvtActionPlannerChoosingAction",           self)
-        :removeEventListener("EvtActionPlannerMakingMovePath",           self)
-        :removeEventListener("EvtActionPlannerChoosingProductionTarget", self)
-        :removeEventListener("EvtActionPlannerIdle",                     self)
-        :removeEventListener("EvtPlayerIndexUpdated",                    self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelActionMenu:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtPlayerIndexUpdated")                    then onEvtPlayerIndexUpdated(self, event)

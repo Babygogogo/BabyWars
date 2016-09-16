@@ -33,20 +33,6 @@ function TileBuilder:loadInstantialData(data)
     return self
 end
 
-function TileBuilder:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "TileBuilder:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function TileBuilder:unsetModelPlayerManager()
-    assert(self.m_ModelPlayerManager, "TileBuilder:unsetModelPlayerManager() the model hasn't been set.")
-    self.m_ModelPlayerManager = nil
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------

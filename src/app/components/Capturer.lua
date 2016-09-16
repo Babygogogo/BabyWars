@@ -12,6 +12,7 @@
 
 local Capturer = require("src.global.functions.class")("Capturer")
 
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
 Capturer.EXPORTED_METHODS = {
@@ -42,9 +43,11 @@ function Capturer:loadInstantialData(data)
     return self
 end
 
-function Capturer:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "Capturer:setModelPlayerManager() the model has been set already.")
-    self.m_ModelPlayerManager = model
+--------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function Capturer:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end
@@ -100,7 +103,7 @@ end
 
 function Capturer:getCaptureAmount()
     local capturer    = self.m_Owner
-    local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(capturer:getPlayerIndex())
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(capturer:getPlayerIndex())
     local modifier    = SkillModifierFunctions.getCaptureAmountModifier(modelPlayer:getModelSkillConfiguration())
     return round(capturer:getNormalizedCurrentHP() * (100 + modifier) / 100)
 end

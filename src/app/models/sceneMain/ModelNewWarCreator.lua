@@ -4,7 +4,9 @@ local ModelNewWarCreator = class("ModelNewWarCreator")
 local WarFieldList              = require("res.data.templateWarField.WarFieldList")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
@@ -71,10 +73,9 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
         local password = modelWarConfigurator:getPassword()
         if ((#password ~= 0) and (#password ~= 4)) then
-            self.m_ModelMessageIndicator:showMessage(getLocalizedText(61))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name                 = "EvtPlayerRequestDoAction",
+            WebSocketManager.sendAction({
                 actionName           = "NewWar",
                 warPassword          = password,
                 warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
@@ -99,8 +100,7 @@ local function initSelectorSkill(self, modelWarConfigurator)
             callbackOnOptionIndicatorTouched = function()
                 modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
-                self.m_RootScriptEventDispatcher:dispatchEvent({
-                    name            = "EvtPlayerRequestDoAction",
+                WebSocketManager.sendAction({
                     actionName      = "GetSkillConfiguration",
                     configurationID = i,
                 })
@@ -231,20 +231,6 @@ end
 function ModelNewWarCreator:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelNewWarCreator:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
-
-    return self
-end
-
-function ModelNewWarCreator:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelNewWarCreator:setModelMessageIndicator() the model has been set.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelNewWarCreator:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelNewWarCreator:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end

@@ -3,10 +3,10 @@ local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
-local ActorManager              = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -93,8 +93,7 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                 callbackOnOptionIndicatorTouched = function()
                     modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                         :setPopUpPanelEnabled(true)
-                    self.m_RootScriptEventDispatcher:dispatchEvent({
-                        name            = "EvtPlayerRequestDoAction",
+                    WebSocketManager.sendAction({
                         actionName      = "GetSkillConfiguration",
                         configurationID = i,
                     })
@@ -154,10 +153,9 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
         local password = modelWarConfigurator:getPassword()
         if ((#password ~= 0) and (#password ~= 4)) then
-            self.m_ModelMessageIndicator:showMessage(getLocalizedText(61))
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
-            self.m_RootScriptEventDispatcher:dispatchEvent({
-                name                 = "EvtPlayerRequestDoAction",
+            WebSocketManager.sendAction({
                 actionName           = "JoinWar",
                 sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
                 playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
@@ -237,30 +235,9 @@ function ModelJoinWarSelector:initView()
     return self
 end
 
-function ModelJoinWarSelector:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil, "ModelJoinWarSelector:setModelConfirmBox() the model has been set already.")
-    self.m_ModelConfirmBox = model
-
-    return self
-end
-
 function ModelJoinWarSelector:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelJoinWarSelector:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
-
-    return self
-end
-
-function ModelJoinWarSelector:setModelMessageIndicator(model)
-    assert(self.m_ModelMessageIndicator == nil, "ModelJoinWarSelector:setModelMessageIndicator() the model has been set.")
-    self.m_ModelMessageIndicator = model
-
-    return self
-end
-
-function ModelJoinWarSelector:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelJoinWarSelector:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end
@@ -269,12 +246,12 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:doActionGetJoinableWarList(action)
-    self.m_WarList = createJoinableWarList(self, action.list)
-    if (self.m_IsEnabled) then
-        if (#self.m_WarList == 0) then
-            self.m_ModelMessageIndicator:showMessage(getLocalizedText(60))
-        elseif (self.m_View) then
-            self.m_View:showWarList(self.m_WarList)
+    if ((self.m_View) and (self.m_IsEnabled)) then
+        local warList = createJoinableWarList(self, action.list)
+        if (#warList == 0) then
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(60))
+        else
+            self.m_View:showWarList(warList)
         end
     end
 
@@ -284,7 +261,7 @@ end
 function ModelJoinWarSelector:doActionJoinWar(action)
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
-    self.m_ModelMessageIndicator:showMessage(action.message)
+    SingletonGetters.getModelMessageIndicator():showMessage(action.message)
 
     return self
 end
@@ -309,8 +286,7 @@ function ModelJoinWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
+        WebSocketManager.sendAction({
             actionName = "GetJoinableWarList",
         })
     end
@@ -330,7 +306,7 @@ end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
     if (#editBoxText ~= 4) then
-        self.m_ModelMessageIndicator:showMessage(getLocalizedText(59))
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(59))
     else
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
         if (self.m_View) then
@@ -338,8 +314,7 @@ function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
                 :setButtonNextVisible(false)
         end
 
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name              = "EvtPlayerRequestDoAction",
+        WebSocketManager.sendAction({
             actionName        = "GetJoinableWarList",
             sceneWarShortName = editBoxText:lower(),
         })

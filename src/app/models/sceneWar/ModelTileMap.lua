@@ -30,11 +30,12 @@
 
 local ModelTileMap = require("src.global.functions.class")("ModelTileMap")
 
-local Actor                  = require("src.global.actors.Actor")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
-local TableFunctions         = require("src.app.utilities.TableFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local toErrMsg               = SerializationFunctions.toErrorMessage
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local Actor                  = require("src.global.actors.Actor")
+
+local toErrMsg = SerializationFunctions.toErrorMessage
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
@@ -135,7 +136,7 @@ local function onEvtDestroyModelTile(self, event)
     end
 
     modelTile:destroyModelTileObject()
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
 end
 
 local function onEvtDestroyViewTile(self, event)
@@ -193,44 +194,6 @@ function ModelTileMap:initView()
     return self
 end
 
-function ModelTileMap:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelTileMap:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtDestroyModelTile", self)
-        :addEventListener("EvtDestroyViewTile",  self)
-        :addEventListener("EvtDestroyModelUnit", self)
-
-    self:forEachModelTile(function(modelTile)
-        modelTile:setRootScriptEventDispatcher(dispatcher)
-    end)
-
-    return self
-end
-
-function ModelTileMap:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelTileMap:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtDestroyModelUnit", self)
-        :removeEventListener("EvtDestroyViewTile",  self)
-        :removeEventListener("EvtDestroyModelTile", self)
-    self.m_RootScriptEventDispatcher = nil
-
-    self:forEachModelTile(function(modelTile)
-        modelTile:unsetRootScriptEventDispatcher()
-    end)
-
-    return self
-end
-
-function ModelTileMap:setModelPlayerManager(model)
-    self:forEachModelTile(function(modelTile)
-        modelTile:setModelPlayerManager(model)
-    end)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -247,8 +210,22 @@ function ModelTileMap:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on script events.
+-- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
+function ModelTileMap:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
+    self:forEachModelTile(function(modelTile)
+        modelTile:onStartRunning(sceneWarFileName)
+    end)
+
+    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+        :addEventListener("EvtDestroyModelTile", self)
+        :addEventListener("EvtDestroyViewTile",  self)
+        :addEventListener("EvtDestroyModelUnit", self)
+
+    return self
+end
+
 function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
@@ -274,14 +251,14 @@ function ModelTileMap:doActionSurrender(action)
         self:getModelTile(gridIndex):doActionSurrender(action)
     end
 
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end
 
 function ModelTileMap:doActionMoveModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    self.m_RootScriptEventDispatcher:dispatchEvent({name = "EvtModelTileMapUpdated"})
+    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
 
     return self
 end

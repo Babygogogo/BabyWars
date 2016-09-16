@@ -36,7 +36,6 @@ local function main()
 
     local actorSceneMain = require("src.global.actors.Actor").createWithModelAndViewName("sceneMain.ModelSceneMain", nil, "sceneMain.ViewSceneMain")
     require("src.app.utilities.WebSocketManager").init()
-        .setOwner(actorSceneMain:getModel())
     require("src.global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
 end
 

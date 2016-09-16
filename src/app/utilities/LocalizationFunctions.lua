@@ -195,6 +195,9 @@ local s_Texts = {
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
             elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
+            elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
+            elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
+            elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -229,6 +232,9 @@ local s_Texts = {
             elseif (skillID == 23) then return "地形加成攻击"
             elseif (skillID == 24) then return "地形加成防御"
             elseif (skillID == 25) then return "我方幸运下限"
+            elseif (skillID == 26) then return "全军晋升"
+            elseif (skillID == 27) then return "全军自带晋升"
+            elseif (skillID == 28) then return "完美移动"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -241,9 +247,11 @@ local s_Texts = {
             if     (skillCategory == "SkillCategoryPassiveAttack")      then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "防 御 类"
             elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "金 钱 类"
+            elseif (skillCategory == "SkillCategoryPassiveMovement")    then return "移 动 类"
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "射 程 类"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "占 领 类"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
+            elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "防 御 类"
@@ -252,6 +260,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "射 程 类"
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "占 领 类"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP 类"
+            elseif (skillCategory == "SkillCategoryActivePromotion")    then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
             else                                                        return "未知6:" .. (skillCategory or "")
@@ -261,9 +270,11 @@ local s_Texts = {
             if     (skillCategory == "SkillCategoryPassiveAttack")      then return "Attack"
             elseif (skillCategory == "SkillCategoryPassiveDefense")     then return "Defense"
             elseif (skillCategory == "SkillCategoryPassiveMoney")       then return "Money"
+            elseif (skillCategory == "SkillCategoryPassiveMovement")    then return "Movement"
             elseif (skillCategory == "SkillCategoryPassiveAttackRange") then return "AttackRange"
             elseif (skillCategory == "SkillCategoryPassiveCapture")     then return "Capture"
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"
+            elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "Promotion"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "Attack"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "Defense"
@@ -272,6 +283,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActiveAttackRange")  then return "AttackRange"
             elseif (skillCategory == "SkillCategoryActiveCapture")      then return "Capture"
             elseif (skillCategory == "SkillCategoryActiveHP")           then return "HP"
+            elseif (skillCategory == "SkillCategoryActivePromotion")    then return "Promotion"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
             else                                                        return "Unknown6:" .. (skillCategory or "")
@@ -301,21 +313,21 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [8] = {
-        [1] = function(commandType)
-            if     (commandType == "Back") then return "返 回"
-            elseif (commandType == "Exit") then return "退 出"
-            else                                return "未识别"
+        [1] = function(textType)
+            if     (textType == "TransferingData")  then return "正在传输数据。若长时间没有反应，请返回重试。"
+            elseif (textType == "NoContinuableWar") then return "您没有可以继续进行的战局。"
+            else                                         return "未知8:" .. (textType or "")
             end
         end,
-        [2] = function(commandType)
-            if     (commandType == "Back") then return "Back"
-            elseif (commandType == "Exit") then return "Exit"
-            else                                return "Unrecognized"
+        [2] = function(textType)
+            if     (textType == "TransferingData")  then return "Transfering data. If it's not responding, please retry."
+            elseif (textType == "NoContinuableWar") then return "No war is continuable currently."
+            else                                         return "Unknown8:"
             end
         end,
     },
+    --[[
     [9] = {
         [1] = function(...) return "游 戏 流 程" end,
         [2] = function(...) return "Game Flow"  end,

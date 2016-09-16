@@ -13,14 +13,16 @@
 local ModelUnitInfo = class("ModelUnitInfo")
 
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateWithModelUnitMap(self)
-    local modelUnit = self.m_ModelUnitMap:getModelUnit(self.m_CursorGridIndex)
+    local modelUnitMap = SingletonGetters.getModelUnitMap()
+    local modelUnit    = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
     if (modelUnit) then
-        local loadedModelUnits = self.m_ModelUnitMap:getLoadedModelUnitsWithLoader(modelUnit)
+        local loadedModelUnits = modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
         if (self.m_View) then
@@ -85,46 +87,23 @@ function ModelUnitInfo:setModelUnitDetail(model)
     return self
 end
 
-function ModelUnitInfo:setModelUnitMap(model)
-    assert(self.m_ModelUnitMap == nil, "ModelUnitInfo:setModelUnitMap() the model has been set.")
-    self.m_ModelUnitMap = model
+--------------------------------------------------------------------------------
+-- The callback functions on start running/script events.
+--------------------------------------------------------------------------------
+function ModelUnitInfo:onStartRunning(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher()
+        :addEventListener("EvtModelUnitMapUpdated",   self)
+        :addEventListener("EvtTurnPhaseMain",         self)
+        :addEventListener("EvtGridSelected",          self)
+        :addEventListener("EvtMapCursorMoved",        self)
+        :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtPlayerIndexUpdated",    self)
 
     updateWithModelUnitMap(self)
 
     return self
 end
 
-function ModelUnitInfo:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelUnitInfo:setRootScriptEventDispatcher() the dispatcher has been set.")
-
-    self.m_RootScriptEventDispatcher = dispatcher
-    dispatcher:addEventListener("EvtModelUnitMapUpdated", self)
-        :addEventListener("EvtTurnPhaseMain",             self)
-        :addEventListener("EvtGridSelected",              self)
-        :addEventListener("EvtMapCursorMoved",            self)
-        :addEventListener("EvtWarCommandMenuUpdated",     self)
-        :addEventListener("EvtPlayerIndexUpdated",        self)
-
-    return self
-end
-
-function ModelUnitInfo:unsetRootScriptEventDispatcher()
-    assert(self.m_RootScriptEventDispatcher, "ModelUnitInfo:unsetRootScriptEventDispatcher() the dispatcher hasn't been set.")
-
-    self.m_RootScriptEventDispatcher:removeEventListener("EvtPlayerIndexUpdated", self)
-        :removeEventListener("EvtWarCommandMenuUpdated",     self)
-        :removeEventListener("EvtMapCursorMoved",            self)
-        :removeEventListener("EvtGridSelected",              self)
-        :removeEventListener("EvtTurnPhaseMain",             self)
-        :removeEventListener("EvtModelUnitMapUpdated",       self)
-    self.m_RootScriptEventDispatcher = nil
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtModelUnitMapUpdated")       then onEvtModelUnitMapUpdated(     self, event)

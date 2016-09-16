@@ -18,6 +18,7 @@ local AttackDoer = require("src.global.functions.class")("AttackDoer")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 
 AttackDoer.EXPORTED_METHODS = {
     "hasPrimaryWeapon",
@@ -92,20 +93,6 @@ function AttackDoer:loadInstantialData(data)
     return self
 end
 
-function AttackDoer:setModelPlayerManager(model)
-    assert(self.m_ModelPlayerManager == nil, "AttackDoer:setModelPlayerManager() the model has been set.")
-    self.m_ModelPlayerManager = model
-
-    return self
-end
-
-function AttackDoer:setModelWeatherManager(model)
-    assert(self.m_ModelWeatherManager == nil, "AttackDoer:setModelWeatherManager() the model has been set.")
-    self.m_ModelWeatherManager = model
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The function for serialzation.
 --------------------------------------------------------------------------------
@@ -119,6 +106,15 @@ function AttackDoer:toSerializableTable()
             }
         }
     end
+end
+
+--------------------------------------------------------------------------------
+-- The public callback function for start running.
+--------------------------------------------------------------------------------
+function AttackDoer:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -210,7 +206,7 @@ function AttackDoer:getAttackRangeMinMax()
     if (maxRange <= 1) then
         return minRange, maxRange
     else
-        local modelPlayer = self.m_ModelPlayerManager:getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
         return minRange,
             math.max(minRange, maxRange + SkillModifierFunctions.getAttackRangeModifier(modelPlayer:getModelSkillConfiguration()))
     end

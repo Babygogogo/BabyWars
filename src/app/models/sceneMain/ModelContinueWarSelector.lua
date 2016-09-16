@@ -11,6 +11,7 @@ local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
@@ -123,8 +124,8 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        WebSocketManager.sendAction({
             actionName = "GetSceneWarData",
             fileName   = modelWarConfigurator:getSceneWarFileName(),
         })
@@ -190,6 +191,10 @@ local function createOngoingWarList(self, list)
         }
     end
 
+    table.sort(warList, function(item1, item2)
+        return item1.sceneWarFileName < item2.sceneWarFileName
+    end)
+
     return warList
 end
 
@@ -213,23 +218,9 @@ function ModelContinueWarSelector:initView()
     return self
 end
 
-function ModelContinueWarSelector:setModelConfirmBox(model)
-    assert(self.m_ModelConfirmBox == nil, "ModelContinueWarSelector:setModelConfirmBox() the model has been set already.")
-    self.m_ModelConfirmBox = model
-
-    return self
-end
-
 function ModelContinueWarSelector:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelContinueWarSelector:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
-
-    return self
-end
-
-function ModelContinueWarSelector:setRootScriptEventDispatcher(dispatcher)
-    assert(self.m_RootScriptEventDispatcher == nil, "ModelContinueWarSelector:setRootScriptEventDispatcher() the dispatcher has been set.")
-    self.m_RootScriptEventDispatcher = dispatcher
 
     return self
 end
@@ -238,9 +229,13 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:doActionGetOngoingWarList(action)
-    self.m_WarList = createOngoingWarList(self, action.list)
     if ((self.m_View) and (self.m_IsEnabled)) then
-        self.m_View:showWarList(self.m_WarList)
+        local warList = createOngoingWarList(self, action.list)
+        if (#warList == 0) then
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+        else
+            self.m_View:showWarList(warList)
+        end
     end
 
     return self
@@ -249,7 +244,6 @@ end
 function ModelContinueWarSelector:doActionGetSceneWarData(action)
     if (self.m_IsEnabled) then
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
-        WebSocketManager.setOwner(actorSceneWar:getModel())
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
 
@@ -263,8 +257,8 @@ function ModelContinueWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        self.m_RootScriptEventDispatcher:dispatchEvent({
-            name       = "EvtPlayerRequestDoAction",
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        WebSocketManager.sendAction({
             actionName = "GetOngoingWarList",
         })
     end
