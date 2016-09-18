@@ -285,6 +285,19 @@ function ViewWarConfigurator:getEditBoxPassword()
     return self.m_EditBoxPassword
 end
 
+function ViewWarConfigurator:disableButtonConfirmForSecs(secs)
+    self.m_ButtonConfirm:setEnabled(false)
+        :stopAllActions()
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(secs),
+            cc.CallFunc:create(function()
+                self.m_ButtonConfirm:setEnabled(true)
+            end)
+        ))
+
+    return self
+end
+
 function ViewWarConfigurator:isPopUpPanelEnabled(enabled)
     return self.m_PopUpGreyMask:isVisible()
 end

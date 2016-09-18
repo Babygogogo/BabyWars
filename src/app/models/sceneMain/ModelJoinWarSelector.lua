@@ -155,6 +155,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         if ((#password ~= 0) and (#password ~= 4)) then
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+            modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
                 actionName           = "JoinWar",
                 sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
@@ -211,6 +213,10 @@ local function createJoinableWarList(self, list)
             end,
         }
     end
+
+    table.sort(warList, function(item1, item2)
+        return item1.sceneWarFileName < item2.sceneWarFileName
+    end)
 
     return warList
 end

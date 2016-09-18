@@ -176,6 +176,14 @@ function ModelWarConfigurator:onButtonBackTouched()
     return self
 end
 
+function ModelWarConfigurator:disableButtonConfirmForSecs(secs)
+    if (self.m_View) then
+        self.m_View:disableButtonConfirmForSecs(secs)
+    end
+
+    return self
+end
+
 function ModelWarConfigurator:onButtonConfirmTouched()
     if (self.m_OnButtonConfirmTouched) then
         self.m_OnButtonConfirmTouched()

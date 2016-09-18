@@ -75,6 +75,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         if ((#password ~= 0) and (#password ~= 4)) then
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+            modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
                 actionName           = "NewWar",
                 warPassword          = password,
