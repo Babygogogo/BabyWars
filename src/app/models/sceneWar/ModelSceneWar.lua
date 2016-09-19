@@ -25,6 +25,7 @@
 
 local ModelSceneWar = class("ModelSceneWar")
 
+local ActionExecutor         = require("src.app.utilities.ActionExecutor")
 local AudioManager           = require("src.app.utilities.AudioManager")
 local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
@@ -80,27 +81,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
-local function doActionLogout(self, event)
-    runSceneMain({confirmText = event.message})
-end
-
-local function doActionMessage(self, action)
-    self:getModelMessageIndicator():showMessage(action.message)
-    local additionalAction = action.additionalAction
-    if     (additionalAction == "RunSceneMain")   then runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
-    elseif (additionalAction == "ReloadSceneWar") then requestReload(self, 3)
-    end
-end
-
-local function doActionError(self, action)
-    error("ModelSceneWar-doActionError(): " .. action.error)
-end
-
-local function doActionGetSceneWarData(self, action)
-    local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
-    ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
-end
-
 local function doActionBeginTurn(self, action)
     local modelTurnManager = self:getModelTurnManager()
     local lostPlayerIndex  = action.lostPlayerIndex
@@ -273,10 +253,13 @@ end
 
 local function doAction(self, action)
     local actionName = action.actionName
-    if     (actionName == "Logout")          then doActionLogout(         self, action)
-    elseif (actionName == "Message")         then doActionMessage(        self, action)
-    elseif (actionName == "Error")           then doActionError(          self, action)
-    elseif (actionName == "GetSceneWarData") then doActionGetSceneWarData(self, action)
+    if ((actionName == "Logout")              or
+        (actionName == "Message")             or
+        (actionName == "Error")               or
+        (actionName == "RunSceneMain")        or
+        (actionName == "GetSceneWarData")     or
+        (actionName == "ReloadCurrentScene")) then
+        return ActionExecutor.execute(action)
     end
 
     if ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
