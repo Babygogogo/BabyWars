@@ -269,38 +269,6 @@ function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAni
     return self
 end
 
-function ModelUnit:doActionLaunchSilo(action, modelUnitMap, silo)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionLaunchSilo", action, modelUnitMap, silo)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            silo:updateView()
-
-            local dispatcher  = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
-            local mapSize     = modelUnitMap:getMapSize()
-            local isWithinMap = GridIndexFunctions.isWithinMap
-            for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
-                if (isWithinMap(gridIndex, mapSize)) then
-                    local modelUnit = modelUnitMap:getModelUnit(gridIndex)
-                    if (modelUnit) then
-                        modelUnit:updateView()
-                    end
-
-                    dispatcher:dispatchEvent({
-                        name      = "EvtSiloAttackGrid",
-                        gridIndex = gridIndex,
-                    })
-                end
-            end
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionBuildModelTile(action, target)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, target)

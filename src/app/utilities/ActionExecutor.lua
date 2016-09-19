@@ -2,6 +2,7 @@
 local ActionExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
@@ -210,6 +211,50 @@ local function executeJoinModelUnit(action)
         end)
 end
 
+local function executeLaunchSilo(action)
+    local path              = action.path
+    local sceneWarFileName  = action.fileName
+    local modelUnitMap      = getModelUnitMap(sceneWarFileName)
+    local mapSize           = modelUnitMap:getMapSize()
+    local focusModelUnit    = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local modelTile         = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
+    local targetModelUnits  = {}
+    local targetGridIndexes = {}
+
+    moveModelUnitWithAction(action)
+    modelTile:updateWithObjectAndBaseId(focusModelUnit:getTileObjectIdAfterLaunch())
+    for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
+        if (GridIndexFunctions.isWithinMap(gridIndex, mapSize)) then
+            targetGridIndexes[#targetGridIndexes + 1] = gridIndex
+
+            local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+            if ((modelUnit) and (modelUnit.setCurrentHP)) then
+                modelUnit:setCurrentHP(math.max(1, modelUnit:getCurrentHP() - 30))
+                targetModelUnits[#targetModelUnits + 1] = modelUnit
+            end
+        end
+    end
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+            modelTile:updateView()
+
+            for _, modelUnit in ipairs(targetModelUnits) do
+                modelUnit:updateView()
+            end
+
+            local dispatcher = getScriptEventDispatcher(sceneWarFileName)
+            for _, gridIndex in ipairs(targetGridIndexes) do
+                dispatcher:dispatchEvent({
+                    name      = "EvtSiloAttackGrid",
+                    gridIndex = gridIndex,
+                })
+            end
+        end)
+end
+
 local function executeWait(action)
     local path           = action.path
     local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
@@ -250,6 +295,7 @@ function ActionExecutor.execute(action)
     modelSceneWar:setActionId(actionID)
 
     if     (actionName == "JoinModelUnit") then executeJoinModelUnit(action)
+    elseif (actionName == "LaunchSilo")    then executeLaunchSilo(   action)
     elseif (actionName == "Wait")          then executeWait(         action)
     end
 

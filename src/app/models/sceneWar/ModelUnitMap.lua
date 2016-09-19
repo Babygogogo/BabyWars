@@ -476,17 +476,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionLaunchSilo(action, silo)
-    local launcher = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    launcher:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(launcher, true))
-    moveActorUnitOnAction(self, action)
-    launcher:doActionLaunchSilo(action, self, silo)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionBuildModelTile(action, target)
     local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder, true))

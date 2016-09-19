@@ -213,10 +213,6 @@ local function doActionCaptureModelTile(self, action)
     modelPlayerManager:doActionCaptureModelTile(action)
 end
 
-local function doActionLaunchSilo(self, action)
-    self:getModelWarField():doActionLaunchSilo(action)
-end
-
 local function doActionBuildModelTile(self, action)
     self:getModelWarField():doActionBuildModelTile(action)
 end
@@ -252,6 +248,7 @@ local function doAction(self, action)
         (actionName == "GetSceneWarData")     or
         (actionName == "ReloadCurrentScene")  or
         (actionName == "JoinModelUnit")       or
+        (actionName == "LaunchSilo")          or
         (actionName == "Wait"))               then
         return ActionExecutor.execute(action)
     end
@@ -274,7 +271,6 @@ local function doAction(self, action)
     elseif (actionName == "ActivateSkillGroup")     then doActionActivateSkillGroup(    self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
-    elseif (actionName == "LaunchSilo")             then doActionLaunchSilo(            self, action)
     elseif (actionName == "BuildModelTile")         then doActionBuildModelTile(        self, action)
     elseif (actionName == "ProduceModelUnitOnUnit") then doActionProduceModelUnitOnUnit(self, action)
     elseif (actionName == "SupplyModelUnit")        then doActionSupplyModelUnit(       self, action)

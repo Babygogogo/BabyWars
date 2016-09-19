@@ -198,17 +198,6 @@ function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimati
     return self
 end
 
-function ModelWarField:doActionLaunchSilo(action)
-    local modelTileMap = self:getModelTileMap()
-    local path         = action.path
-    local silo         = modelTileMap:getModelTile(path[#path])
-
-    self:getModelUnitMap():doActionLaunchSilo(action, silo)
-    modelTileMap          :doActionLaunchSilo(action)
-
-    return self
-end
-
 function ModelWarField:doActionBuildModelTile(action)
     local modelTileMap = self:getModelTileMap()
     local path         = action.path
