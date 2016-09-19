@@ -149,10 +149,6 @@ local function doActionActivateSkillGroup(self, action)
     self:getModelPlayerManager():doActionActivateSkillGroup(action, playerIndex)
 end
 
-local function doActionWait(self, action)
-    self:getModelWarField():doActionWait(action)
-end
-
 local function doActionAttack(self, action)
     local modelPlayerManager = self:getModelPlayerManager()
     local modelTurnManager   = self:getModelTurnManager()
@@ -258,7 +254,8 @@ local function doAction(self, action)
         (actionName == "Error")               or
         (actionName == "RunSceneMain")        or
         (actionName == "GetSceneWarData")     or
-        (actionName == "ReloadCurrentScene")) then
+        (actionName == "ReloadCurrentScene")  or
+        (actionName == "Wait"))               then
         return ActionExecutor.execute(action)
     end
 
@@ -278,7 +275,6 @@ local function doAction(self, action)
     elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
     elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
     elseif (actionName == "ActivateSkillGroup")     then doActionActivateSkillGroup(    self, action)
-    elseif (actionName == "Wait")                   then doActionWait(                  self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
@@ -453,6 +449,12 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:getActionId()
     return self.m_ActionID
+end
+
+function ModelSceneWar:setActionId(actionID)
+    self.m_ActionID = actionID
+
+    return self
 end
 
 function ModelSceneWar:getFileName()

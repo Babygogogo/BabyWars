@@ -19,6 +19,7 @@ UnitLoader.EXPORTED_METHODS = {
     "getRepairAmountAndCostForLoadedModelUnit",
 
     "addLoadUnitId",
+    "removeLoadUnitId",
 }
 
 --------------------------------------------------------------------------------
@@ -124,17 +125,7 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function UnitLoader:doActionLaunchModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    assert(launchUnitID, "UnitLoader:doActionLaunchModelUnit() action.launchUnitID is invalid.")
-
-    for i, unitID in ipairs(self.m_LoadedUnitIds) do
-        if (unitID == launchUnitID) then
-            table.remove(self.m_LoadedUnitIds, i)
-            return self.m_Owner
-        end
-    end
-
-    error("UnitLoader:doActionLaunchModelUnit() no loaded unit id matches action.launchUnitID.")
+    return self:removeLoadUnitId(action.launchUnitID)
 end
 
 function UnitLoader:canJoinModelUnit(modelUnit)
@@ -241,6 +232,17 @@ function UnitLoader:addLoadUnitId(unitID)
     self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
 
     return self.m_Owner
+end
+
+function UnitLoader:removeLoadUnitId(unitID)
+    for i, unitID in ipairs(self.m_LoadedUnitIds) do
+        if (unitID == unitID) then
+            table.remove(self.m_LoadedUnitIds, i)
+            return self.m_Owner
+        end
+    end
+
+    error("UnitLoader:removeLoadUnitId() the param unitID is not loaded: " .. (unitID or ""))
 end
 
 return UnitLoader

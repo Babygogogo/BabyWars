@@ -7,6 +7,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 TileBuilder.EXPORTED_METHODS = {
     "isBuildingModelTile",
+    "setBuildingModelTile",
     "canBuildOnTileType",
     "getBuildAmount",
     "getBuildTiledIdWithTileType",
@@ -77,6 +78,12 @@ end
 --------------------------------------------------------------------------------
 function TileBuilder:isBuildingModelTile()
     return self.m_IsBuilding
+end
+
+function TileBuilder:setBuildingModelTile(isBuilding)
+    self.m_IsBuilding = isBuilding
+
+    return self.m_Owner
 end
 
 function TileBuilder:canBuildOnTileType(tileType)

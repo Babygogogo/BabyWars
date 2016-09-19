@@ -174,13 +174,6 @@ function ModelWarField:doActionSurrender(action)
     return self
 end
 
-function ModelWarField:doActionWait(action)
-    self:getModelUnitMap():doActionWait(action)
-    self:getModelTileMap():doActionWait(action)
-
-    return self
-end
-
 function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
     local modelUnitMap    = self:getModelUnitMap()
     local modelTileMap    = self:getModelTileMap()

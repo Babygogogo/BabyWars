@@ -63,37 +63,6 @@ local function setActorUnitLoaded(self, gridIndex)
     loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
 end
 
-local function setActorUnitUnloaded(self, unitID, gridIndex)
-    local loaded = self.m_LoadedActorUnits
-    local map    = self.m_ActorUnitsMap
-    local x, y   = gridIndex.x, gridIndex.y
-    assert(loaded[unitID], "ModelUnitMap-setActorUnitUnloaded() the focus unit is not loaded.")
-    assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
-
-    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
-
-    if (self.m_View) then
-        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
-    end
-end
-
-local function swapActorUnit(self, gridIndex1, gridIndex2)
-    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
-        return
-    end
-
-    local x1, y1 = gridIndex1.x, gridIndex1.y
-    local x2, y2 = gridIndex2.x, gridIndex2.y
-    local map    = self.m_ActorUnitsMap
-    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
-
-    local view = self.m_View
-    if (view) then
-        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
-        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
-    end
-end
-
 local function moveActorUnitOnAction(self, action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
@@ -101,9 +70,9 @@ local function moveActorUnitOnAction(self, action)
 
     if (launchUnitID) then
         self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
+        self:setActorUnitUnloaded(launchUnitID, endingGridIndex)
     else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
+        self:swapActorUnit(beginningGridIndex, endingGridIndex)
     end
 end
 
@@ -485,17 +454,6 @@ function ModelUnitMap:doActionSurrender(action)
     return self
 end
 
-function ModelUnitMap:doActionWait(action)
-    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionWait(action)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
@@ -633,7 +591,7 @@ function ModelUnitMap:doActionDropModelUnit(action)
     local dropActorUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
         local gridIndex = dropDestination.gridIndex
-        setActorUnitUnloaded(self, dropDestination.unitID, gridIndex)
+        self:setActorUnitUnloaded(dropDestination.unitID, gridIndex)
 
         local dropActorUnit = getActorUnit(self, gridIndex)
         dropActorUnit:getModel():setGridIndex(gridIndex, false)
@@ -712,6 +670,39 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive
 
         return list
     end
+end
+
+function ModelUnitMap:swapActorUnit(gridIndex1, gridIndex2)
+    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
+        return
+    end
+
+    local x1, y1 = gridIndex1.x, gridIndex1.y
+    local x2, y2 = gridIndex2.x, gridIndex2.y
+    local map    = self.m_ActorUnitsMap
+    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
+
+    local view = self.m_View
+    if (view) then
+        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
+        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
+    end
+end
+
+function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    assert(loaded[unitID], "ModelUnitMap-setActorUnitUnloaded() the focus unit is not loaded.")
+    assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
+
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
+
+    if (self.m_View) then
+        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
+    end
+
+    return self
 end
 
 function ModelUnitMap:forEachModelUnitOnMap(func)

@@ -188,20 +188,6 @@ function ModelUnit:doActionLaunchModelUnit(action)
     return self
 end
 
-function ModelUnit:doActionWait(action)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionWait", action)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionAttack", action, attackTarget)
@@ -447,6 +433,16 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
+    if (self.m_View) then
+        self.m_View:moveAlongPath(path, callbackAfterMove)
+    elseif (callbackAfterMove) then
+        callbackAfterMove()
+    end
+
+    return self
+end
+
 function ModelUnit:updateView()
     if (self.m_View) then
         self.m_View:updateWithModelUnit(self)

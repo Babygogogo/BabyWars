@@ -17,6 +17,7 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 
 Capturer.EXPORTED_METHODS = {
     "isCapturingModelTile",
+    "setCapturingModelTile",
     "canCaptureModelTile",
     "getCaptureAmount",
 }
@@ -95,6 +96,12 @@ end
 --------------------------------------------------------------------------------
 function Capturer:isCapturingModelTile()
     return self.m_IsCapturing
+end
+
+function Capturer:setCapturingModelTile(capturing)
+    self.m_IsCapturing = capturing
+
+    return self.m_Owner
 end
 
 function Capturer:canCaptureModelTile(modelTile)
