@@ -250,32 +250,6 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
     return self
 end
 
-function ModelUnit:doActionJoinModelUnit(action, target)
-    local joinIncome = self:getJoinIncome(target)
-    if (joinIncome ~= 0) then
-        local playerIndex = self:getPlayerIndex()
-        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex)
-        modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
-        SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-            name        = "EvtModelPlayerUpdated",
-            modelPlayer = modelPlayer,
-            playerIndex = playerIndex,
-        })
-    end
-
-    target:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionJoinModelUnit", action, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:removeFromParent()
-            target:updateView()
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionCaptureModelTile", action, target)
@@ -446,6 +420,15 @@ end
 function ModelUnit:updateView()
     if (self.m_View) then
         self.m_View:updateWithModelUnit(self)
+    end
+
+    return self
+end
+
+function ModelUnit:removeViewFromParent()
+    if (self.m_View) then
+        self.m_View:removeFromParent()
+        self.m_View = nil
     end
 
     return self

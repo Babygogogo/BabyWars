@@ -186,13 +186,6 @@ function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
     return self
 end
 
-function ModelWarField:doActionJoinModelUnit(action)
-    self:getModelUnitMap():doActionJoinModelUnit(action)
-    self:getModelTileMap():doActionJoinModelUnit(action)
-
-    return self
-end
-
 function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
     local modelUnitMap = self:getModelUnitMap()
     local modelTileMap = self:getModelTileMap()

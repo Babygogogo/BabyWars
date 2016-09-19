@@ -151,19 +151,6 @@ function AttackTaker:canJoinModelUnit(modelUnit)
     return modelUnit:getNormalizedCurrentHP() < 10
 end
 
-function AttackTaker:doActionJoinModelUnit(action, target)
-    local joinedNormalizedHP = math.min(10, self:getNormalizedCurrentHP() + target:getNormalizedCurrentHP())
-    target:setCurrentHP(math.max(
-        (joinedNormalizedHP - 1) * 10 + 1,
-        math.min(
-            self:getCurrentHP() + target:getCurrentHP(),
-            UNIT_MAX_HP
-        )
-    ))
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

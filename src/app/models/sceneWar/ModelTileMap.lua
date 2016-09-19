@@ -267,10 +267,6 @@ function ModelTileMap:doActionAttack(action)
     return self:doActionMoveModelUnit(action)
 end
 
-function ModelTileMap:doActionJoinModelUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
 function ModelTileMap:doActionCaptureModelTile(action)
     return self:doActionMoveModelUnit(action)
 end

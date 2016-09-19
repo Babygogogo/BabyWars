@@ -465,30 +465,6 @@ function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnima
     return self
 end
 
-function ModelUnitMap:doActionJoinModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusActorUnit
-
-    if (launchUnitID) then
-        focusActorUnit = self.m_LoadedActorUnits[launchUnitID]
-        self.m_LoadedActorUnits[launchUnitID] = nil
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-    else
-        focusActorUnit = self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y]
-        self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
-    end
-
-    local focusModelUnit = focusActorUnit:getModel()
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-        :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
     local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer, true))
@@ -701,6 +677,12 @@ function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
     if (self.m_View) then
         self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
     end
+
+    return self
+end
+
+function ModelUnitMap:removeActorUnitWithGridIndex(gridIndex)
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
 
     return self
 end

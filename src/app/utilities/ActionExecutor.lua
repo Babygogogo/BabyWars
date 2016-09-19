@@ -6,12 +6,14 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
 
+local UNIT_MAX_HP           = GameConstantFunctions.getUnitMaxHP()
 local IS_SERVER             = GameConstantFunctions.isServer()
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
+local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
@@ -141,6 +143,73 @@ local function executeReloadCurrentScene(action)
     end
 end
 
+local function executeJoinModelUnit(action)
+    local path             = action.path
+    local endingGridIndex  = path[#path]
+    local sceneWarFileName = action.fileName
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local targetModelUnit  = modelUnitMap:getModelUnit(endingGridIndex)
+
+    modelUnitMap:removeActorUnitWithGridIndex(endingGridIndex)
+    moveModelUnitWithAction(action)
+
+    if ((focusModelUnit.hasPrimaryWeapon) and (focusModelUnit:hasPrimaryWeapon())) then
+        focusModelUnit:setPrimaryWeaponCurrentAmmo(math.min(
+            focusModelUnit:getPrimaryWeaponMaxAmmo(),
+            focusModelUnit:getPrimaryWeaponCurrentAmmo() + targetModelUnit:getPrimaryWeaponCurrentAmmo()
+        ))
+    end
+    if (focusModelUnit.getJoinIncome) then
+        local joinIncome = focusModelUnit:getJoinIncome(targetModelUnit)
+        if (joinIncome ~= 0) then
+            local playerIndex = focusModelUnit:getPlayerIndex()
+            local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+            modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
+            getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+                name        = "EvtModelPlayerUpdated",
+                modelPlayer = modelPlayer,
+                playerIndex = playerIndex,
+            })
+        end
+    end
+    if (focusModelUnit.setCurrentHP) then
+        local joinedNormalizedHP = math.min(10, focusModelUnit:getNormalizedCurrentHP() + targetModelUnit:getNormalizedCurrentHP())
+        focusModelUnit:setCurrentHP(math.max(
+            (joinedNormalizedHP - 1) * 10 + 1,
+            math.min(
+                focusModelUnit:getCurrentHP() + targetModelUnit:getCurrentHP(),
+                UNIT_MAX_HP
+            )
+        ))
+    end
+    if (focusModelUnit.setCurrentFuel) then
+        focusModelUnit:setCurrentFuel(math.min(
+            targetModelUnit:getMaxFuel(),
+            focusModelUnit:getCurrentFuel() + targetModelUnit:getCurrentFuel()
+        ))
+    end
+    if (focusModelUnit.setCurrentMaterial) then
+        focusModelUnit:setCurrentMaterial(math.min(
+            focusModelUnit:getMaxMaterial(),
+            focusModelUnit:getCurrentMaterial() + targetModelUnit:getCurrentMaterial()
+        ))
+    end
+    if (focusModelUnit.setCurrentPromotion) then
+        focusModelUnit:setCurrentPromotion(math.max(
+            focusModelUnit:getCurrentPromotion(),
+            targetModelUnit:getCurrentPromotion()
+        ))
+    end
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+            targetModelUnit:removeViewFromParent()
+        end)
+end
+
 local function executeWait(action)
     local path           = action.path
     local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
@@ -180,7 +249,8 @@ function ActionExecutor.execute(action)
     end
     modelSceneWar:setActionId(actionID)
 
-    if (actionName == "Wait") then executeWait(action)
+    if     (actionName == "JoinModelUnit") then executeJoinModelUnit(action)
+    elseif (actionName == "Wait")          then executeWait(         action)
     end
 
     if (not IS_SERVER) then

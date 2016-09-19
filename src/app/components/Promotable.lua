@@ -67,12 +67,6 @@ function Promotable:doActionPromoteModelUnit(action)
     return owner
 end
 
-function Promotable:doActionJoinModelUnit(action, target)
-    target:setCurrentPromotion(math.max(self:getCurrentPromotion(), target:getCurrentPromotion()))
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

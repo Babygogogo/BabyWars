@@ -184,10 +184,6 @@ local function doActionAttack(self, action)
     modelTurnManager  :doActionAttack(action)
 end
 
-local function doActionJoinModelUnit(self, action)
-    self:getModelWarField():doActionJoinModelUnit(action)
-end
-
 local function doActionCaptureModelTile(self, action)
     local modelWarField      = self:getModelWarField()
     local modelPlayerManager = self:getModelPlayerManager()
@@ -255,6 +251,7 @@ local function doAction(self, action)
         (actionName == "RunSceneMain")        or
         (actionName == "GetSceneWarData")     or
         (actionName == "ReloadCurrentScene")  or
+        (actionName == "JoinModelUnit")       or
         (actionName == "Wait"))               then
         return ActionExecutor.execute(action)
     end
@@ -276,7 +273,6 @@ local function doAction(self, action)
     elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
     elseif (actionName == "ActivateSkillGroup")     then doActionActivateSkillGroup(    self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
-    elseif (actionName == "JoinModelUnit")          then doActionJoinModelUnit(         self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     elseif (actionName == "LaunchSilo")             then doActionLaunchSilo(            self, action)
     elseif (actionName == "BuildModelTile")         then doActionBuildModelTile(        self, action)
