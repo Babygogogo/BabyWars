@@ -222,24 +222,20 @@ local function doActionDropModelUnit(self, action)
     self:getModelWarField():doActionDropModelUnit(action)
 end
 
-local function doActionProduceOnTile(self, action)
-    self:getModelPlayerManager():doActionProduceOnTile(action, self:getModelTurnManager():getPlayerIndex())
-    self:getModelWarField():doActionProduceOnTile(action)
-end
-
 local function doAction(self, action)
     local actionName = action.actionName
-    if ((actionName == "Logout")              or
-        (actionName == "Message")             or
-        (actionName == "Error")               or
-        (actionName == "RunSceneMain")        or
-        (actionName == "GetSceneWarData")     or
-        (actionName == "ReloadCurrentScene")  or
-        (actionName == "ActivateSkillGroup")  or
-        (actionName == "BuildModelTile")      or
-        (actionName == "JoinModelUnit")       or
-        (actionName == "LaunchSilo")          or
-        (actionName == "Wait"))               then
+    if ((actionName == "Logout")                 or
+        (actionName == "Message")                or
+        (actionName == "Error")                  or
+        (actionName == "RunSceneMain")           or
+        (actionName == "GetSceneWarData")        or
+        (actionName == "ReloadCurrentScene")     or
+        (actionName == "ActivateSkillGroup")     or
+        (actionName == "BuildModelTile")         or
+        (actionName == "JoinModelUnit")          or
+        (actionName == "LaunchSilo")             or
+        (actionName == "ProduceModelUnitOnTile") or
+        (actionName == "Wait"))                  then
         return ActionExecutor.execute(action)
     end
 
@@ -264,7 +260,6 @@ local function doAction(self, action)
     elseif (actionName == "SupplyModelUnit")        then doActionSupplyModelUnit(       self, action)
     elseif (actionName == "LoadModelUnit")          then doActionLoadModelUnit(         self, action)
     elseif (actionName == "DropModelUnit")          then doActionDropModelUnit(         self, action)
-    elseif (actionName == "ProduceOnTile")          then doActionProduceOnTile(         self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")
     end
 end

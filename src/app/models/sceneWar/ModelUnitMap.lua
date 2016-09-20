@@ -558,31 +558,22 @@ function ModelUnitMap:doActionDropModelUnit(action)
     return self
 end
 
-function ModelUnitMap:doActionProduceOnTile(action)
-    local gridIndex = action.gridIndex
-    local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
-    local modelUnit = actorUnit:getModel()
-    promoteModelUnitOnProduce(self, modelUnit)
-    modelUnit:onStartRunning(self.m_SceneWarFileName)
-        :setStateActioned()
-        :updateView()
-
-    self.m_AvailableUnitID = self.m_AvailableUnitID + 1
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
-    if (self.m_View) then
-        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
-    end
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()
     return self.m_MapSize
+end
+
+function ModelUnitMap:getAvailableUnitId()
+    return self.m_AvailableUnitID
+end
+
+function ModelUnitMap:setAvailableUnitId(unitID)
+    assert((unitID >= 0) and (math.floor(unitID) == unitID), "ModelUnitMap:setAvailableUnitId() invalid unitID: " .. (unitID or ""))
+    self.m_AvailableUnitID = unitID
+
+    return self
 end
 
 function ModelUnitMap:getModelUnit(gridIndex)
@@ -654,6 +645,15 @@ function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
 
     if (self.m_View) then
         self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
+    end
+
+    return self
+end
+
+function ModelUnitMap:addActorUnitWithGridIndex(actorUnit, gridIndex)
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
+    if (self.m_View) then
+        self.m_View:addViewUnit(actorUnit:getView(), actorUnit:getModel())
     end
 
     return self

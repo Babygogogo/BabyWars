@@ -1,12 +1,13 @@
 
 local ActionExecutor = {}
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local InstantSkillExecutor  = require("src.app.utilities.InstantSkillExecutor")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local Actor                 = require("src.global.actors.Actor")
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local Actor                  = require("src.global.actors.Actor")
 
 local UNIT_MAX_HP           = GameConstantFunctions.getUnitMaxHP()
 local IS_SERVER             = GameConstantFunctions.isServer()
@@ -103,6 +104,14 @@ local function moveModelUnitWithAction(action)
                 modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
             end
         end
+    end
+end
+
+local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+    local modifier    = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
+    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
+        modelUnit:setCurrentPromotion(modifier)
     end
 end
 
@@ -305,6 +314,33 @@ local function executeLaunchSilo(action)
         end)
 end
 
+local function executeProduceModelUnitOnTile(action)
+    local sceneWarFileName = action.fileName
+    local gridIndex        = action.gridIndex
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local availableUnitID  = modelUnitMap:getAvailableUnitId()
+    local actorData        = {
+        tiledID       = action.tiledID,
+        unitID        = availableUnitID,
+        GridIndexable = {gridIndex = gridIndex},
+    }
+
+    local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
+    local modelUnit = actorUnit:getModel()
+    promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+    modelUnit:onStartRunning(sceneWarFileName)
+        :setStateActioned()
+        :updateView()
+
+    modelUnitMap:addActorUnitWithGridIndex(actorUnit, gridIndex)
+        :setAvailableUnitId(availableUnitID + 1)
+
+    local playerIndex = modelUnit:getPlayerIndex()
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
+    dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+end
+
 local function executeWait(action)
     local path           = action.path
     local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
@@ -344,11 +380,12 @@ function ActionExecutor.execute(action)
     end
     modelSceneWar:setActionId(actionID)
 
-    if     (actionName == "ActivateSkillGroup") then executeActivateSkillGroup(action)
-    elseif (actionName == "BuildModelTile")     then executeBuildModelTile(    action)
-    elseif (actionName == "JoinModelUnit")      then executeJoinModelUnit(     action)
-    elseif (actionName == "LaunchSilo")         then executeLaunchSilo(        action)
-    elseif (actionName == "Wait")               then executeWait(              action)
+    if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
+    elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
+    elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
+    elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
+    elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
+    elseif (actionName == "Wait")                   then executeWait(                  action)
     end
 
     if (not IS_SERVER) then
