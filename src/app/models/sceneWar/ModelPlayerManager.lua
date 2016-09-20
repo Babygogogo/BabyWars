@@ -36,7 +36,7 @@ local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
         :forEachModelUnitLoaded(function(modelUnit)
             if (modelUnit:getPlayerIndex() == playerIndex) then
                 local loader = modelUnitMap:getModelUnit(modelUnit:getGridIndex())
-                if (loader:canRepairLoadedModelUnit()) then
+                if ((loader:canRepairLoadedModelUnit()) and (loader:hasLoadUnitId(modelUnit:getUnitId()))) then
                     units[#units + 1] = modelUnit
                 end
             end

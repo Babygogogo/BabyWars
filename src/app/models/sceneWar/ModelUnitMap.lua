@@ -466,31 +466,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionDropModelUnit(action)
-    local launchUnitID   = action.launchUnitID
-    local path           = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-
-    local dropActorUnits = {}
-    for _, dropDestination in ipairs(action.dropDestinations) do
-        local gridIndex = dropDestination.gridIndex
-        self:setActorUnitUnloaded(dropDestination.unitID, gridIndex)
-
-        local dropActorUnit = getActorUnit(self, gridIndex)
-        dropActorUnit:getModel():setGridIndex(gridIndex, false)
-        dropActorUnits[#dropActorUnits + 1] = dropActorUnit
-    end
-    focusModelUnit:doActionDropModelUnit(action, dropActorUnits)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

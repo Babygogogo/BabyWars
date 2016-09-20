@@ -214,6 +214,44 @@ local function executeBuildModelTile(action)
         end)
 end
 
+local function executeDropModelUnit(action)
+    local path           = action.path
+    local modelUnitMap   = getModelUnitMap(action.fileName)
+    local focusModelUnit = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    moveModelUnitWithAction(action)
+
+    local dropModelUnits = {}
+    for _, dropDestination in ipairs(action.dropDestinations) do
+        local gridIndex = dropDestination.gridIndex
+        local unitID    = dropDestination.unitID
+        modelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
+        focusModelUnit:removeLoadUnitId(unitID)
+
+        local dropModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        dropModelUnit:setGridIndex(gridIndex, false)
+            :setStateActioned()
+        dropModelUnits[#dropModelUnits + 1] = dropModelUnit
+    end
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+
+            local loaderEndingGridIndex = path[#path]
+            for _, dropModelUnit in ipairs(dropModelUnits) do
+                dropModelUnit:moveViewAlongPath({
+                        loaderEndingGridIndex,
+                        dropModelUnit:getGridIndex(),
+                    }, function()
+                        dropModelUnit:updateView()
+                            :showNormalAnimation()
+                    end
+                )
+            end
+        end)
+end
+
 local function executeJoinModelUnit(action)
     local path             = action.path
     local endingGridIndex  = path[#path]
@@ -486,6 +524,7 @@ function ActionExecutor.execute(action)
 
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
+    elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
     elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)

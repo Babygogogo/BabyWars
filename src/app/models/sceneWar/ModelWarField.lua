@@ -198,13 +198,6 @@ function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimati
     return self
 end
 
-function ModelWarField:doActionDropModelUnit(action)
-    self:getModelUnitMap():doActionDropModelUnit(action)
-    self:getModelTileMap():doActionDropModelUnit(action)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
