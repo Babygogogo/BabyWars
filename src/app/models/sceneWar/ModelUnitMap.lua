@@ -53,16 +53,6 @@ local function getSupplyTargetModelUnits(self, supplier)
     return targets
 end
 
-local function setActorUnitLoaded(self, gridIndex)
-    local loaded = self.m_LoadedActorUnits
-    local map    = self.m_ActorUnitsMap
-    local x, y   = gridIndex.x, gridIndex.y
-    local unitID = map[x][y]:getModel():getUnitId()
-    assert(loaded[unitID] == nil, "ModelUnitMap-setActorUnitLoaded() the focus unit has been loaded already.")
-
-    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
-end
-
 local function moveActorUnitOnAction(self, action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
@@ -476,25 +466,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionLoadModelUnit(action)
-    local launchUnitID   = action.launchUnitID
-    local path           = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-    else
-        setActorUnitLoaded(self, beginningGridIndex)
-    end
-    focusModelUnit:doActionLoadModelUnit(action, self:getModelUnit(endingGridIndex))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionDropModelUnit(action)
     local launchUnitID   = action.launchUnitID
     local path           = action.path
@@ -594,6 +565,18 @@ function ModelUnitMap:swapActorUnit(gridIndex1, gridIndex2)
         if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
         if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
     end
+end
+
+function ModelUnitMap:setActorUnitLoaded(gridIndex)
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    local unitID = map[x][y]:getModel():getUnitId()
+    assert(loaded[unitID] == nil, "ModelUnitMap:setActorUnitLoaded() the focus unit has been loaded already.")
+
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
+
+    return self
 end
 
 function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)

@@ -92,9 +92,16 @@ local function moveModelUnitWithAction(action)
             modelUnitMap:getModelUnit(beginningGridIndex):removeLoadUnitId(launchUnitID)
                 :updateView()
                 :showNormalAnimation()
-            modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
+
+            if (action.actionName ~= "LoadModelUnit") then
+                modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
+            end
         else
-            modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
+            if (action.actionName == "LoadModelUnit") then
+                modelUnitMap:setActorUnitLoaded(beginningGridIndex)
+            else
+                modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
+            end
 
             local modelTile = getModelTileMap(sceneWarFileName):getModelTile(beginningGridIndex)
             if (modelTile.setCurrentBuildPoint) then
@@ -314,6 +321,24 @@ local function executeLaunchSilo(action)
         end)
 end
 
+local function executeLoadModelUnit(action)
+    local path            = action.path
+    local modelUnitMap    = getModelUnitMap(action.fileName)
+    local focusModelUnit  = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local loaderModelUnit = modelUnitMap:getModelUnit(path[#path])
+
+    moveModelUnitWithAction(action)
+    loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+                :setViewVisible(false)
+            loaderModelUnit:updateView()
+        end)
+end
+
 local function executeProduceModelUnitOnTile(action)
     local sceneWarFileName = action.fileName
     local gridIndex        = action.gridIndex
@@ -463,6 +488,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
+    elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
     elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
     elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)

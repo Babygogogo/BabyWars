@@ -205,10 +205,6 @@ local function doActionCaptureModelTile(self, action)
     modelPlayerManager:doActionCaptureModelTile(action)
 end
 
-local function doActionLoadModelUnit(self, action)
-    self:getModelWarField():doActionLoadModelUnit(action)
-end
-
 local function doActionDropModelUnit(self, action)
     self:getModelWarField():doActionDropModelUnit(action)
 end
@@ -225,6 +221,7 @@ local function doAction(self, action)
         (actionName == "BuildModelTile")         or
         (actionName == "JoinModelUnit")          or
         (actionName == "LaunchSilo")             or
+        (actionName == "LoadModelUnit")          or
         (actionName == "ProduceModelUnitOnTile") or
         (actionName == "ProduceModelUnitOnUnit") or
         (actionName == "SupplyModelUnit")        or
@@ -249,7 +246,6 @@ local function doAction(self, action)
     elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
-    elseif (actionName == "LoadModelUnit")          then doActionLoadModelUnit(         self, action)
     elseif (actionName == "DropModelUnit")          then doActionDropModelUnit(         self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")
     end

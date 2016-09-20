@@ -143,12 +143,6 @@ function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
     return self.m_Owner
 end
 
-function UnitLoader:doActionLoadModelUnit(action, unitID)
-    self:addLoadUnitId(unitID)
-
-    return self.m_Owner
-end
-
 function UnitLoader:doActionDropModelUnit(action)
     self.m_LoadedUnitIds   = getRemainingUnitIdsOnDrop(self:getLoadUnitIdList(), action.dropDestinations)
 

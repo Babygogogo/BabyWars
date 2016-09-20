@@ -269,23 +269,6 @@ function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAni
     return self
 end
 
-function ModelUnit:doActionLoadModelUnit(action, loader)
-    self:setStateActioned()
-    -- Attention! We should be invoking the doActionLoadModelUnit methods for the loader rather than self.
-    ComponentManager.callMethodForAllComponents(loader, "doActionLoadModelUnit", action, self:getUnitId())
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-                :setVisible(false)
-            loader:updateView()
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionDropModelUnit(action, dropActorUnits)
     self:setStateActioned()
     for _, dropActorUnit in ipairs(dropActorUnits) do
@@ -328,6 +311,14 @@ function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
         self.m_View:moveAlongPath(path, callbackAfterMove)
     elseif (callbackAfterMove) then
         callbackAfterMove()
+    end
+
+    return self
+end
+
+function ModelUnit:setViewVisible(visible)
+    if (self.m_View) then
+        self.m_View:setVisible(visible)
     end
 
     return self
