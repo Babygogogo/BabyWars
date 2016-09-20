@@ -476,33 +476,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
-    local path              = action.path
-    local gridIndex         = path[#path]
-    local focusModelUnit    = self:getFocusModelUnit(path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-
-    local producedUnitID    = self.m_AvailableUnitID
-    local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
-    local producedModelUnit = producedActorUnit:getModel()
-    promoteModelUnitOnProduce(self, producedModelUnit)
-    producedModelUnit:onStartRunning(self.m_SceneWarFileName)
-        :setStateActioned()
-
-    self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
-    self.m_LoadedActorUnits[producedUnitID] = producedActorUnit
-    if (self.m_View) then
-        self.m_View:addViewUnit(producedActorUnit:getView(), producedModelUnit)
-    end
-
-    focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionSupplyModelUnit(action)
     local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier, true))
@@ -650,17 +623,31 @@ function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
     return self
 end
 
-function ModelUnitMap:addActorUnitWithGridIndex(actorUnit, gridIndex)
+function ModelUnitMap:addActorUnitOnMap(actorUnit)
+    local modelUnit = actorUnit:getModel()
+    local gridIndex = modelUnit:getGridIndex()
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
+
     if (self.m_View) then
-        self.m_View:addViewUnit(actorUnit:getView(), actorUnit:getModel())
+        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
     end
 
     return self
 end
 
-function ModelUnitMap:removeActorUnitWithGridIndex(gridIndex)
+function ModelUnitMap:removeActorUnitOnMap(gridIndex)
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
+
+    return self
+end
+
+function ModelUnitMap:addActorUnitLoaded(actorUnit)
+    local modelUnit = actorUnit:getModel()
+    self.m_LoadedActorUnits[modelUnit:getUnitId()] = actorUnit
+
+    if (self.m_View) then
+        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
+    end
 
     return self
 end

@@ -229,14 +229,6 @@ function ModelPlayerManager:doActionCaptureModelTile(action)
     return self
 end
 
-function ModelPlayerManager:doActionProduceModelUnitOnUnit(action, playerIndex)
-    local modelPlayer = self:getModelPlayer(playerIndex)
-    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
-    dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
-
-    return self
-end
-
 function ModelPlayerManager:doActionSurrender(action)
     self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
 

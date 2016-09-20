@@ -198,13 +198,6 @@ function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimati
     return self
 end
 
-function ModelWarField:doActionProduceModelUnitOnUnit(action)
-    self:getModelUnitMap():doActionProduceModelUnitOnUnit(action)
-    self:getModelTileMap():doActionProduceModelUnitOnUnit(action)
-
-    return self
-end
-
 function ModelWarField:doActionSupplyModelUnit(action)
     self:getModelUnitMap():doActionSupplyModelUnit(action)
     self:getModelTileMap():doActionSupplyModelUnit(action)

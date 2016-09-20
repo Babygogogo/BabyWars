@@ -215,7 +215,7 @@ local function executeJoinModelUnit(action)
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
     local targetModelUnit  = modelUnitMap:getModelUnit(endingGridIndex)
 
-    modelUnitMap:removeActorUnitWithGridIndex(endingGridIndex)
+    modelUnitMap:removeActorUnitOnMap(endingGridIndex)
     moveModelUnitWithAction(action)
 
     if ((focusModelUnit.hasPrimaryWeapon) and (focusModelUnit:hasPrimaryWeapon())) then
@@ -332,13 +332,53 @@ local function executeProduceModelUnitOnTile(action)
         :setStateActioned()
         :updateView()
 
-    modelUnitMap:addActorUnitWithGridIndex(actorUnit, gridIndex)
+    modelUnitMap:addActorUnitOnMap(actorUnit)
         :setAvailableUnitId(availableUnitID + 1)
 
     local playerIndex = modelUnit:getPlayerIndex()
-    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+end
+
+local function executeProduceModelUnitOnUnit(action)
+    local sceneWarFileName = action.fileName
+    local path             = action.path
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local availableUnitID  = modelUnitMap:getAvailableUnitId()
+    local producer         = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local actorData        = {
+        tiledID       = producer:getMovableProductionTiledId(),
+        unitID        = availableUnitID,
+        GridIndexable = {gridIndex = path[#path]},
+    }
+    moveModelUnitWithAction(action)
+
+    local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
+    local modelUnit = actorUnit:getModel()
+    promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+    modelUnit:onStartRunning(sceneWarFileName)
+        :setStateActioned()
+        :updateView()
+
+    modelUnitMap:addActorUnitLoaded(actorUnit)
+        :setAvailableUnitId(availableUnitID + 1)
+
+    producer:addLoadUnitId(availableUnitID)
+    if (producer.setCurrentMaterial) then
+        producer:setCurrentMaterial(producer:getCurrentMaterial() - 1)
+    end
+
+    local playerIndex = producer:getPlayerIndex()
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+    modelPlayer:setFund(modelPlayer:getFund() - action.cost)
+    dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+
+    producer:setStateActioned()
+        :moveViewAlongPath(path, function()
+            producer:updateView()
+                :showNormalAnimation()
+        end)
 end
 
 local function executeWait(action)
@@ -385,6 +425,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
+    elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
     elseif (actionName == "Wait")                   then executeWait(                  action)
     end
 
