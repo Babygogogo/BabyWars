@@ -3,6 +3,7 @@ local ActionExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local InstantSkillExecutor  = require("src.app.utilities.InstantSkillExecutor")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local Actor                 = require("src.global.actors.Actor")
@@ -16,6 +17,7 @@ local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
@@ -23,6 +25,14 @@ local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name        = "EvtModelPlayerUpdated",
+        modelPlayer = modelPlayer,
+        playerIndex = playerIndex,
+    })
+end
+
 local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -144,6 +154,25 @@ local function executeReloadCurrentScene(action)
     end
 end
 
+local function executeActivateSkillGroup(action)
+    local skillGroupID     = action.skillGroupID
+    local sceneWarFileName = action.fileName
+    InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
+
+    local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+    modelPlayer:getModelSkillConfiguration():setActivatingSkillGroupId(skillGroupID)
+    modelPlayer:setDamageCost(modelPlayer:getDamageCost() - modelPlayer:getDamageCostForSkillGroupId(skillGroupID))
+        :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
+
+    dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name         = "EvtSkillGroupActivated",
+        playerIndex  = playerIndex,
+        skillGroupID = skillGroupID,
+    })
+end
+
 local function executeJoinModelUnit(action)
     local path             = action.path
     local endingGridIndex  = path[#path]
@@ -167,11 +196,7 @@ local function executeJoinModelUnit(action)
             local playerIndex = focusModelUnit:getPlayerIndex()
             local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
             modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
-            getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-                name        = "EvtModelPlayerUpdated",
-                modelPlayer = modelPlayer,
-                playerIndex = playerIndex,
-            })
+            dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
         end
     end
     if (focusModelUnit.setCurrentHP) then
@@ -294,9 +319,10 @@ function ActionExecutor.execute(action)
     end
     modelSceneWar:setActionId(actionID)
 
-    if     (actionName == "JoinModelUnit") then executeJoinModelUnit(action)
-    elseif (actionName == "LaunchSilo")    then executeLaunchSilo(   action)
-    elseif (actionName == "Wait")          then executeWait(         action)
+    if     (actionName == "ActivateSkillGroup") then executeActivateSkillGroup(action)
+    elseif (actionName == "JoinModelUnit")      then executeJoinModelUnit(     action)
+    elseif (actionName == "LaunchSilo")         then executeLaunchSilo(        action)
+    elseif (actionName == "Wait")               then executeWait(              action)
     end
 
     if (not IS_SERVER) then

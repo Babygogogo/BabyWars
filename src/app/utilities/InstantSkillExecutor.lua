@@ -2,6 +2,7 @@
 local InstantSkillExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 
 local getSkillModifier = GameConstantFunctions.getSkillModifier
 
@@ -153,13 +154,19 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function InstantSkillExecutor.doActionActivateSkillGroup(action, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, eventDispatcher)
+function InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
+    local modelWarField           = SingletonGetters.getModelWarField(        sceneWarFileName)
+    local modelPlayerManager      = SingletonGetters.getModelPlayerManager(   sceneWarFileName)
+    local modelTurnManager        = SingletonGetters.getModelTurnManager(     sceneWarFileName)
+    local modelWeatherManager     = SingletonGetters.getModelWeatherManager(  sceneWarFileName)
+    local dispatcher              = SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
     local modelSkillConfiguration = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex()):getModelSkillConfiguration()
-    for _, skill in pairs(modelSkillConfiguration:getAllSkillsInGroup(action.skillGroupID)) do
+
+    for _, skill in pairs(modelSkillConfiguration:getAllSkillsInGroup(skillGroupID)) do
         local id, level  = skill.id, skill.level
         local methodName = "execute" .. id
         if (s_Executors[methodName]) then
-            s_Executors[methodName](skill.level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, eventDispatcher)
+            s_Executors[methodName](skill.level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
         end
     end
 

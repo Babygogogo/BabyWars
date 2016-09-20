@@ -74,22 +74,6 @@ function ModelPlayer:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing actions.
---------------------------------------------------------------------------------
-function ModelPlayer:doActionActivateSkillGroup(action)
-    local skillGroupID            = action.skillGroupID
-    local modelSkillConfiguration = self:getModelSkillConfiguration()
-    local req1, req2              = modelSkillConfiguration:getEnergyRequirement()
-    local requirement             = (skillGroupID == 1) and (req1) or (req2)
-
-    modelSkillConfiguration:setActivatingSkillGroupId(skillGroupID)
-    self.m_DamageCost          = self.m_DamageCost - requirement * getCurrentDamageCostPerEnergyRequirement(self)
-    self.m_SkillActivatedCount = self.m_SkillActivatedCount + 1
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelPlayer:getAccount()
@@ -139,15 +123,46 @@ function ModelPlayer:deactivateSkillGroup()
     return self
 end
 
+function ModelPlayer:getSkillActivatedCount()
+    return self.m_SkillActivatedCount
+end
+
+function ModelPlayer:setSkillActivatedCount(count)
+    assert((count >= 0) and (math.floor(count) == count), "ModelPlayer:setSkillActivatedCount() invalid count: " .. (count or ""))
+    self.m_SkillActivatedCount = count
+
+    return self
+end
+
+function ModelPlayer:getDamageCost()
+    return self.m_DamageCost
+end
+
+function ModelPlayer:getDamageCostForSkillGroupId(skillGroupID)
+    assert((skillGroupID == 1) or (skillGroupID == 2), "ModelPlayer:getDamageCostForSkillGroupId() invalid skillGroupID: " .. (skillGroupID or ""))
+    local modelSkillConfiguration = self:getModelSkillConfiguration()
+    local req1, req2              = modelSkillConfiguration:getEnergyRequirement()
+    local requirement             = (skillGroupID == 1) and (req1) or (req2)
+
+    return (requirement) and (requirement * getCurrentDamageCostPerEnergyRequirement(self)) or (nil)
+end
+
+function ModelPlayer:setDamageCost(cost)
+    assert((cost >= 0) and (math.floor(cost) == cost), "ModelPlayer:setDamageCost() invalid cost: " .. (cost or ""))
+    self.m_DamageCost = cost
+
+    return self
+end
+
 function ModelPlayer:addDamageCost(cost)
     local modelSkillConfiguration = self:getModelSkillConfiguration()
     if (not modelSkillConfiguration:getActivatingSkillGroupId()) then
         local _, maxEnergyRequirement = modelSkillConfiguration:getEnergyRequirement()
         if (maxEnergyRequirement) then
-            self.m_DamageCost = round(math.min(
+            self:setDamageCost(round(math.min(
                 self.m_DamageCost + cost,
                 maxEnergyRequirement * getCurrentDamageCostPerEnergyRequirement(self)
-            ))
+            )))
         end
     end
 

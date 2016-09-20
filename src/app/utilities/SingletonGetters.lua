@@ -39,6 +39,10 @@ function SingletonGetters.getModelWarField(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getModelWarField()
 end
 
+function SingletonGetters.getModelWeatherManager(sceneWarFileName)
+    return SingletonGetters.getModelScene(sceneWarFileName):getModelWeatherManager()
+end
+
 function SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getScriptEventDispatcher()
 end
