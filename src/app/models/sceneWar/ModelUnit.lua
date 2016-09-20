@@ -269,29 +269,6 @@ function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAni
     return self
 end
 
-function ModelUnit:doActionSupplyModelUnit(action, targetModelUnits)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionSupplyModelUnit", action, targetModelUnits)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-
-            local eventDispatcher = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
-            for _, target in pairs(targetModelUnits) do
-                target:updateView()
-                eventDispatcher:dispatchEvent({
-                    name      = "EvtSupplyViewUnit",
-                    gridIndex = target:getGridIndex(),
-                })
-            end
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionLoadModelUnit(action, loader)
     self:setStateActioned()
     -- Attention! We should be invoking the doActionLoadModelUnit methods for the loader rather than self.

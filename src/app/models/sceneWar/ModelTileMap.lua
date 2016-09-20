@@ -271,10 +271,6 @@ function ModelTileMap:doActionCaptureModelTile(action)
     return self:doActionMoveModelUnit(action)
 end
 
-function ModelTileMap:doActionSupplyModelUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
 function ModelTileMap:doActionLoadModelUnit(action)
     return self:doActionMoveModelUnit(action)
 end

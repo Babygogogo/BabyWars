@@ -476,17 +476,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionSupplyModelUnit(action)
-    local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier, true))
-    moveActorUnitOnAction(self, action)
-    supplier:doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, supplier))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionLoadModelUnit(action)
     local launchUnitID   = action.launchUnitID
     local path           = action.path

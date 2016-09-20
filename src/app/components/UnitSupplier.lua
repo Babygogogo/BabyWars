@@ -39,17 +39,6 @@ function UnitSupplier:ctor(param)
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing actions.
---------------------------------------------------------------------------------
-function UnitSupplier:doActionSupplyModelUnit(action, targetModelUnits)
-    for _, modelUnit in pairs(targetModelUnits) do
-        supplyModelUnit(modelUnit)
-    end
-
-    return self.m_Owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function UnitSupplier:canSupplyModelUnit(modelUnit)

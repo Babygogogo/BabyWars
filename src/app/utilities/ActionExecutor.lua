@@ -381,6 +381,45 @@ local function executeProduceModelUnitOnUnit(action)
         end)
 end
 
+local function executeSupplyModelUnit(action)
+    local sceneWarFileName = action.fileName
+    local path             = action.path
+    local endingGridIndex  = path[#path]
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    moveModelUnitWithAction(action)
+
+    local targetModelUnits = {}
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
+        local targetModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((targetModelUnit) and (focusModelUnit:canSupplyModelUnit(targetModelUnit))) then
+            targetModelUnits[#targetModelUnits + 1] = targetModelUnit
+
+            if (targetModelUnit.setCurrentFuel) then
+                targetModelUnit:setCurrentFuel(targetModelUnit:getMaxFuel())
+            end
+            if ((targetModelUnit.hasPrimaryWeapon) and (targetModelUnit:hasPrimaryWeapon())) then
+                targetModelUnit:setPrimaryWeaponCurrentAmmo(targetModelUnit:getPrimaryWeaponMaxAmmo())
+            end
+        end
+    end
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+
+            local dispatcher = getScriptEventDispatcher(sceneWarFileName)
+            for _, targetModelUnit in ipairs(targetModelUnits) do
+                targetModelUnit:updateView()
+                dispatcher:dispatchEvent({
+                    name      = "EvtSupplyViewUnit",
+                    gridIndex = targetModelUnit:getGridIndex(),
+                })
+            end
+        end)
+end
+
 local function executeWait(action)
     local path           = action.path
     local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
@@ -426,6 +465,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
     elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
+    elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
     elseif (actionName == "Wait")                   then executeWait(                  action)
     end
 
