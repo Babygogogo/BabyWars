@@ -58,21 +58,6 @@ function TileBuilder:doActionMoveModelUnit(action)
     return self.m_Owner
 end
 
-function TileBuilder:doActionBuildModelTile(action, target)
-    local owner      = self.m_Owner
-    local buildPoint = target:getCurrentBuildPoint() - self:getBuildAmount()
-    if (buildPoint > 0) then
-        self.m_IsBuilding = true
-        target:setCurrentBuildPoint(buildPoint)
-    else
-        self.m_IsBuilding = false
-        owner:setCurrentMaterial(owner:getCurrentMaterial() - 1)
-        target:updateWithObjectAndBaseId(self:getBuildTiledIdWithTileType(target:getTileType()))
-    end
-
-    return owner
-end
-
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

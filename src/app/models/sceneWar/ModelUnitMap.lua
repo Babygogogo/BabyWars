@@ -476,17 +476,6 @@ function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCapture
     return self
 end
 
-function ModelUnitMap:doActionBuildModelTile(action, target)
-    local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder, true))
-    moveActorUnitOnAction(self, action)
-    builder:doActionBuildModelTile(action, target)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
     local path              = action.path
     local gridIndex         = path[#path]

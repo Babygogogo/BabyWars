@@ -173,6 +173,31 @@ local function executeActivateSkillGroup(action)
     })
 end
 
+local function executeBuildModelTile(action)
+    local path             = action.path
+    local sceneWarFileName = action.fileName
+    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
+    local modelTile        = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
+    local buildPoint       = modelTile:getCurrentBuildPoint() - focusModelUnit:getBuildAmount()
+
+    moveModelUnitWithAction(action)
+    if (buildPoint > 0) then
+        focusModelUnit:setBuildingModelTile(true)
+        modelTile:setCurrentBuildPoint(buildPoint)
+    else
+        focusModelUnit:setBuildingModelTile(false)
+            :setCurrentMaterial(focusModelUnit:getCurrentMaterial() - 1)
+        modelTile:updateWithObjectAndBaseId(focusModelUnit:getBuildTiledIdWithTileType(modelTile:getTileType()))
+    end
+
+    focusModelUnit:setStateActioned()
+        :moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+            modelTile:updateView()
+        end)
+end
+
 local function executeJoinModelUnit(action)
     local path             = action.path
     local endingGridIndex  = path[#path]
@@ -320,6 +345,7 @@ function ActionExecutor.execute(action)
     modelSceneWar:setActionId(actionID)
 
     if     (actionName == "ActivateSkillGroup") then executeActivateSkillGroup(action)
+    elseif (actionName == "BuildModelTile")     then executeBuildModelTile(    action)
     elseif (actionName == "JoinModelUnit")      then executeJoinModelUnit(     action)
     elseif (actionName == "LaunchSilo")         then executeLaunchSilo(        action)
     elseif (actionName == "Wait")               then executeWait(              action)

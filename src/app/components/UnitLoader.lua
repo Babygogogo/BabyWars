@@ -235,8 +235,8 @@ function UnitLoader:addLoadUnitId(unitID)
 end
 
 function UnitLoader:removeLoadUnitId(unitID)
-    for i, unitID in ipairs(self.m_LoadedUnitIds) do
-        if (unitID == unitID) then
+    for i, loadedUnitID in ipairs(self.m_LoadedUnitIds) do
+        if (loadedUnitID == unitID) then
             table.remove(self.m_LoadedUnitIds, i)
             return self.m_Owner
         end

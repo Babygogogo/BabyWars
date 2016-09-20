@@ -269,21 +269,6 @@ function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAni
     return self
 end
 
-function ModelUnit:doActionBuildModelTile(action, target)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionBuildModelTile", action, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            target:updateView()
-        end)
-    end
-
-    return self
-end
-
 function ModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
     self:setStateActioned()
     ComponentManager.callMethodForAllComponents(self, "doActionProduceModelUnitOnUnit", action, producedUnitID)
