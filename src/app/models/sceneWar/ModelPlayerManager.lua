@@ -229,12 +229,6 @@ function ModelPlayerManager:doActionCaptureModelTile(action)
     return self
 end
 
-function ModelPlayerManager:doActionSurrender(action)
-    self.m_ModelPlayers[action.lostPlayerIndex]:setAlive(false)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

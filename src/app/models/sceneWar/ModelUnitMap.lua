@@ -391,28 +391,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelUnitMap:doActionSurrender(action)
-    local eventDispatcher = getScriptEventDispatcher(self.m_SceneWarFileName)
-    local playerIndex     = action.lostPlayerIndex
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        if (modelUnit:getPlayerIndex() == playerIndex) then
-            Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, modelUnit:getGridIndex())
-            eventDispatcher:dispatchEvent({
-                    name      = "EvtDestroyViewUnit",
-                    gridIndex = modelUnit:getGridIndex(),
-                })
-
-            if (modelUnit.m_View) then
-                modelUnit.m_View:removeFromParent()
-            end
-        end
-    end)
-    eventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
     local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
     focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))

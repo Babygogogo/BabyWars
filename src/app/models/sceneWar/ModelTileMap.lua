@@ -233,23 +233,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelTileMap:doActionSurrender(action)
-    local lostPlayerIndex = action.lostPlayerIndex
-    self:forEachModelTile(function(modelTile)
-        if (modelTile:getPlayerIndex() == lostPlayerIndex) then
-            modelTile:doActionSurrender(action)
-        end
-    end)
-
-    for _, gridIndex in ipairs(action.lostUnitGridIndexes) do
-        self:getModelTile(gridIndex):doActionSurrender(action)
-    end
-
-    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
 function ModelTileMap:doActionMoveModelUnit(action)
     self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
     SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})

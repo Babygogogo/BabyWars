@@ -3,8 +3,10 @@ local Destroyers = {}
 
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
-local getModelUnitMap = SingletonGetters.getModelUnitMap
-local getModelTileMap = SingletonGetters.getModelTileMap
+local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
 -- The public functions.
@@ -26,6 +28,28 @@ function Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, gridIndex)
     end
 
     return Destroyers
+end
+
+function Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
+    local dispatcher = getScriptEventDispatcher(sceneWarFileName)
+    getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+        if (modelUnit:getPlayerIndex() == playerIndex) then
+            local gridIndex = modelUnit:getGridIndex()
+            Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, gridIndex)
+            modelUnit:removeViewFromParent()
+            dispatcher:dispatchEvent({
+                name      = "EvtDestroyViewUnit",
+                gridIndex = gridIndex,
+            })
+        end
+    end)
+    getModelTileMap(sceneWarFileName):forEachModelTile(function(modelTile)
+        if (modelTile:getPlayerIndex() == playerIndex) then
+            modelTile:updateWithPlayerIndex(0)
+                :updateView()
+        end
+    end)
+    getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):setAlive(false)
 end
 
 return Destroyers

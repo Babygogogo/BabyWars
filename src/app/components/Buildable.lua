@@ -60,12 +60,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function Buildable:doActionSurrender(action)
-    self:setCurrentBuildPoint(self:getMaxBuildPoint())
-
-    return self
-end
-
 function Buildable:doActionMoveModelUnit(action)
     if ((not action.launchUnitID)                                                   and
         (#action.path > 1)                                                          and

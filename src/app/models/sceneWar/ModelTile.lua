@@ -168,18 +168,6 @@ function ModelTile:doActionMoveModelUnit(action)
     return self
 end
 
-function ModelTile:doActionSurrender(action)
-    if (self:getPlayerIndex() == action.lostPlayerIndex) then
-        self:updateWithPlayerIndex(0)
-    else
-        ComponentManager.callMethodForAllComponents(self, "doActionSurrender", action)
-    end
-
-    self:updateView()
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

@@ -233,12 +233,6 @@ function ModelTurnManager:doActionAttack(action)
     return self
 end
 
-function ModelTurnManager:doActionSurrender(action)
-    self:endTurn()
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

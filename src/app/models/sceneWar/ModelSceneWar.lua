@@ -27,6 +27,7 @@ local ModelSceneWar = class("ModelSceneWar")
 
 local ActionExecutor         = require("src.app.utilities.ActionExecutor")
 local AudioManager           = require("src.app.utilities.AudioManager")
+local Destroyers             = require("src.app.utilities.Destroyers")
 local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
@@ -91,8 +92,7 @@ local function doActionBeginTurn(self, action)
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         action.callbackOnEnterTurnPhaseMain = function()
-            modelWarField:clearPlayerForce(lostPlayerIndex)
-            lostModelPlayer:setAlive(false)
+            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
                 self.m_IsWarEnded = true
@@ -119,13 +119,13 @@ local function doActionEndTurn(self, action)
 end
 
 local function doActionSurrender(self, action)
-    local modelPlayerManager = self:getModelPlayerManager()
     local modelTurnManager   = self:getModelTurnManager()
-    modelPlayerManager:doActionSurrender(action)
-    modelTurnManager:doActionSurrender(action)
-    self:getModelWarField():doActionSurrender(action)
+    local modelPlayerManager = self:getModelPlayerManager()
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+    Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
+    modelTurnManager:endTurn()
 
-    local lostModelPlayer = modelPlayerManager:getModelPlayer(action.lostPlayerIndex)
     if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
         self.m_IsWarEnded = true
         self.m_View:showEffectSurrender(callbackOnWarEnded)
@@ -153,7 +153,7 @@ local function doActionAttack(self, action)
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         callbackOnAttackAnimationEnded = function()
-            modelWarField:clearPlayerForce(lostPlayerIndex)
+            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
                 self.m_IsWarEnded = true
@@ -186,7 +186,7 @@ local function doActionCaptureModelTile(self, action)
         local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         callbackOnCaptureAnimationEnded = function()
-            modelWarField:clearPlayerForce(lostPlayerIndex)
+            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
 
             if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
                 self.m_IsWarEnded = true

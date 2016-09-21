@@ -61,12 +61,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function Capturable:doActionSurrender(action)
-    self:setCurrentCapturePoint(self:getMaxCapturePoint())
-
-    return self
-end
-
 function Capturable:doActionMoveModelUnit(action)
     if ((not action.launchUnitID)                                                   and
         (#action.path > 1)                                                          and
