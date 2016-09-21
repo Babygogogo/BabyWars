@@ -18,6 +18,7 @@
 
 local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
+local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
@@ -37,7 +38,7 @@ local function getActorUnit(self, gridIndex)
     return self.m_ActorUnitsMap[gridIndex.x][gridIndex.y]
 end
 
-local function getLoadedActorUnitWithUnitId(self, unitID)
+local function getActorUnitLoaded(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
@@ -96,29 +97,6 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtDestroyModelUnit(self, event)
-    local gridIndex = event.gridIndex
-    local modelUnit = self:getModelUnit(gridIndex)
-    assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
-
-    if (modelUnit.getLoadUnitIdList) then
-        local view = self.m_View
-        for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-            local loadedActorUnit = self.m_LoadedActorUnits[unitID]
-            self.m_LoadedActorUnits[unitID] = nil
-
-            local loadedViewUnit = loadedActorUnit:getView()
-            if (loadedViewUnit) then
-                loadedViewUnit:removeFromParent()
-            end
-        end
-    end
-
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-end
-
 local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     if (event.turnIndex <= 1) then
         return
@@ -140,11 +118,8 @@ local function onEvtTurnPhaseConsumeUnitFuel(self, event)
                 local modelTile = modelTileMap:getModelTile(gridIndex)
 
                 if ((not modelTile.getRepairAmount) or (not modelTile:getRepairAmount(modelUnit))) then
+                    Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, gridIndex)
                     dispatcher:dispatchEvent({
-                            name      = "EvtDestroyModelUnit",
-                            gridIndex = gridIndex,
-                        })
-                        :dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,
                         })
@@ -392,7 +367,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
         :forEachModelUnitLoaded(func)
 
     getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtDestroyModelUnit",         self)
         :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :addEventListener("EvtTurnPhaseResetSkillState", self)
         :addEventListener("EvtTurnPhaseResetUnitState",  self)
@@ -404,8 +378,7 @@ end
 
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)
-    elseif (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
+    if     (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
     elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
     elseif (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
     elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
@@ -424,11 +397,8 @@ function ModelUnitMap:doActionSurrender(action)
 
     self:forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
+            Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, modelUnit:getGridIndex())
             eventDispatcher:dispatchEvent({
-                    name      = "EvtDestroyModelUnit",
-                    gridIndex = modelUnit:getGridIndex(),
-                })
-                :dispatchEvent({
                     name      = "EvtDestroyViewUnit",
                     gridIndex = modelUnit:getGridIndex(),
                 })
@@ -483,20 +453,20 @@ function ModelUnitMap:setAvailableUnitId(unitID)
     return self
 end
 
+function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
+    return (launchUnitID)                                 and
+        (self:getLoadedModelUnitWithUnitId(launchUnitID)) or
+        (self:getModelUnit(gridIndex))
+end
+
 function ModelUnitMap:getModelUnit(gridIndex)
     local actorUnit = getActorUnit(self, gridIndex)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
 end
 
 function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
+    local actorUnit = getActorUnitLoaded(self, unitID)
     return (actorUnit) and (actorUnit:getModel()) or (nil)
-end
-
-function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
-    return (launchUnitID)                                 and
-        (self:getLoadedModelUnitWithUnitId(launchUnitID)) or
-        (self:getModelUnit(gridIndex))
 end
 
 function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive)
@@ -594,6 +564,16 @@ function ModelUnitMap:addActorUnitLoaded(actorUnit)
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
     end
+
+    return self
+end
+
+function ModelUnitMap:removeActorUnitLoaded(unitID)
+    local loadedModelUnit = self:getLoadedModelUnitWithUnitId(unitID)
+    assert(loadedModelUnit, "ModelUnitMap:removeActorUnitLoaded() the unit that the unitID refers to is not loaded: " .. (unitID or ""))
+
+    loadedModelUnit:removeViewFromParent()
+    self.m_LoadedActorUnits[unitID] = nil
 
     return self
 end

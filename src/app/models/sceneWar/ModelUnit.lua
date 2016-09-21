@@ -12,6 +12,7 @@
 
 local ModelUnit = require("src.global.functions.class")("ModelUnit")
 
+local Destroyers            = require("src.app.utilities.Destroyers")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
@@ -21,13 +22,6 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function dispatchEvtDestroyModelUnit(dispatcher, gridIndex)
-    dispatcher:dispatchEvent({
-        name      = "EvtDestroyModelUnit",
-        gridIndex = gridIndex,
-    })
-end
-
 local function dispatchEvtDestroyModelTile(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtDestroyModelTile",
@@ -195,13 +189,13 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
 
     if (shouldDestroySelf) then
         attackTarget:doActionPromoteModelUnit()
-        dispatchEvtDestroyModelUnit(dispatcher, selfGridIndex)
+        Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, selfGridIndex)
     end
 
     if (shouldDestroyTarget) then
         if (isTargetUnit) then
             self:doActionPromoteModelUnit()
-            dispatchEvtDestroyModelUnit(dispatcher, targetGridIndex)
+            Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, targetGridIndex)
         else
             dispatchEvtDestroyModelTile(dispatcher, targetGridIndex)
         end

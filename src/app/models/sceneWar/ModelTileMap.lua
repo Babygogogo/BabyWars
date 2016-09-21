@@ -144,16 +144,6 @@ local function onEvtDestroyViewTile(self, event)
     destroyAdjacentViewPlasma(self)
 end
 
-local function onEvtDestroyModelUnit(self, event)
-    local modelTile = self:getModelTile(event.gridIndex)
-    if (modelTile.setCurrentBuildPoint) then
-        modelTile:setCurrentBuildPoint(modelTile:getMaxBuildPoint())
-    end
-    if (modelTile.setCurrentCapturePoint) then
-        modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
-    end
-end
-
 --------------------------------------------------------------------------------
 -- The composition tile actors map.
 --------------------------------------------------------------------------------
@@ -227,7 +217,6 @@ function ModelTileMap:onStartRunning(sceneWarFileName)
     SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
         :addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",  self)
-        :addEventListener("EvtDestroyModelUnit", self)
 
     return self
 end
@@ -236,7 +225,6 @@ function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
     elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
-    elseif (eventName == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
     end
 
     return self
