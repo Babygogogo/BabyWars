@@ -20,6 +20,7 @@
 local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
 local IS_SERVER             = require("src.app.utilities.GameConstantFunctions").isServer()
+local Destroyers            = require("src.app.utilities.Destroyers")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
@@ -59,6 +60,43 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
         else
             nextPlayerIndex = nextPlayerIndex + 1
         end
+    end
+end
+
+local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
+    local units = {}
+    modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
+                if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
+                    units[#units + 1] = modelUnit
+                end
+            end
+        end)
+        :forEachModelUnitLoaded(function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                local loader = modelUnitMap:getModelUnit(modelUnit:getGridIndex())
+                if ((loader:canRepairLoadedModelUnit()) and (loader:hasLoadUnitId(modelUnit:getUnitId()))) then
+                    units[#units + 1] = modelUnit
+                end
+            end
+        end)
+
+    table.sort(units, function(unit1, unit2)
+        local cost1, cost2 = unit1:getProductionCost(), unit2:getProductionCost()
+        return (cost1 > cost2)                                             or
+            ((cost1 == cost2) and (unit1:getUnitId() < unit2:getUnitId()))
+    end)
+
+    return units
+end
+
+local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
+    local gridIndex = modelUnit:getGridIndex()
+    if (modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId())) then
+        return modelUnitMap:getModelUnit(gridIndex):getRepairAmountAndCostForLoadedModelUnit(modelUnit)
+    else
+        return modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(modelUnit)
     end
 end
 
@@ -114,23 +152,76 @@ local function runTurnPhaseGetFund(self)
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name         = "EvtTurnPhaseConsumeUnitFuel",
-        playerIndex  = self.m_PlayerIndex,
-        turnIndex    = self.m_TurnIndex,
-        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
-        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
-    })
+    if (self.m_TurnIndex > 1) then
+        local sceneWarFileName = self.m_SceneWarFileName
+        local playerIndex      = self.m_PlayerIndex
+        local modelTileMap     = getModelTileMap(sceneWarFileName)
+        local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
+
+        getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+            if ((modelUnit:getPlayerIndex() == playerIndex) and
+                (modelUnit.setCurrentFuel))                 then
+                local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
+                modelUnit:setCurrentFuel(newFuel)
+                    :updateView()
+
+                if ((newFuel == 0) and (modelUnit:shouldDestroyOnOutOfFuel())) then
+                    local gridIndex = modelUnit:getGridIndex()
+                    local modelTile = modelTileMap:getModelTile(gridIndex)
+
+                    if ((not modelTile.canRepairTarget) or (not modelTile:canRepairTarget(modelUnit))) then
+                        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, gridIndex)
+                        modelUnit:removeViewFromParent()
+                        dispatcher:dispatchEvent({
+                            name      = "EvtDestroyViewUnit",
+                            gridIndex = gridIndex,
+                        })
+                    end
+                end
+            end
+        end)
+    end
+
     self.m_TurnPhase = "repairUnit"
 end
 
 local function runTurnPhaseRepairUnit(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name         = "EvtTurnPhaseRepairUnit",
-        playerIndex  = self.m_PlayerIndex,
-        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
-        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
-    })
+    local sceneWarFileName = self.m_SceneWarFileName
+    local playerIndex      = self.m_PlayerIndex
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local modelTileMap     = getModelTileMap(sceneWarFileName)
+    local modelPlayer      = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+    local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
+
+    for _, modelUnit in ipairs(getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)) do
+        local gridIndex                = modelUnit:getGridIndex()
+        local repairAmount, repairCost = getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
+        local shouldSupply             = modelUnit:getCurrentFuel() < modelUnit:getMaxFuel()
+
+        modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
+            :setCurrentFuel(modelUnit:getMaxFuel())
+        if ((modelUnit.hasPrimaryWeapon)                                                and
+            (modelUnit:hasPrimaryWeapon())                                              and
+            (modelUnit:getPrimaryWeaponCurrentAmmo() < modelUnit:getPrimaryWeaponMaxAmmo())) then
+            shouldSupply = true
+            modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
+        end
+        modelUnit:updateView()
+        modelPlayer:setFund(modelPlayer:getFund() - repairCost)
+
+        if (repairAmount >= 10) then
+            dispatcher:dispatchEvent({
+                name      = "EvtRepairViewUnit",
+                gridIndex = gridIndex,
+            })
+        elseif (shouldSupply) then
+            dispatcher:dispatchEvent({
+                name      = "EvtSupplyViewUnit",
+                gridIndex = gridIndex,
+            })
+        end
+    end
+
     self.m_TurnPhase = "supplyUnit"
 end
 
@@ -148,6 +239,14 @@ local function runTurnPhaseMain(self)
         name        = "EvtTurnPhaseMain",
         playerIndex = self.m_PlayerIndex,
         modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex),
+    })
+
+    local sceneWarFileName = self.m_SceneWarFileName
+    local playerIndex      = self.m_PlayerIndex
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name        = "EvtModelPlayerUpdated",
+        modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex),
+        playerIndex = playerIndex,
     })
 end
 

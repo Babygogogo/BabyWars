@@ -97,42 +97,6 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    if (event.turnIndex <= 1) then
-        return
-    end
-
-    local playerIndex  = event.playerIndex
-    local modelTileMap = SingletonGetters.getModelTileMap(self.m_SceneWarFileName)
-    local dispatcher   = getScriptEventDispatcher(self.m_SceneWarFileName)
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.getCurrentFuel))                 then
-            local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
-            modelUnit:setCurrentFuel(newFuel)
-                :updateView()
-
-            if ((newFuel == 0) and (modelUnit:shouldDestroyOnOutOfFuel())) then
-                local gridIndex = modelUnit:getGridIndex()
-                local modelTile = modelTileMap:getModelTile(gridIndex)
-
-                if ((not modelTile.getRepairAmount) or (not modelTile:getRepairAmount(modelUnit))) then
-                    Destroyers.destroyModelUnitWithGridIndex(self.m_SceneWarFileName, gridIndex)
-                    dispatcher:dispatchEvent({
-                            name      = "EvtDestroyViewUnit",
-                            gridIndex = gridIndex,
-                        })
-
-                    if (modelUnit.m_View) then
-                        modelUnit.m_View:removeFromParent()
-                    end
-                end
-            end
-        end
-    end)
-end
-
 local function onEvtTurnPhaseResetUnitState(self, event)
     local playerIndex = event.playerIndex
     local func = function(modelUnit)
@@ -351,7 +315,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
         :forEachModelUnitLoaded(func)
 
     getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
         :addEventListener("EvtTurnPhaseResetUnitState",  self)
         :addEventListener("EvtTurnPhaseSupplyUnit",      self)
         :addEventListener("EvtSkillGroupActivated",      self)
@@ -361,8 +324,7 @@ end
 
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if     (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
-    elseif (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
+    if     (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
     elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
     elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
     end
