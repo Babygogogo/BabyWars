@@ -7,20 +7,21 @@
 --
 -- 其他：
 --   - 一个回合包括以下阶段（以发生顺序排序，可能还有未列出的）
---     - 初始阶段（EvtTurnPhaseBeginning，通过此event使得begin turn effect（也就是回合初弹出的消息框）出现）
---     - 计算玩家收入（EvtTurnPhaseGetFund）
---     - 消耗unit燃料（EvtTurnPhaseConsumeUnitFuel，符合特定条件的unit会随之毁灭）
---     - 维修unit（EvtTurnPhaseRepairUnit，指的是tile对unit的维修和补给）
---     - 补给unit（EvtTurnPhaseSupplyUnit，指的是unit对unit的补给，目前未实现）
---     - 主要阶段（EvtTurnPhaseMain，即玩家可以进行操作的阶段）
---     - 恢复unit状态（EvtTurnPhaseResetUnitState，即玩家结束回合后，使得移动过的unit恢复为可移动的状态；切换活动玩家，确保当前玩家不能再次操控unit）
---     - 更换weather（EvtTurnPhaseChangeWeather，目前未实现。具体切换与否，由ModelWeatherManager决定）
+--     - 初始阶段（TurnPhaseBeginning，通过此event使得begin turn effect（也就是回合初弹出的消息框）出现）
+--     - 计算玩家收入（TurnPhaseGetFund）
+--     - 消耗unit燃料（TurnPhaseConsumeUnitFuel，符合特定条件的unit会随之毁灭）
+--     - 维修unit（TurnPhaseRepairUnit，指的是tile对unit的维修和补给）
+--     - 补给unit（TurnPhaseSupplyUnit，指的是unit对unit的补给，目前未实现）
+--     - 主要阶段（TurnPhaseMain，即玩家可以进行操作的阶段）
+--     - 恢复unit状态（TurnPhaseResetUnitState，即玩家结束回合后，使得移动过的unit恢复为可移动的状态；切换活动玩家，确保当前玩家不能再次操控unit）
+--     - 更换weather（TurnPhaseChangeWeather，目前未实现。具体切换与否，由ModelWeatherManager决定）
 --]]--------------------------------------------------------------------------------
 
 local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
 local IS_SERVER             = require("src.app.utilities.GameConstantFunctions").isServer()
 local Destroyers            = require("src.app.utilities.Destroyers")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
@@ -98,6 +99,36 @@ local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, model
     else
         return modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(modelUnit)
     end
+end
+
+local function dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
+    dispatcher:dispatchEvent({
+        name      = "EvtSupplyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function supplyModelUnit(modelUnit)
+    local hasSupplied = false
+    local maxFuel = modelUnit:getMaxFuel()
+    if (modelUnit:getCurrentFuel() < maxFuel) then
+        modelUnit:setCurrentFuel(maxFuel)
+        hasSupplied = true
+    end
+
+    if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
+        local maxAmmo = modelUnit:getPrimaryWeaponMaxAmmo()
+        if (modelUnit:getPrimaryWeaponCurrentAmmo() < maxAmmo) then
+            modelUnit:setPrimaryWeaponCurrentAmmo(maxAmmo)
+            hasSupplied = true
+        end
+    end
+
+    if (hasSupplied) then
+        modelUnit:updateView()
+    end
+
+    return hasSupplied
 end
 
 --------------------------------------------------------------------------------
@@ -215,10 +246,7 @@ local function runTurnPhaseRepairUnit(self)
                 gridIndex = gridIndex,
             })
         elseif (shouldSupply) then
-            dispatcher:dispatchEvent({
-                name      = "EvtSupplyViewUnit",
-                gridIndex = gridIndex,
-            })
+            dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
         end
     end
 
@@ -226,28 +254,59 @@ local function runTurnPhaseRepairUnit(self)
 end
 
 local function runTurnPhaseSupplyUnit(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name         = "EvtTurnPhaseSupplyUnit",
-        playerIndex  = self.m_PlayerIndex,
-        modelUnitMap = getModelUnitMap(self.m_SceneWarFileName),
-    })
+    local sceneWarFileName = self.m_SceneWarFileName
+    local playerIndex      = self.m_PlayerIndex
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
+    local mapSize          = modelUnitMap:getMapSize()
+
+    local supplyLoadedModelUnits = function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and
+            (modelUnit.canSupplyLoadedModelUnit)        and
+            (modelUnit:canSupplyLoadedModelUnit())      and
+            (not modelUnit:canRepairLoadedModelUnit())) then
+
+            local hasSupplied = false
+            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
+                hasSupplied = supplyModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID)) or hasSupplied
+            end
+            if (hasSupplied) then
+                dispatchEvtSupplyViewUnit(dispatcher, modelUnit:getGridIndex())
+            end
+        end
+    end
+
+    local supplyAdjacentModelUnits = function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and
+            (modelUnit.canSupplyModelUnit))             then
+            for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(modelUnit:getGridIndex(), mapSize)) do
+                local supplyTarget = modelUnitMap:getModelUnit(gridIndex)
+                if ((supplyTarget)                               and
+                    (modelUnit:canSupplyModelUnit(supplyTarget)) and
+                    (supplyModelUnit(supplyTarget)))             then
+                    dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
+                end
+            end
+        end
+    end
+
+    modelUnitMap:forEachModelUnitOnMap(supplyAdjacentModelUnits)
+        :forEachModelUnitOnMap(        supplyLoadedModelUnits)
+        :forEachModelUnitLoaded(       supplyLoadedModelUnits)
+
     self.m_TurnPhase = "main"
 end
 
 local function runTurnPhaseMain(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name        = "EvtTurnPhaseMain",
-        playerIndex = self.m_PlayerIndex,
-        modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex),
-    })
-
     local sceneWarFileName = self.m_SceneWarFileName
     local playerIndex      = self.m_PlayerIndex
     getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name        = "EvtModelPlayerUpdated",
-        modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex),
-        playerIndex = playerIndex,
-    })
+            name        = "EvtModelPlayerUpdated",
+            modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex),
+            playerIndex = playerIndex,
+        })
+        :dispatchEvent({name = "EvtModelUnitMapUpdated"})
+        :dispatchEvent({name = "EvtModelTileMapUpdated"})
 end
 
 local function runTurnPhaseResetUnitState(self)

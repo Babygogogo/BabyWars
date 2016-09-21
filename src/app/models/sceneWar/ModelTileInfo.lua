@@ -50,11 +50,6 @@ local function onEvtGridSelected(self, event)
     onEvtMapCursorMoved(self, event)
 end
 
-local function onEvtTurnPhaseMain(self, event)
-    self.m_ModelPlayer = event.modelPlayer
-    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
-end
-
 local function onEvtWarCommandMenuUpdated(self, event)
     if (self.m_View) then
         self.m_View:setVisible(not event.isEnabled)
@@ -91,7 +86,6 @@ function ModelTileInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtModelTileMapUpdated",   self)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtGridSelected",          self)
-        :addEventListener("EvtTurnPhaseMain",         self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
@@ -105,7 +99,6 @@ function ModelTileInfo:onEvent(event)
     if     (eventName == "EvtModelTileMapUpdated")       then onEvtModelTileMapUpdated(      self, event)
     elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(           self, event)
     elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(             self, event)
-    elseif (eventName == "EvtTurnPhaseMain")             then onEvtTurnPhaseMain(            self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated")     then onEvtWarCommandMenuUpdated(    self, event)
     elseif (eventName == "EvtPlayerIndexUpdated")        then onEvtPlayerIndexUpdated(       self, event)
     end
@@ -118,7 +111,7 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
     if (self.m_ModelTileDetail) then
-        self.m_ModelTileDetail:updateWithModelTile(self.m_ModelTile, self.m_ModelPlayer)
+        self.m_ModelTileDetail:updateWithModelTile(self.m_ModelTile)
             :setEnabled(true)
     end
 

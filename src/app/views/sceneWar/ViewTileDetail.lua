@@ -252,13 +252,13 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewTileDetail:updateWithModelTile(modelTile, modelPlayer)
+function ViewTileDetail:updateWithModelTile(modelTile)
     updateDescriptionWithModelTile( self, modelTile)
     updateDefenseInfoWithModelTile( self, modelTile)
     updateRepairInfoWithModelTile(  self, modelTile)
     updateCaptureInfoWithModelTile( self, modelTile)
     updateIncomeInfoWithModelTile(  self, modelTile)
-    updateMoveCostInfoWithModelTile(self, modelTile, modelPlayer)
+    updateMoveCostInfoWithModelTile(self, modelTile)
 
     return self
 end

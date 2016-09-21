@@ -42,18 +42,6 @@ local function getActorUnitLoaded(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
-local function getSupplyTargetModelUnits(self, supplier)
-    local targets = {}
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), self:getMapSize())) do
-        local target = self:getModelUnit(gridIndex)
-        if ((target) and (supplier:canSupplyModelUnit(target))) then
-            targets[#targets + 1] = target
-        end
-    end
-
-    return targets
-end
-
 local function moveActorUnitOnAction(self, action)
     local launchUnitID = action.launchUnitID
     local path         = action.path
@@ -108,74 +96,6 @@ local function onEvtTurnPhaseResetUnitState(self, event)
 
     self:forEachModelUnitOnMap( func)
         :forEachModelUnitLoaded(func)
-end
-
-local function onEvtTurnPhaseSupplyUnit(self, event)
-    local playerIndex = event.playerIndex
-    local dispatcher  = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
-
-    local dispatchEvtSupplyViewUnit = function(gridIndex)
-        dispatcher:dispatchEvent({
-            name      = "EvtSupplyViewUnit",
-            gridIndex = gridIndex,
-        })
-    end
-
-    local supply = function(modelUnit)
-        local hasSupplied = false
-        local maxFuel = modelUnit:getMaxFuel()
-        if (modelUnit:getCurrentFuel() < maxFuel) then
-            modelUnit:setCurrentFuel(maxFuel)
-            hasSupplied = true
-        end
-
-        if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-            local maxAmmo = modelUnit:getPrimaryWeaponMaxAmmo()
-            if (modelUnit:getPrimaryWeaponCurrentAmmo() < maxAmmo) then
-                modelUnit:setPrimaryWeaponCurrentAmmo(maxAmmo)
-                hasSupplied = true
-            end
-        end
-
-        if (hasSupplied) then
-            modelUnit:updateView()
-        end
-
-        return hasSupplied
-    end
-
-    local supplyLoadedModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyLoadedModelUnit)        and
-            (modelUnit:canSupplyLoadedModelUnit())      and
-            (not modelUnit:canRepairLoadedModelUnit())) then
-
-            local hasSupplied = false
-            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-                hasSupplied = supply(self:getLoadedModelUnitWithUnitId(unitID)) or hasSupplied
-            end
-            if (hasSupplied) then
-                dispatchEvtSupplyViewUnit(modelUnit:getGridIndex())
-            end
-        end
-    end
-
-    local supplyAdjacentModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyModelUnit))             then
-
-            for _, target in pairs(getSupplyTargetModelUnits(self, modelUnit)) do
-                if (supply(target)) then
-                    target:updateView()
-                    dispatchEvtSupplyViewUnit(target:getGridIndex())
-                end
-            end
-        end
-    end
-
-    self:forEachModelUnitOnMap( supplyAdjacentModelUnits)
-        :forEachModelUnitOnMap( supplyLoadedModelUnits)
-        :forEachModelUnitLoaded(supplyLoadedModelUnits)
 end
 
 local function onEvtSkillGroupActivated(self, event)
@@ -316,7 +236,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
 
     getScriptEventDispatcher(sceneWarFileName)
         :addEventListener("EvtTurnPhaseResetUnitState",  self)
-        :addEventListener("EvtTurnPhaseSupplyUnit",      self)
         :addEventListener("EvtSkillGroupActivated",      self)
 
     return self
@@ -325,7 +244,6 @@ end
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if     (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
-    elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
     elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
     end
 
