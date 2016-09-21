@@ -133,22 +133,6 @@ local function onEvtTurnPhaseConsumeUnitFuel(self, event)
     end)
 end
 
-local function onEvtTurnPhaseResetSkillState(self, event)
-    if (self.m_View) then
-        local playerIndex = event.playerIndex
-        self:forEachModelUnitOnMap(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(nil)
-                end
-            end)
-            :forEachModelUnitLoaded(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(nil)
-                end
-            end)
-    end
-end
-
 local function onEvtTurnPhaseResetUnitState(self, event)
     local playerIndex = event.playerIndex
     local func = function(modelUnit)
@@ -368,7 +352,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
 
     getScriptEventDispatcher(sceneWarFileName)
         :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-        :addEventListener("EvtTurnPhaseResetSkillState", self)
         :addEventListener("EvtTurnPhaseResetUnitState",  self)
         :addEventListener("EvtTurnPhaseSupplyUnit",      self)
         :addEventListener("EvtSkillGroupActivated",      self)
@@ -379,7 +362,6 @@ end
 function ModelUnitMap:onEvent(event)
     local name = event.name
     if     (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
-    elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
     elseif (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
     elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
     elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)

@@ -80,19 +80,36 @@ local function runTurnPhaseBeginning(self)
 end
 
 local function runTurnPhaseResetSkillState(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name        = "EvtTurnPhaseResetSkillState",
-        playerIndex = self.m_PlayerIndex,
-    })
+    local playerIndex = self.m_PlayerIndex
+    getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):deactivateSkillGroup()
+
+    if (not IS_SERVER) then
+        local func = function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                modelUnit:setActivatingSkillGroupId(nil)
+            end
+        end
+
+        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(func)
+            :forEachModelUnitLoaded(func)
+    end
+
     self.m_TurnPhase = "getFund"
 end
 
 local function runTurnPhaseGetFund(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name         = "EvtTurnPhaseGetFund",
-        playerIndex  = self.m_PlayerIndex,
-        modelTileMap = getModelTileMap(self.m_SceneWarFileName),
-    })
+    local playerIndex      = self.m_PlayerIndex
+    local sceneWarFileName = self.m_SceneWarFileName
+    local income           = 0
+    getModelTileMap(sceneWarFileName):forEachModelTile(function(modelTile)
+        if ((modelTile.getIncomeAmount) and (modelTile:getPlayerIndex() == playerIndex)) then
+            income = income + (modelTile:getIncomeAmount() or 0)
+        end
+    end)
+
+    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+    modelPlayer:setFund(modelPlayer:getFund() + income)
+
     self.m_TurnPhase = "consumeUnitFuel"
 end
 

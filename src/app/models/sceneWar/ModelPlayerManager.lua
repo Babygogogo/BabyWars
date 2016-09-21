@@ -6,7 +6,6 @@
 --   同上
 --
 -- 使用场景举例：
---   - 在回合进入“获得收入”的阶段（即收到EvtTurnPhaseGetFund消息）时，更新相应的player属性。
 --   - 在回合进入“维修单位”的阶段（即收到EvtTurnPhaseRepairUnit消息）时，更新相应的unit和player的属性。
 --
 -- 其他：
@@ -93,28 +92,6 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseResetSkillState(self, event)
-    local playerIndex = event.playerIndex
-    self:getModelPlayer(playerIndex):deactivateSkillGroup()
-end
-
-local function onEvtTurnPhaseGetFund(self, event)
-    local playerIndex = event.playerIndex
-    local modelPlayer = self:getModelPlayer(playerIndex)
-
-    if (modelPlayer:isAlive()) then
-        local income = 0
-        event.modelTileMap:forEachModelTile(function(modelTile)
-            if ((modelTile.getIncomeAmount) and (modelTile:getPlayerIndex() == playerIndex)) then
-                income = income + (modelTile:getIncomeAmount() or 0)
-            end
-        end)
-
-        modelPlayer:setFund(modelPlayer:getFund() + income)
-        dispatchEvtModelPlayerUpdated(self.m_SceneWarFileName, modelPlayer, playerIndex)
-    end
-end
-
 local function onEvtTurnPhaseRepairUnit(self, event)
     local modelUnitMap    = event.modelUnitMap
     local modelTileMap    = event.modelTileMap
@@ -189,20 +166,16 @@ function ModelPlayerManager:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtTurnPhaseResetSkillState", self)
-        :addEventListener("EvtTurnPhaseGetFund",         self)
-        :addEventListener("EvtTurnPhaseRepairUnit",      self)
-        :addEventListener("EvtSceneWarStarted",          self)
+        :addEventListener("EvtTurnPhaseRepairUnit", self)
+        :addEventListener("EvtSceneWarStarted",     self)
 
     return self
 end
 
 function ModelPlayerManager:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
-    elseif (eventName == "EvtTurnPhaseGetFund")         then onEvtTurnPhaseGetFund(        self, event)
-    elseif (eventName == "EvtTurnPhaseRepairUnit")      then onEvtTurnPhaseRepairUnit(     self, event)
-    elseif (eventName == "EvtSceneWarStarted")          then onEvtSceneWarStarted(         self, event)
+    if     (eventName == "EvtTurnPhaseRepairUnit") then onEvtTurnPhaseRepairUnit(     self, event)
+    elseif (eventName == "EvtSceneWarStarted")     then onEvtSceneWarStarted(         self, event)
     end
 
     return self
