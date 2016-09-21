@@ -36,6 +36,8 @@ local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
 
+local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -116,29 +118,6 @@ end
 
 local function doActionEndTurn(self, action)
     self:getModelTurnManager():doActionEndTurn(action)
-end
-
-local function doActionSurrender(self, action)
-    local modelTurnManager   = self:getModelTurnManager()
-    local modelPlayerManager = self:getModelPlayerManager()
-    local lostPlayerIndex    = action.lostPlayerIndex
-    local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-    Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
-    modelTurnManager:endTurn()
-
-    if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-        self.m_IsWarEnded = true
-        self.m_View:showEffectSurrender(callbackOnWarEnded)
-    else
-        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(77, lostModelPlayer:getNickname()))
-
-        if (modelPlayerManager:getAlivePlayersCount() == 1) then
-            self.m_IsWarEnded = true
-            self.m_View:showEffectWin(callbackOnWarEnded)
-        else
-            modelTurnManager:runTurn()
-        end
-    end
 end
 
 local function doActionAttack(self, action)
@@ -222,6 +201,7 @@ local function doAction(self, action)
         (actionName == "ProduceModelUnitOnTile") or
         (actionName == "ProduceModelUnitOnUnit") or
         (actionName == "SupplyModelUnit")        or
+        (actionName == "Surrender")              or
         (actionName == "Wait"))                  then
         return ActionExecutor.execute(action)
     end
@@ -240,7 +220,6 @@ local function doAction(self, action)
 
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
     elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
-    elseif (actionName == "Surrender")              then doActionSurrender(             self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")
@@ -419,6 +398,16 @@ function ModelSceneWar:getFileName()
     return self.m_FileName
 end
 
+function ModelSceneWar:isEnded()
+    return self.m_IsWarEnded
+end
+
+function ModelSceneWar:setEnded(ended)
+    self.m_IsWarEnded = ended
+
+    return self
+end
+
 function ModelSceneWar:getModelConfirmBox()
     return self.m_ActorConfirmBox:getModel()
 end
@@ -445,6 +434,20 @@ end
 
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
+end
+
+function ModelSceneWar:showEffectSurrender(callback)
+    assert(not IS_SERVER, "ModelSceneWar:showEffectSurrender() should not be invoked on the server.")
+    self.m_View:showEffectSurrender(callback)
+
+    return self
+end
+
+function ModelSceneWar:showEffectWin(callback)
+    assert(not IS_SERVER, "ModelSceneWar:showEffectWin() should not be invoked on the server.")
+    self.m_View:showEffectWin(callback)
+
+    return self
 end
 
 return ModelSceneWar

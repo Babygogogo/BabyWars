@@ -1,6 +1,7 @@
 
 local ActionExecutor = {}
 
+local Destroyers             = require("src.app.utilities.Destroyers")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
@@ -17,6 +18,7 @@ local ActorManager          = (not IS_SERVER) and (require("src.global.actors.Ac
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getModelScene            = SingletonGetters.getModelScene
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
@@ -483,6 +485,39 @@ local function executeSupplyModelUnit(action)
         end)
 end
 
+local function executeSurrender(action)
+    local sceneWarFileName   = action.fileName
+    local modelSceneWar      = getModelScene(sceneWarFileName)
+    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+    local playerIndex        = modelTurnManager:getPlayerIndex()
+    local modelPlayer        = modelPlayerManager:getModelPlayer(playerIndex)
+
+    Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
+    modelTurnManager:endTurn()
+    if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+        modelSceneWar:setEnded(true)
+    end
+
+    if (not IS_SERVER) then
+        local callbackOnWarEnded = function()
+            runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+        end
+
+        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+            modelSceneWar:setEnded(true)
+                :showEffectSurrender(callbackOnWarEnded)
+        else
+            getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
+            if (modelSceneWar:isEnded()) then
+                modelSceneWar:showEffectWin(callbackOnWarEnded)
+            else
+                modelTurnManager:runTurn()
+            end
+        end
+    end
+end
+
 local function executeWait(action)
     local path           = action.path
     local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
@@ -499,7 +534,7 @@ end
 -- The public function.
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action)
-    local modelSceneWar = SingletonGetters.getModelScene(action.fileName)
+    local modelSceneWar = getModelScene(action.fileName)
     if ((not modelSceneWar) or (not modelSceneWar.getModelWarField)) then
         return
     end
@@ -511,6 +546,10 @@ function ActionExecutor.execute(action)
     elseif (actionName == "RunSceneMain")       then return executeRunSceneMain(      action)
     elseif (actionName == "GetSceneWarData")    then return executeGetSceneWarData(   action)
     elseif (actionName == "ReloadCurrentScene") then return executeReloadCurrentScene(action)
+    end
+
+    if (modelSceneWar:isEnded()) then
+        return
     end
 
     local actionID = action.actionID
@@ -531,6 +570,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
     elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
     elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
+    elseif (actionName == "Surrender")              then executeSurrender(             action)
     elseif (actionName == "Wait")                   then executeWait(                  action)
     end
 
