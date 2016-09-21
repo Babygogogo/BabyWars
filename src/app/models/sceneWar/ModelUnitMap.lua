@@ -115,7 +115,6 @@ local function onEvtDestroyModelUnit(self, event)
     end
 
     self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
-    modelUnit:doActionDestroyModelUnit(event)
 
     getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end

@@ -165,12 +165,6 @@ function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
     return self
 end
 
-function ModelUnit:doActionDestroyModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
-
-    return self
-end
-
 function ModelUnit:doActionPromoteModelUnit(action)
     ComponentManager.callMethodForAllComponents(self, "doActionPromoteModelUnit", action)
 

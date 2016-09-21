@@ -168,13 +168,6 @@ function ModelTile:doActionMoveModelUnit(action)
     return self
 end
 
-function ModelTile:doActionDestroyModelUnit(action)
-    assert(GridIndexFunctions.isEqual(self:getGridIndex(), action.gridIndex))
-    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
-
-    return self
-end
-
 function ModelTile:doActionSurrender(action)
     if (self:getPlayerIndex() == action.lostPlayerIndex) then
         self:updateWithPlayerIndex(0)

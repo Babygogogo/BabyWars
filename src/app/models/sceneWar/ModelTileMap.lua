@@ -145,7 +145,13 @@ local function onEvtDestroyViewTile(self, event)
 end
 
 local function onEvtDestroyModelUnit(self, event)
-    self:getModelTile(event.gridIndex):doActionDestroyModelUnit(event)
+    local modelTile = self:getModelTile(event.gridIndex)
+    if (modelTile.setCurrentBuildPoint) then
+        modelTile:setCurrentBuildPoint(modelTile:getMaxBuildPoint())
+    end
+    if (modelTile.setCurrentCapturePoint) then
+        modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
+    end
 end
 
 --------------------------------------------------------------------------------

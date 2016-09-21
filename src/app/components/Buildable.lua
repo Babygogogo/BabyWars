@@ -60,12 +60,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function Buildable:doActionDestroyModelUnit(action)
-    self:setCurrentBuildPoint(self:getMaxBuildPoint())
-
-    return self.m_Owner
-end
-
 function Buildable:doActionSurrender(action)
     self:setCurrentBuildPoint(self:getMaxBuildPoint())
 

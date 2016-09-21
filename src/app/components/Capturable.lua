@@ -61,12 +61,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for doing the actions.
 --------------------------------------------------------------------------------
-function Capturable:doActionDestroyModelUnit(action)
-    self:setCurrentCapturePoint(self:getMaxCapturePoint())
-
-    return self.m_Owner
-end
-
 function Capturable:doActionSurrender(action)
     self:setCurrentCapturePoint(self:getMaxCapturePoint())
 
