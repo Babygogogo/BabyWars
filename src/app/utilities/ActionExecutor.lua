@@ -124,6 +124,10 @@ local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
     end
 end
 
+local function callbackOnWarEndedForClient()
+    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+end
+
 --------------------------------------------------------------------------------
 -- The private executors.
 --------------------------------------------------------------------------------
@@ -189,6 +193,45 @@ local function executeActivateSkillGroup(action)
         playerIndex  = playerIndex,
         skillGroupID = skillGroupID,
     })
+end
+
+local function executeBeginTurn(action)
+    local sceneWarFileName = action.fileName
+    local modelSceneWar    = getModelScene(sceneWarFileName)
+    local modelTurnManager = getModelTurnManager(sceneWarFileName)
+    local playerIndex      = modelTurnManager:getPlayerIndex()
+    local lostPlayerIndex  = action.lostPlayerIndex
+
+    if (not lostPlayerIndex) then
+        modelTurnManager:beginTurnPhaseBeginning()
+    else
+        local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+
+        if (IS_SERVER) then
+            modelSceneWar:setEnded(modelPlayerManager:getAlive() <= 2)
+            modelTurnManager:beginTurnPhaseBeginning(function()
+                Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+                if (not modelSceneWar:isEnded()) then
+                    modelTurnManager:endTurnPhaseMain()
+                end
+            end)
+        else
+            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+            modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
+
+            modelTurnManager:beginTurnPhaseBeginning(function()
+                Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+                if (isLoggedInPlayerLost) then
+                    modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
+                elseif (modelSceneWar:isEnded()) then
+                    modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
+                else
+                    modelTurnManager:endTurnPhaseMain()
+                end
+            end)
+        end
+    end
 end
 
 local function executeBuildModelTile(action)
@@ -498,25 +541,23 @@ local function executeSurrender(action)
     local modelPlayer        = modelPlayerManager:getModelPlayer(playerIndex)
 
     Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
-    modelTurnManager:endTurn()
-    if (modelPlayerManager:getAlivePlayersCount() <= 1) then
-        modelSceneWar:setEnded(true)
-    end
-
-    if (not IS_SERVER) then
-        local callbackOnWarEnded = function()
-            runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+    if (IS_SERVER) then
+        if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+            modelSceneWar:setEnded(true)
+        else
+            modelTurnManager:endTurnPhaseMain()
         end
-
+    else
         if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
             modelSceneWar:setEnded(true)
-                :showEffectSurrender(callbackOnWarEnded)
+                :showEffectSurrender(callbackOnWarEndedForClient)
         else
             getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
-            if (modelSceneWar:isEnded()) then
-                modelSceneWar:showEffectWin(callbackOnWarEnded)
+            if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+                modelSceneWar:setEnded(true)
+                    :showEffectWin(callbackOnWarEndedForClient)
             else
-                modelTurnManager:runTurn()
+                modelTurnManager:endTurnPhaseMain()
             end
         end
     end
@@ -566,6 +607,7 @@ function ActionExecutor.execute(action)
     modelSceneWar:setActionId(actionID)
 
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
+    elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
     elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
     elseif (actionName == "EndTurn")                then executeEndTurn(               action)

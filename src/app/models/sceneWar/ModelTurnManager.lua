@@ -385,20 +385,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelTurnManager:doActionBeginTurn(action)
-    assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:doActionBeginTurn() the turn phase is expected to be 'requestToBegin'.")
-
-    if (action.lostPlayerIndex) then
-        self.m_CallbackOnEnterTurnPhaseMain = action.callbackOnEnterTurnPhaseMain
-    else
-        self.m_CallbackOnEnterTurnPhaseMain = nil
-    end
-
-    runTurnPhaseBeginning(self)
-
-    return self
-end
-
 function ModelTurnManager:doActionAttack(action)
     if (action.lostPlayerIndex == self:getPlayerIndex()) then
         self:endTurn()
@@ -453,6 +439,15 @@ end
 
 function ModelTurnManager:endTurn()
     runTurnPhaseTickTurnAndPlayerIndex(self)
+
+    return self
+end
+
+function ModelTurnManager:beginTurnPhaseBeginning(callbackOnEnterTurnPhaseMain)
+    assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:beginTurnPhaseBeginning() invalid turn phase: " .. self.m_TurnPhase)
+
+    self.m_CallbackOnEnterTurnPhaseMain = callbackOnEnterTurnPhaseMain
+    runTurnPhaseBeginning(self)
 
     return self
 end

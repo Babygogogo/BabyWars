@@ -84,38 +84,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
-local function doActionBeginTurn(self, action)
-    local modelTurnManager = self:getModelTurnManager()
-    local lostPlayerIndex  = action.lostPlayerIndex
-
-    if (lostPlayerIndex) then
-        local modelWarField      = self:getModelWarField()
-        local modelPlayerManager = self:getModelPlayerManager()
-        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-
-        action.callbackOnEnterTurnPhaseMain = function()
-            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
-
-            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-                self.m_IsWarEnded = true
-                self.m_View:showEffectLose(callbackOnWarEnded)
-            else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
-
-                if (modelPlayerManager:getAlivePlayersCount() == 1) then
-                    self.m_IsWarEnded = true
-                    self.m_View:showEffectWin(callbackOnWarEnded)
-                else
-                    modelTurnManager:endTurn()
-                        :runTurn()
-                end
-            end
-        end
-    end
-
-    modelTurnManager:doActionBeginTurn(action)
-end
-
 local function doActionAttack(self, action)
     local modelPlayerManager = self:getModelPlayerManager()
     local modelTurnManager   = self:getModelTurnManager()
@@ -189,6 +157,7 @@ local function doAction(self, action)
         (actionName == "GetSceneWarData")        or
         (actionName == "ReloadCurrentScene")     or
         (actionName == "ActivateSkillGroup")     or
+        (actionName == "BeginTurn")              or
         (actionName == "BuildModelTile")         or
         (actionName == "DropModelUnit")          or
         (actionName == "EndTurn")                or
@@ -215,8 +184,7 @@ local function doAction(self, action)
     self:getModelMessageIndicator():hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
     dispatchEvtIsWaitingForServerResponse(self, false)
 
-    if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
-    elseif (actionName == "Attack")                 then doActionAttack(                self, action)
+    if     (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")
     end
