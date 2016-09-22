@@ -115,6 +115,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_IsWarEnded     = sceneData.isEnded
     self.m_MaxSkillPoints = sceneData.maxSkillPoints
     self.m_WarPassword    = sceneData.warPassword
+    self.m_CachedActions  = {}
 
     initScriptEventDispatcher(self)
     initActorPlayerManager(   self, sceneData.players)
@@ -218,6 +219,33 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
     ActionExecutor.execute(action)
+
+    return self
+end
+
+function ModelSceneWar:isExecutingAction()
+    return self.m_IsExecutingAction
+end
+
+function ModelSceneWar:setExecutingAction(executing)
+    self.m_IsExecutingAction = executing
+    if ((not executing) and (not self:isEnded())) then
+        local actionID = self:getActionId() + 1
+        local action   = self.m_CachedActions[actionID]
+        if (action) then
+            self.m_CachedActions[actionID] = nil
+            self:executeAction(action)
+        end
+    end
+
+    return self
+end
+
+function ModelSceneWar:cacheAction(action)
+    local actionID = action.actionID
+    if (actionID > self:getActionId()) then
+        self.m_CachedActions[actionID] = action
+    end
 
     return self
 end

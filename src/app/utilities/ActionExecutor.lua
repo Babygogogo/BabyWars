@@ -240,6 +240,7 @@ local function executeActivateSkillGroup(action)
         playerIndex  = playerIndex,
         skillGroupID = skillGroupID,
     })
+    getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
 local function executeAttack(action)
@@ -326,11 +327,14 @@ local function executeAttack(action)
         end
     end
 
+    local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
-        attacker:moveViewAlongPath(path, callbackAfterMoveAnimation)
+        attacker:moveViewAlongPath(path, function()
+            callbackAfterMoveAnimation()
+            modelSceneWar:setExecutingAction(false)
+        end)
     else
-        local modelSceneWar      = getModelScene(sceneWarFileName)
         local modelTurnManager   = getModelTurnManager(sceneWarFileName)
         local isInTurnPlayerLost = (lostPlayerIndex == modelTurnManager:getPlayerIndex())
         if (IS_SERVER) then
@@ -340,6 +344,7 @@ local function executeAttack(action)
             elseif (isInTurnPlayerLost) then
                 modelTurnManager:endTurnPhaseMain()
             end
+            modelSceneWar:setExecutingAction(false)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
@@ -357,6 +362,7 @@ local function executeAttack(action)
                 elseif (isInTurnPlayerLost) then
                     modelTurnManager:endTurnPhaseMain()
                 end
+                modelSceneWar:setExecutingAction(false)
             end)
         end
     end
@@ -370,7 +376,9 @@ local function executeBeginTurn(action)
     local lostPlayerIndex  = action.lostPlayerIndex
 
     if (not lostPlayerIndex) then
-        modelTurnManager:beginTurnPhaseBeginning()
+        modelTurnManager:beginTurnPhaseBeginning(function()
+            modelSceneWar:setExecutingAction(false)
+        end)
     else
         local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
@@ -382,6 +390,7 @@ local function executeBeginTurn(action)
                 if (not modelSceneWar:isEnded()) then
                     modelTurnManager:endTurnPhaseMain()
                 end
+                modelSceneWar:setExecutingAction(false)
             end)
         else
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
@@ -398,6 +407,7 @@ local function executeBeginTurn(action)
                 else
                     modelTurnManager:endTurnPhaseMain()
                 end
+                modelSceneWar:setExecutingAction(false)
             end)
         end
     end
@@ -425,6 +435,8 @@ local function executeBuildModelTile(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -446,19 +458,22 @@ local function executeCaptureModelTile(action)
     end
     focusModelUnit:setStateActioned()
 
+    local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
         focusModelUnit:moveViewAlongPath(path, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
+
+            modelSceneWar:setExecutingAction(false)
         end)
     else
-        local modelSceneWar      = getModelScene(sceneWarFileName)
         local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
         if (IS_SERVER) then
             Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
             modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() < 2)
+                :setExecutingAction(false)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
@@ -477,15 +492,18 @@ local function executeCaptureModelTile(action)
                 elseif (modelSceneWar:isEnded()) then
                     modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
                 end
+
+                modelSceneWar:setExecutingAction(false)
             end)
         end
     end
 end
 
 local function executeDropModelUnit(action)
-    local path           = action.path
-    local modelUnitMap   = getModelUnitMap(action.fileName)
-    local focusModelUnit = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local path             = action.path
+    local sceneWarFileName = action.fileName
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
     moveModelUnitWithAction(action)
 
     local dropModelUnits = {}
@@ -517,11 +535,15 @@ local function executeDropModelUnit(action)
                     end
                 )
             end
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
 local function executeEndTurn(action)
-    getModelTurnManager(action.fileName):endTurnPhaseMain()
+    local sceneWarFileName = action.fileName
+    getModelTurnManager(sceneWarFileName):endTurnPhaseMain()
+    getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
 local function executeJoinModelUnit(action)
@@ -584,6 +606,8 @@ local function executeJoinModelUnit(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
             targetModelUnit:removeViewFromParent()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -628,14 +652,17 @@ local function executeLaunchSilo(action)
                     gridIndex = gridIndex,
                 })
             end
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
 local function executeLoadModelUnit(action)
-    local path            = action.path
-    local modelUnitMap    = getModelUnitMap(action.fileName)
-    local focusModelUnit  = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    local loaderModelUnit = modelUnitMap:getModelUnit(path[#path])
+    local path             = action.path
+    local sceneWarFileName = action.fileName
+    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local loaderModelUnit  = modelUnitMap:getModelUnit(path[#path])
 
     moveModelUnitWithAction(action)
     loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
@@ -646,6 +673,8 @@ local function executeLoadModelUnit(action)
                 :showNormalAnimation()
                 :setViewVisible(false)
             loaderModelUnit:updateView()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -674,6 +703,8 @@ local function executeProduceModelUnitOnTile(action)
     local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+
+    getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
 local function executeProduceModelUnitOnUnit(action)
@@ -713,6 +744,8 @@ local function executeProduceModelUnitOnUnit(action)
         :moveViewAlongPath(path, function()
             producer:updateView()
                 :showNormalAnimation()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -752,6 +785,8 @@ local function executeSupplyModelUnit(action)
                     gridIndex = targetModelUnit:getGridIndex(),
                 })
             end
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -784,17 +819,21 @@ local function executeSurrender(action)
             end
         end
     end
+    modelSceneWar:setExecutingAction(false)
 end
 
 local function executeWait(action)
-    local path           = action.path
-    local focusModelUnit = getModelUnitMap(action.fileName):getFocusModelUnit(path[1], action.launchUnitID)
+    local path             = action.path
+    local sceneWarFileName = action.fileName
+    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
     moveModelUnitWithAction(action)
 
     focusModelUnit:setStateActioned()
         :moveViewAlongPath(path, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
 end
 
@@ -808,15 +847,18 @@ function ActionExecutor.execute(action)
     end
 
     local actionName = action.actionName
-    if     (actionName == "Logout")             then return executeLogout(            action)
+    if     (actionName == "Error")              then return executeError(             action)
+    elseif (actionName == "Logout")             then return executeLogout(            action)
     elseif (actionName == "Message")            then return executeMessage(           action)
-    elseif (actionName == "Error")              then return executeError(             action)
-    elseif (actionName == "RunSceneMain")       then return executeRunSceneMain(      action)
     elseif (actionName == "GetSceneWarData")    then return executeGetSceneWarData(   action)
     elseif (actionName == "ReloadCurrentScene") then return executeReloadCurrentScene(action)
+    elseif (actionName == "RunSceneMain")       then return executeRunSceneMain(      action)
     end
 
     if (modelSceneWar:isEnded()) then
+        return
+    elseif (modelSceneWar:isExecutingAction()) then
+        modelSceneWar:cacheAction(action)
         return
     end
 
@@ -828,6 +870,7 @@ function ActionExecutor.execute(action)
         return
     end
     modelSceneWar:setActionId(actionID)
+        :setExecutingAction(true)
 
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
     elseif (actionName == "Attack")                 then executeAttack(                action)
