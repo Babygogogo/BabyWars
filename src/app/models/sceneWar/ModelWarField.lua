@@ -168,18 +168,6 @@ function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
     return self
 end
 
-function ModelWarField:doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
-    local modelUnitMap = self:getModelUnitMap()
-    local modelTileMap = self:getModelTileMap()
-    local path         = action.path
-    local target       = modelTileMap:getModelTile(path[#path])
-
-    modelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-    modelTileMap:doActionCaptureModelTile(action, target)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

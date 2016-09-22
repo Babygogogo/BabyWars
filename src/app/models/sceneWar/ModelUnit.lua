@@ -238,25 +238,6 @@ function ModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimatio
     return self
 end
 
-function ModelUnit:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-    self:setStateActioned()
-    ComponentManager.callMethodForAllComponents(self, "doActionCaptureModelTile", action, target)
-
-    if (self.m_View) then
-        self.m_View:moveAlongPath(action.path, function()
-            self.m_View:updateWithModelUnit(self)
-                :showNormalAnimation()
-            target:updateView()
-
-            if (callbackOnCaptureAnimationEnded) then
-                callbackOnCaptureAnimationEnded()
-            end
-        end)
-    end
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

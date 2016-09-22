@@ -119,35 +119,6 @@ local function doActionAttack(self, action)
     modelTurnManager  :doActionAttack(action)
 end
 
-local function doActionCaptureModelTile(self, action)
-    local modelWarField      = self:getModelWarField()
-    local modelPlayerManager = self:getModelPlayerManager()
-    local lostPlayerIndex    = action.lostPlayerIndex
-    local callbackOnCaptureAnimationEnded
-
-    if (lostPlayerIndex) then
-        local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-
-        callbackOnCaptureAnimationEnded = function()
-            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
-
-            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-                self.m_IsWarEnded = true
-                self.m_View:showEffectLose(callbackOnWarEnded)
-            else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
-                if (modelPlayerManager:getAlivePlayersCount() == 1) then
-                    self.m_IsWarEnded = true
-                    self.m_View:showEffectWin(callbackOnWarEnded)
-                end
-            end
-        end
-    end
-
-    modelWarField     :doActionCaptureModelTile(action, callbackOnCaptureAnimationEnded)
-    modelPlayerManager:doActionCaptureModelTile(action)
-end
-
 local function doAction(self, action)
     local actionName = action.actionName
     if ((actionName == "Logout")                 or
@@ -159,6 +130,7 @@ local function doAction(self, action)
         (actionName == "ActivateSkillGroup")     or
         (actionName == "BeginTurn")              or
         (actionName == "BuildModelTile")         or
+        (actionName == "CaptureModelTile")       or
         (actionName == "DropModelUnit")          or
         (actionName == "EndTurn")                or
         (actionName == "JoinModelUnit")          or
@@ -185,7 +157,6 @@ local function doAction(self, action)
     dispatchEvtIsWaitingForServerResponse(self, false)
 
     if     (actionName == "Attack")                 then doActionAttack(                self, action)
-    elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")
     end
 end

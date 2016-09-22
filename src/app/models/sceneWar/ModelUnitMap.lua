@@ -250,17 +250,6 @@ function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnima
     return self
 end
 
-function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-    local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer, true))
-    moveActorUnitOnAction(self, action)
-    capturer:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

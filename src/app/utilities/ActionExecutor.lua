@@ -221,7 +221,9 @@ local function executeBeginTurn(action)
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
             modelTurnManager:beginTurnPhaseBeginning(function()
+                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+
                 if (isLoggedInPlayerLost) then
                     modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
                 elseif (modelSceneWar:isEnded()) then
@@ -257,6 +259,60 @@ local function executeBuildModelTile(action)
                 :showNormalAnimation()
             modelTile:updateView()
         end)
+end
+
+local function executeCaptureModelTile(action)
+    local path             = action.path
+    local sceneWarFileName = action.fileName
+    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
+    local modelTile        = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
+    local capturePoint     = modelTile:getCurrentCapturePoint() - focusModelUnit:getCaptureAmount()
+
+    moveModelUnitWithAction(action)
+    if (capturePoint > 0) then
+        focusModelUnit:setCapturingModelTile(true)
+        modelTile:setCurrentCapturePoint(capturePoint)
+    else
+        focusModelUnit:setCapturingModelTile(false)
+        modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
+            :updateWithPlayerIndex(focusModelUnit:getPlayerIndex())
+    end
+    focusModelUnit:setStateActioned()
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (not lostPlayerIndex) then
+        focusModelUnit:moveViewAlongPath(path, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+            modelTile:updateView()
+        end)
+    else
+        local modelSceneWar      = getModelScene(sceneWarFileName)
+        local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+        if (IS_SERVER) then
+            Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() < 2)
+        else
+            local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+            modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
+
+            focusModelUnit:moveViewAlongPath(path, function()
+                focusModelUnit:updateView()
+                    :showNormalAnimation()
+                modelTile:updateView()
+
+                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+
+                if (isLoggedInPlayerLost) then
+                    modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
+                elseif (modelSceneWar:isEnded()) then
+                    modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
+                end
+            end)
+        end
+    end
 end
 
 local function executeDropModelUnit(action)
@@ -548,11 +604,11 @@ local function executeSurrender(action)
             modelTurnManager:endTurnPhaseMain()
         end
     else
+        getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
         if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
             modelSceneWar:setEnded(true)
                 :showEffectSurrender(callbackOnWarEndedForClient)
         else
-            getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
             if (modelPlayerManager:getAlivePlayersCount() <= 1) then
                 modelSceneWar:setEnded(true)
                     :showEffectWin(callbackOnWarEndedForClient)
@@ -609,6 +665,7 @@ function ActionExecutor.execute(action)
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
     elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
+    elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
     elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
     elseif (actionName == "EndTurn")                then executeEndTurn(               action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
