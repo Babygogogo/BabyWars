@@ -209,7 +209,7 @@ local function executeBeginTurn(action)
         local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
 
         if (IS_SERVER) then
-            modelSceneWar:setEnded(modelPlayerManager:getAlive() <= 2)
+            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 2)
             modelTurnManager:beginTurnPhaseBeginning(function()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 if (not modelSceneWar:isEnded()) then

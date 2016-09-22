@@ -414,4 +414,11 @@ function ModelSceneWar:showEffectWin(callback)
     return self
 end
 
+function ModelSceneWar:showEffectLose(callback)
+    assert(not IS_SERVER, "ModelSceneWar:showEffectLose() should not be invoked on the server.")
+    self.m_View:showEffectLose(callback)
+
+    return self
+end
+
 return ModelSceneWar
