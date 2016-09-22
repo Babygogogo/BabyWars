@@ -231,16 +231,6 @@ function ModelTileMap:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelTileMap:doActionMoveModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTileMap:getMapSize()

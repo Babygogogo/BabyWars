@@ -42,19 +42,6 @@ local function getActorUnitLoaded(self, unitID)
     return self.m_LoadedActorUnits[unitID]
 end
 
-local function moveActorUnitOnAction(self, action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        self:setActorUnitUnloaded(launchUnitID, endingGridIndex)
-    else
-        self:swapActorUnit(beginningGridIndex, endingGridIndex)
-    end
-end
-
 local function createEmptyMap(width)
     local map = {}
     for x = 1, width do

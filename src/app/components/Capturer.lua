@@ -67,17 +67,6 @@ function Capturer:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Capturer:doActionMoveModelUnit(action)
-    if (#action.path > 1) then
-        self.m_IsCapturing = false
-    end
-
-    return self.m_Owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Capturer:isCapturingModelTile()

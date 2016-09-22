@@ -151,32 +151,6 @@ function ModelUnit:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelUnit:doActionMoveModelUnit(action, loadedModelUnits)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action, loadedModelUnits)
-
-    return self
-end
-
-function ModelUnit:doActionPromoteModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionPromoteModelUnit", action)
-
-    return self
-end
-
-function ModelUnit:doActionLaunchModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionLaunchModelUnit", action)
-
-    if (self.m_View) then
-        self.m_View:updateWithModelUnit(self)
-            :showNormalAnimation()
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnit:moveViewAlongPath(path, callbackAfterMove)

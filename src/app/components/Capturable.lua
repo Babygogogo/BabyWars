@@ -59,19 +59,6 @@ function Capturable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Capturable:doActionMoveModelUnit(action)
-    if ((not action.launchUnitID)                                                   and
-        (#action.path > 1)                                                          and
-        (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
-        self:setCurrentCapturePoint(self:getMaxCapturePoint())
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Capturable:getCurrentCapturePoint()

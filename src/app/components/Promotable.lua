@@ -57,18 +57,6 @@ function Promotable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Promotable:doActionPromoteModelUnit(action)
-    local currentPromotion = self:getCurrentPromotion()
-    if (currentPromotion < MAX_PROMOTION) then
-        self:setCurrentPromotion(currentPromotion + 1)
-    end
-
-    return owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Promotable:getCurrentPromotion()

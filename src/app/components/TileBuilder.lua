@@ -48,17 +48,6 @@ function TileBuilder:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function TileBuilder:doActionMoveModelUnit(action)
-    if (#action.path > 1) then
-        self.m_IsBuilding = false
-    end
-
-    return self.m_Owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function TileBuilder:isBuildingModelTile()

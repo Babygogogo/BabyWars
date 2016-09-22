@@ -124,23 +124,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function UnitLoader:doActionLaunchModelUnit(action)
-    return self:removeLoadUnitId(action.launchUnitID)
-end
-
 function UnitLoader:canJoinModelUnit(modelUnit)
     return (self:getCurrentLoadCount() == 0)   and
         (modelUnit.getCurrentLoadCount)        and
         (modelUnit:getCurrentLoadCount() == 0)
-end
-
-function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
-    local destination = action.path[#action.path]
-    for _, modelUnit in pairs(loadedModelUnits or {}) do
-        modelUnit:setGridIndex(destination, false)
-    end
-
-    return self.m_Owner
 end
 
 --------------------------------------------------------------------------------

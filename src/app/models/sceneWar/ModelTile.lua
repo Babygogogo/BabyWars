@@ -160,15 +160,6 @@ function ModelTile:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelTile:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTile:updateView()
