@@ -102,19 +102,6 @@ function ModelPlayerManager:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelPlayerManager:doActionAttack(action)
-    if (action.lostPlayerIndex) then
-        local modelPlayer = self:getModelPlayer(action.lostPlayerIndex)
-        assert(modelPlayer:isAlive(), "ModelPlayerManager:doActionAttack() the player that is being defeated is not alive.")
-        modelPlayer:setAlive(false)
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:getModelPlayer(playerIndex)

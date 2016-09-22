@@ -240,10 +240,6 @@ function ModelTileMap:doActionMoveModelUnit(action)
     return self
 end
 
-function ModelTileMap:doActionAttack(action)
-    return self:doActionMoveModelUnit(action)
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

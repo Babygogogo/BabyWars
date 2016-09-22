@@ -36,6 +36,34 @@ local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, play
     })
 end
 
+local function dispatchEvtDestroyViewUnit(sceneWarFileName, gridIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name      = "EvtDestroyViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtDestroyViewTile(sceneWarFileName, gridIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name      = "EvtDestroyViewTile",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewUnit(sceneWarFileName, gridIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name      = "EvtAttackViewUnit",
+        gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtAttackViewTile(sceneWarFileName, gridIndex)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+        name      = "EvtAttackViewTile",
+        gridIndex = gridIndex,
+    })
+end
+
 local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -124,6 +152,25 @@ local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
     end
 end
 
+local function getBaseDamageCostWithTargetAndDamage(target, damage)
+    if (not target.getBaseProductionCost) then
+        return 0
+    else
+        local normalizedRemainingHP = math.ceil(math.max(0, target:getCurrentHP() - damage) / 10)
+        return math.floor(target:getBaseProductionCost() * (target:getNormalizedCurrentHP() - normalizedRemainingHP) / 10)
+    end
+end
+
+local function getSkillModifiedDamageCost(cost, modelPlayer)
+    local modifier = SkillModifierFunctions.getEnergyGrowthRateModifier(modelPlayer:getModelSkillConfiguration())
+    return math.floor(cost * (100 + modifier) / 100)
+end
+
+local function getIncomeWithDamageCost(targetDamageCost, modelPlayer)
+    local modifier = SkillModifierFunctions.getAttackDamageCostToFundModifier(modelPlayer:getModelSkillConfiguration())
+    return math.floor(targetDamageCost * modifier / 100)
+end
+
 local function callbackOnWarEndedForClient()
     runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
 end
@@ -193,6 +240,126 @@ local function executeActivateSkillGroup(action)
         playerIndex  = playerIndex,
         skillGroupID = skillGroupID,
     })
+end
+
+local function executeAttack(action)
+    local path               = action.path
+    local sceneWarFileName   = action.fileName
+    local attackDamage       = action.attackDamage
+    local counterDamage      = action.counterDamage
+    local attackerGridIndex  = path[#path]
+    local targetGridIndex    = action.targetGridIndex
+    local modelUnitMap       = getModelUnitMap(sceneWarFileName)
+    local modelTileMap       = getModelTileMap(sceneWarFileName)
+    local attacker           = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local attackTarget       = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
+
+    moveModelUnitWithAction(action)
+    if (attacker:getPrimaryWeaponBaseDamage(attackTarget:getDefenseType())) then
+        attacker:setPrimaryWeaponCurrentAmmo(attacker:getPrimaryWeaponCurrentAmmo() - 1)
+    end
+    if ((counterDamage) and (attackTarget:getPrimaryWeaponBaseDamage(attacker:getDefenseType()))) then
+        attackTarget:setPrimaryWeaponCurrentAmmo(attackTarget:getPrimaryWeaponCurrentAmmo() - 1)
+    end
+
+    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+    if (attackTarget.getUnitType) then
+        local attackerDamageCost  = getBaseDamageCostWithTargetAndDamage(attacker,     counterDamage or 0)
+        local targetDamageCost    = getBaseDamageCostWithTargetAndDamage(attackTarget, attackDamage)
+        local attackerModelPlayer = modelPlayerManager:getModelPlayer(attacker    :getPlayerIndex())
+        local targetModelPlayer   = modelPlayerManager:getModelPlayer(attackTarget:getPlayerIndex())
+
+        attackerModelPlayer:addDamageCost(getSkillModifiedDamageCost(attackerDamageCost * 2 + targetDamageCost,     attackerModelPlayer))
+        targetModelPlayer  :addDamageCost(getSkillModifiedDamageCost(attackerDamageCost     + targetDamageCost * 2, targetModelPlayer))
+        attackerModelPlayer:setFund(attackerModelPlayer:getFund() + getIncomeWithDamageCost(targetDamageCost,   attackerModelPlayer))
+        targetModelPlayer  :setFund(targetModelPlayer  :getFund() + getIncomeWithDamageCost(attackerDamageCost, targetModelPlayer))
+
+        dispatchEvtModelPlayerUpdated(sceneWarFileName, attackerModelPlayer, attacker:getPlayerIndex())
+    end
+
+    local attackerNewHP = math.max(0, attacker:getCurrentHP() - (counterDamage or 0))
+    attacker:setCurrentHP(attackerNewHP)
+    if (attackerNewHP == 0) then
+        attackTarget:setCurrentPromotion(math.min(attackTarget:getMaxPromotion(), attackTarget:getCurrentPromotion() + 1))
+        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, attackerGridIndex)
+    end
+
+    local targetNewHP = math.max(0, attackTarget:getCurrentHP() - attackDamage)
+    attackTarget:setCurrentHP(targetNewHP)
+    if (targetNewHP == 0) then
+        if (attackTarget.getUnitType) then
+            attacker:setCurrentPromotion(math.min(attacker:getMaxPromotion(), attacker:getCurrentPromotion() + 1))
+            Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, targetGridIndex)
+        else
+            attackTarget:updateWithObjectAndBaseId(0)
+        end
+    end
+
+    attacker:setStateActioned()
+
+    local callbackAfterMoveAnimation = function()
+        attacker:updateView()
+            :showNormalAnimation()
+        attackTarget:updateView()
+
+        if (attackerNewHP == 0) then
+            dispatchEvtDestroyViewUnit(sceneWarFileName, attackerGridIndex)
+            attacker:removeViewFromParent()
+        elseif ((counterDamage) and (targetNewHP > 0)) then
+            dispatchEvtAttackViewUnit(sceneWarFileName, attackerGridIndex)
+        end
+
+        if (targetNewHP == 0) then
+            if (attackTarget.getUnitType) then
+                dispatchEvtDestroyViewUnit(sceneWarFileName, targetGridIndex)
+                attackTarget:removeViewFromParent()
+            else
+                dispatchEvtDestroyViewTile(sceneWarFileName, targetGridIndex)
+                attackTarget:updateView()
+            end
+        else
+            if (attackTarget.getUnitType) then
+                dispatchEvtAttackViewUnit(sceneWarFileName, targetGridIndex)
+            else
+                dispatchEvtAttackViewTile(sceneWarFileName, targetGridIndex)
+            end
+        end
+    end
+
+    local lostPlayerIndex = action.lostPlayerIndex
+    if (not lostPlayerIndex) then
+        attacker:moveViewAlongPath(path, callbackAfterMoveAnimation)
+    else
+        local modelSceneWar      = getModelScene(sceneWarFileName)
+        local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+        local isInTurnPlayerLost = (lostPlayerIndex == modelTurnManager:getPlayerIndex())
+        if (IS_SERVER) then
+            Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+            if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+                modelSceneWar:setEnded(true)
+            elseif (isInTurnPlayerLost) then
+                modelTurnManager:endTurnPhaseMain()
+            end
+        else
+            local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+            modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
+
+            attacker:moveViewAlongPath(path, function()
+                callbackAfterMoveAnimation()
+                Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+
+                if (isLoggedInPlayerLost) then
+                    modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
+                elseif (modelSceneWar:isEnded()) then
+                    modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
+                elseif (isInTurnPlayerLost) then
+                    modelTurnManager:endTurnPhaseMain()
+                end
+            end)
+        end
+    end
 end
 
 local function executeBeginTurn(action)
@@ -663,6 +830,7 @@ function ActionExecutor.execute(action)
     modelSceneWar:setActionId(actionID)
 
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
+    elseif (actionName == "Attack")                 then executeAttack(                action)
     elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
     elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)

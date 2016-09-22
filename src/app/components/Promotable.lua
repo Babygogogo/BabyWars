@@ -20,6 +20,7 @@ local PROMOTION_BONUS = GameConstantFunctions.getPromotionBonus()
 
 Promotable.EXPORTED_METHODS = {
     "getCurrentPromotion",
+    "getMaxPromotion",
     "getPromotionAttackBonus",
     "getPromotionDefenseBonus",
 
@@ -72,6 +73,10 @@ end
 --------------------------------------------------------------------------------
 function Promotable:getCurrentPromotion()
     return self.m_CurrentPromotion
+end
+
+function Promotable:getMaxPromotion()
+    return MAX_PROMOTION
 end
 
 function Promotable:getPromotionAttackBonus()

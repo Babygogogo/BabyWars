@@ -237,20 +237,6 @@ function ModelUnitMap:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelUnitMap:getMapSize()

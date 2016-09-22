@@ -84,41 +84,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions that do the actions the system requested.
 --------------------------------------------------------------------------------
-local function doActionAttack(self, action)
-    local modelPlayerManager = self:getModelPlayerManager()
-    local modelTurnManager   = self:getModelTurnManager()
-    local modelWarField      = self:getModelWarField()
-    local lostPlayerIndex    = action.lostPlayerIndex
-    local callbackOnAttackAnimationEnded
-
-    if (lostPlayerIndex) then
-        local currentPlayerIndex = modelTurnManager:getPlayerIndex()
-        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-
-        callbackOnAttackAnimationEnded = function()
-            Destroyers.destroyPlayerForce(self:getFileName(), lostPlayerIndex)
-
-            if (lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-                self.m_IsWarEnded = true
-                self.m_View:showEffectLose(callbackOnWarEnded)
-            else
-                self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(76, lostModelPlayer:getNickname()))
-
-                if (modelPlayerManager:getAlivePlayersCount() == 1) then
-                    self.m_IsWarEnded = true
-                    self.m_View:showEffectWin(callbackOnWarEnded)
-                elseif (lostPlayerIndex == currentPlayerIndex) then
-                    modelTurnManager:runTurn()
-                end
-            end
-        end
-    end
-
-    modelWarField     :doActionAttack(action, callbackOnAttackAnimationEnded)
-    modelPlayerManager:doActionAttack(action)
-    modelTurnManager  :doActionAttack(action)
-end
-
 local function doAction(self, action)
     local actionName = action.actionName
     if ((actionName == "Logout")                 or
@@ -128,6 +93,7 @@ local function doAction(self, action)
         (actionName == "GetSceneWarData")        or
         (actionName == "ReloadCurrentScene")     or
         (actionName == "ActivateSkillGroup")     or
+        (actionName == "Attack")                 or
         (actionName == "BeginTurn")              or
         (actionName == "BuildModelTile")         or
         (actionName == "CaptureModelTile")       or
@@ -142,22 +108,8 @@ local function doAction(self, action)
         (actionName == "Surrender")              or
         (actionName == "Wait"))                  then
         return ActionExecutor.execute(action)
-    end
-
-    if ((action.fileName ~= self.m_FileName) or (self.m_IsWarEnded)) then
-        return
-    elseif (action.actionID ~= self.m_ActionID + 1) then
-        self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(81, "OutOfSync"))
-        requestReload(self, 3)
-        return
-    end
-
-    self.m_ActionID = action.actionID
-    self:getModelMessageIndicator():hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtIsWaitingForServerResponse(self, false)
-
-    if     (actionName == "Attack")                 then doActionAttack(                self, action)
-    else                                                 print("ModelSceneWar-doAction() unrecognized action.")
+    else
+        print("ModelSceneWar-doAction() unrecognized action: " .. (actionName or ""))
     end
 end
 

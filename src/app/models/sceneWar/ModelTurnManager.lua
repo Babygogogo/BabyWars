@@ -383,17 +383,6 @@ function ModelTurnManager:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelTurnManager:doActionAttack(action)
-    if (action.lostPlayerIndex == self:getPlayerIndex()) then
-        self:endTurn()
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTurnManager:getTurnIndex()

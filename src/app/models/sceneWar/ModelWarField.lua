@@ -154,21 +154,6 @@ function ModelWarField:onEvent(event)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelWarField:doActionAttack(action, callbackOnAttackAnimationEnded)
-    local modelUnitMap    = self:getModelUnitMap()
-    local modelTileMap    = self:getModelTileMap()
-    local targetGridIndex = action.targetGridIndex
-    local attackTarget    = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
-
-    modelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-    modelTileMap:doActionAttack(action, attackTarget)
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarField:getModelUnitMap()
