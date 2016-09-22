@@ -310,11 +310,19 @@ local function runTurnPhaseMain(self)
 end
 
 local function runTurnPhaseResetUnitState(self)
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
-        name        = "EvtTurnPhaseResetUnitState",
-        playerIndex = self.m_PlayerIndex,
-        turnIndex   = self.m_TurnIndex
-    })
+    local playerIndex      = self.m_PlayerIndex
+    local sceneWarFileName = self.m_SceneWarFileName
+    local func             = function(modelUnit)
+        if (modelUnit:getPlayerIndex() == playerIndex) then
+            modelUnit:setStateIdle()
+                :updateView()
+        end
+    end
+
+    getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
     self.m_TurnPhase = "tickTurnAndPlayerIndex"
 end
 
@@ -391,15 +399,6 @@ function ModelTurnManager:doActionBeginTurn(action)
     return self
 end
 
-function ModelTurnManager:doActionEndTurn(action)
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:doActionEndTurn() the turn phase is expected to be 'main'.")
-
-    self.m_TurnPhase = "resetUnitState"
-    self:runTurn()
-
-    return self
-end
-
 function ModelTurnManager:doActionAttack(action)
     if (action.lostPlayerIndex == self:getPlayerIndex()) then
         self:endTurn()
@@ -454,6 +453,14 @@ end
 
 function ModelTurnManager:endTurn()
     runTurnPhaseTickTurnAndPlayerIndex(self)
+
+    return self
+end
+
+function ModelTurnManager:endTurnPhaseMain()
+    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurnPhaseMain() invalid turn phase: " .. self.m_TurnPhase)
+    self.m_TurnPhase = "resetUnitState"
+    self:runTurn()
 
     return self
 end

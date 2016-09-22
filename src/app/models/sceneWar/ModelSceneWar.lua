@@ -116,10 +116,6 @@ local function doActionBeginTurn(self, action)
     modelTurnManager:doActionBeginTurn(action)
 end
 
-local function doActionEndTurn(self, action)
-    self:getModelTurnManager():doActionEndTurn(action)
-end
-
 local function doActionAttack(self, action)
     local modelPlayerManager = self:getModelPlayerManager()
     local modelTurnManager   = self:getModelTurnManager()
@@ -195,6 +191,7 @@ local function doAction(self, action)
         (actionName == "ActivateSkillGroup")     or
         (actionName == "BuildModelTile")         or
         (actionName == "DropModelUnit")          or
+        (actionName == "EndTurn")                or
         (actionName == "JoinModelUnit")          or
         (actionName == "LaunchSilo")             or
         (actionName == "LoadModelUnit")          or
@@ -219,7 +216,6 @@ local function doAction(self, action)
     dispatchEvtIsWaitingForServerResponse(self, false)
 
     if     (actionName == "BeginTurn")              then doActionBeginTurn(             self, action)
-    elseif (actionName == "EndTurn")                then doActionEndTurn(               self, action)
     elseif (actionName == "Attack")                 then doActionAttack(                self, action)
     elseif (actionName == "CaptureModelTile")       then doActionCaptureModelTile(      self, action)
     else                                                 print("ModelSceneWar-doAction() unrecognized action.")

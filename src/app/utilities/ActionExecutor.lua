@@ -254,6 +254,10 @@ local function executeDropModelUnit(action)
         end)
 end
 
+local function executeEndTurn(action)
+    getModelTurnManager(action.fileName):endTurnPhaseMain()
+end
+
 local function executeJoinModelUnit(action)
     local path             = action.path
     local endingGridIndex  = path[#path]
@@ -564,6 +568,7 @@ function ActionExecutor.execute(action)
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
     elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
+    elseif (actionName == "EndTurn")                then executeEndTurn(               action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
     elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)

@@ -85,19 +85,6 @@ end
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
-local function onEvtTurnPhaseResetUnitState(self, event)
-    local playerIndex = event.playerIndex
-    local func = function(modelUnit)
-        if (modelUnit:getPlayerIndex() == playerIndex) then
-            modelUnit:setStateIdle()
-                :updateView()
-        end
-    end
-
-    self:forEachModelUnitOnMap( func)
-        :forEachModelUnitLoaded(func)
-end
-
 local function onEvtSkillGroupActivated(self, event)
     if (self.m_View) then
         local playerIndex  = event.playerIndex
@@ -235,7 +222,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
         :forEachModelUnitLoaded(func)
 
     getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtTurnPhaseResetUnitState",  self)
         :addEventListener("EvtSkillGroupActivated",      self)
 
     return self
@@ -243,8 +229,8 @@ end
 
 function ModelUnitMap:onEvent(event)
     local name = event.name
-    if     (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
-    elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
+    if (name == "EvtSkillGroupActivated") then
+        onEvtSkillGroupActivated(self, event)
     end
 
     return self
