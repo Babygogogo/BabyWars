@@ -13,9 +13,6 @@
 --    - TurnManager
 --    - WeatherManager
 --
---  - ModelSceneWar要正确处理服务器传来的事件消息。目前，是使用doActionXXX系列函数来处理的。
---    由于ModelSceneWar本身是由许多子actor组成，所以这些系列函数通常只是把服务器事件分发给合适的子actor再行处理。
---
 --  - model和view的“时间差”
 --    在目前的设计中，一旦收到事件，model将即时完成所有相关计算，而view将随后跨帧显示相应效果。
 --    考虑服务器传来“某unit A按某路线移动后对unit B发起攻击”的事件的情况。这种情况下，在model中，unit的新的数值将马上完成结算（如hp，弹药量，消灭与否，等级等都会有更新），
@@ -23,95 +20,16 @@
 --    采取model先行结算的方式可以避免很多问题，所以后续开发应该遵守同样的规范。
 --]]--------------------------------------------------------------------------------
 
-local ModelSceneWar = class("ModelSceneWar")
+local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
 
-local ActionExecutor         = require("src.app.utilities.ActionExecutor")
-local AudioManager           = require("src.app.utilities.AudioManager")
-local Destroyers             = require("src.app.utilities.Destroyers")
-local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
-local Actor                  = require("src.global.actors.Actor")
-local ActorManager           = require("src.global.actors.ActorManager")
-local EventDispatcher        = require("src.global.events.EventDispatcher")
+local ActionExecutor        = require("src.app.utilities.ActionExecutor")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local Actor                 = require("src.global.actors.Actor")
+local EventDispatcher       = require("src.global.events.EventDispatcher")
 
-local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
-    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
-
-    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
-    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
-end
-
-local function dispatchEvtIsWaitingForServerResponse(self, waiting)
-    self:getScriptEventDispatcher():dispatchEvent({
-        name    = "EvtIsWaitingForServerResponse",
-        waiting = waiting,
-    })
-end
-
-local function requestReload(self, durationSec)
-    self:getModelMessageIndicator():showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "TransferingData"))
-    dispatchEvtIsWaitingForServerResponse(self, true)
-
-    local func = function()
-        WebSocketManager.sendAction({
-            actionName = "GetSceneWarData",
-            fileName   = self.m_FileName,
-        })
-    end
-
-    if ((self.m_View) and (durationSec) and (durationSec > 0)) then
-        self.m_View:runAction(cc.Sequence:create(
-            cc.DelayTime:create(durationSec),
-            cc.CallFunc:create(func)
-        ))
-    else
-        func()
-    end
-end
-
-local function callbackOnWarEnded()
-    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
-end
-
---------------------------------------------------------------------------------
--- The functions that do the actions the system requested.
---------------------------------------------------------------------------------
-local function doAction(self, action)
-    local actionName = action.actionName
-    if ((actionName == "Logout")                 or
-        (actionName == "Message")                or
-        (actionName == "Error")                  or
-        (actionName == "RunSceneMain")           or
-        (actionName == "GetSceneWarData")        or
-        (actionName == "ReloadCurrentScene")     or
-        (actionName == "ActivateSkillGroup")     or
-        (actionName == "Attack")                 or
-        (actionName == "BeginTurn")              or
-        (actionName == "BuildModelTile")         or
-        (actionName == "CaptureModelTile")       or
-        (actionName == "DropModelUnit")          or
-        (actionName == "EndTurn")                or
-        (actionName == "JoinModelUnit")          or
-        (actionName == "LaunchSilo")             or
-        (actionName == "LoadModelUnit")          or
-        (actionName == "ProduceModelUnitOnTile") or
-        (actionName == "ProduceModelUnitOnUnit") or
-        (actionName == "SupplyModelUnit")        or
-        (actionName == "Surrender")              or
-        (actionName == "Wait"))                  then
-        return ActionExecutor.execute(action)
-    else
-        print("ModelSceneWar-doAction() unrecognized action: " .. (actionName or ""))
-    end
-end
+local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
+local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
+local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -123,7 +41,7 @@ end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
-    doAction(self, param.action)
+    self:executeAction(param.action)
 end
 
 local function onWebSocketClose(self, param)
@@ -189,21 +107,25 @@ local function initActorTurnManager(self, turnData)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_FileName   = sceneData.fileName
-    self.m_IsWarEnded = sceneData.isEnded
-    self.m_ActionID   = sceneData.actionID
+    self.m_ActionID       = sceneData.actionID
+    self.m_FileName       = sceneData.fileName
+    self.m_IsWarEnded     = sceneData.isEnded
+    self.m_MaxSkillPoints = sceneData.maxSkillPoints
+    self.m_WarPassword    = sceneData.warPassword
 
     initScriptEventDispatcher(self)
-    initActorConfirmBox(      self)
-    initActorMessageIndicator(self)
     initActorPlayerManager(   self, sceneData.players)
     initActorWeatherManager(  self, sceneData.weather)
     initActorWarField(        self, sceneData.warField)
-    initActorWarHud(          self)
     initActorTurnManager(     self, sceneData.turn)
+    if (not IS_SERVER) then
+        initActorConfirmBox(      self)
+        initActorMessageIndicator(self)
+        initActorWarHud(          self)
+    end
 
     if (self.m_View) then
         self:initView()
@@ -224,20 +146,41 @@ function ModelSceneWar:initView()
 end
 
 --------------------------------------------------------------------------------
--- The callback functions on start/stop running/script/web socket events.
+-- The functions for serialization.
+--------------------------------------------------------------------------------
+function ModelSceneWar:toSerializableTable()
+    return {
+        fileName       = self.m_FileName,
+        warPassword    = self.m_WarPassword,
+        isEnded        = self.m_IsWarEnded,
+        actionID       = self.m_ActionID,
+        maxSkillPoints = self.m_MaxSkillPoints,
+        warField       = self:getModelWarField()      :toSerializableTable(),
+        turn           = self:getModelTurnManager()   :toSerializableTable(),
+        players        = self:getModelPlayerManager() :toSerializableTable(),
+        weather        = self:getModelWeatherManager():toSerializableTable(),
+    }
+end
+
+--------------------------------------------------------------------------------
+-- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local sceneWarFileName = self:getFileName()
-    self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
-    self:getModelTurnManager()   :onStartRunning(sceneWarFileName)
-    self:getModelPlayerManager() :onStartRunning(sceneWarFileName)
-    self:getModelWarField()      :onStartRunning(sceneWarFileName)
+    local sceneWarFileName   = self:getFileName()
+    local modelTurnManager   = self:getModelTurnManager()
+    local modelPlayerManager = self:getModelPlayerManager()
 
-    local modelTurnManager = self:getModelTurnManager()
-    local playerIndex      = modelTurnManager:getPlayerIndex()
+    if (not IS_SERVER) then
+        self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
+    end
+    modelTurnManager       :onStartRunning(sceneWarFileName)
+    modelPlayerManager     :onStartRunning(sceneWarFileName)
+    self:getModelWarField():onStartRunning(sceneWarFileName)
+
+    local playerIndex = modelTurnManager:getPlayerIndex()
     self:getScriptEventDispatcher():dispatchEvent({
             name         = "EvtModelWeatherUpdated",
-            modelWeather = self:getModelWeatherManager():getCurrentWeather()
+            modelWeather = self:getModelWeatherManager():getCurrentWeather(),
         })
         :dispatchEvent({
             name = "EvtSceneWarStarted",
@@ -245,11 +188,13 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name        = "EvtPlayerIndexUpdated",
             playerIndex = playerIndex,
-            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
+            modelPlayer = modelPlayerManager:getModelPlayer(playerIndex),
         })
 
     modelTurnManager:runTurn()
-    AudioManager.playRandomWarMusic()
+    if (not IS_SERVER) then
+        AudioManager.playRandomWarMusic()
+    end
 
     return self
 end
@@ -271,6 +216,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelSceneWar:executeAction(action)
+    ActionExecutor.execute(action)
+
+    return self
+end
+
 function ModelSceneWar:getActionId()
     return self.m_ActionID
 end
