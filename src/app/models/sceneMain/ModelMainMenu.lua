@@ -308,6 +308,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
             )
         else
             showMenuItems(self,
+                self.m_ItemConfigSkills,
                 self.m_ItemLogin,
                 self.m_ItemSetMusic,
                 self.m_ItemHelp

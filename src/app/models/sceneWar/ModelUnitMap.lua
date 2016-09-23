@@ -61,14 +61,6 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
 end
 
-local function promoteModelUnitOnProduce(self, modelUnit)
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
-    local modifier = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
-    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
-        modelUnit:setCurrentPromotion(modifier)
-    end
-end
-
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
