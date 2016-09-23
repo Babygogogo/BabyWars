@@ -100,6 +100,20 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                 end,
             }
         end
+        for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
+            options[#options + 1] = {
+                text = presetName,
+                data = presetName,
+                callbackOnOptionIndicatorTouched = function()
+                    local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
+                    modelWarConfigurator:setPopUpPanelEnabled(true)
+                        :setPopUpPanelText(string.format("%s %s:\n%s",
+                            getLocalizedText(3, "Configuration"), presetName,
+                            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+                        ))
+                end,
+            }
+        end
 
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
             :setCurrentOptionIndex(2)

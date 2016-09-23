@@ -4346,4 +4346,50 @@ GameConstant.skills = {
     },
 }
 
+GameConstant.skillPresets = {
+    Andy = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 4,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 4,
+                level = 5,
+            },
+            {
+                id    = 1,
+                level = 6,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+            {
+                id    = 6,
+                level = 1,
+            },
+        },
+    },
+}
+
 return GameConstant
