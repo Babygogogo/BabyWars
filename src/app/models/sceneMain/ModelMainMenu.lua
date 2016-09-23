@@ -164,6 +164,18 @@ local function initItemLogin(self)
     self.m_ItemLogin = item
 end
 
+local function initItemSetMessageIndicator(self)
+    local item = {
+        name     = getLocalizedText(1, "SetMessageIndicator"),
+        callback = function()
+            local indicator = SingletonGetters.getModelMessageIndicator()
+            indicator:setEnabled(not indicator:isEnabled())
+        end,
+    }
+
+    self.m_ItemSetMessageIndicator = item
+end
+
 local function initItemSetMusic(self)
     local item = {
         name = getLocalizedText(1, "SetMusic"),
@@ -195,13 +207,14 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initItemNewWar(      self)
-    initItemContinue(    self)
-    initItemJoinWar(     self)
-    initItemConfigSkills(self)
-    initItemLogin(       self)
-    initItemSetMusic(    self)
-    initItemHelp(        self)
+    initItemNewWar(             self)
+    initItemContinue(           self)
+    initItemJoinWar(            self)
+    initItemConfigSkills(       self)
+    initItemLogin(              self)
+    initItemSetMessageIndicator(self)
+    initItemSetMusic(           self)
+    initItemHelp(               self)
 
     if (self.m_View) then
         self:initView()
@@ -303,6 +316,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemJoinWar,
                 self.m_ItemConfigSkills,
                 self.m_ItemLogin,
+                self.m_ItemSetMessageIndicator,
                 self.m_ItemSetMusic,
                 self.m_ItemHelp
             )
@@ -310,6 +324,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
             showMenuItems(self,
                 self.m_ItemConfigSkills,
                 self.m_ItemLogin,
+                self.m_ItemSetMessageIndicator,
                 self.m_ItemSetMusic,
                 self.m_ItemHelp
             )
