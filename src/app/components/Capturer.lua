@@ -17,6 +17,7 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 
 Capturer.EXPORTED_METHODS = {
     "isCapturingModelTile",
+    "setCapturingModelTile",
     "canCaptureModelTile",
     "getCaptureAmount",
 }
@@ -66,35 +67,16 @@ function Capturer:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Capturer:doActionMoveModelUnit(action)
-    if (#action.path > 1) then
-        self.m_IsCapturing = false
-    end
-
-    return self.m_Owner
-end
-
-function Capturer:doActionCaptureModelTile(action, target)
-    local capturePoint = math.max(0, target:getCurrentCapturePoint() - self:getCaptureAmount())
-    if (capturePoint > 0) then
-        self.m_IsCapturing = true
-        target:setCurrentCapturePoint(capturePoint)
-    else
-        self.m_IsCapturing = false
-        target:setCurrentCapturePoint(target:getMaxCapturePoint())
-            :updateWithPlayerIndex(self.m_Owner:getPlayerIndex())
-    end
-
-    return self.m_Owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Capturer:isCapturingModelTile()
     return self.m_IsCapturing
+end
+
+function Capturer:setCapturingModelTile(capturing)
+    self.m_IsCapturing = capturing
+
+    return self.m_Owner
 end
 
 function Capturer:canCaptureModelTile(modelTile)

@@ -54,17 +54,6 @@ function GridIndexable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function GridIndexable:doActionMoveModelUnit(action)
-    if (self.m_Owner.getUnitType) then
-        self:setGridIndex(action.path[#action.path], false)
-    end
-
-    return self.m_Owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function GridIndexable:getGridIndex()

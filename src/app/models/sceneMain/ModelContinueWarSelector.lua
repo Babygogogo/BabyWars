@@ -125,6 +125,7 @@ end
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
             actionName = "GetSceneWarData",
             fileName   = modelWarConfigurator:getSceneWarFileName(),

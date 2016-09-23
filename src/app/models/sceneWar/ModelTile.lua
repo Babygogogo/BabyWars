@@ -160,34 +160,6 @@ function ModelTile:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelTile:doActionMoveModelUnit(action)
-    ComponentManager.callMethodForAllComponents(self, "doActionMoveModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionDestroyModelUnit(action)
-    assert(GridIndexFunctions.isEqual(self:getGridIndex(), action.gridIndex))
-    ComponentManager.callMethodForAllComponents(self, "doActionDestroyModelUnit", action)
-
-    return self
-end
-
-function ModelTile:doActionSurrender(action)
-    if (self:getPlayerIndex() == action.lostPlayerIndex) then
-        self:updateWithPlayerIndex(0)
-    else
-        ComponentManager.callMethodForAllComponents(self, "doActionSurrender", action)
-    end
-
-    self:updateView()
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelTile:updateView()

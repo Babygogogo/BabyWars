@@ -1,10 +1,10 @@
 
 local ViewUnit = class("ViewUnit", cc.Node)
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
 local AnimationLoader       = require("src.app.utilities.AnimationLoader")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}
@@ -27,7 +27,7 @@ local UNIT_SPRITE_Z_ORDER     = 0
 --------------------------------------------------------------------------------
 local function createActionMoveAlongPath(self, path, callback)
     local steps = {}
-    local playerIndexMod = self.m_PlayerIndex % 2
+    local playerIndexMod = self.m_Model:getPlayerIndex() % 2
 
     for i = 2, #path do
         local currentX, previousX = path[i].x, path[i - 1].x
@@ -52,14 +52,20 @@ local function createActionMoveAlongPath(self, path, callback)
     return cc.Sequence:create(unpack(steps))
 end
 
-local function getSkillIndicatorFrame(self)
-    local id = self.m_ActivatingSkillGroupID
+local function getSkillIndicatorFrame(unit)
+    if (not unit:getSceneWarFileName()) then
+        return nil
+    end
+
+    local playerIndex = unit:getPlayerIndex()
+    local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(playerIndex)
+    local id          = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
     if (not id) then
         return nil
     elseif (id == 1) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s08_f0" .. self.m_PlayerIndex .. ".png")
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s08_f0" .. playerIndex .. ".png")
     else
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s07_f0" .. self.m_PlayerIndex .. ".png")
+        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s07_f0" .. playerIndex .. ".png")
     end
 end
 
@@ -219,7 +225,7 @@ end
 
 local function updateStateIndicator(self, unit)
     local frames = {}
-    frames[#frames + 1] = getSkillIndicatorFrame(    self)
+    frames[#frames + 1] = getSkillIndicatorFrame(    unit)
     frames[#frames + 1] = getLevelIndicatorFrame(    unit)
     frames[#frames + 1] = getFuelIndicatorFrame(     unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
@@ -260,12 +266,11 @@ end
 function ViewUnit:updateWithModelUnit(unit)
     local tiledID = unit:getTiledId()
     local state   = unit:getState()
-    updateUnitSprite(    self,                  tiledID)
-    updateUnitState(     self,                  state)
-    updateHpIndicator(   self.m_HpIndicator,    unit:getNormalizedCurrentHP())
-    updateStateIndicator(self,                  unit)
+    updateUnitSprite(    self,               tiledID)
+    updateUnitState(     self,               state)
+    updateHpIndicator(   self.m_HpIndicator, unit:getNormalizedCurrentHP())
+    updateStateIndicator(self,               unit)
 
-    self.m_PlayerIndex = unit:getPlayerIndex()
     self.m_TiledID     = tiledID
     self.m_State       = state
 
@@ -289,13 +294,6 @@ function ViewUnit:showMovingAnimation()
 
         self.m_IsShowingNormalAnimation = false
     end
-
-    return self
-end
-
-function ViewUnit:setActivatingSkillGroupId(skillGroupId)
-    self.m_ActivatingSkillGroupID = skillGroupId
-    updateStateIndicator(self, self.m_Model)
 
     return self
 end

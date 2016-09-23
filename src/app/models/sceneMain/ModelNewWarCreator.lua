@@ -75,6 +75,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         if ((#password ~= 0) and (#password ~= 4)) then
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+            modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
                 actionName           = "NewWar",
                 warPassword          = password,
@@ -106,6 +108,27 @@ local function initSelectorSkill(self, modelWarConfigurator)
                 })
             end,
         }
+    end
+    local presetOptions = {}
+    for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
+        presetOptions[#presetOptions + 1] = {
+            text = presetName,
+            data = presetName,
+            callbackOnOptionIndicatorTouched = function()
+                local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
+                modelWarConfigurator:setPopUpPanelEnabled(true)
+                    :setPopUpPanelText(string.format("%s %s:\n%s",
+                        getLocalizedText(3, "Configuration"), presetName,
+                        SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+                    ))
+            end,
+        }
+    end
+    table.sort(presetOptions, function(option1, option2)
+        return option1.text < option2.text
+    end)
+    for _, presetOption in ipairs(presetOptions) do
+        options[#options + 1] = presetOption
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)

@@ -20,6 +20,7 @@ local PROMOTION_BONUS = GameConstantFunctions.getPromotionBonus()
 
 Promotable.EXPORTED_METHODS = {
     "getCurrentPromotion",
+    "getMaxPromotion",
     "getPromotionAttackBonus",
     "getPromotionDefenseBonus",
 
@@ -56,28 +57,14 @@ function Promotable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Promotable:doActionPromoteModelUnit(action)
-    local currentPromotion = self:getCurrentPromotion()
-    if (currentPromotion < MAX_PROMOTION) then
-        self:setCurrentPromotion(currentPromotion + 1)
-    end
-
-    return owner
-end
-
-function Promotable:doActionJoinModelUnit(action, target)
-    target:setCurrentPromotion(math.max(self:getCurrentPromotion(), target:getCurrentPromotion()))
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Promotable:getCurrentPromotion()
     return self.m_CurrentPromotion
+end
+
+function Promotable:getMaxPromotion()
+    return MAX_PROMOTION
 end
 
 function Promotable:getPromotionAttackBonus()

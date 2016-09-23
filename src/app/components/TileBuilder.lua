@@ -7,6 +7,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 TileBuilder.EXPORTED_METHODS = {
     "isBuildingModelTile",
+    "setBuildingModelTile",
     "canBuildOnTileType",
     "getBuildAmount",
     "getBuildTiledIdWithTileType",
@@ -47,36 +48,16 @@ function TileBuilder:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function TileBuilder:doActionMoveModelUnit(action)
-    if (#action.path > 1) then
-        self.m_IsBuilding = false
-    end
-
-    return self.m_Owner
-end
-
-function TileBuilder:doActionBuildModelTile(action, target)
-    local owner      = self.m_Owner
-    local buildPoint = target:getCurrentBuildPoint() - self:getBuildAmount()
-    if (buildPoint > 0) then
-        self.m_IsBuilding = true
-        target:setCurrentBuildPoint(buildPoint)
-    else
-        self.m_IsBuilding = false
-        owner:setCurrentMaterial(owner:getCurrentMaterial() - 1)
-        target:updateWithObjectAndBaseId(self:getBuildTiledIdWithTileType(target:getTileType()))
-    end
-
-    return owner
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function TileBuilder:isBuildingModelTile()
     return self.m_IsBuilding
+end
+
+function TileBuilder:setBuildingModelTile(isBuilding)
+    self.m_IsBuilding = isBuilding
+
+    return self.m_Owner
 end
 
 function TileBuilder:canBuildOnTileType(tileType)

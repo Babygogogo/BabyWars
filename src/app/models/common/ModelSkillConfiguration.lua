@@ -30,6 +30,17 @@ local function getModelSkillGroupWithId(self, skillGroupID)
     end
 end
 
+local function getExtraPointsForPassiveSkills(basePoints, isEnabledActive1, isEnabledActive2)
+    local enabledCount = 0
+    if (isEnabledActive1) then enabledCount = enabledCount + 1 end
+    if (isEnabledActive2) then enabledCount = enabledCount + 1 end
+
+    if     (enabledCount == 0) then return basePoints * 3 / 2
+    elseif (enabledCount == 1) then return basePoints / 2
+    else                            return 0
+    end
+end
+
 local function resetMaxSkillPoints(self)
     -- TODO: move the key constants to GameConstant.
     local skillPassive     = self.m_ModelSkillGroupPassive
@@ -39,11 +50,7 @@ local function resetMaxSkillPoints(self)
     local isEnabledActive2 = skillActive2:isEnabled()
     local maxPoints        = self:getMaxSkillPoints()
 
-    local extraPointsForPassive = 0
-    if (not isEnabledActive1) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
-    if (not isEnabledActive2) then extraPointsForPassive = extraPointsForPassive + maxPoints / 2 end
-
-    local totalPointsForPassive = maxPoints + extraPointsForPassive
+    local totalPointsForPassive = maxPoints + getExtraPointsForPassiveSkills(maxPoints, isEnabledActive1, isEnabledActive2)
     skillPassive:setMaxSkillPoints(totalPointsForPassive)
 
     local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()))

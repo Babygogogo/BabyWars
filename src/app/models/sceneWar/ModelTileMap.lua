@@ -144,10 +144,6 @@ local function onEvtDestroyViewTile(self, event)
     destroyAdjacentViewPlasma(self)
 end
 
-local function onEvtDestroyModelUnit(self, event)
-    self:getModelTile(event.gridIndex):doActionDestroyModelUnit(event)
-end
-
 --------------------------------------------------------------------------------
 -- The composition tile actors map.
 --------------------------------------------------------------------------------
@@ -221,7 +217,6 @@ function ModelTileMap:onStartRunning(sceneWarFileName)
     SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
         :addEventListener("EvtDestroyModelTile", self)
         :addEventListener("EvtDestroyViewTile",  self)
-        :addEventListener("EvtDestroyModelUnit", self)
 
     return self
 end
@@ -230,77 +225,9 @@ function ModelTileMap:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
     elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
-    elseif (eventName == "EvtDestroyModelUnit") then onEvtDestroyModelUnit(self, event)
     end
 
     return self
-end
-
---------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelTileMap:doActionSurrender(action)
-    local lostPlayerIndex = action.lostPlayerIndex
-    self:forEachModelTile(function(modelTile)
-        if (modelTile:getPlayerIndex() == lostPlayerIndex) then
-            modelTile:doActionSurrender(action)
-        end
-    end)
-
-    for _, gridIndex in ipairs(action.lostUnitGridIndexes) do
-        self:getModelTile(gridIndex):doActionSurrender(action)
-    end
-
-    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelTileMap:doActionMoveModelUnit(action)
-    self:getModelTile(action.path[1]):doActionMoveModelUnit(action)
-    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
-
-    return self
-end
-
-function ModelTileMap:doActionWait(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionAttack(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionJoinModelUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionCaptureModelTile(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionLaunchSilo(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionBuildModelTile(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionProduceModelUnitOnUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionSupplyModelUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionLoadModelUnit(action)
-    return self:doActionMoveModelUnit(action)
-end
-
-function ModelTileMap:doActionDropModelUnit(action)
-    return self:doActionMoveModelUnit(action)
 end
 
 --------------------------------------------------------------------------------

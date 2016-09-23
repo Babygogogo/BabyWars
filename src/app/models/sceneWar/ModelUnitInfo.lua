@@ -41,10 +41,6 @@ local function onEvtModelUnitMapUpdated(self, event)
     updateWithModelUnitMap(self)
 end
 
-local function onEvtTurnPhaseMain(self, event)
-    updateWithModelUnitMap(self)
-end
-
 local function onEvtGridSelected(self, event)
     self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
     updateWithModelUnitMap(self)
@@ -93,7 +89,6 @@ end
 function ModelUnitInfo:onStartRunning(sceneWarFileName)
     SingletonGetters.getScriptEventDispatcher()
         :addEventListener("EvtModelUnitMapUpdated",   self)
-        :addEventListener("EvtTurnPhaseMain",         self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
@@ -107,7 +102,6 @@ end
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
     if     (eventName == "EvtModelUnitMapUpdated")       then onEvtModelUnitMapUpdated(     self, event)
-    elseif (eventName == "EvtTurnPhaseMain")             then onEvtTurnPhaseMain(           self, event)
     elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(            self, event)
     elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(          self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated")     then onEvtWarCommandMenuUpdated(   self, event)

@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.6"
+GameConstant.version = "0.1.6.7"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -3947,7 +3947,7 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels = {
-            [-1] = {modifier = -1, pointsPassive = -100, pointsActive = -20, minEnergy = 2},
+            [-1] = {modifier = -1, pointsPassive = -80, pointsActive = -20, minEnergy = 2},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 300, pointsActive = 200, minEnergy = 3},
             [2] = {modifier = 2, pointsPassive = 700, pointsActive = 400, minEnergy = 6},
@@ -3985,13 +3985,13 @@ GameConstant.skills = {
         maxLevel     = 7,
         modifierUnit = "HP",
         levels       = {
-            [1] = {modifier = 1, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
-            [2] = {modifier = 2, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
-            [3] = {modifier = 3, pointsPassive = 90, pointsActive = nil, minEnergy = nil},
-            [4] = {modifier = 4, pointsPassive = 120, pointsActive = nil, minEnergy = nil},
-            [5] = {modifier = 5, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
-            [6] = {modifier = 6, pointsPassive = 180, pointsActive = nil, minEnergy = nil},
-            [7] = {modifier = 7, pointsPassive = 210, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = 1, pointsPassive = 28, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 2, pointsPassive = 52, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 3, pointsPassive = 72, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = 4, pointsPassive = 88, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = 5, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = 6, pointsPassive = 108, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = 7, pointsPassive = 112, pointsActive = nil, minEnergy = nil},
         },
     },
 
@@ -4317,9 +4317,9 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels       = {
-            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 150, minEnergy = 2},
-            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 300, minEnergy = 4},
-            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 450, minEnergy = 6},
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 150, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 300, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 450, minEnergy = 3},
         },
     },
 
@@ -4329,9 +4329,9 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels       = {
-            [1] = {modifier = 1, pointsPassive = 150, pointsActive = nil, minEnergy = nil},
-            [2] = {modifier = 2, pointsPassive = 300, pointsActive = nil, minEnergy = nil},
-            [3] = {modifier = 3, pointsPassive = 450, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = 1, pointsPassive = 75, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = 2, pointsPassive = 175, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = 3, pointsPassive = 325, pointsActive = nil, minEnergy = nil},
         },
     },
 
@@ -4342,6 +4342,340 @@ GameConstant.skills = {
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = 200, pointsActive = 100, minEnergy = 2},
+        },
+    },
+}
+
+GameConstant.skillPresets = {
+    Adder = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 18,
+                level = 1,
+            },
+        },
+        active1 = {
+            energyRequirement = 2,
+            {
+                id    = 6,
+                level = 1,
+            },
+            {
+                id    = 1,
+                level = 4,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 5,
+            {
+                id    = 6,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 6,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Andy = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 4,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 4,
+                level = 5,
+            },
+            {
+                id    = 1,
+                level = 6,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+            {
+                id    = 6,
+                level = 1,
+            },
+        },
+    },
+
+    Colin = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 1,
+                level = -2,
+            },
+            {
+                id    = 3,
+                level = 3,
+            }
+        },
+        active1 = {
+            energyRequirement = 2,
+            {
+                id    = 12,
+                level = 5,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 20,
+                level = 16,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Grimm = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 1,
+                level = 6,
+            },
+            {
+                id    = 2,
+                level = -2,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 1,
+                level = 6,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 1,
+                level = 12,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Hawke = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 1,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 5,
+            {
+                id    = 4,
+                level = 1,
+            },
+            {
+                id    = 5,
+                level = 1,
+            },
+            {
+                id    = 1,
+                level = 3,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 9,
+            {
+                id    = 4,
+                level = 2,
+            },
+            {
+                id    = 5,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 4,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Lash = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 23,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 4,
+            {
+                id    = 23,
+                level = 2,
+            },
+            {
+                id    = 24,
+                level = 2,
+            },
+            {
+                id    = 28,
+                level = 1,
+            },
+        },
+        active2 = {
+            energyRequirement = 7,
+            {
+                id    = 23,
+                level = 4,
+            },
+            {
+                id    = 24,
+                level = 4,
+            },
+            {
+                id    = 28,
+                level = 1,
+            },
+        },
+    },
+
+    Nell = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 14,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 14,
+                level = 6,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 14,
+                level = 14,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Sasha = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 17,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 2,
+            {
+                id    = 13,
+                level = 4,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 22,
+                level = 16,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
         },
     },
 }

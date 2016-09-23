@@ -34,6 +34,7 @@ AttackDoer.EXPORTED_METHODS = {
     "getSecondaryWeaponStrongList",
 
     "getBaseDamage",
+    "getPrimaryWeaponBaseDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
     "isPrimaryWeaponAmmoInShort",
@@ -46,14 +47,6 @@ AttackDoer.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 local function getAttackDoer(owner)
     return ComponentManager.getComponent(owner, "AttackDoer")
-end
-
-local function getPrimaryWeaponBaseDamage(self, defenseType)
-    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
-        return self.m_Template.primaryWeapon.baseDamage[defenseType]
-    else
-        return nil
-    end
 end
 
 local function getSecondaryWeaponBaseDamage(self, defenseType)
@@ -118,33 +111,6 @@ function AttackDoer:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function AttackDoer:doActionAttack(action, target)
-    if (getPrimaryWeaponBaseDamage(self, target:getDefenseType())) then
-        self:setPrimaryWeaponCurrentAmmo(self:getPrimaryWeaponCurrentAmmo() - 1)
-    end
-
-    if ((action.counterDamage)                                                              and
-        (getPrimaryWeaponBaseDamage(getAttackDoer(target), self.m_Owner:getDefenseType()))) then
-        target:setPrimaryWeaponCurrentAmmo(target:getPrimaryWeaponCurrentAmmo() - 1)
-    end
-
-    return self
-end
-
-function AttackDoer:doActionJoinModelUnit(action, target)
-    if (self:hasPrimaryWeapon()) then
-        target:setPrimaryWeaponCurrentAmmo(math.min(
-            target:getPrimaryWeaponMaxAmmo(),
-            self:getPrimaryWeaponCurrentAmmo() + target:getPrimaryWeaponCurrentAmmo()
-        ))
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- Exported methods.
 --------------------------------------------------------------------------------
 function AttackDoer:hasPrimaryWeapon()
@@ -196,7 +162,15 @@ function AttackDoer:getSecondaryWeaponStrongList()
 end
 
 function AttackDoer:getBaseDamage(defenseType)
-    return getPrimaryWeaponBaseDamage(self, defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
+    return self:getPrimaryWeaponBaseDamage(defenseType) or getSecondaryWeaponBaseDamage(self, defenseType)
+end
+
+function AttackDoer:getPrimaryWeaponBaseDamage(defenseType)
+    if (self:hasPrimaryWeapon() and self:getPrimaryWeaponCurrentAmmo() > 0) then
+        return self.m_Template.primaryWeapon.baseDamage[defenseType]
+    else
+        return nil
+    end
 end
 
 function AttackDoer:getAttackRangeMinMax()

@@ -18,6 +18,7 @@
 
 local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
+local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
@@ -37,74 +38,8 @@ local function getActorUnit(self, gridIndex)
     return self.m_ActorUnitsMap[gridIndex.x][gridIndex.y]
 end
 
-local function getLoadedActorUnitWithUnitId(self, unitID)
+local function getActorUnitLoaded(self, unitID)
     return self.m_LoadedActorUnits[unitID]
-end
-
-local function getSupplyTargetModelUnits(self, supplier)
-    local targets = {}
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(supplier:getGridIndex(), self:getMapSize())) do
-        local target = self:getModelUnit(gridIndex)
-        if ((target) and (supplier:canSupplyModelUnit(target))) then
-            targets[#targets + 1] = target
-        end
-    end
-
-    return targets
-end
-
-local function setActorUnitLoaded(self, gridIndex)
-    local loaded = self.m_LoadedActorUnits
-    local map    = self.m_ActorUnitsMap
-    local x, y   = gridIndex.x, gridIndex.y
-    local unitID = map[x][y]:getModel():getUnitId()
-    assert(loaded[unitID] == nil, "ModelUnitMap-setActorUnitLoaded() the focus unit has been loaded already.")
-
-    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
-end
-
-local function setActorUnitUnloaded(self, unitID, gridIndex)
-    local loaded = self.m_LoadedActorUnits
-    local map    = self.m_ActorUnitsMap
-    local x, y   = gridIndex.x, gridIndex.y
-    assert(loaded[unitID], "ModelUnitMap-setActorUnitUnloaded() the focus unit is not loaded.")
-    assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
-
-    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
-
-    if (self.m_View) then
-        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
-    end
-end
-
-local function swapActorUnit(self, gridIndex1, gridIndex2)
-    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
-        return
-    end
-
-    local x1, y1 = gridIndex1.x, gridIndex1.y
-    local x2, y2 = gridIndex2.x, gridIndex2.y
-    local map    = self.m_ActorUnitsMap
-    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
-
-    local view = self.m_View
-    if (view) then
-        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
-        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
-    end
-end
-
-local function moveActorUnitOnAction(self, action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-        setActorUnitUnloaded(self, launchUnitID, endingGridIndex)
-    else
-        swapActorUnit(self, beginningGridIndex, endingGridIndex)
-    end
 end
 
 local function createEmptyMap(width)
@@ -124,194 +59,6 @@ local function createActorUnit(tiledID, unitID, gridIndex)
     }
 
     return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
-end
-
-local function promoteModelUnitOnProduce(self, modelUnit)
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
-    local modifier = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
-    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
-        modelUnit:setCurrentPromotion(modifier)
-    end
-end
-
---------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtDestroyModelUnit(self, event)
-    local gridIndex = event.gridIndex
-    local modelUnit = self:getModelUnit(gridIndex)
-    assert(modelUnit, "ModelUnitMap-onEvtDestroyModelUnit() there is no unit on event.gridIndex.")
-
-    if (modelUnit.getLoadUnitIdList) then
-        local view = self.m_View
-        for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-            local loadedActorUnit = self.m_LoadedActorUnits[unitID]
-            self.m_LoadedActorUnits[unitID] = nil
-
-            local loadedViewUnit = loadedActorUnit:getView()
-            if (loadedViewUnit) then
-                loadedViewUnit:removeFromParent()
-            end
-        end
-    end
-
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
-    modelUnit:doActionDestroyModelUnit(event)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-end
-
-local function onEvtTurnPhaseConsumeUnitFuel(self, event)
-    if (event.turnIndex <= 1) then
-        return
-    end
-
-    local playerIndex  = event.playerIndex
-    local modelTileMap = SingletonGetters.getModelTileMap(self.m_SceneWarFileName)
-    local dispatcher   = getScriptEventDispatcher(self.m_SceneWarFileName)
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.getCurrentFuel))                 then
-            local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
-            modelUnit:setCurrentFuel(newFuel)
-                :updateView()
-
-            if ((newFuel == 0) and (modelUnit:shouldDestroyOnOutOfFuel())) then
-                local gridIndex = modelUnit:getGridIndex()
-                local modelTile = modelTileMap:getModelTile(gridIndex)
-
-                if ((not modelTile.getRepairAmount) or (not modelTile:getRepairAmount(modelUnit))) then
-                    dispatcher:dispatchEvent({
-                            name      = "EvtDestroyModelUnit",
-                            gridIndex = gridIndex,
-                        })
-                        :dispatchEvent({
-                            name      = "EvtDestroyViewUnit",
-                            gridIndex = gridIndex,
-                        })
-
-                    if (modelUnit.m_View) then
-                        modelUnit.m_View:removeFromParent()
-                    end
-                end
-            end
-        end
-    end)
-end
-
-local function onEvtTurnPhaseResetSkillState(self, event)
-    if (self.m_View) then
-        local playerIndex = event.playerIndex
-        self:forEachModelUnitOnMap(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(nil)
-                end
-            end)
-            :forEachModelUnitLoaded(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(nil)
-                end
-            end)
-    end
-end
-
-local function onEvtTurnPhaseResetUnitState(self, event)
-    local playerIndex = event.playerIndex
-    local func = function(modelUnit)
-        if (modelUnit:getPlayerIndex() == playerIndex) then
-            modelUnit:setStateIdle()
-                :updateView()
-        end
-    end
-
-    self:forEachModelUnitOnMap( func)
-        :forEachModelUnitLoaded(func)
-end
-
-local function onEvtTurnPhaseSupplyUnit(self, event)
-    local playerIndex = event.playerIndex
-    local dispatcher  = SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName)
-
-    local dispatchEvtSupplyViewUnit = function(gridIndex)
-        dispatcher:dispatchEvent({
-            name      = "EvtSupplyViewUnit",
-            gridIndex = gridIndex,
-        })
-    end
-
-    local supply = function(modelUnit)
-        local hasSupplied = false
-        local maxFuel = modelUnit:getMaxFuel()
-        if (modelUnit:getCurrentFuel() < maxFuel) then
-            modelUnit:setCurrentFuel(maxFuel)
-            hasSupplied = true
-        end
-
-        if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-            local maxAmmo = modelUnit:getPrimaryWeaponMaxAmmo()
-            if (modelUnit:getPrimaryWeaponCurrentAmmo() < maxAmmo) then
-                modelUnit:setPrimaryWeaponCurrentAmmo(maxAmmo)
-                hasSupplied = true
-            end
-        end
-
-        if (hasSupplied) then
-            modelUnit:updateView()
-        end
-
-        return hasSupplied
-    end
-
-    local supplyLoadedModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyLoadedModelUnit)        and
-            (modelUnit:canSupplyLoadedModelUnit())      and
-            (not modelUnit:canRepairLoadedModelUnit())) then
-
-            local hasSupplied = false
-            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-                hasSupplied = supply(self:getLoadedModelUnitWithUnitId(unitID)) or hasSupplied
-            end
-            if (hasSupplied) then
-                dispatchEvtSupplyViewUnit(modelUnit:getGridIndex())
-            end
-        end
-    end
-
-    local supplyAdjacentModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyModelUnit))             then
-
-            for _, target in pairs(getSupplyTargetModelUnits(self, modelUnit)) do
-                if (supply(target)) then
-                    target:updateView()
-                    dispatchEvtSupplyViewUnit(target:getGridIndex())
-                end
-            end
-        end
-    end
-
-    self:forEachModelUnitOnMap( supplyAdjacentModelUnits)
-        :forEachModelUnitOnMap( supplyLoadedModelUnits)
-        :forEachModelUnitLoaded(supplyLoadedModelUnits)
-end
-
-local function onEvtSkillGroupActivated(self, event)
-    if (self.m_View) then
-        local playerIndex  = event.playerIndex
-        local skillGroupID = event.skillGroupID
-        self:forEachModelUnitOnMap(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(skillGroupID)
-                end
-            end)
-            :forEachModelUnitLoaded(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(skillGroupID)
-                end
-            end)
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -433,236 +180,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
     self:forEachModelUnitOnMap( func)
         :forEachModelUnitLoaded(func)
 
-    getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtDestroyModelUnit",         self)
-        :addEventListener("EvtTurnPhaseConsumeUnitFuel", self)
-        :addEventListener("EvtTurnPhaseResetSkillState", self)
-        :addEventListener("EvtTurnPhaseResetUnitState",  self)
-        :addEventListener("EvtTurnPhaseSupplyUnit",      self)
-        :addEventListener("EvtSkillGroupActivated",      self)
-
-    return self
-end
-
-function ModelUnitMap:onEvent(event)
-    local name = event.name
-    if     (name == "EvtDestroyModelUnit")         then onEvtDestroyModelUnit(        self, event)
-    elseif (name == "EvtTurnPhaseConsumeUnitFuel") then onEvtTurnPhaseConsumeUnitFuel(self, event)
-    elseif (name == "EvtTurnPhaseResetSkillState") then onEvtTurnPhaseResetSkillState(self, event)
-    elseif (name == "EvtTurnPhaseResetUnitState")  then onEvtTurnPhaseResetUnitState( self, event)
-    elseif (name == "EvtTurnPhaseSupplyUnit")      then onEvtTurnPhaseSupplyUnit(     self, event)
-    elseif (name == "EvtSkillGroupActivated")      then onEvtSkillGroupActivated(     self, event)
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelUnitMap:doActionSurrender(action)
-    local eventDispatcher = getScriptEventDispatcher(self.m_SceneWarFileName)
-    local playerIndex     = action.lostPlayerIndex
-
-    self:forEachModelUnitOnMap(function(modelUnit)
-        if (modelUnit:getPlayerIndex() == playerIndex) then
-            eventDispatcher:dispatchEvent({
-                    name      = "EvtDestroyModelUnit",
-                    gridIndex = modelUnit:getGridIndex(),
-                })
-                :dispatchEvent({
-                    name      = "EvtDestroyViewUnit",
-                    gridIndex = modelUnit:getGridIndex(),
-                })
-
-            if (modelUnit.m_View) then
-                modelUnit.m_View:removeFromParent()
-            end
-        end
-    end)
-    eventDispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionWait(action)
-    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionWait(action)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-    local focusModelUnit = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-    focusModelUnit:doActionAttack(action, attackTarget, callbackOnAttackAnimationEnded)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionJoinModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    local path         = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusActorUnit
-
-    if (launchUnitID) then
-        focusActorUnit = self.m_LoadedActorUnits[launchUnitID]
-        self.m_LoadedActorUnits[launchUnitID] = nil
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-    else
-        focusActorUnit = self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y]
-        self.m_ActorUnitsMap[beginningGridIndex.x][beginningGridIndex.y] = nil
-    end
-
-    local focusModelUnit = focusActorUnit:getModel()
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-        :doActionJoinModelUnit(action, self:getModelUnit(endingGridIndex))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-    local capturer = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    capturer:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(capturer, true))
-    moveActorUnitOnAction(self, action)
-    capturer:doActionCaptureModelTile(action, target, callbackOnCaptureAnimationEnded)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionLaunchSilo(action, silo)
-    local launcher = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    launcher:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(launcher, true))
-    moveActorUnitOnAction(self, action)
-    launcher:doActionLaunchSilo(action, self, silo)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionBuildModelTile(action, target)
-    local builder = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    builder:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(builder, true))
-    moveActorUnitOnAction(self, action)
-    builder:doActionBuildModelTile(action, target)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionProduceModelUnitOnUnit(action)
-    local path              = action.path
-    local gridIndex         = path[#path]
-    local focusModelUnit    = self:getFocusModelUnit(path[1], action.launchUnitID)
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-
-    local producedUnitID    = self.m_AvailableUnitID
-    local producedActorUnit = createActorUnit(focusModelUnit:getMovableProductionTiledId(), producedUnitID, gridIndex)
-    local producedModelUnit = producedActorUnit:getModel()
-    promoteModelUnitOnProduce(self, producedModelUnit)
-    producedModelUnit:onStartRunning(self.m_SceneWarFileName)
-        :setStateActioned()
-
-    self.m_AvailableUnitID                  = self.m_AvailableUnitID + 1
-    self.m_LoadedActorUnits[producedUnitID] = producedActorUnit
-    if (self.m_View) then
-        self.m_View:addViewUnit(producedActorUnit:getView(), producedModelUnit)
-    end
-
-    focusModelUnit:doActionProduceModelUnitOnUnit(action, producedUnitID)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionSupplyModelUnit(action)
-    local supplier = self:getFocusModelUnit(action.path[1], action.launchUnitID)
-    supplier:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(supplier, true))
-    moveActorUnitOnAction(self, action)
-    supplier:doActionSupplyModelUnit(action, getSupplyTargetModelUnits(self, supplier))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionLoadModelUnit(action)
-    local launchUnitID   = action.launchUnitID
-    local path           = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    if (launchUnitID) then
-        self:getModelUnit(beginningGridIndex):doActionLaunchModelUnit(action)
-    else
-        setActorUnitLoaded(self, beginningGridIndex)
-    end
-    focusModelUnit:doActionLoadModelUnit(action, self:getModelUnit(endingGridIndex))
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionDropModelUnit(action)
-    local launchUnitID   = action.launchUnitID
-    local path           = action.path
-    local beginningGridIndex, endingGridIndex = path[1], path[#path]
-    local focusModelUnit = self:getFocusModelUnit(beginningGridIndex, launchUnitID)
-
-    focusModelUnit:doActionMoveModelUnit(action, self:getLoadedModelUnitsWithLoader(focusModelUnit, true))
-    moveActorUnitOnAction(self, action)
-
-    local dropActorUnits = {}
-    for _, dropDestination in ipairs(action.dropDestinations) do
-        local gridIndex = dropDestination.gridIndex
-        setActorUnitUnloaded(self, dropDestination.unitID, gridIndex)
-
-        local dropActorUnit = getActorUnit(self, gridIndex)
-        dropActorUnit:getModel():setGridIndex(gridIndex, false)
-        dropActorUnits[#dropActorUnits + 1] = dropActorUnit
-    end
-    focusModelUnit:doActionDropModelUnit(action, dropActorUnits)
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
-    return self
-end
-
-function ModelUnitMap:doActionProduceOnTile(action)
-    local gridIndex = action.gridIndex
-    local actorUnit = createActorUnit(action.tiledID, self.m_AvailableUnitID, gridIndex)
-    local modelUnit = actorUnit:getModel()
-    promoteModelUnitOnProduce(self, modelUnit)
-    modelUnit:onStartRunning(self.m_SceneWarFileName)
-        :setStateActioned()
-        :updateView()
-
-    self.m_AvailableUnitID = self.m_AvailableUnitID + 1
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
-    if (self.m_View) then
-        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
-    end
-
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
-
     return self
 end
 
@@ -673,20 +190,31 @@ function ModelUnitMap:getMapSize()
     return self.m_MapSize
 end
 
-function ModelUnitMap:getModelUnit(gridIndex)
-    local actorUnit = getActorUnit(self, gridIndex)
-    return (actorUnit) and (actorUnit:getModel()) or (nil)
+function ModelUnitMap:getAvailableUnitId()
+    return self.m_AvailableUnitID
 end
 
-function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-    local actorUnit = getLoadedActorUnitWithUnitId(self, unitID)
-    return (actorUnit) and (actorUnit:getModel()) or (nil)
+function ModelUnitMap:setAvailableUnitId(unitID)
+    assert((unitID >= 0) and (math.floor(unitID) == unitID), "ModelUnitMap:setAvailableUnitId() invalid unitID: " .. (unitID or ""))
+    self.m_AvailableUnitID = unitID
+
+    return self
 end
 
 function ModelUnitMap:getFocusModelUnit(gridIndex, launchUnitID)
     return (launchUnitID)                                 and
         (self:getLoadedModelUnitWithUnitId(launchUnitID)) or
         (self:getModelUnit(gridIndex))
+end
+
+function ModelUnitMap:getModelUnit(gridIndex)
+    local actorUnit = getActorUnit(self, gridIndex)
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
+end
+
+function ModelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+    local actorUnit = getActorUnitLoaded(self, unitID)
+    return (actorUnit) and (actorUnit:getModel()) or (nil)
 end
 
 function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive)
@@ -712,6 +240,90 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive
 
         return list
     end
+end
+
+function ModelUnitMap:swapActorUnit(gridIndex1, gridIndex2)
+    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
+        return
+    end
+
+    local x1, y1 = gridIndex1.x, gridIndex1.y
+    local x2, y2 = gridIndex2.x, gridIndex2.y
+    local map    = self.m_ActorUnitsMap
+    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
+
+    local view = self.m_View
+    if (view) then
+        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
+        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
+    end
+end
+
+function ModelUnitMap:setActorUnitLoaded(gridIndex)
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    local unitID = map[x][y]:getModel():getUnitId()
+    assert(loaded[unitID] == nil, "ModelUnitMap:setActorUnitLoaded() the focus unit has been loaded already.")
+
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
+
+    return self
+end
+
+function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
+    local loaded = self.m_LoadedActorUnits
+    local map    = self.m_ActorUnitsMap
+    local x, y   = gridIndex.x, gridIndex.y
+    assert(loaded[unitID], "ModelUnitMap-setActorUnitUnloaded() the focus unit is not loaded.")
+    assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
+
+    loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
+
+    if (self.m_View) then
+        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
+    end
+
+    return self
+end
+
+function ModelUnitMap:addActorUnitOnMap(actorUnit)
+    local modelUnit = actorUnit:getModel()
+    local gridIndex = modelUnit:getGridIndex()
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
+
+    if (self.m_View) then
+        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
+    end
+
+    return self
+end
+
+function ModelUnitMap:removeActorUnitOnMap(gridIndex)
+    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
+
+    return self
+end
+
+function ModelUnitMap:addActorUnitLoaded(actorUnit)
+    local modelUnit = actorUnit:getModel()
+    self.m_LoadedActorUnits[modelUnit:getUnitId()] = actorUnit
+
+    if (self.m_View) then
+        self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
+    end
+
+    return self
+end
+
+function ModelUnitMap:removeActorUnitLoaded(unitID)
+    local loadedModelUnit = self:getLoadedModelUnitWithUnitId(unitID)
+    assert(loadedModelUnit, "ModelUnitMap:removeActorUnitLoaded() the unit that the unitID refers to is not loaded: " .. (unitID or ""))
+
+    loadedModelUnit:removeViewFromParent()
+    self.m_LoadedActorUnits[unitID] = nil
+
+    return self
 end
 
 function ModelUnitMap:forEachModelUnitOnMap(func)

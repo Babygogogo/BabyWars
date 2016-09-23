@@ -19,6 +19,7 @@ UnitLoader.EXPORTED_METHODS = {
     "getRepairAmountAndCostForLoadedModelUnit",
 
     "addLoadUnitId",
+    "removeLoadUnitId",
 }
 
 --------------------------------------------------------------------------------
@@ -123,45 +124,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function UnitLoader:doActionLaunchModelUnit(action)
-    local launchUnitID = action.launchUnitID
-    assert(launchUnitID, "UnitLoader:doActionLaunchModelUnit() action.launchUnitID is invalid.")
-
-    for i, unitID in ipairs(self.m_LoadedUnitIds) do
-        if (unitID == launchUnitID) then
-            table.remove(self.m_LoadedUnitIds, i)
-            return self.m_Owner
-        end
-    end
-
-    error("UnitLoader:doActionLaunchModelUnit() no loaded unit id matches action.launchUnitID.")
-end
-
 function UnitLoader:canJoinModelUnit(modelUnit)
     return (self:getCurrentLoadCount() == 0)   and
         (modelUnit.getCurrentLoadCount)        and
         (modelUnit:getCurrentLoadCount() == 0)
-end
-
-function UnitLoader:doActionMoveModelUnit(action, loadedModelUnits)
-    local destination = action.path[#action.path]
-    for _, modelUnit in pairs(loadedModelUnits or {}) do
-        modelUnit:setGridIndex(destination, false)
-    end
-
-    return self.m_Owner
-end
-
-function UnitLoader:doActionLoadModelUnit(action, unitID)
-    self:addLoadUnitId(unitID)
-
-    return self.m_Owner
-end
-
-function UnitLoader:doActionDropModelUnit(action)
-    self.m_LoadedUnitIds   = getRemainingUnitIdsOnDrop(self:getLoadUnitIdList(), action.dropDestinations)
-
-    return self.m_Owner
 end
 
 --------------------------------------------------------------------------------
@@ -241,6 +207,17 @@ function UnitLoader:addLoadUnitId(unitID)
     self.m_LoadedUnitIds[#self.m_LoadedUnitIds + 1] = unitID
 
     return self.m_Owner
+end
+
+function UnitLoader:removeLoadUnitId(unitID)
+    for i, loadedUnitID in ipairs(self.m_LoadedUnitIds) do
+        if (loadedUnitID == unitID) then
+            table.remove(self.m_LoadedUnitIds, i)
+            return self.m_Owner
+        end
+    end
+
+    error("UnitLoader:removeLoadUnitId() the param unitID is not loaded: " .. (unitID or ""))
 end
 
 return UnitLoader

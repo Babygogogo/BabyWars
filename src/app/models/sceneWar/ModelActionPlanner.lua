@@ -279,9 +279,9 @@ local function sendActionWait(self)
     })
 end
 
-local function sendActionProduceOnTile(self, gridIndex, tiledID)
+local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
     createAndSendAction({
-        actionName = "ProduceOnTile",
+        actionName = "ProduceModelUnitOnTile",
         gridIndex  = GridIndexFunctions.clone(gridIndex),
         tiledID    = tiledID,
     })
@@ -737,7 +737,7 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 
     for _, listItem in ipairs(productionList) do
         listItem.callback = function()
-            sendActionProduceOnTile(self, gridIndex, listItem.tiledID)
+            sendActionProduceModelUnitOnTile(self, gridIndex, listItem.tiledID)
         end
     end
 

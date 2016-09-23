@@ -100,6 +100,27 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                 end,
             }
         end
+        local presetOptions = {}
+        for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
+            presetOptions[#presetOptions + 1] = {
+                text = presetName,
+                data = presetName,
+                callbackOnOptionIndicatorTouched = function()
+                    local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
+                    modelWarConfigurator:setPopUpPanelEnabled(true)
+                        :setPopUpPanelText(string.format("%s %s:\n%s",
+                            getLocalizedText(3, "Configuration"), presetName,
+                            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+                        ))
+                end,
+            }
+        end
+        table.sort(presetOptions, function(option1, option2)
+            return option1.text < option2.text
+        end)
+        for _, presetOption in ipairs(presetOptions) do
+            options[#options + 1] = presetOption
+        end
 
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
             :setCurrentOptionIndex(2)
@@ -155,6 +176,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         if ((#password ~= 0) and (#password ~= 4)) then
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
         else
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+            modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
                 actionName           = "JoinWar",
                 sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
@@ -211,6 +234,10 @@ local function createJoinableWarList(self, list)
             end,
         }
     end
+
+    table.sort(warList, function(item1, item2)
+        return item1.sceneWarFileName < item2.sceneWarFileName
+    end)
 
     return warList
 end

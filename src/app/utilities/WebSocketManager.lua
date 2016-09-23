@@ -9,7 +9,7 @@ local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 local SERVER_URL = "localhost:19297/BabyWars"
 --]]
 
-local HEARTBEAT_INTERVAL = 15
+local HEARTBEAT_INTERVAL = 10
 
 local s_Socket
 local s_Account, s_Password

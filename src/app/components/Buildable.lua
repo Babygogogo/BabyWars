@@ -58,31 +58,6 @@ function Buildable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function Buildable:doActionDestroyModelUnit(action)
-    self:setCurrentBuildPoint(self:getMaxBuildPoint())
-
-    return self.m_Owner
-end
-
-function Buildable:doActionSurrender(action)
-    self:setCurrentBuildPoint(self:getMaxBuildPoint())
-
-    return self
-end
-
-function Buildable:doActionMoveModelUnit(action)
-    if ((not action.launchUnitID)                                                   and
-        (#action.path > 1)                                                          and
-        (GridIndexFunctions.isEqual(action.path[1], self.m_Owner:getGridIndex()))) then
-        self:setCurrentBuildPoint(self:getMaxBuildPoint())
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Buildable:getCurrentBuildPoint()

@@ -72,24 +72,6 @@ function FuelOwner:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
--- The functions for doing the actions.
---------------------------------------------------------------------------------
-function FuelOwner:doActionMoveModelUnit(action)
-    self:setCurrentFuel(self.m_CurrentFuel - action.path.fuelConsumption)
-
-    return self
-end
-
-function FuelOwner:doActionJoinModelUnit(action, target)
-    target:setCurrentFuel(math.min(
-        target:getMaxFuel(),
-        self:getCurrentFuel() + target:getCurrentFuel()
-    ))
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function FuelOwner:getCurrentFuel()

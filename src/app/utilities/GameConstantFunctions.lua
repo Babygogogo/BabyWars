@@ -258,6 +258,10 @@ function GameConstantFunctions.getSkillLevelMinMax(id)
     return skill.minLevel, skill.maxLevel
 end
 
+function GameConstantFunctions.getSkillPresets()
+    return GAME_CONSTANT.skillPresets
+end
+
 function GameConstantFunctions.getTiledIdWithTileOrUnitName(name, playerIndex)
     for id, index in ipairs(TILE_UNIT_INDEXES) do
         if ((index.name == name) and
