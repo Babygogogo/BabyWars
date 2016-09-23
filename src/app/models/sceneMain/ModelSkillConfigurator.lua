@@ -187,10 +187,12 @@ local function initItemsAllConfigurations(self)
             name     = getConfigurationTitle(i),
             callback = function()
                 setStateOverviewConfiguration(self, i)
-                WebSocketManager.sendAction({
-                    actionName      = "GetSkillConfiguration",
-                    configurationID = i,
-                })
+                if (WebSocketManager.getLoggedInAccountAndPassword()) then
+                    WebSocketManager.sendAction({
+                        actionName      = "GetSkillConfiguration",
+                        configurationID = i,
+                    })
+                end
             end,
         }
     end
