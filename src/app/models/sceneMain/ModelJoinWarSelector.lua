@@ -100,8 +100,9 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                 end,
             }
         end
+        local presetOptions = {}
         for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
-            options[#options + 1] = {
+            presetOptions[#presetOptions + 1] = {
                 text = presetName,
                 data = presetName,
                 callbackOnOptionIndicatorTouched = function()
@@ -113,6 +114,12 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                         ))
                 end,
             }
+        end
+        table.sort(presetOptions, function(option1, option2)
+            return option1.text < option2.text
+        end)
+        for _, presetOption in ipairs(presetOptions) do
+            options[#options + 1] = presetOption
         end
 
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
