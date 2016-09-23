@@ -4586,7 +4586,7 @@ GameConstant.skillPresets = {
             energyRequirement = 7,
             {
                 id    = 23,
-                level = 3,
+                level = 4,
             },
             {
                 id    = 24,
