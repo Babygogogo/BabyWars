@@ -15,48 +15,6 @@ local ModelPlayer      = require("src.app.models.sceneWar.ModelPlayer")
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
-    local gridIndex = modelUnit:getGridIndex()
-    if (modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId())) then
-        return modelUnitMap:getModelUnit(gridIndex):getRepairAmountAndCostForLoadedModelUnit(modelUnit)
-    else
-        return modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(modelUnit)
-    end
-end
-
-local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
-    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name        = "EvtModelPlayerUpdated",
-        modelPlayer = modelPlayer,
-        playerIndex = playerIndex,
-    })
-end
-
-local function dispatchEvtSkillGroupActivated(sceneWarFileName, playerIndex, skillGroupID)
-    SingletonGetters.getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name         = "EvtSkillGroupActivated",
-        playerIndex  = playerIndex,
-        skillGroupID = skillGroupID,
-    })
-end
-
---------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtSceneWarStarted(self, event)
-    self:forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:isAlive()) then
-            local activatingSkillGroupID = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
-            if (activatingSkillGroupID) then
-                dispatchEvtSkillGroupActivated(self.m_SceneWarFileName, playerIndex, activatingSkillGroupID)
-            end
-        end
-    end)
-end
-
---------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:ctor(param)
@@ -78,27 +36,6 @@ function ModelPlayerManager:toSerializableTable()
     end)
 
     return t
-end
-
---------------------------------------------------------------------------------
--- The callback functions on start running/script events.
---------------------------------------------------------------------------------
-function ModelPlayerManager:onStartRunning(sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
-
-    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtSceneWarStarted",     self)
-
-    return self
-end
-
-function ModelPlayerManager:onEvent(event)
-    local eventName = event.name
-    if (eventName == "EvtSceneWarStarted") then
-        onEvtSceneWarStarted(self, event)
-    end
-
-    return self
 end
 
 --------------------------------------------------------------------------------

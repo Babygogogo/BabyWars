@@ -116,7 +116,8 @@ function ModelUnit:initView()
     assert(view, "ModelUnit:initView() no view is attached to the actor of the model.")
 
     self:setViewPositionWithGridIndex()
-        :updateView()
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -147,12 +148,18 @@ function ModelUnit:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
 
+    self:updateView()
+
     return self
 end
 
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelUnit:getSceneWarFileName()
+    return self.m_SceneWarFileName
+end
+
 function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
     if (self.m_View) then
         self.m_View:moveAlongPath(path, callbackAfterMove)
@@ -199,14 +206,6 @@ end
 function ModelUnit:showMovingAnimation()
     if (self.m_View) then
         self.m_View:showMovingAnimation()
-    end
-
-    return self
-end
-
-function ModelUnit:setActivatingSkillGroupId(skillGroupId)
-    if (self.m_View) then
-        self.m_View:setActivatingSkillGroupId(skillGroupId)
     end
 
     return self

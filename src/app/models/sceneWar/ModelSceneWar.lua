@@ -169,13 +169,10 @@ end
 function ModelSceneWar:onStartRunning()
     local sceneWarFileName   = self:getFileName()
     local modelTurnManager   = self:getModelTurnManager()
-    local modelPlayerManager = self:getModelPlayerManager()
-
     if (not IS_SERVER) then
         self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
     end
     modelTurnManager       :onStartRunning(sceneWarFileName)
-    modelPlayerManager     :onStartRunning(sceneWarFileName)
     self:getModelWarField():onStartRunning(sceneWarFileName)
 
     local playerIndex = modelTurnManager:getPlayerIndex()
@@ -189,7 +186,7 @@ function ModelSceneWar:onStartRunning()
         :dispatchEvent({
             name        = "EvtPlayerIndexUpdated",
             playerIndex = playerIndex,
-            modelPlayer = modelPlayerManager:getModelPlayer(playerIndex),
+            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
         })
 
     modelTurnManager:runTurn()

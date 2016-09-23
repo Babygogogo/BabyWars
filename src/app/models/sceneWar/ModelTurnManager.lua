@@ -155,7 +155,7 @@ local function runTurnPhaseResetSkillState(self)
     if (not IS_SERVER) then
         local func = function(modelUnit)
             if (modelUnit:getPlayerIndex() == playerIndex) then
-                modelUnit:setActivatingSkillGroupId(nil)
+                modelUnit:updateView()
             end
         end
 
@@ -422,12 +422,6 @@ function ModelTurnManager:runTurn()
             modelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
         end
     end
-
-    return self
-end
-
-function ModelTurnManager:endTurn()
-    runTurnPhaseTickTurnAndPlayerIndex(self)
 
     return self
 end

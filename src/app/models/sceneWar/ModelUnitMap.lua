@@ -70,26 +70,6 @@ local function promoteModelUnitOnProduce(self, modelUnit)
 end
 
 --------------------------------------------------------------------------------
--- The private callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtSkillGroupActivated(self, event)
-    if (self.m_View) then
-        local playerIndex  = event.playerIndex
-        local skillGroupID = event.skillGroupID
-        self:forEachModelUnitOnMap(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(skillGroupID)
-                end
-            end)
-            :forEachModelUnitLoaded(function(modelUnit)
-                if (modelUnit:getPlayerIndex() == playerIndex) then
-                    modelUnit:setActivatingSkillGroupId(skillGroupID)
-                end
-            end)
-    end
-end
-
---------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
 local function createActorUnitsMapWithTemplate(mapData)
@@ -207,18 +187,6 @@ function ModelUnitMap:onStartRunning(sceneWarFileName)
     end
     self:forEachModelUnitOnMap( func)
         :forEachModelUnitLoaded(func)
-
-    getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtSkillGroupActivated",      self)
-
-    return self
-end
-
-function ModelUnitMap:onEvent(event)
-    local name = event.name
-    if (name == "EvtSkillGroupActivated") then
-        onEvtSkillGroupActivated(self, event)
-    end
 
     return self
 end

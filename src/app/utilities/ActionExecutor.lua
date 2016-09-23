@@ -234,12 +234,17 @@ local function executeActivateSkillGroup(action)
     modelPlayer:setDamageCost(modelPlayer:getDamageCost() - modelPlayer:getDamageCostForSkillGroupId(skillGroupID))
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
 
+    if (not IS_SERVER) then
+        local func = function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                modelUnit:updateView()
+            end
+        end
+        getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
+            :forEachModelUnitLoaded(func)
+    end
+
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name         = "EvtSkillGroupActivated",
-        playerIndex  = playerIndex,
-        skillGroupID = skillGroupID,
-    })
     getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
@@ -692,9 +697,8 @@ local function executeProduceModelUnitOnTile(action)
     local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
     local modelUnit = actorUnit:getModel()
     promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
-    modelUnit:onStartRunning(sceneWarFileName)
-        :setStateActioned()
-        :updateView()
+    modelUnit:setStateActioned()
+        :onStartRunning(sceneWarFileName)
 
     modelUnitMap:addActorUnitOnMap(actorUnit)
         :setAvailableUnitId(availableUnitID + 1)
@@ -723,9 +727,8 @@ local function executeProduceModelUnitOnUnit(action)
     local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
     local modelUnit = actorUnit:getModel()
     promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
-    modelUnit:onStartRunning(sceneWarFileName)
-        :setStateActioned()
-        :updateView()
+    modelUnit:setStateActioned()
+        :onStartRunning(sceneWarFileName)
 
     modelUnitMap:addActorUnitLoaded(actorUnit)
         :setAvailableUnitId(availableUnitID + 1)
