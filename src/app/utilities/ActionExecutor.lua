@@ -6,6 +6,7 @@ local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions"
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local InstantSkillExecutor   = require("src.app.utilities.InstantSkillExecutor")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local Actor                  = require("src.global.actors.Actor")
@@ -24,6 +25,7 @@ local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local toErrorMessage           = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -214,12 +216,6 @@ local function executeGetSceneWarData(action)
 
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
-    end
-end
-
-local function executeReloadCurrentScene(action)
-    if (not IS_SERVER) then
-        requestReloadSceneWar(action.message)
     end
 end
 
@@ -850,12 +846,22 @@ function ActionExecutor.execute(action)
     end
 
     local actionName = action.actionName
-    if     (actionName == "Error")              then return executeError(             action)
-    elseif (actionName == "Logout")             then return executeLogout(            action)
-    elseif (actionName == "Message")            then return executeMessage(           action)
-    elseif (actionName == "GetSceneWarData")    then return executeGetSceneWarData(   action)
-    elseif (actionName == "ReloadCurrentScene") then return executeReloadCurrentScene(action)
-    elseif (actionName == "RunSceneMain")       then return executeRunSceneMain(      action)
+    local actionID   = action.actionID
+    if (not actionID) then
+        assert(not IS_SERVER, "ActionExecutor.execute() invalid action for the server: " .. toErrorMessage(action))
+        if     (actionName == "Error")           then executeError(          action)
+        elseif (actionName == "Logout")          then executeLogout(         action)
+        elseif (actionName == "Message")         then executeMessage(        action)
+        elseif (actionName == "GetSceneWarData") then executeGetSceneWarData(action)
+        elseif (actionName == "RunSceneMain")    then executeRunSceneMain(   action)
+        else
+            local account, password = WebSocketManager.getLoggedInAccountAndPassword()
+            runSceneMain({
+                    isPlayerLoggedIn = (account ~= nil),
+                    confirmText      = "InvalidAction: " .. toErrorMessage(action)
+                }, account, password)
+        end
+        return
     end
 
     if (modelSceneWar:isEnded()) then
@@ -865,15 +871,15 @@ function ActionExecutor.execute(action)
         return
     end
 
-    local actionID = action.actionID
-    if (actionID ~= modelSceneWar:getActionId() + 1) then
+    modelSceneWar:setExecutingAction(true)
+    if (actionID == modelSceneWar:getActionId() + 1) then
+        modelSceneWar:setActionId(actionID)
+    else
         assert(not IS_SERVER, "ActionExecutor.execute() the actionID is invalid on the server: " .. (actionID or ""))
         getModelMessageIndicator():showPersistentMessage(getLocalizedText(81, "OutOfSync"))
         requestReloadSceneWar()
         return
     end
-    modelSceneWar:setActionId(actionID)
-        :setExecutingAction(true)
 
     if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
     elseif (actionName == "Attack")                 then executeAttack(                action)

@@ -776,7 +776,7 @@ local s_Texts = {
     [81] = {
         [1] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "网络传输出现错误。将自动刷新场景。" .. text
+            if     (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
             elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
             elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
             elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
