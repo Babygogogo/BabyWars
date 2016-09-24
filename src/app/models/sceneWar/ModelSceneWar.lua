@@ -215,7 +215,10 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
-    ActionExecutor.execute(action)
+    local sceneWarFileName = action.fileName
+    if ((not sceneWarFileName) or (sceneWarFileName == self:getFileName())) then
+        ActionExecutor.execute(action)
+    end
 
     return self
 end
