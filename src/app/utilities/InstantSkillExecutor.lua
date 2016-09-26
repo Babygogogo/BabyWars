@@ -103,13 +103,19 @@ s_Executors.execute12 = function(level, modelWarField, modelPlayerManager, model
 end
 
 s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex  = modelTurnManager:getPlayerIndex()
-    local fund         = modelPlayerManager:getModelPlayer(playerIndex):getFund()
-    local modifier     = 1 + getSkillModifier(13, level) * fund / 1000000
+    local playerIndex = modelTurnManager:getPlayerIndex()
+    local fund        = modelPlayerManager:getModelPlayer(playerIndex):getFund()
+    local modifier    = getSkillModifier(13, level) * fund / 1000000
 
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, index)
         if ((modelPlayer:isAlive()) and (index ~= playerIndex)) then
-            modelPlayer:updateDamageCostWithModifier(modifier)
+            local _, req1, req2 = modelPlayer:getEnergy()
+            if (req2) then
+                modelPlayer:setDamageCost(math.max(
+                    0,
+                    round(modelPlayer:getDamageCost() + req2 * modelPlayer:getCurrentDamageCostPerEnergyRequirement() * modifier)
+                ))
+            end
         end
     end)
 end
