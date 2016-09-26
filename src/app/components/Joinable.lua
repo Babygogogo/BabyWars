@@ -27,16 +27,14 @@ end
 --------------------------------------------------------------------------------
 function Joinable:canJoinModelUnit(modelUnit)
     local owner = self.m_Owner
-    if (owner:getTiledId() ~= modelUnit:getTiledId()) then
+    if ((owner:getTiledId() ~= modelUnit:getTiledId() or
+        (modelUnit:getNormalizedCurrentHP() == 10)))  then
         return false
     end
 
-    for _, component in pairs(ComponentManager.getAllComponents(owner)) do
-        if ((component ~= self)                          and
-            (component.canJoinModelUnit)                 and
-            (not component:canJoinModelUnit(modelUnit))) then
-            return false
-        end
+    if ((owner.getCurrentLoadCount)                                                 and
+        (owner:getCurrentLoadCount() > 0) or (modelUnit:getCurrentLoadCount() > 0)) then
+        return false
     end
 
     return true

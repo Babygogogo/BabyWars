@@ -122,15 +122,6 @@ function UnitLoader:onStartRunning(sceneWarFileName)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function UnitLoader:canJoinModelUnit(modelUnit)
-    return (self:getCurrentLoadCount() == 0)   and
-        (modelUnit.getCurrentLoadCount)        and
-        (modelUnit:getCurrentLoadCount() == 0)
-end
-
---------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function UnitLoader:getMaxLoadCount()
