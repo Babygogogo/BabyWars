@@ -103,7 +103,7 @@ local function setStateSelectMaxPoint(self)
     self.m_State = "stateSelectMaxPoint"
 
     if (self.m_View) then
-        self.m_View:setMenuTitle(getLocalizedText(3, "MaxPoints"))
+        self.m_View:setMenuTitle(getLocalizedText(3, "BasePoints"))
             :setMenuItems(self.m_ItemsMaxPoints)
             :setButtonSaveVisible(false)
     end

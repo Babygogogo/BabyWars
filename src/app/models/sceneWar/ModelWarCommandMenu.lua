@@ -48,7 +48,7 @@ local function getTilesInfo(tileTypeCounters)
     )
 end
 
-local function getMapInfo(modelTileMap)
+local function getMapInfo()
     local modelTileMap = SingletonGetters.getModelTileMap()
     local tileTypeCounters = {
         Headquarters = 0,
@@ -68,9 +68,10 @@ local function getMapInfo(modelTileMap)
         end
     end)
 
-    return string.format("%s: %s        %s: %s\n%s",
-        getLocalizedText(65,  "MapName"),      modelTileMap:getMapName(),
-        getLocalizedText(65,  "Author"),       modelTileMap:getAuthorName(),
+    return string.format("%s: %s      %s: %s      %s: %s\n%s",
+        getLocalizedText(65, "MapName"), modelTileMap:getMapName(),
+        getLocalizedText(65, "Author"),  modelTileMap:getAuthorName(),
+        getLocalizedText(65, "WarID"),   SingletonGetters.getModelScene():getFileName():sub(13),
         getTilesInfo(tileTypeCounters)
     )
 end
@@ -87,6 +88,7 @@ local function updateStringWarInfo(self)
                 energy       = energy,
                 req1         = req1,
                 req2         = req2,
+                damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement(),
                 unitsCount   = 0,
                 unitsValue   = 0,
                 tilesCount   = 0,
@@ -131,20 +133,21 @@ local function updateStringWarInfo(self)
         end
     end)
 
-    local stringList = {getMapInfo(modelTileMap)}
+    local stringList = {getMapInfo()}
     for i = 1, modelPlayerManager:getPlayersCount() do
         if (not dataForEachPlayer[i]) then
             stringList[#stringList + 1] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
             local d = dataForEachPlayer[i]
-            stringList[#stringList + 1] = string.format("%s %d:    %s\n%s: %d      %s: %d      %s: %.2f / %s / %s\n%s: %d      %s: %d\n%s: %d\n%s",
-                getLocalizedText(65, "Player"),     i,           d.nickname,
-                getLocalizedText(65, "Fund"),       d.fund,
-                getLocalizedText(65, "Income"),     d.income,
-                getLocalizedText(65, "Energy"),     d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
-                getLocalizedText(65, "UnitsCount"), d.unitsCount,
-                getLocalizedText(65, "UnitsValue"), d.unitsValue,
-                getLocalizedText(65, "TilesCount"), d.tilesCount,
+            stringList[#stringList + 1] = string.format("%s %d:    %s\n%s: %d      %s: %d\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %d\n%s: %d\n%s",
+                getLocalizedText(65, "Player"),              i,           d.nickname,
+                getLocalizedText(65, "Fund"),                d.fund,
+                getLocalizedText(65, "Income"),              d.income,
+                getLocalizedText(65, "Energy"),              d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
+                getLocalizedText(65, "DamageCostPerEnergy"), d.damageCostPerEnergy,
+                getLocalizedText(65, "UnitsCount"),          d.unitsCount,
+                getLocalizedText(65, "UnitsValue"),          d.unitsValue,
+                getLocalizedText(65, "TilesCount"),          d.tilesCount,
                 getTilesInfo(d)
             )
         end

@@ -20,8 +20,8 @@ local SKILL_GROUP_ID_ACTIVE2 = ModelSkillConfiguration.getSkillGroupIdActive2()
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForMaxSkillPoints(points)
-    return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), points)
+local function getDescriptionForBaseSkillPoints(points)
+    return string.format("%s: %d", getLocalizedText(3, "BasePoints"), points)
 end
 
 local function transformModifier1(modifier, unit)
@@ -142,7 +142,7 @@ function SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
     end
 
     return string.format("%s\n%s\n\n%s\n\n%s",
-        getDescriptionForMaxSkillPoints(maxSkillPoints),
+        getDescriptionForBaseSkillPoints(maxSkillPoints),
         getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupPassive(), SKILL_GROUP_ID_PASSIVE),
         getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive1(), SKILL_GROUP_ID_ACTIVE1),
         getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive2(), SKILL_GROUP_ID_ACTIVE2)
