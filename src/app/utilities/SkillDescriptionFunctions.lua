@@ -136,7 +136,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
-    local maxSkillPoints = modelSkillConfiguration:getMaxSkillPoints()
+    local maxSkillPoints = modelSkillConfiguration:getBaseSkillPoints()
     if (not maxSkillPoints) then
         return getLocalizedText(3, "NoSkills")
     end

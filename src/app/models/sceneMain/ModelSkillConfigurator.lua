@@ -235,9 +235,11 @@ local function initItemsMaxPoints(self)
     local items = {}
     for points = MIN_POINTS, MAX_POINTS, POINTS_PER_STEP do
         items[#items + 1] = {
-            name     = "" .. points,
+            name     = (points ~= 100) and
+                ("" .. points)         or
+                (string.format("%d(%s)", points, getLocalizedText(3, "Default"))),
             callback = function()
-                self.m_ModelSkillConfiguration:setMaxSkillPoints(points)
+                self.m_ModelSkillConfiguration:setBaseSkillPoints(points)
                 setStateOverviewConfiguration(self, self.m_ConfigurationID)
             end,
         }

@@ -7,6 +7,7 @@ local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions"
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+local round            = require("src.global.functions.round")
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
 local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = GameConstantFunctions.getSkillPointsPerEnergyRequirement()
@@ -41,6 +42,10 @@ local function getExtraPointsForPassiveSkills(basePoints, isEnabledActive1, isEn
     end
 end
 
+local function getMaxSkillPointsForActiveSkillGroup(basePoints, energyRequirement, extraPointsForActive)
+    return round((basePoints / 2 + 50) * energyRequirement + extraPointsForActive)
+end
+
 local function resetMaxSkillPoints(self)
     -- TODO: move the key constants to GameConstant.
     local skillPassive     = self.m_ModelSkillGroupPassive
@@ -48,20 +53,18 @@ local function resetMaxSkillPoints(self)
     local skillActive2     = self.m_ModelSkillGroupActive2
     local isEnabledActive1 = skillActive1:isEnabled()
     local isEnabledActive2 = skillActive2:isEnabled()
-    local maxPoints        = self:getMaxSkillPoints()
+    local basePoints        = self:getBaseSkillPoints()
 
-    local totalPointsForPassive = maxPoints + getExtraPointsForPassiveSkills(maxPoints, isEnabledActive1, isEnabledActive2)
+    local totalPointsForPassive = basePoints + getExtraPointsForPassiveSkills(basePoints, isEnabledActive1, isEnabledActive2)
     skillPassive:setMaxSkillPoints(totalPointsForPassive)
 
     local extraPointsForActive = math.max(0, (totalPointsForPassive - skillPassive:getSkillPoints()))
     extraPointsForActive       = math.min(extraPointsForActive, totalPointsForPassive)
     if (isEnabledActive1) then
-        local basePoints = skillActive1:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
-        skillActive1:setMaxSkillPoints(basePoints + extraPointsForActive)
+        skillActive1:setMaxSkillPoints(getMaxSkillPointsForActiveSkillGroup(basePoints, skillActive1:getEnergyRequirement(), extraPointsForActive))
     end
     if (isEnabledActive2) then
-        local basePoints = skillActive2:getEnergyRequirement() * SKILL_POINTS_PER_ENERGY_REQUIREMENT
-        skillActive2:setMaxSkillPoints(basePoints + extraPointsForActive)
+        skillActive2:setMaxSkillPoints(getMaxSkillPointsForActiveSkillGroup(basePoints, skillActive2:getEnergyRequirement(), extraPointsForActive))
     end
 end
 
@@ -77,7 +80,7 @@ function ModelSkillConfiguration:ctor(param)
     self.m_ModelSkillGroupPassive:ctor(param.passive)
     self.m_ModelSkillGroupActive1:ctor(param.active1)
     self.m_ModelSkillGroupActive2:ctor(param.active2)
-    self:setMaxSkillPoints(        param.maxPoints or 100)
+    self:setBaseSkillPoints(       param.basePoints or 100)
         :setActivatingSkillGroupId(param.activatingSkillGroupId)
 
     return self
@@ -97,7 +100,7 @@ function ModelSkillConfiguration:toSerializableTable()
     end
 
     return {
-        maxPoints              = self:getMaxSkillPoints(),
+        basePoints             = self:getBaseSkillPoints(),
         activatingSkillGroupId = self:getActivatingSkillGroupId(),
 
         passive                = self.m_ModelSkillGroupPassive:toSerializableTable(),
@@ -134,7 +137,7 @@ function ModelSkillConfiguration:getModelSkillGroupActive2()
 end
 
 function ModelSkillConfiguration:isEmpty()
-    return not self:getMaxSkillPoints()
+    return not self:getBaseSkillPoints()
 end
 
 function ModelSkillConfiguration:isValid()
@@ -204,17 +207,17 @@ function ModelSkillConfiguration:getActivatingModelSkillGroup()
     end
 end
 
-function ModelSkillConfiguration:setMaxSkillPoints(points)
+function ModelSkillConfiguration:setBaseSkillPoints(points)
     assert((points >= MIN_POINTS) and (points <= MAX_POINTS) and ((points - MIN_POINTS) % POINTS_PER_STEP == 0))
 
-    self.m_MaxPoints = points
+    self.m_BasePoints = points
     resetMaxSkillPoints(self)
 
     return self
 end
 
-function ModelSkillConfiguration:getMaxSkillPoints()
-    return self.m_MaxPoints
+function ModelSkillConfiguration:getBaseSkillPoints()
+    return self.m_BasePoints
 end
 
 function ModelSkillConfiguration:getAllSkillsInGroup(skillGroupID)

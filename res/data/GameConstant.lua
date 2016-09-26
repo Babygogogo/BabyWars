@@ -3787,10 +3787,10 @@ GameConstant.templateModelUnits = {
 }
 
 GameConstant.minSkillPoints                  = 0
-GameConstant.maxSkillPoints                  = 500
+GameConstant.maxSkillPoints                  = 200
+GameConstant.skillPointsPerStep              = 10
 GameConstant.minEnergyRequirement            = 1
 GameConstant.maxEnergyRequirement            = 15
-GameConstant.skillPointsPerStep              = 25
 GameConstant.skillPointsPerEnergyRequirement = 100
 GameConstant.damageCostPerEnergyRequirement  = 18000
 GameConstant.damageCostGrowthRates           = 20
