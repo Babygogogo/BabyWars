@@ -31,12 +31,19 @@ local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isSe
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(30))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(30))
+
+    WebSocketManager.sendAction({
+        actionName = "GetSceneWarActionId",
+        fileName   = self:getFileName(),
+    })
 end
 
 local function onWebSocketMessage(self, param)
@@ -46,12 +53,12 @@ end
 
 local function onWebSocketClose(self, param)
     print("ModelSceneWar-onWebSocketClose()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(31))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(31))
 end
 
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
-    self:getModelMessageIndicator():showMessage(LocalizationFunctions.getLocalizedText(32, param.error))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(32, param.error))
 end
 
 --------------------------------------------------------------------------------
@@ -215,10 +222,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
-    local sceneWarFileName = action.fileName
-    if ((not sceneWarFileName) or (sceneWarFileName == self:getFileName())) then
-        ActionExecutor.execute(action)
-    end
+    ActionExecutor.execute(action)
 
     return self
 end

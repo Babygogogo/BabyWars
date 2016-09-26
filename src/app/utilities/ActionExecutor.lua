@@ -87,7 +87,7 @@ local function requestReloadSceneWar(message)
     })
 
     WebSocketManager.sendAction({
-        actionName = "GetSceneWarData",
+        actionName = "ReloadSceneWar",
         fileName   = getSceneWarFileName(),
     })
 end
@@ -181,30 +181,30 @@ end
 -- The private executors.
 --------------------------------------------------------------------------------
 local function executeLogout(action)
-    if (not IS_SERVER) then
-        runSceneMain({confirmText = action.message})
-    end
-end
-
-local function executeMessage(action)
-    if (not IS_SERVER) then
-        getModelMessageIndicator():showMessage(action.message)
-    end
+    assert(not IS_SERVER, "ActionExecutor-executeLogout() should not be invoked on the server.")
+    runSceneMain({confirmText = action.message})
 end
 
 local function executeError(action)
-    if (not IS_SERVER) then
-        error("ActionExecutor-executeError() " .. (action.error or ""))
-    end
+    assert(not IS_SERVER, "ActionExecutor-executeError() should not be invoked on the server.")
+    error("ActionExecutor-executeError() " .. (action.error or ""))
 end
 
-local function executeRunSceneMain(action)
-    if (not IS_SERVER) then
-        local param = {
+local function executeMessage(action)
+    assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
+    getModelMessageIndicator():showMessage(action.message)
+end
+
+local function executeGetSceneWarActionId(action)
+    assert(not IS_SERVER, "ActionExecutor-executeGetSceneWarActionId() should not be invoked on the server.")
+    local actionID = action.sceneWarActionID
+    if (not actionID) then
+        runSceneMain({
             isPlayerLoggedIn = true,
-            confirmText      = action.message,
-        }
-        runSceneMain(param, WebSocketManager.getLoggedInAccountAndPassword())
+            confirmText      = getLocalizedText(81, "InvalidWarFileName"),
+        }, WebSocketManager.getLoggedInAccountAndPassword())
+    elseif (actionID > getModelScene():getActionId()) then
+        requestReloadSceneWar(getLocalizedText(81, "OutOfSync"))
     end
 end
 
@@ -213,7 +213,8 @@ local function executeGetSceneWarData(action)
 end
 
 local function executeReloadSceneWar(action)
-    if ((not IS_SERVER) and (action.data.actionID >= getModelScene():getActionId())) then
+    assert(not IS_SERVER, "ActionExecutor-executeReloadSceneWar() should not be invoked on the server.")
+    if (action.data.actionID >= getModelScene():getActionId()) then
         if (action.message) then
             getModelMessageIndicator():showPersistentMessage(action.message)
         end
@@ -221,6 +222,15 @@ local function executeReloadSceneWar(action)
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
+end
+
+local function executeRunSceneMain(action)
+    assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
+    local param = {
+        isPlayerLoggedIn = true,
+        confirmText      = action.message,
+    }
+    runSceneMain(param, WebSocketManager.getLoggedInAccountAndPassword())
 end
 
 local function executeActivateSkillGroup(action)
@@ -844,21 +854,29 @@ end
 -- The public function.
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action)
-    local modelSceneWar = getModelScene(action.fileName)
-    if ((not modelSceneWar) or (not modelSceneWar.getModelWarField)) then
+    local actionName = action.actionName
+    if (actionName == "Logout") then
+        executeLogout(action)
         return
     end
 
-    local actionName = action.actionName
-    local actionID   = action.actionID
+    local sceneWarFileName = action.fileName
+    local modelSceneWar    = getModelScene(sceneWarFileName)
+    if ((not modelSceneWar)                                or
+        (not modelSceneWar.getFileName)                    or
+        (modelSceneWar:getFileName() ~= sceneWarFileName)) then
+        return
+    end
+
+    local actionID = action.actionID
     if (not actionID) then
         assert(not IS_SERVER, "ActionExecutor.execute() invalid action for the server: " .. toErrorMessage(action))
-        if     (actionName == "Error")           then executeError(          action)
-        elseif (actionName == "Logout")          then executeLogout(         action)
-        elseif (actionName == "Message")         then executeMessage(        action)
-        elseif (actionName == "GetSceneWarData") then executeGetSceneWarData(action)
-        elseif (actionName == "ReloadSceneWar")  then executeReloadSceneWar( action)
-        elseif (actionName == "RunSceneMain")    then executeRunSceneMain(   action)
+        if     (actionName == "Error")               then executeError(              action)
+        elseif (actionName == "Message")             then executeMessage(            action)
+        elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
+        elseif (actionName == "GetSceneWarData")     then executeGetSceneWarData(    action)
+        elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
+        elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
         else
             local account, password = WebSocketManager.getLoggedInAccountAndPassword()
             runSceneMain({
