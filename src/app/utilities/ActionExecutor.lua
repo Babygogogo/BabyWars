@@ -209,7 +209,11 @@ local function executeRunSceneMain(action)
 end
 
 local function executeGetSceneWarData(action)
-    if (not IS_SERVER) then
+    -- The "GetSceneWarData" action is now ignored when a war scene is running. Use the "ReloadSceneWar" action instead.
+end
+
+local function executeReloadSceneWar(action)
+    if ((not IS_SERVER) and (action.data.actionID >= getModelScene():getActionId())) then
         if (action.message) then
             getModelMessageIndicator():showPersistentMessage(action.message)
         end
@@ -853,6 +857,7 @@ function ActionExecutor.execute(action)
         elseif (actionName == "Logout")          then executeLogout(         action)
         elseif (actionName == "Message")         then executeMessage(        action)
         elseif (actionName == "GetSceneWarData") then executeGetSceneWarData(action)
+        elseif (actionName == "ReloadSceneWar")  then executeReloadSceneWar( action)
         elseif (actionName == "RunSceneMain")    then executeRunSceneMain(   action)
         else
             local account, password = WebSocketManager.getLoggedInAccountAndPassword()

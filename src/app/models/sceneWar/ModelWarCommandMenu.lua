@@ -197,9 +197,9 @@ local function sendActionEndTurn()
     createAndSendAction({actionName = "EndTurn"}, true)
 end
 
-local function sendActionGetSceneWarData()
+local function sendActionReloadSceneWar()
     createAndSendAction({
-        actionName = "GetSceneWarData",
+        actionName = "ReloadSceneWar",
         fileName   = SingletonGetters.getSceneWarFileName(),
     }, false)
 end
@@ -509,7 +509,7 @@ local function initItemReload(self)
                 :setOnConfirmYes(function()
                     modelConfirmBox:setEnabled(false)
                     self:setEnabled(false)
-                    sendActionGetSceneWarData()
+                    sendActionReloadSceneWar()
                 end)
                 :setEnabled(true)
         end,
