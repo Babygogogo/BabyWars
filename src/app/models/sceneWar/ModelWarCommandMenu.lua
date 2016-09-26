@@ -28,66 +28,124 @@ local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 local ActorManager              = require("src.global.actors.ActorManager")
 
+local round            = require("src.global.functions.round")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getTilesInfo(tileTypeCounters)
+    return string.format("%s: %d        %s: %d        %s: %d        %s: %d        %s: %d\n%s: %d        %s: %d        %s: %d        %s: %d",
+        getLocalizedText(116, "Headquarters"), tileTypeCounters.Headquarters,
+        getLocalizedText(116, "City"),         tileTypeCounters.City,
+        getLocalizedText(116, "Factory"),      tileTypeCounters.Factory,
+        getLocalizedText(116, "Airport"),      tileTypeCounters.Airport,
+        getLocalizedText(116, "Seaport"),      tileTypeCounters.Seaport,
+        getLocalizedText(116, "CommandTower"), tileTypeCounters.CommandTower,
+        getLocalizedText(116, "Radar"),        tileTypeCounters.Radar,
+        getLocalizedText(116, "TempAirport"),  tileTypeCounters.TempAirport,
+        getLocalizedText(116, "TempSeaport"),  tileTypeCounters.TempSeaport
+    )
+end
+
+local function getMapInfo(modelTileMap)
+    local modelTileMap = SingletonGetters.getModelTileMap()
+    local tileTypeCounters = {
+        Headquarters = 0,
+        City         = 0,
+        Factory      = 0,
+        Airport      = 0,
+        Seaport      = 0,
+        TempAirport  = 0,
+        TempSeaport  = 0,
+        CommandTower = 0,
+        Radar        = 0,
+    }
+    modelTileMap:forEachModelTile(function(modelTile)
+        local tileType = modelTile:getTileType()
+        if (tileTypeCounters[tileType]) then
+            tileTypeCounters[tileType] = tileTypeCounters[tileType] + 1
+        end
+    end)
+
+    return string.format("%s: %s        %s: %s\n%s",
+        getLocalizedText(65,  "MapName"),      modelTileMap:getMapName(),
+        getLocalizedText(65,  "Author"),       modelTileMap:getAuthorName(),
+        getTilesInfo(tileTypeCounters)
+    )
+end
+
 local function updateStringWarInfo(self)
     local modelPlayerManager = SingletonGetters.getModelPlayerManager()
-    local data               = {}
-
+    local dataForEachPlayer  = {}
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:isAlive()) then
             local energy, req1, req2 = modelPlayer:getEnergy()
-            data[playerIndex] = {
-                nickname   = modelPlayer:getNickname(),
-                fund       = modelPlayer:getFund(),
-                energy     = energy,
-                req1       = req1,
-                req2       = req2,
-                unitsCount = 0,
-                tilesCount = 0,
-                income     = 0,
+            dataForEachPlayer[playerIndex] = {
+                nickname     = modelPlayer:getNickname(),
+                fund         = modelPlayer:getFund(),
+                energy       = energy,
+                req1         = req1,
+                req2         = req2,
+                unitsCount   = 0,
+                unitsValue   = 0,
+                tilesCount   = 0,
+                income       = 0,
+
+                Headquarters = 0,
+                City         = 0,
+                Factory      = 0,
+                Airport      = 0,
+                Seaport      = 0,
+                TempAirport  = 0,
+                TempSeaport  = 0,
+                CommandTower = 0,
+                Radar        = 0,
             }
         end
     end)
 
-    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        local unitsCount = 1
-        if (modelUnit.getCurrentLoadCount) then
-            unitsCount = unitsCount + modelUnit:getCurrentLoadCount()
-        end
+    local updateUnitCountAndValue = function(modelUnit)
+        local data      = dataForEachPlayer[modelUnit:getPlayerIndex()]
+        data.unitsCount = data.unitsCount + 1
+        data.unitsValue = data.unitsValue + round(modelUnit:getNormalizedCurrentHP() * modelUnit:getBaseProductionCost() / 10)
+    end
+    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(updateUnitCountAndValue)
+        :forEachModelUnitLoaded(updateUnitCountAndValue)
 
-        local playerIndex = modelUnit:getPlayerIndex()
-        data[playerIndex].unitsCount = data[playerIndex].unitsCount + unitsCount
-    end)
-
-    SingletonGetters.getModelTileMap():forEachModelTile(function(modelTile)
+    local modelTileMap = SingletonGetters.getModelTileMap()
+    modelTileMap:forEachModelTile(function(modelTile)
         local playerIndex = modelTile:getPlayerIndex()
         if (playerIndex ~= 0) then
-            data[playerIndex].tilesCount = data[playerIndex].tilesCount + 1
+            local data = dataForEachPlayer[playerIndex]
+            data.tilesCount = data.tilesCount + 1
+
+            local tileType = modelTile:getTileType()
+            if (data[tileType]) then
+                data[tileType] = data[tileType] + 1
+            end
+
             if (modelTile.getIncomeAmount) then
-                data[playerIndex].income = data[playerIndex].income + (modelTile:getIncomeAmount() or 0)
+                data.income = data.income + (modelTile:getIncomeAmount() or 0)
             end
         end
     end)
 
-    local playersCount = modelPlayerManager:getPlayersCount()
-    local stringList   = {}
-    for i = 1, playersCount do
-        if (not data[i]) then
-            stringList[i] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
+    local stringList = {getMapInfo(modelTileMap)}
+    for i = 1, modelPlayerManager:getPlayersCount() do
+        if (not dataForEachPlayer[i]) then
+            stringList[#stringList + 1] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
-            local d = data[i]
-            stringList[i] = string.format("%s %d:\n%s: %s\n%s: %d\n%s: %d\n%s: %.2f / %s / %s\n%s: %d\n%s: %d",
-                getLocalizedText(65, "Player"),     i,
-                getLocalizedText(65, "Nickname"),   d.nickname,
+            local d = dataForEachPlayer[i]
+            stringList[#stringList + 1] = string.format("%s %d:    %s\n%s: %d      %s: %d      %s: %.2f / %s / %s\n%s: %d      %s: %d\n%s: %d\n%s",
+                getLocalizedText(65, "Player"),     i,           d.nickname,
                 getLocalizedText(65, "Fund"),       d.fund,
                 getLocalizedText(65, "Income"),     d.income,
                 getLocalizedText(65, "Energy"),     d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "UnitsCount"), d.unitsCount,
-                getLocalizedText(65, "TilesCount"), d.tilesCount
+                getLocalizedText(65, "UnitsValue"), d.unitsValue,
+                getLocalizedText(65, "TilesCount"), d.tilesCount,
+                getTilesInfo(d)
             )
         end
     end

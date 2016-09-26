@@ -32,8 +32,8 @@ function Joinable:canJoinModelUnit(modelUnit)
         return false
     end
 
-    if ((owner.getCurrentLoadCount)                                                 and
-        (owner:getCurrentLoadCount() > 0) or (modelUnit:getCurrentLoadCount() > 0)) then
+    if ((owner.getCurrentLoadCount)                                                   and
+        ((owner:getCurrentLoadCount() > 0) or (modelUnit:getCurrentLoadCount() > 0))) then
         return false
     end
 
