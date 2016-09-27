@@ -211,6 +211,14 @@ local s_Texts = {
             elseif (skillID == 34) then return "使我方步兵系的攻击伤害变为基础的"
             elseif (skillID == 35) then return "使我方车辆系的攻击伤害变为基础的"
             elseif (skillID == 36) then return "使我方近战机械部队的攻击伤害变为基础的"
+            elseif (skillID == 37) then return "使我方所有近战部队受到的攻击伤害变为基础的"
+            elseif (skillID == 38) then return "使我方所有远程部队受到的攻击伤害变为基础的"
+            elseif (skillID == 39) then return "使我方所有陆军受到的攻击伤害变为基础的"
+            elseif (skillID == 40) then return "使我方所有空军受到的攻击伤害变为基础的"
+            elseif (skillID == 41) then return "使我方所有海军受到的攻击伤害变为基础的"
+            elseif (skillID == 42) then return "使我方步兵系受到的攻击伤害变为基础的"
+            elseif (skillID == 43) then return "使我方车辆系受到的攻击伤害变为基础的"
+            elseif (skillID == 44) then return "使我方近战机械部队受到的攻击伤害变为基础的"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -256,6 +264,14 @@ local s_Texts = {
             elseif (skillID == 34) then return "步兵系攻击力"
             elseif (skillID == 35) then return "车辆系攻击力"
             elseif (skillID == 36) then return "近战机械攻击力"
+            elseif (skillID == 37) then return "近战系防御力"
+            elseif (skillID == 38) then return "远程系防御力"
+            elseif (skillID == 39) then return "陆军防御力"
+            elseif (skillID == 40) then return "空军防御力"
+            elseif (skillID == 41) then return "海军防御力"
+            elseif (skillID == 42) then return "步兵系防御力"
+            elseif (skillID == 43) then return "车辆系防御力"
+            elseif (skillID == 44) then return "近战机械防御力"
             else                        return "未知5:" .. (skillID or "")
             end
         end,

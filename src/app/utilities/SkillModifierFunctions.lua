@@ -77,6 +77,22 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 24) then
                 local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
                 modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            elseif ((skillID == 37) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 38) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 39) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 40) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 41) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 42) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 43) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 44) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end
