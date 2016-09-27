@@ -204,6 +204,13 @@ local s_Texts = {
             elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
             elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
             elseif (skillID == 29) then return "使我方所有近战部队的攻击伤害变为基础的"
+            elseif (skillID == 30) then return "使我方所有远程部队的攻击伤害变为基础的"
+            elseif (skillID == 31) then return "使我方所有陆军的攻击伤害变为基础的"
+            elseif (skillID == 32) then return "使我方所有空军的攻击伤害变为基础的"
+            elseif (skillID == 33) then return "使我方所有海军的攻击伤害变为基础的"
+            elseif (skillID == 34) then return "使我方步兵系的攻击伤害变为基础的"
+            elseif (skillID == 35) then return "使我方车辆系的攻击伤害变为基础的"
+            elseif (skillID == 36) then return "使我方近战机械部队的攻击伤害变为基础的"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -241,7 +248,14 @@ local s_Texts = {
             elseif (skillID == 26) then return "全军晋升"
             elseif (skillID == 27) then return "全军自带晋升"
             elseif (skillID == 28) then return "完美移动"
-            elseif (skillID == 29) then return "近战部队攻击力"
+            elseif (skillID == 29) then return "近战系攻击力"
+            elseif (skillID == 30) then return "远程系攻击力"
+            elseif (skillID == 31) then return "陆军攻击力"
+            elseif (skillID == 32) then return "空军攻击力"
+            elseif (skillID == 33) then return "海军攻击力"
+            elseif (skillID == 34) then return "步兵系攻击力"
+            elseif (skillID == 35) then return "车辆系攻击力"
+            elseif (skillID == 36) then return "近战机械攻击力"
             else                        return "未知5:" .. (skillID or "")
             end
         end,

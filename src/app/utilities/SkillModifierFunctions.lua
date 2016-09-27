@@ -35,6 +35,20 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
                 modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
             elseif ((skillID == 29) and (isTypeInCategory(attacker:getUnitType(), "DirectUnits"))) then
                 modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 30) and (isTypeInCategory(attacker:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 31) and (isTypeInCategory(attacker:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 32) and (isTypeInCategory(attacker:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 33) and (isTypeInCategory(attacker:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 34) and (isTypeInCategory(attacker:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 35) and (isTypeInCategory(attacker:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 36) and (isTypeInCategory(attacker:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end
