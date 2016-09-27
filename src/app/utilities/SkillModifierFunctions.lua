@@ -4,6 +4,7 @@ local SkillModifierFunctions = {}
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 local getSkillModifier = GameConstantFunctions.getSkillModifier
+local isTypeInCategory = GameConstantFunctions.isTypeInCategory
 
 local PASSIVE_SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
 local ACTIVE_SLOTS_COUNT  = GameConstantFunctions.getActiveSkillSlotsCount()
@@ -32,6 +33,8 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 23) then
                 local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(attackerGridIndex)
                 modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            elseif ((skillID == 29) and (isTypeInCategory(attacker:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end

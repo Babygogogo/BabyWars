@@ -121,9 +121,9 @@ local s_Texts = {
             elseif (textType == "PassiveSkill")           then return "日 常 技 能"
             elseif (textType == "ActiveSkill")            then return "主 动 技 能"
             elseif (textType == "Skill")                  then return "技 能"
-            elseif (textType == "MaxPoints")              then return "最大技能点"
+            elseif (textType == "MaxPoints")              then return "可用总技能点"
             elseif (textType == "BasePoints")             then return "基准技能点"
-            elseif (textType == "TotalPoints")            then return "合计技能点"
+            elseif (textType == "TotalPoints")            then return "已用技能点"
             elseif (textType == "SkillPoints")            then return "技能点"
             elseif (textType == "EnergyRequirement")      then return "能量槽长度"
             elseif (textType == "MinEnergy")              then return "最小能量槽"
@@ -199,10 +199,11 @@ local s_Texts = {
             elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
-            elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
+            elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限（不高于上限），幅度为"
             elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
             elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
             elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
+            elseif (skillID == 29) then return "使我方所有近战部队的攻击伤害变为基础的"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -240,6 +241,7 @@ local s_Texts = {
             elseif (skillID == 26) then return "全军晋升"
             elseif (skillID == 27) then return "全军自带晋升"
             elseif (skillID == 28) then return "完美移动"
+            elseif (skillID == 29) then return "近战部队攻击力"
             else                        return "未知5:" .. (skillID or "")
             end
         end,

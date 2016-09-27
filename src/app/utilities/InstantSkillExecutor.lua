@@ -111,9 +111,13 @@ s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, model
         if ((modelPlayer:isAlive()) and (index ~= playerIndex)) then
             local _, req1, req2 = modelPlayer:getEnergy()
             if (req2) then
+                local maxDamageCost = round(req2 * modelPlayer:getCurrentDamageCostPerEnergyRequirement())
                 modelPlayer:setDamageCost(math.max(
                     0,
-                    round(modelPlayer:getDamageCost() + req2 * modelPlayer:getCurrentDamageCostPerEnergyRequirement() * modifier)
+                    math.min(
+                        round(modelPlayer:getDamageCost() + maxDamageCost * modifier),
+                        maxDamageCost
+                    )
                 ))
             end
         end
