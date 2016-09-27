@@ -161,7 +161,7 @@ local function updateStringSkillInfo(self)
     SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
         stringList[#stringList + 1] = string.format("%s %d: %s",
             getLocalizedText(65, "Player"), playerIndex,
-            SkillDescriptionFunctions.getDescription(modelPlayer:getModelSkillConfiguration())
+            SkillDescriptionFunctions.getBriefDescription(modelPlayer:getModelSkillConfiguration())
         )
     end)
 

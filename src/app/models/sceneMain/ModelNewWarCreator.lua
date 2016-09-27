@@ -31,14 +31,19 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
         :setOptions(options)
 end
 
+local function resetSelectorMaxSkillPoints(modelWarConfigurator)
+    local minPoints, _, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex((100 - minPoints) / pointsPerStep + 2)
+end
+
 local function resetModelWarConfigurator(model, warFieldFileName)
     model:setWarFieldFileName(warFieldFileName)
         :setEnabled(true)
 
     local warField = require("res.data.templateWarField." .. warFieldFileName)
-    resetSelectorPlayerIndex(model, warField.playersCount)
-    model:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex(6)
-    model:getModelOptionSelectorWithName("Skill")         :setCurrentOptionIndex(2)
+    resetSelectorPlayerIndex(   model, warField.playersCount)
+    resetSelectorMaxSkillPoints(model)
+    model:getModelOptionSelectorWithName("Skill"):setCurrentOptionIndex(2)
 end
 
 --------------------------------------------------------------------------------
@@ -119,7 +124,7 @@ local function initSelectorSkill(self, modelWarConfigurator)
                 modelWarConfigurator:setPopUpPanelEnabled(true)
                     :setPopUpPanelText(string.format("%s %s:\n%s",
                         getLocalizedText(3, "Configuration"), presetName,
-                        SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+                        SkillDescriptionFunctions.getBriefDescription(modelSkillConfiguration)
                     ))
             end,
         }
@@ -159,7 +164,6 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
-        :setCurrentOptionIndex(5)
         :setButtonsEnabled(true)
 end
 
@@ -267,7 +271,7 @@ function ModelNewWarCreator:doActionGetSkillConfiguration(action)
         local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
         modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
             getLocalizedText(3, "Configuration"), action.configurationID,
-            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+            SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
         ))
     end
 
