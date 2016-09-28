@@ -93,6 +93,8 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
                 modifier = modifier + getSkillModifier(skillID, skill.level)
             elseif ((skillID == 44) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "DirectMachineUnits"))) then
                 modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 45) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "TransportUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end
