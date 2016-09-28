@@ -3916,6 +3916,10 @@ GameConstant.skills = {
         maxLevel     = 12,
         modifierUnit = "%",
         levels = {
+            [-10] = {modifier = -50, pointsPassive = 0, pointsActive = 0, minEnergy = 5},
+            [-9] = {modifier = -45, pointsPassive = 0, pointsActive = 0, minEnergy = 5},
+            [-8] = {modifier = -40, pointsPassive = 0, pointsActive = 0, minEnergy = 4},
+            [-7] = {modifier = -35, pointsPassive = 0, pointsActive = 0, minEnergy = 4},
             [-6] = {modifier = -30, pointsPassive = -240, pointsActive = -60, minEnergy = 3},
             [-5] = {modifier = -25, pointsPassive = -200, pointsActive = -50, minEnergy = 3},
             [-4] = {modifier = -20, pointsPassive = -160, pointsActive = -40, minEnergy = 2},
@@ -5175,6 +5179,114 @@ GameConstant.skillPresets = {
         },
     },
 
+    Drake = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 33,
+                level = 4,
+            },
+            {
+                id    = 41,
+                level = 4,
+            },
+            {
+                id    = 32,
+                level = -2,
+            },
+        },
+        active1 = {
+            energyRequirement = 4,
+            {
+                id    = 5,
+                level = 1,
+            },
+            {
+                id    = 9,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 7,
+            {
+                id    = 5,
+                level = 2,
+            },
+            {
+                id    = 9,
+                level = 4,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Eagle = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 32,
+                level = 2,
+            },
+            {
+                id    = 40,
+                level = 2,
+            },
+            {
+                id    = 33,
+                level = -4
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 8,
+                level = 1,
+            },
+            {
+                id    = 1,
+                level = -10,
+            },
+            {
+                id    = 2,
+                level = -4,
+            },
+        },
+        active2 = {
+            energyRequirement = 9,
+            {
+                id    = 8,
+                level = 1,
+            },
+            {
+                id    = 32,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
     Grimm = {
         maxPoints = 100,
         passive = {
@@ -5203,6 +5315,62 @@ GameConstant.skillPresets = {
             {
                 id    = 1,
                 level = 12,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Grit = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 7,
+                level = 1,
+            },
+            {
+                id    = 30,
+                level = 2,
+            },
+            {
+                id    = 36,
+                level = -4,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 7,
+                level = 1,
+            },
+            {
+                id    = 30,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 7,
+                level = 2,
+            },
+            {
+                id    = 30,
+                level = 6,
+            },
+            {
+                id    = 1,
+                level = 2,
             },
             {
                 id    = 2,
@@ -5259,6 +5427,62 @@ GameConstant.skillPresets = {
         },
     },
 
+    Jess = {
+        maxPoints = 100,
+        passive   = {
+            {
+                id    = 35,
+                level = 4,
+            },
+            {
+                id    = 32,
+                level = -2,
+            },
+            {
+                id    = 33,
+                level = -2,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 35,
+                level = 4,
+            },
+            {
+                id    = 52,
+                level = 1,
+            },
+            {
+                id    = 16,
+                level = 1,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 35,
+                level = 8,
+            },
+            {
+                id    = 52,
+                level = 2,
+            },
+            {
+                id    = 16,
+                level = 1,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
     Lash = {
         maxPoints = 100,
         passive = {
@@ -5299,6 +5523,58 @@ GameConstant.skillPresets = {
         },
     },
 
+    Max = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 36,
+                level = 4,
+            },
+            {
+                id    = 7,
+                level = -1,
+            },
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 36,
+                level = 3,
+            },
+            {
+                id    = 53,
+                level = 1,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+        active2 = {
+            energyRequirement = 6,
+            {
+                id    = 36,
+                level = 6,
+            },
+            {
+                id    = 53,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
     Nell = {
         maxPoints = 100,
         passive = {
@@ -5330,6 +5606,66 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            },
+        },
+    },
+
+    Sami = {
+        maxPoints = 100,
+        passive = {
+            {
+                id    = 15,
+                level = 5,
+            },
+            {
+                id    = 34,
+                level = 6,
+            },
+            {
+                id    = 36,
+                level = -2,
+            },
+            {
+                id    = 54,
+                level = 1,
+            }
+        },
+        active1 = {
+            energyRequirement = 3,
+            {
+                id    = 34,
+                level = 6,
+            },
+            {
+                id    = 51,
+                level = 1,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+            {
+                id    = 2,
+                level = 2,
+            }
+        },
+        active2 = {
+            energyRequirement = 8,
+            {
+                id    = 15,
+                level = 11,
+            },
+            {
+                id    = 34,
+                level = 10,
+            },
+            {
+                id    = 51,
                 level = 2,
             },
             {
