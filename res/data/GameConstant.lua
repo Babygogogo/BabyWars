@@ -5067,11 +5067,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = 4,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 3,
             },
         },
         active2 = {
@@ -5082,11 +5078,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = 6,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 8,
             },
         },
     },
@@ -5105,14 +5097,6 @@ GameConstant.skillPresets = {
                 id    = 4,
                 level = 2,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
@@ -5122,11 +5106,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = 6,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 4,
             },
             {
                 id    = 6,
@@ -5151,30 +5131,14 @@ GameConstant.skillPresets = {
             energyRequirement = 2,
             {
                 id    = 12,
-                level = 5,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 4,
             },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 20,
-                level = 16,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 15,
             },
         },
     },
@@ -5196,7 +5160,7 @@ GameConstant.skillPresets = {
             },
         },
         active1 = {
-            energyRequirement = 4,
+            energyRequirement = 3,
             {
                 id    = 5,
                 level = 1,
@@ -5205,17 +5169,9 @@ GameConstant.skillPresets = {
                 id    = 9,
                 level = 2,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
-            energyRequirement = 7,
+            energyRequirement = 6,
             {
                 id    = 5,
                 level = 2,
@@ -5223,14 +5179,6 @@ GameConstant.skillPresets = {
             {
                 id    = 9,
                 level = 4,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
             },
         },
     },
@@ -5240,7 +5188,7 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 32,
-                level = 2,
+                level = 3,
             },
             {
                 id    = 40,
@@ -5274,15 +5222,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 32,
-                level = 2,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 4,
             },
         },
     },
@@ -5305,20 +5245,12 @@ GameConstant.skillPresets = {
                 id    = 1,
                 level = 6,
             },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 1,
                 level = 12,
-            },
-            {
-                id    = 2,
-                level = 2,
             },
         },
     },
@@ -5329,10 +5261,6 @@ GameConstant.skillPresets = {
             {
                 id    = 7,
                 level = 1,
-            },
-            {
-                id    = 30,
-                level = 2,
             },
             {
                 id    = 36,
@@ -5349,14 +5277,6 @@ GameConstant.skillPresets = {
                 id    = 30,
                 level = 2,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
@@ -5366,15 +5286,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 30,
-                level = 6,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 4,
             },
         },
     },
@@ -5397,14 +5309,6 @@ GameConstant.skillPresets = {
                 id    = 5,
                 level = 1,
             },
-            {
-                id    = 1,
-                level = 3,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 9,
@@ -5414,14 +5318,6 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 5,
-                level = 2,
-            },
-            {
-                id    = 1,
-                level = 4,
-            },
-            {
-                id    = 2,
                 level = 2,
             },
         },
@@ -5457,10 +5353,6 @@ GameConstant.skillPresets = {
                 id    = 16,
                 level = 1,
             },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
@@ -5475,10 +5367,6 @@ GameConstant.skillPresets = {
             {
                 id    = 16,
                 level = 1,
-            },
-            {
-                id    = 2,
-                level = 2,
             },
         },
     },
@@ -5539,37 +5427,21 @@ GameConstant.skillPresets = {
             energyRequirement = 3,
             {
                 id    = 36,
-                level = 3,
+                level = 4,
             },
             {
                 id    = 53,
                 level = 1,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
             },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 36,
-                level = 6,
+                level = 8,
             },
             {
                 id    = 53,
-                level = 2,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
                 level = 2,
             },
         },
@@ -5589,28 +5461,12 @@ GameConstant.skillPresets = {
                 id    = 14,
                 level = 6,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 14,
-                level = 14,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
+                level = 12,
             },
         },
     },
@@ -5645,14 +5501,6 @@ GameConstant.skillPresets = {
                 id    = 51,
                 level = 1,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            }
         },
         active2 = {
             energyRequirement = 8,
@@ -5662,14 +5510,10 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 34,
-                level = 10,
+                level = 8,
             },
             {
                 id    = 51,
-                level = 2,
-            },
-            {
-                id    = 2,
                 level = 2,
             },
         },
@@ -5689,28 +5533,12 @@ GameConstant.skillPresets = {
                 id    = 13,
                 level = 4,
             },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 22,
                 level = 16,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 2,
-                level = 2,
             },
         },
     },
