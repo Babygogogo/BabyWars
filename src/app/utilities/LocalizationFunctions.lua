@@ -220,6 +220,15 @@ local s_Texts = {
             elseif (skillID == 43) then return "使我方车辆系受到的攻击伤害变为基础的"
             elseif (skillID == 44) then return "使我方近战机械部队受到的攻击伤害变为基础的"
             elseif (skillID == 45) then return "使我方运输系（不含炮舰）受到的攻击伤害变为基础的"
+            elseif (skillID == 46) then return "改变我方所有近战部队的移动力，幅度为"
+            elseif (skillID == 47) then return "改变我方所有远程部队的移动力，幅度为"
+            elseif (skillID == 48) then return "改变我方所有陆军的移动力，幅度为"
+            elseif (skillID == 49) then return "改变我方所有空军的移动力，幅度为"
+            elseif (skillID == 50) then return "改变我方所有海军的移动力，幅度为"
+            elseif (skillID == 51) then return "改变我方所有步兵系的移动力，幅度为"
+            elseif (skillID == 52) then return "改变我方所有车辆系的移动力，幅度为"
+            elseif (skillID == 53) then return "改变我方所有近战机械部队的移动力，幅度为"
+            elseif (skillID == 54) then return "改变我方所有运输系（不含炮舰）的移动力，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -274,6 +283,15 @@ local s_Texts = {
             elseif (skillID == 43) then return "车辆系防御力"
             elseif (skillID == 44) then return "近战机械防御力"
             elseif (skillID == 45) then return "运输系防御力"
+            elseif (skillID == 46) then return "近战系移动力"
+            elseif (skillID == 47) then return "远程系移动力"
+            elseif (skillID == 48) then return "陆军移动力"
+            elseif (skillID == 49) then return "空军移动力"
+            elseif (skillID == 50) then return "海军移动力"
+            elseif (skillID == 51) then return "步兵系移动力"
+            elseif (skillID == 52) then return "车辆系移动力"
+            elseif (skillID == 53) then return "近战机械移动力"
+            elseif (skillID == 54) then return "运输系移动力"
             else                        return "未知5:" .. (skillID or "")
             end
         end,

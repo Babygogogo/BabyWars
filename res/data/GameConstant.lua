@@ -878,12 +878,22 @@ GameConstant.categories = {
 
     ["SkillCategoryPassiveMovement"] = {
         28,
+        54,
     },
 
     ["SkillCategoryActiveMovement"] = {
         6,
         8,
         28,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
     },
 
     ["SkillCategoryPassiveAttackRange"] = {
@@ -4035,10 +4045,10 @@ GameConstant.skills = {
         modifierUnit = "",
         levels = {
             [1] = {modifier = 1, pointsPassive = nil, pointsActive = 150, minEnergy = 2},
-            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 350, minEnergy = 4},
-            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 600, minEnergy = 6},
-            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 900, minEnergy = 8},
-            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 1250, minEnergy = 10},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 300, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 450, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 600, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 750, minEnergy = 10},
         },
     },
 
@@ -4323,19 +4333,29 @@ GameConstant.skills = {
     -- Modify the defense power regarding to money of the owner player.
     [21] = {
         minLevel     = 1,
-        maxLevel     = 10,
+        maxLevel     = 20,
         modifierUnit = "%",
         levels       = {
-            [1] = {modifier = 5, pointsPassive = 80, pointsActive = 80, minEnergy = 1},
-            [2] = {modifier = 10, pointsPassive = 160, pointsActive = 160, minEnergy = 2},
-            [3] = {modifier = 15, pointsPassive = 240, pointsActive = 240, minEnergy = 3},
-            [4] = {modifier = 20, pointsPassive = 320, pointsActive = 320, minEnergy = 4},
-            [5] = {modifier = 25, pointsPassive = 400, pointsActive = 400, minEnergy = 5},
-            [6] = {modifier = 30, pointsPassive = 480, pointsActive = 480, minEnergy = 6},
-            [7] = {modifier = 35, pointsPassive = 560, pointsActive = 560, minEnergy = 7},
-            [8] = {modifier = 40, pointsPassive = 640, pointsActive = 640, minEnergy = 8},
-            [9] = {modifier = 45, pointsPassive = 720, pointsActive = 720, minEnergy = 9},
-            [10] = {modifier = 50, pointsPassive = 800, pointsActive = 800, minEnergy = 10},
+            [1] = {modifier = 2, pointsPassive = 50, pointsActive = 30, minEnergy = 1},
+            [2] = {modifier = 4, pointsPassive = 100, pointsActive = 60, minEnergy = 1},
+            [3] = {modifier = 6, pointsPassive = 150, pointsActive = 90, minEnergy = 1},
+            [4] = {modifier = 8, pointsPassive = 200, pointsActive = 120, minEnergy = 2},
+            [5] = {modifier = 10, pointsPassive = 250, pointsActive = 150, minEnergy = 2},
+            [6] = {modifier = 12, pointsPassive = 300, pointsActive = 180, minEnergy = 2},
+            [7] = {modifier = 14, pointsPassive = 350, pointsActive = 210, minEnergy = 3},
+            [8] = {modifier = 16, pointsPassive = 400, pointsActive = 240, minEnergy = 3},
+            [9] = {modifier = 18, pointsPassive = 450, pointsActive = 270, minEnergy = 3},
+            [10] = {modifier = 20, pointsPassive = 500, pointsActive = 300, minEnergy = 4},
+            [11] = {modifier = 22, pointsPassive = 550, pointsActive = 330, minEnergy = 4},
+            [12] = {modifier = 24, pointsPassive = 600, pointsActive = 360, minEnergy = 4},
+            [13] = {modifier = 26, pointsPassive = 650, pointsActive = 390, minEnergy = 5},
+            [14] = {modifier = 28, pointsPassive = 700, pointsActive = 420, minEnergy = 5},
+            [15] = {modifier = 30, pointsPassive = 750, pointsActive = 450, minEnergy = 5},
+            [16] = {modifier = 32, pointsPassive = 800, pointsActive = 480, minEnergy = 6},
+            [17] = {modifier = 34, pointsPassive = 850, pointsActive = 510, minEnergy = 6},
+            [18] = {modifier = 36, pointsPassive = 900, pointsActive = 540, minEnergy = 6},
+            [19] = {modifier = 38, pointsPassive = 950, pointsActive = 570, minEnergy = 7},
+            [20] = {modifier = 40, pointsPassive = 1000, pointsActive = 600, minEnergy = 7},
         },
     },
 
@@ -4896,6 +4916,132 @@ GameConstant.skills = {
             [10] = {modifier = 50, pointsPassive = 150, pointsActive = 150, minEnergy = 5},
             [11] = {modifier = 55, pointsPassive = 165, pointsActive = 165, minEnergy = 6},
             [12] = {modifier = 60, pointsPassive = 180, pointsActive = 180, minEnergy = 6},
+        },
+    },
+
+    -- Modify movements of direct units of the owner player.
+    [46] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 135, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 270, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 405, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 540, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 675, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of indirect units of the owner player.
+    [47] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 120, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 240, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 360, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 480, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 600, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of ground units of the owner player.
+    [48] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 135, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 270, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 405, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 540, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 675, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of air units of the owner player.
+    [49] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 105, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 210, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 315, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 420, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 525, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of naval units of the owner player.
+    [50] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 105, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 210, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 315, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 420, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 525, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of infantry units of the owner player.
+    [51] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 75, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 150, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 225, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 300, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 375, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of vehicle units of the owner player.
+    [52] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 120, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 240, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 360, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 480, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 600, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of direct non-infantry units of the owner player.
+    [53] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = nil, pointsActive = 120, minEnergy = 2},
+            [2] = {modifier = 2, pointsPassive = nil, pointsActive = 240, minEnergy = 4},
+            [3] = {modifier = 3, pointsPassive = nil, pointsActive = 360, minEnergy = 6},
+            [4] = {modifier = 4, pointsPassive = nil, pointsActive = 480, minEnergy = 8},
+            [5] = {modifier = 5, pointsPassive = nil, pointsActive = 600, minEnergy = 10},
+        },
+    },
+
+    -- Modify movements of transport units of the owner player.
+    [54] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 100, pointsActive = 45, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 200, pointsActive = 90, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 300, pointsActive = 135, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 400, pointsActive = 180, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 500, pointsActive = 225, minEnergy = 5},
         },
     },
 }

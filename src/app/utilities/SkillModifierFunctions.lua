@@ -120,7 +120,7 @@ local function getProductionCostModifierForSkillGroup(modelSkillGroup, slotsCoun
     return modifier
 end
 
-local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
+local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount, modelUnit)
     if (not modelSkillGroup) then
         return 0
     end
@@ -129,9 +129,29 @@ local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
     local skills   = modelSkillGroup:getAllSkills()
     for i = 1, slotsCount do
         local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 6)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        if (skill) then
+            local skillID = skill.id
+            if (skillID == 6) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 46) and (isTypeInCategory(modelUnit:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 47) and (isTypeInCategory(modelUnit:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 48) and (isTypeInCategory(modelUnit:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 49) and (isTypeInCategory(modelUnit:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 50) and (isTypeInCategory(modelUnit:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 51) and (isTypeInCategory(modelUnit:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 52) and (isTypeInCategory(modelUnit:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 53) and (isTypeInCategory(modelUnit:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 54) and (isTypeInCategory(modelUnit:getUnitType(), "TransportUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            end
         end
     end
 
@@ -322,9 +342,9 @@ function SkillModifierFunctions.getProductionCostModifier(configuration, tiledID
         getProductionCostModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT, tiledID)
 end
 
-function SkillModifierFunctions.getMoveRangeModifier(configuration)
-    return getMoveRangeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
-        getMoveRangeModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+function SkillModifierFunctions.getMoveRangeModifier(configuration, modelUnit)
+    return getMoveRangeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT, modelUnit) +
+        getMoveRangeModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT, modelUnit)
 end
 
 function SkillModifierFunctions.getAttackRangeModifier(configuration)
