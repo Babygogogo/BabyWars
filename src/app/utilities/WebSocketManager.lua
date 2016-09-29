@@ -38,6 +38,10 @@ local function heartbeat()
 end
 
 local function cleanup()
+    s_Socket:unregisterScriptHandler(cc.WEBSOCKET_OPEN)
+    s_Socket:unregisterScriptHandler(cc.WEBSOCKET_MESSAGE)
+    s_Socket:unregisterScriptHandler(cc.WEBSOCKET_CLOSE)
+    s_Socket:unregisterScriptHandler(cc.WEBSOCKET_ERROR)
     s_Socket = nil
 
     if (s_HeartbeatScheduleID) then
@@ -55,13 +59,13 @@ end
 
 function WebSocketManager.init()
     assert(not WebSocketManager.isInitialized(), "WebSocketManager.init() the socket has been initialized.")
-    s_Socket              = cc.WebSocket:create(SERVER_URL)
-    s_HeartbeatCounter    = 0
-    s_IsHeartbeatAnswered = true
+    s_Socket = cc.WebSocket:create(SERVER_URL)
 
     s_Socket:registerScriptHandler(function()
         ActorManager.getRootActor():getModel():onWebSocketEvent("open")
 
+        s_HeartbeatCounter    = 0
+        s_IsHeartbeatAnswered = true
         s_HeartbeatScheduleID = s_Scheduler:scheduleScriptFunc(heartbeat, HEARTBEAT_INTERVAL, false)
         heartbeat()
     end, cc.WEBSOCKET_OPEN)
