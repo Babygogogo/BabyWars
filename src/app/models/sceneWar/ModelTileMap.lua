@@ -237,6 +237,14 @@ function ModelTileMap:getMapSize()
     return self.m_MapSize
 end
 
+function ModelTileMap:getMapName()
+    return requireMapData(self.m_TemplateName).warFieldName
+end
+
+function ModelTileMap:getAuthorName()
+    return requireMapData(self.m_TemplateName).authorName
+end
+
 function ModelTileMap:getModelTile(gridIndex)
     assert(GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize()),
         "ModelTileMap-getModelTile() invalid param gridIndex: " .. toErrMsg(gridIndex))

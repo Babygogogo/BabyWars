@@ -117,18 +117,20 @@ local s_Texts = {
     [3] = {
         [1] = function(textType)
             if     (textType == "Configuration")          then return "配 置"
-            elseif (textType == "SetSkillPoint")          then return "设定技能点数上限"
+            elseif (textType == "SetSkillPoint")          then return "设定基准技能点数"
             elseif (textType == "PassiveSkill")           then return "日 常 技 能"
             elseif (textType == "ActiveSkill")            then return "主 动 技 能"
             elseif (textType == "Skill")                  then return "技 能"
-            elseif (textType == "MaxPoints")              then return "最大技能点"
-            elseif (textType == "TotalPoints")            then return "合计技能点"
+            elseif (textType == "MaxPoints")              then return "可用总技能点"
+            elseif (textType == "BasePoints")             then return "基准技能点"
+            elseif (textType == "TotalPoints")            then return "已用技能点"
             elseif (textType == "SkillPoints")            then return "技能点"
             elseif (textType == "EnergyRequirement")      then return "能量槽长度"
             elseif (textType == "MinEnergy")              then return "最小能量槽"
             elseif (textType == "SetEnergyRequirement")   then return "设定能量槽长度"
             elseif (textType == "Level")                  then return "等级"
             elseif (textType == "Modifier")               then return "幅度"
+            elseif (textType == "Default")                then return "默认"
             elseif (textType == "Clear")                  then return "清 空"
             elseif (textType == "Enable")                 then return "启 用"
             elseif (textType == "Disable")                then return "禁 用"
@@ -156,6 +158,7 @@ local s_Texts = {
             elseif (textType == "SetEnergyRequirement")   then return "Set Energy"
             elseif (textType == "Level")                  then return "Level"
             elseif (textType == "Modifier")               then return "Modifier"
+            elseif (textType == "Default")                then return "Default"
             elseif (textType == "Clear")                  then return "Clear"
             elseif (textType == "Enable")                 then return "Enable"
             elseif (textType == "Disable")                then return "Disable"
@@ -196,10 +199,36 @@ local s_Texts = {
             elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
-            elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限，幅度为"
+            elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限（不高于上限），幅度为"
             elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
             elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
             elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
+            elseif (skillID == 29) then return "使我方所有近战部队的攻击伤害变为基础的"
+            elseif (skillID == 30) then return "使我方所有远程部队的攻击伤害变为基础的"
+            elseif (skillID == 31) then return "使我方所有陆军的攻击伤害变为基础的"
+            elseif (skillID == 32) then return "使我方所有空军的攻击伤害变为基础的"
+            elseif (skillID == 33) then return "使我方所有海军的攻击伤害变为基础的"
+            elseif (skillID == 34) then return "使我方步兵系的攻击伤害变为基础的"
+            elseif (skillID == 35) then return "使我方车辆系的攻击伤害变为基础的"
+            elseif (skillID == 36) then return "使我方近战机械部队的攻击伤害变为基础的"
+            elseif (skillID == 37) then return "使我方所有近战部队受到的攻击伤害变为基础的"
+            elseif (skillID == 38) then return "使我方所有远程部队受到的攻击伤害变为基础的"
+            elseif (skillID == 39) then return "使我方所有陆军受到的攻击伤害变为基础的"
+            elseif (skillID == 40) then return "使我方所有空军受到的攻击伤害变为基础的"
+            elseif (skillID == 41) then return "使我方所有海军受到的攻击伤害变为基础的"
+            elseif (skillID == 42) then return "使我方步兵系受到的攻击伤害变为基础的"
+            elseif (skillID == 43) then return "使我方车辆系受到的攻击伤害变为基础的"
+            elseif (skillID == 44) then return "使我方近战机械部队受到的攻击伤害变为基础的"
+            elseif (skillID == 45) then return "使我方运输系（不含炮舰）受到的攻击伤害变为基础的"
+            elseif (skillID == 46) then return "改变我方所有近战部队的移动力，幅度为"
+            elseif (skillID == 47) then return "改变我方所有远程部队的移动力，幅度为"
+            elseif (skillID == 48) then return "改变我方所有陆军的移动力，幅度为"
+            elseif (skillID == 49) then return "改变我方所有空军的移动力，幅度为"
+            elseif (skillID == 50) then return "改变我方所有海军的移动力，幅度为"
+            elseif (skillID == 51) then return "改变我方所有步兵系的移动力，幅度为"
+            elseif (skillID == 52) then return "改变我方所有车辆系的移动力，幅度为"
+            elseif (skillID == 53) then return "改变我方所有近战机械部队的移动力，幅度为"
+            elseif (skillID == 54) then return "改变我方所有运输系（不含炮舰）的移动力，幅度为"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -237,6 +266,32 @@ local s_Texts = {
             elseif (skillID == 26) then return "全军晋升"
             elseif (skillID == 27) then return "全军自带晋升"
             elseif (skillID == 28) then return "完美移动"
+            elseif (skillID == 29) then return "近战系攻击力"
+            elseif (skillID == 30) then return "远程系攻击力"
+            elseif (skillID == 31) then return "陆军攻击力"
+            elseif (skillID == 32) then return "空军攻击力"
+            elseif (skillID == 33) then return "海军攻击力"
+            elseif (skillID == 34) then return "步兵系攻击力"
+            elseif (skillID == 35) then return "车辆系攻击力"
+            elseif (skillID == 36) then return "近战机械攻击力"
+            elseif (skillID == 37) then return "近战系防御力"
+            elseif (skillID == 38) then return "远程系防御力"
+            elseif (skillID == 39) then return "陆军防御力"
+            elseif (skillID == 40) then return "空军防御力"
+            elseif (skillID == 41) then return "海军防御力"
+            elseif (skillID == 42) then return "步兵系防御力"
+            elseif (skillID == 43) then return "车辆系防御力"
+            elseif (skillID == 44) then return "近战机械防御力"
+            elseif (skillID == 45) then return "运输系防御力"
+            elseif (skillID == 46) then return "近战系移动力"
+            elseif (skillID == 47) then return "远程系移动力"
+            elseif (skillID == 48) then return "陆军移动力"
+            elseif (skillID == 49) then return "空军移动力"
+            elseif (skillID == 50) then return "海军移动力"
+            elseif (skillID == 51) then return "步兵系移动力"
+            elseif (skillID == 52) then return "车辆系移动力"
+            elseif (skillID == 53) then return "近战机械移动力"
+            elseif (skillID == 54) then return "运输系移动力"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -448,11 +503,11 @@ local s_Texts = {
         [2] = function() return "Weather" end,
     },
     [37] = {
-        [1] = function() return "技 能 配 置" end,
+        [1] = function() return "我 方 技 能 配 置" end,
         [2] = function() return "Skills"     end,
     },
     [38] = {
-        [1] = function() return "技 能 点 上 限"    end,
+        [1] = function() return "基 准 技 能 点 上 限"    end,
         [2] = function() return "Max Skill Points" end,
     },
     [39] = {
@@ -591,55 +646,65 @@ local s_Texts = {
     },
     [65] = {
         [1] = function(textType)
-            if     (textType == "WarMenu")       then return "战 场 菜 单"
-            elseif (textType == "QuitWar")       then return "退 出"
-            elseif (textType == "FindIdleUnit")  then return "寻 找 空 闲 部 队"
-            elseif (textType == "FindIdleTile")  then return "寻 找 空 闲 建 筑"
-            elseif (textType == "WarInfo")       then return "战 场 信 息"
-            elseif (textType == "SkillInfo")     then return "技 能 信 息"
-            elseif (textType == "ActivateSkill") then return "发 动 技 能"
-            elseif (textType == "HideUI")        then return "隐 藏 界 面"
-            elseif (textType == "DamageChart")   then return "基 础 伤 害 表"
-            elseif (textType == "Surrender")     then return "投 降"
-            elseif (textType == "ReloadWar")     then return "重 新 载 入"
-            elseif (textType == "EndTurn")       then return "结 束 回 合"
-            elseif (textType == "Player")        then return "玩 家"
-            elseif (textType == "Nickname")      then return "昵 称"
-            elseif (textType == "Fund")          then return "资 金"
-            elseif (textType == "Income")        then return "收 入"
-            elseif (textType == "Energy")        then return "能 量"
-            elseif (textType == "UnitsCount")    then return "部队数量"
-            elseif (textType == "TilesCount")    then return "据点数量"
-            elseif (textType == "Lost")          then return "已战败"
-            elseif (textType == "MainWeapon")    then return "主武器"
-            elseif (textType == "SubWeapon")     then return "副武器"
-            else                                      return "未知65:" .. (textType or "")
+            if     (textType == "WarMenu")             then return "战 场 菜 单"
+            elseif (textType == "QuitWar")             then return "退 出"
+            elseif (textType == "FindIdleUnit")        then return "寻 找 空 闲 部 队"
+            elseif (textType == "FindIdleTile")        then return "寻 找 空 闲 建 筑"
+            elseif (textType == "WarInfo")             then return "战 场 信 息"
+            elseif (textType == "SkillInfo")           then return "技 能 信 息"
+            elseif (textType == "ActivateSkill")       then return "发 动 技 能"
+            elseif (textType == "HideUI")              then return "隐 藏 界 面"
+            elseif (textType == "DamageChart")         then return "基 础 伤 害 表"
+            elseif (textType == "Surrender")           then return "投 降"
+            elseif (textType == "ReloadWar")           then return "重 新 载 入"
+            elseif (textType == "EndTurn")             then return "结 束 回 合"
+            elseif (textType == "MapName")             then return "地图"
+            elseif (textType == "Author")              then return "作者"
+            elseif (textType == "WarID")               then return "战局代号"
+            elseif (textType == "Player")              then return "玩 家"
+            elseif (textType == "Nickname")            then return "昵 称"
+            elseif (textType == "Fund")                then return "资 金"
+            elseif (textType == "Income")              then return "收 入"
+            elseif (textType == "Energy")              then return "能 量"
+            elseif (textType == "DamageCostPerEnergy") then return "每单位能量价值"
+            elseif (textType == "UnitsCount")          then return "部队数量"
+            elseif (textType == "UnitsValue")          then return "部队基础价值"
+            elseif (textType == "TilesCount")          then return "据点数量"
+            elseif (textType == "Lost")                then return "已战败"
+            elseif (textType == "MainWeapon")          then return "主武器"
+            elseif (textType == "SubWeapon")           then return "副武器"
+            else                                            return "未知65:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "WarMenu")       then return "War Menu"
-            elseif (textType == "QuitWar")       then return "Quit"
-            elseif (textType == "FindIdleUnit")  then return "FindIdleUnit"
-            elseif (textType == "FindIdleTile")  then return "FildIdleTile"
-            elseif (textType == "WarInfo")       then return "War Info"
-            elseif (textType == "SkillInfo")     then return "Skill Info"
-            elseif (textType == "ActivateSkill") then return "ActivateSkill"
-            elseif (textType == "HideUI")        then return "Hide UI"
-            elseif (textType == "DamageChart")   then return "DamageChart"
-            elseif (textType == "Surrender")     then return "Surrender"
-            elseif (textType == "ReloadWar")     then return "Reload"
-            elseif (textType == "EndTurn")       then return "End Turn"
-            elseif (textType == "Player")        then return "Player"
-            elseif (textType == "Nickname")      then return "Nickname"
-            elseif (textType == "Fund")          then return "Fund"
-            elseif (textType == "Income")        then return "Income"
-            elseif (textType == "Energy")        then return "Energy"
-            elseif (textType == "UnitsCount")    then return "Num of units"
-            elseif (textType == "TilesCount")    then return "Num of bases"
-            elseif (textType == "Lost")          then return "Lost"
-            elseif (textType == "MainWeapon")    then return "Main"
-            elseif (textType == "SubWeapon")     then return "Sub"
-            else                                      return "Unknown65:" .. (textType or "")
+            if     (textType == "WarMenu")             then return "War Menu"
+            elseif (textType == "QuitWar")             then return "Quit"
+            elseif (textType == "FindIdleUnit")        then return "FindIdleUnit"
+            elseif (textType == "FindIdleTile")        then return "FildIdleTile"
+            elseif (textType == "WarInfo")             then return "War Info"
+            elseif (textType == "SkillInfo")           then return "Skill Info"
+            elseif (textType == "ActivateSkill")       then return "ActivateSkill"
+            elseif (textType == "HideUI")              then return "Hide UI"
+            elseif (textType == "DamageChart")         then return "DamageChart"
+            elseif (textType == "Surrender")           then return "Surrender"
+            elseif (textType == "ReloadWar")           then return "Reload"
+            elseif (textType == "EndTurn")             then return "End Turn"
+            elseif (textType == "MapName")             then return "Map Name"
+            elseif (textType == "Author")              then return "Author"
+            elseif (textType == "WarID")               then return "War ID"
+            elseif (textType == "Player")              then return "Player"
+            elseif (textType == "Nickname")            then return "Nickname"
+            elseif (textType == "Fund")                then return "Fund"
+            elseif (textType == "Income")              then return "Income"
+            elseif (textType == "Energy")              then return "Energy"
+            elseif (textType == "DamageCostPerEnergy") then return "DamageCostPerEnergy"
+            elseif (textType == "UnitsCount")          then return "Num of units"
+            elseif (textType == "UnitsValue")          then return "Value of units"
+            elseif (textType == "TilesCount")          then return "Num of bases"
+            elseif (textType == "Lost")                then return "Lost"
+            elseif (textType == "MainWeapon")          then return "Main"
+            elseif (textType == "SubWeapon")           then return "Sub"
+            else                                            return "Unknown65:" .. (textType or "")
             end
         end,
     },
@@ -776,7 +841,7 @@ local s_Texts = {
     [81] = {
         [1] = function(errType, text)
             text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "网络传输出现错误。将自动刷新场景。" .. text
+            if     (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
             elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
             elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
             elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text

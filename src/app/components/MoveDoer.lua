@@ -75,8 +75,9 @@ end
 --------------------------------------------------------------------------------
 function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
-    return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration()))
+    local owner       = self.m_Owner
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(owner:getPlayerIndex())
+    return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration(), owner))
 end
 
 function MoveDoer:getMoveType()

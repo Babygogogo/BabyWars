@@ -110,7 +110,7 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                     modelWarConfigurator:setPopUpPanelEnabled(true)
                         :setPopUpPanelText(string.format("%s %s:\n%s",
                             getLocalizedText(3, "Configuration"), presetName,
-                            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+                            SkillDescriptionFunctions.getBriefDescription(modelSkillConfiguration)
                         ))
                 end,
             }
@@ -299,7 +299,7 @@ function ModelJoinWarSelector:doActionGetSkillConfiguration(action)
         local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
         modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
             getLocalizedText(3, "Configuration"), action.configurationID,
-            SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
+            SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
         ))
     end
 

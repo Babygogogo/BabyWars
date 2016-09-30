@@ -101,7 +101,7 @@ local function onEvtSystemRequestDoAction(self, event)
     elseif (actionName == "Message")               then doActionMessage(              self, event)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
     else
-        print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action.")
+        print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action: " .. (actionName or ""))
     end
 end
 

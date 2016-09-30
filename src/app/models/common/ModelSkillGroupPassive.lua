@@ -84,6 +84,17 @@ function ModelSkillGroupPassive:isValid()
     end
 end
 
+function ModelSkillGroupPassive:isEmpty()
+    local slots = self.m_Slots
+    for i = 1, SLOTS_COUNT do
+        if (slots[i]) then
+            return false
+        end
+    end
+
+    return true
+end
+
 function ModelSkillGroupPassive:getSkillPoints()
     local totalPoints = 0
     local slots       = self.m_Slots

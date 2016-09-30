@@ -4,6 +4,7 @@ local SkillModifierFunctions = {}
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 
 local getSkillModifier = GameConstantFunctions.getSkillModifier
+local isTypeInCategory = GameConstantFunctions.isTypeInCategory
 
 local PASSIVE_SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
 local ACTIVE_SLOTS_COUNT  = GameConstantFunctions.getActiveSkillSlotsCount()
@@ -32,6 +33,22 @@ local function getAttackModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 23) then
                 local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(attackerGridIndex)
                 modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            elseif ((skillID == 29) and (isTypeInCategory(attacker:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 30) and (isTypeInCategory(attacker:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 31) and (isTypeInCategory(attacker:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 32) and (isTypeInCategory(attacker:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 33) and (isTypeInCategory(attacker:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 34) and (isTypeInCategory(attacker:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 35) and (isTypeInCategory(attacker:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 36) and (isTypeInCategory(attacker:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end
@@ -60,6 +77,24 @@ local function getDefenseModifierForSkillGroup(modelSkillGroup, slotsCount,
             elseif (skillID == 24) then
                 local modelTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
                 modifier = modifier + getSkillModifier(skillID, skill.level) * modelTile:getNormalizedDefenseBonusAmount()
+            elseif ((skillID == 37) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 38) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 39) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 40) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 41) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 42) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 43) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 44) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 45) and (target.getUnitType) and (isTypeInCategory(target:getUnitType(), "TransportUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
             end
         end
     end
@@ -85,7 +120,7 @@ local function getProductionCostModifierForSkillGroup(modelSkillGroup, slotsCoun
     return modifier
 end
 
-local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
+local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount, modelUnit)
     if (not modelSkillGroup) then
         return 0
     end
@@ -94,9 +129,29 @@ local function getMoveRangeModifierForSkillGroup(modelSkillGroup, slotsCount)
     local skills   = modelSkillGroup:getAllSkills()
     for i = 1, slotsCount do
         local skill = skills[i]
-        if ((skill)          and
-            (skill.id == 6)) then
-            modifier = modifier + getSkillModifier(skill.id, skill.level)
+        if (skill) then
+            local skillID = skill.id
+            if (skillID == 6) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 46) and (isTypeInCategory(modelUnit:getUnitType(), "DirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 47) and (isTypeInCategory(modelUnit:getUnitType(), "IndirectUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 48) and (isTypeInCategory(modelUnit:getUnitType(), "GroundUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 49) and (isTypeInCategory(modelUnit:getUnitType(), "AirUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 50) and (isTypeInCategory(modelUnit:getUnitType(), "NavalUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 51) and (isTypeInCategory(modelUnit:getUnitType(), "InfantryUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 52) and (isTypeInCategory(modelUnit:getUnitType(), "VehicleUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 53) and (isTypeInCategory(modelUnit:getUnitType(), "DirectMachineUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif ((skillID == 54) and (isTypeInCategory(modelUnit:getUnitType(), "TransportUnits"))) then
+                modifier = modifier + getSkillModifier(skillID, skill.level)
+            end
         end
     end
 
@@ -287,9 +342,9 @@ function SkillModifierFunctions.getProductionCostModifier(configuration, tiledID
         getProductionCostModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT, tiledID)
 end
 
-function SkillModifierFunctions.getMoveRangeModifier(configuration)
-    return getMoveRangeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
-        getMoveRangeModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+function SkillModifierFunctions.getMoveRangeModifier(configuration, modelUnit)
+    return getMoveRangeModifierForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT, modelUnit) +
+        getMoveRangeModifierForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT, modelUnit)
 end
 
 function SkillModifierFunctions.getAttackRangeModifier(configuration)

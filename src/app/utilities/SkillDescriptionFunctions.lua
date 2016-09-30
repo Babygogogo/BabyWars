@@ -20,10 +20,6 @@ local SKILL_GROUP_ID_ACTIVE2 = ModelSkillConfiguration.getSkillGroupIdActive2()
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getDescriptionForMaxSkillPoints(points)
-    return string.format("%s: %d", getLocalizedText(3, "MaxPoints"), points)
-end
-
 local function transformModifier1(modifier, unit)
     return string.format("%d%s", 100 + modifier, unit)
 end
@@ -74,10 +70,40 @@ local function getSkillModifierForDisplay(id, level)
     elseif (id == 25) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 26) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 27) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 29) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 30) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 31) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 32) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 33) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 34) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 35) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 36) then return transformModifier1(modifier,  modifierUnit)
+    elseif (id == 37) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 38) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 39) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 40) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 41) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 42) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 43) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 44) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 45) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 46) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 47) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 48) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 49) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 50) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 51) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 52) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 53) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 54) then return transformModifier3(modifier,  modifierUnit)
     end
 end
 
-local function getDescriptionForSingleSkill(id, level, isPassive)
+local function getFullDescriptionForBaseSkillPoints(points)
+    return string.format("%s: %d", getLocalizedText(3, "BasePoints"), points)
+end
+
+local function getFullDescriptionForSingleSkill(id, level, isPassive)
     if (isPassive) then
         return string.format("%s      %s: %d      %s: %.2f\n%s %s",
             getLocalizedText(5, id),
@@ -96,7 +122,14 @@ local function getDescriptionForSingleSkill(id, level, isPassive)
     end
 end
 
-local function getDescriptionForSkillGroup(skillGroup, skillGroupID)
+local function getBriefDescriptionForSingleSkill(id, level)
+    return string.format("%s\n%s %s",
+        getLocalizedText(5, id),
+        getLocalizedText(4, id), getSkillModifierForDisplay(id, level)
+    )
+end
+
+local function getFullDescriptionForSkillGroup(skillGroup, skillGroupID)
     local isPassive = skillGroupID == SKILL_GROUP_ID_PASSIVE
     local prefix    = (isPassive)                                                     and
         (string.format("%s : ",    getLocalizedText(3, "PassiveSkill")))              or
@@ -123,9 +156,48 @@ local function getDescriptionForSkillGroup(skillGroup, skillGroupID)
     for i = 1, slotsCount do
         local skill = skills[i]
         if (skill) then
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getDescriptionForSingleSkill(skill.id, skill.level, isPassive))
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getFullDescriptionForSingleSkill(skill.id, skill.level, isPassive))
         else
             descriptions[#descriptions + 1] = string.format("%d. %s", i, getLocalizedText(3, "None"))
+        end
+    end
+
+    return table.concat(descriptions, "\n")
+end
+
+local function getBriefDescriptionForSkillGroup(skillGroup, skillGroupID)
+    local isPassive = skillGroupID == SKILL_GROUP_ID_PASSIVE
+    local prefix    = (isPassive)                                                     and
+        (string.format("%s : ",    getLocalizedText(3, "PassiveSkill")))              or
+        (string.format("%s %d : ", getLocalizedText(3, "ActiveSkill"), skillGroupID))
+
+    if ((isPassive) and (skillGroup:isEmpty())) then
+        return prefix .. getLocalizedText(3, "None")
+    elseif ((not isPassive) and (not skillGroup:isEnabled())) then
+        return prefix .. getLocalizedText(3, "Disabled")
+    end
+
+    local descriptions = {
+        (isPassive) and
+        (prefix)    or
+        (string.format("%s    %s:   %d", prefix, getLocalizedText(3, "EnergyRequirement"), skillGroup:getEnergyRequirement())),
+    }
+
+    local slotsCount = (isPassive) and (PASSIVE_SLOTS_COUNT) or (ACTIVE_SLOTS_COUNT)
+    local skills     = skillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if (skill) then
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getBriefDescriptionForSingleSkill(skill.id, skill.level))
+        else
+            if (i == 1) then
+                descriptions[#descriptions + 1] = string.format("1. %s", getLocalizedText(3, "None"))
+            end
+
+            for j = i + 1, slotsCount do
+                assert(not skills[j], "SkillDescriptionFunctions-getBriefDescriptionForSkillGroup() invalid skill group: ".. skillGroupID)
+            end
+            break
         end
     end
 
@@ -135,17 +207,30 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function SkillDescriptionFunctions.getDescription(modelSkillConfiguration)
-    local maxSkillPoints = modelSkillConfiguration:getMaxSkillPoints()
-    if (not maxSkillPoints) then
+function SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
+    return string.format("%s\n%s\n\n%s\n\n%s",
+        getFullDescriptionForBaseSkillPoints(modelSkillConfiguration:getBaseSkillPoints()),
+        getFullDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupPassive(), SKILL_GROUP_ID_PASSIVE),
+        getFullDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive1(), SKILL_GROUP_ID_ACTIVE1),
+        getFullDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive2(), SKILL_GROUP_ID_ACTIVE2)
+    )
+end
+
+function SkillDescriptionFunctions.getBriefDescription(modelSkillConfiguration)
+    local skillGroupPassive = modelSkillConfiguration:getModelSkillGroupPassive()
+    local skillGroupActive1 = modelSkillConfiguration:getModelSkillGroupActive1()
+    local skillGroupActive2 = modelSkillConfiguration:getModelSkillGroupActive2()
+    if ((skillGroupPassive:isEmpty())        and
+        (not skillGroupActive1:isEnabled())  and
+        (not skillGroupActive2:isEnabled())) then
         return getLocalizedText(3, "NoSkills")
     end
 
     return string.format("%s\n%s\n\n%s\n\n%s",
-        getDescriptionForMaxSkillPoints(maxSkillPoints),
-        getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupPassive(), SKILL_GROUP_ID_PASSIVE),
-        getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive1(), SKILL_GROUP_ID_ACTIVE1),
-        getDescriptionForSkillGroup(modelSkillConfiguration:getModelSkillGroupActive2(), SKILL_GROUP_ID_ACTIVE2)
+        getFullDescriptionForBaseSkillPoints(modelSkillConfiguration:getBaseSkillPoints()),
+        getBriefDescriptionForSkillGroup(skillGroupPassive, SKILL_GROUP_ID_PASSIVE),
+        getBriefDescriptionForSkillGroup(skillGroupActive1, SKILL_GROUP_ID_ACTIVE1),
+        getBriefDescriptionForSkillGroup(skillGroupActive2, SKILL_GROUP_ID_ACTIVE2)
     )
 end
 
