@@ -15,6 +15,7 @@
 
 local ModelActionPlanner = class("ModelActionPlanner")
 
+local Producible                  = require("src.app.components.Producible")
 local AnimationLoader             = require("src.app.utilities.AnimationLoader")
 local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
 local GridIndexFunctions          = require("src.app.utilities.GridIndexFunctions")
@@ -558,7 +559,10 @@ local function getActionProduceModelUnitOnUnit(self)
             :playAnimationForever(AnimationLoader.getUnitAnimationWithTiledId(produceTiledId))
 
         return {
-            name        = getLocalizedText(78, "ProduceModelUnitOnUnit"),
+            name        = string.format("%s\n%d",
+                getLocalizedText(78, "ProduceModelUnitOnUnit"),
+                Producible.getProductionCostWithTiledId(produceTiledId, getModelPlayerManager())
+            ),
             icon        = icon,
             isAvailable = (focusModelUnit:getCurrentMaterial() >= 1)                      and
                 (focusModelUnit:getMovableProductionCost() <= fund)                       and

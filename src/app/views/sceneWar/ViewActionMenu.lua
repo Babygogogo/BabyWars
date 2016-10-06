@@ -25,7 +25,8 @@ local LIST_VIEW_POS_Y        = 6
 local LIST_VIEW_ITEMS_MARGIN = 10
 
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
-local ITEM_FONT_SIZE          = 25
+local ITEM_FONT_SIZE_SMALL    = 16
+local ITEM_FONT_SIZE_LARGE    = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
@@ -51,7 +52,9 @@ local function setAllButtomConfirmEnabled(self, enabled)
 end
 
 local function createViewAction(itemModel)
-    local label = cc.Label:createWithTTF(itemModel.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
+    local text     = itemModel.name
+    local fontSize = (string.len(text) >= 10) and (ITEM_FONT_SIZE_SMALL) or (ITEM_FONT_SIZE_LARGE)
+    local label    = cc.Label:createWithTTF(text, ITEM_FONT_NAME, fontSize)
     label:ignoreAnchorPointForPosition(true)
 
         :setDimensions(ITEM_ACTION_WIDTH, ITEM_ACTION_HEIGHT)
