@@ -98,52 +98,6 @@ local function updateTileActorsMapWithGridsData(map, mapSize, gridsData)
     end
 end
 
-local function destroyAdjacentModelPlasma(self, gridIndex, mapSize)
-    local modelTile = self:getModelTile(gridIndex)
-    if (modelTile:getTileType() == "Plasma") then
-        modelTile:destroyModelTileObject()
-        self.m_PlasmaGridsToDestroy[#self.m_PlasmaGridsToDestroy + 1] = gridIndex
-
-        for _, g in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, mapSize)) do
-            destroyAdjacentModelPlasma(self, g, mapSize)
-        end
-    end
-end
-
-local function destroyAdjacentViewPlasma(self)
-    if (self.m_PlasmaGridsToDestroy) then
-        for _, gridIndex in pairs(self.m_PlasmaGridsToDestroy) do
-            self:getModelTile(gridIndex):destroyViewTileObject()
-        end
-        self.m_PlasmaGridsToDestroy = nil
-    end
-end
-
---------------------------------------------------------------------------------
--- The callback functions on script events.
---------------------------------------------------------------------------------
-local function onEvtDestroyModelTile(self, event)
-    local gridIndex = event.gridIndex
-    local modelTile = self:getModelTile(gridIndex)
-    if (modelTile:getTileType() == "Meteor") then
-        destroyAdjacentViewPlasma(self)
-        self.m_PlasmaGridsToDestroy = {}
-
-        local mapSize = self:getMapSize()
-        for _, g in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, mapSize)) do
-            destroyAdjacentModelPlasma(self, g, mapSize)
-        end
-    end
-
-    modelTile:destroyModelTileObject()
-    SingletonGetters.getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({name = "EvtModelTileMapUpdated"})
-end
-
-local function onEvtDestroyViewTile(self, event)
-    self:getModelTile(event.gridIndex):destroyViewTileObject()
-    destroyAdjacentViewPlasma(self)
-end
-
 --------------------------------------------------------------------------------
 -- The composition tile actors map.
 --------------------------------------------------------------------------------
@@ -213,19 +167,6 @@ function ModelTileMap:onStartRunning(sceneWarFileName)
     self:forEachModelTile(function(modelTile)
         modelTile:onStartRunning(sceneWarFileName)
     end)
-
-    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
-        :addEventListener("EvtDestroyModelTile", self)
-        :addEventListener("EvtDestroyViewTile",  self)
-
-    return self
-end
-
-function ModelTileMap:onEvent(event)
-    local eventName = event.name
-    if     (eventName == "EvtDestroyModelTile") then onEvtDestroyModelTile(self, event)
-    elseif (eventName == "EvtDestroyViewTile")  then onEvtDestroyViewTile( self, event)
-    end
 
     return self
 end

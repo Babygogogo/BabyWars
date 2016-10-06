@@ -173,6 +173,30 @@ local function getIncomeWithDamageCost(targetDamageCost, modelPlayer)
     return math.floor(targetDamageCost * modifier / 100)
 end
 
+local function getAdjacentPlasmaGridIndexes(modelTileMap, gridIndex)
+    local mapSize     = modelTileMap:getMapSize()
+    local indexes     = {[0] = gridIndex}
+    local searchedMap = {gridIndex.x = {gridIndex.y = true}}
+
+    local i = 0
+    while (i <= #indexes) do
+        for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(indexes[i], mapSize)) do
+            if (modelTileMap:getModelTile(adjacentGridIndex):getTileType() == "Plasma") then
+                local x, y = adjacentGridIndex.x, adjacentGridIndex.y
+                searchedMap[x] = searchedMap[x] or {}
+                if (not searchedMap[x][y]) then
+                    indexes[#indexes + 1] = adjacentGridIndex
+                    searchedMap[x][y] = true
+                end
+            end
+        end
+        i = i + 1
+    end
+
+    indexes[0] = nil
+    return indexes
+end
+
 local function callbackOnWarEndedForClient()
     runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
 end
@@ -300,6 +324,7 @@ local function executeAttack(action)
         Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, attackerGridIndex)
     end
 
+    local plasmaGridIndexes
     local targetNewHP = math.max(0, attackTarget:getCurrentHP() - attackDamage)
     attackTarget:setCurrentHP(targetNewHP)
     if (targetNewHP == 0) then
@@ -308,6 +333,10 @@ local function executeAttack(action)
             Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, targetGridIndex)
         else
             attackTarget:updateWithObjectAndBaseId(0)
+            plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex)
+            for _, gridIndex in ipairs(plasmaGridIndexes) do
+                modelTileMap:getModelTile():updateWithObjectAndBaseId(0)
+            end
         end
     end
 
@@ -332,6 +361,9 @@ local function executeAttack(action)
             else
                 dispatchEvtDestroyViewTile(sceneWarFileName, targetGridIndex)
                 attackTarget:updateView()
+                for _, gridIndex in ipairs(plasmaGridIndexes) do
+                    modelTileMap:getModelTile():updateView()
+                end
             end
         else
             if (attackTarget.getUnitType) then
