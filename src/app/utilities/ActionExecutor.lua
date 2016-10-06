@@ -173,10 +173,10 @@ local function getIncomeWithDamageCost(targetDamageCost, modelPlayer)
     return math.floor(targetDamageCost * modifier / 100)
 end
 
-local function getAdjacentPlasmaGridIndexes(modelTileMap, gridIndex)
+local function getAdjacentPlasmaGridIndexes(gridIndex, modelTileMap)
     local mapSize     = modelTileMap:getMapSize()
     local indexes     = {[0] = gridIndex}
-    local searchedMap = {gridIndex.x = {gridIndex.y = true}}
+    local searchedMap = {[gridIndex.x] = {[gridIndex.y] = true}}
 
     local i = 0
     while (i <= #indexes) do
@@ -333,9 +333,9 @@ local function executeAttack(action)
             Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, targetGridIndex)
         else
             attackTarget:updateWithObjectAndBaseId(0)
-            plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex)
+            plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex, modelTileMap)
             for _, gridIndex in ipairs(plasmaGridIndexes) do
-                modelTileMap:getModelTile():updateWithObjectAndBaseId(0)
+                modelTileMap:getModelTile(gridIndex):updateWithObjectAndBaseId(0)
             end
         end
     end
@@ -362,7 +362,7 @@ local function executeAttack(action)
                 dispatchEvtDestroyViewTile(sceneWarFileName, targetGridIndex)
                 attackTarget:updateView()
                 for _, gridIndex in ipairs(plasmaGridIndexes) do
-                    modelTileMap:getModelTile():updateView()
+                    modelTileMap:getModelTile(gridIndex):updateView()
                 end
             end
         else
