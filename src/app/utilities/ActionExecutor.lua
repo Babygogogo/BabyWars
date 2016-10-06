@@ -615,6 +615,9 @@ local function executeJoinModelUnit(action)
             targetModelUnit:getCurrentPromotion()
         ))
     end
+    if (focusModelUnit.setCapturingModelTile) then
+        focusModelUnit:setCapturingModelTile(targetModelUnit:isCapturingModelTile())
+    end
 
     focusModelUnit:setStateActioned()
         :moveViewAlongPath(path, function()
