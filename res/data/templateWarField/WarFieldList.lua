@@ -3,9 +3,7 @@ return {
     "BeiPan",
     "BeiZhong",
     "BiFengGang",
-    "ChaZuoShanMai",
     "DiXiaShui",
-    "DuiChenDaoYu",
     "DuoYanPingYuan",
     "FengBaoQianXian",
     "GaoLaMiJia",
@@ -15,7 +13,6 @@ return {
     "HeiSenLin",
     "HuanXingShanMai",
     "HuiShengDao",
-    "JiangQi",
     "LianYuShengTan",
     "ManShouXueXing",
     "NaiLaoDao",
@@ -30,5 +27,6 @@ return {
     "YunShiQun",
     "ZhengZhengFangFang",
 
-    "FullTest",
+    "JiangQi",
+    "QuanMianCeShi",
 }

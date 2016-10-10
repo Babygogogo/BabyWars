@@ -1,5 +1,5 @@
 return {
-  warFieldName = "全面测试-测试用",
+  warFieldName = "测试用-全面测试",
   authorName   = "Babygogogo",
   playersCount = 4,
 

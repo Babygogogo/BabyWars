@@ -1,5 +1,5 @@
 return {
-  warFieldName = "将 棋",
+  warFieldName = "测试用-将棋",
   authorName   = "Intelligent Systems",
   playersCount = 2,
 
