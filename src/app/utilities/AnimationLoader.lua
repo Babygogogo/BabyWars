@@ -53,10 +53,10 @@ local function loadUnitAnimations()
 end
 
 local function loadGridAnimations()
-    local reachableGridAnimation = display.newAnimation(display.newFrames("c03_t03_s01_f%02d.png", 1, 15), 0.07)
+    local reachableGridAnimation = display.newAnimation(display.newFrames("c01_t99_s05_f%02d.png", 1, 15), 0.07)
     display.setAnimationCache("ReachableGrid", reachableGridAnimation)
 
-    local attackableGridAnimation = display.newAnimation(display.newFrames("c03_t03_s02_f%02d.png", 1, 15), 0.07)
+    local attackableGridAnimation = display.newAnimation(display.newFrames("c01_t99_s06_f%02d.png", 1, 15), 0.07)
     display.setAnimationCache("AttackableGrid", attackableGridAnimation)
 
     local explosionAnimation = display.newAnimation(display.newFrames("c03_t08_s01_f%02d.png", 1, 9), 0.06)
