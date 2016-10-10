@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="22" height="20" tilewidth="24" tileheight="24" nextobjectid="1">
- <tileset firstgid="1" name="tileBase" tilewidth="24" tileheight="24" tilecount="76" columns="0">
+ <tileset firstgid="1" name="tileBase" tilewidth="24" tileheight="24" tilecount="100" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/tileBase/c01_t01_s01_f01.png"/>
   </tile>
@@ -229,8 +229,80 @@
   <tile id="75">
    <image width="24" height="24" source="textures/tileBase/c01_t04_s12_f01.png"/>
   </tile>
+  <tile id="76">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s13_f01.png"/>
+  </tile>
+  <tile id="77">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s14_f01.png"/>
+  </tile>
+  <tile id="78">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s15_f01.png"/>
+  </tile>
+  <tile id="79">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s16_f01.png"/>
+  </tile>
+  <tile id="80">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s17_f01.png"/>
+  </tile>
+  <tile id="81">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s18_f01.png"/>
+  </tile>
+  <tile id="82">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s19_f01.png"/>
+  </tile>
+  <tile id="83">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s20_f01.png"/>
+  </tile>
+  <tile id="84">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s21_f01.png"/>
+  </tile>
+  <tile id="85">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s22_f01.png"/>
+  </tile>
+  <tile id="86">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s23_f01.png"/>
+  </tile>
+  <tile id="87">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s24_f01.png"/>
+  </tile>
+  <tile id="88">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s25_f01.png"/>
+  </tile>
+  <tile id="89">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s26_f01.png"/>
+  </tile>
+  <tile id="90">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s27_f01.png"/>
+  </tile>
+  <tile id="91">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s28_f01.png"/>
+  </tile>
+  <tile id="92">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s29_f01.png"/>
+  </tile>
+  <tile id="93">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s30_f01.png"/>
+  </tile>
+  <tile id="94">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s31_f01.png"/>
+  </tile>
+  <tile id="95">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s32_f01.png"/>
+  </tile>
+  <tile id="96">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s33_f01.png"/>
+  </tile>
+  <tile id="97">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s34_f01.png"/>
+  </tile>
+  <tile id="98">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s35_f01.png"/>
+  </tile>
+  <tile id="99">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s36_f01.png"/>
+  </tile>
  </tileset>
- <tileset firstgid="77" name="tileObject" tilewidth="24" tileheight="48" tilecount="109" columns="0">
+ <tileset firstgid="101" name="tileObject" tilewidth="24" tileheight="48" tilecount="109" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/tileObject/c01_t05_s01_f01.png"/>
   </tile>
@@ -559,7 +631,7 @@
    <image width="24" height="24" source="textures/tileObject/c01_t28_s16_f01.png"/>
   </tile>
  </tileset>
- <tileset firstgid="186" name="unit" tilewidth="24" tileheight="29" tilecount="104" columns="0">
+ <tileset firstgid="210" name="unit" tilewidth="24" tileheight="29" tilecount="104" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/units/c02_t01_s01_f01.png"/>
   </tile>
