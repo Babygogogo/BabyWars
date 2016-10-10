@@ -265,18 +265,21 @@ local function sendActionReloadSceneWar()
     }, false)
 end
 
-local function dispatchEvtWarCommandMenuUpdated(self, isEnabled, isVisible)
-    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
-        name      = "EvtWarCommandMenuUpdated",
-        isEnabled = isEnabled,
-        isVisible = isVisible,
-    })
+local function dispatchEvtHideUI()
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({name = "EvtHideUI"})
 end
 
 local function dispatchEvtMapCursorMoved(self, gridIndex)
     SingletonGetters.getScriptEventDispatcher():dispatchEvent({
         name      = "EvtMapCursorMoved",
         gridIndex = gridIndex,
+    })
+end
+
+local function dispatchEvtWarCommandMenuUpdated(self)
+    SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        name                = "EvtWarCommandMenuUpdated",
+        modelWarCommandMenu = self,
     })
 end
 
@@ -539,7 +542,9 @@ local function initItemHideUI(self)
         name     = getLocalizedText(65, "HideUI"),
         callback = function()
             setStateDisabled(self)
-            dispatchEvtWarCommandMenuUpdated(self, true, false)
+
+            dispatchEvtWarCommandMenuUpdated(self)
+            dispatchEvtHideUI()
         end,
     }
 
@@ -647,8 +652,6 @@ function ModelWarCommandMenu:initView()
     local view = self.m_View
     assert(view, "ModelWarCommandMenu:initView() no view is attached to the actor of the model.")
 
-    view:setItems(self.m_ItemQuit, self.m_ItemEndTurn)
-
     return self
 end
 
@@ -683,13 +686,17 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarCommandMenu:isEnabled()
+    return self.m_State ~= "disabled"
+end
+
 function ModelWarCommandMenu:setEnabled(enabled)
-    if (not enabled) then
-        setStateDisabled(self)
-    else
+    if (enabled) then
         setStateMain(self)
+    else
+        setStateDisabled(self)
     end
-    dispatchEvtWarCommandMenuUpdated(self, enabled, true)
+    dispatchEvtWarCommandMenuUpdated(self)
 
     return self
 end

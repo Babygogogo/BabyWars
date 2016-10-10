@@ -18,12 +18,13 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function updateWithModelTile(self, modelTile)
-    self.m_ModelTile = modelTile
+local function updateWithModelTileMap(self)
+    local modelTileMap = SingletonGetters.getModelTileMap()
+    local modelTile    = modelTileMap:getModelTile(self.m_CursorGridIndex)
 
     if (self.m_View) then
         self.m_View:updateWithModelTile(modelTile)
-            :setVisible(true)
+            :setVisible(not SingletonGetters.getModelWarCommandMenu():isEnabled())
     end
 end
 
@@ -31,28 +32,28 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtModelTileMapUpdated(self, event)
-    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
+    updateWithModelTileMap(self)
 end
 
 local function onEvtMapCursorMoved(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(true)
-    end
-
-    local gridIndex = event.gridIndex
-    if (not GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
-        self.m_CursorGridIndex = GridIndexFunctions.clone(gridIndex)
-        updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(gridIndex))
-    end
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    updateWithModelTileMap(self)
 end
 
 local function onEvtGridSelected(self, event)
-    onEvtMapCursorMoved(self, event)
+    self.m_CursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    updateWithModelTileMap(self)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     if (self.m_View) then
-        self.m_View:setVisible(not event.isEnabled)
+        self.m_View:setVisible(not event.modelWarCommandMenu:isEnabled())
+    end
+end
+
+local function onEvtHideUI(self)
+    if (self.m_View) then
+        self.m_View:setVisible(false)
     end
 end
 
@@ -87,20 +88,22 @@ function ModelTileInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
-    updateWithModelTile(self, SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex))
+    updateWithModelTileMap(self)
 
     return self
 end
 
 function ModelTileInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelTileMapUpdated")       then onEvtModelTileMapUpdated(      self, event)
-    elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(           self, event)
-    elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(             self, event)
-    elseif (eventName == "EvtWarCommandMenuUpdated")     then onEvtWarCommandMenuUpdated(    self, event)
-    elseif (eventName == "EvtPlayerIndexUpdated")        then onEvtPlayerIndexUpdated(       self, event)
+    if     (eventName == "EvtModelTileMapUpdated")   then onEvtModelTileMapUpdated(  self, event)
+    elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
+    elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
+    elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
+    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     end
 
     return self
@@ -111,7 +114,8 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
     if (self.m_ModelTileDetail) then
-        self.m_ModelTileDetail:updateWithModelTile(self.m_ModelTile)
+        local modelTile = SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex)
+        self.m_ModelTileDetail:updateWithModelTile(modelTile)
             :setEnabled(true)
     end
 

@@ -33,7 +33,13 @@ end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     if (self.m_View) then
-        self.m_View:setVisible(not event.isEnabled)
+        self.m_View:setVisible(not event.modelWarCommandMenu:isEnabled())
+    end
+end
+
+local function onEvtHideUI(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(false)
     end
 end
 
@@ -67,15 +73,6 @@ function ModelMoneyEnergyInfo:initView()
     return self
 end
 
-function ModelMoneyEnergyInfo:setModelWarCommandMenu(model)
-    assert(self.m_ModelWarCommandMenu == nil, "ModelMoneyEnergyInfo:setModelWarCommandMenu() the model has been set.")
-
-    model:setEnabled(false)
-    self.m_ModelWarCommandMenu = model
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
@@ -84,6 +81,7 @@ function ModelMoneyEnergyInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
 end
@@ -93,6 +91,7 @@ function ModelMoneyEnergyInfo:onEvent(event)
     if     (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     elseif (eventName == "EvtModelPlayerUpdated")    then onEvtModelPlayerUpdated(   self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
+    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
     elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
     elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
     end
@@ -104,7 +103,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    self.m_ModelWarCommandMenu:setEnabled(true)
+    SingletonGetters.getModelWarCommandMenu():setEnabled(true)
 
     return self
 end

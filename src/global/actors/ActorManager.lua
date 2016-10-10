@@ -28,8 +28,8 @@ function ActorManager.setAndRunRootActor(actor, transition, time, more)
         end
     end
 
-    s_RootActor = actor
     display.runScene(actor:getView(), transition, time, more)
+    s_RootActor = actor
 
     local model = actor:getModel()
     if ((model) and (model.onStartRunning)) then

@@ -889,7 +889,7 @@ local function onEvtIsWaitingForServerResponse(self, event)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (event.isEnabled) then
+    if (event.modelWarCommandMenu:isEnabled()) then
         setStateIdle(self, not self.m_IsWaitingForServerResponse)
     end
 end
