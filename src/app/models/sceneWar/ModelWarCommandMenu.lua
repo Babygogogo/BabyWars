@@ -34,13 +34,92 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getTilesInfo(tileTypeCounters)
-    return string.format("%s: %d        %s: %d        %s: %d        %s: %d        %s: %d\n%s: %d        %s: %d        %s: %d        %s: %d",
+local function generateEmptyDataForEachPlayer()
+    local modelPlayerManager = SingletonGetters.getModelPlayerManager()
+    local dataForEachPlayer  = {}
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:isAlive()) then
+            local energy, req1, req2 = modelPlayer:getEnergy()
+            dataForEachPlayer[playerIndex] = {
+                nickname            = modelPlayer:getNickname(),
+                fund                = modelPlayer:getFund(),
+                energy              = energy,
+                req1                = req1,
+                req2                = req2,
+                damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement(),
+                idleUnitsCount      = 0,
+                unitsCount          = 0,
+                unitsValue          = 0,
+                tilesCount          = 0,
+                income              = 0,
+
+                Headquarters        = 0,
+                City                = 0,
+                Factory             = 0,
+                idleFactoriesCount  = 0,
+                Airport             = 0,
+                idleAirportsCount   = 0,
+                Seaport             = 0,
+                idleSeaportsCount   = 0,
+                TempAirport         = 0,
+                TempSeaport         = 0,
+                CommandTower        = 0,
+                Radar               = 0,
+            }
+        end
+    end)
+
+    return dataForEachPlayer
+end
+
+local function updateUnitsData(dataForEachPlayer)
+    local updateUnitCountAndValue = function(modelUnit)
+        local data          = dataForEachPlayer[modelUnit:getPlayerIndex()]
+        data.unitsCount     = data.unitsCount + 1
+        data.idleUnitsCount = data.idleUnitsCount + (modelUnit:getState() == "idle" and 1 or 0)
+        data.unitsValue     = data.unitsValue + round(modelUnit:getNormalizedCurrentHP() * modelUnit:getBaseProductionCost() / 10)
+    end
+
+    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(updateUnitCountAndValue)
+        :forEachModelUnitLoaded(updateUnitCountAndValue)
+end
+
+local function updateTilesData(dataForEachPlayer)
+    local modelUnitMap = SingletonGetters.getModelUnitMap()
+    SingletonGetters.getModelTileMap():forEachModelTile(function(modelTile)
+        local playerIndex = modelTile:getPlayerIndex()
+        if (playerIndex ~= 0) then
+            local data = dataForEachPlayer[playerIndex]
+            data.tilesCount = data.tilesCount + 1
+
+            local tileType = modelTile:getTileType()
+            if (data[tileType]) then
+                data[tileType] = data[tileType] + 1
+                if (not modelUnitMap:getModelUnit(modelTile:getGridIndex())) then
+                    if     (tileType == "Factory") then data.idleFactoriesCount = data.idleFactoriesCount + 1
+                    elseif (tileType == "Airport") then data.idleAirportsCount  = data.idleAirportsCount  + 1
+                    elseif (tileType == "Seaport") then data.idleSeaportsCount  = data.idleSeaportsCount  + 1
+                    end
+                end
+            end
+
+            if (modelTile.getIncomeAmount) then
+                data.income = data.income + (modelTile:getIncomeAmount() or 0)
+            end
+        end
+    end)
+end
+
+local function getTilesInfo(tileTypeCounters, showIdleTilesCount)
+    return string.format("%s: %d        %s: %d        %s: %d%s        %s: %d%s        %s: %d%s\n%s: %d        %s: %d        %s: %d        %s: %d",
         getLocalizedText(116, "Headquarters"), tileTypeCounters.Headquarters,
         getLocalizedText(116, "City"),         tileTypeCounters.City,
         getLocalizedText(116, "Factory"),      tileTypeCounters.Factory,
+        ((showIdleTilesCount) and (string.format(" (%d)", tileTypeCounters.idleFactoriesCount)) or ("")),
         getLocalizedText(116, "Airport"),      tileTypeCounters.Airport,
+        ((showIdleTilesCount) and (string.format(" (%d)", tileTypeCounters.idleAirportsCount)) or ("")),
         getLocalizedText(116, "Seaport"),      tileTypeCounters.Seaport,
+        ((showIdleTilesCount) and (string.format(" (%d)", tileTypeCounters.idleSeaportsCount)) or ("")),
         getLocalizedText(116, "CommandTower"), tileTypeCounters.CommandTower,
         getLocalizedText(116, "Radar"),        tileTypeCounters.Radar,
         getLocalizedText(116, "TempAirport"),  tileTypeCounters.TempAirport,
@@ -77,78 +156,30 @@ local function getMapInfo()
 end
 
 local function updateStringWarInfo(self)
-    local modelPlayerManager = SingletonGetters.getModelPlayerManager()
-    local dataForEachPlayer  = {}
-    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:isAlive()) then
-            local energy, req1, req2 = modelPlayer:getEnergy()
-            dataForEachPlayer[playerIndex] = {
-                nickname     = modelPlayer:getNickname(),
-                fund         = modelPlayer:getFund(),
-                energy       = energy,
-                req1         = req1,
-                req2         = req2,
-                damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement(),
-                unitsCount   = 0,
-                unitsValue   = 0,
-                tilesCount   = 0,
-                income       = 0,
+    local dataForEachPlayer = generateEmptyDataForEachPlayer()
+    updateUnitsData(dataForEachPlayer)
+    updateTilesData(dataForEachPlayer)
 
-                Headquarters = 0,
-                City         = 0,
-                Factory      = 0,
-                Airport      = 0,
-                Seaport      = 0,
-                TempAirport  = 0,
-                TempSeaport  = 0,
-                CommandTower = 0,
-                Radar        = 0,
-            }
-        end
-    end)
-
-    local updateUnitCountAndValue = function(modelUnit)
-        local data      = dataForEachPlayer[modelUnit:getPlayerIndex()]
-        data.unitsCount = data.unitsCount + 1
-        data.unitsValue = data.unitsValue + round(modelUnit:getNormalizedCurrentHP() * modelUnit:getBaseProductionCost() / 10)
-    end
-    SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(updateUnitCountAndValue)
-        :forEachModelUnitLoaded(updateUnitCountAndValue)
-
-    local modelTileMap = SingletonGetters.getModelTileMap()
-    modelTileMap:forEachModelTile(function(modelTile)
-        local playerIndex = modelTile:getPlayerIndex()
-        if (playerIndex ~= 0) then
-            local data = dataForEachPlayer[playerIndex]
-            data.tilesCount = data.tilesCount + 1
-
-            local tileType = modelTile:getTileType()
-            if (data[tileType]) then
-                data[tileType] = data[tileType] + 1
-            end
-
-            if (modelTile.getIncomeAmount) then
-                data.income = data.income + (modelTile:getIncomeAmount() or 0)
-            end
-        end
-    end)
-
-    local stringList = {getMapInfo()}
-    for i = 1, modelPlayerManager:getPlayersCount() do
+    local stringList        = {getMapInfo()}
+    local playerIndexInTurn = SingletonGetters.getModelTurnManager():getPlayerIndex()
+    for i = 1, SingletonGetters.getModelPlayerManager():getPlayersCount() do
         if (not dataForEachPlayer[i]) then
             stringList[#stringList + 1] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
-            local d = dataForEachPlayer[i]
-            stringList[#stringList + 1] = string.format("%s %d:    %s\n%s: %d      %s: %d\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %d\n%s: %d\n%s",
+            local d              = dataForEachPlayer[i]
+            local isPlayerInTurn = i == playerIndexInTurn
+            stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %d\n%s: %d%s      %s: %d\n%s: %d\n%s",
                 getLocalizedText(65, "Player"),              i,           d.nickname,
-                getLocalizedText(65, "Fund"),                d.fund,
-                getLocalizedText(65, "Income"),              d.income,
-                getLocalizedText(65, "Energy"),              d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
-                getLocalizedText(65, "DamageCostPerEnergy"), d.damageCostPerEnergy,
-                getLocalizedText(65, "UnitsCount"),          d.unitsCount,
-                getLocalizedText(65, "UnitsValue"),          d.unitsValue,
-                getLocalizedText(65, "TilesCount"),          d.tilesCount,
-                getTilesInfo(d)
+                ((isPlayerInTurn) and (string.format(" (%s)", getLocalizedText(49))) or ("")),
+                getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
+                getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,
+                getLocalizedText(65, "Fund"),                 d.fund,
+                getLocalizedText(65, "Income"),               d.income,
+                getLocalizedText(65, "UnitsCount"),           d.unitsCount,
+                ((isPlayerInTurn) and (string.format(" (%d)", d.idleUnitsCount)) or ("")),
+                getLocalizedText(65, "UnitsValue"),           d.unitsValue,
+                getLocalizedText(65, "TilesCount"),           d.tilesCount,
+                getTilesInfo(d, isPlayerInTurn)
             )
         end
     end
