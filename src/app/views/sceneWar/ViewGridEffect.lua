@@ -4,12 +4,15 @@ local ViewGridEffect = class("ViewGridEffect", cc.Node)
 local GRID_SIZE          = require("src.app.utilities.GameConstantFunctions").getGridSize()
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 
-local DAMAGE_Z_ORDER    = 2
-local EXPLOSION_Z_ORDER = 1
-local SUPPLY_Z_ORDER    = 0
+local SKILL_ACTIVATION_Z_ORDER = 3
+local DAMAGE_Z_ORDER           = 2
+local EXPLOSION_Z_ORDER        = 1
+local SUPPLY_Z_ORDER           = 0
 
-local SUPPLY_OFFSET_X = GRID_SIZE.width  * 0.3
-local SUPPLY_OFFSET_Y = GRID_SIZE.height * 0.7
+local SKILL_ACTIVATION_OFFSET_X = - (336 - GRID_SIZE.width)  / 2
+local SKILL_ACTIVATION_OFFSET_Y = - (336 - GRID_SIZE.height) / 2
+local SUPPLY_OFFSET_X           = GRID_SIZE.width  * 0.3
+local SUPPLY_OFFSET_Y           = GRID_SIZE.height * 0.7
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -66,6 +69,16 @@ local function createAnimationSiloAttack(gridIndex)
     return sprite
 end
 
+local function createAnimationSkillActivation(gridIndex)
+    local sprite = cc.Sprite:create()
+    local x, y   = GridIndexFunctions.toPosition(gridIndex)
+    sprite:ignoreAnchorPointForPosition(true)
+        :setPosition(x + SKILL_ACTIVATION_OFFSET_X, y + SKILL_ACTIVATION_OFFSET_Y)
+        :playAnimationOnce(display.getAnimationCache("SkillActivation"), {removeSelf = true})
+
+    return sprite
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -102,6 +115,12 @@ end
 
 function ViewGridEffect:showAnimationSiloAttack(gridIndex)
     self:addChild(createAnimationSiloAttack(gridIndex), EXPLOSION_Z_ORDER)
+
+    return self
+end
+
+function ViewGridEffect:showAnimationSkillActivation(gridIndex)
+    self:addChild(createAnimationSkillActivation(gridIndex), SKILL_ACTIVATION_Z_ORDER)
 
     return self
 end

@@ -92,4 +92,15 @@ function ModelGridEffect:onEvent(event)
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelGridEffect:showAnimationSkillActivation(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSkillActivation(gridIndex)
+    end
+
+    return self
+end
+
 return ModelGridEffect

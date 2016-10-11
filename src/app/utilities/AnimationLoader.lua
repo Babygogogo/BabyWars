@@ -67,6 +67,9 @@ local function loadGridAnimations()
 
     local targetCursorAnimation = display.newAnimation(display.newFrames("c03_t07_s08_f%02d.png", 1, 4), 0.08)
     display.setAnimationCache("TargetCursor", targetCursorAnimation)
+
+    local skillActivationAnimation = display.newAnimation(display.newFrames("c03_t08_s06_f%02d.png", 1, 34), 0.025)
+    display.setAnimationCache("SkillActivation", skillActivationAnimation)
 end
 
 --------------------------------------------------------------------------------
