@@ -54,6 +54,10 @@ function SingletonGetters.getModelConfirmBox()
     return SingletonGetters.getModelScene():getModelConfirmBox()
 end
 
+function SingletonGetters.getModelMapCursor()
+    return SingletonGetters.getModelScene():getModelWarField():getModelMapCursor()
+end
+
 function SingletonGetters.getModelMessageIndicator()
     return SingletonGetters.getModelScene():getModelMessageIndicator()
 end

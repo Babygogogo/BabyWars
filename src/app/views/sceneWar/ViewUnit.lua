@@ -25,9 +25,11 @@ local UNIT_SPRITE_Z_ORDER     = 0
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createActionMoveAlongPath(self, path, callback)
-    local steps = {}
+local function createStepsForActionMoveAlongPath(self, path)
     local playerIndexMod = self.m_Model:getPlayerIndex() % 2
+    local steps          = {cc.CallFunc:create(function()
+        SingletonGetters.getModelMapCursor():setMovableByPlayer(false)
+    end)}
 
     for i = 2, #path do
         local currentX, previousX = path[i].x, path[i - 1].x
@@ -44,10 +46,39 @@ local function createActionMoveAlongPath(self, path, callback)
         steps[#steps + 1] = cc.MoveTo:create(MOVE_DURATION_PER_GRID, GridIndexFunctions.toPositionTable(path[i]))
     end
 
+    return steps
+end
+
+local function createActionMoveAlongPath(self, path, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path)
     steps[#steps + 1] = cc.CallFunc:create(function()
+        SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
+        callback()
     end)
-    steps[#steps + 1] = cc.CallFunc:create(callback)
+
+    return cc.Sequence:create(unpack(steps))
+end
+
+local function createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path)
+    steps[#steps + 1] = cc.CallFunc:create(function()
+        SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+            name      = "EvtMapCursorMoved",
+            gridIndex = targetGridIndex,
+        })
+        SingletonGetters.getModelMapCursor():setNormalCursorVisible(false)
+            :setTargetCursorVisible(true)
+    end)
+    steps[#steps + 1] = cc.DelayTime:create(0.5)
+    steps[#steps + 1] = cc.CallFunc:create(function()
+        SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
+            :setNormalCursorVisible(true)
+            :setTargetCursorVisible(false)
+
+        self.m_UnitSprite:setFlippedX(false)
+        callback()
+    end)
 
     return cc.Sequence:create(unpack(steps))
 end
@@ -303,6 +334,15 @@ function ViewUnit:moveAlongPath(path, callbackOnFinish)
         :showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
         :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
+
+    return self
+end
+
+function ViewUnit:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackOnFinish)
+    self:setVisible(true)
+        :showMovingAnimation()
+        :setPosition(GridIndexFunctions.toPosition(path[1]))
+        :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callbackOnFinish))
 
     return self
 end

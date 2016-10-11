@@ -164,4 +164,8 @@ function ModelWarField:getModelTileMap()
     return self.m_ActorTileMap:getModel()
 end
 
+function ModelWarField:getModelMapCursor()
+    return self.m_ActorMapCursor:getModel()
+end
+
 return ModelWarField

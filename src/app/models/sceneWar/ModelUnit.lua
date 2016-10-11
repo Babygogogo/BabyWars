@@ -132,6 +132,16 @@ function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
     return self
 end
 
+function ModelUnit:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, callbackAfterMove)
+    if (self.m_View) then
+        self.m_View:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackAfterMove)
+    elseif (callbackAfterMove) then
+        callbackAfterMove()
+    end
+
+    return self
+end
+
 function ModelUnit:setViewVisible(visible)
     if (self.m_View) then
         self.m_View:setVisible(visible)

@@ -345,7 +345,7 @@ local function executeAttack(action)
     local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
-        attacker:moveViewAlongPath(path, function()
+        attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
             callbackAfterMoveAnimation()
             modelSceneWar:setExecutingAction(false)
         end)
@@ -365,7 +365,7 @@ local function executeAttack(action)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
-            attacker:moveViewAlongPath(path, function()
+            attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
                 callbackAfterMoveAnimation()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
