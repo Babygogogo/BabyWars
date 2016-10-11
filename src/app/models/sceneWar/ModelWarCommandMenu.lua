@@ -190,8 +190,8 @@ end
 local function updateStringSkillInfo(self)
     local stringList = {}
     SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
-        stringList[#stringList + 1] = string.format("%s %d: %s",
-            getLocalizedText(65, "Player"), playerIndex,
+        stringList[#stringList + 1] = string.format("%s %d: %s\n%s",
+            getLocalizedText(65, "Player"), playerIndex, modelPlayer:getNickname(),
             SkillDescriptionFunctions.getBriefDescription(modelPlayer:getModelSkillConfiguration())
         )
     end)
@@ -208,7 +208,7 @@ local function getAvailableMainItems(self)
             self.m_ItemHideUI,
             self.m_ItemSetMusic,
             self.m_ItemReload,
-            self.m_ItemDamageChart,
+            self.m_ItemUnitPropertyList,
         }
     else
         local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndex)
@@ -225,7 +225,7 @@ local function getAvailableMainItems(self)
         items[#items + 1] = self.m_ItemHideUI
         items[#items + 1] = self.m_ItemSetMusic
         items[#items + 1] = self.m_ItemReload
-        items[#items + 1] = self.m_ItemDamageChart
+        items[#items + 1] = self.m_ItemUnitPropertyList
         items[#items + 1] = self.m_ItemEndTurn
 
         return items
@@ -252,11 +252,11 @@ local function setStateMain(self)
     end
 end
 
-local function setStateDamageChart(self)
-    self.m_State = "damageChart"
+local function setStateUnitPropertyList(self)
+    self.m_State = "unitPropertyList"
 
     if (self.m_View) then
-        self.m_View:setItems(self.m_ItemsDamageDetail)
+        self.m_View:setItems(self.m_ItemsUnitProperties)
     end
 end
 
@@ -352,6 +352,35 @@ local function getIdleUnitsCount(self)
     return count
 end
 
+local function createWeaponPropertyText(unitType)
+    local template   = GameConstantFunctions.getTemplateModelUnitWithName(unitType)
+    local attackDoer = template.AttackDoer
+    if (not attackDoer) then
+        return ""
+    else
+        local maxAmmo = (attackDoer.primaryWeapon) and (attackDoer.primaryWeapon.maxAmmo) or (nil)
+        return string.format("%s: %d - %d      %s: %s      %s: %s",
+                getLocalizedText(9, "AttackRange"),        attackDoer.minAttackRange, attackDoer.maxAttackRange,
+                getLocalizedText(9, "MaxAmmo"),            (maxAmmo) and ("" .. maxAmmo) or ("--"),
+                getLocalizedText(9, "CanAttackAfterMove"), getLocalizedText(9, attackDoer.canAttackAfterMove)
+            )
+    end
+end
+
+local function createCommonPropertyText(unitType)
+    local template   = GameConstantFunctions.getTemplateModelUnitWithName(unitType)
+    local weaponText = createWeaponPropertyText(unitType)
+    return string.format("%s: %d (%s)      %s: %d      %s: %d\n%s: %d      %s: %d      %s: %s%s",
+        getLocalizedText(9, "Movement"),           template.MoveDoer.range, getLocalizedText(110, template.MoveDoer.type),
+        getLocalizedText(9, "Vision"),             template.vision,
+        getLocalizedText(9, "ProductionCost"),     template.Producible.productionCost,
+        getLocalizedText(9, "MaxFuel"),            template.FuelOwner.max,
+        getLocalizedText(9, "ConsumptionPerTurn"), template.FuelOwner.consumptionPerTurn,
+        getLocalizedText(9, "DestroyOnRunOut"),    getLocalizedText(9, template.FuelOwner.destroyOnOutOfFuel),
+        ((string.len(weaponText) > 0) and ("\n" .. weaponText) or (weaponText))
+    )
+end
+
 local function createDamageSubText(targetType, primaryDamage, secondaryDamage)
     local targetTypeText = getLocalizedText(113, targetType)
     local primaryText    = string.format("%s", primaryDamage[targetType]   or "--")
@@ -367,7 +396,7 @@ end
 local function createDamageText(unitType)
     local baseDamage = GameConstantFunctions.getBaseDamageForAttackerUnitType(unitType)
     if (not baseDamage) then
-        return string.format("%s : %s", getLocalizedText(113, unitType), getLocalizedText(3, "None"))
+        return string.format("%s : %s", getLocalizedText(65, "DamageChart"), getLocalizedText(3, "None"))
     else
         local subTexts  = {}
         local primary   = baseDamage.primary or {}
@@ -377,13 +406,22 @@ local function createDamageText(unitType)
         end
         subTexts[#subTexts + 1] = createDamageSubText("Meteor", primary, secondary)
 
-        local unitTypeText = getLocalizedText(113, unitType)
+        local unitTypeText = getLocalizedText(65, "DamageChart")
         return string.format("%s%s%s          %s\n%s",
             unitTypeText, string.rep(" ", 28 - string.len(unitTypeText) / 3 * 4),
             getLocalizedText(65, "MainWeapon"), getLocalizedText(65, "SubWeapon"),
             table.concat(subTexts, "\n")
         )
     end
+end
+
+local function createUnitPropertyText(unitType)
+    local template = GameConstantFunctions.getTemplateModelUnitWithName(unitType)
+    return string.format("%s\n%s\n\n%s",
+        getLocalizedText(114, unitType),
+        createCommonPropertyText(unitType),
+        createDamageText(unitType)
+    )
 end
 
 --------------------------------------------------------------------------------
@@ -540,18 +578,18 @@ local function initItemActivateSkill2(self)
     self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
 end
 
-local function initItemDamageChart(self)
+local function initItemUnitPropertyList(self)
     local item = {
-        name     = getLocalizedText(65, "DamageChart"),
+        name     = getLocalizedText(65, "UnitPropertyList"),
         callback = function()
-            setStateDamageChart(self)
+            setStateUnitPropertyList(self)
         end,
     }
 
-    self.m_ItemDamageChart = item
+    self.m_ItemUnitPropertyList = item
 end
 
-local function initItemsDamageDetail(self)
+local function initItemsUnitProperties(self)
     local items    = {}
     local allUnits = GameConstantFunctions.getCategory("AllUnits")
     for _, unitType in ipairs(allUnits) do
@@ -559,13 +597,13 @@ local function initItemsDamageDetail(self)
             name     = getLocalizedText(113, unitType),
             callback = function()
                 if (self.m_View) then
-                    self.m_View:setOverviewString(createDamageText(unitType))
+                    self.m_View:setOverviewString(createUnitPropertyText(unitType))
                 end
             end,
         }
     end
 
-    self.m_ItemsDamageDetail = items
+    self.m_ItemsUnitProperties = items
 end
 
 local function initItemHideUI(self)
@@ -657,20 +695,20 @@ end
 function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
-    initItemQuit(          self)
-    initItemFindIdleUnit(  self)
-    initItemFindIdleTile(  self)
-    initItemWarInfo(       self)
-    initItemSkillInfo(     self)
-    initItemActivateSkill1(self)
-    initItemActivateSkill2(self)
-    initItemDamageChart(   self)
-    initItemsDamageDetail( self)
-    initItemHideUI(        self)
-    initItemSetMusic(      self)
-    initItemReload(        self)
-    initItemSurrender(     self)
-    initItemEndTurn(       self)
+    initItemQuit(            self)
+    initItemFindIdleUnit(    self)
+    initItemFindIdleTile(    self)
+    initItemWarInfo(         self)
+    initItemSkillInfo(       self)
+    initItemActivateSkill1(  self)
+    initItemActivateSkill2(  self)
+    initItemUnitPropertyList(self)
+    initItemsUnitProperties(   self)
+    initItemHideUI(          self)
+    initItemSetMusic(        self)
+    initItemReload(          self)
+    initItemSurrender(       self)
+    initItemEndTurn(         self)
 
     if (self.m_View) then
         self:initView()
@@ -735,7 +773,7 @@ end
 function ModelWarCommandMenu:onButtonBackTouched()
     local state = self.m_State
     if     (state == "main")        then self:setEnabled(false)
-    elseif (state == "damageChart") then setStateMain(self)
+    elseif (state == "unitPropertyList") then setStateMain(self)
     else                                 error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
     end
 
