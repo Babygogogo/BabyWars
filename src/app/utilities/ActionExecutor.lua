@@ -733,29 +733,31 @@ end
 
 local function executeProduceModelUnitOnTile(action)
     local sceneWarFileName = action.fileName
-    local gridIndex        = action.gridIndex
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local availableUnitID  = modelUnitMap:getAvailableUnitId()
-    local actorData        = {
-        tiledID       = action.tiledID,
-        unitID        = availableUnitID,
-        GridIndexable = {gridIndex = gridIndex},
-    }
 
-    local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
-    local modelUnit = actorUnit:getModel()
-    promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
-    modelUnit:setStateActioned()
-        :onStartRunning(sceneWarFileName)
+    if (action.tiledID) then
+        local actorData = {
+            tiledID       = action.tiledID,
+            unitID        = availableUnitID,
+            GridIndexable = {gridIndex = action.gridIndex},
+        }
+        local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
+        local modelUnit = actorUnit:getModel()
 
-    modelUnitMap:addActorUnitOnMap(actorUnit)
-        :setAvailableUnitId(availableUnitID + 1)
+        promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+        modelUnit:setStateActioned()
+            :onStartRunning(sceneWarFileName)
 
-    local playerIndex = modelUnit:getPlayerIndex()
+        modelUnitMap:addActorUnitOnMap(actorUnit)
+    end
+
+    local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
     local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
+    modelUnitMap:setAvailableUnitId(availableUnitID + 1)
     getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
