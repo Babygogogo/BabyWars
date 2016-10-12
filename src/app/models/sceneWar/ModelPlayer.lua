@@ -158,9 +158,9 @@ end
 
 function ModelPlayer:getCurrentDamageCostPerEnergyRequirement()
     if (SkillModifierFunctions.isDamageCostPerEnergyRequirementLocked(self:getModelSkillConfiguration())) then
-        return DAMAGE_COST_PER_ENERGY_REQUIREMENT
+        return round(DAMAGE_COST_PER_ENERGY_REQUIREMENT)
     else
-        return DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100)
+        return round(DAMAGE_COST_PER_ENERGY_REQUIREMENT * (1 + self.m_SkillActivatedCount * DAMAGE_COST_GROWTH_RATES / 100))
     end
 end
 

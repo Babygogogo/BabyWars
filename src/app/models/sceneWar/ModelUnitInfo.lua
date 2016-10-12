@@ -27,7 +27,7 @@ local function updateWithModelUnitMap(self)
 
         if (self.m_View) then
             self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
-                :setVisible(true)
+                :setVisible(not SingletonGetters.getModelWarCommandMenu():isEnabled())
         end
     elseif (self.m_View) then
         self.m_View:setVisible(false)
@@ -52,12 +52,18 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (event.isEnabled) then
+    if (event.modelWarCommandMenu:isEnabled()) then
         if (self.m_View) then
             self.m_View:setVisible(false)
         end
     else
         updateWithModelUnitMap(self)
+    end
+end
+
+local function onEvtHideUI(self, event)
+    if (self.m_View) then
+        self.m_View:setVisible(false)
     end
 end
 
@@ -92,6 +98,7 @@ function ModelUnitInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
     updateWithModelUnitMap(self)
@@ -101,11 +108,12 @@ end
 
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelUnitMapUpdated")       then onEvtModelUnitMapUpdated(     self, event)
-    elseif (eventName == "EvtGridSelected")              then onEvtGridSelected(            self, event)
-    elseif (eventName == "EvtMapCursorMoved")            then onEvtMapCursorMoved(          self, event)
-    elseif (eventName == "EvtWarCommandMenuUpdated")     then onEvtWarCommandMenuUpdated(   self, event)
-    elseif (eventName == "EvtPlayerIndexUpdated")        then onEvtPlayerIndexUpdated(      self, event)
+    if     (eventName == "EvtModelUnitMapUpdated")   then onEvtModelUnitMapUpdated(  self, event)
+    elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
+    elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
+    elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
+    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     end
 
     return self

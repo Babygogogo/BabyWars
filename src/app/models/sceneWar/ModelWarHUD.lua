@@ -26,13 +26,13 @@ local Actor = require("src.global.actors.Actor")
 --------------------------------------------------------------------------------
 local function initActorWarCommandMenu(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarCommandMenu", nil, "sceneWar.ViewWarCommandMenu")
+    actor:getModel():setEnabled(false)
 
     self.m_ActorWarCommandMenu = actor
 end
 
 local function initActorMoneyEnergyInfo(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelMoneyEnergyInfo", nil, "sceneWar.ViewMoneyEnergyInfo")
-    actor:getModel():setModelWarCommandMenu(self.m_ActorWarCommandMenu:getModel())
 
     self.m_ActorMoneyEnergyInfo = actor
 end
@@ -115,6 +115,13 @@ function ModelWarHUD:onStartRunning(sceneWarFileName)
     self.m_ActorWarCommandMenu :getModel():onStartRunning(sceneWarFileName)
 
     return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelWarHUD:getModelWarCommandMenu()
+    return self.m_ActorWarCommandMenu:getModel()
 end
 
 return ModelWarHUD

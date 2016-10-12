@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="24" tileheight="24" nextobjectid="1">
- <tileset firstgid="1" name="tileBase" tilewidth="24" tileheight="24" tilecount="76" columns="0">
+ <tileset firstgid="1" name="tileBase" tilewidth="24" tileheight="24" tilecount="100" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/tileBase/c01_t01_s01_f01.png"/>
   </tile>
@@ -229,8 +229,80 @@
   <tile id="75">
    <image width="24" height="24" source="textures/tileBase/c01_t04_s12_f01.png"/>
   </tile>
+  <tile id="76">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s13_f01.png"/>
+  </tile>
+  <tile id="77">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s14_f01.png"/>
+  </tile>
+  <tile id="78">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s15_f01.png"/>
+  </tile>
+  <tile id="79">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s16_f01.png"/>
+  </tile>
+  <tile id="80">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s17_f01.png"/>
+  </tile>
+  <tile id="81">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s18_f01.png"/>
+  </tile>
+  <tile id="82">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s19_f01.png"/>
+  </tile>
+  <tile id="83">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s20_f01.png"/>
+  </tile>
+  <tile id="84">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s21_f01.png"/>
+  </tile>
+  <tile id="85">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s22_f01.png"/>
+  </tile>
+  <tile id="86">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s23_f01.png"/>
+  </tile>
+  <tile id="87">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s24_f01.png"/>
+  </tile>
+  <tile id="88">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s25_f01.png"/>
+  </tile>
+  <tile id="89">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s26_f01.png"/>
+  </tile>
+  <tile id="90">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s27_f01.png"/>
+  </tile>
+  <tile id="91">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s28_f01.png"/>
+  </tile>
+  <tile id="92">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s29_f01.png"/>
+  </tile>
+  <tile id="93">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s30_f01.png"/>
+  </tile>
+  <tile id="94">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s31_f01.png"/>
+  </tile>
+  <tile id="95">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s32_f01.png"/>
+  </tile>
+  <tile id="96">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s33_f01.png"/>
+  </tile>
+  <tile id="97">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s34_f01.png"/>
+  </tile>
+  <tile id="98">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s35_f01.png"/>
+  </tile>
+  <tile id="99">
+   <image width="24" height="24" source="textures/tileBase/c01_t04_s36_f01.png"/>
+  </tile>
  </tileset>
- <tileset firstgid="77" name="tileObject" tilewidth="24" tileheight="48" tilecount="109" columns="0">
+ <tileset firstgid="101" name="tileObject" tilewidth="24" tileheight="48" tilecount="109" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/tileObject/c01_t05_s01_f01.png"/>
   </tile>
@@ -559,7 +631,7 @@
    <image width="24" height="24" source="textures/tileObject/c01_t28_s16_f01.png"/>
   </tile>
  </tileset>
- <tileset firstgid="186" name="unit" tilewidth="24" tileheight="29" tilecount="104" columns="0">
+ <tileset firstgid="210" name="unit" tilewidth="24" tileheight="29" tilecount="104" columns="0">
   <tile id="0">
    <image width="24" height="24" source="textures/units/c02_t01_s01_f01.png"/>
   </tile>
@@ -876,48 +948,48 @@
  <layer name="tileBase" width="16" height="16">
   <data encoding="csv">
 18,19,43,43,43,43,43,43,43,43,43,22,34,1,1,1,
-19,47,1,1,1,1,1,1,1,1,1,72,44,61,70,1,
+19,47,1,1,1,1,1,1,1,1,1,84,44,61,82,1,
 34,1,1,1,1,1,1,1,1,1,1,1,1,1,40,52,
 34,1,1,1,1,1,1,1,1,1,1,1,1,1,38,18,
-20,70,1,1,1,1,1,1,1,1,1,1,1,1,72,22,
+20,82,1,1,1,1,1,1,1,1,1,1,1,1,84,22,
 18,68,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
-19,71,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
+19,83,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
 34,1,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
 34,1,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
-34,1,1,1,1,1,1,1,1,1,1,1,1,1,69,26,
+34,1,1,1,1,1,1,1,1,1,1,1,1,1,81,26,
 34,1,1,1,1,1,1,1,1,1,1,1,1,1,67,18,
-20,70,1,1,1,1,1,1,1,1,1,1,1,1,72,22,
+20,82,1,1,1,1,1,1,1,1,1,1,1,1,84,22,
 18,34,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
 43,35,1,1,1,1,1,1,1,1,1,1,1,1,1,38,
-1,72,61,54,70,1,1,1,1,1,1,1,1,1,58,26,
+1,84,61,54,82,1,1,1,1,1,1,1,1,1,58,26,
 1,1,1,38,20,52,52,52,52,52,52,52,52,52,26,18
 </data>
  </layer>
  <layer name="tileObject" width="16" height="16">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,130,100,99,
-0,0,100,150,0,100,100,0,99,99,0,0,0,0,0,100,
-0,100,130,0,0,99,0,130,0,0,147,0,127,130,0,0,
-0,0,0,100,99,0,100,79,77,77,77,147,0,0,0,0,
-0,0,100,130,0,100,99,78,99,100,0,99,0,0,0,0,
-0,0,99,0,79,77,77,86,100,0,130,0,99,0,130,0,
-0,0,0,99,130,0,99,130,99,0,0,0,0,0,0,0,
-0,100,0,0,78,0,0,0,100,0,99,100,130,99,100,0,
-0,100,99,130,100,99,0,100,0,0,0,78,0,0,100,0,
-0,0,0,0,0,0,0,99,130,99,0,130,99,0,0,0,
-0,130,0,99,0,130,0,100,85,77,77,82,0,99,0,0,
-0,0,0,0,99,0,100,99,78,99,100,0,130,100,0,0,
-0,0,0,0,146,77,77,77,82,100,0,99,100,0,0,0,
-0,0,130,126,0,146,0,0,130,0,99,0,0,130,100,0,
-100,0,0,0,0,0,99,99,0,100,100,0,150,100,0,0,
-99,100,130,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,154,124,123,
+0,0,124,174,0,124,124,0,123,123,0,0,0,0,0,124,
+0,124,154,0,0,123,0,154,0,0,171,0,151,154,0,0,
+0,0,0,124,123,0,124,103,101,101,101,171,0,0,0,0,
+0,0,124,154,0,124,123,102,123,124,0,123,0,0,0,0,
+0,0,123,0,103,101,101,110,124,0,154,0,123,0,154,0,
+0,0,0,123,154,0,123,154,123,0,0,0,0,0,0,0,
+0,124,0,0,102,0,0,0,124,0,123,124,154,123,124,0,
+0,124,123,154,124,123,0,124,0,0,0,102,0,0,124,0,
+0,0,0,0,0,0,0,123,154,123,0,154,123,0,0,0,
+0,154,0,123,0,154,0,124,109,101,101,106,0,123,0,0,
+0,0,0,0,123,0,124,123,102,123,124,0,154,124,0,0,
+0,0,0,0,170,101,101,101,106,124,0,123,124,0,0,0,
+0,0,154,150,0,170,0,0,154,0,123,0,0,154,124,0,
+124,0,0,0,0,0,123,123,0,124,124,0,174,124,0,0,
+123,124,154,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
  <layer name="unit" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,187,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,211,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

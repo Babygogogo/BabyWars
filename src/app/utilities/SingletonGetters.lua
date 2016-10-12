@@ -19,20 +19,20 @@ function SingletonGetters.getActionId(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getActionId()
 end
 
-function SingletonGetters.getModelConfirmBox(sceneWarFileName)
-    return SingletonGetters.getModelScene(sceneWarFileName):getModelConfirmBox()
-end
-
-function SingletonGetters.getModelMessageIndicator(sceneWarFileName)
-    return SingletonGetters.getModelScene(sceneWarFileName):getModelMessageIndicator()
-end
-
 function SingletonGetters.getModelPlayerManager(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getModelPlayerManager()
 end
 
+function SingletonGetters.getModelTileMap(sceneWarFileName)
+    return SingletonGetters.getModelWarField(sceneWarFileName):getModelTileMap()
+end
+
 function SingletonGetters.getModelTurnManager(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getModelTurnManager()
+end
+
+function SingletonGetters.getModelUnitMap(sceneWarFileName)
+    return SingletonGetters.getModelWarField(sceneWarFileName):getModelUnitMap()
 end
 
 function SingletonGetters.getModelWarField(sceneWarFileName)
@@ -47,12 +47,27 @@ function SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getScriptEventDispatcher()
 end
 
-function SingletonGetters.getModelTileMap(sceneWarFileName)
-    return SingletonGetters.getModelWarField(sceneWarFileName):getModelTileMap()
+--------------------------------------------------------------------------------
+-- The public getters that can be used only on the client.
+--------------------------------------------------------------------------------
+function SingletonGetters.getModelConfirmBox()
+    return SingletonGetters.getModelScene():getModelConfirmBox()
 end
 
-function SingletonGetters.getModelUnitMap(sceneWarFileName)
-    return SingletonGetters.getModelWarField(sceneWarFileName):getModelUnitMap()
+function SingletonGetters.getModelGridEffect()
+    return SingletonGetters.getModelScene():getModelWarField():getModelGridEffect()
+end
+
+function SingletonGetters.getModelMapCursor()
+    return SingletonGetters.getModelScene():getModelWarField():getModelMapCursor()
+end
+
+function SingletonGetters.getModelMessageIndicator()
+    return SingletonGetters.getModelScene():getModelMessageIndicator()
+end
+
+function SingletonGetters.getModelWarCommandMenu()
+    return SingletonGetters.getModelScene():getModelWarHud():getModelWarCommandMenu()
 end
 
 return SingletonGetters

@@ -5,7 +5,7 @@ local AnimationLoader       = require("src.app.utilities.AnimationLoader")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 150
-local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 104 - 130 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
+local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 93 - 130 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
 local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 210
 local MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM = MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM
 local MENU_BACKGROUND_CAPINSETS                  = {x = 4, y = 6, width = 1, height = 1}

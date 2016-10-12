@@ -384,11 +384,41 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [9] = {
-        [1] = function(...) return "游 戏 流 程" end,
-        [2] = function(...) return "Game Flow"  end,
+        [1] = function(textType)
+            if     (textType == "AttackRange")        then return "射程"
+            elseif (textType == "CanAttackAfterMove") then return "可移动后攻击"
+            elseif (textType == "ConsumptionPerTurn") then return "每回合消耗"
+            elseif (textType == "DestroyOnRunOut")    then return "耗尽后消灭"
+            elseif (textType == "MaxAmmo")            then return "主武器最大弹药量"
+            elseif (textType == "MaxFuel")            then return "最大燃料值"
+            elseif (textType == "Movement")           then return "移动力"
+            elseif (textType == "MoveType")           then return "移动类型"
+            elseif (textType == "ProductionCost")     then return "造价"
+            elseif (textType == "Vision")             then return "视野"
+            elseif (textType == false)                then return "否"
+            elseif (textType == true)                 then return "是"
+            else                                           return "未知9: " .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "AttackRange")        then return "AttackRange"
+            elseif (textType == "CanAttackAfterMove") then return "CanAttackAfterMove"
+            elseif (textType == "ConsumptionPerTurn") then return "ConsumptionPerTurn"
+            elseif (textType == "DestroyOnRunOut")    then return "DestroyOnRunOut"
+            elseif (textType == "MaxAmmo")            then return "MaxAmmo"
+            elseif (textType == "MaxFuel")            then return "MaxFuel"
+            elseif (textType == "Movement")           then return "Movement"
+            elseif (textType == "MoveType")           then return "MoveType"
+            elseif (textType == "ProductionCost")     then return "ProductionCost"
+            elseif (textType == "Vision")             then return "Vision"
+            elseif (textType == false)                then return "No"
+            elseif (textType == true)                 then return "Yes"
+            else                                           return "Unknown9: " .. (textType or "")
+            end
+        end,
     },
+    --[[
     [10] = {
         [1] = function(...) return "战 局 操 作" end,
         [2] = function(...) return "War Control" end,
@@ -654,7 +684,8 @@ local s_Texts = {
             elseif (textType == "SkillInfo")           then return "技 能 信 息"
             elseif (textType == "ActivateSkill")       then return "发 动 技 能"
             elseif (textType == "HideUI")              then return "隐 藏 界 面"
-            elseif (textType == "DamageChart")         then return "基 础 伤 害 表"
+            elseif (textType == "DamageChart")         then return "基础伤害表"
+            elseif (textType == "UnitPropertyList")    then return "部队基础属性表"
             elseif (textType == "Surrender")           then return "投 降"
             elseif (textType == "ReloadWar")           then return "重 新 载 入"
             elseif (textType == "EndTurn")             then return "结 束 回 合"
@@ -686,6 +717,7 @@ local s_Texts = {
             elseif (textType == "ActivateSkill")       then return "ActivateSkill"
             elseif (textType == "HideUI")              then return "Hide UI"
             elseif (textType == "DamageChart")         then return "DamageChart"
+            elseif (textType == "UnitPropertyList")    then return "UnitProperties"
             elseif (textType == "Surrender")           then return "Surrender"
             elseif (textType == "ReloadWar")           then return "Reload"
             elseif (textType == "EndTurn")             then return "End Turn"

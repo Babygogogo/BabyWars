@@ -17,6 +17,7 @@ local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.We
 local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelGridEffect       = SingletonGetters.getModelGridEffect
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelScene            = SingletonGetters.getModelScene
@@ -269,8 +270,10 @@ local function executeActivateSkillGroup(action)
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
 
     if (not IS_SERVER) then
+        local modelGridEffect = getModelGridEffect()
         local func = function(modelUnit)
             if (modelUnit:getPlayerIndex() == playerIndex) then
+                modelGridEffect:showAnimationSkillActivation(modelUnit:getGridIndex())
                 modelUnit:updateView()
             end
         end
@@ -377,7 +380,7 @@ local function executeAttack(action)
     local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
-        attacker:moveViewAlongPath(path, function()
+        attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
             callbackAfterMoveAnimation()
             modelSceneWar:setExecutingAction(false)
         end)
@@ -397,7 +400,7 @@ local function executeAttack(action)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
-            attacker:moveViewAlongPath(path, function()
+            attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
                 callbackAfterMoveAnimation()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))

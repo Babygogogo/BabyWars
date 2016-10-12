@@ -63,7 +63,7 @@ local function getReversedDigitsForInt(int)
 end
 
 local function createDigitSprite(digit, reversedIndex)
-    local sprite = cc.Sprite:createWithSpriteFrameName("c03_t09_s01_f0" .. digit .. ".png")
+    local sprite = cc.Sprite:createWithSpriteFrameName("c02_t99_s10_f0" .. digit .. ".png")
     sprite:ignoreAnchorPointForPosition(true)
         :setPositionX(INFO_LABEL_WIDTH - reversedIndex * DIGIT_WIDTH)
 
@@ -89,7 +89,7 @@ local function createInfoLabel(posX, posY)
 end
 
 local function resetBackground(background, playerIndex)
-    background:loadTextureNormal("c03_t01_s0" .. playerIndex .. "_f01.png", ccui.TextureResType.plistType)
+    background:loadTextureNormal("c02_t99_s09_f0" .. playerIndex .. ".png", ccui.TextureResType.plistType)
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
@@ -137,7 +137,7 @@ local function initUnitLabel(self)
 end
 
 local function initHPInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s01_f01.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(HP_INFO_POS_X, HP_INFO_POS_Y)
@@ -151,7 +151,7 @@ local function initHPInfo(self)
 end
 
 local function initFuelInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s02_f01.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f02.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(FUEL_INFO_POS_X, FUEL_INFO_POS_Y)
@@ -165,7 +165,7 @@ local function initFuelInfo(self)
 end
 
 local function initAmmoInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s03_f01.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f03.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(AMMO_INFO_POS_X, AMMO_INFO_POS_Y)
@@ -179,7 +179,7 @@ local function initAmmoInfo(self)
 end
 
 local function initMaterialInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c03_t07_s09_f01.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f06.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(AMMO_INFO_POS_X, AMMO_INFO_POS_Y)

@@ -31,6 +31,7 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local ComponentManager   = require("src.global.components.ComponentManager")
 
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local getModelWarCommandMenu   = SingletonGetters.getModelWarCommandMenu
 
 local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 
@@ -66,10 +67,6 @@ local function onEvtSceneWarStarted(self, event)
     dispatchEvtMapCursorMoved(self, self:getGridIndex())
 end
 
-local function onEvtWarCommandMenuUpdated(self, event)
-    self.m_IsWarCommandMenuVisible = event.isEnabled and event.isVisible
-end
-
 local function setCursorAppearance(self, normalVisible, targetVisible, siloVisible)
     if (self.m_View) then
         self.m_View:setNormalCursorVisible(normalVisible)
@@ -87,7 +84,7 @@ local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
     local function onTouchesBegan(touches, event)
-        if (self.m_IsWarCommandMenuVisible) then
+        if (getModelWarCommandMenu():isEnabled()) then
             return
         end
 
@@ -99,8 +96,8 @@ local function createTouchListener(self)
     end
 
     local function onTouchesMoved(touches, event)
-        if ((not isTouchBegan)                or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (self.m_IsWarCommandMenuVisible)) then
+        if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (getModelWarCommandMenu():isEnabled())) then
             return
         end
 
@@ -117,7 +114,8 @@ local function createTouchListener(self)
         else
             if (isTouchingCursor) then
                 local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
-                if ((GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) and
+                if ((self:isMovableByPlayer())                                        and
+                    (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize))       and
                     (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
                     dispatchEvtMapCursorMoved(self, gridIndex)
                     isTouchMoved = true
@@ -138,13 +136,13 @@ local function createTouchListener(self)
     end
 
     local function onTouchesEnded(touches, event)
-        if ((not isTouchBegan)                or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (self.m_IsWarCommandMenuVisible)) then
+        if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (getModelWarCommandMenu():isEnabled())) then
             return
         end
 
         local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
-        if (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize)) then
+        if ((self:isMovableByPlayer()) and (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize))) then
             if (not isTouchMoved) then
                 dispatchEvtGridSelected(self, gridIndex)
             elseif ((isTouchingCursor) and (not GridIndexFunctions.isEqual(gridIndex, self:getGridIndex()))) then
@@ -187,6 +185,7 @@ function ModelMapCursor:ctor(param)
         width  = param.mapSize.width,
         height = param.mapSize.height,
     }
+    self:setMovableByPlayer(true)
 
     if (self.m_View) then
         self:initView()
@@ -223,7 +222,6 @@ function ModelMapCursor:onStartRunning(sceneWarFileName)
         :addEventListener("EvtActionPlannerChoosingAction",     self)
         :addEventListener("EvtActionPlannerChoosingSiloTarget", self)
         :addEventListener("EvtSceneWarStarted",                 self)
-        :addEventListener("EvtWarCommandMenuUpdated",           self)
 
     return self
 end
@@ -233,13 +231,49 @@ function ModelMapCursor:onEvent(event)
     if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(         self, event)
     elseif (eventName == "EvtMapCursorMoved")                  then onEvtMapCursorMoved(       self, event)
     elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(      self, event)
-    elseif (eventName == "EvtWarCommandMenuUpdated")           then onEvtWarCommandMenuUpdated(self, event)
     elseif (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerMakingMovePath")     then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerChoosingAction")     then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerChoosingSiloTarget") then setCursorAppearance(self, false, true,  true )
     elseif (eventName == "EvtPreviewNoBattleDamage")           then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtPreviewBattleDamage")             then setCursorAppearance(self, false, true,  false)
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelMapCursor:isMovableByPlayer()
+    return self.m_IsMovableByPlayer
+end
+
+function ModelMapCursor:setMovableByPlayer(movable)
+    self.m_IsMovableByPlayer = movable
+
+    return self
+end
+
+function ModelMapCursor:setNormalCursorVisible(visible)
+    if (self.m_View) then
+        self.m_View:setNormalCursorVisible(visible)
+    end
+
+    return self
+end
+
+function ModelMapCursor:setTargetCursorVisible(visible)
+    if (self.m_View) then
+        self.m_View:setTargetCursorVisible(visible)
+    end
+
+    return self
+end
+
+function ModelMapCursor:setSiloCursorVisible(visible)
+    if (self.m_View) then
+        self.m_View:setSiloCursorVisible(visible)
     end
 
     return self

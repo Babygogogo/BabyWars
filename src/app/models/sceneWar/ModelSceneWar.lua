@@ -302,6 +302,10 @@ function ModelSceneWar:getModelWarField()
     return self.m_ActorWarField:getModel()
 end
 
+function ModelSceneWar:getModelWarHud()
+    return self.m_ActorWarHud:getModel()
+end
+
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
 end

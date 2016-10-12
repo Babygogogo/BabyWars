@@ -33,7 +33,7 @@ local OPTION_INDICATOR_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 --------------------------------------------------------------------------------
 local function initArrowLeft(self)
     local arrowLeft = ccui.Button:create()
-    arrowLeft:loadTextureNormal("c03_t02_s05_f01.png", ccui.TextureResType.plistType)
+    arrowLeft:loadTextureNormal("c01_t99_s04_f05.png", ccui.TextureResType.plistType)
         :setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(ARROW_LEFT_POS_X, ARROW_LEFT_POS_Y)
@@ -53,7 +53,7 @@ end
 
 local function initArrowRight(self)
     local arrowRight = ccui.Button:create()
-    arrowRight:loadTextureNormal("c03_t02_s06_f01.png", ccui.TextureResType.plistType)
+    arrowRight:loadTextureNormal("c01_t99_s04_f06.png", ccui.TextureResType.plistType)
         :setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(ARROW_RIGHT_POS_X, ARROW_RIGHT_POS_Y)
@@ -89,7 +89,7 @@ end
 
 local function initOptionIndicator(self)
     local optionIndicator = ccui.Button:create()
-    optionIndicator:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    optionIndicator:loadTextureNormal("c01_t99_s01_f01.png", ccui.TextureResType.plistType)
         :setScale9Enabled(true)
         :setCapInsets(OPTION_INDICATOR_CAPINSETS)
         :setContentSize(OPTION_INDICATOR_WIDTH, OPTION_INDICATOR_HEIGHT)

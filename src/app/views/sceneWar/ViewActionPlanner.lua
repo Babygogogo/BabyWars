@@ -19,16 +19,16 @@ local ATTACKABLE_GRIDS_OPACITY = 140
 local REACHABLE_GRIDS_OPACITY  = 150
 
 local SPRITE_FRAME_NAME_EMPTY             = nil
-local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c03_t02_s01_f01.png"
-local SPRITE_FRAME_NAME_LINE_HORIZONTAL   = "c03_t02_s02_f01.png"
-local SPRITE_FRAME_NAME_ARROW_UP          = "c03_t02_s03_f01.png"
-local SPRITE_FRAME_NAME_ARROW_DOWN        = "c03_t02_s04_f01.png"
-local SPRITE_FRAME_NAME_ARROW_LEFT        = "c03_t02_s05_f01.png"
-local SPRITE_FRAME_NAME_ARROW_RIGHT       = "c03_t02_s06_f01.png"
-local SPRITE_FRAME_NAME_CORNER_DOWN_LEFT  = "c03_t02_s07_f01.png"
-local SPRITE_FRAME_NAME_CORNER_DOWN_RIGHT = "c03_t02_s08_f01.png"
-local SPRITE_FRAME_NAME_CORNER_UP_LEFT    = "c03_t02_s09_f01.png"
-local SPRITE_FRAME_NAME_CORNER_UP_RIGHT   = "c03_t02_s10_f01.png"
+local SPRITE_FRAME_NAME_LINE_VERTICAL     = "c01_t99_s04_f01.png"
+local SPRITE_FRAME_NAME_LINE_HORIZONTAL   = "c01_t99_s04_f02.png"
+local SPRITE_FRAME_NAME_ARROW_UP          = "c01_t99_s04_f03.png"
+local SPRITE_FRAME_NAME_ARROW_DOWN        = "c01_t99_s04_f04.png"
+local SPRITE_FRAME_NAME_ARROW_LEFT        = "c01_t99_s04_f05.png"
+local SPRITE_FRAME_NAME_ARROW_RIGHT       = "c01_t99_s04_f06.png"
+local SPRITE_FRAME_NAME_CORNER_DOWN_LEFT  = "c01_t99_s04_f07.png"
+local SPRITE_FRAME_NAME_CORNER_DOWN_RIGHT = "c01_t99_s04_f08.png"
+local SPRITE_FRAME_NAME_CORNER_UP_LEFT    = "c01_t99_s04_f09.png"
+local SPRITE_FRAME_NAME_CORNER_UP_RIGHT   = "c01_t99_s04_f10.png"
 
 --------------------------------------------------------------------------------
 -- The util functions.
