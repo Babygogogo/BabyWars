@@ -124,8 +124,8 @@ local function getAmmoIndicatorFrame(unit)
     end
 end
 
-local function getSubmergedIndicatorFrame(unit)
-    if ((unit.isSumberged) and (unit:isSumberged())) then
+local function getDiveIndicatorFrame(unit)
+    if ((unit.isDiving) and (unit:isDiving())) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s03_f0" .. unit:getPlayerIndex() .. ".png")
     else
         return nil
@@ -260,7 +260,7 @@ local function updateStateIndicator(self, unit)
     frames[#frames + 1] = getLevelIndicatorFrame(    unit)
     frames[#frames + 1] = getFuelIndicatorFrame(     unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
-    frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
+    frames[#frames + 1] = getDiveIndicatorFrame(     unit)
     frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
     frames[#frames + 1] = getBuildIndicatorFrame(    unit)
     frames[#frames + 1] = getLoadIndicatorFrame(     unit)

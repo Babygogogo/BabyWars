@@ -3634,6 +3634,11 @@ GameConstant.templateModelUnits = {
             productionCost = 20000,
         },
 
+        Diver = {
+            isDiving                  = true,
+            additionalFuelConsumption = 4,
+        },
+
         Joinable = {},
 
         vision      = 5,
