@@ -4082,11 +4082,11 @@ GameConstant.skills = {
         maxLevel     = 3,
         modifierUnit = "",
         levels = {
-            [-1] = {modifier = -1, pointsPassive = -100, pointsActive = -25, minEnergy = 3},
+            [-1] = {modifier = -1, pointsPassive = -80, pointsActive = -20, minEnergy = 3},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
-            [1] = {modifier = 1, pointsPassive = 375, pointsActive = 250, minEnergy = 3},
-            [2] = {modifier = 2, pointsPassive = 750, pointsActive = 500, minEnergy = 6},
-            [3] = {modifier = 3, pointsPassive = 1125, pointsActive = 750, minEnergy = 9},
+            [1] = {modifier = 1, pointsPassive = 300, pointsActive = 200, minEnergy = 3},
+            [2] = {modifier = 2, pointsPassive = 600, pointsActive = 400, minEnergy = 6},
+            [3] = {modifier = 3, pointsPassive = 900, pointsActive = 600, minEnergy = 9},
         },
     },
 
@@ -4096,7 +4096,7 @@ GameConstant.skills = {
         maxLevel     = 1,
         modifierUnit = "",
         levels       = {
-            [1] = {modifier = nil, pointsPassive = nil, pointsActive = 700, minEnergy = 8},
+            [1] = {modifier = nil, pointsPassive = nil, pointsActive = 850, minEnergy = 8},
         },
     },
 
