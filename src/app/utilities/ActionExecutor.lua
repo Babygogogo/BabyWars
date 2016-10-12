@@ -880,14 +880,21 @@ local function executeWait(action)
     local sceneWarFileName = action.fileName
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
     moveModelUnitWithAction(action)
-
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        focusModelUnit:moveViewAlongPath(path, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+            if (path.isBlocked) then
+                getModelGridEffect():showAnimationBlock(path[#path])
+            end
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
+    end
 end
 
 --------------------------------------------------------------------------------

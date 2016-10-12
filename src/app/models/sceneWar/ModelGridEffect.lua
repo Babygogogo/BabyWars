@@ -95,6 +95,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelGridEffect:showAnimationBlock(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationBlock(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationSkillActivation(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationSkillActivation(gridIndex)

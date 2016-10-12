@@ -7,6 +7,7 @@ local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 local SKILL_ACTIVATION_Z_ORDER = 3
 local DAMAGE_Z_ORDER           = 2
 local EXPLOSION_Z_ORDER        = 1
+local BLOCK_Z_ORDER            = 0
 local SUPPLY_Z_ORDER           = 0
 
 local SKILL_ACTIVATION_OFFSET_X = - (336 - GRID_SIZE.width)  / 2
@@ -17,6 +18,23 @@ local SUPPLY_OFFSET_Y           = GRID_SIZE.height * 0.7
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function createAnimationBlock(gridIndex)
+    local animation = cc.Sprite:createWithSpriteFrameName("c03_t08_s05_f01.png")
+    local x, y = GridIndexFunctions.toPosition(gridIndex)
+    animation:setAnchorPoint(1, 0)
+        :setPosition(x + SUPPLY_OFFSET_X, y + SUPPLY_OFFSET_Y)
+        :setScale(2)
+
+    local action = cc.Sequence:create(
+        cc.ScaleTo:create(0.1, 1),
+        cc.DelayTime:create(0.6),
+        cc.CallFunc:create(function() animation:removeFromParent() end)
+    )
+    animation:runAction(action)
+
+    return animation
+end
+
 local function createAnimationExplosion(gridIndex, callbackOnFinish)
     local animation = cc.Sprite:create()
     local x, y = GridIndexFunctions.toPosition(gridIndex)
@@ -89,6 +107,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ViewGridEffect:showAnimationBlock(gridIndex)
+    self:addChild(createAnimationBlock(gridIndex), BLOCK_Z_ORDER)
+
+    return self
+end
+
 function ViewGridEffect:showAnimationExplosion(gridIndex, callbackOnFinish)
     self:addChild(createAnimationExplosion(gridIndex), EXPLOSION_Z_ORDER)
 
