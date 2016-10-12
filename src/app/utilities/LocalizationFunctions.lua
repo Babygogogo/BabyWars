@@ -824,15 +824,16 @@ local s_Texts = {
             elseif (actionType == "Attack")                 then return "攻 击"
             elseif (actionType == "CaptureModelTile")       then return "占 领"
             elseif (actionType == "LoadModelUnit")          then return "装 载"
+            elseif (actionType == "Dive")                   then return "下 潜"
             elseif (actionType == "DropModelUnit")          then return "卸 载"
             elseif (actionType == "LaunchModelUnit")        then return "弹 射"
             elseif (actionType == "JoinModelUnit")          then return "合 流"
             elseif (actionType == "SupplyModelUnit")        then return "补 给"
+            elseif (actionType == "Surface")                then return "上 浮"
             elseif (actionType == "BuildModelTile")         then return "建 造"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "生 产"
             elseif (actionType == "LaunchSilo")             then return "发 射"
-            else
-                return "未 知"
+            else                                                 return "未知78: " .. (actionType or "")
             end
         end,
         [2] = function(actionType)
@@ -840,15 +841,16 @@ local s_Texts = {
             elseif (actionType == "Attack")                 then return "Attack"
             elseif (actionType == "CaptureModelTile")       then return "Capture"
             elseif (actionType == "LoadModelUnit")          then return "Load"
+            elseif (actionType == "Dive")                   then return "Dive"
             elseif (actionType == "DropModelUnit")          then return "Drop"
             elseif (actionType == "LaunchModelUnit")        then return "Launch"
             elseif (actionType == "JoinModelUnit")          then return "Join"
             elseif (actionType == "SupplyModelUnit")        then return "Supply"
+            elseif (actionType == "Surface")                then return "Surface"
             elseif (actionType == "BuildModelTile")         then return "Build"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "Produce"
             elseif (actionType == "LaunchSilo")             then return "Launch"
-            else
-                return "Unknown"
+            else                                                 return "Unknown78: " .. (actionType or "")
             end
         end,
     },
