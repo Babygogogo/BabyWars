@@ -336,7 +336,9 @@ function ModelUnitMap:addActorUnitOnMap(actorUnit)
 end
 
 function ModelUnitMap:removeActorUnitOnMap(gridIndex)
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
+    local x, y = gridIndex.x, gridIndex.y
+    assert(self.m_ActorUnitsMap[x][y], "ModelUnitMap:removeActorUnitOnMap() there's no unit on the grid: " .. x .. " " .. y)
+    self.m_ActorUnitsMap[x][y] = nil
 
     return self
 end

@@ -9,6 +9,7 @@ local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions"
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
 local UNIT_MAX_HP           = GameConstantFunctions.getUnitMaxHP()
@@ -167,6 +168,18 @@ local function moveModelUnitWithAction(action)
         end
         if (modelTile.setCurrentCapturePoint) then
             modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
+        end
+
+        if (not IS_SERVER) then
+            local playerIndex = focusModelUnit:getPlayerIndex()
+            for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
+                local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+                if ((adjacentModelUnit)                                                                                          and
+                    (not VisibilityFunctions.isModelUnitVisibleToPlayerIndex(adjacentModelUnit, sceneWarFileName, playerIndex))) then
+                    modelUnitMap:removeActorUnitOnMap(adjacentGridIndex)
+                    adjacentModelUnit:removeViewFromParent()
+                end
+            end
         end
     end
 
