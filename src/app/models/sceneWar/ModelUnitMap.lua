@@ -25,10 +25,12 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
+local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
+local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
+local WebSocketManager        = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+
 local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
 local isModelUnitVisibleToPlayerIndex = VisibilityFunctions.isModelUnitVisibleToPlayerIndex
-
-local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -176,11 +178,24 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitMap:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
-    local func = function(modelUnit)
-        modelUnit:onStartRunning(sceneWarFileName)
+
+    if (IS_SERVER) then
+        self:forEachModelUnitOnMap(function(modelUnit)
+            modelUnit:onStartRunning(sceneWarFileName)
+        end)
+    else
+        local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+        self:forEachModelUnitOnMap(function(modelUnit)
+            modelUnit:onStartRunning(sceneWarFileName)
+            if (not isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndexLoggedIn)) then
+                modelUnit:setViewVisible(false)
+            end
+        end)
     end
-    self:forEachModelUnitOnMap( func)
-        :forEachModelUnitLoaded(func)
+
+    self:forEachModelUnitLoaded(function(modelUnit)
+        modelUnit:onStartRunning(sceneWarFileName)
+    end)
 
     return self
 end
