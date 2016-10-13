@@ -101,17 +101,25 @@ end
 
 local function getLoggedInPlayerIndex()
     assert(not IS_SERVER, "ActionExecutor-getLoggedInPlayerIndex() this should not be called on the server.")
-    local _, playerIndex = getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-    return playerIndex
+
+    local account = WebSocketManager.getLoggedInAccountAndPassword()
+    local playerIndexLoggedIn
+    getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (modelPlayer:getAccount() == account) then
+            playerIndexLoggedIn = playerIndex
+        end
+    end)
+
+    return playerIndexLoggedIn
 end
 
-local function setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex, visible)
+local function setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex)
     assert(not IS_SERVER, "ActionExecutor-setAdjacentModelUnitsVisible() this should not be called on the server.")
     local modelUnitMap = getModelUnitMap(sceneWarFileName)
     for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
         if (modelUnit) then
-            modelUnit:setViewVisible(visible)
+            modelUnit:setViewVisible(true)
         end
     end
 end
@@ -793,12 +801,7 @@ local function executeProduceModelUnitOnTile(action)
         :setAvailableUnitId(availableUnitID + 1)
 
     if (not IS_SERVER) then
-        local playerIndexLoggedIn = getLoggedInPlayerIndex()
-        if (modelUnit:getPlayerIndex() == playerIndexLoggedIn) then
-            setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex, true)
-        elseif (not isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndexLoggedIn)) then
-            modelUnit:setViewVisible(false)
-        end
+        setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex)
     end
 
     local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
@@ -941,13 +944,7 @@ local function executeWait(action)
             if (path.isBlocked) then
                 getModelGridEffect():showAnimationBlock(endingGridIndex)
             end
-
-            local playerIndexLoggedIn = getLoggedInPlayerIndex()
-            if (focusModelUnit:getPlayerIndex() == playerIndexLoggedIn) then
-                setAdjacentModelUnitsVisible(sceneWarFileName, endingGridIndex, true)
-            elseif (isModelUnitVisibleToPlayerIndex(focusModelUnit, sceneWarFileName, playerIndexLoggedIn)) then
-                focusModelUnit:setViewVisible(true)
-            end
+            setAdjacentModelUnitsVisible(sceneWarFileName, endingGridIndex)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
