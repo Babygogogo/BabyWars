@@ -22,9 +22,11 @@ local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
+local isModelUnitVisibleToPlayerIndex = VisibilityFunctions.isModelUnitVisibleToPlayerIndex
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
@@ -164,6 +166,38 @@ function ModelUnitMap:toSerializableTable()
     return {
         mapSize         = self:getMapSize(),
         availableUnitId = self.m_AvailableUnitID,
+        grids           = grids,
+        loaded          = loaded,
+    }
+end
+
+function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
+    -- TODO: deal with the fog of war.
+    local sceneWarFileName = self.m_SceneWarFileName
+    local grids            = {}
+    local visibleMap       = {}
+    self:forEachModelUnitOnMap(function(modelUnit)
+        if (isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndex)) then
+            grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+
+            local gridIndex = modelUnit:getGridIndex()
+            local x, y      = gridIndex.x, gridIndex.y
+            visibleMap[x]    = visibleMap[x] or {}
+            visibleMap[x][y] = true
+        end
+    end)
+
+    local loaded = {}
+    self:forEachModelUnitLoaded(function(modelUnit)
+        local gridIndex = modelUnit:getGridIndex()
+        if ((visibleMap[gridIndex.x]) and (visibleMap[gridIndex.x][gridIndex.y])) then
+            loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+        end
+    end)
+
+    return {
+        mapSize         = self:getMapSize(),
+        availableUnitId = self:getAvailableUnitId(),
         grids           = grids,
         loaded          = loaded,
     }

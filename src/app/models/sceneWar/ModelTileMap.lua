@@ -159,6 +159,11 @@ function ModelTileMap:toSerializableTable()
     }
 end
 
+function ModelTileMap:toSerializableTableForPlayerIndex(playerIndex)
+    -- TODO: deal with the fog of war.
+    return self:toSerializableTable()
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
