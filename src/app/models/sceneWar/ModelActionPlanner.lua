@@ -23,7 +23,6 @@ local LocalizationFunctions       = require("src.app.utilities.LocalizationFunct
 local MovePathFunctions           = require("src.app.utilities.MovePathFunctions")
 local ReachableAreaFunctions      = require("src.app.utilities.ReachableAreaFunctions")
 local SingletonGetters            = require("src.app.utilities.SingletonGetters")
-local VisibilityFunctions         = require("src.app.utilities.VisibilityFunctions")
 local WebSocketManager            = require("src.app.utilities.WebSocketManager")
 local Actor                       = require("src.global.actors.Actor")
 
@@ -32,7 +31,6 @@ local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
-local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
@@ -47,10 +45,7 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
         return nil
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        local playerIndex       = modelUnit:getPlayerIndex()
-        if ((existingModelUnit)                                                                                           and
-            (existingModelUnit:getPlayerIndex() ~= playerIndex)                                                           and
-            (VisibilityFunctions.isModelUnitVisibleToPlayerIndex(existingModelUnit, getSceneWarFileName(), playerIndex))) then
+        if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
             return nil
         else
             return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(modelUnit)

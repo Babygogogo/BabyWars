@@ -330,7 +330,8 @@ function ViewUnit:showMovingAnimation()
 end
 
 function ViewUnit:moveAlongPath(path, callbackOnFinish)
-    self:showMovingAnimation()
+    self:setVisible(true)
+        :showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
         :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
 
@@ -338,7 +339,8 @@ function ViewUnit:moveAlongPath(path, callbackOnFinish)
 end
 
 function ViewUnit:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackOnFinish)
-    self:showMovingAnimation()
+    self:setVisible(true)
+        :showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
         :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callbackOnFinish))
 

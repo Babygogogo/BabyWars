@@ -17,22 +17,20 @@ local IS_SERVER             = GameConstantFunctions.isServer()
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
 
-local getAdjacentGrids                = GridIndexFunctions.getAdjacentGrids
-local getLocalizedText                = LocalizationFunctions.getLocalizedText
-local getModelGridEffect              = SingletonGetters.getModelGridEffect
-local getModelMessageIndicator        = SingletonGetters.getModelMessageIndicator
-local getModelPlayerManager           = SingletonGetters.getModelPlayerManager
-local getModelScene                   = SingletonGetters.getModelScene
-local getModelTileMap                 = SingletonGetters.getModelTileMap
-local getModelTurnManager             = SingletonGetters.getModelTurnManager
-local getModelUnitMap                 = SingletonGetters.getModelUnitMap
-local getSceneWarFileName             = SingletonGetters.getSceneWarFileName
-local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
-local isModelUnitVisibleToPlayerIndex = VisibilityFunctions.isModelUnitVisibleToPlayerIndex
-local toErrorMessage                  = SerializationFunctions.toErrorMessage
+local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelGridEffect       = SingletonGetters.getModelGridEffect
+local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
+local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getModelScene            = SingletonGetters.getModelScene
+local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelTurnManager      = SingletonGetters.getModelTurnManager
+local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
+local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local toErrorMessage           = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
--- The functions for dispatching events.
+-- The util functions.
 --------------------------------------------------------------------------------
 local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
     getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
@@ -70,9 +68,6 @@ local function dispatchEvtAttackViewTile(sceneWarFileName, gridIndex)
     })
 end
 
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
 local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -99,27 +94,25 @@ local function requestReloadSceneWar(message)
     })
 end
 
-local function getLoggedInPlayerIndex()
-    assert(not IS_SERVER, "ActionExecutor-getLoggedInPlayerIndex() this should not be called on the server.")
+local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
+    if ((not IS_SERVER) and (revealedUnits)) then
+        local modelUnitMap = getModelUnitMap()
+        for unitID, data in pairs(revealedUnits) do
+            local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
+            actorUnit:getModel():onStartRunning(sceneWarFileName)
+                :updateView()
+                :setViewVisible(visible)
 
-    local account = WebSocketManager.getLoggedInAccountAndPassword()
-    local playerIndexLoggedIn
-    getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:getAccount() == account) then
-            playerIndexLoggedIn = playerIndex
+            modelUnitMap:addActorUnitOnMap(actorUnit)
         end
-    end)
-
-    return playerIndexLoggedIn
+    end
 end
 
-local function setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex)
-    assert(not IS_SERVER, "ActionExecutor-setAdjacentModelUnitsVisible() this should not be called on the server.")
-    local modelUnitMap = getModelUnitMap(sceneWarFileName)
-    for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
-        local modelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-        if (modelUnit) then
-            modelUnit:setViewVisible(true)
+local function setRevealedUnitsVisible(revealedUnits, visible)
+    if ((not IS_SERVER) and (revealedUnits)) then
+        local modelUnitMap = getModelUnitMap()
+        for _, data in pairs(revealedUnits) do
+            modelUnitMap:getModelUnit(data.GridIndexable.gridIndex):setViewVisible(visible)
         end
     end
 end
@@ -178,23 +171,19 @@ local function moveModelUnitWithAction(action)
         end
 
         if (not IS_SERVER) then
-            local playerIndexLoggedIn = getLoggedInPlayerIndex()
-            local playerIndexMoving   = focusModelUnit:getPlayerIndex()
-            if (playerIndexLoggedIn ~= playerIndexMoving) then
-                if ((focusModelUnit.isDiving) and (focusModelUnit:isDiving())) then
-                    focusModelUnit:setViewVisible(false)
-                end
-            else
-                for _, adjacentGridIndex in ipairs(getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
-                    local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-                    if ((adjacentModelUnit)                                                                            and
-                        (not isModelUnitVisibleToPlayerIndex(adjacentModelUnit, sceneWarFileName, playerIndexMoving))) then
-                        adjacentModelUnit:setViewVisible(false)
-                    end
+            local playerIndex = focusModelUnit:getPlayerIndex()
+            for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
+                local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+                if ((adjacentModelUnit)                                                                                          and
+                    (not VisibilityFunctions.isModelUnitVisibleToPlayerIndex(adjacentModelUnit, sceneWarFileName, playerIndex))) then
+                    modelUnitMap:removeActorUnitOnMap(adjacentGridIndex)
+                    adjacentModelUnit:removeViewFromParent()
                 end
             end
         end
     end
+
+    addActorUnitsOnMapWithRevealedUnits(path.revealedUnits, false)
 end
 
 local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
@@ -231,7 +220,7 @@ local function getAdjacentPlasmaGridIndexes(gridIndex, modelTileMap)
 
     local i = 0
     while (i <= #indexes) do
-        for _, adjacentGridIndex in ipairs(getAdjacentGrids(indexes[i], mapSize)) do
+        for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(indexes[i], mapSize)) do
             if (modelTileMap:getModelTile(adjacentGridIndex):getTileType() == "Plasma") then
                 local x, y = adjacentGridIndex.x, adjacentGridIndex.y
                 searchedMap[x] = searchedMap[x] or {}
@@ -785,23 +774,22 @@ local function executeProduceModelUnitOnTile(action)
     local sceneWarFileName = action.fileName
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local availableUnitID  = modelUnitMap:getAvailableUnitId()
-    local gridIndex        = action.gridIndex
-    local actorData = {
-        tiledID       = action.tiledID,
-        unitID        = availableUnitID,
-        GridIndexable = {gridIndex = gridIndex},
-    }
-    local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
-    local modelUnit = actorUnit:getModel()
 
-    promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
-    modelUnit:setStateActioned()
-        :onStartRunning(sceneWarFileName)
-    modelUnitMap:addActorUnitOnMap(actorUnit)
-        :setAvailableUnitId(availableUnitID + 1)
+    if (action.tiledID) then
+        local actorData = {
+            tiledID       = action.tiledID,
+            unitID        = availableUnitID,
+            GridIndexable = {gridIndex = action.gridIndex},
+        }
+        local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
+        local modelUnit = actorUnit:getModel()
 
-    if (not IS_SERVER) then
-        setAdjacentModelUnitsVisible(sceneWarFileName, gridIndex)
+        promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+        modelUnit:setStateActioned()
+            :onStartRunning(sceneWarFileName)
+
+        modelUnitMap:addActorUnitOnMap(actorUnit)
+        addActorUnitsOnMapWithRevealedUnits(action.revealedUnits, true)
     end
 
     local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
@@ -809,6 +797,7 @@ local function executeProduceModelUnitOnTile(action)
     modelPlayer:setFund(modelPlayer:getFund() - action.cost)
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
+    modelUnitMap:setAvailableUnitId(availableUnitID + 1)
     getModelScene(sceneWarFileName):setExecutingAction(false)
 end
 
@@ -862,7 +851,7 @@ local function executeSupplyModelUnit(action)
     moveModelUnitWithAction(action)
 
     local targetModelUnits = {}
-    for _, gridIndex in pairs(getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
         local targetModelUnit = modelUnitMap:getModelUnit(gridIndex)
         if ((targetModelUnit) and (focusModelUnit:canSupplyModelUnit(targetModelUnit))) then
             targetModelUnits[#targetModelUnits + 1] = targetModelUnit
@@ -940,11 +929,10 @@ local function executeWait(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            local endingGridIndex = path[#path]
+            setRevealedUnitsVisible(path.revealedUnits, true)
             if (path.isBlocked) then
-                getModelGridEffect():showAnimationBlock(endingGridIndex)
+                getModelGridEffect():showAnimationBlock(path[#path])
             end
-            setAdjacentModelUnitsVisible(sceneWarFileName, endingGridIndex)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)

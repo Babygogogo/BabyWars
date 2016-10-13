@@ -372,6 +372,10 @@ function ModelTurnManager:toSerializableTable()
     }
 end
 
+function ModelTurnManager:toSerializableTableForPlayerIndex(playerIndex)
+    return self:toSerializableTable()
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
