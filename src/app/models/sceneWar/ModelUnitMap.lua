@@ -324,7 +324,9 @@ end
 function ModelUnitMap:addActorUnitOnMap(actorUnit)
     local modelUnit = actorUnit:getModel()
     local gridIndex = modelUnit:getGridIndex()
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
+    local x, y      = gridIndex.x, gridIndex.y
+    assert(not self.m_ActorUnitsMap[x][y], "ModelUnitMap:addActorUnitOnMap() there's another unit on the grid: " .. x .. " " .. y)
+    self.m_ActorUnitsMap[x][y] = actorUnit
 
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), modelUnit)

@@ -93,58 +93,84 @@ local function requestReloadSceneWar(message)
     })
 end
 
+local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
+    if ((not IS_SERVER) and (revealedUnits)) then
+        local modelUnitMap = getModelUnitMap()
+        for unitID, data in pairs(revealedUnits) do
+            local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
+            actorUnit:getModel():onStartRunning(sceneWarFileName)
+                :updateView()
+                :setViewVisible(visible)
+
+            modelUnitMap:addActorUnitOnMap(actorUnit)
+        end
+    end
+end
+
+local function setRevealedUnitsVisible(revealedUnits, visible)
+    if ((not IS_SERVER) and (revealedUnits)) then
+        local modelUnitMap = getModelUnitMap()
+        for _, data in pairs(revealedUnits) do
+            modelUnitMap:getModelUnit(data.GridIndexable.gridIndex):setViewVisible(visible)
+        end
+    end
+end
+
 local function moveModelUnitWithAction(action)
     local path       = action.path
     local pathLength = #path
+    if (pathLength <= 1) then
+        return
+    end
 
-    if (pathLength > 1) then
-        local sceneWarFileName   = action.fileName
-        local modelUnitMap       = getModelUnitMap(sceneWarFileName)
-        local beginningGridIndex = path[1]
-        local endingGridIndex    = path[pathLength]
-        local launchUnitID       = action.launchUnitID
-        local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+    local sceneWarFileName   = action.fileName
+    local modelUnitMap       = getModelUnitMap(sceneWarFileName)
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[pathLength]
+    local launchUnitID       = action.launchUnitID
+    local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
 
-        if (focusModelUnit.setCapturingModelTile) then
-            focusModelUnit:setCapturingModelTile(false)
-        end
-        if (focusModelUnit.setCurrentFuel) then
-            focusModelUnit:setCurrentFuel(focusModelUnit:getCurrentFuel() - path.fuelConsumption)
-        end
-        if (focusModelUnit.setBuildingModelTile) then
-            focusModelUnit:setBuildingModelTile(false)
-        end
-        if (focusModelUnit.getLoadUnitIdList) then
-            for _, loadedModelUnit in pairs(modelUnitMap:getLoadedModelUnitsWithLoader(focusModelUnit, true)) do
-                loadedModelUnit:setGridIndex(endingGridIndex, false)
-            end
-        end
-
-        focusModelUnit:setGridIndex(endingGridIndex, false)
-        if (launchUnitID) then
-            modelUnitMap:getModelUnit(beginningGridIndex):removeLoadUnitId(launchUnitID)
-                :updateView()
-                :showNormalAnimation()
-
-            if (action.actionName ~= "LoadModelUnit") then
-                modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
-            end
-        else
-            if (action.actionName == "LoadModelUnit") then
-                modelUnitMap:setActorUnitLoaded(beginningGridIndex)
-            else
-                modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
-            end
-
-            local modelTile = getModelTileMap(sceneWarFileName):getModelTile(beginningGridIndex)
-            if (modelTile.setCurrentBuildPoint) then
-                modelTile:setCurrentBuildPoint(modelTile:getMaxBuildPoint())
-            end
-            if (modelTile.setCurrentCapturePoint) then
-                modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
-            end
+    if (focusModelUnit.setCapturingModelTile) then
+        focusModelUnit:setCapturingModelTile(false)
+    end
+    if (focusModelUnit.setCurrentFuel) then
+        focusModelUnit:setCurrentFuel(focusModelUnit:getCurrentFuel() - path.fuelConsumption)
+    end
+    if (focusModelUnit.setBuildingModelTile) then
+        focusModelUnit:setBuildingModelTile(false)
+    end
+    if (focusModelUnit.getLoadUnitIdList) then
+        for _, loadedModelUnit in pairs(modelUnitMap:getLoadedModelUnitsWithLoader(focusModelUnit, true)) do
+            loadedModelUnit:setGridIndex(endingGridIndex, false)
         end
     end
+
+    focusModelUnit:setGridIndex(endingGridIndex, false)
+    if (launchUnitID) then
+        modelUnitMap:getModelUnit(beginningGridIndex):removeLoadUnitId(launchUnitID)
+            :updateView()
+            :showNormalAnimation()
+
+        if (action.actionName ~= "LoadModelUnit") then
+            modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
+        end
+    else
+        if (action.actionName == "LoadModelUnit") then
+            modelUnitMap:setActorUnitLoaded(beginningGridIndex)
+        else
+            modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
+        end
+
+        local modelTile = getModelTileMap(sceneWarFileName):getModelTile(beginningGridIndex)
+        if (modelTile.setCurrentBuildPoint) then
+            modelTile:setCurrentBuildPoint(modelTile:getMaxBuildPoint())
+        end
+        if (modelTile.setCurrentCapturePoint) then
+            modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
+        end
+    end
+
+    addActorUnitsOnMapWithRevealedUnits(path.revealedUnits, false)
 end
 
 local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
@@ -750,6 +776,7 @@ local function executeProduceModelUnitOnTile(action)
             :onStartRunning(sceneWarFileName)
 
         modelUnitMap:addActorUnitOnMap(actorUnit)
+        addActorUnitsOnMapWithRevealedUnits(action.revealedUnits, true)
     end
 
     local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
@@ -888,6 +915,8 @@ local function executeWait(action)
         focusModelUnit:moveViewAlongPath(path, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+
+            setRevealedUnitsVisible(path.revealedUnits, true)
             if (path.isBlocked) then
                 getModelGridEffect():showAnimationBlock(path[#path])
             end

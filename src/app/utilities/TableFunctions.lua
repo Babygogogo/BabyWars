@@ -15,4 +15,13 @@ function TableFunctions.appendList(list1, list2, additionalItem)
     end
 end
 
+function TableFunctions.clone(t)
+    local clonedTable = {}
+    for k, v in pairs(t) do
+        clonedTable[k] = v
+    end
+
+    return clonedTable
+end
+
 return TableFunctions
