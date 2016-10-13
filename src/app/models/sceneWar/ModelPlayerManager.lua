@@ -38,11 +38,6 @@ function ModelPlayerManager:toSerializableTable()
     return t
 end
 
-function ModelPlayerManager:toSerializableTableForPlayerIndex(playerIndex)
-    --TODO: deal with the fog of war.
-    return self:toSerializableTable()
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

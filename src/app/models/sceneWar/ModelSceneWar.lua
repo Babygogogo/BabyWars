@@ -170,20 +170,6 @@ function ModelSceneWar:toSerializableTable()
     }
 end
 
-function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
-    return {
-        fileName       = self.m_FileName,
-        warPassword    = self.m_WarPassword,
-        isEnded        = self.m_IsWarEnded,
-        actionID       = self.m_ActionID,
-        maxSkillPoints = self.m_MaxSkillPoints,
-        warField       = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
-        turn           = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
-        players        = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
-        weather        = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
-    }
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------

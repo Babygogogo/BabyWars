@@ -33,10 +33,6 @@ function ModelWeatherManager:toSerializableTable()
     }
 end
 
-function ModelWeatherManager:toSerializableTableForPlayerIndex(playerIndex)
-    return self:toSerializableTable()
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
