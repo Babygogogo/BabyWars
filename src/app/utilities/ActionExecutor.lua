@@ -95,7 +95,8 @@ local function requestReloadSceneWar(message)
 end
 
 local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
-    if ((not IS_SERVER) and (revealedUnits)) then
+    assert(not IS_SERVER, "ActionExecutor-addActorUnitsOnMapWithRevealedUnits() this should not be called on the server.")
+    if (revealedUnits) then
         local modelUnitMap = getModelUnitMap()
         for unitID, data in pairs(revealedUnits) do
             local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
@@ -183,7 +184,9 @@ local function moveModelUnitWithAction(action)
         end
     end
 
-    addActorUnitsOnMapWithRevealedUnits(path.revealedUnits, false)
+    if (not IS_SERVER) then
+        addActorUnitsOnMapWithRevealedUnits(path.revealedUnits, false)
+    end
 end
 
 local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
@@ -789,7 +792,9 @@ local function executeProduceModelUnitOnTile(action)
             :onStartRunning(sceneWarFileName)
 
         modelUnitMap:addActorUnitOnMap(actorUnit)
-        addActorUnitsOnMapWithRevealedUnits(action.revealedUnits, true)
+        if (not IS_SERVER) then
+            addActorUnitsOnMapWithRevealedUnits(action.revealedUnits, true)
+        end
     end
 
     local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()

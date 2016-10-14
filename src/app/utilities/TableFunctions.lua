@@ -15,10 +15,13 @@ function TableFunctions.appendList(list1, list2, additionalItem)
     end
 end
 
-function TableFunctions.clone(t)
+function TableFunctions.clone(t, ignoredKeys)
     local clonedTable = {}
     for k, v in pairs(t) do
         clonedTable[k] = v
+    end
+    for _, ignoredKey in pairs(ignoredKeys) do
+        clonedTable[ignoredKey] = nil
     end
 
     return clonedTable
