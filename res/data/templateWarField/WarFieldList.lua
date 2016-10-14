@@ -4,6 +4,7 @@ return {
     "BeiZhong",
     "BiFengGang",
     "DiXiaShui",
+    "DuiKangZhaoTianTong",
     "DuoYanPingYuan",
     "FengBaoQianXian",
     "GaoLaMiJia",
