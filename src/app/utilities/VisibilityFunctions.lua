@@ -29,6 +29,23 @@ function VisibilityFunctions.isModelUnitVisibleToPlayerIndex(modelUnit, sceneWar
     end
 end
 
+function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, isDiving, unitPlayerIndex, opponentPlayerIndex)
+    -- TODO: deal with the fog of war.
+    if ((unitPlayerIndex == opponentPlayerIndex) or (not isDiving)) then
+        return true
+    else
+        local modelUnitMap = getModelUnitMap(sceneWarFileName)
+        for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
+            local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+            if ((adjacentModelUnit) and (adjacentModelUnit:getPlayerIndex() == opponentPlayerIndex)) then
+                return true
+            end
+        end
+
+        return false
+    end
+end
+
 function VisibilityFunctions.getRevealedUnitsDataWithGridIndex(gridIndex, sceneWarFileName, playerIndex)
     -- TODO: deal with fog of war.
     local modelUnitMap  = getModelUnitMap(sceneWarFileName)
