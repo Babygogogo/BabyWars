@@ -27,10 +27,8 @@ local UNIT_SPRITE_Z_ORDER     = 0
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createStepsForActionMoveAlongPath(self, path)
-    local modelUnit              = self.m_Model
-    local isDiving               = (modelUnit.isDiving) and (modelUnit:isDiving())
-    local playerIndex            = modelUnit:getPlayerIndex()
+local function createStepsForActionMoveAlongPath(self, path, isDiving)
+    local playerIndex            = self.m_Model:getPlayerIndex()
     local playerIndexMod         = playerIndex % 2
     local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
     local sceneWarFileName       = SingletonGetters.getSceneWarFileName()
@@ -75,8 +73,8 @@ local function createStepsForActionMoveAlongPath(self, path)
     return steps
 end
 
-local function createActionMoveAlongPath(self, path, callback)
-    local steps = createStepsForActionMoveAlongPath(self, path)
+local function createActionMoveAlongPath(self, path, isDiving, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
         SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
@@ -86,8 +84,8 @@ local function createActionMoveAlongPath(self, path, callback)
     return cc.Sequence:create(unpack(steps))
 end
 
-local function createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callback)
-    local steps = createStepsForActionMoveAlongPath(self, path)
+local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
         SingletonGetters.getScriptEventDispatcher():dispatchEvent({
             name      = "EvtMapCursorMoved",
@@ -355,18 +353,18 @@ function ViewUnit:showMovingAnimation()
     return self
 end
 
-function ViewUnit:moveAlongPath(path, callbackOnFinish)
+function ViewUnit:moveAlongPath(path, isDiving, callbackOnFinish)
     self:showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
-        :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
+        :runAction(createActionMoveAlongPath(self, path, isDiving, callbackOnFinish))
 
     return self
 end
 
-function ViewUnit:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackOnFinish)
+function ViewUnit:moveAlongPathAndFocusOnTarget(path, isDiving, targetGridIndex, callbackOnFinish)
     self:showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
-        :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callbackOnFinish))
+        :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callbackOnFinish))
 
     return self
 end

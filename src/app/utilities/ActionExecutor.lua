@@ -136,6 +136,10 @@ local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
     end
 end
 
+local function isModelUnitDiving(modelUnit)
+    return (modelUnit.isDiving) and (modelUnit:isDiving())
+end
+
 local function setRevealedUnitsVisible(revealedUnits, visible)
     assert(not IS_SERVER, "ActionExecutor-setRevealedUnitsVisible() this should not be called on the server.")
     if (revealedUnits) then
@@ -156,8 +160,7 @@ local function removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingG
 
     if (playerIndexLoggedIn ~= playerIndexActing) then
         -- 如果登录的玩家不是行动玩家，那么判断行动单位在行动后是否可见，如果不可见则清除行动单位。
-        local isDiving = (modelUnit.isDiving) and (modelUnit:isDiving())
-        if (not isUnitVisible(sceneWarFileName, endingGridIndex, isDiving, playerIndexActing, playerIndexLoggedIn)) then
+        if (not isUnitVisible(sceneWarFileName, endingGridIndex, isModelUnitDiving(modelUnit), playerIndexActing, playerIndexLoggedIn)) then
             modelUnitMap:removeActorUnitOnMap(endingGridIndex)
             return {modelUnit}
         end
@@ -166,9 +169,8 @@ local function removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingG
         local removedModelUnits = {}
         for _, adjacentGridIndex in ipairs(getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
             local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-            local isDiving          = (adjacentModelUnit) and (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving())
-            if ((adjacentModelUnit)                                                                                                          and
-                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, isDiving, adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
+            if ((adjacentModelUnit)                                                                                                                                      and
+                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
                 modelUnitMap:removeActorUnitOnMap(adjacentGridIndex)
                 removedModelUnits[#removedModelUnits + 1] = adjacentModelUnit
             end
@@ -465,7 +467,7 @@ local function executeAttack(action)
     local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
-        attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
+        attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
             callbackAfterMoveAnimation()
             modelSceneWar:setExecutingAction(false)
         end)
@@ -485,7 +487,7 @@ local function executeAttack(action)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
-            attacker:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, function()
+            attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
                 callbackAfterMoveAnimation()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
@@ -566,7 +568,7 @@ local function executeBuildModelTile(action)
     end
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
@@ -596,7 +598,7 @@ local function executeCaptureModelTile(action)
     local modelSceneWar   = getModelScene(sceneWarFileName)
     local lostPlayerIndex = action.lostPlayerIndex
     if (not lostPlayerIndex) then
-        focusModelUnit:moveViewAlongPath(path, function()
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
@@ -614,7 +616,7 @@ local function executeCaptureModelTile(action)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
-            focusModelUnit:moveViewAlongPath(path, function()
+            focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
                 focusModelUnit:updateView()
                     :showNormalAnimation()
                 modelTile:updateView()
@@ -655,7 +657,7 @@ local function executeDropModelUnit(action)
     end
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
@@ -664,7 +666,9 @@ local function executeDropModelUnit(action)
                 dropModelUnit:moveViewAlongPath({
                         loaderEndingGridIndex,
                         dropModelUnit:getGridIndex(),
-                    }, function()
+                    },
+                    isModelUnitDiving(dropModelUnit),
+                    function()
                         dropModelUnit:updateView()
                             :showNormalAnimation()
                     end
@@ -740,7 +744,7 @@ local function executeJoinModelUnit(action)
     end
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             targetModelUnit:removeViewFromParent()
@@ -774,7 +778,7 @@ local function executeLaunchSilo(action)
     end
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
@@ -806,7 +810,7 @@ local function executeLoadModelUnit(action)
     loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
                 :setViewVisible(false)
@@ -882,7 +886,7 @@ local function executeProduceModelUnitOnUnit(action)
     dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
     producer:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(producer), function()
             producer:updateView()
                 :showNormalAnimation()
 
@@ -914,7 +918,7 @@ local function executeSupplyModelUnit(action)
     end
 
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, function()
+        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
@@ -989,7 +993,7 @@ local function executeWait(action)
         addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
         local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
 
-        focusModelUnit:moveViewAlongPath(path, function()
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
