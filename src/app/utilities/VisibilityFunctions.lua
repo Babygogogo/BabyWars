@@ -52,7 +52,9 @@ function VisibilityFunctions.getRevealedUnitsDataWithGridIndex(gridIndex, sceneW
     local revealedUnits
     for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-        if ((modelUnit) and (not VisibilityFunctions.isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndex))) then
+        local isDiving  = (modelUnit) and (modelUnit.isDiving) and (modelUnit:isDiving())
+        if ((modelUnit)                                                                                                                                        and
+            (not VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, adjacentGridIndex, isDiving, modelUnit:getPlayerIndex(), playerIndex))) then
             revealedUnits = revealedUnits or {}
             revealedUnits[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
         end

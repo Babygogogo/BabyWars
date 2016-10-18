@@ -17,6 +17,7 @@ local IS_SERVER             = GameConstantFunctions.isServer()
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
 
+local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelGridEffect       = SingletonGetters.getModelGridEffect
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
@@ -27,10 +28,11 @@ local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local toErrorMessage           = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
--- The util functions.
+-- The functions for dispatching events.
 --------------------------------------------------------------------------------
 local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
     getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
@@ -68,6 +70,9 @@ local function dispatchEvtAttackViewTile(sceneWarFileName, gridIndex)
     })
 end
 
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
 local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -94,6 +99,28 @@ local function requestReloadSceneWar(message)
     })
 end
 
+local function getPlayerIndexLoggedIn()
+    assert(not IS_SERVER, "ActionExecutor-getPlayerIndexLoggedIn() this should not be called on the server.")
+    local _, playerIndex = getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    return playerIndex
+end
+
+local function addActorUnitWithFocusUnitData(data, isLoaded, isViewVisible)
+    assert(not IS_SERVER, "Action-addActorUnitWithFocusUnitData() this should not be called on the server.")
+    if (data) then
+        local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
+        actorUnit:getModel():onStartRunning(getSceneWarFileName())
+            :updateView()
+            :setViewVisible(isViewVisible)
+
+        if (isLoaded) then
+            getModelUnitMap():addActorUnitLoaded(actorUnit)
+        else
+            getModelUnitMap():addActorUnitOnMap(actorUnit)
+        end
+    end
+end
+
 local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
     assert(not IS_SERVER, "ActionExecutor-addActorUnitsOnMapWithRevealedUnits() this should not be called on the server.")
     if (revealedUnits) then
@@ -110,11 +137,43 @@ local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
 end
 
 local function setRevealedUnitsVisible(revealedUnits, visible)
-    if ((not IS_SERVER) and (revealedUnits)) then
+    assert(not IS_SERVER, "ActionExecutor-setRevealedUnitsVisible() this should not be called on the server.")
+    if (revealedUnits) then
         local modelUnitMap = getModelUnitMap()
         for _, data in pairs(revealedUnits) do
             modelUnitMap:getModelUnit(data.GridIndexable.gridIndex):setViewVisible(visible)
         end
+    end
+end
+
+local function removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+    assert(not IS_SERVER, "ActionExecutor-setRevealedUnitsVisible() this should not be called on the server.")
+    local sceneWarFileName    = getSceneWarFileName()
+    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    local modelUnitMap        = getModelUnitMap()
+    local modelUnit           = modelUnitMap:getModelUnit(endingGridIndex)
+    local playerIndexActing   = modelUnit:getPlayerIndex()
+
+    if (playerIndexLoggedIn ~= playerIndexActing) then
+        -- 如果登录的玩家不是行动玩家，那么判断行动单位在行动后是否可见，如果不可见则清除行动单位。
+        local isDiving = (modelUnit.isDiving) and (modelUnit:isDiving())
+        if (not isUnitVisible(sceneWarFileName, endingGridIndex, isDiving, playerIndexActing, playerIndexLoggedIn)) then
+            modelUnitMap:removeActorUnitOnMap(endingGridIndex)
+            return {modelUnit}
+        end
+    else
+        -- 如果登录的玩家是行动玩家，那么需要清除行动单位在行动前可见、行动后不可见的部队。
+        local removedModelUnits = {}
+        for _, adjacentGridIndex in ipairs(getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
+            local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+            local isDiving          = (adjacentModelUnit) and (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving())
+            if ((adjacentModelUnit)                                                                                                          and
+                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, isDiving, adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
+                modelUnitMap:removeActorUnitOnMap(adjacentGridIndex)
+                removedModelUnits[#removedModelUnits + 1] = adjacentModelUnit
+            end
+        end
+        return removedModelUnits
     end
 end
 
@@ -170,22 +229,6 @@ local function moveModelUnitWithAction(action)
         if (modelTile.setCurrentCapturePoint) then
             modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
         end
-
-        if (not IS_SERVER) then
-            local playerIndex = focusModelUnit:getPlayerIndex()
-            for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(beginningGridIndex, modelUnitMap:getMapSize())) do
-                local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-                if ((adjacentModelUnit)                                                                                          and
-                    (not VisibilityFunctions.isModelUnitVisibleToPlayerIndex(adjacentModelUnit, sceneWarFileName, playerIndex))) then
-                    modelUnitMap:removeActorUnitOnMap(adjacentGridIndex)
-                    adjacentModelUnit:removeViewFromParent()
-                end
-            end
-        end
-    end
-
-    if (not IS_SERVER) then
-        addActorUnitsOnMapWithRevealedUnits(path.revealedUnits, false)
     end
 end
 
@@ -223,7 +266,7 @@ local function getAdjacentPlasmaGridIndexes(gridIndex, modelTileMap)
 
     local i = 0
     while (i <= #indexes) do
-        for _, adjacentGridIndex in ipairs(GridIndexFunctions.getAdjacentGrids(indexes[i], mapSize)) do
+        for _, adjacentGridIndex in ipairs(getAdjacentGrids(indexes[i], mapSize)) do
             if (modelTileMap:getModelTile(adjacentGridIndex):getTileType() == "Plasma") then
                 local x, y = adjacentGridIndex.x, adjacentGridIndex.y
                 searchedMap[x] = searchedMap[x] or {}
@@ -856,7 +899,7 @@ local function executeSupplyModelUnit(action)
     moveModelUnitWithAction(action)
 
     local targetModelUnits = {}
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
+    for _, gridIndex in pairs(getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
         local targetModelUnit = modelUnitMap:getModelUnit(gridIndex)
         if ((targetModelUnit) and (focusModelUnit:canSupplyModelUnit(targetModelUnit))) then
             targetModelUnits[#targetModelUnits + 1] = targetModelUnit
@@ -920,23 +963,42 @@ local function executeSurrender(action)
     modelSceneWar:setExecutingAction(false)
 end
 
+local function executeTickActionId(action)
+    assert(not IS_SERVER, "ActionExecutor-executeTickActionId() this should not be called on the server.")
+    getModelScene():setExecutingAction(false)
+end
+
 local function executeWait(action)
-    local path             = action.path
-    local sceneWarFileName = action.fileName
-    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
+    local launchUnitID = action.launchUnitID
+    if (not IS_SERVER) then
+        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+    end
+
+    local path               = action.path
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[#path]
+    local sceneWarFileName   = action.fileName
+    local focusModelUnit     = getModelUnitMap(sceneWarFileName):getFocusModelUnit(beginningGridIndex, launchUnitID)
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
 
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
     else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+
         focusModelUnit:moveViewAlongPath(path, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            setRevealedUnitsVisible(path.revealedUnits, true)
+            setRevealedUnitsVisible(revealedUnits, true)
             if (path.isBlocked) then
-                getModelGridEffect():showAnimationBlock(path[#path])
+                getModelGridEffect():showAnimationBlock(endingGridIndex)
+            end
+            for _, removedModelUnit in pairs(removedModelUnits or {}) do
+                removedModelUnit:removeViewFromParent()
             end
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -1012,6 +1074,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
     elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
     elseif (actionName == "Surrender")              then executeSurrender(             action)
+    elseif (actionName == "TickActionId")           then executeTickActionId(          action)
     elseif (actionName == "Wait")                   then executeWait(                  action)
     end
 
