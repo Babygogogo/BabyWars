@@ -4,6 +4,7 @@ local Diver = require("src.global.functions.class")("Diver")
 Diver.EXPORTED_METHODS = {
     "isDiving",
     "canDive",
+    "canSurface",
     "getAdditionalFuelConsumptionForDive",
 
     "setDiving",
@@ -51,6 +52,10 @@ end
 
 function Diver:canDive()
     return not self:isDiving()
+end
+
+function Diver:canSurface()
+    return self:isDiving()
 end
 
 function Diver:getAdditionalFuelConsumptionForDive()

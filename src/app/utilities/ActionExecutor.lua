@@ -636,6 +636,42 @@ local function executeCaptureModelTile(action)
     end
 end
 
+local function executeDive(action)
+    local launchUnitID = action.launchUnitID
+    if (not IS_SERVER) then
+        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+    end
+
+    local path               = action.path
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[#path]
+    local sceneWarFileName   = action.fileName
+    local focusModelUnit     = getModelUnitMap(sceneWarFileName):getFocusModelUnit(beginningGridIndex, launchUnitID)
+    moveModelUnitWithAction(action)
+    focusModelUnit:setStateActioned()
+        :setDiving(true)
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+
+        focusModelUnit:moveViewAlongPath(path, false, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+
+            setRevealedUnitsVisible(revealedUnits, true)
+            for _, removedModelUnit in pairs(removedModelUnits or {}) do
+                removedModelUnit:removeViewFromParent()
+            end
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
+        end)
+    end
+end
+
 local function executeDropModelUnit(action)
     local path             = action.path
     local sceneWarFileName = action.fileName
@@ -935,6 +971,43 @@ local function executeSupplyModelUnit(action)
         end)
 end
 
+local function executeSurface(action)
+    local launchUnitID = action.launchUnitID
+    if (not IS_SERVER) then
+        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+    end
+
+    local path               = action.path
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[#path]
+    local sceneWarFileName   = action.fileName
+    local focusModelUnit     = getModelUnitMap(sceneWarFileName):getFocusModelUnit(beginningGridIndex, launchUnitID)
+    moveModelUnitWithAction(action)
+    focusModelUnit:setStateActioned()
+        :setDiving(false)
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+
+        focusModelUnit:moveViewAlongPath(path, true, function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+                :setViewVisible(true)
+
+            setRevealedUnitsVisible(revealedUnits, true)
+            for _, removedModelUnit in pairs(removedModelUnits or {}) do
+                removedModelUnit:removeViewFromParent()
+            end
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
+        end)
+    end
+end
+
 local function executeSurrender(action)
     local sceneWarFileName   = action.fileName
     local modelSceneWar      = getModelScene(sceneWarFileName)
@@ -1069,6 +1142,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
     elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
     elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
+    elseif (actionName == "Dive")                   then executeDive(                  action)
     elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
     elseif (actionName == "EndTurn")                then executeEndTurn(               action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
@@ -1077,6 +1151,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
     elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
     elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
+    elseif (actionName == "Surface")                then executeSurface(               action)
     elseif (actionName == "Surrender")              then executeSurrender(             action)
     elseif (actionName == "TickActionId")           then executeTickActionId(          action)
     elseif (actionName == "Wait")                   then executeWait(                  action)
