@@ -5,6 +5,8 @@ local AnimationLoader       = require("src.app.utilities.AnimationLoader")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}
@@ -26,8 +28,14 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path)
-    local playerIndexMod = self.m_Model:getPlayerIndex() % 2
-    local steps          = {cc.CallFunc:create(function()
+    local modelUnit              = self.m_Model
+    local isDiving               = (modelUnit.isDiving) and (modelUnit:isDiving())
+    local playerIndex            = modelUnit:getPlayerIndex()
+    local playerIndexMod         = playerIndex % 2
+    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    local sceneWarFileName       = SingletonGetters.getSceneWarFileName()
+    local isUnitVisible          = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+    local steps                  = {cc.CallFunc:create(function()
         SingletonGetters.getModelMapCursor():setMovableByPlayer(false)
     end)}
 
@@ -41,6 +49,24 @@ local function createStepsForActionMoveAlongPath(self, path)
             steps[#steps + 1] = cc.CallFunc:create(function()
                 self.m_UnitSprite:setFlippedX(playerIndexMod == 0)
             end)
+        end
+
+        if (playerIndex ~= playerIndexLoggedIn) then
+            if (isDiving) then
+                if ((i == #path)                                                                            and
+                    (isUnitVisible(sceneWarFileName, path[i], isDiving, playerIndex, playerIndexLoggedIn))) then
+                    steps[#steps + 1] = cc.Show:create()
+                else
+                    steps[#steps + 1] = cc.Hide:create()
+                end
+            else
+                if ((isUnitVisible(sceneWarFileName, path[i - 1], isDiving, playerIndex, playerIndexLoggedIn))  or
+                    (isUnitVisible(sceneWarFileName, path[i],     isDiving, playerIndex, playerIndexLoggedIn))) then
+                    steps[#steps + 1] = cc.Show:create()
+                else
+                    steps[#steps + 1] = cc.Hide:create()
+                end
+            end
         end
 
         steps[#steps + 1] = cc.MoveTo:create(MOVE_DURATION_PER_GRID, GridIndexFunctions.toPositionTable(path[i]))
