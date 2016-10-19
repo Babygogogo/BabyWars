@@ -30,6 +30,8 @@ function VisibilityFunctions.isModelUnitVisibleToPlayerIndex(modelUnit, sceneWar
 end
 
 function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, isDiving, unitPlayerIndex, opponentPlayerIndex)
+    assert(type(unitPlayerIndex)     == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
+    assert(type(opponentPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid opponentPlayerIndex: " .. (opponentPlayerIndex or ""))
     -- TODO: deal with the fog of war.
     if ((unitPlayerIndex == opponentPlayerIndex) or (not isDiving)) then
         return true

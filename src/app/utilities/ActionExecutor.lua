@@ -411,7 +411,7 @@ local function executeAttack(action)
     attacker:setCurrentHP(attackerNewHP)
     if (attackerNewHP == 0) then
         attackTarget:setCurrentPromotion(math.min(attackTarget:getMaxPromotion(), attackTarget:getCurrentPromotion() + 1))
-        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, attackerGridIndex)
+        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, attackerGridIndex, false)
     end
 
     local plasmaGridIndexes
@@ -420,7 +420,7 @@ local function executeAttack(action)
     if (targetNewHP == 0) then
         if (attackTarget.getUnitType) then
             attacker:setCurrentPromotion(math.min(attacker:getMaxPromotion(), attacker:getCurrentPromotion() + 1))
-            Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, targetGridIndex)
+            Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, targetGridIndex, false)
         else
             attackTarget:updateWithObjectAndBaseId(0)
             plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex, modelTileMap)
