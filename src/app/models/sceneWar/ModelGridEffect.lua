@@ -111,4 +111,12 @@ function ModelGridEffect:showAnimationSkillActivation(gridIndex)
     return self
 end
 
+function ModelGridEffect:showAnimationSupply(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSupply(gridIndex)
+    end
+
+    return self
+end
+
 return ModelGridEffect

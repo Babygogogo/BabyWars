@@ -105,6 +105,34 @@ local function getPlayerIndexLoggedIn()
     return playerIndex
 end
 
+local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridIndex, playerIndex)
+    assert(type(playerIndex) == "number", "ActionExecutor-getAndSupplyAdjacentModelUnits() invalid playerIndex: " .. (playerIndex or ""))
+
+    local modelUnitMap = getModelUnitMap(sceneWarFileName)
+    local targets      = {}
+    for _, adjacentGridIndex in pairs(getAdjacentGrids(supplierGridIndex, modelUnitMap:getMapSize())) do
+        local target = modelUnitMap:getModelUnit(adjacentGridIndex)
+        if ((target) and (target:getPlayerIndex() == playerIndex)) then
+            local isSupplied = false
+            if (target:getCurrentFuel() < target:getMaxFuel()) then
+                target:setCurrentFuel(target:getMaxFuel())
+                isSupplied = true
+            end
+            if ((target.hasPrimaryWeapon)                                                  and
+                (target:hasPrimaryWeapon())                                                and
+                (target:getPrimaryWeaponCurrentAmmo() < target:getPrimaryWeaponMaxAmmo())) then
+                target:setPrimaryWeaponCurrentAmmo(target:getPrimaryWeaponMaxAmmo())
+                isSupplied = true
+            end
+            if (isSupplied) then
+                targets[#targets + 1] = target
+            end
+        end
+    end
+
+    return targets
+end
+
 local function addActorUnitWithFocusUnitData(data, isLoaded, isViewVisible)
     assert(not IS_SERVER, "Action-addActorUnitWithFocusUnitData() this should not be called on the server.")
     if (data) then
@@ -931,44 +959,59 @@ local function executeProduceModelUnitOnUnit(action)
 end
 
 local function executeSupplyModelUnit(action)
-    local sceneWarFileName = action.fileName
-    local path             = action.path
-    local endingGridIndex  = path[#path]
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    moveModelUnitWithAction(action)
-
-    local targetModelUnits = {}
-    for _, gridIndex in pairs(getAdjacentGrids(endingGridIndex, modelUnitMap:getMapSize())) do
-        local targetModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if ((targetModelUnit) and (focusModelUnit:canSupplyModelUnit(targetModelUnit))) then
-            targetModelUnits[#targetModelUnits + 1] = targetModelUnit
-
-            if (targetModelUnit.setCurrentFuel) then
-                targetModelUnit:setCurrentFuel(targetModelUnit:getMaxFuel())
-            end
-            if ((targetModelUnit.hasPrimaryWeapon) and (targetModelUnit:hasPrimaryWeapon())) then
-                targetModelUnit:setPrimaryWeaponCurrentAmmo(targetModelUnit:getPrimaryWeaponMaxAmmo())
-            end
-        end
+    local launchUnitID = action.launchUnitID
+    if (not IS_SERVER) then
+        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
     end
 
-    focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
-            focusModelUnit:updateView()
-                :showNormalAnimation()
+    local sceneWarFileName = action.fileName
+    local path             = action.path
+    if (not path) then
+        assert(not IS_SERVER, "ActionExecutor-executeSupplyModelUnit() the action contains no path. This should not happen on the server.")
+        local playerIndexActing = getModelTurnManager():getPlayerIndex()
+        assert(playerIndexActing ~= getPlayerIndexLoggedIn())
 
-            local dispatcher = getScriptEventDispatcher(sceneWarFileName)
-            for _, targetModelUnit in ipairs(targetModelUnits) do
-                targetModelUnit:updateView()
-                dispatcher:dispatchEvent({
-                    name      = "EvtSupplyViewUnit",
-                    gridIndex = targetModelUnit:getGridIndex(),
-                })
-            end
+        local targetModelUnits = getAndSupplyAdjacentModelUnits(sceneWarFileName, action.supplierGridIndex, playerIndexActing)
+        local modelGridEffect  = getModelGridEffect()
+        for _, targetModelUnit in pairs(targetModelUnits) do
+            targetModelUnit:updateView()
+            modelGridEffect:showAnimationSupply(targetModelUnit:getGridIndex())
+        end
 
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local beginningGridIndex = path[1]
+        local endingGridIndex    = path[#path]
+        local focusModelUnit     = getModelUnitMap(sceneWarFileName):getFocusModelUnit(beginningGridIndex, launchUnitID)
+        local targetModelUnits   = getAndSupplyAdjacentModelUnits(sceneWarFileName, endingGridIndex, focusModelUnit:getPlayerIndex())
+        moveModelUnitWithAction(action)
+        focusModelUnit:setStateActioned()
+
+        if (IS_SERVER) then
             getModelScene(sceneWarFileName):setExecutingAction(false)
-        end)
+        else
+            local revealedUnits = action.revealedUnits
+            addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+            local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+
+            focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+                focusModelUnit:updateView()
+                    :showNormalAnimation()
+                setRevealedUnitsVisible(revealedUnits, true)
+
+                local modelGridEffect = getModelGridEffect()
+                for _, targetModelUnit in pairs(targetModelUnits) do
+                    targetModelUnit:updateView()
+                    modelGridEffect:showAnimationSupply(targetModelUnit:getGridIndex())
+                end
+                for _, removedModelUnit in pairs(removedModelUnits or {}) do
+                    removedModelUnit:removeViewFromParent()
+                end
+
+                getModelScene(sceneWarFileName):setExecutingAction(false)
+            end)
+        end
+    end
 end
 
 local function executeSurface(action)
