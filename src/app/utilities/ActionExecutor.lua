@@ -133,8 +133,8 @@ local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridInde
     return targets
 end
 
-local function addActorUnitWithFocusUnitData(data, isLoaded, isViewVisible)
-    assert(not IS_SERVER, "Action-addActorUnitWithFocusUnitData() this should not be called on the server.")
+local function addActorUnitWithUnitData(data, isLoaded, isViewVisible)
+    assert(not IS_SERVER, "Action-addActorUnitWithUnitData() this should not be called on the server.")
     if (data) then
         local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
         actorUnit:getModel():onStartRunning(getSceneWarFileName())
@@ -238,9 +238,12 @@ local function moveModelUnitWithAction(action)
 
     focusModelUnit:setGridIndex(endingGridIndex, false)
     if (launchUnitID) then
-        modelUnitMap:getModelUnit(beginningGridIndex):removeLoadUnitId(launchUnitID)
-            :updateView()
-            :showNormalAnimation()
+        local loaderModelUnit = modelUnitMap:getModelUnit(beginningGridIndex)
+        if (loaderModelUnit) then
+            loaderModelUnit:removeLoadUnitId(launchUnitID)
+                :updateView()
+                :showNormalAnimation()
+        end
 
         if (action.actionName ~= "LoadModelUnit") then
             modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
@@ -667,7 +670,7 @@ end
 local function executeDive(action)
     local launchUnitID = action.launchUnitID
     if (not IS_SERVER) then
-        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+        addActorUnitWithUnitData(action.focusUnitData, launchUnitID ~= nil, false)
     end
 
     local path               = action.path
@@ -750,15 +753,23 @@ local function executeEndTurn(action)
 end
 
 local function executeJoinModelUnit(action)
-    local path             = action.path
-    local endingGridIndex  = path[#path]
-    local sceneWarFileName = action.fileName
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    local targetModelUnit  = modelUnitMap:getModelUnit(endingGridIndex)
+    local launchUnitID = action.launchUnitID
+    if (not IS_SERVER) then
+        addActorUnitWithUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+        addActorUnitWithUnitData(action.joiningUnitData, false, false)
+    end
+
+    local path               = action.path
+    local beginningGridIndex = path[1]
+    local endingGridIndex    = path[#path]
+    local sceneWarFileName   = action.fileName
+    local modelUnitMap       = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+    local targetModelUnit    = modelUnitMap:getModelUnit(endingGridIndex)
 
     modelUnitMap:removeActorUnitOnMap(endingGridIndex)
     moveModelUnitWithAction(action)
+    focusModelUnit:setStateActioned()
 
     if ((focusModelUnit.hasPrimaryWeapon) and (focusModelUnit:hasPrimaryWeapon())) then
         focusModelUnit:setPrimaryWeaponCurrentAmmo(math.min(
@@ -807,14 +818,26 @@ local function executeJoinModelUnit(action)
         focusModelUnit:setCapturingModelTile(targetModelUnit:isCapturingModelTile())
     end
 
-    focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitOnMapAfterAction(beginningGridIndex, endingGridIndex)
+
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+            setRevealedUnitsVisible(revealedUnits, true)
+
             targetModelUnit:removeViewFromParent()
+            for _, removedModelUnit in pairs(removedModelUnits or {}) do
+                removedModelUnit:removeViewFromParent()
+            end
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
+    end
 end
 
 local function executeLaunchSilo(action)
@@ -961,7 +984,7 @@ end
 local function executeSupplyModelUnit(action)
     local launchUnitID = action.launchUnitID
     if (not IS_SERVER) then
-        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+        addActorUnitWithUnitData(action.focusUnitData, launchUnitID ~= nil, false)
     end
 
     local sceneWarFileName = action.fileName
@@ -1017,7 +1040,7 @@ end
 local function executeSurface(action)
     local launchUnitID = action.launchUnitID
     if (not IS_SERVER) then
-        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+        addActorUnitWithUnitData(action.focusUnitData, launchUnitID ~= nil, false)
     end
 
     local path               = action.path
@@ -1091,7 +1114,7 @@ end
 local function executeWait(action)
     local launchUnitID = action.launchUnitID
     if (not IS_SERVER) then
-        addActorUnitWithFocusUnitData(action.focusUnitData, launchUnitID ~= nil, false)
+        addActorUnitWithUnitData(action.focusUnitData, launchUnitID ~= nil, false)
     end
 
     local path               = action.path
