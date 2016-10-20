@@ -48,9 +48,11 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, g
     end
 end
 
-function VisibilityFunctions.getRevealedUnitsDataWithGridIndex(gridIndex, sceneWarFileName, playerIndex)
+function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path, modelUnit)
     -- TODO: deal with fog of war.
     local modelUnitMap  = getModelUnitMap(sceneWarFileName)
+    local gridIndex     = path[#path]
+    local playerIndex   = modelUnit:getPlayerIndex()
     local revealedUnits
     for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
