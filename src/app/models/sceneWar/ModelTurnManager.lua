@@ -201,7 +201,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
                     local modelTile = modelTileMap:getModelTile(gridIndex)
 
                     if ((not modelTile.canRepairTarget) or (not modelTile:canRepairTarget(modelUnit))) then
-                        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, gridIndex, true)
+                        Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
                         dispatcher:dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,

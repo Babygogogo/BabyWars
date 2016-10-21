@@ -357,8 +357,6 @@ end
 function ModelUnitMap:removeActorUnitLoaded(unitID)
     local loadedModelUnit = self:getLoadedModelUnitWithUnitId(unitID)
     assert(loadedModelUnit, "ModelUnitMap:removeActorUnitLoaded() the unit that the unitID refers to is not loaded: " .. (unitID or ""))
-
-    loadedModelUnit:removeViewFromParent()
     self.m_LoadedActorUnits[unitID] = nil
 
     return self
