@@ -249,6 +249,8 @@ local function moveModelUnitWithAction(action)
             loaderModelUnit:removeLoadUnitId(launchUnitID)
                 :updateView()
                 :showNormalAnimation()
+        else
+            assert(not IS_SERVER, "ActionExecutor-moveModelUnitWithAction() failed to get the loader for the launching unit, on the server.")
         end
 
         if (action.actionName ~= "LoadModelUnit") then
@@ -912,7 +914,11 @@ local function executeLoadModelUnit(action)
 
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
-    loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
+    if (loaderModelUnit) then
+        loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
+    else
+        assert(not IS_SERVER, "ActionExecutor-executeLoadModelUnit() failed to get the target loader on the server.")
+    end
 
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -925,7 +931,9 @@ local function executeLoadModelUnit(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
                 :setViewVisible(false)
-            loaderModelUnit:updateView()
+            if (loaderModelUnit) then
+                loaderModelUnit:updateView()
+            end
 
             setRevealedUnitsVisible(revealedUnits, true)
             for _, removedModelUnit in pairs(removedModelUnits or {}) do

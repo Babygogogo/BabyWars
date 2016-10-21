@@ -345,7 +345,9 @@ end
 
 function ModelUnitMap:addActorUnitLoaded(actorUnit)
     local modelUnit = actorUnit:getModel()
-    self.m_LoadedActorUnits[modelUnit:getUnitId()] = actorUnit
+    local unitID    = modelUnit:getUnitId()
+    assert(self.m_LoadedActorUnits[unitID] == nil, "ModelUnitMap:addActorUnitLoaded() the unit id is loaded already: " .. unitID)
+    self.m_LoadedActorUnits[unitID] = actorUnit
 
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
