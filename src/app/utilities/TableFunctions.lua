@@ -15,6 +15,22 @@ function TableFunctions.appendList(list1, list2, additionalItem)
     end
 end
 
+function TableFunctions.union(t1, t2)
+    if ((t1 == nil) and (t2 == nil)) then
+        return nil
+    end
+
+    local t = {}
+    for k, v in pairs(t1 or {}) do
+        t[k] = v
+    end
+    for k, v in pairs(t2 or {}) do
+        t[k] = v
+    end
+
+    return t
+end
+
 function TableFunctions.clone(t, ignoredKeys)
     local clonedTable = {}
     for k, v in pairs(t) do

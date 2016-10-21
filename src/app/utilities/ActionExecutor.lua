@@ -135,18 +135,22 @@ local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridInde
     return targets
 end
 
-local function addActorUnitWithUnitData(data, isViewVisible)
-    assert(not IS_SERVER, "Action-addActorUnitWithUnitData() this should not be called on the server.")
-    if (data) then
-        local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", data, "sceneWar.ViewUnit")
-        actorUnit:getModel():onStartRunning(getSceneWarFileName())
-            :updateView()
-            :setViewVisible(isViewVisible)
+local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
+    assert(not IS_SERVER, "Action-addActorUnitsWithUnitsData() this should not be called on the server.")
+    if (unitsData) then
+        local sceneWarFileName = getSceneWarFileName()
+        local modelUnitMap     = getModelUnitMap()
+        for unitID, unitData in pairs(unitsData) do
+            local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
+            actorUnit:getModel():onStartRunning(sceneWarFileName)
+                :updateView()
+                :setViewVisible(isViewVisible)
 
-        if (data.isLoaded) then
-            getModelUnitMap():addActorUnitLoaded(actorUnit)
-        else
-            getModelUnitMap():addActorUnitOnMap(actorUnit)
+            if (unitData.isLoaded) then
+                modelUnitMap:addActorUnitLoaded(actorUnit)
+            else
+                modelUnitMap:addActorUnitOnMap(actorUnit)
+            end
         end
     end
 end
@@ -676,7 +680,7 @@ end
 
 local function executeDive(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
@@ -762,8 +766,7 @@ end
 
 local function executeJoinModelUnit(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
-        addActorUnitWithUnitData(action.joiningUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
@@ -896,7 +899,7 @@ end
 
 local function executeLoadModelUnit(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
@@ -909,9 +912,7 @@ local function executeLoadModelUnit(action)
 
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
-    if (loaderModelUnit) then
-        loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
-    end
+    loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
 
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -924,9 +925,7 @@ local function executeLoadModelUnit(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
                 :setViewVisible(false)
-            if (loaderModelUnit) then
-                loaderModelUnit:updateView()
-            end
+            loaderModelUnit:updateView()
 
             setRevealedUnitsVisible(revealedUnits, true)
             for _, removedModelUnit in pairs(removedModelUnits or {}) do
@@ -1014,7 +1013,7 @@ end
 
 local function executeSupplyModelUnit(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
@@ -1057,7 +1056,7 @@ end
 
 local function executeSurface(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
@@ -1131,7 +1130,7 @@ end
 
 local function executeWait(action)
     if (not IS_SERVER) then
-        addActorUnitWithUnitData(action.focusUnitData, false)
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
     end
 
     local sceneWarFileName   = action.fileName
