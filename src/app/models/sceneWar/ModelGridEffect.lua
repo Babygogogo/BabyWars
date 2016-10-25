@@ -111,6 +111,14 @@ function ModelGridEffect:showAnimationExplosion(gridIndex)
     return self
 end
 
+function ModelGridEffect:showAnimationSiloAttack(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSiloAttack(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationSkillActivation(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationSkillActivation(gridIndex)
