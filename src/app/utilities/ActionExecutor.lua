@@ -637,15 +637,26 @@ local function executeBuildModelTile(action)
             :setCurrentMaterial(focusModelUnit:getCurrentMaterial() - 1)
         modelTile:updateWithObjectAndBaseId(focusModelUnit:getBuildTiledIdWithTileType(modelTile:getTileType()))
     end
-
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitsAfterAction(action)
+
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
 
+            setRevealedUnitsVisible(revealedUnits, true)
+            removeViewUnits(removedModelUnits)
+
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
+    end
 end
 
 local function executeCaptureModelTile(action)
@@ -758,12 +769,16 @@ local function executeDive(action)
 end
 
 local function executeDropModelUnit(action)
+    if (not IS_SERVER) then
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
+    end
+
     local path             = action.path
     local sceneWarFileName = action.fileName
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    moveModelUnitWithAction(action)
 
+    moveModelUnitWithAction(action)
     local dropModelUnits = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
         local gridIndex = dropDestination.gridIndex
@@ -776,28 +791,45 @@ local function executeDropModelUnit(action)
             :setStateActioned()
         dropModelUnits[#dropModelUnits + 1] = dropModelUnit
     end
-
     focusModelUnit:setStateActioned()
-        :moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        local revealedUnits = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnits = removeHiddenActorUnitsAfterAction(action)
+
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
             local loaderEndingGridIndex = path[#path]
+            local playerIndexLoggedIn   = getPlayerIndexLoggedIn()
             for _, dropModelUnit in ipairs(dropModelUnits) do
-                dropModelUnit:moveViewAlongPath({
-                        loaderEndingGridIndex,
-                        dropModelUnit:getGridIndex(),
-                    },
-                    isModelUnitDiving(dropModelUnit),
-                    function()
-                        dropModelUnit:updateView()
-                            :showNormalAnimation()
+                local isDiving  = isModelUnitDiving(dropModelUnit)
+                local gridIndex = dropModelUnit:getGridIndex()
+                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, isDiving, dropModelUnit:getPlayerIndex(), playerIndexLoggedIn)
+                if (not isVisible) then
+                    Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, false)
+                end
+
+                dropModelUnit:moveViewAlongPath({loaderEndingGridIndex, gridIndex}, isDiving, function()
+                    dropModelUnit:updateView()
+                        :showNormalAnimation()
+
+                    if (not isVisible) then
+                        dropModelUnit:removeViewFromParent()
                     end
-                )
+                end)
             end
+
+            setRevealedUnitsVisible(revealedUnits, true)
+            removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
         end)
+    end
 end
 
 local function executeEndTurn(action)

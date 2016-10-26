@@ -49,7 +49,9 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
             end)
         end
 
-        if (playerIndex ~= playerIndexLoggedIn) then
+        if (playerIndex == playerIndexLoggedIn) then
+            steps[#steps + 1] = cc.Show:create()
+        else
             if (isDiving) then
                 if ((i == #path)                                                                            and
                     (isUnitVisible(sceneWarFileName, path[i], isDiving, playerIndex, playerIndexLoggedIn))) then
