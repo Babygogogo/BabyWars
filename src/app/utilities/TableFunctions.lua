@@ -36,8 +36,11 @@ function TableFunctions.clone(t, ignoredKeys)
     for k, v in pairs(t) do
         clonedTable[k] = v
     end
-    for _, ignoredKey in pairs(ignoredKeys) do
-        clonedTable[ignoredKey] = nil
+
+    if (ignoredKeys) then
+        for _, ignoredKey in pairs(ignoredKeys) do
+            clonedTable[ignoredKey] = nil
+        end
     end
 
     return clonedTable

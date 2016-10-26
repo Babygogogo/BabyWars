@@ -111,6 +111,14 @@ function ModelGridEffect:showAnimationExplosion(gridIndex)
     return self
 end
 
+function ModelGridEffect:showAnimationRepair(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationRepair(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationSiloAttack(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationSiloAttack(gridIndex)

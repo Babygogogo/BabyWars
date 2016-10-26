@@ -577,34 +577,37 @@ local function executeAttack(action)
 end
 
 local function executeBeginTurn(action)
-    local sceneWarFileName = action.fileName
-    local modelSceneWar    = getModelScene(sceneWarFileName)
-    local modelTurnManager = getModelTurnManager(sceneWarFileName)
-    local playerIndex      = modelTurnManager:getPlayerIndex()
-    local lostPlayerIndex  = action.lostPlayerIndex
+    local sceneWarFileName   = action.fileName
+    local modelSceneWar      = getModelScene(sceneWarFileName)
+    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
 
-    if (not lostPlayerIndex) then
-        modelTurnManager:beginTurnPhaseBeginning(function()
-            modelSceneWar:setExecutingAction(false)
-        end)
-    else
-        local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
-        local lostModelPlayer    = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-
-        if (IS_SERVER) then
+    if (IS_SERVER) then
+        if (not lostPlayerIndex) then
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+                modelSceneWar:setExecutingAction(false)
+            end)
+        else
             modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 2)
-            modelTurnManager:beginTurnPhaseBeginning(function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 if (not modelSceneWar:isEnded()) then
                     modelTurnManager:endTurnPhaseMain()
                 end
                 modelSceneWar:setExecutingAction(false)
             end)
+        end
+    else
+        if (not lostPlayerIndex) then
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+                modelSceneWar:setExecutingAction(false)
+            end)
         else
+            local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
-
-            modelTurnManager:beginTurnPhaseBeginning(function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
 
