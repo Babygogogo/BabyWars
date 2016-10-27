@@ -103,6 +103,14 @@ function ModelGridEffect:showAnimationBlock(gridIndex)
     return self
 end
 
+function ModelGridEffect:showAnimationDamage(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationDamage(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationExplosion(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationExplosion(gridIndex)

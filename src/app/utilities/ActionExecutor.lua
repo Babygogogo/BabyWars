@@ -44,34 +44,6 @@ local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, play
     })
 end
 
-local function dispatchEvtDestroyViewUnit(sceneWarFileName, gridIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name      = "EvtDestroyViewUnit",
-        gridIndex = gridIndex,
-    })
-end
-
-local function dispatchEvtDestroyViewTile(sceneWarFileName, gridIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name      = "EvtDestroyViewTile",
-        gridIndex = gridIndex,
-    })
-end
-
-local function dispatchEvtAttackViewUnit(sceneWarFileName, gridIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name      = "EvtAttackViewUnit",
-        gridIndex = gridIndex,
-    })
-end
-
-local function dispatchEvtAttackViewTile(sceneWarFileName, gridIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
-        name      = "EvtAttackViewTile",
-        gridIndex = gridIndex,
-    })
-end
-
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -439,6 +411,10 @@ local function executeActivateSkillGroup(action)
 end
 
 local function executeAttack(action)
+    if (not IS_SERVER) then
+        addActorUnitsWithUnitsData(action.actingUnitsData, false)
+    end
+
     local path               = action.path
     local sceneWarFileName   = action.fileName
     local attackDamage       = action.attackDamage
@@ -473,12 +449,12 @@ local function executeAttack(action)
         dispatchEvtModelPlayerUpdated(sceneWarFileName, attackerModelPlayer, attacker:getPlayerIndex())
     end
 
-    local destroyedModelUnits = {}
-    local attackerNewHP       = math.max(0, attacker:getCurrentHP() - (counterDamage or 0))
+    local removedModelUnitsForAttack = {}
+    local attackerNewHP              = math.max(0, attacker:getCurrentHP() - (counterDamage or 0))
     attacker:setCurrentHP(attackerNewHP)
     if (attackerNewHP == 0) then
         attackTarget:setCurrentPromotion(math.min(attackTarget:getMaxPromotion(), attackTarget:getCurrentPromotion() + 1))
-        appendList(destroyedModelUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, attackerGridIndex, false))
+        appendList(removedModelUnitsForAttack, Destroyers.destroyActorUnitOnMap(sceneWarFileName, attackerGridIndex, false))
     end
 
     local plasmaGridIndexes
@@ -487,7 +463,7 @@ local function executeAttack(action)
     if (targetNewHP == 0) then
         if (attackTarget.getUnitType) then
             attacker:setCurrentPromotion(math.min(attacker:getMaxPromotion(), attacker:getCurrentPromotion() + 1))
-            appendList(destroyedModelUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, targetGridIndex, false))
+            appendList(removedModelUnitsForAttack, Destroyers.destroyActorUnitOnMap(sceneWarFileName, targetGridIndex, false))
         else
             attackTarget:updateWithObjectAndBaseId(0)
             plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex, modelTileMap)
@@ -499,60 +475,56 @@ local function executeAttack(action)
 
     attacker:setStateActioned()
 
-    local callbackAfterMoveAnimation = function()
-        attacker:updateView()
-            :showNormalAnimation()
-        attackTarget:updateView()
-
-        if (not IS_SERVER) then
-            for _, destroyedModelUnit in pairs(destroyedModelUnits) do
-                destroyedModelUnit:removeViewFromParent()
-            end
-        end
-
-        if (attackerNewHP == 0) then
-            dispatchEvtDestroyViewUnit(sceneWarFileName, attackerGridIndex)
-        elseif ((counterDamage) and (targetNewHP > 0)) then
-            dispatchEvtAttackViewUnit(sceneWarFileName, attackerGridIndex)
-        end
-
-        if (targetNewHP == 0) then
-            if (attackTarget.getUnitType) then
-                dispatchEvtDestroyViewUnit(sceneWarFileName, targetGridIndex)
-            else
-                dispatchEvtDestroyViewTile(sceneWarFileName, targetGridIndex)
-                attackTarget:updateView()
-                for _, gridIndex in ipairs(plasmaGridIndexes) do
-                    modelTileMap:getModelTile(gridIndex):updateView()
-                end
-            end
-        else
-            if (attackTarget.getUnitType) then
-                dispatchEvtAttackViewUnit(sceneWarFileName, targetGridIndex)
-            else
-                dispatchEvtAttackViewTile(sceneWarFileName, targetGridIndex)
-            end
-        end
-    end
-
-    local modelSceneWar   = getModelScene(sceneWarFileName)
-    local lostPlayerIndex = action.lostPlayerIndex
-    if (not lostPlayerIndex) then
-        attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
-            callbackAfterMoveAnimation()
-            modelSceneWar:setExecutingAction(false)
-        end)
-    else
-        local modelTurnManager   = getModelTurnManager(sceneWarFileName)
-        local isInTurnPlayerLost = (lostPlayerIndex == modelTurnManager:getPlayerIndex())
-        if (IS_SERVER) then
+    local modelSceneWar      = getModelScene(sceneWarFileName)
+    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+    local lostPlayerIndex    = action.lostPlayerIndex
+    local isInTurnPlayerLost = (lostPlayerIndex == modelTurnManager:getPlayerIndex())
+    if (IS_SERVER) then
+        if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
             if (modelPlayerManager:getAlivePlayersCount() <= 1) then
                 modelSceneWar:setEnded(true)
             elseif (isInTurnPlayerLost) then
                 modelTurnManager:endTurnPhaseMain()
             end
-            modelSceneWar:setExecutingAction(false)
+        end
+        modelSceneWar:setExecutingAction(false)
+    else
+        local revealedUnits              = action.revealedUnits
+        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
+        local removedModelUnitsForPath   = removeHiddenActorUnitsAfterAction(action)
+        local callbackAfterMoveAnimation = function()
+            attacker:updateView()
+                :showNormalAnimation()
+            attackTarget:updateView()
+
+            removeViewUnits(removedModelUnitsForAttack)
+            removeViewUnits(removedModelUnitsForPath)
+
+            local modelGridEffect = getModelGridEffect()
+            if (attackerNewHP == 0) then
+                modelGridEffect:showAnimationExplosion(attackerGridIndex)
+            elseif ((counterDamage) and (targetNewHP > 0)) then
+                modelGridEffect:showAnimationDamage(attackerGridIndex)
+            end
+
+            if (targetNewHP > 0) then
+                modelGridEffect:showAnimationDamage(targetGridIndex)
+            else
+                modelGridEffect:showAnimationExplosion(targetGridIndex)
+                if (not attackTarget.getUnitType) then
+                    for _, gridIndex in ipairs(plasmaGridIndexes) do
+                        modelTileMap:getModelTile(gridIndex):updateView()
+                    end
+                end
+            end
+        end
+
+        if (not lostPlayerIndex) then
+            attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
+                callbackAfterMoveAnimation()
+                modelSceneWar:setExecutingAction(false)
+            end)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
@@ -561,7 +533,7 @@ local function executeAttack(action)
             attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
                 callbackAfterMoveAnimation()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
-                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator():showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
 
                 if (isLoggedInPlayerLost) then
                     modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
