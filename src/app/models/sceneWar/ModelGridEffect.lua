@@ -111,6 +111,14 @@ function ModelGridEffect:showAnimationDamage(gridIndex)
     return self
 end
 
+function ModelGridEffect:showAnimationDive(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationDive(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationExplosion(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationExplosion(gridIndex)
@@ -146,6 +154,14 @@ end
 function ModelGridEffect:showAnimationSupply(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationSupply(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationSurface(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSurface(gridIndex)
     end
 
     return self

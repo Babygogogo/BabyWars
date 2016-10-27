@@ -7,13 +7,18 @@ local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 local SKILL_ACTIVATION_Z_ORDER = 3
 local DAMAGE_Z_ORDER           = 2
 local EXPLOSION_Z_ORDER        = 1
+local DIVE_Z_ORDER             = 1
+local SURFACE_Z_ORDER          = 1
 local BLOCK_Z_ORDER            = 0
 local SUPPLY_Z_ORDER           = 0
+local REPAIR_Z_ORDER           = 0
 
-local SKILL_ACTIVATION_OFFSET_X = - (336 - GRID_SIZE.width)  / 2
-local SKILL_ACTIVATION_OFFSET_Y = - (336 - GRID_SIZE.height) / 2
-local SUPPLY_OFFSET_X           = GRID_SIZE.width  * 0.3
-local SUPPLY_OFFSET_Y           = GRID_SIZE.height * 0.7
+local GRID_WIDTH                = GRID_SIZE.width
+local GRID_HEIGHT               = GRID_SIZE.height
+local SKILL_ACTIVATION_OFFSET_X = - (336 - GRID_WIDTH)  / 2
+local SKILL_ACTIVATION_OFFSET_Y = - (336 - GRID_HEIGHT) / 2
+local SUPPLY_OFFSET_X           = GRID_WIDTH  * 0.3
+local SUPPLY_OFFSET_Y           = GRID_HEIGHT * 0.7
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -35,11 +40,21 @@ local function createAnimationBlock(gridIndex)
     return animation
 end
 
+local function createAnimationDive(gridIndex)
+    local animation = cc.Sprite:create()
+    local x, y      = GridIndexFunctions.toPosition(gridIndex)
+    animation:ignoreAnchorPointForPosition(true)
+        :setPosition(x - GRID_WIDTH, y - GRID_HEIGHT)
+        :playAnimationOnce(display.getAnimationCache("Dive"), {removeSelf = true})
+
+    return animation
+end
+
 local function createAnimationExplosion(gridIndex, callbackOnFinish)
     local animation = cc.Sprite:create()
     local x, y = GridIndexFunctions.toPosition(gridIndex)
     animation:ignoreAnchorPointForPosition(true)
-        :setPosition(x - GRID_SIZE.width, y)
+        :setPosition(x - GRID_WIDTH, y)
         :playAnimationOnce(display.getAnimationCache("GridExplosion"), {removeSelf = true, onComplete = callbackOnFinish})
 
     return animation
@@ -49,7 +64,7 @@ local function createAnimationDamage(gridIndex, callbackOnFinish)
     local animation = cc.Sprite:create()
     local x, y = GridIndexFunctions.toPosition(gridIndex)
     animation:ignoreAnchorPointForPosition(true)
-        :setPosition(x - GRID_SIZE.width, y - GRID_SIZE.height)
+        :setPosition(x - GRID_WIDTH, y - GRID_HEIGHT)
         :playAnimationOnce(display.getAnimationCache("GridDamage"), {removeSelf = true, onComplete = callbackOnFinish})
 
     return animation
@@ -76,10 +91,10 @@ local function createAnimationSiloAttack(gridIndex)
     local sprite = cc.Sprite:create()
     local x, y   = GridIndexFunctions.toPosition(gridIndex)
     sprite:ignoreAnchorPointForPosition(true)
-        :setPosition(x - GRID_SIZE.width, y - GRID_SIZE.height)
+        :setPosition(x - GRID_WIDTH, y - GRID_HEIGHT)
         :playAnimationOnce(display.getAnimationCache("GridDamage"), {
             onComplete = function()
-                sprite:setPosition(x - GRID_SIZE.width, y)
+                sprite:setPosition(x - GRID_WIDTH, y)
                     :playAnimationOnce(display.getAnimationCache("GridExplosion"), {removeSelf = true})
             end,
         })
@@ -97,6 +112,16 @@ local function createAnimationSkillActivation(gridIndex)
     return sprite
 end
 
+local function createAnimationSurface(gridIndex)
+    local animation = cc.Sprite:create()
+    local x, y      = GridIndexFunctions.toPosition(gridIndex)
+    animation:ignoreAnchorPointForPosition(true)
+        :setPosition(x - GRID_WIDTH, y - GRID_HEIGHT)
+        :playAnimationOnce(display.getAnimationCache("Surface"), {removeSelf = true})
+
+    return animation
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -109,6 +134,12 @@ end
 --------------------------------------------------------------------------------
 function ViewGridEffect:showAnimationBlock(gridIndex)
     self:addChild(createAnimationBlock(gridIndex), BLOCK_Z_ORDER)
+
+    return self
+end
+
+function ViewGridEffect:showAnimationDive(gridIndex)
+    self:addChild(createAnimationDive(gridIndex), DIVE_Z_ORDER)
 
     return self
 end
@@ -132,7 +163,7 @@ function ViewGridEffect:showAnimationSupply(gridIndex)
 end
 
 function ViewGridEffect:showAnimationRepair(gridIndex)
-    self:addChild(createAnimationSupplyOrRepair(gridIndex, false), SUPPLY_Z_ORDER)
+    self:addChild(createAnimationSupplyOrRepair(gridIndex, false), REPAIR_Z_ORDER)
 
     return self
 end
@@ -145,6 +176,12 @@ end
 
 function ViewGridEffect:showAnimationSkillActivation(gridIndex)
     self:addChild(createAnimationSkillActivation(gridIndex), SKILL_ACTIVATION_Z_ORDER)
+
+    return self
+end
+
+function ViewGridEffect:showAnimationSurface(gridIndex)
+    self:addChild(createAnimationSurface(gridIndex), SURFACE_Z_ORDER)
 
     return self
 end

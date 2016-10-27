@@ -53,23 +53,29 @@ local function loadUnitAnimations()
 end
 
 local function loadGridAnimations()
-    local reachableGridAnimation = display.newAnimation(display.newFrames("c01_t99_s05_f%02d.png", 1, 15), 0.07)
-    display.setAnimationCache("ReachableGrid", reachableGridAnimation)
+    local animationReachableGrid = display.newAnimation(display.newFrames("c01_t99_s05_f%02d.png", 1, 15), 0.07)
+    display.setAnimationCache("ReachableGrid", animationReachableGrid)
 
-    local attackableGridAnimation = display.newAnimation(display.newFrames("c01_t99_s06_f%02d.png", 1, 15), 0.07)
-    display.setAnimationCache("AttackableGrid", attackableGridAnimation)
+    local animationAttackableGrid = display.newAnimation(display.newFrames("c01_t99_s06_f%02d.png", 1, 15), 0.07)
+    display.setAnimationCache("AttackableGrid", animationAttackableGrid)
 
-    local explosionAnimation = display.newAnimation(display.newFrames("c03_t08_s01_f%02d.png", 1, 9), 0.06)
-    display.setAnimationCache("GridExplosion", explosionAnimation)
+    local animationExplosion = display.newAnimation(display.newFrames("c03_t08_s01_f%02d.png", 1, 9), 0.06)
+    display.setAnimationCache("GridExplosion", animationExplosion)
 
-    local damageAnimation = display.newAnimation(display.newFrames("c03_t08_s02_f%02d.png", 1, 8), 0.04)
-    display.setAnimationCache("GridDamage", damageAnimation)
+    local animationDive = display.newAnimation(display.newFrames("c03_t08_s07_f%02d.png", 1, 7), 0.06)
+    display.setAnimationCache("Dive", animationDive)
 
-    local targetCursorAnimation = display.newAnimation(display.newFrames("c03_t07_s08_f%02d.png", 1, 4), 0.08)
-    display.setAnimationCache("TargetCursor", targetCursorAnimation)
+    local animationSurface = display.newAnimation(display.newFrames("c03_t08_s08_f%02d.png", 1, 5), 0.06)
+    display.setAnimationCache("Surface", animationSurface)
 
-    local skillActivationAnimation = display.newAnimation(display.newFrames("c03_t08_s06_f%02d.png", 1, 34), 0.025)
-    display.setAnimationCache("SkillActivation", skillActivationAnimation)
+    local animationDamage = display.newAnimation(display.newFrames("c03_t08_s02_f%02d.png", 1, 8), 0.04)
+    display.setAnimationCache("GridDamage", animationDamage)
+
+    local animationTargetCursor = display.newAnimation(display.newFrames("c03_t07_s08_f%02d.png", 1, 4), 0.08)
+    display.setAnimationCache("TargetCursor", animationTargetCursor)
+
+    local animationSkillActivation = display.newAnimation(display.newFrames("c03_t08_s06_f%02d.png", 1, 34), 0.025)
+    display.setAnimationCache("SkillActivation", animationSkillActivation)
 end
 
 --------------------------------------------------------------------------------

@@ -717,7 +717,6 @@ local function executeDive(action)
     local sceneWarFileName   = action.fileName
     local launchUnitID       = action.launchUnitID
     local path               = action.path
-    local endingGridIndex    = path[#path]
     local focusModelUnit     = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
@@ -726,7 +725,8 @@ local function executeDive(action)
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
     else
-        local revealedUnits = action.revealedUnits
+        local endingGridIndex   = path[#path]
+        local revealedUnits     = action.revealedUnits
         addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
         local removedModelUnits = removeHiddenActorUnitsAfterAction(action)
 
@@ -734,6 +734,8 @@ local function executeDive(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
                 :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, true, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
+
+            getModelGridEffect():showAnimationDive(endingGridIndex)
 
             setRevealedUnitsVisible(revealedUnits, true)
             removeViewUnits(removedModelUnits)
@@ -1127,14 +1129,17 @@ local function executeSurface(action)
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
     else
-        local revealedUnits = action.revealedUnits
+        local endingGridIndex   = path[#path]
+        local revealedUnits     = action.revealedUnits
         addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
         local removedModelUnits = removeHiddenActorUnitsAfterAction(action)
 
         focusModelUnit:moveViewAlongPath(path, true, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
-                :setViewVisible(isUnitVisible(sceneWarFileName, path[#path], false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
+                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
+
+            getModelGridEffect():showAnimationSurface(endingGridIndex)
 
             setRevealedUnitsVisible(revealedUnits, true)
             removeViewUnits(removedModelUnits)
