@@ -91,8 +91,9 @@ local function canAttack(attacker, attackerMovePath, target, targetMovePath)
 
     local attackerGridIndex = (attackerMovePath) and (getEndingGridIndex(attackerMovePath)) or (attacker:getGridIndex())
     local targetGridIndex   = (targetMovePath)   and (getEndingGridIndex(targetMovePath))   or (target:getGridIndex())
-    if (((not attackDoer:canAttackAfterMove()) and (attackerMovePath) and (#attackerMovePath > 1))    or
-        (not isInAttackRange(attackerGridIndex, targetGridIndex, attackDoer:getAttackRangeMinMax()))) then
+    if (((not attackDoer:canAttackAfterMove()) and (attackerMovePath) and (#attackerMovePath > 1))   or
+        (not isInAttackRange(attackerGridIndex, targetGridIndex, attackDoer:getAttackRangeMinMax())) or
+        ((target.isDiving) and (target:isDiving()) and (not attackDoer:canAttackDivingTarget())))    then
         return false
     end
 

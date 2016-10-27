@@ -1732,9 +1732,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -1816,9 +1817,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Barzooka",
@@ -1933,9 +1935,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2017,9 +2020,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2092,9 +2096,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2167,10 +2172,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            name               = "AttackDoer",
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Cannon",
@@ -2245,9 +2250,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "TankGun",
@@ -2353,9 +2359,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "HeavyTankGun",
@@ -2461,9 +2468,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "MegaGun",
@@ -2569,9 +2577,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 2,
-            maxAttackRange     = 3,
-            canAttackAfterMove = false,
+            minAttackRange        = 2,
+            maxAttackRange        = 3,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type       = "Cannon",
@@ -2646,9 +2655,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 3,
-            canAttackAfterMove = false,
+            minAttackRange        = 1,
+            maxAttackRange        = 3,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type       = "Cannon",
@@ -2723,10 +2733,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            name               = "AttackDoer",
-            minAttackRange     = 3,
-            maxAttackRange     = 5,
-            canAttackAfterMove = false,
+            minAttackRange        = 3,
+            maxAttackRange        = 5,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Rockets",
@@ -2801,9 +2811,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 3,
-            maxAttackRange     = 6,
-            canAttackAfterMove = false,
+            minAttackRange        = 3,
+            maxAttackRange        = 6,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "AAMissiles",
@@ -2936,9 +2947,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "AAMissiles",
@@ -3013,9 +3025,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Bombs",
@@ -3090,9 +3103,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "MachineGun",
@@ -3167,9 +3181,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Missiles",
@@ -3319,9 +3334,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Missiles",
@@ -3396,9 +3412,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 3,
-            maxAttackRange     = 5,
-            canAttackAfterMove = true,
+            minAttackRange        = 3,
+            maxAttackRange        = 5,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Cannon",
@@ -3473,9 +3490,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = nil,
             secondaryWeapon = {
@@ -3567,9 +3585,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = true,
 
             primaryWeapon = {
                 type        = "Torpedoes",
@@ -3649,9 +3668,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = true,
 
             primaryWeapon = {
                 type        = "ASMissiles",
@@ -3815,9 +3835,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "ASMissiles",
