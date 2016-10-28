@@ -95,9 +95,73 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelGridEffect:showAnimationBlock(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationBlock(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationDamage(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationDamage(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationDive(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationDive(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationExplosion(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationExplosion(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationRepair(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationRepair(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationSiloAttack(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSiloAttack(gridIndex)
+    end
+
+    return self
+end
+
 function ModelGridEffect:showAnimationSkillActivation(gridIndex)
     if (self.m_View) then
         self.m_View:showAnimationSkillActivation(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationSupply(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSupply(gridIndex)
+    end
+
+    return self
+end
+
+function ModelGridEffect:showAnimationSurface(gridIndex)
+    if (self.m_View) then
+        self.m_View:showAnimationSurface(gridIndex)
     end
 
     return self

@@ -83,7 +83,12 @@ function FuelOwner:getMaxFuel()
 end
 
 function FuelOwner:getFuelConsumptionPerTurn()
-    return self.m_Template.consumptionPerTurn
+    local owner = self.m_Owner
+    if ((owner.isDiving) and (owner:isDiving())) then
+        return self.m_Template.consumptionPerTurn + owner:getAdditionalFuelConsumptionForDive()
+    else
+        return self.m_Template.consumptionPerTurn
+    end
 end
 
 function FuelOwner:getDescriptionOnOutOfFuel()

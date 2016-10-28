@@ -177,6 +177,10 @@ function GameConstantFunctions.getTileMaxHP()
     return GAME_CONSTANT.tileMaxHP
 end
 
+function GameConstantFunctions.getBaseNormalizedRepairAmount()
+    return GAME_CONSTANT.baseNormalizedRepairAmount
+end
+
 function GameConstantFunctions.getCommandTowerAttackBonus()
     return GAME_CONSTANT.commandTowerAttackBonus
 end

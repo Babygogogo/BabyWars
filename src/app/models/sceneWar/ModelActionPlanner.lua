@@ -249,6 +249,14 @@ local function sendActionCaptureModelTile(self)
     })
 end
 
+local function sendActionDive(self)
+    createAndSendAction({
+        actionName   = "Dive",
+        path         = createPathForDispatch(self.m_MovePath),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function sendActionBuildModelTile(self)
     createAndSendAction({
         actionName   = "BuildModelTile",
@@ -267,6 +275,14 @@ end
 local function sendActionSupplyModelUnit(self)
     createAndSendAction({
         actionName   = "SupplyModelUnit",
+        path         = createPathForDispatch(self.m_MovePath),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionSurface(self)
+    createAndSendAction({
+        actionName   = "Surface",
         path         = createPathForDispatch(self.m_MovePath),
         launchUnitID = self.m_LaunchUnitID,
     })
@@ -399,6 +415,18 @@ local function getActionCapture(self)
     end
 end
 
+local function getActionDive(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((focusModelUnit.canDive) and (focusModelUnit:canDive())) then
+        return {
+            name     = getLocalizedText(78, "Dive"),
+            callback = function()
+                sendActionDive(self)
+            end,
+        }
+    end
+end
+
 local function getActionBuildModelTile(self)
     local tileType       = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath)):getTileType()
     local focusModelUnit = self.m_FocusModelUnit
@@ -444,6 +472,18 @@ local function getActionSupplyModelUnit(self)
     end
 
     return nil
+end
+
+local function getActionSurface(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((focusModelUnit.isDiving) and (focusModelUnit:isDiving())) then
+        return {
+            name     = getLocalizedText(78, "Surface"),
+            callback = function()
+                sendActionSurface(self)
+            end,
+        }
+    end
 end
 
 local function getSingleActionLaunchModelUnit(self, unitID)
@@ -601,6 +641,8 @@ local function getAvailableActionList(self)
     local list = {}
     list[#list + 1] = getActionAttack(                self)
     list[#list + 1] = getActionCapture(               self)
+    list[#list + 1] = getActionDive(                  self)
+    list[#list + 1] = getActionSurface(               self)
     list[#list + 1] = getActionBuildModelTile(        self)
     list[#list + 1] = getActionSupplyModelUnit(       self)
     for _, action in ipairs(getActionsLaunchModelUnit(self)) do

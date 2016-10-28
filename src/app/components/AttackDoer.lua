@@ -37,6 +37,7 @@ AttackDoer.EXPORTED_METHODS = {
     "getPrimaryWeaponBaseDamage",
     "getAttackRangeMinMax",
     "canAttackAfterMove",
+    "canAttackDivingTarget",
     "isPrimaryWeaponAmmoInShort",
 
     "setPrimaryWeaponCurrentAmmo",
@@ -68,9 +69,10 @@ function AttackDoer:ctor(param)
 end
 
 function AttackDoer:loadTemplate(template)
-    assert(template.minAttackRange ~= nil,     "AttackDoer:loadTemplate() the param template.minAttackRange is invalid.")
-    assert(template.maxAttackRange ~= nil,     "AttackDoer:loadTemplate() the param template.maxAttackRange is invalid.")
-    assert(template.canAttackAfterMove ~= nil, "AttackDoer:loadTemplate() the param template.canAttackAfterMove is invalid.")
+    assert(type(template.minAttackRange)        == "number",   "AttackDoer:loadTemplate() the param template.minAttackRange is invalid.")
+    assert(type(template.maxAttackRange)        == "number",   "AttackDoer:loadTemplate() the param template.maxAttackRange is invalid.")
+    assert(type(template.canAttackAfterMove)    == "boolean",  "AttackDoer:loadTemplate() the param template.canAttackAfterMove is invalid.")
+    assert(type(template.canAttackDivingTarget) == "boolean",  "AttackDoer:loadTemplate() the param template.canAttackDivingTarget is invalid.")
     assert(template.primaryWeapon or template.secondaryWeapon, "AttackDoer:loadTemplate() the template has no weapon.")
 
     self.m_Template = template
@@ -188,6 +190,10 @@ end
 
 function AttackDoer:canAttackAfterMove()
     return self.m_Template.canAttackAfterMove
+end
+
+function AttackDoer:canAttackDivingTarget()
+    return self.m_Template.canAttackDivingTarget
 end
 
 function AttackDoer:isPrimaryWeaponAmmoInShort()

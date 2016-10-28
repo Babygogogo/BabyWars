@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.6.9"
+GameConstant.version = "0.1.7.0"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -945,12 +945,13 @@ GameConstant.categories = {
     },
 }
 
-GameConstant.maxCapturePoint         = 20
-GameConstant.maxBuildPoint           = 20
-GameConstant.unitMaxHP               = 100
-GameConstant.tileMaxHP               = 99
-GameConstant.incomePerTurn           = 1000
-GameConstant.commandTowerAttackBonus = 10
+GameConstant.maxCapturePoint            = 20
+GameConstant.maxBuildPoint              = 20
+GameConstant.unitMaxHP                  = 100
+GameConstant.tileMaxHP                  = 99
+GameConstant.incomePerTurn              = 1000
+GameConstant.commandTowerAttackBonus    = 10
+GameConstant.baseNormalizedRepairAmount = 2
 
 GameConstant.maxPromotion   = 3
 GameConstant.promotionBonus = {
@@ -1731,9 +1732,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -1815,9 +1817,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Barzooka",
@@ -1932,9 +1935,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2016,9 +2020,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2091,9 +2096,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon   = nil,
             secondaryWeapon = {
@@ -2166,10 +2172,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            name               = "AttackDoer",
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Cannon",
@@ -2244,9 +2250,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "TankGun",
@@ -2352,9 +2359,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "HeavyTankGun",
@@ -2460,9 +2468,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "MegaGun",
@@ -2568,9 +2577,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 2,
-            maxAttackRange     = 3,
-            canAttackAfterMove = false,
+            minAttackRange        = 2,
+            maxAttackRange        = 3,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type       = "Cannon",
@@ -2645,9 +2655,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 3,
-            canAttackAfterMove = false,
+            minAttackRange        = 1,
+            maxAttackRange        = 3,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type       = "Cannon",
@@ -2722,10 +2733,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            name               = "AttackDoer",
-            minAttackRange     = 3,
-            maxAttackRange     = 5,
-            canAttackAfterMove = false,
+            minAttackRange        = 3,
+            maxAttackRange        = 5,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Rockets",
@@ -2800,9 +2811,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 3,
-            maxAttackRange     = 6,
-            canAttackAfterMove = false,
+            minAttackRange        = 3,
+            maxAttackRange        = 6,
+            canAttackAfterMove    = false,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "AAMissiles",
@@ -2935,9 +2947,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "AAMissiles",
@@ -3012,9 +3025,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Bombs",
@@ -3089,9 +3103,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "MachineGun",
@@ -3166,9 +3181,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Missiles",
@@ -3318,9 +3334,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Missiles",
@@ -3395,9 +3412,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 3,
-            maxAttackRange     = 5,
-            canAttackAfterMove = true,
+            minAttackRange        = 3,
+            maxAttackRange        = 5,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "Cannon",
@@ -3472,9 +3490,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = nil,
             secondaryWeapon = {
@@ -3566,9 +3585,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = true,
 
             primaryWeapon = {
                 type        = "Torpedoes",
@@ -3634,6 +3654,11 @@ GameConstant.templateModelUnits = {
             productionCost = 20000,
         },
 
+        Diver = {
+            isDiving                  = true,
+            additionalFuelConsumption = 4,
+        },
+
         Joinable = {},
 
         vision      = 5,
@@ -3643,9 +3668,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = true,
 
             primaryWeapon = {
                 type        = "ASMissiles",
@@ -3809,9 +3835,10 @@ GameConstant.templateModelUnits = {
         GridIndexable = {},
 
         AttackDoer = {
-            minAttackRange     = 1,
-            maxAttackRange     = 1,
-            canAttackAfterMove = true,
+            minAttackRange        = 1,
+            maxAttackRange        = 1,
+            canAttackAfterMove    = true,
+            canAttackDivingTarget = false,
 
             primaryWeapon = {
                 type        = "ASMissiles",
@@ -3983,26 +4010,26 @@ GameConstant.skills = {
             [-2] = {modifier = 10, pointsPassive = -150, pointsActive = -5, minEnergy = 1},
             [-1] = {modifier = 5, pointsPassive = -75, pointsActive = -2.5, minEnergy = 1},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
-            [1] = {modifier = -5, pointsPassive = 95, pointsActive = 20, minEnergy = 1},
-            [2] = {modifier = -10, pointsPassive = 190, pointsActive = 40, minEnergy = 1},
-            [3] = {modifier = -15, pointsPassive = 285, pointsActive = 60, minEnergy = 1},
-            [4] = {modifier = -20, pointsPassive = 380, pointsActive = 80, minEnergy = 1},
-            [5] = {modifier = -25, pointsPassive = 475, pointsActive = 100, minEnergy = 1},
-            [6] = {modifier = -30, pointsPassive = 570, pointsActive = 120, minEnergy = 2},
-            [7] = {modifier = -35, pointsPassive = 665, pointsActive = 140, minEnergy = 2},
-            [8] = {modifier = -40, pointsPassive = 760, pointsActive = 160, minEnergy = 2},
-            [9] = {modifier = -45, pointsPassive = 855, pointsActive = 180, minEnergy = 2},
-            [10] = {modifier = -50, pointsPassive = 950, pointsActive = 200, minEnergy = 2},
-            [11] = {modifier = -55, pointsPassive = 1045, pointsActive = 220, minEnergy = 3},
-            [12] = {modifier = -60, pointsPassive = 1140, pointsActive = 240, minEnergy = 3},
-            [13] = {modifier = -65, pointsPassive = 1235, pointsActive = 260, minEnergy = 3},
-            [14] = {modifier = -70, pointsPassive = 1330, pointsActive = 280, minEnergy = 3},
-            [15] = {modifier = -75, pointsPassive = 1425, pointsActive = 300, minEnergy = 3},
-            [16] = {modifier = -80, pointsPassive = 1520, pointsActive = 320, minEnergy = 4},
-            [17] = {modifier = -85, pointsPassive = 1615, pointsActive = 340, minEnergy = 4},
-            [18] = {modifier = -90, pointsPassive = 1710, pointsActive = 360, minEnergy = 4},
-            [19] = {modifier = -95, pointsPassive = 1805, pointsActive = 380, minEnergy = 4},
-            [20] = {modifier = -100, pointsPassive = 1900, pointsActive = 400, minEnergy = 4},
+            [1] = {modifier = -5, pointsPassive = 95, pointsActive = 25, minEnergy = 1},
+            [2] = {modifier = -10, pointsPassive = 190, pointsActive = 50, minEnergy = 1},
+            [3] = {modifier = -15, pointsPassive = 285, pointsActive = 75, minEnergy = 1},
+            [4] = {modifier = -20, pointsPassive = 380, pointsActive = 100, minEnergy = 1},
+            [5] = {modifier = -25, pointsPassive = 475, pointsActive = 125, minEnergy = 2},
+            [6] = {modifier = -30, pointsPassive = 570, pointsActive = 150, minEnergy = 2},
+            [7] = {modifier = -35, pointsPassive = 665, pointsActive = 175, minEnergy = 2},
+            [8] = {modifier = -40, pointsPassive = 760, pointsActive = 200, minEnergy = 2},
+            [9] = {modifier = -45, pointsPassive = 855, pointsActive = 225, minEnergy = 3},
+            [10] = {modifier = -50, pointsPassive = 950, pointsActive = 250, minEnergy = 3},
+            [11] = {modifier = -55, pointsPassive = 1045, pointsActive = 275, minEnergy = 3},
+            [12] = {modifier = -60, pointsPassive = 1140, pointsActive = 300, minEnergy = 3},
+            [13] = {modifier = -65, pointsPassive = 1235, pointsActive = 325, minEnergy = 4},
+            [14] = {modifier = -70, pointsPassive = 1330, pointsActive = 350, minEnergy = 4},
+            [15] = {modifier = -75, pointsPassive = 1425, pointsActive = 375, minEnergy = 4},
+            [16] = {modifier = -80, pointsPassive = 1520, pointsActive = 400, minEnergy = 4},
+            [17] = {modifier = -85, pointsPassive = 1615, pointsActive = 425, minEnergy = 5},
+            [18] = {modifier = -90, pointsPassive = 1710, pointsActive = 450, minEnergy = 5},
+            [19] = {modifier = -95, pointsPassive = 1805, pointsActive = 475, minEnergy = 5},
+            [20] = {modifier = -100, pointsPassive = 1900, pointsActive = 500, minEnergy = 5},
         },
     },
 
@@ -4141,16 +4168,16 @@ GameConstant.skills = {
         maxLevel     = 10,
         modifierUnit = "%",
         levels       = {
-            [1] = {modifier = -10, pointsPassive = 7.5, pointsActive = nil, minEnergy = nil},
-            [2] = {modifier = -20, pointsPassive = 15, pointsActive = nil, minEnergy = nil},
-            [3] = {modifier = -30, pointsPassive = 22.5, pointsActive = nil, minEnergy = nil},
-            [4] = {modifier = -40, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
-            [5] = {modifier = -50, pointsPassive = 37.5, pointsActive = nil, minEnergy = nil},
-            [6] = {modifier = -60, pointsPassive = 45, pointsActive = nil, minEnergy = nil},
-            [7] = {modifier = -70, pointsPassive = 52.5, pointsActive = nil, minEnergy = nil},
-            [8] = {modifier = -80, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
-            [9] = {modifier = -90, pointsPassive = 67.5, pointsActive = nil, minEnergy = nil},
-            [10] = {modifier = -100, pointsPassive = 75, pointsActive = nil, minEnergy = nil},
+            [1] = {modifier = -10, pointsPassive = 10, pointsActive = nil, minEnergy = nil},
+            [2] = {modifier = -20, pointsPassive = 20, pointsActive = nil, minEnergy = nil},
+            [3] = {modifier = -30, pointsPassive = 30, pointsActive = nil, minEnergy = nil},
+            [4] = {modifier = -40, pointsPassive = 40, pointsActive = nil, minEnergy = nil},
+            [5] = {modifier = -50, pointsPassive = 50, pointsActive = nil, minEnergy = nil},
+            [6] = {modifier = -60, pointsPassive = 60, pointsActive = nil, minEnergy = nil},
+            [7] = {modifier = -70, pointsPassive = 70, pointsActive = nil, minEnergy = nil},
+            [8] = {modifier = -80, pointsPassive = 80, pointsActive = nil, minEnergy = nil},
+            [9] = {modifier = -90, pointsPassive = 90, pointsActive = nil, minEnergy = nil},
+            [10] = {modifier = -100, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
         },
     },
 
@@ -4160,26 +4187,26 @@ GameConstant.skills = {
         maxLevel     = 20,
         modifierUnit = "%",
         levels       = {
-            [1] = {modifier = 10, pointsPassive = nil, pointsActive = 65, minEnergy = 1},
-            [2] = {modifier = 20, pointsPassive = nil, pointsActive = 130, minEnergy = 1},
-            [3] = {modifier = 30, pointsPassive = nil, pointsActive = 195, minEnergy = 2},
-            [4] = {modifier = 40, pointsPassive = nil, pointsActive = 260, minEnergy = 2},
-            [5] = {modifier = 50, pointsPassive = nil, pointsActive = 325, minEnergy = 3},
-            [6] = {modifier = 60, pointsPassive = nil, pointsActive = 390, minEnergy = 3},
-            [7] = {modifier = 70, pointsPassive = nil, pointsActive = 455, minEnergy = 4},
-            [8] = {modifier = 80, pointsPassive = nil, pointsActive = 520, minEnergy = 4},
-            [9] = {modifier = 90, pointsPassive = nil, pointsActive = 585, minEnergy = 5},
-            [10] = {modifier = 100, pointsPassive = nil, pointsActive = 650, minEnergy = 5},
-            [11] = {modifier = 110, pointsPassive = nil, pointsActive = 715, minEnergy = 6},
-            [12] = {modifier = 120, pointsPassive = nil, pointsActive = 780, minEnergy = 6},
-            [13] = {modifier = 130, pointsPassive = nil, pointsActive = 845, minEnergy = 7},
-            [14] = {modifier = 140, pointsPassive = nil, pointsActive = 910, minEnergy = 7},
-            [15] = {modifier = 150, pointsPassive = nil, pointsActive = 975, minEnergy = 8},
-            [16] = {modifier = 160, pointsPassive = nil, pointsActive = 1040, minEnergy = 8},
-            [17] = {modifier = 170, pointsPassive = nil, pointsActive = 1105, minEnergy = 9},
-            [18] = {modifier = 180, pointsPassive = nil, pointsActive = 1170, minEnergy = 9},
-            [19] = {modifier = 190, pointsPassive = nil, pointsActive = 1235, minEnergy = 10},
-            [20] = {modifier = 200, pointsPassive = nil, pointsActive = 1300, minEnergy = 10},
+            [1] = {modifier = 10, pointsPassive = nil, pointsActive = 75, minEnergy = 1},
+            [2] = {modifier = 20, pointsPassive = nil, pointsActive = 150, minEnergy = 1},
+            [3] = {modifier = 30, pointsPassive = nil, pointsActive = 225, minEnergy = 2},
+            [4] = {modifier = 40, pointsPassive = nil, pointsActive = 300, minEnergy = 2},
+            [5] = {modifier = 50, pointsPassive = nil, pointsActive = 375, minEnergy = 3},
+            [6] = {modifier = 60, pointsPassive = nil, pointsActive = 450, minEnergy = 3},
+            [7] = {modifier = 70, pointsPassive = nil, pointsActive = 525, minEnergy = 4},
+            [8] = {modifier = 80, pointsPassive = nil, pointsActive = 600, minEnergy = 4},
+            [9] = {modifier = 90, pointsPassive = nil, pointsActive = 675, minEnergy = 5},
+            [10] = {modifier = 100, pointsPassive = nil, pointsActive = 750, minEnergy = 5},
+            [11] = {modifier = 110, pointsPassive = nil, pointsActive = 825, minEnergy = 6},
+            [12] = {modifier = 120, pointsPassive = nil, pointsActive = 900, minEnergy = 6},
+            [13] = {modifier = 130, pointsPassive = nil, pointsActive = 975, minEnergy = 7},
+            [14] = {modifier = 140, pointsPassive = nil, pointsActive = 1050, minEnergy = 7},
+            [15] = {modifier = 150, pointsPassive = nil, pointsActive = 1125, minEnergy = 8},
+            [16] = {modifier = 160, pointsPassive = nil, pointsActive = 1200, minEnergy = 8},
+            [17] = {modifier = 170, pointsPassive = nil, pointsActive = 1275, minEnergy = 9},
+            [18] = {modifier = 180, pointsPassive = nil, pointsActive = 1350, minEnergy = 9},
+            [19] = {modifier = 190, pointsPassive = nil, pointsActive = 1425, minEnergy = 10},
+            [20] = {modifier = 200, pointsPassive = nil, pointsActive = 1500, minEnergy = 10},
         },
     },
 

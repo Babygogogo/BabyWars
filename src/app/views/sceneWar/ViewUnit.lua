@@ -5,6 +5,8 @@ local AnimationLoader       = require("src.app.utilities.AnimationLoader")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}
@@ -25,9 +27,13 @@ local UNIT_SPRITE_Z_ORDER     = 0
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createStepsForActionMoveAlongPath(self, path)
-    local playerIndexMod = self.m_Model:getPlayerIndex() % 2
-    local steps          = {cc.CallFunc:create(function()
+local function createStepsForActionMoveAlongPath(self, path, isDiving)
+    local playerIndex            = self.m_Model:getPlayerIndex()
+    local playerIndexMod         = playerIndex % 2
+    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    local sceneWarFileName       = SingletonGetters.getSceneWarFileName()
+    local isUnitVisible          = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+    local steps                  = {cc.CallFunc:create(function()
         SingletonGetters.getModelMapCursor():setMovableByPlayer(false)
     end)}
 
@@ -43,14 +49,34 @@ local function createStepsForActionMoveAlongPath(self, path)
             end)
         end
 
+        if (playerIndex == playerIndexLoggedIn) then
+            steps[#steps + 1] = cc.Show:create()
+        else
+            if (isDiving) then
+                if ((i == #path)                                                                            and
+                    (isUnitVisible(sceneWarFileName, path[i], isDiving, playerIndex, playerIndexLoggedIn))) then
+                    steps[#steps + 1] = cc.Show:create()
+                else
+                    steps[#steps + 1] = cc.Hide:create()
+                end
+            else
+                if ((isUnitVisible(sceneWarFileName, path[i - 1], isDiving, playerIndex, playerIndexLoggedIn))  or
+                    (isUnitVisible(sceneWarFileName, path[i],     isDiving, playerIndex, playerIndexLoggedIn))) then
+                    steps[#steps + 1] = cc.Show:create()
+                else
+                    steps[#steps + 1] = cc.Hide:create()
+                end
+            end
+        end
+
         steps[#steps + 1] = cc.MoveTo:create(MOVE_DURATION_PER_GRID, GridIndexFunctions.toPositionTable(path[i]))
     end
 
     return steps
 end
 
-local function createActionMoveAlongPath(self, path, callback)
-    local steps = createStepsForActionMoveAlongPath(self, path)
+local function createActionMoveAlongPath(self, path, isDiving, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
         SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
@@ -60,8 +86,8 @@ local function createActionMoveAlongPath(self, path, callback)
     return cc.Sequence:create(unpack(steps))
 end
 
-local function createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callback)
-    local steps = createStepsForActionMoveAlongPath(self, path)
+local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
+    local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
         SingletonGetters.getScriptEventDispatcher():dispatchEvent({
             name      = "EvtMapCursorMoved",
@@ -124,8 +150,8 @@ local function getAmmoIndicatorFrame(unit)
     end
 end
 
-local function getSubmergedIndicatorFrame(unit)
-    if ((unit.isSumberged) and (unit:isSumberged())) then
+local function getDiveIndicatorFrame(unit)
+    if ((unit.isDiving) and (unit:isDiving())) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s03_f0" .. unit:getPlayerIndex() .. ".png")
     else
         return nil
@@ -260,7 +286,7 @@ local function updateStateIndicator(self, unit)
     frames[#frames + 1] = getLevelIndicatorFrame(    unit)
     frames[#frames + 1] = getFuelIndicatorFrame(     unit)
     frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
-    frames[#frames + 1] = getSubmergedIndicatorFrame(unit)
+    frames[#frames + 1] = getDiveIndicatorFrame(     unit)
     frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
     frames[#frames + 1] = getBuildIndicatorFrame(    unit)
     frames[#frames + 1] = getLoadIndicatorFrame(     unit)
@@ -329,20 +355,18 @@ function ViewUnit:showMovingAnimation()
     return self
 end
 
-function ViewUnit:moveAlongPath(path, callbackOnFinish)
-    self:setVisible(true)
-        :showMovingAnimation()
+function ViewUnit:moveAlongPath(path, isDiving, callbackOnFinish)
+    self:showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
-        :runAction(createActionMoveAlongPath(self, path, callbackOnFinish))
+        :runAction(createActionMoveAlongPath(self, path, isDiving, callbackOnFinish))
 
     return self
 end
 
-function ViewUnit:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackOnFinish)
-    self:setVisible(true)
-        :showMovingAnimation()
+function ViewUnit:moveAlongPathAndFocusOnTarget(path, isDiving, targetGridIndex, callbackOnFinish)
+    self:showMovingAnimation()
         :setPosition(GridIndexFunctions.toPosition(path[1]))
-        :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, targetGridIndex, callbackOnFinish))
+        :runAction(createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callbackOnFinish))
 
     return self
 end

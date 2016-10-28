@@ -122,9 +122,9 @@ function ModelUnit:getSceneWarFileName()
     return self.m_SceneWarFileName
 end
 
-function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
+function ModelUnit:moveViewAlongPath(path, isDiving, callbackAfterMove)
     if (self.m_View) then
-        self.m_View:moveAlongPath(path, callbackAfterMove)
+        self.m_View:moveAlongPath(path, isDiving, callbackAfterMove)
     elseif (callbackAfterMove) then
         callbackAfterMove()
     end
@@ -132,9 +132,9 @@ function ModelUnit:moveViewAlongPath(path, callbackAfterMove)
     return self
 end
 
-function ModelUnit:moveViewAlongPathAndFocusOnTarget(path, targetGridIndex, callbackAfterMove)
+function ModelUnit:moveViewAlongPathAndFocusOnTarget(path, isDiving, targetGridIndex, callbackAfterMove)
     if (self.m_View) then
-        self.m_View:moveAlongPathAndFocusOnTarget(path, targetGridIndex, callbackAfterMove)
+        self.m_View:moveAlongPathAndFocusOnTarget(path, isDiving, targetGridIndex, callbackAfterMove)
     elseif (callbackAfterMove) then
         callbackAfterMove()
     end

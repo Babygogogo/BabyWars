@@ -22,9 +22,11 @@ local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
+local isModelUnitVisibleToPlayerIndex = VisibilityFunctions.isModelUnitVisibleToPlayerIndex
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
@@ -169,6 +171,38 @@ function ModelUnitMap:toSerializableTable()
     }
 end
 
+function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
+    -- TODO: deal with the fog of war.
+    local sceneWarFileName = self.m_SceneWarFileName
+    local grids            = {}
+    local visibleMap       = {}
+    self:forEachModelUnitOnMap(function(modelUnit)
+        if (isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndex)) then
+            grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+
+            local gridIndex = modelUnit:getGridIndex()
+            local x, y      = gridIndex.x, gridIndex.y
+            visibleMap[x]    = visibleMap[x] or {}
+            visibleMap[x][y] = true
+        end
+    end)
+
+    local loaded = {}
+    self:forEachModelUnitLoaded(function(modelUnit)
+        local gridIndex = modelUnit:getGridIndex()
+        if ((visibleMap[gridIndex.x]) and (visibleMap[gridIndex.x][gridIndex.y])) then
+            loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+        end
+    end)
+
+    return {
+        mapSize         = self:getMapSize(),
+        availableUnitId = self:getAvailableUnitId(),
+        grids           = grids,
+        loaded          = loaded,
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
@@ -290,7 +324,9 @@ end
 function ModelUnitMap:addActorUnitOnMap(actorUnit)
     local modelUnit = actorUnit:getModel()
     local gridIndex = modelUnit:getGridIndex()
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = actorUnit
+    local x, y      = gridIndex.x, gridIndex.y
+    assert(not self.m_ActorUnitsMap[x][y], "ModelUnitMap:addActorUnitOnMap() there's another unit on the grid: " .. x .. " " .. y)
+    self.m_ActorUnitsMap[x][y] = actorUnit
 
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
@@ -300,14 +336,18 @@ function ModelUnitMap:addActorUnitOnMap(actorUnit)
 end
 
 function ModelUnitMap:removeActorUnitOnMap(gridIndex)
-    self.m_ActorUnitsMap[gridIndex.x][gridIndex.y] = nil
+    local x, y = gridIndex.x, gridIndex.y
+    assert(self.m_ActorUnitsMap[x][y], "ModelUnitMap:removeActorUnitOnMap() there's no unit on the grid: " .. x .. " " .. y)
+    self.m_ActorUnitsMap[x][y] = nil
 
     return self
 end
 
 function ModelUnitMap:addActorUnitLoaded(actorUnit)
     local modelUnit = actorUnit:getModel()
-    self.m_LoadedActorUnits[modelUnit:getUnitId()] = actorUnit
+    local unitID    = modelUnit:getUnitId()
+    assert(self.m_LoadedActorUnits[unitID] == nil, "ModelUnitMap:addActorUnitLoaded() the unit id is loaded already: " .. unitID)
+    self.m_LoadedActorUnits[unitID] = actorUnit
 
     if (self.m_View) then
         self.m_View:addViewUnit(actorUnit:getView(), modelUnit)
@@ -319,8 +359,6 @@ end
 function ModelUnitMap:removeActorUnitLoaded(unitID)
     local loadedModelUnit = self:getLoadedModelUnitWithUnitId(unitID)
     assert(loadedModelUnit, "ModelUnitMap:removeActorUnitLoaded() the unit that the unitID refers to is not loaded: " .. (unitID or ""))
-
-    loadedModelUnit:removeViewFromParent()
     self.m_LoadedActorUnits[unitID] = nil
 
     return self

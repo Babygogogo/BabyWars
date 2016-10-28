@@ -64,43 +64,6 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
     end
 end
 
-local function getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)
-    local units = {}
-    modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
-            if (modelUnit:getPlayerIndex() == playerIndex) then
-                local modelTile = modelTileMap:getModelTile(modelUnit:getGridIndex())
-                if ((modelTile.canRepairTarget) and (modelTile:canRepairTarget(modelUnit))) then
-                    units[#units + 1] = modelUnit
-                end
-            end
-        end)
-        :forEachModelUnitLoaded(function(modelUnit)
-            if (modelUnit:getPlayerIndex() == playerIndex) then
-                local loader = modelUnitMap:getModelUnit(modelUnit:getGridIndex())
-                if ((loader:canRepairLoadedModelUnit()) and (loader:hasLoadUnitId(modelUnit:getUnitId()))) then
-                    units[#units + 1] = modelUnit
-                end
-            end
-        end)
-
-    table.sort(units, function(unit1, unit2)
-        local cost1, cost2 = unit1:getProductionCost(), unit2:getProductionCost()
-        return (cost1 > cost2)                                             or
-            ((cost1 == cost2) and (unit1:getUnitId() < unit2:getUnitId()))
-    end)
-
-    return units
-end
-
-local function getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
-    local gridIndex = modelUnit:getGridIndex()
-    if (modelUnitMap:getLoadedModelUnitWithUnitId(modelUnit:getUnitId())) then
-        return modelUnitMap:getModelUnit(gridIndex):getRepairAmountAndCostForLoadedModelUnit(modelUnit)
-    else
-        return modelTileMap:getModelTile(gridIndex):getRepairAmountAndCost(modelUnit)
-    end
-end
-
 local function dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
     dispatcher:dispatchEvent({
         name      = "EvtSupplyViewUnit",
@@ -129,6 +92,21 @@ local function supplyModelUnit(modelUnit)
     end
 
     return hasSupplied
+end
+
+local function repairModelUnit(modelUnit, repairAmount)
+    modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
+    local hasSupplied = supplyModelUnit(modelUnit)
+
+    if (not IS_SERVER) then
+        modelUnit:updateView()
+
+        if (repairAmount >= 10) then
+            SingletonGetters.getModelGridEffect():showAnimationRepair(modelUnit:getGridIndex())
+        elseif (hasSupplied) then
+            SingletonGetters.getModelGridEffect():showAnimationSupply(modelUnit:getGridIndex())
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -167,17 +145,11 @@ local function runTurnPhaseResetSkillState(self)
 end
 
 local function runTurnPhaseGetFund(self)
-    local playerIndex      = self.m_PlayerIndex
-    local sceneWarFileName = self.m_SceneWarFileName
-    local income           = 0
-    getModelTileMap(sceneWarFileName):forEachModelTile(function(modelTile)
-        if ((modelTile.getIncomeAmount) and (modelTile:getPlayerIndex() == playerIndex)) then
-            income = income + (modelTile:getIncomeAmount() or 0)
-        end
-    end)
-
-    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
-    modelPlayer:setFund(modelPlayer:getFund() + income)
+    if (self.m_IncomeForNextTurn) then
+        local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
+        modelPlayer:setFund(modelPlayer:getFund() + self.m_IncomeForNextTurn)
+        self.m_IncomeForNextTurn = nil
+    end
 
     self.m_TurnPhase = "consumeUnitFuel"
 end
@@ -201,8 +173,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
                     local modelTile = modelTileMap:getModelTile(gridIndex)
 
                     if ((not modelTile.canRepairTarget) or (not modelTile:canRepairTarget(modelUnit))) then
-                        Destroyers.destroyModelUnitWithGridIndex(sceneWarFileName, gridIndex)
-                        modelUnit:removeViewFromParent()
+                        Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
                         dispatcher:dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,
@@ -217,37 +188,19 @@ local function runTurnPhaseConsumeUnitFuel(self)
 end
 
 local function runTurnPhaseRepairUnit(self)
-    local sceneWarFileName = self.m_SceneWarFileName
-    local playerIndex      = self.m_PlayerIndex
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local modelTileMap     = getModelTileMap(sceneWarFileName)
-    local modelPlayer      = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
-    local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
-
-    for _, modelUnit in ipairs(getRepairableModelUnits(modelUnitMap, modelTileMap, playerIndex)) do
-        local gridIndex                = modelUnit:getGridIndex()
-        local repairAmount, repairCost = getRepairAmountAndCostForModelUnit(modelUnit, modelUnitMap, modelTileMap)
-        local shouldSupply             = modelUnit:getCurrentFuel() < modelUnit:getMaxFuel()
-
-        modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
-            :setCurrentFuel(modelUnit:getMaxFuel())
-        if ((modelUnit.hasPrimaryWeapon)                                                and
-            (modelUnit:hasPrimaryWeapon())                                              and
-            (modelUnit:getPrimaryWeaponCurrentAmmo() < modelUnit:getPrimaryWeaponMaxAmmo())) then
-            shouldSupply = true
-            modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
+    local repairData = self.m_RepairDataForNextTurn
+    if (repairData) then
+        local sceneWarFileName = self.m_SceneWarFileName
+        local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+        for unitID, data in pairs(repairData.onMapData) do
+            repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
         end
-        modelUnit:updateView()
-        modelPlayer:setFund(modelPlayer:getFund() - repairCost)
-
-        if (repairAmount >= 10) then
-            dispatcher:dispatchEvent({
-                name      = "EvtRepairViewUnit",
-                gridIndex = gridIndex,
-            })
-        elseif (shouldSupply) then
-            dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
+        for unitID, data in pairs(repairData.loadedData) do
+            repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
         end
+
+        getModelPlayerManager(sceneWarFileName):getModelPlayer(self.m_PlayerIndex):setFund(repairData.remainingFund)
+        self.m_RepairDataForNextTurn = nil
     end
 
     self.m_TurnPhase = "supplyUnit"
@@ -372,6 +325,10 @@ function ModelTurnManager:toSerializableTable()
     }
 end
 
+function ModelTurnManager:toSerializableTableForPlayerIndex(playerIndex)
+    return self:toSerializableTable()
+end
+
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
@@ -409,9 +366,9 @@ function ModelTurnManager:runTurn()
     if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then runTurnPhaseTickTurnAndPlayerIndex(self) end
     if (self.m_TurnPhase == "requestToBegin")         then runTurnPhaseRequestToBegin(        self) end
 
-    if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMain)) then
-        self.m_CallbackOnEnterTurnPhaseMain()
-        self.m_CallbackOnEnterTurnPhaseMain = nil
+    if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then
+        self.m_CallbackOnEnterTurnPhaseMainForNextTurn()
+        self.m_CallbackOnEnterTurnPhaseMainForNextTurn = nil
     end
 
     if (not IS_SERVER) then
@@ -426,10 +383,13 @@ function ModelTurnManager:runTurn()
     return self
 end
 
-function ModelTurnManager:beginTurnPhaseBeginning(callbackOnEnterTurnPhaseMain)
+function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, callbackOnEnterTurnPhaseMain)
     assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:beginTurnPhaseBeginning() invalid turn phase: " .. self.m_TurnPhase)
 
-    self.m_CallbackOnEnterTurnPhaseMain = callbackOnEnterTurnPhaseMain
+    self.m_IncomeForNextTurn                       = income
+    self.m_RepairDataForNextTurn                   = repairData
+    self.m_CallbackOnEnterTurnPhaseMainForNextTurn = callbackOnEnterTurnPhaseMain
+
     runTurnPhaseBeginning(self)
 
     return self

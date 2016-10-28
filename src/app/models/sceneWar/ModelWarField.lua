@@ -123,6 +123,14 @@ function ModelWarField:toSerializableTable()
     }
 end
 
+function ModelWarField:toSerializableTableForPlayerIndex(playerIndex)
+    -- TODO: deal with the fog of war.
+    return {
+        tileMap = self:getModelTileMap():toSerializableTableForPlayerIndex(playerIndex),
+        unitMap = self:getModelUnitMap():toSerializableTableForPlayerIndex(playerIndex),
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
