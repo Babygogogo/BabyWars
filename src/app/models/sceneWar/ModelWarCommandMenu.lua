@@ -200,7 +200,8 @@ local function updateStringSkillInfo(self)
 end
 
 local function getAvailableMainItems(self)
-    if ((not self.m_IsPlayerInTurn) or (self.m_IsWaitingForServerResponse)) then
+    if ((self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) or
+        (self.m_IsWaitingForServerResponse))                     then
         return {
             self.m_ItemQuit,
             self.m_ItemWarInfo,
@@ -211,7 +212,7 @@ local function getAvailableMainItems(self)
             self.m_ItemUnitPropertyList,
         }
     else
-        local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndex)
+        local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndexInTurn)
         local items = {
             self.m_ItemQuit,
             self.m_ItemFindIdleUnit,
@@ -327,11 +328,11 @@ end
 local function getEmptyProducersCount(self)
     local modelUnitMap = SingletonGetters.getModelUnitMap()
     local count        = 0
-    local playerIndex  = self.m_PlayerIndex
+    local playerIndex  = self.m_PlayerIndexInTurn
 
     SingletonGetters.getModelTileMap():forEachModelTile(function(modelTile)
         if ((modelTile.getProductionList)                                 and
-            (modelTile:getPlayerIndex() == self.m_PlayerIndex)            and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndexInTurn)            and
             (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
             count = count + 1
         end
@@ -342,7 +343,7 @@ end
 
 local function getIdleUnitsCount(self)
     local count       = 0
-    local playerIndex = self.m_PlayerIndex
+    local playerIndex = self.m_PlayerIndexInTurn
     SingletonGetters.getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
         if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
             count = count + 1
@@ -436,8 +437,7 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtPlayerIndexUpdated(self, event)
-    self.m_PlayerIndex    = event.playerIndex
-    self.m_IsPlayerInTurn = (event.modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword())
+    self.m_PlayerIndexInTurn = event.playerIndex
 end
 
 local function onEvtIsWaitingForServerResponse(self, event)
@@ -477,7 +477,7 @@ local function initItemFindIdleUnit(self)
                     local gridIndex = {x = x, y = y}
                     local modelUnit = modelUnitMap:getModelUnit(gridIndex)
                     if ((modelUnit)                                                and
-                        (modelUnit:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (modelUnit:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and
                         (modelUnit:getState() == "idle"))                          then
                         if ((y > cursorY)                       or
                             ((y == cursorY) and (x > cursorX))) then
@@ -518,7 +518,7 @@ local function initItemFindIdleTile(self)
                     local gridIndex = {x = x, y = y}
                     local modelTile = modelTileMap:getModelTile(gridIndex)
                     if ((modelTile.getProductionList)                              and
-                        (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+                        (modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and
                         (not modelUnitMap:getModelUnit(gridIndex)))                then
                         if ((y > cursorY)                       or
                             ((y == cursorY) and (x > cursorX))) then
@@ -734,11 +734,11 @@ function ModelWarCommandMenu:onStartRunning(sceneWarFileName)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)
 
-    SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
-            self.m_LoggedInPlayerIndex = playerIndex
-        end
-    end)
+    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    self.m_PlayerIndexLoggedIn = playerIndexLoggedIn
+    self.m_PlayerIndexInTurn   = SingletonGetters.getModelTurnManager():getPlayerIndex()
+
+    return self
 end
 
 function ModelWarCommandMenu:onEvent(event)

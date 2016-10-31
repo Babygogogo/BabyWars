@@ -89,7 +89,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
                 playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
                 skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
                 maxSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                isFogOfWar           = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
             })
         end
     end)

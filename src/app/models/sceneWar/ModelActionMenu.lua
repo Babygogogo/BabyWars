@@ -65,6 +65,10 @@ function ModelActionMenu:onStartRunning(sceneWarFileName)
         :addEventListener("EvtActionPlannerChoosingDropDestination",  self)
         :addEventListener("EvtActionPlannerChoosingSiloTarget",       self)
 
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+    end
+
     return self
 end
 

@@ -592,7 +592,7 @@ local function getActionProduceModelUnitOnUnit(self)
         return nil
     else
         local produceTiledId = focusModelUnit:getMovableProductionTiledId()
-        local fund           = getModelPlayerManager():getModelPlayer(self.m_LoggedInPlayerIndex):getFund()
+        local fund           = getModelPlayerManager():getModelPlayer(self.m_PlayerIndexLoggedIn):getFund()
         local icon           = cc.Sprite:create()
         icon:setAnchorPoint(0, 0)
             :setScale(0.5)
@@ -716,7 +716,7 @@ local function canSetStatePreviewingAttackableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
     return (modelUnit)                                             and
         (modelUnit.getAttackRangeMinMax)                           and
-        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
 end
 
 setStatePreviewingAttackableArea = function(self, gridIndex)
@@ -742,7 +742,7 @@ local function canSetStatePreviewingReachableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
     return (modelUnit)                                             and
         (not modelUnit.getAttackRangeMinMax)                       and
-        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
 end
 
 setStatePreviewingReachableArea = function(self, gridIndex)
@@ -766,12 +766,12 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return false
     else
         local modelTile = getModelTileMap():getModelTile(gridIndex)
         return (not getModelUnitMap():getModelUnit(gridIndex))       and
-            (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and
             (modelTile.getProductionList)
     end
 end
@@ -794,11 +794,11 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+        return (modelUnit) and (modelUnit:canDoAction(self.m_PlayerIndexLoggedIn))
     end
 end
 
@@ -925,10 +925,6 @@ local function onEvtPlayerIndexUpdated(self, event)
     setStateIdle(self, true)
 end
 
-local function onEvtModelWeatherUpdated(self, event)
-    self.m_ModelWeather = event.modelWeather
-end
-
 local function onEvtIsWaitingForServerResponse(self, event)
     setStateIdle(self, false)
     self.m_IsWaitingForServerResponse = event.waiting
@@ -942,7 +938,7 @@ end
 
 local function onEvtMapCursorMoved(self, event)
     if ((self.m_IsWaitingForServerResponse)                       or
-        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
+        (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn)) then
         return
     end
 
@@ -1081,22 +1077,18 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)
         :addEventListener("EvtPlayerIndexUpdated",         self)
-        :addEventListener("EvtModelWeatherUpdated",        self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
-    local playerAccount = WebSocketManager.getLoggedInAccountAndPassword()
-    SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:getAccount() == playerAccount) then
-            self.m_LoggedInPlayerIndex = playerIndex
-        end
-    end)
-    assert(self.m_LoggedInPlayerIndex,
-        "ModelActionPlanner:onStartRunning() failed to find the player index for the logged-in player.")
+    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    assert(playerIndexLoggedIn, "ModelActionPlanner:onStartRunning() failed to find the player index for the logged-in player.")
+    self.m_PlayerIndexLoggedIn = playerIndexLoggedIn
+    self.m_PlayerIndexInTurn   = SingletonGetters.getModelTurnManager():getPlayerIndex()
 
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap():getMapSize())
     end
+    setStateIdle(self, true)
 
     return self
 end
@@ -1105,7 +1097,6 @@ function ModelActionPlanner:onEvent(event)
     local name = event.name
     if     (name == "EvtGridSelected")               then onEvtGridSelected(              self, event)
     elseif (name == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
-    elseif (name == "EvtModelWeatherUpdated")        then onEvtModelWeatherUpdated(       self, event)
     elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     elseif (name == "EvtWarCommandMenuUpdated")      then onEvtWarCommandMenuUpdated(     self, event)
