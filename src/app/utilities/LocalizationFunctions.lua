@@ -496,6 +496,7 @@ local s_Texts = {
         [1] = function(account) return "欢迎注册，【" .. account .. "】！祝您游戏愉快！"            end,
         [2] = function(account) return "Welcome, " .. account .. "!\nThank you for registering!" end,
     },
+    --[[
     [28] = {
         [1] = function() return "是"  end,
         [2] = function() return "Yes" end,
@@ -504,6 +505,7 @@ local s_Texts = {
         [1] = function() return "否" end,
         [2] = function() return "No" end,
     },
+    --]]
     [30] = {
         [1] = function() return "已成功连接服务器。"       end,
         [2] = function() return "Connection established." end,

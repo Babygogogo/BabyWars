@@ -95,7 +95,7 @@ end
 
 local function initButtonYes(self)
     local button = createConfirmButton(BUTTON_YES_POS_X, BUTTON_YES_POS_Y, BUTTON_YES_FONT_COLOR,
-        LocalizationFunctions.getLocalizedText(28),
+        LocalizationFunctions.getLocalizedText(9, true),
         function()
             if (self.m_Model) then
                 self.m_Model:onConfirmYes()
@@ -108,7 +108,7 @@ end
 
 local function initButtonNo(self)
     local button = createConfirmButton(BUTTON_NO_POS_X, BUTTON_NO_POS_Y, BUTTON_NO_FONT_COLOR,
-        LocalizationFunctions.getLocalizedText(29),
+        LocalizationFunctions.getLocalizedText(9, false),
         function()
             if (self.m_Model) then
                 self.m_Model:onConfirmNo()
