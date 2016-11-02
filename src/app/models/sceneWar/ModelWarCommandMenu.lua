@@ -373,7 +373,7 @@ local function createCommonPropertyText(unitType)
     local weaponText = createWeaponPropertyText(unitType)
     return string.format("%s: %d (%s)      %s: %d      %s: %d\n%s: %d      %s: %d      %s: %s%s",
         getLocalizedText(9, "Movement"),           template.MoveDoer.range, getLocalizedText(110, template.MoveDoer.type),
-        getLocalizedText(9, "Vision"),             template.vision,
+        getLocalizedText(9, "Vision"),             template.VisionOwner.vision,
         getLocalizedText(9, "ProductionCost"),     template.Producible.productionCost,
         getLocalizedText(9, "MaxFuel"),            template.FuelOwner.max,
         getLocalizedText(9, "ConsumptionPerTurn"), template.FuelOwner.consumptionPerTurn,

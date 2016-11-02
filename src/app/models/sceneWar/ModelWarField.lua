@@ -46,6 +46,12 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function initActorFogMap(self, fogMapData)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData)
+
+    self.m_ActorFogMap = actor
+end
+
 local function initActorTileMap(self, tileMapData)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelTileMap", tileMapData, "sceneWar.ViewTileMap")
 
@@ -80,6 +86,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarField:ctor(warFieldData)
+    initActorFogMap( self, warFieldData.fogMap)
     initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
 
@@ -118,14 +125,15 @@ end
 --------------------------------------------------------------------------------
 function ModelWarField:toSerializableTable()
     return {
+        fogMap  = self:getModelFogMap() :toSerializableTable(),
         tileMap = self:getModelTileMap():toSerializableTable(),
         unitMap = self:getModelUnitMap():toSerializableTable(),
     }
 end
 
 function ModelWarField:toSerializableTableForPlayerIndex(playerIndex)
-    -- TODO: deal with the fog of war.
     return {
+        fogMap  = self:getModelFogMap() :toSerializableTableForPlayerIndex(playerIndex),
         tileMap = self:getModelTileMap():toSerializableTableForPlayerIndex(playerIndex),
         unitMap = self:getModelUnitMap():toSerializableTableForPlayerIndex(playerIndex),
     }
@@ -135,6 +143,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onStartRunning(sceneWarFileName)
+    self:getModelFogMap() :onStartRunning(sceneWarFileName)
     self:getModelTileMap():onStartRunning(sceneWarFileName)
     self:getModelUnitMap():onStartRunning(sceneWarFileName)
     if (not IS_SERVER) then
@@ -164,6 +173,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarField:getModelFogMap()
+    return self.m_ActorFogMap:getModel()
+end
+
 function ModelWarField:getModelUnitMap()
     return self.m_ActorUnitMap:getModel()
 end

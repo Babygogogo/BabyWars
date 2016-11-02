@@ -1220,6 +1220,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = true,
+        },
     },
 
     Rough = {
@@ -1422,6 +1427,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     City = {
@@ -1457,6 +1467,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     CommandTower = {
@@ -1487,6 +1502,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Radar = {
@@ -1516,6 +1536,11 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = false,
             Transport = false,
+        },
+
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
         },
     },
 
@@ -1571,6 +1596,11 @@ GameConstant.templateModelTiles = {
                 "Rig",
             },
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Airport = {
@@ -1615,6 +1645,11 @@ GameConstant.templateModelTiles = {
                 "BattleCopter",
                 "TransportCopter",
             },
+        },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
         },
     },
 
@@ -1662,6 +1697,11 @@ GameConstant.templateModelTiles = {
                 "Gunboat",
             },
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     TempAirport = {
@@ -1693,6 +1733,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     TempSeaport = {
@@ -1723,6 +1768,11 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = 1,
             Transport = 1,
+        },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
         },
     },
 }
@@ -1810,7 +1860,13 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+            bonusOnTiles = {
+                Mountain = 3,
+            },
+        },
     },
 
     Mech       = {
@@ -1928,7 +1984,13 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+            bonusOnTiles = {
+                Mountain = 3,
+            },
+        },
     },
 
     Bike       = {
@@ -2013,7 +2075,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Recon      = {
@@ -2089,7 +2154,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Flare      = {
@@ -2165,7 +2233,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     AntiAir    = {
@@ -2243,7 +2314,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Tank       = {
@@ -2352,7 +2426,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     MediumTank = {
@@ -2461,7 +2538,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     WarTank    = {
@@ -2570,7 +2650,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Artillery  = {
@@ -2648,7 +2731,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     AntiTank   = {
@@ -2726,7 +2812,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Rockets    = {
@@ -2804,7 +2893,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Missiles   = {
@@ -2882,7 +2974,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Rig        = {
@@ -2940,7 +3035,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Fighter    = {
@@ -3018,7 +3116,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Bomber     = {
@@ -3096,7 +3197,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Duster     = {
@@ -3174,7 +3278,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     BattleCopter    = {
@@ -3283,7 +3390,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     TransportCopter    = {
@@ -3327,7 +3437,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Seaplane   = {
@@ -3405,7 +3518,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Battleship = {
@@ -3483,7 +3599,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Carrier    = {
@@ -3578,7 +3697,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Submarine  = {
@@ -3661,7 +3783,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Cruiser    = {
@@ -3779,7 +3904,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Lander     = {
@@ -3828,7 +3956,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Gunboat    = {
@@ -3920,7 +4051,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 }
 

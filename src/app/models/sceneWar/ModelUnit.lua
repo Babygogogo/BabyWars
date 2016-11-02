@@ -223,10 +223,6 @@ function ModelUnit:getUnitTypeFullName()
     return LocalizationFunctions.getLocalizedText(113, self:getUnitType())
 end
 
-function ModelUnit:getVision()
-    return self.m_Template.vision
-end
-
 function ModelUnit:canDoAction(playerIndex)
     return (self:getPlayerIndex() == playerIndex) and (self:getState() == "idle")
 end

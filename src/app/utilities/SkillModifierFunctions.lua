@@ -427,4 +427,14 @@ function SkillModifierFunctions.isPerfectMovement(configuration)
         isPerfectMovementForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
+function SkillModifierFunctions.getVisionModifierForUnits(configuration)
+    -- TODO: add code to do the job.
+    return 0
+end
+
+function SkillModifierFunctions.getVisionModifierForTiles(configuration)
+    -- TODO: add code to do the job.
+    return 0
+end
+
 return SkillModifierFunctions
