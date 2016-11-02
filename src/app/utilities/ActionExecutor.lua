@@ -908,7 +908,6 @@ local function executeLaunchSilo(action)
     local path              = action.path
     local sceneWarFileName  = action.fileName
     local modelUnitMap      = getModelUnitMap(sceneWarFileName)
-    local mapSize           = modelUnitMap:getMapSize()
     local focusModelUnit    = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
     local modelTile         = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
     local targetModelUnits  = {}
@@ -916,15 +915,13 @@ local function executeLaunchSilo(action)
 
     moveModelUnitWithAction(action)
     modelTile:updateWithObjectAndBaseId(focusModelUnit:getTileObjectIdAfterLaunch())
-    for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2)) do
-        if (GridIndexFunctions.isWithinMap(gridIndex, mapSize)) then
-            targetGridIndexes[#targetGridIndexes + 1] = gridIndex
+    for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(action.targetGridIndex, 0, 2, modelUnitMap:getMapSize())) do
+        targetGridIndexes[#targetGridIndexes + 1] = gridIndex
 
-            local modelUnit = modelUnitMap:getModelUnit(gridIndex)
-            if ((modelUnit) and (modelUnit.setCurrentHP)) then
-                modelUnit:setCurrentHP(math.max(1, modelUnit:getCurrentHP() - 30))
-                targetModelUnits[#targetModelUnits + 1] = modelUnit
-            end
+        local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((modelUnit) and (modelUnit.setCurrentHP)) then
+            modelUnit:setCurrentHP(math.max(1, modelUnit:getCurrentHP() - 30))
+            targetModelUnits[#targetModelUnits + 1] = modelUnit
         end
     end
     focusModelUnit:setStateActioned()

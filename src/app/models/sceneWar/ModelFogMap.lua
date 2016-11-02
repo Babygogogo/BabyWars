@@ -75,6 +75,21 @@ local function createVisibilityMapForPathWithData(data, mapSize)
     return map
 end
 
+local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex)
+    return ((modelTileOrUnit) and (modelTileOrUnit.getVisionForPlayerIndex))
+        and (modelTileOrUnit:getVisionForPlayerIndex(playerIndex))
+        or (nil)
+end
+
+local function updateMapForArmy(map, mapSize, origin, vision, modifier)
+    if (vision) then
+        assert((modifier == 1) or (modifier == -1), "ModelFogMap-updateMapForArmy() invalid modifier: " .. (modifier or ""))
+        for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(origin, 0, vision, mapSize)) do
+            map[gridIndex.x][gridIndex.y] = map[gridIndex.x][gridIndex.y] + modifier
+        end
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -113,12 +128,11 @@ function ModelFogMap:initialize()
         self.m_VisibilityMapsForArmy = {}
         for playerIndex = 1, SingletonGetters.getModelPlayerManager(sceneWarFileName):getPlayersCount() do
             self.m_VisibilityMapsForArmy[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForArmyWithPlayerIndex(playerIndex)
+            self:resetMapForArmy(playerIndex)
         end
     else
-        local _, playerIndex = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-        self.m_VisibilityMapsForArmy = {[playerIndex] = createSingleMap(mapSize, 0)}
-        self:resetMapForArmyWithPlayerIndex(playerIndex)
+        self.m_VisibilityMapsForArmy = {[self.m_PlayerIndexLoggedIn] = createSingleMap(mapSize, 0)}
+        self:resetMapForArmy(self.m_PlayerIndexLoggedIn)
     end
 
     return self
@@ -153,6 +167,10 @@ end
 function ModelFogMap:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName    = sceneWarFileName
     self.m_IsFogOfWarByDefault = SingletonGetters.getModelScene(sceneWarFileName):isFogOfWarByDefault()
+    if (not IS_SERVER) then
+        local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+        self.m_PlayerIndexLoggedIn   = playerIndexLoggedIn
+    end
 
     return self
 end
@@ -181,8 +199,13 @@ function ModelFogMap:isDisablingFogByForce()
     return self.m_StateForForcingFog == "Disabled"
 end
 
-function ModelFogMap:resetMapForArmyWithPlayerIndex(playerIndex)
-    assert(self:isInitialized(), "ModelFogMap:resetMapForArmyWithPlayerIndex() the maps have not been initialized yet.")
+function ModelFogMap:resetMapForArmy(playerIndex)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForArmy() the maps have not been initialized yet.")
+    if (not IS_SERVER) then
+        assert((playerIndex == nil) or (playerIndex == self.m_PlayerIndexLoggedIn),
+            "ModelFogMap:resetMapForArmy() invalid playerIndex on the client: " .. (playerIndex or ""))
+        playerIndex = self.m_PlayerIndexLoggedIn
+    end
 
     local sceneWarFileName = self.m_SceneWarFileName
     local modelTileMap     = SingletonGetters.getModelTileMap(sceneWarFileName)
@@ -190,14 +213,14 @@ function ModelFogMap:resetMapForArmyWithPlayerIndex(playerIndex)
     local visibilityMap    = self.m_VisibilityMapsForArmy[playerIndex]
     local mapSize          = self:getMapSize()
     local width, height    = mapSize.width, mapSize.height
+    local gridIndex        = {}
 
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
-
-    local gridIndex = {}
     for x = 1, width do
         for y = 1, height do
             gridIndex.x, gridIndex.y = x, y
-            -- TODO: complete the function.
+            updateMapForArmy(visibilityMap, mapSize, gridIndex, getVisionForModelTileOrUnit(modelTileMap:getModelTile(gridIndex), playerIndex), 1)
+            updateMapForArmy(visibilityMap, mapSize, gridIndex, getVisionForModelTileOrUnit(modelUnitMap:getModelUnit(gridIndex), playerIndex), 1)
         end
     end
 
@@ -209,6 +232,24 @@ function ModelFogMap:clearMapForPath()
     fillSingleMapWithValue(self.m_VisibilityMapForPath, self:getMapSize(), 0)
 
     return self
+end
+
+function ModelFogMap:hasFogOnGrid(gridIndex, playerIndex)
+    if (not IS_SERVER) then
+        assert((playerIndex == nil) or (playerIndex == self.m_PlayerIndexLoggedIn),
+            "ModelFogMap:hasFogOnGrid() invalid playerIndex on the client: " .. (playerIndex or ""))
+        playerIndex = self.m_PlayerIndexLoggedIn
+    end
+
+    if (not self:isFogOfWarCurrently()) then
+        return false
+    else
+        local x, y              = gridIndex.x, gridIndex.y
+        local playerIndexInTurn = SingletonGetters.getModelTurnManager(self.m_SceneWarFileName):getPlayerIndex()
+        local mapForArmy        = self.m_VisibilityMapsForArmy[playerIndex]
+        local mapForPath        = (playerIndexInTurn == playerIndex) and (self.m_VisibilityMapForPath) or (nil)
+        return not ((mapForArmy) and (mapForArmy[x][y] > 0)) or ((mapForPath) and (mapForPath[x][y] > 0))
+    end
 end
 
 return ModelFogMap

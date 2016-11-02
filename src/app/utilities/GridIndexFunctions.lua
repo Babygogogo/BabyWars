@@ -113,10 +113,14 @@ function GridIndexFunctions.getDistance(index1, index2)
     return math.abs(offset.x) + math.abs(offset.y)
 end
 
-function GridIndexFunctions.getGridsWithinDistance(origin, minDistance, maxDistance, predicate)
-    local grids = {}
-    if (minDistance == 0) and (minDistance <= maxDistance) then
-        grids[1] = {x = origin.x, y = origin.y}
+function GridIndexFunctions.getGridsWithinDistance(origin, minDistance, maxDistance, mapSize, predicate)
+    local grids       = {}
+    local isWithinMap = GridIndexFunctions.isWithinMap
+    if ((minDistance == 0)                                and
+        (minDistance <= maxDistance)                      and
+        ((not mapSize) or (isWithinMap(origin, mapSize))) and
+        ((not predicate) or (predicate(origin))))         then
+        grids[1] = GridIndexFunctions.clone(origin)
     end
 
     for distance = minDistance, maxDistance do
@@ -124,7 +128,8 @@ function GridIndexFunctions.getGridsWithinDistance(origin, minDistance, maxDista
             local gridIndex = GridIndexFunctions.add(origin, GridIndexFunctions.sub(GridIndexFunctions.scale(offsetItem, distance), offsetItem.clockwiseOffset))
             for i = 1, distance do
                 gridIndex = GridIndexFunctions.add(gridIndex, offsetItem.clockwiseOffset)
-                if (not predicate) or (predicate(gridIndex)) then
+                if (((not mapSize) or (isWithinMap(gridIndex, mapSize))) and
+                    ((not predicate) or (predicate(gridIndex))))         then
                     grids[#grids + 1] = gridIndex
                 end
             end
