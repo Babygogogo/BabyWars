@@ -104,6 +104,10 @@ function AttackTaker:toSerializableTable()
     end
 end
 
+function AttackTaker:toSerializableTableWithFog()
+    return self:toSerializableTable()
+end
+
 --------------------------------------------------------------------------------
 -- The public callback function for start running.
 --------------------------------------------------------------------------------

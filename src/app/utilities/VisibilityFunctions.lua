@@ -6,6 +6,7 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local TableFunctions     = require("src.app.utilities.TableFunctions")
 
 local getAdjacentGrids = GridIndexFunctions.getAdjacentGrids
+local getModelFogMap   = SingletonGetters.getModelFogMap
 local getModelUnitMap  = SingletonGetters.getModelUnitMap
 
 --------------------------------------------------------------------------------
@@ -70,6 +71,10 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, g
 
         return false
     end
+end
+
+function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, targetPlayerIndex)
+    return not getModelFogMap(sceneWarFileName):hasFogOnGridForPlayerIndex(gridIndex, targetPlayerIndex)
 end
 
 function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path, modelUnit, isModelUnitDestroyed)

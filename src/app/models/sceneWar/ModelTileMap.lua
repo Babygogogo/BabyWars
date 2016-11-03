@@ -161,8 +161,15 @@ function ModelTileMap:toSerializableTable()
 end
 
 function ModelTileMap:toSerializableTableForPlayerIndex(playerIndex)
-    -- TODO: deal with the fog of war.
-    return self:toSerializableTable()
+    local grids = {}
+    self:forEachModelTile(function(modelTile)
+        grids[#grids + 1] = modelTile:toSerializableTableForPlayerIndex(playerIndex)
+    end)
+
+    return {
+        template = self.m_TemplateName,
+        grids    = grids,
+    }
 end
 
 --------------------------------------------------------------------------------

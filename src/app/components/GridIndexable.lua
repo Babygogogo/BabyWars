@@ -53,6 +53,10 @@ function GridIndexable:toSerializableTable()
     }
 end
 
+function GridIndexable:toSerializableTableWithFog()
+    return self:toSerializableTable()
+end
+
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------

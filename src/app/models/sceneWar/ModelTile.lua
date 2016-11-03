@@ -54,10 +54,11 @@ local ModelTile = require("src.global.functions.class")("ModelTile")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local getModelFogMap         = SingletonGetters.getModelFogMap
-local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+local getPlayerIndexLoggedIn     = SingletonGetters.getPlayerIndexLoggedIn
+local isTileVisibleToPlayerIndex = VisibilityFunctions.isTileVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -155,6 +156,54 @@ function ModelTile:toSerializableTable()
     end
 end
 
+function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
+    local gridIndex = self:getGridIndex()
+    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, gridIndex, playerIndex)) then
+        return self:toSerializableTable()
+    end
+
+    local tileType        = self:getTileType()
+    local initialObjectID = self.m_InitialObjectID
+    local initialBaseID   = self.m_InitialBaseID
+    if (self.getCurrentCapturePoint) then
+        if (tileType == "Headquarters") then
+            return nil
+        else
+            local objectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileType, 0)
+            if ((objectID == initialObjectID) and (self.m_BaseID == initialBaseID)) then
+                return nil
+            else
+                return {
+                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
+                    GridIndexable = {gridIndex = gridIndex},
+                }
+            end
+        end
+    end
+
+    local t               = {}
+    local componentsCount = 0
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.toSerializableTableWithFog) then
+            local componentTable = component:toSerializableTableWithFog()
+            if (componentTable) then
+                t[name]         = componentTable
+                componentsCount = componentsCount + 1
+            end
+        end
+    end
+
+    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+        return nil
+    else
+        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
+        t.baseID   = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+
+        return t
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
@@ -173,7 +222,7 @@ function ModelTile:updateView()
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
         if (self.m_SceneWarFileName) then
-            self.m_View:setHasFog(getModelFogMap():hasFogOnGridForPlayerIndex(self:getGridIndex(), getPlayerIndexLoggedIn()))
+            self.m_View:setHasFog(not isTileVisibleToPlayerIndex(self.m_SceneWarFileName, self:getGridIndex(), getPlayerIndexLoggedIn()))
         end
     end
 
