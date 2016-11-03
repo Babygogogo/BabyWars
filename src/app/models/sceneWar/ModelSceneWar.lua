@@ -193,13 +193,18 @@ end
 function ModelSceneWar:onStartRunning()
     local sceneWarFileName = self:getFileName()
     local modelTurnManager = self:getModelTurnManager()
+    local modelWarField    = self:getModelWarField()
     if (not IS_SERVER) then
         self:getModelWarHud():onStartRunning(sceneWarFileName)
     end
-    modelTurnManager       :onStartRunning(sceneWarFileName)
-    self:getModelWarField():onStartRunning(sceneWarFileName)
+    modelTurnManager            :onStartRunning(sceneWarFileName)
+    self:getModelPlayerManager():onStartRunning(sceneWarFileName)
+    modelWarField               :onStartRunning(sceneWarFileName)
 
-    self:getModelWarField():getModelFogMap():initialize()
+    modelWarField:getModelFogMap():initialize()
+    if (not IS_SERVER) then
+        modelWarField:getModelTileMap():updateViewWithFogMap()
+    end
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
 

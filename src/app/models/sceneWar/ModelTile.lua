@@ -51,17 +51,18 @@
 
 local ModelTile = require("src.global.functions.class")("ModelTile")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local ComponentManager      = require("src.global.components.ComponentManager")
+
+local getModelFogMap         = SingletonGetters.getModelFogMap
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function initWithTiledID(self, objectID, baseID)
+local function initWithTiledID(self, objectID, baseID, isPreview)
     self.m_InitialObjectID = self.m_InitialObjectID or objectID
     self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
 
@@ -69,28 +70,34 @@ local function initWithTiledID(self, objectID, baseID)
     self.m_BaseID   = baseID   or self.m_BaseID
     assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
 
-    local template = GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(self.m_ObjectID, self.m_BaseID)
-    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
+    if (not isPreview) then
+        local template = GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(self.m_ObjectID, self.m_BaseID)
+        assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
-    if (self.m_Template ~= template) then
-        self.m_Template = template
+        if (self.m_Template ~= template) then
+            self.m_Template = template
 
-        ComponentManager.unbindAllComponents(self)
-        for name, data in pairs(template) do
-            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-                ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+            ComponentManager.unbindAllComponents(self)
+            for name, data in pairs(template) do
+                if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                    ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+                end
             end
         end
     end
 end
 
 local function loadInstantialData(self, param)
-    for name, data in pairs(param) do
-        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-            local component = ComponentManager.getComponent(self, name)
-            assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
+    if (param.isPreview) then
+        ComponentManager.bindComponent(self, "GridIndexable", {instantialData = param.GridIndexable})
+    else
+        for name, data in pairs(param) do
+            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                local component = ComponentManager.getComponent(self, name)
+                assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
 
-            component:loadInstantialData(data)
+                component:loadInstantialData(data)
+            end
         end
     end
 end
@@ -100,9 +107,8 @@ end
 --------------------------------------------------------------------------------
 function ModelTile:ctor(param)
     if ((param.objectID) or (param.baseID)) then
-        initWithTiledID(self, param.objectID, param.baseID)
+        initWithTiledID(self, param.objectID, param.baseID, param.isPreview)
     end
-
     loadInstantialData(self, param)
 
     if (self.m_View) then
@@ -166,6 +172,9 @@ function ModelTile:updateView()
     if (self.m_View) then
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
+        if (self.m_SceneWarFileName) then
+            self.m_View:setHasFog(getModelFogMap():hasFogOnGridForPlayerIndex(self:getGridIndex(), getPlayerIndexLoggedIn()))
+        end
     end
 
     return self

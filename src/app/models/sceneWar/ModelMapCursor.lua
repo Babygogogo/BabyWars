@@ -204,6 +204,7 @@ function ModelMapCursor:initView()
 
         :setNormalCursorVisible(true)
         :setTargetCursorVisible(false)
+        :setSiloCursorVisible(  false)
 
     return self
 end
@@ -228,9 +229,9 @@ end
 
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(         self, event)
-    elseif (eventName == "EvtMapCursorMoved")                  then onEvtMapCursorMoved(       self, event)
-    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(      self, event)
+    if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(   self, event)
+    elseif (eventName == "EvtMapCursorMoved")                  then onEvtMapCursorMoved( self, event)
+    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(self, event)
     elseif (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerMakingMovePath")     then setCursorAppearance(self, true,  false, false)
     elseif (eventName == "EvtActionPlannerChoosingAction")     then setCursorAppearance(self, true,  false, false)

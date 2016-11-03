@@ -5,7 +5,7 @@ local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
-local WebSocketManager = (IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -63,7 +63,7 @@ local function createVisibilityMapForPathWithData(data, mapSize)
     local map           = createSingleMap(mapSize, 0)
     local width, height = mapSize.width, mapSize.height
     local byteFor0      = string.byte("0")
-    local bytesForData  = {string.byte(data)}
+    local bytesForData  = {string.byte(data, 1, -1)}
     for x = 1, width do
         local column = map[x]
         local offset = (x - 1) * height
@@ -128,11 +128,11 @@ function ModelFogMap:initialize()
         self.m_VisibilityMapsForArmy = {}
         for playerIndex = 1, SingletonGetters.getModelPlayerManager(sceneWarFileName):getPlayersCount() do
             self.m_VisibilityMapsForArmy[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForArmy(playerIndex)
+            self:resetMapForArmyForPlayerIndex(playerIndex)
         end
     else
         self.m_VisibilityMapsForArmy = {[self.m_PlayerIndexLoggedIn] = createSingleMap(mapSize, 0)}
-        self:resetMapForArmy(self.m_PlayerIndexLoggedIn)
+        self:resetMapForArmyForPlayerIndex(self.m_PlayerIndexLoggedIn)
     end
 
     return self
@@ -155,7 +155,7 @@ function ModelFogMap:toSerializableTableForPlayerIndex(playerIndex)
         stateForForcingFog               = self.m_StateForForcingFog,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
-        visibilityMapForPath             = (SingletonGetters.getModelTurnManager():getPlayerIndex() == playerIndex)
+        visibilityMapForPath             = (SingletonGetters.getModelTurnManager(self.m_SceneWarFileName):getPlayerIndex() == playerIndex)
             and (createSerializableDataForVisibilityMapForPath(self.m_VisibilityMapForPath, self:getMapSize()))
             or  (nil),
     }
@@ -199,12 +199,11 @@ function ModelFogMap:isDisablingFogByForce()
     return self.m_StateForForcingFog == "Disabled"
 end
 
-function ModelFogMap:resetMapForArmy(playerIndex)
-    assert(self:isInitialized(), "ModelFogMap:resetMapForArmy() the maps have not been initialized yet.")
+function ModelFogMap:resetMapForArmyForPlayerIndex(playerIndex)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForArmyForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
-        assert((playerIndex == nil) or (playerIndex == self.m_PlayerIndexLoggedIn),
-            "ModelFogMap:resetMapForArmy() invalid playerIndex on the client: " .. (playerIndex or ""))
-        playerIndex = self.m_PlayerIndexLoggedIn
+        assert(playerIndex == self.m_PlayerIndexLoggedIn,
+            "ModelFogMap:resetMapForArmyForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     local sceneWarFileName = self.m_SceneWarFileName
@@ -234,11 +233,10 @@ function ModelFogMap:clearMapForPath()
     return self
 end
 
-function ModelFogMap:hasFogOnGrid(gridIndex, playerIndex)
+function ModelFogMap:hasFogOnGridForPlayerIndex(gridIndex, playerIndex)
     if (not IS_SERVER) then
-        assert((playerIndex == nil) or (playerIndex == self.m_PlayerIndexLoggedIn),
-            "ModelFogMap:hasFogOnGrid() invalid playerIndex on the client: " .. (playerIndex or ""))
-        playerIndex = self.m_PlayerIndexLoggedIn
+        assert(playerIndex == self.m_PlayerIndexLoggedIn,
+            "ModelFogMap:hasFogOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     if (not self:isFogOfWarCurrently()) then
@@ -248,7 +246,7 @@ function ModelFogMap:hasFogOnGrid(gridIndex, playerIndex)
         local playerIndexInTurn = SingletonGetters.getModelTurnManager(self.m_SceneWarFileName):getPlayerIndex()
         local mapForArmy        = self.m_VisibilityMapsForArmy[playerIndex]
         local mapForPath        = (playerIndexInTurn == playerIndex) and (self.m_VisibilityMapForPath) or (nil)
-        return not ((mapForArmy) and (mapForArmy[x][y] > 0)) or ((mapForPath) and (mapForPath[x][y] > 0))
+        return not (((mapForArmy) and (mapForArmy[x][y] > 0)) or ((mapForPath) and (mapForPath[x][y] > 0)))
     end
 end
 

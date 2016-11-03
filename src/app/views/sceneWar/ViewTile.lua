@@ -3,6 +3,8 @@ local ViewTile = class("ViewTile", cc.Node)
 
 local TILE_OBJECT_Z_ORDER = 1
 local TILE_BASE_Z_ORDER   = 0
+local CLEAR_COLOR         = {r = 255, g = 255, b = 255}
+local FOG_COLOR           = {r = 160, g = 160, b = 160}
 
 local ComponentManager      = require("src.global.components.ComponentManager")
 local TypeChecker           = require("src.app.utilities.TypeChecker")
@@ -14,6 +16,7 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 --------------------------------------------------------------------------------
 function ViewTile:ctor(param)
     self:ignoreAnchorPointForPosition(true)
+        :setCascadeColorEnabled(true)
 
     return self
 end
@@ -59,6 +62,12 @@ function ViewTile:setViewBaseWithTiledId(baseID)
     end
 
     self.m_BaseID = baseID
+    return self
+end
+
+function ViewTile:setHasFog(hasFog)
+    self:setColor(hasFog and FOG_COLOR or CLEAR_COLOR)
+
     return self
 end
 

@@ -70,7 +70,7 @@ local function createEmptyMap(width)
     return map
 end
 
-local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
+local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer, isPreview)
     local width, height = baseLayer.width, baseLayer.height
     local map = createEmptyMap(width)
 
@@ -78,9 +78,10 @@ local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
         for y = 1, height do
             local idIndex = x + (height - y) * width
             local actorData = {
-                objectID = objectLayer.data[idIndex],
-                baseID   = baseLayer.data[idIndex],
-                GridIndexable = {gridIndex = {x = x, y = y}}
+                objectID      = objectLayer.data[idIndex],
+                baseID        = baseLayer.data[idIndex],
+                GridIndexable = {gridIndex = {x = x, y = y}},
+                isPreview     = isPreview,
             }
 
             map[x][y] = Actor.createWithModelAndViewName("sceneWar.ModelTile", actorData, "sceneWar.ViewTile", actorData)
@@ -104,7 +105,7 @@ end
 local function createTileActorsMap(param)
     local mapData         = requireMapData(param)
     local templateMapData = requireMapData(mapData.template)
-    local map, mapSize    = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
+    local map, mapSize    = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData), param.isPreview)
     updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
     return map, mapSize, mapData.template
@@ -205,6 +206,14 @@ function ModelTileMap:forEachModelTile(func)
             func(self.m_ActorTilesMap[x][y]:getModel())
         end
     end
+
+    return self
+end
+
+function ModelTileMap:updateViewWithFogMap()
+    self:forEachModelTile(function(modelTile)
+        modelTile:updateView()
+    end)
 
     return self
 end
