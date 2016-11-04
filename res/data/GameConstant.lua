@@ -680,6 +680,29 @@ GameConstant.categories = {
         "Gunboat",
     },
 
+    ["Ground/AirUnits"] = {
+        "Infantry",
+        "Mech",
+        "Bike",
+        "Recon",
+        "Flare",
+        "AntiAir",
+        "Tank",
+        "MediumTank",
+        "WarTank",
+        "Artillery",
+        "AntiTank",
+        "Rockets",
+        "Missiles",
+        "Rig",
+        "Fighter",
+        "Bomber",
+        "Duster",
+        "BattleCopter",
+        "TransportCopter",
+        "Seaplane",
+    },
+
     ["DirectUnits"] = {
         "Infantry",
         "Mech",
@@ -1140,6 +1163,10 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
     },
 
     Mountain = {
@@ -1200,7 +1227,11 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
-    },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
+},
 
     Fire = {
         GridIndexable = {},
@@ -1265,6 +1296,10 @@ GameConstant.templateModelTiles = {
             Ship      = 1,
             Transport = 1,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.NavalUnits,
+        },
     },
 
     Reef = {
@@ -1284,6 +1319,10 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = 2,
             Transport = 2,
+        },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.NavalUnits,
         },
     },
 
@@ -1432,6 +1471,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
     },
 
     City = {
@@ -1472,6 +1515,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
     },
 
     CommandTower = {
@@ -1507,6 +1554,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
     },
 
     Radar = {
@@ -1541,6 +1592,10 @@ GameConstant.templateModelTiles = {
         VisionOwner = {
             vision                 = 5,
             isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
         },
     },
 
@@ -1601,6 +1656,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories.GroundUnits,
+        },
     },
 
     Airport = {
@@ -1650,6 +1709,10 @@ GameConstant.templateModelTiles = {
         VisionOwner = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories["Ground/AirUnits"],
         },
     },
 
@@ -1702,6 +1765,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories["Ground/NavalUnits"],
+        },
     },
 
     TempAirport = {
@@ -1738,6 +1805,10 @@ GameConstant.templateModelTiles = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories["Ground/AirUnits"],
+        },
     },
 
     TempSeaport = {
@@ -1773,6 +1844,10 @@ GameConstant.templateModelTiles = {
         VisionOwner = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = GameConstant.categories["Ground/NavalUnits"],
         },
     },
 }

@@ -65,6 +65,7 @@ function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIn
         if (visibilityForUnits == 2) then
             return true
         elseif ((visibilityForUnits == 1) or (visibilityForTiles == 1)) then
+            -- TODO: take the skills into account.
             return not modelTile.canHideUnitType
         else
             return false

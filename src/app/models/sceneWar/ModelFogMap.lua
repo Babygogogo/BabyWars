@@ -107,11 +107,11 @@ local function updateMapForUnits(map, mapSize, origin, vision)
         return
     end
 
-    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
         map[gridIndex.x][gridIndex.y] = 2
     end
     for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
-        map[gridIndex.x][gridIndex.y] = 1
+        map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
     end
 end
 
@@ -261,13 +261,12 @@ function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
     local mapSize       = self:getMapSize()
     if (data) then
         fillMapForUnitWithData(visibilityMap, mapSize, data)
-        return
+    else
+        fillSingleMapWithValue(visibilityMap, mapSize, 0)
+        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+            updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex))
+        end)
     end
-
-    fillSingleMapWithValue(visibilityMap, mapSize, 0)
-    getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
-        updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex))
-    end)
 
     return self
 end
