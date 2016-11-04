@@ -102,7 +102,7 @@ local function updateMapForTiles(map, mapSize, origin, vision, modifier)
     end
 end
 
-local function updateMapForUnits(map, mapSize, origin, vision, canSeeThrough)
+local function updateMapForUnits(map, mapSize, origin, vision)
     if (not vision) then
         return
     end
@@ -110,10 +110,8 @@ local function updateMapForUnits(map, mapSize, origin, vision, canSeeThrough)
     for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
         map[gridIndex.x][gridIndex.y] = 2
     end
-
-    local visibility = (canSeeThrough) and (2) or (1)
     for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
-        map[gridIndex.x][gridIndex.y] = visibility
+        map[gridIndex.x][gridIndex.y] = 1
     end
 end
 
@@ -241,6 +239,18 @@ function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
     return self
 end
 
+function ModelFogMap:updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndex, gridIndex, vision)
+    updateMapForTiles(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, 1)
+
+    return self
+end
+
+function ModelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(playerIndex, gridIndex, vision)
+    updateMapForTiles(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, -1)
+
+    return self
+end
+
 function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
     assert(self:isInitialized(), "ModelFogMap:resetMapForUnitsForPlayerIndex() the map have not been initialized yet.")
     if (not IS_SERVER) then
@@ -256,25 +266,31 @@ function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
 
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
-        -- TODO: check if the units can see through hiding places.
-        updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex), false)
+        updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex))
     end)
 
     return self
 end
 
-function ModelFogMap:hasFogOnGridForPlayerIndex(gridIndex, playerIndex)
+function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
+    -- This function returns 2 numbers, indicating the visibility calculated with the tiles/units of the playerIndex.
+    -- Each visibility can be 0 or 1:
+    -- 0: The grid is out of vision completly.
+    -- 1: The grid is in vision, but no unit of the playerIndex is beside or passed by it.
+    -- The visibility of units can also be 2:
+    -- 2: The grid is in vision, and one or more units of the playerIndex are beside or passed by it.
+
+    -- The skills that enable the tiles/units to see through the hiding places are ignored.
+
     if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:hasFogOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:getVisibilityOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     if (not self:isFogOfWarCurrently()) then
-        return false
+        return 1, 2
     else
-        local x, y        = gridIndex.x, gridIndex.y
-        local mapForTiles = self.m_MapsForTiles[playerIndex]
-        local mapForUnits = self.m_MapsForUnits[playerIndex]
-        return not (((mapForTiles) and (mapForTiles[x][y] > 0)) or ((mapForUnits) and (mapForUnits[x][y] > 0)))
+        local x, y = gridIndex.x, gridIndex.y
+        return (self.m_MapsForTiles[playerIndex][x][y] > 0) and (1) or (0), self.m_MapsForUnits[playerIndex][x][y]
     end
 end
 
