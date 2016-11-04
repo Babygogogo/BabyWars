@@ -7,6 +7,11 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
+local getGridsWithinDistance = GridIndexFunctions.getGridsWithinDistance
+local getModelTileMap        = SingletonGetters.getModelTileMap
+local getModelUnitMap        = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -41,7 +46,7 @@ local function createSingleMap(mapSize, defaultValue)
     return map
 end
 
-local function createSerializableDataForVisibilityMapForPath(map, mapSize)
+local function createSerializableDataForSingleMapForUnits(map, mapSize)
     local width, height = mapSize.width, mapSize.height
     local array         = {}
     for x = 1, width do
@@ -55,12 +60,19 @@ local function createSerializableDataForVisibilityMapForPath(map, mapSize)
     return table.concat(array)
 end
 
-local function createVisibilityMapForPathWithData(data, mapSize)
-    if (not data) then
-        return createSingleMap(mapSize, 0)
+local function createSerializableDataForMapsForUnits(maps, mapSize, playerIndex)
+    if (playerIndex) then
+        return {[playerIndex] = createSerializableDataForSingleMapForUnits(maps[playerIndex], mapSize)}
+    else
+        local data = {}
+        for index, map in ipairs(maps) do
+            data[index] = createSerializableDataForSingleMapForUnits(map, mapSize)
+        end
+        return data
     end
+end
 
-    local map           = createSingleMap(mapSize, 0)
+local function fillMapForUnitWithData(map, mapSize, data)
     local width, height = mapSize.width, mapSize.height
     local byteFor0      = string.byte("0")
     local bytesForData  = {string.byte(data, 1, -1)}
@@ -81,12 +93,27 @@ local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex)
         or (nil)
 end
 
-local function updateMapForArmy(map, mapSize, origin, vision, modifier)
+local function updateMapForTiles(map, mapSize, origin, vision, modifier)
+    assert((modifier == 1) or (modifier == -1), "ModelFogMap-updateMapForTiles() invalid modifier: " .. (modifier or ""))
     if (vision) then
-        assert((modifier == 1) or (modifier == -1), "ModelFogMap-updateMapForArmy() invalid modifier: " .. (modifier or ""))
-        for _, gridIndex in pairs(GridIndexFunctions.getGridsWithinDistance(origin, 0, vision, mapSize)) do
+        for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
             map[gridIndex.x][gridIndex.y] = map[gridIndex.x][gridIndex.y] + modifier
         end
+    end
+end
+
+local function updateMapForUnits(map, mapSize, origin, vision, canSeeThrough)
+    if (not vision) then
+        return
+    end
+
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
+        map[gridIndex.x][gridIndex.y] = 2
+    end
+
+    local visibility = (canSeeThrough) and (2) or (1)
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
+        map[gridIndex.x][gridIndex.y] = visibility
     end
 end
 
@@ -110,29 +137,34 @@ function ModelFogMap:initialize()
 
     local data                   = self.m_DataForInitialization
     local sceneWarFileName       = self.m_SceneWarFileName
-    local mapSize                = SingletonGetters.getModelTileMap(sceneWarFileName):getMapSize()
+    local mapSize                = getModelTileMap(sceneWarFileName):getMapSize()
     self.m_DataForInitialization = nil
     self.m_MapSize               = mapSize
+    self.m_MapsForTiles          = {}
+    self.m_MapsForUnits          = {}
 
     if (not data) then
         self.m_StateForForcingFog   = "None"
-        self.m_VisibilityMapForPath = createSingleMap(mapSize, 0)
     else
         self.m_StateForForcingFog               = data.stateForForcingFog
         self.m_ExpiringTurnIndexForForcingFog   = data.expiringTurnIndexForForcingFog
         self.m_ExpiringPlayerIndexForForcingFog = data.expiringPlayerIndexForForcingFog
-        self.m_VisibilityMapForPath             = createVisibilityMapForPathWithData(data.visibilityMapForPath, mapSize)
     end
 
     if (IS_SERVER) then
-        self.m_VisibilityMapsForArmy = {}
+        local mapsForUnits = (data) and (data.mapsForUnits) or (nil)
         for playerIndex = 1, SingletonGetters.getModelPlayerManager(sceneWarFileName):getPlayersCount() do
-            self.m_VisibilityMapsForArmy[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForArmyForPlayerIndex(playerIndex)
+            self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
+            self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
+            self:resetMapForTilesForPlayerIndex(playerIndex)
+            self:resetMapForUnitsForPlayerIndex(playerIndex, mapsForUnits and mapsForUnits[playerIndex] or nil)
         end
     else
-        self.m_VisibilityMapsForArmy = {[self.m_PlayerIndexLoggedIn] = createSingleMap(mapSize, 0)}
-        self:resetMapForArmyForPlayerIndex(self.m_PlayerIndexLoggedIn)
+        local playerIndex = getPlayerIndexLoggedIn()
+        self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
+        self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
+        self:resetMapForTilesForPlayerIndex(playerIndex)
+        self:resetMapForUnitsForPlayerIndex(playerIndex, data and data.mapsForUnits and data.mapsForUnits[playerIndex])
     end
 
     return self
@@ -146,7 +178,7 @@ function ModelFogMap:toSerializableTable()
         stateForForcingFog               = self.m_StateForForcingFog,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
-        visibilityMapForPath             = createSerializableDataForVisibilityMapForPath(self.m_VisibilityMapForPath, self:getMapSize()),
+        mapsForUnits                     = createSerializableDataForMapsForUnits(self.m_MapsForUnits, self:getMapSize()),
     }
 end
 
@@ -155,9 +187,7 @@ function ModelFogMap:toSerializableTableForPlayerIndex(playerIndex)
         stateForForcingFog               = self.m_StateForForcingFog,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
-        visibilityMapForPath             = (SingletonGetters.getModelTurnManager(self.m_SceneWarFileName):getPlayerIndex() == playerIndex)
-            and (createSerializableDataForVisibilityMapForPath(self.m_VisibilityMapForPath, self:getMapSize()))
-            or  (nil),
+        mapsForUnits                     = createSerializableDataForMapsForUnits(self.m_MapsForUnits, self:getMapSize(), playerIndex),
     }
 end
 
@@ -167,10 +197,6 @@ end
 function ModelFogMap:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName    = sceneWarFileName
     self.m_IsFogOfWarByDefault = SingletonGetters.getModelScene(sceneWarFileName):isFogOfWarByDefault()
-    if (not IS_SERVER) then
-        local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-        self.m_PlayerIndexLoggedIn   = playerIndexLoggedIn
-    end
 
     return self
 end
@@ -199,54 +225,56 @@ function ModelFogMap:isDisablingFogByForce()
     return self.m_StateForForcingFog == "Disabled"
 end
 
-function ModelFogMap:resetMapForArmyForPlayerIndex(playerIndex)
-    assert(self:isInitialized(), "ModelFogMap:resetMapForArmyForPlayerIndex() the maps have not been initialized yet.")
+function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForTilesForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
-        assert(playerIndex == self.m_PlayerIndexLoggedIn,
-            "ModelFogMap:resetMapForArmyForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForTilesForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
-    local sceneWarFileName = self.m_SceneWarFileName
-    local modelTileMap     = SingletonGetters.getModelTileMap(sceneWarFileName)
-    local modelUnitMap     = SingletonGetters.getModelUnitMap(sceneWarFileName)
-    local visibilityMap    = self.m_VisibilityMapsForArmy[playerIndex]
-    local mapSize          = self:getMapSize()
-    local width, height    = mapSize.width, mapSize.height
-    local gridIndex        = {}
-
+    local visibilityMap = self.m_MapsForTiles[playerIndex]
+    local mapSize       = self:getMapSize()
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
-    for x = 1, width do
-        for y = 1, height do
-            gridIndex.x, gridIndex.y = x, y
-            updateMapForArmy(visibilityMap, mapSize, gridIndex, getVisionForModelTileOrUnit(modelTileMap:getModelTile(gridIndex), playerIndex), 1)
-            updateMapForArmy(visibilityMap, mapSize, gridIndex, getVisionForModelTileOrUnit(modelUnitMap:getModelUnit(gridIndex), playerIndex), 1)
-        end
-    end
+    getModelTileMap(self.m_SceneWarFileName):forEachModelTile(function(modelTile)
+        updateMapForTiles(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex), 1)
+    end)
 
     return self
 end
 
-function ModelFogMap:clearMapForPath()
-    assert(self:isInitialized(), "ModelFogMap:clearMapForPath() the map have not been initialized yet.")
-    fillSingleMapWithValue(self.m_VisibilityMapForPath, self:getMapSize(), 0)
+function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForUnitsForPlayerIndex() the map have not been initialized yet.")
+    if (not IS_SERVER) then
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
+    end
+
+    local visibilityMap = self.m_MapsForUnits[playerIndex]
+    local mapSize       = self:getMapSize()
+    if (data) then
+        fillMapForUnitWithData(visibilityMap, mapSize, data)
+        return
+    end
+
+    fillSingleMapWithValue(visibilityMap, mapSize, 0)
+    getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+        -- TODO: check if the units can see through hiding places.
+        updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex), false)
+    end)
 
     return self
 end
 
 function ModelFogMap:hasFogOnGridForPlayerIndex(gridIndex, playerIndex)
     if (not IS_SERVER) then
-        assert(playerIndex == self.m_PlayerIndexLoggedIn,
-            "ModelFogMap:hasFogOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:hasFogOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     if (not self:isFogOfWarCurrently()) then
         return false
     else
-        local x, y              = gridIndex.x, gridIndex.y
-        local playerIndexInTurn = SingletonGetters.getModelTurnManager(self.m_SceneWarFileName):getPlayerIndex()
-        local mapForArmy        = self.m_VisibilityMapsForArmy[playerIndex]
-        local mapForPath        = (playerIndexInTurn == playerIndex) and (self.m_VisibilityMapForPath) or (nil)
-        return not (((mapForArmy) and (mapForArmy[x][y] > 0)) or ((mapForPath) and (mapForPath[x][y] > 0)))
+        local x, y        = gridIndex.x, gridIndex.y
+        local mapForTiles = self.m_MapsForTiles[playerIndex]
+        local mapForUnits = self.m_MapsForUnits[playerIndex]
+        return not (((mapForTiles) and (mapForTiles[x][y] > 0)) or ((mapForUnits) and (mapForUnits[x][y] > 0)))
     end
 end
 
