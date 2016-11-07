@@ -336,7 +336,7 @@ function GameConstantFunctions.getCategory(categoryType)
 end
 
 function GameConstantFunctions.isTypeInCategory(type, categoryType)
-    for _, t in pairs(GameConstantFunctions.getCategory(categoryType) or {}) do
+    for _, t in pairs(GameConstantFunctions.getCategory(categoryType)) do
         if (type == t) then
             return true
         end

@@ -178,7 +178,7 @@ local function removeHiddenActorUnitsAfterAction(action)
             for _, adjacentGridIndex in ipairs(getAdjacentGrids(path[1], modelUnitMap:getMapSize())) do
                 local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
                 if ((adjacentModelUnit)                                                                                                                                      and
-                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
+                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
                     appendList(removedModelUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, false))
                 end
             end
@@ -192,7 +192,7 @@ local function removeHiddenActorUnitsAfterAction(action)
             -- 无法找到行动部队，则唯一可能性是行动部队被消灭了（主动发起进攻并被反击摧毁）。直接返回即可。
             assert(action.actionName == "Attack", "ActionExecutor-removeHiddenActorUnitsAfterAction() action Attack expected.")
             return {}
-        elseif (isUnitVisible(sceneWarFileName, endingGridIndex, isModelUnitDiving(modelUnit), playerIndexActing, playerIndexLoggedIn)) then
+        elseif (isUnitVisible(sceneWarFileName, endingGridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), playerIndexActing, playerIndexLoggedIn)) then
             -- 该部队可见，所以直接返回即可。
             return {}
         elseif (modelUnitMap:getModelUnit(endingGridIndex)) then
@@ -733,7 +733,7 @@ local function executeDive(action)
         focusModelUnit:moveViewAlongPath(path, false, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
-                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, true, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
+                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), true, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
 
             getModelGridEffect():showAnimationDive(endingGridIndex)
 
@@ -786,7 +786,7 @@ local function executeDropModelUnit(action)
             for _, dropModelUnit in ipairs(dropModelUnits) do
                 local isDiving  = isModelUnitDiving(dropModelUnit)
                 local gridIndex = dropModelUnit:getGridIndex()
-                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, isDiving, dropModelUnit:getPlayerIndex(), playerIndexLoggedIn)
+                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, dropModelUnit:getUnitType(), isDiving, dropModelUnit:getPlayerIndex(), playerIndexLoggedIn)
                 if (not isVisible) then
                     Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, false)
                 end
@@ -1134,7 +1134,7 @@ local function executeSurface(action)
         focusModelUnit:moveViewAlongPath(path, true, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
-                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
+                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
 
             getModelGridEffect():showAnimationSurface(endingGridIndex)
 

@@ -1185,7 +1185,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1249,7 +1249,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1318,7 +1318,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.NavalUnits,
+            targetCategoryType = "NavalUnits",
         },
     },
 
@@ -1342,7 +1342,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.NavalUnits,
+            targetCategoryType = "NavalUnits",
         },
     },
 
@@ -1493,7 +1493,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1537,7 +1537,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1576,7 +1576,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1615,7 +1615,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1678,7 +1678,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories.GroundUnits,
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1732,7 +1732,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories["Ground/AirUnits"],
+            targetCategoryType = "Ground/AirUnits",
         },
     },
 
@@ -1787,7 +1787,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories["Ground/NavalUnits"],
+            targetCategoryType = "Ground/NavalUnits",
         },
     },
 
@@ -1827,7 +1827,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories["Ground/AirUnits"],
+            targetCategoryType = "Ground/AirUnits",
         },
     },
 
@@ -1867,7 +1867,7 @@ GameConstant.templateModelTiles = {
         },
 
         UnitHider = {
-            targetCategoryType = GameConstant.categories["Ground/NavalUnits"],
+            targetCategoryType = "Ground/NavalUnits",
         },
     },
 }

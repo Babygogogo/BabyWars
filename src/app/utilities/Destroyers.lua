@@ -77,7 +77,7 @@ function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRem
         for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
             local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
             if ((adjacentModelUnit)                                                                                                                                                                 and
-                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving()), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
+                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving()), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
                 appendList(destroyedUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, shouldRemoveView))
             end
         end

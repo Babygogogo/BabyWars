@@ -33,6 +33,7 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
     local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
     local sceneWarFileName       = SingletonGetters.getSceneWarFileName()
     local isUnitVisible          = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+    local unitType               = self.m_Model:getUnitType()
     local steps                  = {cc.CallFunc:create(function()
         SingletonGetters.getModelMapCursor():setMovableByPlayer(false)
     end)}
@@ -54,14 +55,14 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
         else
             if (isDiving) then
                 if ((i == #path)                                                                            and
-                    (isUnitVisible(sceneWarFileName, path[i], isDiving, playerIndex, playerIndexLoggedIn))) then
+                    (isUnitVisible(sceneWarFileName, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()
                 end
             else
-                if ((isUnitVisible(sceneWarFileName, path[i - 1], isDiving, playerIndex, playerIndexLoggedIn))  or
-                    (isUnitVisible(sceneWarFileName, path[i],     isDiving, playerIndex, playerIndexLoggedIn))) then
+                if ((isUnitVisible(sceneWarFileName, path[i - 1], unitType, isDiving, playerIndex, playerIndexLoggedIn))  or
+                    (isUnitVisible(sceneWarFileName, path[i],     unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()

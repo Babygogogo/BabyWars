@@ -39,22 +39,44 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, isDiving, unitPlayerIndex, opponentPlayerIndex)
-    assert(type(unitPlayerIndex)     == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
-    assert(type(opponentPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid opponentPlayerIndex: " .. (opponentPlayerIndex or ""))
-    -- TODO: deal with the fog of war.
-    if ((unitPlayerIndex == opponentPlayerIndex) or (not isDiving)) then
+function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, unitType, isDiving, unitPlayerIndex, targetPlayerIndex)
+    assert(type(unitType)          == "string", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitType: " .. (unitType or ""))
+    assert(type(unitPlayerIndex)   == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
+    assert(type(targetPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid targetPlayerIndex: " .. (targetPlayerIndex or ""))
+    if (unitPlayerIndex == targetPlayerIndex) then
         return true
-    else
+    elseif (isDiving) then
         local modelUnitMap = getModelUnitMap(sceneWarFileName)
         for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
             local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-            if ((adjacentModelUnit) and (adjacentModelUnit:getPlayerIndex() == opponentPlayerIndex)) then
+            if ((adjacentModelUnit) and (adjacentModelUnit:getPlayerIndex() == targetPlayerIndex)) then
                 return true
             end
         end
 
         return false
+    end
+
+    local modelTile = getModelTileMap(sceneWarFileName):getModelTile(gridIndex)
+    if (modelTile:getPlayerIndex() == targetPlayerIndex) then
+        return true
+    end
+
+    local visibilityForTiles, visibilityForUnits = getModelFogMap(sceneWarFileName):getVisibilityOnGridForPlayerIndex(gridIndex, targetPlayerIndex)
+    if (visibilityForUnits == 2) then
+        return true
+    elseif ((visibilityForUnits == 0) and (visibilityForTiles == 0)) then
+        return false
+    elseif ((not modelTile.canHideUnitType) or (not modelTile:canHideUnitType(unitType))) then
+        return true
+    else
+        local skillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
+        if (((visibilityForTiles == 1) and (SkillModifierFunctions.canRevealHidingPlacesForTiles(skillConfiguration)))  or
+            ((visibilityForUnits == 1) and (SkillModifierFunctions.canRevealHidingPlacesForUnits(skillConfiguration)))) then
+            return true
+        else
+            return false
+        end
     end
 end
 
