@@ -229,6 +229,12 @@ local s_Texts = {
             elseif (skillID == 52) then return "改变我方所有车辆系的移动力，幅度为"
             elseif (skillID == 53) then return "改变我方所有近战机械部队的移动力，幅度为"
             elseif (skillID == 54) then return "改变我方所有运输系（不含炮舰）的移动力，幅度为"
+            elseif (skillID == 55) then return "改变我方所有部队的视野，幅度为"
+            elseif (skillID == 56) then return "改变我方所有建筑的视野，幅度为"
+            elseif (skillID == 57) then return "改变我方所有部队和建筑的视野，幅度为"
+            elseif (skillID == 58) then return "使我方所有部队能够直接探明视野内的敌军隐蔽地点。"
+            elseif (skillID == 59) then return "使我方所有建筑能够直接探明视野内的敌军隐蔽地点。"
+            elseif (skillID == 60) then return "使我方所有部队和建筑能够直接探明视野内的敌军隐蔽地点。"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -292,6 +298,12 @@ local s_Texts = {
             elseif (skillID == 52) then return "车辆系移动力"
             elseif (skillID == 53) then return "近战机械移动力"
             elseif (skillID == 54) then return "运输系移动力"
+            elseif (skillID == 55) then return "部队视野范围"
+            elseif (skillID == 56) then return "建筑视野范围"
+            elseif (skillID == 57) then return "部队建筑视野范围"
+            elseif (skillID == 58) then return "部队视野穿透"
+            elseif (skillID == 59) then return "建筑视野穿透"
+            elseif (skillID == 60) then return "部队建筑视野穿透"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -310,6 +322,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
             elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "能 量 类"
+            elseif (skillCategory == "SkillCategoryPassiveVision")      then return "视 野 类"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "防 御 类"
             elseif (skillCategory == "SkillCategoryActiveMoney")        then return "金 钱 类"
@@ -320,6 +333,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActivePromotion")    then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
+            elseif (skillCategory == "SkillCategoryActiveVision")       then return "视 野 类"
             else                                                        return "未知6:" .. (skillCategory or "")
             end
         end,
@@ -333,6 +347,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"
             elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "Promotion"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "Energy"
+            elseif (skillCategory == "SkillCategoryPassiveVision")      then return "Vision"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "Attack"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "Defense"
             elseif (skillCategory == "SkillCategoryActiveMoney")        then return "Money"
@@ -343,6 +358,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActivePromotion")    then return "Promotion"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
+            elseif (skillCategory == "SkillCategoryActiveVision")       then return "Vision"
             else                                                        return "Unknown6:" .. (skillCategory or "")
             end
         end,
@@ -496,7 +512,6 @@ local s_Texts = {
         [1] = function(account) return "欢迎注册，【" .. account .. "】！祝您游戏愉快！"            end,
         [2] = function(account) return "Welcome, " .. account .. "!\nThank you for registering!" end,
     },
-    --[[
     [28] = {
         [1] = function() return "是"  end,
         [2] = function() return "Yes" end,
@@ -505,7 +520,6 @@ local s_Texts = {
         [1] = function() return "否" end,
         [2] = function() return "No" end,
     },
-    --]]
     [30] = {
         [1] = function() return "已成功连接服务器。"       end,
         [2] = function() return "Connection established." end,

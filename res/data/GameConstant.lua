@@ -806,6 +806,7 @@ GameConstant.categories = {
         "SkillCategoryPassiveRepair",
         "SkillCategoryPassivePromotion",
         "SkillCategoryPassiveEnergy",
+        "SkillCategoryPassiveVision",
     },
 
     ["SkillCategoriesForActive"] = {
@@ -819,6 +820,7 @@ GameConstant.categories = {
         "SkillCategoryActivePromotion",
         "SkillCategoryActiveEnergy",
         "SkillCategoryActiveLogistics",
+        "SkillCategoryActiveVision",
     },
 
     ["SkillCategoryPassiveAttack"] = {
@@ -965,6 +967,24 @@ GameConstant.categories = {
     ["SkillCategoryActiveLogistics"] = {
         9,
         16,
+    },
+
+    ["SkillCategoryPassiveVision"] = {
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+    },
+
+    ["SkillCategoryActiveVision"] = {
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
     },
 }
 
@@ -1231,7 +1251,7 @@ GameConstant.templateModelTiles = {
         UnitHider = {
             targetCategoryType = GameConstant.categories.GroundUnits,
         },
-},
+    },
 
     Fire = {
         GridIndexable = {},
@@ -5337,6 +5357,78 @@ GameConstant.skills = {
             [3] = {modifier = 3, pointsPassive = 300, pointsActive = 150, minEnergy = 6},
             [4] = {modifier = 4, pointsPassive = 400, pointsActive = 200, minEnergy = 8},
             [5] = {modifier = 5, pointsPassive = 500, pointsActive = 250, minEnergy = 10},
+        },
+    },
+
+    -- Modify vision of units of the owner player.
+    [55] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 480, pointsActive = 240, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 720, pointsActive = 360, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 960, pointsActive = 480, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 1200, pointsActive = 600, minEnergy = 5},
+        },
+    },
+
+    -- Modify vision of buildings of the owner player.
+    [56] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 320, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 480, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 640, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 800, pointsActive = 400, minEnergy = 5},
+        },
+    },
+
+    -- Modify vision of units and buildings of the owner player.
+    [57] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 300, pointsActive = 150, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 600, pointsActive = 300, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 900, pointsActive = 450, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 1200, pointsActive = 600, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 1500, pointsActive = 750, minEnergy = 5},
+        },
+    },
+
+    -- Enable of units of the owner player to reveal the hiding places in distance.
+    [58] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+        },
+    },
+
+    -- Enable of buildings of the owner player to reveal the hiding places in distance.
+    [59] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+        },
+    },
+
+    -- Enable of units and buildings of the owner player to reveal the hiding places in distance.
+    [60] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 300, pointsActive = 150, minEnergy = 1},
         },
     },
 }

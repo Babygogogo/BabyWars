@@ -1,14 +1,16 @@
 
 local VisibilityFunctions = {}
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters   = require("src.app.utilities.SingletonGetters")
-local TableFunctions     = require("src.app.utilities.TableFunctions")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
 
-local getAdjacentGrids = GridIndexFunctions.getAdjacentGrids
-local getModelFogMap   = SingletonGetters.getModelFogMap
-local getModelTileMap  = SingletonGetters.getModelTileMap
-local getModelUnitMap  = SingletonGetters.getModelUnitMap
+local getAdjacentGrids      = GridIndexFunctions.getAdjacentGrids
+local getModelFogMap        = SingletonGetters.getModelFogMap
+local getModelPlayerManager = SingletonGetters.getModelPlayerManager
+local getModelTileMap       = SingletonGetters.getModelTileMap
+local getModelUnitMap       = SingletonGetters.getModelUnitMap
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -64,11 +66,18 @@ function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIn
         local visibilityForTiles, visibilityForUnits = getModelFogMap(sceneWarFileName):getVisibilityOnGridForPlayerIndex(gridIndex, targetPlayerIndex)
         if (visibilityForUnits == 2) then
             return true
-        elseif ((visibilityForUnits == 1) or (visibilityForTiles == 1)) then
-            -- TODO: take the skills into account.
-            return not modelTile.canHideUnitType
-        else
+        elseif ((visibilityForUnits == 0) and (visibilityForTiles == 0)) then
             return false
+        elseif (not modelTile.canHideUnitType) then
+            return true
+        else
+            local skillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
+            if (((visibilityForTiles == 1) and (SkillModifierFunctions.canRevealHidingPlacesForTiles(skillConfiguration)))  or
+                ((visibilityForUnits == 1) and (SkillModifierFunctions.canRevealHidingPlacesForUnits(skillConfiguration)))) then
+                return true
+            else
+                return false
+            end
         end
     end
 end
