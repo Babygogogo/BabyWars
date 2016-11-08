@@ -132,6 +132,15 @@ function ModelTile:initView()
     return self
 end
 
+function ModelTile:initHasFog(hasFog)
+    assert(not IS_SERVER, "ModelTile:initHasFog() this shouldn't be called on the server.")
+    assert(type(hasFog) == "boolean", "ModelTile:initHasFog() invalid param hasFog.")
+    assert(self.m_HasFog == nil, "ModelTile:initHasFog() self.m_HasFog has been initialized already.")
+
+    self.m_HasFog = hasFog
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -224,9 +233,7 @@ function ModelTile:updateView()
     if (self.m_View) then
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
-        if (self.m_SceneWarFileName) then
-            self.m_View:setHasFog(not isTileVisibleToPlayerIndex(self.m_SceneWarFileName, self:getGridIndex(), getPlayerIndexLoggedIn()))
-        end
+            :setHasFog(self.m_HasFog)
     end
 
     return self
@@ -301,24 +308,44 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
     return self
 end
 
-function ModelTile:updateWithFogEnabled()
-    assert(not IS_SERVER, "ModelTile:updateWithFogEnabled() this shouldn't be called on the server.")
-    if (not self.getCurrentCapturePoint) then
-        return self
+function ModelTile:updateAsFogDisabled(data)
+    assert(not IS_SERVER, "ModelTile:updateAsFogDisabled() this shouldn't be called on the server.")
+    if (self.m_HasFog == true) then
+        self.m_HasFog = false
+
+        if (not data) then
+            self.m_ObjectID = self.m_InitialObjectID
+            self.m_BaseID   = self.m_InitialBaseID
+        else
+            local objectID = data.objectID or self.m_InitialObjectID
+            local baseID   = data.baseID   or self.m_InitialBaseID
+            if ((objectID == self.m_ObjectID) and (baseID == self.m_BaseID)) then
+                loadInstantialData(self, data)
+            else
+                initWithTiledID(self, objectID, baseID)
+                loadInstantialData(self, data)
+                self:onStartRunning(self.m_SceneWarFileName)
+            end
+        end
     end
 
-    local tileType         = self:getTileType()
-    local gridIndex        = self:getGridIndex()
-    local objectID, baseID = self:getObjectAndBaseId()
-    if (tileType ~= "Headquarters") then
-        objectID = getTiledIdWithTileOrUnitName(tileType, 0)
-    end
+    return self
+end
 
-    initWithTiledID(self, objectID, baseID)
-    loadInstantialData(self, {
-        GridIndexable = {gridIndex = gridIndex},
-    })
-    self:onStartRunning(self.m_SceneWarFileName)
+function ModelTile:updateAsFogEnabled()
+    assert(not IS_SERVER, "ModelTile:updateAsFogEnabled() this shouldn't be called on the server.")
+    if (self.m_HasFog == false) then
+        self.m_HasFog = true
+
+        if (self.getCurrentCapturePoint) then
+            local tileType = self:getTileType()
+            if (tileType ~= "Headquarters") then
+                self.m_ObjectID = getTiledIdWithTileOrUnitName(tileType, 0)
+            end
+        end
+
+        ComponentManager.callMethodForAllComponents(self, "updateAsFogEnabled")
+    end
 
     return self
 end

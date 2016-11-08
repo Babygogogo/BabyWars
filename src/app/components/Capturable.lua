@@ -59,6 +59,15 @@ function Capturable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function Capturable:updateAsFogEnabled()
+    self:setCurrentCapturePoint(self:getMaxCapturePoint())
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Capturable:getCurrentCapturePoint()

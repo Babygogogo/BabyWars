@@ -203,7 +203,7 @@ function ModelSceneWar:onStartRunning()
 
     modelWarField:getModelFogMap():initialize()
     if (not IS_SERVER) then
-        modelWarField:getModelTileMap():updateViewWithFogMap()
+        modelWarField:getModelTileMap():updateAsModelFogMapInitialized()
     end
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})

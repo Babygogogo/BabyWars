@@ -123,7 +123,7 @@ local function resetVisionOnClient()
 
     getModelTileMap():forEachModelTile(function(modelTile)
         if (not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
-            modelTile:updateWithFogEnabled()
+            modelTile:updateAsFogEnabled()
                 :updateView()
         end
     end)

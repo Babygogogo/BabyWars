@@ -33,10 +33,13 @@ local ModelTileMap = require("src.global.functions.class")("ModelTileMap")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local toErrMsg = SerializationFunctions.toErrorMessage
+local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
+local toErrMsg      = SerializationFunctions.toErrorMessage
 
+local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
@@ -145,6 +148,19 @@ function ModelTileMap:initView()
     return self
 end
 
+function ModelTileMap:updateAsModelFogMapInitialized()
+    assert(not IS_SERVER, "ModelTileMap:updateAsModelFogMapInitialized() this shouldn't be called on the server.")
+
+    local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
+    local sceneWarFileName = self.m_SceneWarFileName
+    self:forEachModelTile(function(modelTile)
+        modelTile:initHasFog(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
+            :updateView()
+    end)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -213,14 +229,6 @@ function ModelTileMap:forEachModelTile(func)
             func(self.m_ActorTilesMap[x][y]:getModel())
         end
     end
-
-    return self
-end
-
-function ModelTileMap:updateViewWithFogMap()
-    self:forEachModelTile(function(modelTile)
-        modelTile:updateView()
-    end)
 
     return self
 end
