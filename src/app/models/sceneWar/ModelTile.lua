@@ -57,8 +57,11 @@ local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
-local getPlayerIndexLoggedIn     = SingletonGetters.getPlayerIndexLoggedIn
-local isTileVisibleToPlayerIndex = VisibilityFunctions.isTileVisibleToPlayerIndex
+local IS_SERVER = GameConstantFunctions.isServer()
+
+local getPlayerIndexLoggedIn       = SingletonGetters.getPlayerIndexLoggedIn
+local getTiledIdWithTileOrUnitName = GameConstantFunctions.getTiledIdWithTileOrUnitName
+local isTileVisibleToPlayerIndex   = VisibilityFunctions.isTileVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -169,7 +172,7 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
         if (tileType == "Headquarters") then
             return nil
         else
-            local objectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileType, 0)
+            local objectID = getTiledIdWithTileOrUnitName(tileType, 0)
             if ((objectID == initialObjectID) and (self.m_BaseID == initialBaseID)) then
                 return nil
             else
@@ -282,18 +285,40 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
 
     local tileName = self:getTileType()
     if (tileName ~= "Headquarters") then
-        self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileName, playerIndex)
+        self.m_ObjectID = getTiledIdWithTileOrUnitName(tileName, playerIndex)
     else
         local gridIndex           = self:getGridIndex()
         local currentCapturePoint = self:getCurrentCapturePoint()
 
-        initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
+        initWithTiledID(self, getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
         self:onStartRunning(self.m_SceneWarFileName)
     end
+
+    return self
+end
+
+function ModelTile:updateWithFogEnabled()
+    assert(not IS_SERVER, "ModelTile:updateWithFogEnabled() this shouldn't be called on the server.")
+    if (not self.getCurrentCapturePoint) then
+        return self
+    end
+
+    local tileType         = self:getTileType()
+    local gridIndex        = self:getGridIndex()
+    local objectID, baseID = self:getObjectAndBaseId()
+    if (tileType ~= "Headquarters") then
+        objectID = getTiledIdWithTileOrUnitName(tileType, 0)
+    end
+
+    initWithTiledID(self, objectID, baseID)
+    loadInstantialData(self, {
+        GridIndexable = {gridIndex = gridIndex},
+    })
+    self:onStartRunning(self.m_SceneWarFileName)
 
     return self
 end

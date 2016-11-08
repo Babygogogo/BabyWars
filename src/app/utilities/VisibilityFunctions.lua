@@ -115,7 +115,7 @@ function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path
         for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
             local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
             if ((adjacentModelUnit)                                                                                                                                                                    and
-                (not VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, adjacentGridIndex, isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndex))) then
+                (not VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndex))) then
                 revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, adjacentModelUnit))
             end
         end

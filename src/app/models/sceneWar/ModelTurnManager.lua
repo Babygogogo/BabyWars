@@ -24,25 +24,23 @@ local Destroyers            = require("src.app.utilities.Destroyers")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
+local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function isLoggedInPlayerInTurn(self)
-    if (not WebSocketManager) then
-        return false
-    else
-        local modelPlayerInTurn = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
-        return modelPlayerInTurn:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
-    end
-end
-
 local function getNextTurnAndPlayerIndex(self, playerManager)
     local nextTurnIndex   = self.m_TurnIndex
     local nextPlayerIndex = self.m_PlayerIndex + 1
@@ -109,13 +107,35 @@ local function repairModelUnit(modelUnit, repairAmount)
     end
 end
 
+local function resetVisionOnClient()
+    assert(not IS_SERVER, "ModelTurnManager-resetVisionOnClient() this shouldn't be called on the server.")
+    local sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
+
+    getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
+
+    getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        local gridIndex = modelUnit:getGridIndex()
+        if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), (modelUnit.isDiving and modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
+            Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+        end
+    end)
+
+    getModelTileMap():forEachModelTile(function(modelTile)
+        if (not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
+            modelTile:updateWithFogEnabled()
+                :updateView()
+        end
+    end)
+end
+
 --------------------------------------------------------------------------------
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
     local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
-        self.m_TurnPhase = "resetSkillState"
+        self.m_TurnPhase = "getFund"
         self:runTurn()
     end
 
@@ -124,24 +144,6 @@ local function runTurnPhaseBeginning(self)
     else
         callbackOnBeginTurnEffectDisappear()
     end
-end
-
-local function runTurnPhaseResetSkillState(self)
-    local playerIndex = self.m_PlayerIndex
-    getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):deactivateSkillGroup()
-
-    if (not IS_SERVER) then
-        local func = function(modelUnit)
-            if (modelUnit:getPlayerIndex() == playerIndex) then
-                modelUnit:updateView()
-            end
-        end
-
-        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(func)
-            :forEachModelUnitLoaded(func)
-    end
-
-    self.m_TurnPhase = "getFund"
 end
 
 local function runTurnPhaseGetFund(self)
@@ -274,7 +276,16 @@ local function runTurnPhaseResetUnitState(self)
 
     getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({name = "EvtModelUnitMapUpdated"})
+
+    self.m_TurnPhase = "resetVisionForEndingTurnPlayer"
+end
+
+local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
+    if (IS_SERVER) then
+        getModelFogMap(self.m_SceneWarFileName):resetMapForUnitsForPlayerIndex(self.m_PlayerIndex)
+    elseif (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+        resetVisionOnClient()
+    end
 
     self.m_TurnPhase = "tickTurnAndPlayerIndex"
 end
@@ -290,11 +301,39 @@ local function runTurnPhaseTickTurnAndPlayerIndex(self)
     })
 
     -- TODO: Change the vision, weather and so on.
+    self.m_TurnPhase = "resetSkillState"
+end
+
+local function runTurnPhaseResetSkillState(self)
+    local playerIndex = self.m_PlayerIndex
+    getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):deactivateSkillGroup()
+
+    if (not IS_SERVER) then
+        local func = function(modelUnit)
+            if (modelUnit:getPlayerIndex() == playerIndex) then
+                modelUnit:updateView()
+            end
+        end
+
+        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(func)
+            :forEachModelUnitLoaded(func)
+    end
+
+    self.m_TurnPhase = "resetVisionForBeginningTurnPlayer"
+end
+
+local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
+    if (IS_SERVER) then
+        getModelFogMap(self.m_SceneWarFileName):resetMapForUnitsForPlayerIndex(self.m_PlayerIndex)
+    elseif (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+        resetVisionOnClient()
+    end
+
     self.m_TurnPhase = "requestToBegin"
 end
 
 local function runTurnPhaseRequestToBegin(self)
-    if ((WebSocketManager) and (isLoggedInPlayerInTurn(self))) then
+    if ((not IS_SERVER) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
         WebSocketManager.sendAction({
             actionName       = "BeginTurn",
             actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
@@ -355,16 +394,18 @@ function ModelTurnManager:getPlayerIndex()
 end
 
 function ModelTurnManager:runTurn()
-    if (self.m_TurnPhase == "beginning")              then runTurnPhaseBeginning(             self) end
-    if (self.m_TurnPhase == "resetSkillState")        then runTurnPhaseResetSkillState(       self) end
-    if (self.m_TurnPhase == "getFund")                then runTurnPhaseGetFund(               self) end
-    if (self.m_TurnPhase == "consumeUnitFuel")        then runTurnPhaseConsumeUnitFuel(       self) end
-    if (self.m_TurnPhase == "repairUnit")             then runTurnPhaseRepairUnit(            self) end
-    if (self.m_TurnPhase == "supplyUnit")             then runTurnPhaseSupplyUnit(            self) end
-    if (self.m_TurnPhase == "main")                   then runTurnPhaseMain(                  self) end
-    if (self.m_TurnPhase == "resetUnitState")         then runTurnPhaseResetUnitState(        self) end
-    if (self.m_TurnPhase == "tickTurnAndPlayerIndex") then runTurnPhaseTickTurnAndPlayerIndex(self) end
-    if (self.m_TurnPhase == "requestToBegin")         then runTurnPhaseRequestToBegin(        self) end
+    if (self.m_TurnPhase == "beginning")                         then runTurnPhaseBeginning(                        self) end
+    if (self.m_TurnPhase == "getFund")                           then runTurnPhaseGetFund(                          self) end
+    if (self.m_TurnPhase == "consumeUnitFuel")                   then runTurnPhaseConsumeUnitFuel(                  self) end
+    if (self.m_TurnPhase == "repairUnit")                        then runTurnPhaseRepairUnit(                       self) end
+    if (self.m_TurnPhase == "supplyUnit")                        then runTurnPhaseSupplyUnit(                       self) end
+    if (self.m_TurnPhase == "main")                              then runTurnPhaseMain(                             self) end
+    if (self.m_TurnPhase == "resetUnitState")                    then runTurnPhaseResetUnitState(                   self) end
+    if (self.m_TurnPhase == "resetVisionForEndingTurnPlayer")    then runTurnPhaseResetVisionForEndingTurnPlayer(   self) end
+    if (self.m_TurnPhase == "tickTurnAndPlayerIndex")            then runTurnPhaseTickTurnAndPlayerIndex(           self) end
+    if (self.m_TurnPhase == "resetSkillState")                   then runTurnPhaseResetSkillState(                  self) end
+    if (self.m_TurnPhase == "resetVisionForBeginningTurnPlayer") then runTurnPhaseResetVisionForBeginningTurnPlayer(self) end
+    if (self.m_TurnPhase == "requestToBegin")                    then runTurnPhaseRequestToBegin(                   self) end
 
     if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then
         self.m_CallbackOnEnterTurnPhaseMainForNextTurn()
@@ -372,11 +413,10 @@ function ModelTurnManager:runTurn()
     end
 
     if (not IS_SERVER) then
-        local modelMessageIndicator = SingletonGetters.getModelMessageIndicator()
-        if (isLoggedInPlayerInTurn(self)) then
-            modelMessageIndicator:hidePersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
+        if (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "NotInTurn"))
         else
-            modelMessageIndicator:showPersistentMessage(LocalizationFunctions.getLocalizedText(80, "NotInTurn"))
+            getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "NotInTurn"))
         end
     end
 
