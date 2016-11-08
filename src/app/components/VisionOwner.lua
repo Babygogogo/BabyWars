@@ -4,6 +4,8 @@ local VisionOwner = require("src.global.functions.class")("VisionOwner")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
+local getModelTileMap = SingletonGetters.getModelTileMap
+
 VisionOwner.EXPORTED_METHODS = {
     "getVisionForPlayerIndex",
 }
@@ -35,7 +37,7 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function VisionOwner:getVisionForPlayerIndex(playerIndex)
+function VisionOwner:getVisionForPlayerIndex(playerIndex, gridIndex)
     local template         = self.m_Template
     local owner            = self.m_Owner
     local ownerPlayerIndex = owner:getPlayerIndex()
@@ -53,7 +55,7 @@ function VisionOwner:getVisionForPlayerIndex(playerIndex)
                 return baseVision
             end
         else
-            local tileType = SingletonGetters.getModelTileMap(sceneWarFileName):getModelTile(owner:getGridIndex()):getTileType()
+            local tileType = getModelTileMap(sceneWarFileName):getModelTile(gridIndex or owner:getGridIndex()):getTileType()
             local bonus    = (template.bonusOnTiles) and (template.bonusOnTiles[tileType] or 0) or (0)
             return baseVision + bonus + SkillModifierFunctions.getVisionModifierForUnits(modelSkillConfiguration)
         end

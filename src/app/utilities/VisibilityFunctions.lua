@@ -6,17 +6,25 @@ local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local TableFunctions         = require("src.app.utilities.TableFunctions")
 
-local getAdjacentGrids      = GridIndexFunctions.getAdjacentGrids
-local getModelFogMap        = SingletonGetters.getModelFogMap
-local getModelPlayerManager = SingletonGetters.getModelPlayerManager
-local getModelTileMap       = SingletonGetters.getModelTileMap
-local getModelUnitMap       = SingletonGetters.getModelUnitMap
+local getAdjacentGrids       = GridIndexFunctions.getAdjacentGrids
+local getGridsWithinDistance = GridIndexFunctions.getGridsWithinDistance
+local getModelFogMap         = SingletonGetters.getModelFogMap
+local getModelPlayerManager  = SingletonGetters.getModelPlayerManager
+local getModelTileMap        = SingletonGetters.getModelTileMap
+local getModelUnitMap        = SingletonGetters.getModelUnitMap
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function isModelUnitDiving(modelUnit)
     return (modelUnit.isDiving) and (modelUnit:isDiving())
+end
+
+local function isUnitHiddenByTileToPlayerIndex(sceneWarFileName, modelUnit, playerIndex)
+    local modelTile = getModelTileMap(sceneWarFileName):getModelTile(modelUnit:getGridIndex())
+    return (modelTile:getPlayerIndex() ~= playerIndex)       and
+        (modelTile.canHideUnitType)                          and
+        (modelTile:canHideUnitType(modelUnit:getUnitType()))
 end
 
 local function generateSingleUnitData(modelUnitMap, modelUnit)
@@ -34,6 +42,40 @@ local function generateUnitsData(sceneWarFileName, modelUnit)
     end
 
     return data
+end
+
+local function createEmptyMap(mapSize)
+    local map = {}
+    for x = 1, mapSize.width do
+        map[x] = {}
+    end
+
+    return map
+end
+
+local function createVisibilityMapWithPath(sceneWarFileName, path, modelUnit)
+    local playerIndex           = modelUnit:getPlayerIndex()
+    local canRevealHidingPlaces = SkillModifierFunctions.canRevealHidingPlacesForUnits(getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local mapSize               = getModelTileMap(sceneWarFileName):getMapSize()
+    local visibilityMap         = createEmptyMap(mapSize)
+
+    for _, pathNode in ipairs(path) do
+        local vision = modelUnit:getVisionForPlayerIndex(playerIndex, pathNode)
+        if (canRevealHidingPlaces) then
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, vision, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = 2
+            end
+        else
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, 1, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = 2
+            end
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 2, vision, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = visibilityMap[gridIndex.x][gridIndex.y] or 1
+            end
+        end
+    end
+
+    return visibilityMap
 end
 
 --------------------------------------------------------------------------------
@@ -104,18 +146,39 @@ function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIn
     end
 end
 
+local isUnitVisible = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
+
 function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path, modelUnit, isModelUnitDestroyed)
-    -- TODO: deal with fog of war.
     local modelUnitMap  = getModelUnitMap(sceneWarFileName)
-    local gridIndex     = path[#path]
+    local mapSize       = modelUnitMap:getMapSize()
     local playerIndex   = modelUnit:getPlayerIndex()
+    local visibilityMap = createVisibilityMapWithPath(sceneWarFileName, path, modelUnit)
     local revealedUnits
 
+    for x = 1, mapSize.width do
+        for y = 1, mapSize.height do
+            local visibility = visibilityMap[x][y]
+            if (visibility) then
+                local gridIndex  = {x = x, y = y}
+                local revealUnit = modelUnitMap:getModelUnit(gridIndex)
+                if ((revealUnit)                                                                                                                 and
+                    (not isModelUnitDiving(revealUnit))                                                                                          and
+                    (not isUnitVisible(sceneWarFileName, gridIndex, revealUnit:getUnitType(), false, revealUnit:getPlayerIndex(), playerIndex))) then
+                    if ((visibility == 2) or (not isUnitHiddenByTileToPlayerIndex(sceneWarFileName, revealUnit, playerIndex))) then
+                        revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, revealUnit))
+                    end
+                end
+            end
+        end
+    end
+
     if (not isModelUnitDestroyed) then
-        for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
+        for _, adjacentGridIndex in ipairs(getAdjacentGrids(path[#path], mapSize)) do
             local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-            if ((adjacentModelUnit)                                                                                                                                                                    and
-                (not VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndex))) then
+            if ((adjacentModelUnit)                                                                                                                               and
+                (isModelUnitDiving(adjacentModelUnit))                                                                                                            and
+                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), true, adjacentModelUnit:getPlayerIndex(), playerIndex))) then
                 revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, adjacentModelUnit))
             end
         end

@@ -135,9 +135,9 @@ end
 function ModelTile:initHasFog(hasFog)
     assert(not IS_SERVER, "ModelTile:initHasFog() this shouldn't be called on the server.")
     assert(type(hasFog) == "boolean", "ModelTile:initHasFog() invalid param hasFog.")
-    assert(self.m_HasFog == nil, "ModelTile:initHasFog() self.m_HasFog has been initialized already.")
+    assert(self.m_HasFogOnClient == nil, "ModelTile:initHasFog() self.m_HasFogOnClient has been initialized already.")
 
-    self.m_HasFog = hasFog
+    self.m_HasFogOnClient = hasFog
     return self
 end
 
@@ -233,7 +233,7 @@ function ModelTile:updateView()
     if (self.m_View) then
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
-            :setHasFog(self.m_HasFog)
+            :setHasFog(self.m_HasFogOnClient)
     end
 
     return self
@@ -310,8 +310,10 @@ end
 
 function ModelTile:updateAsFogDisabled(data)
     assert(not IS_SERVER, "ModelTile:updateAsFogDisabled() this shouldn't be called on the server.")
-    if (self.m_HasFog == true) then
-        self.m_HasFog = false
+    assert(type(self.m_HasFogOnClient) == "boolean", "ModelTile:updateAsFogDisabled() self.m_HasFogOnClient has not been initialized yet.")
+
+    if (self.m_HasFogOnClient) then
+        self.m_HasFogOnClient = false
 
         if (not data) then
             self.m_ObjectID = self.m_InitialObjectID
@@ -334,8 +336,10 @@ end
 
 function ModelTile:updateAsFogEnabled()
     assert(not IS_SERVER, "ModelTile:updateAsFogEnabled() this shouldn't be called on the server.")
-    if (self.m_HasFog == false) then
-        self.m_HasFog = true
+    assert(type(self.m_HasFogOnClient) == "boolean", "ModelTile:updateAsFogEnabled() self.m_HasFogOnClient has not been initialized yet.")
+
+    if (not self.m_HasFogOnClient) then
+        self.m_HasFogOnClient = true
 
         if (self.getCurrentCapturePoint) then
             local tileType = self:getTileType()
