@@ -21,6 +21,7 @@ local ActorManager          = (not IS_SERVER) and (require("src.global.actors.Ac
 local appendList               = TableFunctions.appendList
 local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelGridEffect       = SingletonGetters.getModelGridEffect
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
@@ -28,8 +29,10 @@ local getModelScene            = SingletonGetters.getModelScene
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local toErrorMessage           = SerializationFunctions.toErrorMessage
 
@@ -71,12 +74,6 @@ local function requestReloadSceneWar(message)
         actionName = "ReloadSceneWar",
         fileName   = getSceneWarFileName(),
     })
-end
-
-local function getPlayerIndexLoggedIn()
-    assert(not IS_SERVER, "ActionExecutor-getPlayerIndexLoggedIn() this should not be called on the server.")
-    local _, playerIndex = getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-    return playerIndex
 end
 
 local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridIndex, playerIndex)
@@ -125,6 +122,30 @@ local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
             end
         end
     end
+end
+
+local function updateModelTilesWithTilesData(tilesData)
+    assert(not IS_SERVER, "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called on the server.")
+    if (tilesData) then
+        local modelTileMap = getModelTileMap()
+        for _, tileData in pairs(tilesData) do
+            local modelTile = modelTileMap:getModelTile(tileData.GridIndexable.gridIndex)
+            assert(modelTile:isFogEnabledOnClient(), "ActionExecutor-updateModelTilesWithTilesData() the tile has no fog.")
+            modelTile:updateAsFogDisabled(tileData)
+        end
+    end
+end
+
+local function updateRevealedViewTiles()
+    assert(not IS_SERVER, "ActionExecutor-updateRevealedViewTiles() this shouldn't be called on the server.")
+    local sceneWarFileName = getSceneWarFileName()
+    local playerIndex      = getPlayerIndexLoggedIn()
+    getModelTileMap():forEachModelTile(function(modelTile)
+        if (isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
+            modelTile:updateAsFogDisabled()
+                :updateView()
+        end
+    end)
 end
 
 local function addActorUnitsOnMapWithRevealedUnits(revealedUnits, visible)
@@ -225,6 +246,10 @@ local function moveModelUnitWithAction(action)
     local endingGridIndex    = path[pathLength]
     local launchUnitID       = action.launchUnitID
     local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+
+    if ((IS_SERVER) or (focusModelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) then
+        getModelFogMap(sceneWarFileName):updateMapForUnitsWithPath(path, launchUnitID)
+    end
 
     if (focusModelUnit.setCapturingModelTile) then
         focusModelUnit:setCapturingModelTile(false)
@@ -1190,6 +1215,8 @@ end
 local function executeWait(action)
     if (not IS_SERVER) then
         addActorUnitsWithUnitsData(action.actingUnitsData, false)
+        addActorUnitsWithUnitsData(action.revealedUnits,   false)
+        updateModelTilesWithTilesData(action.revealedTiles, false)
     end
 
     local sceneWarFileName = action.fileName
@@ -1201,15 +1228,14 @@ local function executeWait(action)
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
     else
-        local revealedUnits = action.revealedUnits
-        addActorUnitsOnMapWithRevealedUnits(revealedUnits, false)
         local removedModelUnits = removeHiddenActorUnitsAfterAction(action)
 
         focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            setRevealedUnitsVisible(revealedUnits, true)
+            setRevealedUnitsVisible(action.revealedUnits, true)
+            updateRevealedViewTiles()
             removeViewUnits(removedModelUnits)
 
             if (path.isBlocked) then

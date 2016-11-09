@@ -149,18 +149,27 @@ end
 local isUnitVisible = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
 
-function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path, modelUnit, isModelUnitDestroyed)
+function VisibilityFunctions.getRevealedTilesAndUnitsData(sceneWarFileName, path, modelUnit, isModelUnitDestroyed)
+    local modelTileMap  = getModelTileMap(sceneWarFileName)
     local modelUnitMap  = getModelUnitMap(sceneWarFileName)
     local mapSize       = modelUnitMap:getMapSize()
     local playerIndex   = modelUnit:getPlayerIndex()
     local visibilityMap = createVisibilityMapWithPath(sceneWarFileName, path, modelUnit)
+    local revealedTiles = {}
     local revealedUnits
 
     for x = 1, mapSize.width do
         for y = 1, mapSize.height do
             local visibility = visibilityMap[x][y]
             if (visibility) then
-                local gridIndex  = {x = x, y = y}
+                local gridIndex = {x = x, y = y}
+                if (not isTileVisible(sceneWarFileName, gridIndex, playerIndex)) then
+                    local modelTile = modelTileMap:getModelTile(gridIndex)
+                    if ((visibility == 2) or (not modelTile.canHideUnitType)) then
+                        revealedTiles[#revealedTiles + 1] = modelTile:toSerializableTable()
+                    end
+                end
+
                 local revealUnit = modelUnitMap:getModelUnit(gridIndex)
                 if ((revealUnit)                                                                                                                 and
                     (not isModelUnitDiving(revealUnit))                                                                                          and
@@ -184,7 +193,8 @@ function VisibilityFunctions.getRevealedUnitsDataWithPath(sceneWarFileName, path
         end
     end
 
-    return revealedUnits
+    revealedTiles = (#revealedTiles > 0) and (revealedTiles) or (nil)
+    return revealedTiles, revealedUnits
 end
 
 return VisibilityFunctions

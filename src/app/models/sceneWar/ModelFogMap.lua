@@ -8,6 +8,7 @@ local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isSe
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
 local getGridsWithinDistance = GridIndexFunctions.getGridsWithinDistance
+local getModelPlayerManager  = SingletonGetters.getModelPlayerManager
 local getModelTileMap        = SingletonGetters.getModelTileMap
 local getModelUnitMap        = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
@@ -103,15 +104,13 @@ local function updateMapForTiles(map, mapSize, origin, vision, modifier)
 end
 
 local function updateMapForUnits(map, mapSize, origin, vision)
-    if (not vision) then
-        return
-    end
-
-    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
-        map[gridIndex.x][gridIndex.y] = 2
-    end
-    for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
-        map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
+    if (vision) then
+        for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
+            map[gridIndex.x][gridIndex.y] = 2
+        end
+        for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
+            map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
+        end
     end
 end
 
@@ -151,7 +150,7 @@ function ModelFogMap:initialize()
 
     if (IS_SERVER) then
         local mapsForUnits = (data) and (data.mapsForUnits) or (nil)
-        for playerIndex = 1, SingletonGetters.getModelPlayerManager(sceneWarFileName):getPlayersCount() do
+        for playerIndex = 1, getModelPlayerManager(sceneWarFileName):getPlayersCount() do
             self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
             self:resetMapForTilesForPlayerIndex(playerIndex)
@@ -266,6 +265,22 @@ function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
         getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
             updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex))
         end)
+    end
+
+    return self
+end
+
+function ModelFogMap:updateMapForUnitsWithPath(path, launchID)
+    local modelUnit   = getModelUnitMap(self.m_SceneWarFileName):getFocusModelUnit(path[1], launchID)
+    local playerIndex = modelUnit:getPlayerIndex()
+    if (not IS_SERVER) then
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForUnitsWithPath() invalid playerIndex on the client: " .. (playerIndex or ""))
+    end
+
+    local visibilityMap = self.m_MapsForUnits[playerIndex]
+    local mapSize       = self:getMapSize()
+    for _, pathNode in ipairs(path) do
+        updateMapForUnits(visibilityMap, mapSize, pathNode, modelUnit:getVisionForPlayerIndex(playerIndex, pathNode))
     end
 
     return self
