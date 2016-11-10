@@ -311,6 +311,10 @@ function GameConstantFunctions.getShapeIndexWithTiledId(tiledID)
     return TILE_UNIT_INDEXES[tiledID].shapeIndex
 end
 
+function GameConstantFunctions.getTemplateModelTileWithTileType(tileType)
+    return TEMPLATE_MODEL_TILES[tileType]
+end
+
 function GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(objectID, baseID)
     return TEMPLATE_MODEL_TILES[GameConstantFunctions.getTileTypeWithObjectAndBaseId(objectID, baseID)]
 end
@@ -321,14 +325,6 @@ end
 
 function GameConstantFunctions.getTemplateModelUnitWithName(name)
     return TEMPLATE_MODEL_UNITS[name]
-end
-
-function GameConstantFunctions.doesViewTileFillGrid(tiledID)
-    if ((not tiledID) or (tiledID == 0)) then
-        return false
-    else
-        return TILE_ANIMATIONS[GameConstantFunctions.getTileTypeWithTiledId(tiledID)].fillsGrid
-    end
 end
 
 function GameConstantFunctions.getCategory(categoryType)

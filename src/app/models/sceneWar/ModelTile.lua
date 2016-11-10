@@ -233,7 +233,7 @@ function ModelTile:updateView()
     if (self.m_View) then
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
-            :setHasFog(self.m_IsFogEnabledOnClient)
+            :setFogEnabled(self.m_IsFogEnabledOnClient)
     end
 
     return self

@@ -65,8 +65,11 @@ function ViewTile:setViewBaseWithTiledId(baseID)
     return self
 end
 
-function ViewTile:setHasFog(hasFog)
-    self:setColor(hasFog and FOG_COLOR or CLEAR_COLOR)
+function ViewTile:setFogEnabled(enabled)
+    if (self.m_IsFogEnabled ~= enabled) then
+        self.m_IsFogEnabled = enabled
+        self:setColor(enabled and FOG_COLOR or CLEAR_COLOR)
+    end
 
     return self
 end
