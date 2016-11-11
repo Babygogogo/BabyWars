@@ -68,7 +68,7 @@ local function getReversedDigitsForInt(int)
 end
 
 local function createDigitSprite(digit, reversedIndex)
-    local sprite = cc.Sprite:createWithSpriteFrameName("c02_t99_s10_f0" .. digit .. ".png")
+    local sprite = cc.Sprite:createWithSpriteFrameName("c01_t99_s02_f0" .. digit .. ".png")
     sprite:ignoreAnchorPointForPosition(true)
         :setPositionX(INFO_LABEL_WIDTH - reversedIndex * DIGIT_WIDTH)
 
@@ -102,7 +102,7 @@ local function moveToRightSide(self)
 end
 
 local function resetBackground(background, playerIndex)
-    background:loadTextureNormal("c02_t99_s09_f0" .. playerIndex .. ".png", ccui.TextureResType.plistType)
+    background:loadTextureNormal("c01_t99_s01_f0" .. playerIndex .. ".png", ccui.TextureResType.plistType)
         :ignoreAnchorPointForPosition(true)
 
         :setScale9Enabled(true)
@@ -160,7 +160,7 @@ local function initTileLabel(self)
 end
 
 local function initDefenseInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f04.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c01_t99_s03_f04.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(DEFENSE_INFO_POS_X, DEFENSE_INFO_POS_Y)
@@ -174,7 +174,7 @@ local function initDefenseInfo(self)
 end
 
 local function initCaptureInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f05.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c01_t99_s03_f05.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(CAPTURE_INFO_POS_X, CAPTURE_INFO_POS_Y)
@@ -188,7 +188,7 @@ local function initCaptureInfo(self)
 end
 
 local function initHPInfo(self)
-    local icon = cc.Sprite:createWithSpriteFrameName("c02_t99_s11_f01.png")
+    local icon = cc.Sprite:createWithSpriteFrameName("c01_t99_s03_f01.png")
     icon:setAnchorPoint(0, 0)
         :ignoreAnchorPointForPosition(true)
         :setPosition(HP_INFO_POS_X, HP_INFO_POS_Y)

@@ -89,7 +89,7 @@ end
 
 local function initOptionIndicator(self)
     local optionIndicator = ccui.Button:create()
-    optionIndicator:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+    optionIndicator:loadTextureNormal("c01_t99_s01_f01.png", ccui.TextureResType.plistType)
         :setScale9Enabled(true)
         :setCapInsets(OPTION_INDICATOR_CAPINSETS)
         :setContentSize(OPTION_INDICATOR_WIDTH, OPTION_INDICATOR_HEIGHT)

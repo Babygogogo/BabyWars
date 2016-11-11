@@ -11,7 +11,7 @@
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{960,768}}</string>
                 <key>sourceSize</key>
@@ -25,9 +25,9 @@
             <key>realTextureFileName</key>
             <string>BabyWarsTextureGallery.png</string>
             <key>size</key>
-            <string>{772,964}</string>
+            <string>{1024,1024}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:7e1f145224206dfb51ba6542e5f88582:6c2b3397ea6b58c984ebebaa3bbd3ac8:328cc6d43f0dccb40d4f6711c5485469$</string>
+            <string>$TexturePacker:SmartUpdate:3b835d65440fe5ea83236a4673efb30b:6c2b3397ea6b58c984ebebaa3bbd3ac8:328cc6d43f0dccb40d4f6711c5485469$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureGallery.png</string>
         </dict>
