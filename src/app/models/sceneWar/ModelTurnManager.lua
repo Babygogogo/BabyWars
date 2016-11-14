@@ -34,6 +34,7 @@ local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
+local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
@@ -109,10 +110,8 @@ end
 
 local function resetVisionOnClient()
     assert(not IS_SERVER, "ModelTurnManager-resetVisionOnClient() this shouldn't be called on the server.")
-    local sceneWarFileName = SingletonGetters.getSceneWarFileName()
-    local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
-
-    getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
+    local sceneWarFileName = getSceneWarFileName()
+    local playerIndex      = getPlayerIndexLoggedIn()
 
     getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
         local gridIndex = modelUnit:getGridIndex()
@@ -281,9 +280,11 @@ local function runTurnPhaseResetUnitState(self)
 end
 
 local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
+    local playerIndex = self:getPlayerIndex()
     if (IS_SERVER) then
-        getModelFogMap(self.m_SceneWarFileName):resetMapForUnitsForPlayerIndex(self.m_PlayerIndex)
-    elseif (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+        getModelFogMap(self.m_SceneWarFileName):resetMapForPathsForPlayerIndex(playerIndex)
+    elseif (playerIndex == getPlayerIndexLoggedIn()) then
+        getModelFogMap():resetMapForPathsForPlayerIndex(playerIndex)
         resetVisionOnClient()
     end
 
@@ -323,9 +324,13 @@ local function runTurnPhaseResetSkillState(self)
 end
 
 local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
+    local playerIndex = self:getPlayerIndex()
     if (IS_SERVER) then
-        getModelFogMap(self.m_SceneWarFileName):resetMapForUnitsForPlayerIndex(self.m_PlayerIndex)
-    elseif (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+        getModelFogMap(self.m_SceneWarFileName):resetMapForTilesForPlayerIndex(playerIndex)
+            :resetMapForUnitsForPlayerIndex(playerIndex)
+    elseif (playerIndex == getPlayerIndexLoggedIn()) then
+        getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+            :resetMapForUnitsForPlayerIndex(playerIndex)
         resetVisionOnClient()
     end
 
@@ -413,7 +418,7 @@ function ModelTurnManager:runTurn()
     end
 
     if (not IS_SERVER) then
-        if (self.m_PlayerIndex == getPlayerIndexLoggedIn()) then
+        if (self:getPlayerIndex() == getPlayerIndexLoggedIn()) then
             getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "NotInTurn"))
         else
             getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "NotInTurn"))

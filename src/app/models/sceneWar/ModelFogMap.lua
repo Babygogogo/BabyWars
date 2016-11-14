@@ -20,6 +20,12 @@ local function setInitialized(self, initialized)
     self.m_IsInitialized = initialized
 end
 
+local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex)
+    return ((modelTileOrUnit) and (modelTileOrUnit.getVisionForPlayerIndex))
+        and (modelTileOrUnit:getVisionForPlayerIndex(playerIndex))
+        or (nil)
+end
+
 local function fillArray(array, size, value)
     for i = 1, size do
         array[i] = value
@@ -47,7 +53,7 @@ local function createSingleMap(mapSize, defaultValue)
     return map
 end
 
-local function createSerializableDataForSingleMapForUnits(map, mapSize)
+local function createSerializableDataForSingleMapForPaths(map, mapSize)
     local width, height = mapSize.width, mapSize.height
     local array         = {}
     for x = 1, width do
@@ -61,19 +67,19 @@ local function createSerializableDataForSingleMapForUnits(map, mapSize)
     return table.concat(array)
 end
 
-local function createSerializableDataForMapsForUnits(maps, mapSize, playerIndex)
+local function createSerializableDataForMapsForPaths(maps, mapSize, playerIndex)
     if (playerIndex) then
-        return {[playerIndex] = createSerializableDataForSingleMapForUnits(maps[playerIndex], mapSize)}
+        return {[playerIndex] = createSerializableDataForSingleMapForPaths(maps[playerIndex], mapSize)}
     else
         local data = {}
         for index, map in ipairs(maps) do
-            data[index] = createSerializableDataForSingleMapForUnits(map, mapSize)
+            data[index] = createSerializableDataForSingleMapForPaths(map, mapSize)
         end
         return data
     end
 end
 
-local function fillMapForUnitWithData(map, mapSize, data)
+local function fillMapForPathsWithData(map, mapSize, data)
     local width, height = mapSize.width, mapSize.height
     local byteFor0      = string.byte("0")
     local bytesForData  = {string.byte(data, 1, -1)}
@@ -88,28 +94,22 @@ local function fillMapForUnitWithData(map, mapSize, data)
     return map
 end
 
-local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex)
-    return ((modelTileOrUnit) and (modelTileOrUnit.getVisionForPlayerIndex))
-        and (modelTileOrUnit:getVisionForPlayerIndex(playerIndex))
-        or (nil)
-end
-
-local function updateMapForTiles(map, mapSize, origin, vision, modifier)
-    assert((modifier == 1) or (modifier == -1), "ModelFogMap-updateMapForTiles() invalid modifier: " .. (modifier or ""))
-    if (vision) then
-        for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
-            map[gridIndex.x][gridIndex.y] = map[gridIndex.x][gridIndex.y] + modifier
-        end
-    end
-end
-
-local function updateMapForUnits(map, mapSize, origin, vision)
+local function updateMapForPaths(map, mapSize, origin, vision)
     if (vision) then
         for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
             map[gridIndex.x][gridIndex.y] = 2
         end
         for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
             map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
+        end
+    end
+end
+
+local function updateMapForTilesOrUnits(map, mapSize, origin, vision, modifier)
+    assert((modifier == 1) or (modifier == -1), "ModelFogMap-updateMapForTilesOrUnits() invalid modifier: " .. (modifier or ""))
+    if (vision) then
+        for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
+            map[gridIndex.x][gridIndex.y] = map[gridIndex.x][gridIndex.y] + modifier
         end
     end
 end
@@ -137,11 +137,12 @@ function ModelFogMap:initialize()
     local mapSize                = getModelTileMap(sceneWarFileName):getMapSize()
     self.m_DataForInitialization = nil
     self.m_MapSize               = mapSize
+    self.m_MapsForPaths          = {}
     self.m_MapsForTiles          = {}
     self.m_MapsForUnits          = {}
 
     if (not data) then
-        self.m_StateForForcingFog   = "None"
+        self.m_StateForForcingFog = "None"
     else
         self.m_StateForForcingFog               = data.stateForForcingFog
         self.m_ExpiringTurnIndexForForcingFog   = data.expiringTurnIndexForForcingFog
@@ -149,19 +150,23 @@ function ModelFogMap:initialize()
     end
 
     if (IS_SERVER) then
-        local mapsForUnits = (data) and (data.mapsForUnits) or (nil)
+        local mapsForPaths = (data) and (data.mapsForPaths) or (nil)
         for playerIndex = 1, getModelPlayerManager(sceneWarFileName):getPlayersCount() do
+            self.m_MapsForPaths[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForTilesForPlayerIndex(playerIndex)
-            self:resetMapForUnitsForPlayerIndex(playerIndex, mapsForUnits and mapsForUnits[playerIndex] or nil)
+            self:resetMapForPathsForPlayerIndex(playerIndex, mapsForPaths and mapsForPaths[playerIndex] or nil)
+                :resetMapForTilesForPlayerIndex(playerIndex)
+                :resetMapForUnitsForPlayerIndex(playerIndex)
         end
     else
         local playerIndex = getPlayerIndexLoggedIn()
+        self.m_MapsForPaths[playerIndex] = createSingleMap(mapSize, 0)
         self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
         self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
-        self:resetMapForTilesForPlayerIndex(playerIndex)
-        self:resetMapForUnitsForPlayerIndex(playerIndex, data and data.mapsForUnits and data.mapsForUnits[playerIndex])
+        self:resetMapForPathsForPlayerIndex(playerIndex, data and data.mapsForPaths and data.mapsForPaths[playerIndex])
+            :resetMapForTilesForPlayerIndex(playerIndex)
+            :resetMapForUnitsForPlayerIndex(playerIndex)
     end
 
     return self
@@ -175,7 +180,7 @@ function ModelFogMap:toSerializableTable()
         stateForForcingFog               = self.m_StateForForcingFog,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
-        mapsForUnits                     = createSerializableDataForMapsForUnits(self.m_MapsForUnits, self:getMapSize()),
+        mapsForPaths                     = createSerializableDataForMapsForPaths(self.m_MapsForPaths, self:getMapSize()),
     }
 end
 
@@ -184,7 +189,7 @@ function ModelFogMap:toSerializableTableForPlayerIndex(playerIndex)
         stateForForcingFog               = self.m_StateForForcingFog,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
-        mapsForUnits                     = createSerializableDataForMapsForUnits(self.m_MapsForUnits, self:getMapSize(), playerIndex),
+        mapsForPaths                     = createSerializableDataForMapsForPaths(self.m_MapsForPaths, self:getMapSize(), playerIndex),
     }
 end
 
@@ -222,6 +227,39 @@ function ModelFogMap:isDisablingFogByForce()
     return self.m_StateForForcingFog == "Disabled"
 end
 
+function ModelFogMap:resetMapForPathsForPlayerIndex(playerIndex, data)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForPathsForPlayerIndex() the map have not been initialized yet.")
+    if (not IS_SERVER) then
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForPathsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
+    end
+
+    local visibilityMap = self.m_MapsForPaths[playerIndex]
+    local mapSize       = self:getMapSize()
+    if (data) then
+        fillMapForPathsWithData(visibilityMap, mapSize, data)
+    else
+        fillSingleMapWithValue(visibilityMap, mapSize, 0)
+    end
+
+    return self
+end
+
+function ModelFogMap:updateMapForPathsWithPath(path, launchID)
+    local modelUnit   = getModelUnitMap(self.m_SceneWarFileName):getFocusModelUnit(path[1], launchID)
+    local playerIndex = modelUnit:getPlayerIndex()
+    if (not IS_SERVER) then
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithPath() invalid playerIndex on the client: " .. (playerIndex or ""))
+    end
+
+    local visibilityMap = self.m_MapsForPaths[playerIndex]
+    local mapSize       = self:getMapSize()
+    for _, pathNode in ipairs(path) do
+        updateMapForPaths(visibilityMap, mapSize, pathNode, modelUnit:getVisionForPlayerIndex(playerIndex, pathNode))
+    end
+
+    return self
+end
+
 function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
     assert(self:isInitialized(), "ModelFogMap:resetMapForTilesForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
@@ -232,79 +270,74 @@ function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
     local mapSize       = self:getMapSize()
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelTileMap(self.m_SceneWarFileName):forEachModelTile(function(modelTile)
-        updateMapForTiles(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex), 1)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex), 1)
     end)
 
     return self
 end
 
 function ModelFogMap:updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndex, gridIndex, vision)
-    updateMapForTiles(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, 1)
+    updateMapForTilesOrUnits(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, 1)
 
     return self
 end
 
 function ModelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(playerIndex, gridIndex, vision)
-    updateMapForTiles(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, -1)
+    updateMapForTilesOrUnits(self.m_MapsForTiles[playerIndex], self:getMapSize(), gridIndex, vision, -1)
 
     return self
 end
 
-function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, data)
-    assert(self:isInitialized(), "ModelFogMap:resetMapForUnitsForPlayerIndex() the map have not been initialized yet.")
+function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex)
+    assert(self:isInitialized(), "ModelFogMap:resetMapForUnitsForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     local visibilityMap = self.m_MapsForUnits[playerIndex]
     local mapSize       = self:getMapSize()
-    if (data) then
-        fillMapForUnitWithData(visibilityMap, mapSize, data)
-    else
-        fillSingleMapWithValue(visibilityMap, mapSize, 0)
-        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
-            updateMapForUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex))
-        end)
-    end
+    fillSingleMapWithValue(visibilityMap, mapSize, 0)
+    getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex), 1)
+    end)
 
     return self
 end
 
-function ModelFogMap:updateMapForUnitsWithPath(path, launchID)
-    local modelUnit   = getModelUnitMap(self.m_SceneWarFileName):getFocusModelUnit(path[1], launchID)
-    local playerIndex = modelUnit:getPlayerIndex()
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForUnitsWithPath() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+function ModelFogMap:updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, vision)
+    updateMapForTilesOrUnits(self.m_MapsForUnits[playerIndex], self:getMapSize(), gridIndex, vision, 1)
 
-    local visibilityMap = self.m_MapsForUnits[playerIndex]
-    local mapSize       = self:getMapSize()
-    for _, pathNode in ipairs(path) do
-        updateMapForUnits(visibilityMap, mapSize, pathNode, modelUnit:getVisionForPlayerIndex(playerIndex, pathNode))
-    end
+    return self
+end
+
+function ModelFogMap:updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, gridIndex, vision)
+    updateMapForTilesOrUnits(self.m_MapsForUnits[playerIndex], self:getMapSize(), gridIndex, vision, -1)
 
     return self
 end
 
 function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
-    -- This function returns 2 numbers, indicating the visibility calculated with the tiles/units of the playerIndex.
+    -- This function returns 3 numbers, indicating the visibility calculated with the move paths/tiles/units of the playerIndex.
     -- Each visibility can be 0 or 1:
     -- 0: The grid is out of vision completly.
-    -- 1: The grid is in vision, but no unit of the playerIndex is beside or passed by it.
-    -- The visibility of units can also be 2:
-    -- 2: The grid is in vision, and one or more units of the playerIndex are beside or passed by it.
+    -- 1: The grid is in vision, but it's not sure that if any unit of the playerIndex is beside it or has passed by it.
+    -- The visibility of paths can also be 2:
+    -- 2: The grid is in vision, and one or more units of the playerIndex are beside it or have passed by it.
 
-    -- The skills that enable the tiles/units to see through the hiding places are ignored.
+    -- The skills that enable the tiles/units to see through the hiding places are ignored here.
+    -- To check if a tile/unit is visible to a player, use functions in VisibilityFunctions.
 
     if (not IS_SERVER) then
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:getVisibilityOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     if (not self:isFogOfWarCurrently()) then
-        return 1, 2
+        return 2, 1, 1
     else
         local x, y = gridIndex.x, gridIndex.y
-        return (self.m_MapsForTiles[playerIndex][x][y] > 0) and (1) or (0), self.m_MapsForUnits[playerIndex][x][y]
+        return self.m_MapsForPaths[playerIndex][x][y],
+            (self.m_MapsForTiles[playerIndex][x][y] > 0) and (1) or (0),
+            (self.m_MapsForUnits[playerIndex][x][y] > 0) and (1) or (0)
     end
 end
 

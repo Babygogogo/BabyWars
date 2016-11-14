@@ -280,16 +280,22 @@ local function moveModelUnitWithAction(action)
     end
 
     local sceneWarFileName   = action.fileName
+    local actionName         = action.actionName
+    local modelFogMap        = getModelFogMap(sceneWarFileName)
     local modelUnitMap       = getModelUnitMap(sceneWarFileName)
     local beginningGridIndex = path[1]
     local endingGridIndex    = path[pathLength]
     local launchUnitID       = action.launchUnitID
     local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
+    local playerIndex        = focusModelUnit:getPlayerIndex()
+    local shouldUpdateFogMap = (IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())
 
-    if ((IS_SERVER) or (focusModelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) then
-        getModelFogMap(sceneWarFileName):updateMapForUnitsWithPath(path, launchUnitID)
+    if (shouldUpdateFogMap) then
+        modelFogMap:updateMapForPathsWithPath(path, launchUnitID)
+        if (not launchUnitID) then
+            modelFogMap:updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, beginningGridIndex, focusModelUnit:getVisionForPlayerIndex(playerIndex))
+        end
     end
-
     if (focusModelUnit.setCapturingModelTile) then
         focusModelUnit:setCapturingModelTile(false)
     end
@@ -304,8 +310,11 @@ local function moveModelUnitWithAction(action)
             loadedModelUnit:setGridIndex(endingGridIndex, false)
         end
     end
-
     focusModelUnit:setGridIndex(endingGridIndex, false)
+    if ((shouldUpdateFogMap) and (actionName ~= "LoadModelUnit")) then
+        modelFogMap:updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, endingGridIndex, focusModelUnit:getVisionForPlayerIndex(playerIndex))
+    end
+
     if (launchUnitID) then
         local loaderModelUnit = modelUnitMap:getModelUnit(beginningGridIndex)
         if (loaderModelUnit) then
@@ -316,11 +325,11 @@ local function moveModelUnitWithAction(action)
             assert(not IS_SERVER, "ActionExecutor-moveModelUnitWithAction() failed to get the loader for the launching unit, on the server.")
         end
 
-        if (action.actionName ~= "LoadModelUnit") then
+        if (actionName ~= "LoadModelUnit") then
             modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
         end
     else
-        if (action.actionName == "LoadModelUnit") then
+        if (actionName == "LoadModelUnit") then
             modelUnitMap:setActorUnitLoaded(beginningGridIndex)
         else
             modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
@@ -1054,7 +1063,8 @@ local function executeProduceModelUnitOnTile(action)
         modelUnitMap:addActorUnitOnMap(producedActorUnit)
 
         if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
-            getModelFogMap(sceneWarFileName):updateMapForUnitsWithPath({gridIndex})
+            local vision = producedActorUnit:getModel():getVisionForPlayerIndex(playerIndex)
+            getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, vision)
         end
     end
 
