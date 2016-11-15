@@ -180,15 +180,17 @@ local function setRevealedUnitsVisible(revealedUnits, visible)
     end
 end
 
-local function updateRevealedViewTiles()
-    assert(not IS_SERVER, "ActionExecutor-updateRevealedViewTiles() this shouldn't be called on the server.")
+local function updateViewTileMapOnVisibilityChanged()
+    assert(not IS_SERVER, "ActionExecutor-updateViewTileMapOnVisibilityChanged() this shouldn't be called on the server.")
     local sceneWarFileName = getSceneWarFileName()
     local playerIndex      = getPlayerIndexLoggedIn()
     getModelTileMap():forEachModelTile(function(modelTile)
         if (isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
             modelTile:updateAsFogDisabled()
-                :updateView()
+        else
+            modelTile:updateAsFogEnabled()
         end
+        modelTile:updateView()
     end)
 end
 
@@ -291,7 +293,7 @@ local function moveModelUnitWithAction(action)
     local shouldUpdateFogMap = (IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())
 
     if (shouldUpdateFogMap) then
-        modelFogMap:updateMapForPathsWithPath(path, launchUnitID)
+        modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, path)
         if (not launchUnitID) then
             modelFogMap:updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, beginningGridIndex, focusModelUnit:getVisionForPlayerIndex(playerIndex))
         end
@@ -746,7 +748,7 @@ local function executeCaptureModelTile(action)
                 modelTile:updateView()
 
                 setRevealedUnitsVisible(action.revealedUnits, true)
-                updateRevealedViewTiles()
+                updateViewTileMapOnVisibilityChanged()
                 removeViewUnits(removedModelUnits)
 
                 modelSceneWar:setExecutingAction(false)
@@ -771,7 +773,7 @@ local function executeCaptureModelTile(action)
                 end
 
                 setRevealedUnitsVisible(action.revealedUnits, true)
-                updateRevealedViewTiles()
+                updateViewTileMapOnVisibilityChanged()
                 removeViewUnits(removedModelUnits)
 
                 modelSceneWar:setExecutingAction(false)
@@ -805,7 +807,7 @@ local function executeDive(action)
             getModelGridEffect():showAnimationDive(endingGridIndex)
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -819,21 +821,35 @@ local function executeDropModelUnit(action)
     local path             = action.path
     local sceneWarFileName = action.fileName
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local endingGridIndex  = path[#path]
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
 
-    local dropModelUnits = {}
+    local playerIndex        = focusModelUnit:getPlayerIndex()
+    local shouldUpdateFogMap = (IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())
+    local modelFogMap        = getModelFogMap(sceneWarFileName)
+    local dropModelUnits     = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
-        local gridIndex = dropDestination.gridIndex
-        local unitID    = dropDestination.unitID
+        local gridIndex     = dropDestination.gridIndex
+        local unitID        = dropDestination.unitID
+        local dropModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
         modelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
         focusModelUnit:removeLoadUnitId(unitID)
 
-        local dropModelUnit = modelUnitMap:getModelUnit(gridIndex)
+        dropModelUnits[#dropModelUnits + 1] = dropModelUnit
         dropModelUnit:setGridIndex(gridIndex, false)
             :setStateActioned()
-        dropModelUnits[#dropModelUnits + 1] = dropModelUnit
+        if (dropModelUnit.getLoadUnitIdList) then
+            for _, loadedModelUnit in pairs(modelUnitMap:getLoadedModelUnitsWithLoader(dropModelUnit, true)) do
+                loadedModelUnit:setGridIndex(gridIndex, false)
+            end
+        end
+
+        if (shouldUpdateFogMap) then
+            modelFogMap:updateMapForPathsWithModelUnitAndPath(dropModelUnit, {endingGridIndex, gridIndex})
+                :updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, dropModelUnit:getVisionForPlayerIndex(playerIndex))
+        end
     end
 
     if (IS_SERVER) then
@@ -845,17 +861,16 @@ local function executeDropModelUnit(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            local loaderEndingGridIndex = path[#path]
-            local playerIndexLoggedIn   = getPlayerIndexLoggedIn()
+            local playerIndexLoggedIn = getPlayerIndexLoggedIn()
             for _, dropModelUnit in ipairs(dropModelUnits) do
                 local isDiving  = isModelUnitDiving(dropModelUnit)
                 local gridIndex = dropModelUnit:getGridIndex()
-                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, dropModelUnit:getUnitType(), isDiving, dropModelUnit:getPlayerIndex(), playerIndexLoggedIn)
+                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, dropModelUnit:getUnitType(), isDiving, playerIndex, playerIndexLoggedIn)
                 if (not isVisible) then
                     Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, false)
                 end
 
-                dropModelUnit:moveViewAlongPath({loaderEndingGridIndex, gridIndex}, isDiving, function()
+                dropModelUnit:moveViewAlongPath({endingGridIndex, gridIndex}, isDiving, function()
                     dropModelUnit:updateView()
                         :showNormalAnimation()
 
@@ -866,7 +881,7 @@ local function executeDropModelUnit(action)
             end
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -952,7 +967,7 @@ local function executeJoinModelUnit(action)
             targetModelUnit:removeViewFromParent()
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -1003,7 +1018,7 @@ local function executeLaunchSilo(action)
             end
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -1041,7 +1056,7 @@ local function executeLoadModelUnit(action)
             end
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -1075,7 +1090,7 @@ local function executeProduceModelUnitOnTile(action)
         getModelScene(sceneWarFileName):setExecutingAction(false)
     else
         setRevealedUnitsVisible(action.revealedUnits, true)
-        updateRevealedViewTiles()
+        updateViewTileMapOnVisibilityChanged()
 
         getModelScene(sceneWarFileName):setExecutingAction(false)
     end
@@ -1111,7 +1126,7 @@ local function executeProduceModelUnitOnUnit(action)
                 :showNormalAnimation()
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelScene(sceneWarFileName):setExecutingAction(false)
@@ -1140,7 +1155,7 @@ local function executeSupplyModelUnit(action)
                 :showNormalAnimation()
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             local modelGridEffect = getModelGridEffect()
@@ -1177,7 +1192,7 @@ local function executeSurface(action)
                 :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             getModelGridEffect():showAnimationSurface(endingGridIndex)
@@ -1243,7 +1258,7 @@ local function executeWait(action)
                 :showNormalAnimation()
 
             setRevealedUnitsVisible(action.revealedUnits, true)
-            updateRevealedViewTiles()
+            updateViewTileMapOnVisibilityChanged()
             removeViewUnits(removedModelUnits)
 
             if (path.isBlocked) then

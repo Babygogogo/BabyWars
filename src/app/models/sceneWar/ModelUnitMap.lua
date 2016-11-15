@@ -173,7 +173,7 @@ end
 
 function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
     local sceneWarFileName = self.m_SceneWarFileName
-    local grids, loaded    = {}
+    local grids, loaded    = {}, {}
     self:forEachModelUnitOnMap(function(modelUnit)
         if (isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, modelUnit:getGridIndex(), modelUnit:getUnitType(), (modelUnit.isDiving) and (modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
             grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()

@@ -244,11 +244,10 @@ function ModelFogMap:resetMapForPathsForPlayerIndex(playerIndex, data)
     return self
 end
 
-function ModelFogMap:updateMapForPathsWithPath(path, launchID)
-    local modelUnit   = getModelUnitMap(self.m_SceneWarFileName):getFocusModelUnit(path[1], launchID)
+function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
     local playerIndex = modelUnit:getPlayerIndex()
     if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithPath() invalid playerIndex on the client: " .. (playerIndex or ""))
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
     local visibilityMap = self.m_MapsForPaths[playerIndex]
