@@ -41,13 +41,12 @@ function VisionOwner:getVisionForPlayerIndex(playerIndex, gridIndex)
     local template         = self.m_Template
     local owner            = self.m_Owner
     local ownerPlayerIndex = owner:getPlayerIndex()
-    if ((not template.isEnabledForAllPlayers) and
-        (ownerPlayerIndex ~= playerIndex))    then
+    if ((not template.isEnabledForAllPlayers) and (ownerPlayerIndex ~= playerIndex)) then
         return nil
     else
         local sceneWarFileName        = self.m_SceneWarFileName
         local baseVision              = template.vision
-        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(sceneWarFileName):getModelPlayer(ownerPlayerIndex):getModelSkillConfiguration()
+        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration()
         if (owner.getTileType) then
             if (ownerPlayerIndex == playerIndex) then
                 return baseVision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
