@@ -47,6 +47,48 @@ local function hasUnitWithPlayerIndexOnGrid(sceneWarFileName, gridIndex, playerI
     return (modelUnit) and (modelUnit:getPlayerIndex() == playerIndex)
 end
 
+local function createEmptyMap(mapSize)
+    local map = {}
+    for x = 1, mapSize.width do
+        map[x] = {}
+    end
+
+    return map
+end
+
+local function createVisibilityMapWithPath(sceneWarFileName, path, modelUnit)
+    local playerIndex           = modelUnit:getPlayerIndex()
+    local canRevealHidingPlaces = canRevealHidingPlacesForUnits(getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local mapSize               = getModelTileMap(sceneWarFileName):getMapSize()
+    local visibilityMap         = createEmptyMap(mapSize)
+
+    for _, pathNode in ipairs(path) do
+        local vision = modelUnit:getVisionForPlayerIndex(playerIndex, pathNode)
+        if (canRevealHidingPlaces) then
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, vision, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = 2
+            end
+        else
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, 1, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = 2
+            end
+            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 2, vision, mapSize)) do
+                visibilityMap[gridIndex.x][gridIndex.y] = visibilityMap[gridIndex.x][gridIndex.y] or 1
+            end
+        end
+    end
+
+    return visibilityMap
+end
+
+local function getVisionForBuiltTile(sceneWarFileName, gridIndex, builder)
+    local oldTileType             = getModelTileMap(sceneWarFileName):getModelTile(gridIndex):getTileType()
+    local newTileType             = GameConstantFunctions.getTileTypeWithTiledId(builder:getBuildTiledIdWithTileType(oldTileType))
+    local template                = GameConstantFunctions.getTemplateModelTileWithTileType(newTileType).VisionOwner
+    local modelSkillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(builder:getPlayerIndex()):getModelSkillConfiguration()
+    return template.vision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
+end
+
 local function getVisionForCapturedTile(sceneWarFileName, gridIndex, playerIndex)
     local tileType                = getModelTileMap(sceneWarFileName):getModelTile(gridIndex):getTileType()
     tileType                      = (tileType ~= "Headquarters") and (tileType) or ("City")
@@ -82,38 +124,37 @@ local function generateUnitsData(sceneWarFileName, modelUnit)
     return data
 end
 
-local function createEmptyMap(mapSize)
-    local map = {}
-    for x = 1, mapSize.width do
-        map[x] = {}
-    end
+local function getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(sceneWarFileName, origin, vision, playerIndex)
+    local modelTileMap          = getModelTileMap(sceneWarFileName)
+    local modelUnitMap          = getModelUnitMap(sceneWarFileName)
+    local mapSize               = modelTileMap:getMapSize()
+    local canRevealHidingPlaces = canRevealHidingPlacesForTiles(getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local revealedTiles, revealedUnits
 
-    return map
-end
-
-local function createVisibilityMapWithPath(sceneWarFileName, path, modelUnit)
-    local playerIndex           = modelUnit:getPlayerIndex()
-    local canRevealHidingPlaces = canRevealHidingPlacesForUnits(getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
-    local mapSize               = getModelTileMap(sceneWarFileName):getMapSize()
-    local visibilityMap         = createEmptyMap(mapSize)
-
-    for _, pathNode in ipairs(path) do
-        local vision = modelUnit:getVisionForPlayerIndex(playerIndex, pathNode)
-        if (canRevealHidingPlaces) then
-            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, vision, mapSize)) do
-                visibilityMap[gridIndex.x][gridIndex.y] = 2
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
+        local modelTile = modelTileMap:getModelTile(gridIndex)
+        if (not VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, playerIndex)) then
+            if ((canRevealHidingPlaces)                          or
+                (not modelTile.canHideUnitType)                  or
+                (GridIndexFunctions.isEqual(origin, gridIndex))) then
+                revealedTiles = TableFunctions.union(revealedTiles, generateTilesData(modelTile, mapSize))
             end
-        else
-            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 0, 1, mapSize)) do
-                visibilityMap[gridIndex.x][gridIndex.y] = 2
-            end
-            for _, gridIndex in pairs(getGridsWithinDistance(pathNode, 2, vision, mapSize)) do
-                visibilityMap[gridIndex.x][gridIndex.y] = visibilityMap[gridIndex.x][gridIndex.y] or 1
+        end
+
+        local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if (modelUnit) then
+            local unitType = modelUnit:getUnitType()
+            if (not VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, unitType, isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
+                if ((canRevealHidingPlaces)                    or
+                    (not modelTile.canHideUnitType)            or
+                    (not modelTile:canHideUnitType(unitType))) then
+                    revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, modelUnit))
+                end
             end
         end
     end
 
-    return visibilityMap
+    return revealedTiles, revealedUnits
 end
 
 --------------------------------------------------------------------------------
@@ -222,37 +263,12 @@ function VisibilityFunctions.getRevealedTilesAndUnitsData(sceneWarFileName, path
     return revealedTiles, revealedUnits
 end
 
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForBuild(sceneWarFileName, origin, builder)
+    return getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(sceneWarFileName, origin, getVisionForBuiltTile(sceneWarFileName, origin, builder), builder:getPlayerIndex())
+end
+
 function VisibilityFunctions.getRevealedTilesAndUnitsDataForCapture(sceneWarFileName, origin, playerIndex)
-    local modelTileMap          = getModelTileMap(sceneWarFileName)
-    local modelUnitMap          = getModelUnitMap(sceneWarFileName)
-    local mapSize               = modelTileMap:getMapSize()
-    local canRevealHidingPlaces = canRevealHidingPlacesForTiles(getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
-    local revealedTiles, revealedUnits
-
-    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, getVisionForCapturedTile(sceneWarFileName, origin, playerIndex), mapSize)) do
-        local modelTile = modelTileMap:getModelTile(gridIndex)
-        if (not isTileVisible(sceneWarFileName, gridIndex, playerIndex)) then
-            if ((canRevealHidingPlaces)                          or
-                (not modelTile.canHideUnitType)                  or
-                (GridIndexFunctions.isEqual(origin, gridIndex))) then
-                revealedTiles = TableFunctions.union(revealedTiles, generateTilesData(modelTile, mapSize))
-            end
-        end
-
-        local modelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if (modelUnit) then
-            local unitType = modelUnit:getUnitType()
-            if (not isUnitVisible(sceneWarFileName, gridIndex, unitType, isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
-                if ((canRevealHidingPlaces)                    or
-                    (not modelTile.canHideUnitType)            or
-                    (not modelTile:canHideUnitType(unitType))) then
-                    revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, modelUnit))
-                end
-            end
-        end
-    end
-
-    return revealedTiles, revealedUnits
+    return getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(sceneWarFileName, origin, getVisionForCapturedTile(sceneWarFileName, origin, playerIndex), playerIndex)
 end
 
 return VisibilityFunctions

@@ -27,6 +27,8 @@ local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
+local destroyActorUnitOnMap    = Destroyers.destroyActorUnitOnMap
+local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
@@ -42,6 +44,10 @@ local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function isModelUnitDiving(modelUnit)
+    return (modelUnit.isDiving) and (modelUnit:isDiving())
+end
+
 local function getNextTurnAndPlayerIndex(self, playerManager)
     local nextTurnIndex   = self.m_TurnIndex
     local nextPlayerIndex = self.m_PlayerIndex + 1
@@ -115,8 +121,8 @@ local function resetVisionOnClient()
 
     getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
         local gridIndex = modelUnit:getGridIndex()
-        if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), (modelUnit.isDiving and modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
-            Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+        if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
+            destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
         end
     end)
 
@@ -160,9 +166,11 @@ local function runTurnPhaseConsumeUnitFuel(self)
         local sceneWarFileName = self.m_SceneWarFileName
         local playerIndex      = self.m_PlayerIndex
         local modelTileMap     = getModelTileMap(sceneWarFileName)
+        local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+        local mapSize          = modelTileMap:getMapSize()
         local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
 
-        getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+        modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
             if ((modelUnit:getPlayerIndex() == playerIndex) and
                 (modelUnit.setCurrentFuel))                 then
                 local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
@@ -174,11 +182,20 @@ local function runTurnPhaseConsumeUnitFuel(self)
                     local modelTile = modelTileMap:getModelTile(gridIndex)
 
                     if ((not modelTile.canRepairTarget) or (not modelTile:canRepairTarget(modelUnit))) then
-                        Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+                        destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
                         dispatcher:dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,
                         })
+                        if (not IS_SERVER) then
+                            for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, mapSize)) do
+                                local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+                                if ((adjacentModelUnit)                                                                                                                                                               and
+                                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndex))) then
+                                    destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, true)
+                                end
+                            end
+                        end
                     end
                 end
             end
@@ -233,7 +250,7 @@ local function runTurnPhaseSupplyUnit(self)
     local supplyAdjacentModelUnits = function(modelUnit)
         if ((modelUnit:getPlayerIndex() == playerIndex) and
             (modelUnit.canSupplyModelUnit))             then
-            for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(modelUnit:getGridIndex(), mapSize)) do
+            for _, gridIndex in pairs(getAdjacentGrids(modelUnit:getGridIndex(), mapSize)) do
                 local supplyTarget = modelUnitMap:getModelUnit(gridIndex)
                 if ((supplyTarget)                               and
                     (modelUnit:canSupplyModelUnit(supplyTarget)) and

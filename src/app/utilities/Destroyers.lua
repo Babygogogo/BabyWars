@@ -10,10 +10,12 @@ local WebSocketManager    = (not IS_SERVER) and (require("src.app.utilities.WebS
 
 local appendList               = TableFunctions.appendList
 local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelGridEffect       = SingletonGetters.getModelGridEffect
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
@@ -72,15 +74,9 @@ function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRem
         destroyedUnits[#destroyedUnits + 1] = destroySingleActorUnitLoaded(modelUnitMap, modelUnitLoaded, shouldRemoveView)
     end
 
-    if (not IS_SERVER) then
-        local _, playerIndexLoggedIn = getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-        for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
-            local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-            if ((adjacentModelUnit)                                                                                                                                                                 and
-                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving()), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
-                appendList(destroyedUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, shouldRemoveView))
-            end
-        end
+    local playerIndex = modelUnit:getPlayerIndex()
+    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+        getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, gridIndex, modelUnit:getVisionForPlayerIndex(playerIndex))
     end
 
     return destroyedUnits
