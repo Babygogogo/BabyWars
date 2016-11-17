@@ -24,6 +24,7 @@ local Destroyers            = require("src.app.utilities.Destroyers")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local SupplyFunctions       = require("src.app.utilities.SupplyFunctions")
 local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
@@ -40,6 +41,7 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
+local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -76,32 +78,9 @@ local function dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
     })
 end
 
-local function supplyModelUnit(modelUnit)
-    local hasSupplied = false
-    local maxFuel = modelUnit:getMaxFuel()
-    if (modelUnit:getCurrentFuel() < maxFuel) then
-        modelUnit:setCurrentFuel(maxFuel)
-        hasSupplied = true
-    end
-
-    if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-        local maxAmmo = modelUnit:getPrimaryWeaponMaxAmmo()
-        if (modelUnit:getPrimaryWeaponCurrentAmmo() < maxAmmo) then
-            modelUnit:setPrimaryWeaponCurrentAmmo(maxAmmo)
-            hasSupplied = true
-        end
-    end
-
-    if (hasSupplied) then
-        modelUnit:updateView()
-    end
-
-    return hasSupplied
-end
-
 local function repairModelUnit(modelUnit, repairAmount)
     modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
-    local hasSupplied = supplyModelUnit(modelUnit)
+    local hasSupplied = supplyWithAmmoAndFuel(modelUnit, true)
 
     if (not IS_SERVER) then
         modelUnit:updateView()
@@ -239,7 +218,7 @@ local function runTurnPhaseSupplyUnit(self)
 
             local hasSupplied = false
             for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-                hasSupplied = supplyModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID)) or hasSupplied
+                hasSupplied = supplyWithAmmoAndFuel(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), true) or hasSupplied
             end
             if (hasSupplied) then
                 dispatchEvtSupplyViewUnit(dispatcher, modelUnit:getGridIndex())
@@ -254,7 +233,7 @@ local function runTurnPhaseSupplyUnit(self)
                 local supplyTarget = modelUnitMap:getModelUnit(gridIndex)
                 if ((supplyTarget)                               and
                     (modelUnit:canSupplyModelUnit(supplyTarget)) and
-                    (supplyModelUnit(supplyTarget)))             then
+                    (supplyWithAmmoAndFuel(supplyTarget, true))) then
                     dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
                 end
             end

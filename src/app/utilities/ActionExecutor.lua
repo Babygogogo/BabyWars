@@ -9,6 +9,7 @@ local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions"
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local SupplyFunctions        = require("src.app.utilities.SupplyFunctions")
 local TableFunctions         = require("src.app.utilities.TableFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
@@ -37,6 +38,7 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 local toErrorMessage           = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
@@ -119,21 +121,8 @@ local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridInde
     local targets      = {}
     for _, adjacentGridIndex in pairs(getAdjacentGrids(supplierGridIndex, modelUnitMap:getMapSize())) do
         local target = modelUnitMap:getModelUnit(adjacentGridIndex)
-        if ((target) and (target:getPlayerIndex() == playerIndex)) then
-            local isSupplied = false
-            if (target:getCurrentFuel() < target:getMaxFuel()) then
-                target:setCurrentFuel(target:getMaxFuel())
-                isSupplied = true
-            end
-            if ((target.hasPrimaryWeapon)                                                  and
-                (target:hasPrimaryWeapon())                                                and
-                (target:getPrimaryWeaponCurrentAmmo() < target:getPrimaryWeaponMaxAmmo())) then
-                target:setPrimaryWeaponCurrentAmmo(target:getPrimaryWeaponMaxAmmo())
-                isSupplied = true
-            end
-            if (isSupplied) then
-                targets[#targets + 1] = target
-            end
+        if ((target) and (target:getPlayerIndex() == playerIndex) and (supplyWithAmmoAndFuel(target))) then
+            targets[#targets + 1] = target
         end
     end
 
@@ -1164,9 +1153,9 @@ local function executeSupplyModelUnit(action)
     local launchUnitID     = action.launchUnitID
     local path             = action.path
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
-    local targetModelUnits = getAndSupplyAdjacentModelUnits(sceneWarFileName, path[#path], focusModelUnit:getPlayerIndex())
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
+    local targetModelUnits = getAndSupplyAdjacentModelUnits(sceneWarFileName, path[#path], focusModelUnit:getPlayerIndex())
 
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)

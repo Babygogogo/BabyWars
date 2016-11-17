@@ -3,8 +3,10 @@ local InstantSkillExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local SupplyFunctions       = require("src.app.utilities.SupplyFunctions")
 
-local getSkillModifier = GameConstantFunctions.getSkillModifier
+local getSkillModifier      = GameConstantFunctions.getSkillModifier
+local supplyWithAmmoAndFuel = SupplyFunctions.supplyWithAmmoAndFuel
 
 local s_Executors = {}
 
@@ -128,10 +130,7 @@ s_Executors.execute16 = function(level, modelWarField, modelPlayerManager, model
     local playerIndex = modelTurnManager:getPlayerIndex()
     local func        = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
-            modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
-            if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-                modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
-            end
+            supplyWithAmmoAndFuel(modelUnit)
             if (modelUnit.setCurrentMaterial) then
                 modelUnit:setCurrentMaterial(modelUnit:getMaxMaterial())
             end
