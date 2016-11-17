@@ -508,10 +508,18 @@ local function executeAttack(action)
             attacker:setCurrentPromotion(math.min(attacker:getMaxPromotion(), attacker:getCurrentPromotion() + 1))
             destroyActorUnitOnMap(sceneWarFileName, targetGridIndex, false, true)
         else
+            if ((not IS_SERVER) and (attackTarget:isFogEnabledOnClient())) then
+                attackTarget:updateAsFogDisabled()
+            end
             attackTarget:updateWithObjectAndBaseId(0)
+
             plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex, modelTileMap)
             for _, gridIndex in ipairs(plasmaGridIndexes) do
-                modelTileMap:getModelTile(gridIndex):updateWithObjectAndBaseId(0)
+                local modelTile = modelTileMap:getModelTile(gridIndex)
+                if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+                    modelTile:updateAsFogDisabled()
+                end
+                modelTile:updateWithObjectAndBaseId(0)
             end
         end
     end
