@@ -271,4 +271,27 @@ function VisibilityFunctions.getRevealedTilesAndUnitsDataForCapture(sceneWarFile
     return getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(sceneWarFileName, origin, getVisionForCapturedTile(sceneWarFileName, origin, playerIndex), playerIndex)
 end
 
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForFlare(sceneWarFileName, origin, radius, playerIndex)
+    local modelTileMap = getModelTileMap(sceneWarFileName)
+    local modelUnitMap = getModelUnitMap(sceneWarFileName)
+    local mapSize      = modelTileMap:getMapSize()
+    local revealedTiles, revealedUnits
+
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, radius, mapSize)) do
+        local modelTile = modelTileMap:getModelTile(gridIndex)
+        if (not VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, playerIndex)) then
+            revealedTiles = TableFunctions.union(revealedTiles, generateTilesData(modelTile, mapSize))
+        end
+
+        local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+        if ((modelUnit)                                                                                                                and
+            (not isModelUnitDiving(modelUnit))                                                                                         and
+            (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), false, modelUnit:getPlayerIndex(), playerIndex))) then
+            revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, modelUnit))
+        end
+    end
+
+    return revealedTiles, revealedUnits
+end
+
 return VisibilityFunctions

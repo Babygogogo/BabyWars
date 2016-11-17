@@ -972,6 +972,46 @@ local function executeJoinModelUnit(action)
     end
 end
 
+local function executeLaunchFlare(action)
+    updateTilesAndUnitsBeforeExecutingAction(action)
+
+    local path                = action.path
+    local sceneWarFileName    = action.fileName
+    local targetGridIndex     = action.targetGridIndex
+    local modelUnitMap        = getModelUnitMap(sceneWarFileName)
+    local focusModelUnit      = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local playerIndexActing   = focusModelUnit:getPlayerIndex()
+    local flareAreaRadius     = focusModelUnit:getFlareAreaRadius()
+    local playerIndexLoggedIn = (not IS_SERVER) and (getPlayerIndexLoggedIn()) or (nil)
+    moveModelUnitWithAction(action)
+    focusModelUnit:setStateActioned()
+        :setCurrentFlareAmmo(focusModelUnit:getCurrentFlareAmmo() - 1)
+
+    if ((IS_SERVER) or (playerIndexActing == playerIndexLoggedIn)) then
+        getModelFogMap(sceneWarFileName):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
+    end
+
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
+        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+            focusModelUnit:updateView()
+                :showNormalAnimation()
+
+            if (playerIndexActing == playerIndexLoggedIn) then
+                local modelGridEffect = getModelGridEffect()
+                for _, gridIndex in pairs(getGridsWithinDistance(targetGridIndex, 0, flareAreaRadius, modelUnitMap:getMapSize())) do
+                    modelGridEffect:showAnimationFlare(gridIndex)
+                end
+            end
+
+            updateTileAndUnitMapOnVisibilityChanged()
+
+            getModelScene(sceneWarFileName):setExecutingAction(false)
+        end)
+    end
+end
+
 local function executeLaunchSilo(action)
     updateTilesAndUnitsBeforeExecutingAction(action)
 
@@ -1309,6 +1349,7 @@ function ActionExecutor.execute(action)
     elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
     elseif (actionName == "EndTurn")                then executeEndTurn(               action)
     elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
+    elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
     elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
     elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
     elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)

@@ -2,7 +2,7 @@
 local FlareLauncher = require("src.global.functions.class")("FlareLauncher")
 
 FlareLauncher.EXPORTED_METHODS = {
-    "getAreaRadius",
+    "getFlareAreaRadius",
     "getMaxFlareRange",
     "getMaxFlareAmmo",
     "getCurrentFlareAmmo",
@@ -46,7 +46,7 @@ end
 --------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
-function FlareLauncher:getAreaRadius()
+function FlareLauncher:getFlareAreaRadius()
     return self.m_Template.areaRadius
 end
 

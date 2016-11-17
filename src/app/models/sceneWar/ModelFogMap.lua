@@ -259,6 +259,19 @@ function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
     return self
 end
 
+function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origin, radius)
+    if (not IS_SERVER) then
+        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsForPlayerIndexWithFlare() invalid playerIndex on the client: " .. (playerIndex or ""))
+    end
+
+    local visibilityMap = self.m_MapsForPaths[playerIndex]
+    for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, radius, self:getMapSize())) do
+        visibilityMap[gridIndex.x][gridIndex.y] = 2
+    end
+
+    return self
+end
+
 function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
     assert(self:isInitialized(), "ModelFogMap:resetMapForTilesForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
