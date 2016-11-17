@@ -144,7 +144,8 @@ local function getFuelIndicatorFrame(unit)
 end
 
 local function getAmmoIndicatorFrame(unit)
-    if ((unit.isPrimaryWeaponAmmoInShort) and (unit:isPrimaryWeaponAmmoInShort())) then
+    if (((unit.isPrimaryWeaponAmmoInShort) and (unit:isPrimaryWeaponAmmoInShort())) or
+        ((unit.isFlareAmmoInShort) and (unit:isFlareAmmoInShort())))                then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s02_f02.png")
     else
         return nil

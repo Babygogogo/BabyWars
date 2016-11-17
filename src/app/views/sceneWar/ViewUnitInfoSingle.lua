@@ -212,13 +212,17 @@ local function updateFuelInfoWithModelUnit(self, unit)
 end
 
 local function updateAmmoInfoWithModelUnit(self, unit)
-    if (not ((unit.hasPrimaryWeapon) and (unit:hasPrimaryWeapon()))) then
-        self.m_AmmoIcon:setVisible(false)
-        self.m_AmmoLabel:setVisible(false)
-    else
+    if ((unit.hasPrimaryWeapon) and (unit:hasPrimaryWeapon())) then
         self.m_AmmoIcon:setVisible(true)
         self.m_AmmoLabel:setVisible(true)
             :setInt(unit:getPrimaryWeaponCurrentAmmo())
+    elseif (unit.getCurrentFlareAmmo) then
+        self.m_AmmoIcon:setVisible(true)
+        self.m_AmmoLabel:setVisible(true)
+            :setInt(unit:getCurrentFlareAmmo())
+    else
+        self.m_AmmoIcon:setVisible(false)
+        self.m_AmmoLabel:setVisible(false)
     end
 end
 

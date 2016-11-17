@@ -7,6 +7,7 @@ FlareLauncher.EXPORTED_METHODS = {
     "getMaxFlareAmmo",
     "getCurrentFlareAmmo",
     "setCurrentFlareAmmo",
+    "isFlareAmmoInShort"
 }
 
 --------------------------------------------------------------------------------
@@ -66,6 +67,10 @@ function FlareLauncher:setCurrentFlareAmmo(ammo)
     self.m_CurrentAmmo = ammo
 
     return self.m_Owner
+end
+
+function FlareLauncher:isFlareAmmoInShort()
+    return self:getCurrentFlareAmmo() <= 1
 end
 
 return FlareLauncher
