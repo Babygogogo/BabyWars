@@ -2332,6 +2332,13 @@ GameConstant.templateModelUnits = {
             vision                 = 2,
             isEnabledForAllPlayers = false,
         },
+
+        FlareLauncher = {
+            maxAmmo     = 3,
+            currentAmmo = 3,
+            maxRange    = 5,
+            areaRadius  = 2,
+        },
     },
 
     AntiAir    = {

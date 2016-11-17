@@ -214,30 +214,32 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:onStartRunning(sceneWarFileName)
     getScriptEventDispatcher()
-        :addEventListener("EvtGridSelected",                    self)
-        :addEventListener("EvtMapCursorMoved",                  self)
-        :addEventListener("EvtPreviewBattleDamage",             self)
-        :addEventListener("EvtPreviewNoBattleDamage",           self)
-        :addEventListener("EvtActionPlannerIdle",               self)
-        :addEventListener("EvtActionPlannerMakingMovePath",     self)
-        :addEventListener("EvtActionPlannerChoosingAction",     self)
-        :addEventListener("EvtActionPlannerChoosingSiloTarget", self)
-        :addEventListener("EvtSceneWarStarted",                 self)
+        :addEventListener("EvtGridSelected",                     self)
+        :addEventListener("EvtMapCursorMoved",                   self)
+        :addEventListener("EvtPreviewBattleDamage",              self)
+        :addEventListener("EvtPreviewNoBattleDamage",            self)
+        :addEventListener("EvtActionPlannerIdle",                self)
+        :addEventListener("EvtActionPlannerMakingMovePath",      self)
+        :addEventListener("EvtActionPlannerChoosingAction",      self)
+        :addEventListener("EvtActionPlannerChoosingFlareTarget", self)
+        :addEventListener("EvtActionPlannerChoosingSiloTarget",  self)
+        :addEventListener("EvtSceneWarStarted",                  self)
 
     return self
 end
 
 function ModelMapCursor:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtGridSelected")                    then onEvtGridSelected(   self, event)
-    elseif (eventName == "EvtMapCursorMoved")                  then onEvtMapCursorMoved( self, event)
-    elseif (eventName == "EvtSceneWarStarted")                 then onEvtSceneWarStarted(self, event)
-    elseif (eventName == "EvtActionPlannerIdle")               then setCursorAppearance(self, true,  false, false)
-    elseif (eventName == "EvtActionPlannerMakingMovePath")     then setCursorAppearance(self, true,  false, false)
-    elseif (eventName == "EvtActionPlannerChoosingAction")     then setCursorAppearance(self, true,  false, false)
-    elseif (eventName == "EvtActionPlannerChoosingSiloTarget") then setCursorAppearance(self, false, true,  true )
-    elseif (eventName == "EvtPreviewNoBattleDamage")           then setCursorAppearance(self, true,  false, false)
-    elseif (eventName == "EvtPreviewBattleDamage")             then setCursorAppearance(self, false, true,  false)
+    if     (eventName == "EvtGridSelected")                     then onEvtGridSelected(   self, event)
+    elseif (eventName == "EvtMapCursorMoved")                   then onEvtMapCursorMoved( self, event)
+    elseif (eventName == "EvtSceneWarStarted")                  then onEvtSceneWarStarted(self, event)
+    elseif (eventName == "EvtActionPlannerIdle")                then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerMakingMovePath")      then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerChoosingAction")      then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtActionPlannerChoosingFlareTarget") then setCursorAppearance(self, false, true,  true )
+    elseif (eventName == "EvtActionPlannerChoosingSiloTarget")  then setCursorAppearance(self, false, true,  true )
+    elseif (eventName == "EvtPreviewNoBattleDamage")            then setCursorAppearance(self, true,  false, false)
+    elseif (eventName == "EvtPreviewBattleDamage")              then setCursorAppearance(self, false, true,  false)
     end
 
     return self

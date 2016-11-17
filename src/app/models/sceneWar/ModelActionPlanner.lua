@@ -28,9 +28,12 @@ local Actor                       = require("src.global.actors.Actor")
 
 local createPathForDispatch    = MovePathFunctions.createPathForDispatch
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
@@ -329,6 +332,15 @@ local function sendActionDropModelUnit(self)
     })
 end
 
+local function sendActionLaunchFlare(self, gridIndex)
+    createAndSendAction({
+        actionName      = "LaunchFlare",
+        path            = createPathForDispatch(self.m_MovePath),
+        launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = gridIndex,
+    })
+end
+
 local function sendActionLaunchSilo(self, targetGridIndex)
     createAndSendAction({
         actionName      = "LaunchSilo",
@@ -348,6 +360,7 @@ local setStateChoosingProductionTarget
 local setStateMakingMovePath
 local setStateChoosingAction
 local setStateChoosingAttackTarget
+local setStateChoosingFlareTarget
 local setStateChoosingSiloTarget
 local setStateChoosingDropDestination
 local setStateChoosingAdditionalDropAction
@@ -565,6 +578,23 @@ local function getActionsDropModelUnit(self)
     return actions
 end
 
+local function getActionLaunchFlare(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((not getModelFogMap():isFogOfWarCurrently()) or
+        (#self.m_MovePath ~= 1)                      or
+        (not focusModelUnit.getCurrentFlareAmmo)     or
+        (focusModelUnit:getCurrentFlareAmmo() == 0)) then
+        return nil
+    else
+        return {
+            name     = getLocalizedText(78, "LaunchFlare"),
+            callback = function()
+                setStateChoosingFlareTarget(self)
+            end,
+        }
+    end
+end
+
 local function getActionLaunchSilo(self)
     local focusModelUnit = self.m_FocusModelUnit
     local modelTile      = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
@@ -651,6 +681,7 @@ local function getAvailableActionList(self)
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
+    list[#list + 1] = getActionLaunchFlare(           self)
     list[#list + 1] = getActionLaunchSilo(            self)
     list[#list + 1] = getActionProduceModelUnitOnUnit(self)
     list[#list + 1] = getActionWait(                  self)
@@ -679,7 +710,7 @@ end
 --------------------------------------------------------------------------------
 setStateIdle = function(self, resetUnitAnimation)
     if (self.m_View) then
-        self.m_View:setReachableAreaVisible( false)
+        self.m_View:setReachableAreaVisible(  false)
             :setAttackableGridsVisible(       false)
             :setMovePathVisible(              false)
             :setMovePathDestinationVisible(   false)
@@ -688,6 +719,7 @@ setStateIdle = function(self, resetUnitAnimation)
             :setDropDestinationsVisible(      false)
             :setPreviewAttackableAreaVisible( false)
             :setPreviewReachableAreaVisible(  false)
+            :setFlareGridsVisible(            false)
 
         getModelUnitMap():setPreviewLaunchUnitVisible(false)
         if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
@@ -854,6 +886,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
             :setDroppableGridsVisible(false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(false)
+            :setFlareGridsVisible(false)
 
         if (not launchUnitID) then
             getModelUnitMap():setPreviewLaunchUnitVisible(false)
@@ -875,6 +908,17 @@ setStateChoosingAttackTarget = function(self, destination)
     end
 
     getScriptEventDispatcher():dispatchEvent({name = "EvtActionPlannerChoosingAttackTarget"})
+end
+
+setStateChoosingFlareTarget = function(self)
+    self.m_State = "choosingFlareTarget"
+
+    if (self.m_View) then
+        self.m_View:setFlareGrids(getMovePathDestination(self.m_MovePath), self.m_FocusModelUnit:getMaxFlareRange())
+            :setFlareGridsVisible(true)
+    end
+
+    getScriptEventDispatcher():dispatchEvent({name = "EvtActionPlannerChoosingFlareTarget"})
 end
 
 setStateChoosingSiloTarget = function(self)
@@ -1015,6 +1059,13 @@ local function onEvtGridSelected(self, event)
                 dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
             end
         end
+    elseif (state == "choosingFlareTarget") then
+        local destination = getMovePathDestination(self.m_MovePath)
+        if (GridIndexFunctions.getDistance(gridIndex, destination) > self.m_FocusModelUnit:getMaxFlareRange()) then
+            setStateChoosingAction(self, destination, self.m_LaunchUnitID)
+        elseif (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
+            sendActionLaunchFlare(self, gridIndex)
+        end
     elseif (state == "choosingSiloTarget") then
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
             sendActionLaunchSilo(self, gridIndex)
@@ -1080,10 +1131,8 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
-    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-    assert(playerIndexLoggedIn, "ModelActionPlanner:onStartRunning() failed to find the player index for the logged-in player.")
-    self.m_PlayerIndexLoggedIn = playerIndexLoggedIn
-    self.m_PlayerIndexInTurn   = SingletonGetters.getModelTurnManager():getPlayerIndex()
+    self.m_PlayerIndexLoggedIn = getPlayerIndexLoggedIn()
+    self.m_PlayerIndexInTurn   = getModelTurnManager():getPlayerIndex()
 
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap():getMapSize())

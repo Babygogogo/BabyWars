@@ -7,6 +7,7 @@ local Actor              = require("src.global.actors.Actor")
 local MOVE_PATH_Z_ORDER                = 1
 local PREVIEW_DROP_DESTINATION_Z_ORDER = 1
 local DROP_DESTIONATIONS_Z_ORDER       = 1
+local FLARE_AREA_Z_ORDER               = 0
 local REACHABLE_GRIDS_Z_ORDER          = 0
 local ATTACKABLE_GRIDS_Z_ORDER         = 0
 local MOVE_PATH_DESTINATION_Z_ORDER    = 0
@@ -241,6 +242,15 @@ local function initViewPreviewReachableArea(self)
     self:addChild(self.m_ViewPreviewReachableArea, PREVIEW_REACHABLE_AREA_Z_ORDER)
 end
 
+local function initViewFlareArea(self)
+    self.m_ViewFlareArea, self.m_ViewFlareGrids = createViewAreaAndGrids(
+        self.m_MapSize,
+        createViewSingleReachableGridWithXY,
+        REACHABLE_GRIDS_OPACITY
+    )
+    self:addChild(self.m_ViewFlareArea, FLARE_AREA_Z_ORDER)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -261,6 +271,7 @@ function ViewActionPlanner:setMapSize(size)
     initViewReachableArea(        self)
     initViewPreviewAttackableArea(self)
     initViewPreviewReachableArea( self)
+    initViewFlareArea(            self)
 
     return self
 end
@@ -399,6 +410,26 @@ end
 
 function ViewActionPlanner:setPreviewReachableAreaVisible(visible)
     self.m_ViewPreviewReachableArea:setVisible(visible)
+
+    return self
+end
+
+function ViewActionPlanner:setFlareGrids(origin, radius)
+    local grids         = self.m_ViewFlareGrids
+    local mapSize       = self.m_MapSize
+    local width, height = mapSize.width, mapSize.height
+
+    for x = 1, width do
+        for y = 1, height do
+            grids[x][y]:setVisible(GridIndexFunctions.getDistance(origin, {x = x, y = y}) <= radius)
+        end
+    end
+
+    return self
+end
+
+function ViewActionPlanner:setFlareGridsVisible(visible)
+    self.m_ViewFlareArea:setVisible(visible)
 
     return self
 end

@@ -849,7 +849,8 @@ local s_Texts = {
             elseif (actionType == "BuildModelTile")         then return "建 造"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "生 产"
             elseif (actionType == "LaunchSilo")             then return "发 射"
-            else                                                 return "未知78: " .. (actionType or "")
+            elseif (actionType == "LaunchFlare")            then return "照 明"
+            else                                                 return "未知78:" .. (actionType or "")
             end
         end,
         [2] = function(actionType)
@@ -866,7 +867,8 @@ local s_Texts = {
             elseif (actionType == "BuildModelTile")         then return "Build"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "Produce"
             elseif (actionType == "LaunchSilo")             then return "Launch"
-            else                                                 return "Unknown78: " .. (actionType or "")
+            elseif (actionType == "LaunchFlare")            then return "Flare"
+            else                                                 return "Unknown78:" .. (actionType or "")
             end
         end,
     },
