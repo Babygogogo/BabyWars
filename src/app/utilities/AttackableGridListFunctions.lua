@@ -71,15 +71,12 @@ function AttackableGridListFunctions.createList(movePath, launchUnitID)
         movePath[#movePath],
         minRange,
         maxRange,
+        mapSize,
         function(targetGridIndex)
-            if (not isWithinMap(targetGridIndex, mapSize)) then
-                return false
-            else
-                targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage =
-                    DamageCalculator.getEstimatedBattleDamage(movePath, launchUnitID, targetGridIndex, modelSceneWar)
+            targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage =
+                DamageCalculator.getEstimatedBattleDamage(movePath, launchUnitID, targetGridIndex, modelSceneWar)
 
-                return targetGridIndex.estimatedAttackDamage ~= nil
-            end
+            return targetGridIndex.estimatedAttackDamage ~= nil
         end
     )
 end

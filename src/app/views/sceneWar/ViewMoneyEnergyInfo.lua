@@ -2,8 +2,11 @@
 local ViewMoneyEnergyInfo = class("ViewMoneyEnergyInfo", cc.Node)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 
-local getLocalizedText = LocalizationFunctions.getLocalizedText
+local getLocalizedText       = LocalizationFunctions.getLocalizedText
+local getModelFogMap         = SingletonGetters.getModelFogMap
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
 
 local LABEL_Z_ORDER      = 1
 local BACKGROUND_Z_ORDER = 0
@@ -115,12 +118,12 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
     return self
 end
 
-function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer)
+function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer, playerIndex)
     local label              = self.m_Label
     local energy, req1, req2 = modelPlayer:getEnergy()
     label:setString(string.format("%s\n%s\n%s",
         getLocalizedText(62, modelPlayer:getNickname()),
-        getLocalizedText(63, modelPlayer:getFund()),
+        getLocalizedText(63, (getModelFogMap():isFogOfWarCurrently() and (playerIndex ~= getPlayerIndexLoggedIn())) and ("--") or (modelPlayer:getFund())),
         getLocalizedText(64, string.format("%.2f/%s/%s", energy, "" .. (req1 or "--"), "" .. (req2 or "--")))
     ))
     label:setScaleX(math.min(1, LABEL_MAX_WIDTH / label:getContentSize().width))

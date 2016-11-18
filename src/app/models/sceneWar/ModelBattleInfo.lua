@@ -66,6 +66,10 @@ function ModelBattleInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtActionPlannerChoosingAction", self)
         :addEventListener("EvtPlayerIndexUpdated",          self)
 
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+    end
+
     return self
 end
 

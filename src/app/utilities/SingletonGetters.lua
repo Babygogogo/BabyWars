@@ -19,6 +19,10 @@ function SingletonGetters.getActionId(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getActionId()
 end
 
+function SingletonGetters.getModelFogMap(sceneWarFileName)
+    return SingletonGetters.getModelWarField(sceneWarFileName):getModelFogMap()
+end
+
 function SingletonGetters.getModelPlayerManager(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getModelPlayerManager()
 end
@@ -55,11 +59,11 @@ function SingletonGetters.getModelConfirmBox()
 end
 
 function SingletonGetters.getModelGridEffect()
-    return SingletonGetters.getModelScene():getModelWarField():getModelGridEffect()
+    return SingletonGetters.getModelWarField():getModelGridEffect()
 end
 
 function SingletonGetters.getModelMapCursor()
-    return SingletonGetters.getModelScene():getModelWarField():getModelMapCursor()
+    return SingletonGetters.getModelWarField():getModelMapCursor()
 end
 
 function SingletonGetters.getModelMessageIndicator()
@@ -68,6 +72,10 @@ end
 
 function SingletonGetters.getModelWarCommandMenu()
     return SingletonGetters.getModelScene():getModelWarHud():getModelWarCommandMenu()
+end
+
+function SingletonGetters.getPlayerIndexLoggedIn()
+    return SingletonGetters.getModelPlayerManager():getPlayerIndexLoggedIn()
 end
 
 return SingletonGetters

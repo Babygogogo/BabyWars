@@ -117,12 +117,13 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_ActionID       = sceneData.actionID
-    self.m_FileName       = sceneData.fileName
-    self.m_IsWarEnded     = sceneData.isEnded
-    self.m_MaxSkillPoints = sceneData.maxSkillPoints
-    self.m_WarPassword    = sceneData.warPassword
-    self.m_CachedActions  = {}
+    self.m_ActionID            = sceneData.actionID
+    self.m_FileName            = sceneData.fileName
+    self.m_IsWarEnded          = sceneData.isEnded
+    self.m_IsFogOfWarByDefault = sceneData.isFogOfWarByDefault
+    self.m_MaxSkillPoints      = sceneData.maxSkillPoints
+    self.m_WarPassword         = sceneData.warPassword
+    self.m_CachedActions       = {}
 
     initScriptEventDispatcher(self)
     initActorPlayerManager(   self, sceneData.players)
@@ -158,29 +159,31 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:toSerializableTable()
     return {
-        fileName       = self.m_FileName,
-        warPassword    = self.m_WarPassword,
-        isEnded        = self.m_IsWarEnded,
-        actionID       = self.m_ActionID,
-        maxSkillPoints = self.m_MaxSkillPoints,
-        warField       = self:getModelWarField()      :toSerializableTable(),
-        turn           = self:getModelTurnManager()   :toSerializableTable(),
-        players        = self:getModelPlayerManager() :toSerializableTable(),
-        weather        = self:getModelWeatherManager():toSerializableTable(),
+        fileName            = self.m_FileName,
+        warPassword         = self.m_WarPassword,
+        isEnded             = self.m_IsWarEnded,
+        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
+        actionID            = self.m_ActionID,
+        maxSkillPoints      = self.m_MaxSkillPoints,
+        warField            = self:getModelWarField()      :toSerializableTable(),
+        turn                = self:getModelTurnManager()   :toSerializableTable(),
+        players             = self:getModelPlayerManager() :toSerializableTable(),
+        weather             = self:getModelWeatherManager():toSerializableTable(),
     }
 end
 
 function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     return {
-        fileName       = self.m_FileName,
-        warPassword    = self.m_WarPassword,
-        isEnded        = self.m_IsWarEnded,
-        actionID       = self.m_ActionID,
-        maxSkillPoints = self.m_MaxSkillPoints,
-        warField       = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
-        turn           = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
-        players        = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
-        weather        = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
+        fileName            = self.m_FileName,
+        warPassword         = self.m_WarPassword,
+        isEnded             = self.m_IsWarEnded,
+        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
+        actionID            = self.m_ActionID,
+        maxSkillPoints      = self.m_MaxSkillPoints,
+        warField            = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
+        turn                = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
+        players             = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
+        weather             = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
     }
 end
 
@@ -188,27 +191,22 @@ end
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local sceneWarFileName   = self:getFileName()
-    local modelTurnManager   = self:getModelTurnManager()
+    local sceneWarFileName = self:getFileName()
+    local modelTurnManager = self:getModelTurnManager()
+    local modelWarField    = self:getModelWarField()
     if (not IS_SERVER) then
-        self.m_ActorWarHud:getModel():onStartRunning(sceneWarFileName)
+        self:getModelWarHud():onStartRunning(sceneWarFileName)
     end
-    modelTurnManager       :onStartRunning(sceneWarFileName)
-    self:getModelWarField():onStartRunning(sceneWarFileName)
+    modelTurnManager            :onStartRunning(sceneWarFileName)
+    self:getModelPlayerManager():onStartRunning(sceneWarFileName)
+    modelWarField               :onStartRunning(sceneWarFileName)
 
-    local playerIndex = modelTurnManager:getPlayerIndex()
-    self:getScriptEventDispatcher():dispatchEvent({
-            name         = "EvtModelWeatherUpdated",
-            modelWeather = self:getModelWeatherManager():getCurrentWeather(),
-        })
-        :dispatchEvent({
-            name = "EvtSceneWarStarted",
-        })
-        :dispatchEvent({
-            name        = "EvtPlayerIndexUpdated",
-            playerIndex = playerIndex,
-            modelPlayer = self:getModelPlayerManager():getModelPlayer(playerIndex),
-        })
+    modelWarField:getModelFogMap():initialize()
+    if (not IS_SERVER) then
+        modelWarField:getModelTileMap():updateAsModelFogMapInitialized()
+    end
+
+    self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
 
     modelTurnManager:runTurn()
     if (not IS_SERVER) then
@@ -284,6 +282,10 @@ end
 
 function ModelSceneWar:isEnded()
     return self.m_IsWarEnded
+end
+
+function ModelSceneWar:isFogOfWarByDefault()
+    return self.m_IsFogOfWarByDefault
 end
 
 function ModelSceneWar:setEnded(ended)

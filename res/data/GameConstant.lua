@@ -1,7 +1,7 @@
 
 local GameConstant = {}
 
-GameConstant.version = "0.1.7.0"
+GameConstant.version = "0.1.7.1"
 
 GameConstant.gridSize = {
     width = 72, height = 72
@@ -680,6 +680,29 @@ GameConstant.categories = {
         "Gunboat",
     },
 
+    ["Ground/AirUnits"] = {
+        "Infantry",
+        "Mech",
+        "Bike",
+        "Recon",
+        "Flare",
+        "AntiAir",
+        "Tank",
+        "MediumTank",
+        "WarTank",
+        "Artillery",
+        "AntiTank",
+        "Rockets",
+        "Missiles",
+        "Rig",
+        "Fighter",
+        "Bomber",
+        "Duster",
+        "BattleCopter",
+        "TransportCopter",
+        "Seaplane",
+    },
+
     ["DirectUnits"] = {
         "Infantry",
         "Mech",
@@ -783,6 +806,7 @@ GameConstant.categories = {
         "SkillCategoryPassiveRepair",
         "SkillCategoryPassivePromotion",
         "SkillCategoryPassiveEnergy",
+        "SkillCategoryPassiveVision",
     },
 
     ["SkillCategoriesForActive"] = {
@@ -796,6 +820,7 @@ GameConstant.categories = {
         "SkillCategoryActivePromotion",
         "SkillCategoryActiveEnergy",
         "SkillCategoryActiveLogistics",
+        "SkillCategoryActiveVision",
     },
 
     ["SkillCategoryPassiveAttack"] = {
@@ -942,6 +967,24 @@ GameConstant.categories = {
     ["SkillCategoryActiveLogistics"] = {
         9,
         16,
+    },
+
+    ["SkillCategoryPassiveVision"] = {
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+    },
+
+    ["SkillCategoryActiveVision"] = {
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
     },
 }
 
@@ -1140,6 +1183,10 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     Mountain = {
@@ -1200,6 +1247,10 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     Fire = {
@@ -1219,6 +1270,11 @@ GameConstant.templateModelTiles = {
             Air       = false,
             Ship      = false,
             Transport = false,
+        },
+
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = true,
         },
     },
 
@@ -1260,6 +1316,10 @@ GameConstant.templateModelTiles = {
             Ship      = 1,
             Transport = 1,
         },
+
+        UnitHider = {
+            targetCategoryType = "NavalUnits",
+        },
     },
 
     Reef = {
@@ -1279,6 +1339,10 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = 2,
             Transport = 2,
+        },
+
+        UnitHider = {
+            targetCategoryType = "NavalUnits",
         },
     },
 
@@ -1422,6 +1486,15 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     City = {
@@ -1457,6 +1530,15 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     CommandTower = {
@@ -1487,6 +1569,15 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     Radar = {
@@ -1516,6 +1607,15 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = false,
             Transport = false,
+        },
+
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
         },
     },
 
@@ -1571,6 +1671,15 @@ GameConstant.templateModelTiles = {
                 "Rig",
             },
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "GroundUnits",
+        },
     },
 
     Airport = {
@@ -1615,6 +1724,15 @@ GameConstant.templateModelTiles = {
                 "BattleCopter",
                 "TransportCopter",
             },
+        },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "Ground/AirUnits",
         },
     },
 
@@ -1662,6 +1780,15 @@ GameConstant.templateModelTiles = {
                 "Gunboat",
             },
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "Ground/NavalUnits",
+        },
     },
 
     TempAirport = {
@@ -1693,6 +1820,15 @@ GameConstant.templateModelTiles = {
             Ship      = false,
             Transport = false,
         },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "Ground/AirUnits",
+        },
     },
 
     TempSeaport = {
@@ -1723,6 +1859,15 @@ GameConstant.templateModelTiles = {
             Air       = 1,
             Ship      = 1,
             Transport = 1,
+        },
+
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        UnitHider = {
+            targetCategoryType = "Ground/NavalUnits",
         },
     },
 }
@@ -1810,7 +1955,13 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+            bonusOnTiles = {
+                Mountain = 3,
+            },
+        },
     },
 
     Mech       = {
@@ -1928,7 +2079,13 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+            bonusOnTiles = {
+                Mountain = 3,
+            },
+        },
     },
 
     Bike       = {
@@ -2013,7 +2170,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Recon      = {
@@ -2089,7 +2249,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Flare      = {
@@ -2165,7 +2328,17 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
+
+        FlareLauncher = {
+            maxAmmo     = 3,
+            currentAmmo = 3,
+            maxRange    = 5,
+            areaRadius  = 2,
+        },
     },
 
     AntiAir    = {
@@ -2243,7 +2416,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Tank       = {
@@ -2352,7 +2528,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     MediumTank = {
@@ -2461,7 +2640,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     WarTank    = {
@@ -2570,7 +2752,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Artillery  = {
@@ -2648,7 +2833,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     AntiTank   = {
@@ -2726,7 +2914,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Rockets    = {
@@ -2804,7 +2995,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Missiles   = {
@@ -2882,7 +3076,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Rig        = {
@@ -2940,7 +3137,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Fighter    = {
@@ -3018,7 +3218,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Bomber     = {
@@ -3096,7 +3299,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Duster     = {
@@ -3174,7 +3380,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     BattleCopter    = {
@@ -3283,7 +3492,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     TransportCopter    = {
@@ -3327,7 +3539,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Seaplane   = {
@@ -3405,7 +3620,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Battleship = {
@@ -3483,7 +3701,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 3,
+        VisionOwner = {
+            vision                 = 3,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Carrier    = {
@@ -3578,7 +3799,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 4,
+        VisionOwner = {
+            vision                 = 4,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Submarine  = {
@@ -3661,7 +3885,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Cruiser    = {
@@ -3779,7 +4006,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 5,
+        VisionOwner = {
+            vision                 = 5,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Lander     = {
@@ -3828,7 +4058,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 1,
+        VisionOwner = {
+            vision                 = 1,
+            isEnabledForAllPlayers = false,
+        },
     },
 
     Gunboat    = {
@@ -3920,7 +4153,10 @@ GameConstant.templateModelUnits = {
 
         Joinable = {},
 
-        vision      = 2,
+        VisionOwner = {
+            vision                 = 2,
+            isEnabledForAllPlayers = false,
+        },
     },
 }
 
@@ -5128,6 +5364,78 @@ GameConstant.skills = {
             [3] = {modifier = 3, pointsPassive = 300, pointsActive = 150, minEnergy = 6},
             [4] = {modifier = 4, pointsPassive = 400, pointsActive = 200, minEnergy = 8},
             [5] = {modifier = 5, pointsPassive = 500, pointsActive = 250, minEnergy = 10},
+        },
+    },
+
+    -- Modify vision of units of the owner player.
+    [55] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 480, pointsActive = 240, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 720, pointsActive = 360, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 960, pointsActive = 480, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 1200, pointsActive = 600, minEnergy = 5},
+        },
+    },
+
+    -- Modify vision of buildings of the owner player.
+    [56] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 320, pointsActive = 160, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 480, pointsActive = 240, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 640, pointsActive = 320, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 800, pointsActive = 400, minEnergy = 5},
+        },
+    },
+
+    -- Modify vision of units and buildings of the owner player.
+    [57] = {
+        minLevel     = 1,
+        maxLevel     = 5,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = 1, pointsPassive = 300, pointsActive = 150, minEnergy = 1},
+            [2] = {modifier = 2, pointsPassive = 600, pointsActive = 300, minEnergy = 2},
+            [3] = {modifier = 3, pointsPassive = 900, pointsActive = 450, minEnergy = 3},
+            [4] = {modifier = 4, pointsPassive = 1200, pointsActive = 600, minEnergy = 4},
+            [5] = {modifier = 5, pointsPassive = 1500, pointsActive = 750, minEnergy = 5},
+        },
+    },
+
+    -- Enable of units of the owner player to reveal the hiding places in distance.
+    [58] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
+        },
+    },
+
+    -- Enable of buildings of the owner player to reveal the hiding places in distance.
+    [59] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
+        },
+    },
+
+    -- Enable of units and buildings of the owner player to reveal the hiding places in distance.
+    [60] = {
+        minLevel     = 1,
+        maxLevel     = 1,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifier = nil, pointsPassive = 300, pointsActive = 150, minEnergy = 1},
         },
     },
 }

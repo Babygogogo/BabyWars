@@ -55,7 +55,8 @@ function ModelOptionSelector:setOptions(options)
 end
 
 function ModelOptionSelector:getCurrentOption()
-    return (self.m_Options) and (self.m_Options[self.m_OptionIndex].data) or nil
+    assert(self.m_Options, "ModelOptionSelector:getCurrentOption() no option has been set yet.")
+    return self.m_Options[self.m_OptionIndex].data
 end
 
 function ModelOptionSelector:setCurrentOptionIndex(index)

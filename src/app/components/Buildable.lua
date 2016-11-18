@@ -58,6 +58,15 @@ function Buildable:toSerializableTable()
 end
 
 --------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function Buildable:updateAsFogEnabled()
+    self:setCurrentBuildPoint(self:getMaxBuildPoint())
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Buildable:getCurrentBuildPoint()

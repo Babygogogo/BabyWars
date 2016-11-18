@@ -12572,7 +12572,7 @@
             <key>size</key>
             <string>{4096,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:afd11d3e60b7e7662b689465cc11242f:f51e2847e0397029212afc9c6649d381:bac65cfb3d54b1baadbc9ddd78ee89b2$</string>
+            <string>$TexturePacker:SmartUpdate:e483dd2886485385c4481dc4763292aa:02a1283b355b260ddb3f075b347034df:bac65cfb3d54b1baadbc9ddd78ee89b2$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureTile.png</string>
         </dict>

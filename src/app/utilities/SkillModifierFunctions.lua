@@ -427,4 +427,102 @@ function SkillModifierFunctions.isPerfectMovement(configuration)
         isPerfectMovementForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
 end
 
+function SkillModifierFunctions.getVisionModifierForUnitsForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local skills   = modelSkillGroup:getAllSkills()
+    local modifier = 0
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if (skill) then
+            local skillID = skill.id
+            if     (skillID == 55) then modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif (skillID == 57) then modifier = modifier + getSkillModifier(skillID, skill.level)
+            end
+        end
+    end
+
+    return modifier
+end
+
+function SkillModifierFunctions.getVisionModifierForUnits(configuration)
+    return SkillModifierFunctions.getVisionModifierForUnitsForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        SkillModifierFunctions.getVisionModifierForUnitsForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.getVisionModifierForTilesForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return 0
+    end
+
+    local skills   = modelSkillGroup:getAllSkills()
+    local modifier = 0
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if (skill) then
+            local skillID = skill.id
+            if     (skillID == 56) then modifier = modifier + getSkillModifier(skillID, skill.level)
+            elseif (skillID == 57) then modifier = modifier + getSkillModifier(skillID, skill.level)
+            end
+        end
+    end
+
+    return modifier
+end
+
+function SkillModifierFunctions.getVisionModifierForTiles(configuration)
+    return SkillModifierFunctions.getVisionModifierForTilesForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) +
+        SkillModifierFunctions.getVisionModifierForTilesForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return false
+    end
+
+    local skills = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if (skill) then
+            local skillID = skill.id
+            if ((skillID == 58) or (skillID == 60)) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+function SkillModifierFunctions.canRevealHidingPlacesForUnits(configuration)
+    return SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) or
+        SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
+function SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(modelSkillGroup, slotsCount)
+    if (not modelSkillGroup) then
+        return false
+    end
+
+    local skills = modelSkillGroup:getAllSkills()
+    for i = 1, slotsCount do
+        local skill = skills[i]
+        if (skill) then
+            local skillID = skill.id
+            if ((skillID == 59) or (skillID == 60)) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+function SkillModifierFunctions.canRevealHidingPlacesForTiles(configuration)
+    return SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(configuration:getModelSkillGroupPassive(), PASSIVE_SLOTS_COUNT) or
+        SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(configuration:getActivatingModelSkillGroup(), ACTIVE_SLOTS_COUNT)
+end
+
 return SkillModifierFunctions

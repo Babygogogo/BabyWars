@@ -150,6 +150,12 @@ function ViewGridEffect:showAnimationExplosion(gridIndex, callbackOnFinish)
     return self
 end
 
+function ViewGridEffect:showAnimationFlare(gridIndex)
+    self:addChild(createAnimationDamage(gridIndex), DAMAGE_Z_ORDER)
+
+    return self
+end
+
 function ViewGridEffect:showAnimationDamage(gridIndex, callbackOnFinish)
     self:addChild(createAnimationDamage(gridIndex), DAMAGE_Z_ORDER)
 

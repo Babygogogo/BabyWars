@@ -229,6 +229,12 @@ local s_Texts = {
             elseif (skillID == 52) then return "改变我方所有车辆系的移动力，幅度为"
             elseif (skillID == 53) then return "改变我方所有近战机械部队的移动力，幅度为"
             elseif (skillID == 54) then return "改变我方所有运输系（不含炮舰）的移动力，幅度为"
+            elseif (skillID == 55) then return "改变我方所有部队的视野，幅度为"
+            elseif (skillID == 56) then return "改变我方所有建筑的视野，幅度为"
+            elseif (skillID == 57) then return "改变我方所有部队和建筑的视野，幅度为"
+            elseif (skillID == 58) then return "使我方所有部队能够直接探明视野内的敌军隐蔽地点。"
+            elseif (skillID == 59) then return "使我方所有建筑能够直接探明视野内的敌军隐蔽地点。"
+            elseif (skillID == 60) then return "使我方所有部队和建筑能够直接探明视野内的敌军隐蔽地点。"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -292,6 +298,12 @@ local s_Texts = {
             elseif (skillID == 52) then return "车辆系移动力"
             elseif (skillID == 53) then return "近战机械移动力"
             elseif (skillID == 54) then return "运输系移动力"
+            elseif (skillID == 55) then return "部队视野范围"
+            elseif (skillID == 56) then return "建筑视野范围"
+            elseif (skillID == 57) then return "部队建筑视野范围"
+            elseif (skillID == 58) then return "部队视野穿透"
+            elseif (skillID == 59) then return "建筑视野穿透"
+            elseif (skillID == 60) then return "部队建筑视野穿透"
             else                        return "未知5:" .. (skillID or "")
             end
         end,
@@ -310,6 +322,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "维 修 类"
             elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "能 量 类"
+            elseif (skillCategory == "SkillCategoryPassiveVision")      then return "视 野 类"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "攻 击 类"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "防 御 类"
             elseif (skillCategory == "SkillCategoryActiveMoney")        then return "金 钱 类"
@@ -320,6 +333,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActivePromotion")    then return "晋 升 类"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "能 量 类"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "后 勤 类"
+            elseif (skillCategory == "SkillCategoryActiveVision")       then return "视 野 类"
             else                                                        return "未知6:" .. (skillCategory or "")
             end
         end,
@@ -333,6 +347,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryPassiveRepair")      then return "Repair"
             elseif (skillCategory == "SkillCategoryPassivePromotion")   then return "Promotion"
             elseif (skillCategory == "SkillCategoryPassiveEnergy")      then return "Energy"
+            elseif (skillCategory == "SkillCategoryPassiveVision")      then return "Vision"
             elseif (skillCategory == "SkillCategoryActiveAttack")       then return "Attack"
             elseif (skillCategory == "SkillCategoryActiveDefense")      then return "Defense"
             elseif (skillCategory == "SkillCategoryActiveMoney")        then return "Money"
@@ -343,6 +358,7 @@ local s_Texts = {
             elseif (skillCategory == "SkillCategoryActivePromotion")    then return "Promotion"
             elseif (skillCategory == "SkillCategoryActiveEnergy")       then return "Energy"
             elseif (skillCategory == "SkillCategoryActiveLogistics")    then return "Logistics"
+            elseif (skillCategory == "SkillCategoryActiveVision")       then return "Vision"
             else                                                        return "Unknown6:" .. (skillCategory or "")
             end
         end,
@@ -701,6 +717,7 @@ local s_Texts = {
             elseif (textType == "UnitsCount")          then return "部队数量"
             elseif (textType == "UnitsValue")          then return "部队基础价值"
             elseif (textType == "TilesCount")          then return "据点数量"
+            elseif (textType == "TurnIndex")           then return "回合数"
             elseif (textType == "Lost")                then return "已战败"
             elseif (textType == "MainWeapon")          then return "主武器"
             elseif (textType == "SubWeapon")           then return "副武器"
@@ -733,6 +750,7 @@ local s_Texts = {
             elseif (textType == "UnitsCount")          then return "Num of units"
             elseif (textType == "UnitsValue")          then return "Value of units"
             elseif (textType == "TilesCount")          then return "Num of bases"
+            elseif (textType == "TurnIndex")           then return "Turn"
             elseif (textType == "Lost")                then return "Lost"
             elseif (textType == "MainWeapon")          then return "Main"
             elseif (textType == "SubWeapon")           then return "Sub"
@@ -833,7 +851,8 @@ local s_Texts = {
             elseif (actionType == "BuildModelTile")         then return "建 造"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "生 产"
             elseif (actionType == "LaunchSilo")             then return "发 射"
-            else                                                 return "未知78: " .. (actionType or "")
+            elseif (actionType == "LaunchFlare")            then return "照 明"
+            else                                                 return "未知78:" .. (actionType or "")
             end
         end,
         [2] = function(actionType)
@@ -850,7 +869,8 @@ local s_Texts = {
             elseif (actionType == "BuildModelTile")         then return "Build"
             elseif (actionType == "ProduceModelUnitOnUnit") then return "Produce"
             elseif (actionType == "LaunchSilo")             then return "Launch"
-            else                                                 return "Unknown78: " .. (actionType or "")
+            elseif (actionType == "LaunchFlare")            then return "Flare"
+            else                                                 return "Unknown78:" .. (actionType or "")
             end
         end,
     },

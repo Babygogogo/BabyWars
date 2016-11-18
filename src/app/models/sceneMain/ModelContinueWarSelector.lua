@@ -55,10 +55,10 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
 end
 
 local function resetSelectorFog(modelWarConfigurator, warConfiguration)
-    local hasFog = warConfiguration.fog
+    local isFogOfWarByDefault = warConfiguration.isFogOfWarByDefault
     local options = {{
-        data = hasFog,
-        text = getLocalizedText(hasFog and 28 or 29),
+        data = isFogOfWarByDefault,
+        text = getLocalizedText(9, isFogOfWarByDefault),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("Fog"):setOptions(options)

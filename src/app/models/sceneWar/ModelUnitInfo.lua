@@ -101,6 +101,10 @@ function ModelUnitInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
+    if (self.m_View) then
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+    end
+
     updateWithModelUnitMap(self)
 
     return self

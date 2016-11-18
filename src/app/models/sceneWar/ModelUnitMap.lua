@@ -26,7 +26,7 @@ local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
 local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
-local isModelUnitVisibleToPlayerIndex = VisibilityFunctions.isModelUnitVisibleToPlayerIndex
+local isUnitOnMapVisibleToPlayerIndex = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
@@ -172,26 +172,15 @@ function ModelUnitMap:toSerializableTable()
 end
 
 function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
-    -- TODO: deal with the fog of war.
     local sceneWarFileName = self.m_SceneWarFileName
-    local grids            = {}
-    local visibleMap       = {}
+    local grids, loaded    = {}, {}
     self:forEachModelUnitOnMap(function(modelUnit)
-        if (isModelUnitVisibleToPlayerIndex(modelUnit, sceneWarFileName, playerIndex)) then
+        if (isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, modelUnit:getGridIndex(), modelUnit:getUnitType(), (modelUnit.isDiving) and (modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
             grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
 
-            local gridIndex = modelUnit:getGridIndex()
-            local x, y      = gridIndex.x, gridIndex.y
-            visibleMap[x]    = visibleMap[x] or {}
-            visibleMap[x][y] = true
-        end
-    end)
-
-    local loaded = {}
-    self:forEachModelUnitLoaded(function(modelUnit)
-        local gridIndex = modelUnit:getGridIndex()
-        if ((visibleMap[gridIndex.x]) and (visibleMap[gridIndex.x][gridIndex.y])) then
-            loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+            for _, loadedModelUnit in pairs(self:getLoadedModelUnitsWithLoader(modelUnit, true) or {}) do
+                loaded[loadedModelUnit:getUnitId()] = loadedModelUnit:toSerializableTable()
+            end
         end
     end)
 

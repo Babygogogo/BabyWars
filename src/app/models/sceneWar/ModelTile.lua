@@ -51,17 +51,22 @@
 
 local ModelTile = require("src.global.functions.class")("ModelTile")
 
-local TypeChecker           = require("src.app.utilities.TypeChecker")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
 local ComponentManager      = require("src.global.components.ComponentManager")
+
+local IS_SERVER = GameConstantFunctions.isServer()
+
+local getPlayerIndexLoggedIn       = SingletonGetters.getPlayerIndexLoggedIn
+local getTiledIdWithTileOrUnitName = GameConstantFunctions.getTiledIdWithTileOrUnitName
+local isTileVisibleToPlayerIndex   = VisibilityFunctions.isTileVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function initWithTiledID(self, objectID, baseID)
+local function initWithTiledID(self, objectID, baseID, isPreview)
     self.m_InitialObjectID = self.m_InitialObjectID or objectID
     self.m_InitialBaseID   = self.m_InitialBaseID   or baseID
 
@@ -69,28 +74,34 @@ local function initWithTiledID(self, objectID, baseID)
     self.m_BaseID   = baseID   or self.m_BaseID
     assert(self.m_ObjectID and self.m_BaseID, "ModelTile-initWithTiledID() failed to init self.m_ObjectID and/or self.m_BaseID.")
 
-    local template = GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(self.m_ObjectID, self.m_BaseID)
-    assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
+    if (not isPreview) then
+        local template = GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(self.m_ObjectID, self.m_BaseID)
+        assert(template, "ModelTile-initWithTiledID() failed to get the template model tile with param objectID and baseID.")
 
-    if (self.m_Template ~= template) then
-        self.m_Template = template
+        if (self.m_Template ~= template) then
+            self.m_Template = template
 
-        ComponentManager.unbindAllComponents(self)
-        for name, data in pairs(template) do
-            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-                ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+            ComponentManager.unbindAllComponents(self)
+            for name, data in pairs(template) do
+                if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                    ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+                end
             end
         end
     end
 end
 
 local function loadInstantialData(self, param)
-    for name, data in pairs(param) do
-        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-            local component = ComponentManager.getComponent(self, name)
-            assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
+    if (param.isPreview) then
+        ComponentManager.bindComponent(self, "GridIndexable", {instantialData = param.GridIndexable})
+    else
+        for name, data in pairs(param) do
+            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                local component = ComponentManager.getComponent(self, name)
+                assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
 
-            component:loadInstantialData(data)
+                component:loadInstantialData(data)
+            end
         end
     end
 end
@@ -100,9 +111,8 @@ end
 --------------------------------------------------------------------------------
 function ModelTile:ctor(param)
     if ((param.objectID) or (param.baseID)) then
-        initWithTiledID(self, param.objectID, param.baseID)
+        initWithTiledID(self, param.objectID, param.baseID, param.isPreview)
     end
-
     loadInstantialData(self, param)
 
     if (self.m_View) then
@@ -119,6 +129,15 @@ function ModelTile:initView()
     self:setViewPositionWithGridIndex()
         :updateView()
 
+    return self
+end
+
+function ModelTile:initHasFog(hasFog)
+    assert(not IS_SERVER, "ModelTile:initHasFog() this shouldn't be called on the server.")
+    assert(type(hasFog) == "boolean", "ModelTile:initHasFog() invalid param hasFog.")
+    assert(self.m_IsFogEnabledOnClient == nil, "ModelTile:initHasFog() self.m_IsFogEnabledOnClient has been initialized already.")
+
+    self.m_IsFogEnabledOnClient = hasFog
     return self
 end
 
@@ -149,6 +168,54 @@ function ModelTile:toSerializableTable()
     end
 end
 
+function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
+    local gridIndex = self:getGridIndex()
+    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, gridIndex, playerIndex)) then
+        return self:toSerializableTable()
+    end
+
+    local tileType        = self:getTileType()
+    local initialObjectID = self.m_InitialObjectID
+    local initialBaseID   = self.m_InitialBaseID
+    if (self.getCurrentCapturePoint) then
+        if (tileType == "Headquarters") then
+            return nil
+        else
+            local objectID = getTiledIdWithTileOrUnitName(tileType, 0)
+            if ((objectID == initialObjectID) and (self.m_BaseID == initialBaseID)) then
+                return nil
+            else
+                return {
+                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
+                    GridIndexable = {gridIndex = gridIndex},
+                }
+            end
+        end
+    end
+
+    local t               = {}
+    local componentsCount = 0
+    for name, component in pairs(ComponentManager.getAllComponents(self)) do
+        if (component.toSerializableTableWithFog) then
+            local componentTable = component:toSerializableTableWithFog()
+            if (componentTable) then
+                t[name]         = componentTable
+                componentsCount = componentsCount + 1
+            end
+        end
+    end
+
+    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+        return nil
+    else
+        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
+        t.baseID   = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+
+        return t
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
@@ -166,6 +233,7 @@ function ModelTile:updateView()
     if (self.m_View) then
         self.m_View:setViewObjectWithTiledId(self.m_ObjectID)
             :setViewBaseWithTiledId(self.m_BaseID)
+            :setFogEnabled(self.m_IsFogEnabledOnClient)
     end
 
     return self
@@ -224,17 +292,67 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
 
     local tileName = self:getTileType()
     if (tileName ~= "Headquarters") then
-        self.m_ObjectID = GameConstantFunctions.getTiledIdWithTileOrUnitName(tileName, playerIndex)
+        self.m_ObjectID = getTiledIdWithTileOrUnitName(tileName, playerIndex)
     else
         local gridIndex           = self:getGridIndex()
         local currentCapturePoint = self:getCurrentCapturePoint()
 
-        initWithTiledID(self, GameConstantFunctions.getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
+        initWithTiledID(self, getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
             GridIndexable = {gridIndex           = gridIndex},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
         self:onStartRunning(self.m_SceneWarFileName)
+    end
+
+    return self
+end
+
+function ModelTile:isFogEnabledOnClient()
+    return self.m_IsFogEnabledOnClient
+end
+
+function ModelTile:updateAsFogDisabled(data)
+    assert(not IS_SERVER, "ModelTile:updateAsFogDisabled() this shouldn't be called on the server.")
+    assert(type(self.m_IsFogEnabledOnClient) == "boolean", "ModelTile:updateAsFogDisabled() self.m_IsFogEnabledOnClient has not been initialized yet.")
+
+    if (self.m_IsFogEnabledOnClient) then
+        self.m_IsFogEnabledOnClient = false
+
+        if (not data) then
+            self.m_ObjectID = self.m_InitialObjectID
+            self.m_BaseID   = self.m_InitialBaseID
+        else
+            local objectID = data.objectID or self.m_InitialObjectID
+            local baseID   = data.baseID   or self.m_InitialBaseID
+            if ((objectID == self.m_ObjectID) and (baseID == self.m_BaseID)) then
+                loadInstantialData(self, data)
+            else
+                initWithTiledID(self, objectID, baseID)
+                loadInstantialData(self, data)
+                self:onStartRunning(self.m_SceneWarFileName)
+            end
+        end
+    end
+
+    return self
+end
+
+function ModelTile:updateAsFogEnabled()
+    assert(not IS_SERVER, "ModelTile:updateAsFogEnabled() this shouldn't be called on the server.")
+    assert(type(self.m_IsFogEnabledOnClient) == "boolean", "ModelTile:updateAsFogEnabled() self.m_IsFogEnabledOnClient has not been initialized yet.")
+
+    if (not self.m_IsFogEnabledOnClient) then
+        self.m_IsFogEnabledOnClient = true
+
+        if (self.getCurrentCapturePoint) then
+            local tileType = self:getTileType()
+            if (tileType ~= "Headquarters") then
+                self.m_ObjectID = getTiledIdWithTileOrUnitName(tileType, 0)
+            end
+        end
+
+        ComponentManager.callMethodForAllComponents(self, "updateAsFogEnabled")
     end
 
     return self

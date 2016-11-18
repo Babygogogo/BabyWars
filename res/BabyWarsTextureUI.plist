@@ -1028,7 +1028,7 @@
             <key>size</key>
             <string>{1024,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:7f3f144fcda1eb2b22853609e6fa6076:80e5a3ac8777e2eb2ab9d464f7f7e34d:215d1941b12516cc0f89fcfb847e1dd5$</string>
+            <string>$TexturePacker:SmartUpdate:5e1646b9dfeea827b723ece3348fe9ee:ba0415421a7c3707bdbcc2a08901eb7e:215d1941b12516cc0f89fcfb847e1dd5$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureUI.png</string>
         </dict>

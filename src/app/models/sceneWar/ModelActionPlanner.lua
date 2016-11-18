@@ -28,9 +28,12 @@ local Actor                       = require("src.global.actors.Actor")
 
 local createPathForDispatch    = MovePathFunctions.createPathForDispatch
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
+local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
@@ -329,6 +332,15 @@ local function sendActionDropModelUnit(self)
     })
 end
 
+local function sendActionLaunchFlare(self, gridIndex)
+    createAndSendAction({
+        actionName      = "LaunchFlare",
+        path            = createPathForDispatch(self.m_MovePath),
+        launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = gridIndex,
+    })
+end
+
 local function sendActionLaunchSilo(self, targetGridIndex)
     createAndSendAction({
         actionName      = "LaunchSilo",
@@ -348,6 +360,7 @@ local setStateChoosingProductionTarget
 local setStateMakingMovePath
 local setStateChoosingAction
 local setStateChoosingAttackTarget
+local setStateChoosingFlareTarget
 local setStateChoosingSiloTarget
 local setStateChoosingDropDestination
 local setStateChoosingAdditionalDropAction
@@ -565,6 +578,23 @@ local function getActionsDropModelUnit(self)
     return actions
 end
 
+local function getActionLaunchFlare(self)
+    local focusModelUnit = self.m_FocusModelUnit
+    if ((not getModelFogMap():isFogOfWarCurrently()) or
+        (#self.m_MovePath ~= 1)                      or
+        (not focusModelUnit.getCurrentFlareAmmo)     or
+        (focusModelUnit:getCurrentFlareAmmo() == 0)) then
+        return nil
+    else
+        return {
+            name     = getLocalizedText(78, "LaunchFlare"),
+            callback = function()
+                setStateChoosingFlareTarget(self)
+            end,
+        }
+    end
+end
+
 local function getActionLaunchSilo(self)
     local focusModelUnit = self.m_FocusModelUnit
     local modelTile      = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
@@ -592,7 +622,7 @@ local function getActionProduceModelUnitOnUnit(self)
         return nil
     else
         local produceTiledId = focusModelUnit:getMovableProductionTiledId()
-        local fund           = getModelPlayerManager():getModelPlayer(self.m_LoggedInPlayerIndex):getFund()
+        local fund           = getModelPlayerManager():getModelPlayer(self.m_PlayerIndexLoggedIn):getFund()
         local icon           = cc.Sprite:create()
         icon:setAnchorPoint(0, 0)
             :setScale(0.5)
@@ -651,6 +681,7 @@ local function getAvailableActionList(self)
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
+    list[#list + 1] = getActionLaunchFlare(           self)
     list[#list + 1] = getActionLaunchSilo(            self)
     list[#list + 1] = getActionProduceModelUnitOnUnit(self)
     list[#list + 1] = getActionWait(                  self)
@@ -679,7 +710,7 @@ end
 --------------------------------------------------------------------------------
 setStateIdle = function(self, resetUnitAnimation)
     if (self.m_View) then
-        self.m_View:setReachableAreaVisible( false)
+        self.m_View:setReachableAreaVisible(  false)
             :setAttackableGridsVisible(       false)
             :setMovePathVisible(              false)
             :setMovePathDestinationVisible(   false)
@@ -688,6 +719,7 @@ setStateIdle = function(self, resetUnitAnimation)
             :setDropDestinationsVisible(      false)
             :setPreviewAttackableAreaVisible( false)
             :setPreviewReachableAreaVisible(  false)
+            :setFlareGridsVisible(            false)
 
         getModelUnitMap():setPreviewLaunchUnitVisible(false)
         if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
@@ -716,7 +748,7 @@ local function canSetStatePreviewingAttackableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
     return (modelUnit)                                             and
         (modelUnit.getAttackRangeMinMax)                           and
-        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
 end
 
 setStatePreviewingAttackableArea = function(self, gridIndex)
@@ -742,7 +774,7 @@ local function canSetStatePreviewingReachableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
     return (modelUnit)                                             and
         (not modelUnit.getAttackRangeMinMax)                       and
-        (modelUnit:getPlayerIndex() ~= self.m_LoggedInPlayerIndex)
+        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
 end
 
 setStatePreviewingReachableArea = function(self, gridIndex)
@@ -766,12 +798,12 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return false
     else
         local modelTile = getModelTileMap():getModelTile(gridIndex)
         return (not getModelUnitMap():getModelUnit(gridIndex))       and
-            (modelTile:getPlayerIndex() == self.m_LoggedInPlayerIndex) and
+            (modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and
             (modelTile.getProductionList)
     end
 end
@@ -794,11 +826,11 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    if (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex) then
+    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:canDoAction(self.m_LoggedInPlayerIndex))
+        return (modelUnit) and (modelUnit:canDoAction(self.m_PlayerIndexLoggedIn))
     end
 end
 
@@ -854,6 +886,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
             :setDroppableGridsVisible(false)
             :setPreviewDropDestinationVisible(false)
             :setDropDestinationsVisible(false)
+            :setFlareGridsVisible(false)
 
         if (not launchUnitID) then
             getModelUnitMap():setPreviewLaunchUnitVisible(false)
@@ -875,6 +908,17 @@ setStateChoosingAttackTarget = function(self, destination)
     end
 
     getScriptEventDispatcher():dispatchEvent({name = "EvtActionPlannerChoosingAttackTarget"})
+end
+
+setStateChoosingFlareTarget = function(self)
+    self.m_State = "choosingFlareTarget"
+
+    if (self.m_View) then
+        self.m_View:setFlareGrids(getMovePathDestination(self.m_MovePath), self.m_FocusModelUnit:getMaxFlareRange())
+            :setFlareGridsVisible(true)
+    end
+
+    getScriptEventDispatcher():dispatchEvent({name = "EvtActionPlannerChoosingFlareTarget"})
 end
 
 setStateChoosingSiloTarget = function(self)
@@ -925,10 +969,6 @@ local function onEvtPlayerIndexUpdated(self, event)
     setStateIdle(self, true)
 end
 
-local function onEvtModelWeatherUpdated(self, event)
-    self.m_ModelWeather = event.modelWeather
-end
-
 local function onEvtIsWaitingForServerResponse(self, event)
     setStateIdle(self, false)
     self.m_IsWaitingForServerResponse = event.waiting
@@ -942,7 +982,7 @@ end
 
 local function onEvtMapCursorMoved(self, event)
     if ((self.m_IsWaitingForServerResponse)                       or
-        (self.m_PlayerIndexInTurn ~= self.m_LoggedInPlayerIndex)) then
+        (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn)) then
         return
     end
 
@@ -1019,6 +1059,13 @@ local function onEvtGridSelected(self, event)
                 dispatchEvtPreviewBattleDamage(self, listNode.estimatedAttackDamage, listNode.estimatedCounterDamage)
             end
         end
+    elseif (state == "choosingFlareTarget") then
+        local destination = getMovePathDestination(self.m_MovePath)
+        if (GridIndexFunctions.getDistance(gridIndex, destination) > self.m_FocusModelUnit:getMaxFlareRange()) then
+            setStateChoosingAction(self, destination, self.m_LaunchUnitID)
+        elseif (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
+            sendActionLaunchFlare(self, gridIndex)
+        end
     elseif (state == "choosingSiloTarget") then
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
             sendActionLaunchSilo(self, gridIndex)
@@ -1081,22 +1128,16 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)
         :addEventListener("EvtPlayerIndexUpdated",         self)
-        :addEventListener("EvtModelWeatherUpdated",        self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
-    local playerAccount = WebSocketManager.getLoggedInAccountAndPassword()
-    SingletonGetters.getModelPlayerManager():forEachModelPlayer(function(modelPlayer, playerIndex)
-        if (modelPlayer:getAccount() == playerAccount) then
-            self.m_LoggedInPlayerIndex = playerIndex
-        end
-    end)
-    assert(self.m_LoggedInPlayerIndex,
-        "ModelActionPlanner:onStartRunning() failed to find the player index for the logged-in player.")
+    self.m_PlayerIndexLoggedIn = getPlayerIndexLoggedIn()
+    self.m_PlayerIndexInTurn   = getModelTurnManager():getPlayerIndex()
 
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap():getMapSize())
     end
+    setStateIdle(self, true)
 
     return self
 end
@@ -1105,7 +1146,6 @@ function ModelActionPlanner:onEvent(event)
     local name = event.name
     if     (name == "EvtGridSelected")               then onEvtGridSelected(              self, event)
     elseif (name == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
-    elseif (name == "EvtModelWeatherUpdated")        then onEvtModelWeatherUpdated(       self, event)
     elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     elseif (name == "EvtWarCommandMenuUpdated")      then onEvtWarCommandMenuUpdated(     self, event)

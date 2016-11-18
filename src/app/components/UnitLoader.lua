@@ -4,6 +4,7 @@ local UnitLoader = require("src.global.functions.class")("UnitLoader")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
 UnitLoader.EXPORTED_METHODS = {
@@ -107,7 +108,7 @@ function UnitLoader:toSerializableTable()
         return nil
     else
         return {
-            loaded = self.m_LoadedUnitIds,
+            loaded = TableFunctions.clone(self.m_LoadedUnitIds),
         }
     end
 end

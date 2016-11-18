@@ -27,7 +27,7 @@ end
 
 local function onEvtModelPlayerUpdated(self, event)
     if ((self.m_PlayerIndex == event.playerIndex) and (self.m_View)) then
-        self.m_View:updateWithModelPlayer(event.modelPlayer)
+        self.m_View:updateWithModelPlayer(event.modelPlayer, event.playerIndex)
     end
 end
 
@@ -84,6 +84,14 @@ function ModelMoneyEnergyInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
+
+    self.m_PlayerIndex = SingletonGetters.getModelTurnManager():getPlayerIndex()
+    if (self.m_View) then
+        self.m_View:updateWithModelPlayer(SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndex))
+            :updateWithPlayerIndex(self.m_PlayerIndex)
+    end
+
+    return self
 end
 
 function ModelMoneyEnergyInfo:onEvent(event)

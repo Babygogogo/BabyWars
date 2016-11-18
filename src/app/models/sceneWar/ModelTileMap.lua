@@ -33,10 +33,13 @@ local ModelTileMap = require("src.global.functions.class")("ModelTileMap")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local toErrMsg = SerializationFunctions.toErrorMessage
+local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
+local toErrMsg      = SerializationFunctions.toErrorMessage
 
+local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
@@ -70,7 +73,7 @@ local function createEmptyMap(width)
     return map
 end
 
-local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
+local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer, isPreview)
     local width, height = baseLayer.width, baseLayer.height
     local map = createEmptyMap(width)
 
@@ -78,9 +81,10 @@ local function createTileActorsMapWithTiledLayers(objectLayer, baseLayer)
         for y = 1, height do
             local idIndex = x + (height - y) * width
             local actorData = {
-                objectID = objectLayer.data[idIndex],
-                baseID   = baseLayer.data[idIndex],
-                GridIndexable = {gridIndex = {x = x, y = y}}
+                objectID      = objectLayer.data[idIndex],
+                baseID        = baseLayer.data[idIndex],
+                GridIndexable = {gridIndex = {x = x, y = y}},
+                isPreview     = isPreview,
             }
 
             map[x][y] = Actor.createWithModelAndViewName("sceneWar.ModelTile", actorData, "sceneWar.ViewTile", actorData)
@@ -104,7 +108,7 @@ end
 local function createTileActorsMap(param)
     local mapData         = requireMapData(param)
     local templateMapData = requireMapData(mapData.template)
-    local map, mapSize    = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData))
+    local map, mapSize    = createTileActorsMapWithTiledLayers(getTiledTileObjectLayer(templateMapData), getTiledTileBaseLayer(templateMapData), param.isPreview)
     updateTileActorsMapWithGridsData(map, mapSize, mapData.grids or {})
 
     return map, mapSize, mapData.template
@@ -144,6 +148,19 @@ function ModelTileMap:initView()
     return self
 end
 
+function ModelTileMap:updateAsModelFogMapInitialized()
+    assert(not IS_SERVER, "ModelTileMap:updateAsModelFogMapInitialized() this shouldn't be called on the server.")
+
+    local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
+    local sceneWarFileName = self.m_SceneWarFileName
+    self:forEachModelTile(function(modelTile)
+        modelTile:initHasFog(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
+            :updateView()
+    end)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -160,8 +177,15 @@ function ModelTileMap:toSerializableTable()
 end
 
 function ModelTileMap:toSerializableTableForPlayerIndex(playerIndex)
-    -- TODO: deal with the fog of war.
-    return self:toSerializableTable()
+    local grids = {}
+    self:forEachModelTile(function(modelTile)
+        grids[#grids + 1] = modelTile:toSerializableTableForPlayerIndex(playerIndex)
+    end)
+
+    return {
+        template = self.m_TemplateName,
+        grids    = grids,
+    }
 end
 
 --------------------------------------------------------------------------------

@@ -10,10 +10,12 @@ local WebSocketManager    = (not IS_SERVER) and (require("src.app.utilities.WebS
 
 local appendList               = TableFunctions.appendList
 local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
+local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelGridEffect       = SingletonGetters.getModelGridEffect
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
@@ -56,7 +58,7 @@ function Destroyers.destroyActorUnitLoaded(sceneWarFileName, unitID, shouldRemov
     return destroyedUnits
 end
 
-function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRemoveView)
+function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRemoveView, shouldRetainVisibility)
     resetModelTile(sceneWarFileName, gridIndex)
 
     local modelUnitMap   = getModelUnitMap(sceneWarFileName)
@@ -69,17 +71,13 @@ function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRem
         modelUnit:removeViewFromParent()
     end
     for _, modelUnitLoaded in pairs(modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit, true) or {}) do
-        destroyedUnits[#destroyedUnits + 1] = destroySingleActorUnitLoaded(modelUnitMap, modelUnitLoaded, shouldRemoveView)
+        destroyedUnits[#destroyedUnits + 1] = destroySingleActorUnitLoaded(modelUnitMap, modelUnitLoaded, true)
     end
 
-    if (not IS_SERVER) then
-        local _, playerIndexLoggedIn = getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-        for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
-            local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-            if ((adjacentModelUnit)                                                                                                                                                                 and
-                (not isUnitVisible(sceneWarFileName, adjacentGridIndex, (adjacentModelUnit.isDiving) and (adjacentModelUnit:isDiving()), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
-                appendList(destroyedUnits, Destroyers.destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, shouldRemoveView))
-            end
+    if (not shouldRetainVisibility) then
+        local playerIndex = modelUnit:getPlayerIndex()
+        if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+            getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, gridIndex, modelUnit:getVisionForPlayerIndex(playerIndex))
         end
     end
 
@@ -91,7 +89,7 @@ function Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
     getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             local gridIndex = modelUnit:getGridIndex()
-            Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+            Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true, true)
 
             if (not IS_SERVER) then
                 modelGridEffect:showAnimationExplosion(gridIndex)
@@ -105,6 +103,12 @@ function Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
                 :updateView()
         end
     end)
+
+    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+        getModelFogMap(sceneWarFileName):resetMapForPathsForPlayerIndex(playerIndex)
+            :resetMapForTilesForPlayerIndex(playerIndex)
+            :resetMapForUnitsForPlayerIndex(playerIndex)
+    end
 
     getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):setAlive(false)
 end

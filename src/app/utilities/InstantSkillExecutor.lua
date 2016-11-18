@@ -3,8 +3,13 @@ local InstantSkillExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local SupplyFunctions       = require("src.app.utilities.SupplyFunctions")
 
-local getSkillModifier = GameConstantFunctions.getSkillModifier
+local IS_SERVER = GameConstantFunctions.isServer()
+
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+local getSkillModifier       = GameConstantFunctions.getSkillModifier
+local supplyWithAmmoAndFuel  = SupplyFunctions.supplyWithAmmoAndFuel
 
 local s_Executors = {}
 
@@ -128,10 +133,7 @@ s_Executors.execute16 = function(level, modelWarField, modelPlayerManager, model
     local playerIndex = modelTurnManager:getPlayerIndex()
     local func        = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
-            modelUnit:setCurrentFuel(modelUnit:getMaxFuel())
-            if ((modelUnit.hasPrimaryWeapon) and (modelUnit:hasPrimaryWeapon())) then
-                modelUnit:setPrimaryWeaponCurrentAmmo(modelUnit:getPrimaryWeaponMaxAmmo())
-            end
+            supplyWithAmmoAndFuel(modelUnit)
             if (modelUnit.setCurrentMaterial) then
                 modelUnit:setCurrentMaterial(modelUnit:getMaxMaterial())
             end
@@ -159,6 +161,34 @@ s_Executors.execute26 = function(level, modelWarField, modelPlayerManager, model
         :forEachModelUnitLoaded(func)
 
     dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
+s_Executors.execute55 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex = modelTurnManager:getPlayerIndex()
+    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelWarField:getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
+        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+            :dispatchEvent({name = "EvtModelTileMapUpdated"})
+    end
+end
+
+s_Executors.execute56 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex = modelTurnManager:getPlayerIndex()
+    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+            :dispatchEvent({name = "EvtModelTileMapUpdated"})
+    end
+end
+
+s_Executors.execute57 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local playerIndex = modelTurnManager:getPlayerIndex()
+    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+            :resetMapForUnitsForPlayerIndex(playerIndex)
+        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+            :dispatchEvent({name = "EvtModelTileMapUpdated"})
+    end
 end
 
 --------------------------------------------------------------------------------

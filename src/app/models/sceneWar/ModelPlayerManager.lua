@@ -14,6 +14,9 @@ local ModelPlayerManager = require("src.global.functions.class")("ModelPlayerMan
 local ModelPlayer      = require("src.app.models.sceneWar.ModelPlayer")
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
+local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
+local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -44,6 +47,18 @@ function ModelPlayerManager:toSerializableTableForPlayerIndex(playerIndex)
 end
 
 --------------------------------------------------------------------------------
+-- The public callback function on start running.
+--------------------------------------------------------------------------------
+function ModelPlayerManager:onStartRunning(sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
+    if (not IS_SERVER) then
+        self.m_ModelPlayerLoggedIn, self.m_PlayerIndexLoggedIn = self:getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
+    end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelPlayerManager:getModelPlayer(playerIndex)
@@ -63,6 +78,11 @@ function ModelPlayerManager:getAlivePlayersCount()
     end
 
     return count
+end
+
+function ModelPlayerManager:getPlayerIndexLoggedIn()
+    assert(not IS_SERVER, "ModelPlayerManager:getPlayerIndexLoggedIn() this shouldn't be called on the server.")
+    return self.m_PlayerIndexLoggedIn
 end
 
 function ModelPlayerManager:getModelPlayerWithAccount(account)

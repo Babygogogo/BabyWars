@@ -281,7 +281,7 @@ local function updateMovementInfoWithModelUnit(self, unit)
 end
 
 local function updateVisionInfoWithModelUnit(self, unit)
-    self.m_VisionLabel:setString(LocalizationFunctions.getLocalizedText(92, unit:getVision()))
+    self.m_VisionLabel:setString(LocalizationFunctions.getLocalizedText(92, unit:getVisionForPlayerIndex(unit:getPlayerIndex())))
 end
 
 local function updateFuelInfoWithModelUnit(self, unit)
