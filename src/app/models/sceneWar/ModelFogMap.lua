@@ -1,17 +1,19 @@
 
 local ModelFogMap = require("src.global.functions.class")("ModelFogMap")
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters   = require("src.app.utilities.SingletonGetters")
+local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
+local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
-local getGridsWithinDistance = GridIndexFunctions.getGridsWithinDistance
-local getModelPlayerManager  = SingletonGetters.getModelPlayerManager
-local getModelTileMap        = SingletonGetters.getModelTileMap
-local getModelUnitMap        = SingletonGetters.getModelUnitMap
-local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+local canRevealHidingPlacesForUnits = SkillModifierFunctions.canRevealHidingPlacesForUnits
+local getGridsWithinDistance        = GridIndexFunctions.getGridsWithinDistance
+local getModelPlayerManager         = SingletonGetters.getModelPlayerManager
+local getModelTileMap               = SingletonGetters.getModelTileMap
+local getModelUnitMap               = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn        = SingletonGetters.getPlayerIndexLoggedIn
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -20,10 +22,14 @@ local function setInitialized(self, initialized)
     self.m_IsInitialized = initialized
 end
 
-local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex)
-    return ((modelTileOrUnit) and (modelTileOrUnit.getVisionForPlayerIndex))
-        and (modelTileOrUnit:getVisionForPlayerIndex(playerIndex))
-        or (nil)
+local function getVisionForModelTileOrUnit(modelTileOrUnit, playerIndex, visionModifier)
+    if ((modelTileOrUnit) and (modelTileOrUnit.getVisionForPlayerIndex)) then
+        local vision = modelTileOrUnit:getVisionForPlayerIndex(playerIndex)
+        if (vision) then
+            return vision + visionModifier
+        end
+    end
+    return nil
 end
 
 local function fillArray(array, size, value)
@@ -94,13 +100,19 @@ local function fillMapForPathsWithData(map, mapSize, data)
     return map
 end
 
-local function updateMapForPaths(map, mapSize, origin, vision)
+local function updateMapForPaths(map, mapSize, origin, vision, canRevealHidingPlaces)
     if (vision) then
-        for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
-            map[gridIndex.x][gridIndex.y] = 2
-        end
-        for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
-            map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
+        if (canRevealHidingPlaces) then
+            for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, vision, mapSize)) do
+                map[gridIndex.x][gridIndex.y] = 2
+            end
+        else
+            for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, 1, mapSize)) do
+                map[gridIndex.x][gridIndex.y] = 2
+            end
+            for _, gridIndex in pairs(getGridsWithinDistance(origin, 2, vision, mapSize)) do
+                map[gridIndex.x][gridIndex.y] = math.max(1, map[gridIndex.x][gridIndex.y])
+            end
         end
     end
 end
@@ -250,10 +262,11 @@ function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
-    local visibilityMap = self.m_MapsForPaths[playerIndex]
-    local mapSize       = self:getMapSize()
+    local canRevealHidingPlaces = canRevealHidingPlacesForUnits(getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local visibilityMap         = self.m_MapsForPaths[playerIndex]
+    local mapSize               = self:getMapSize()
     for _, pathNode in ipairs(path) do
-        updateMapForPaths(visibilityMap, mapSize, pathNode, modelUnit:getVisionForPlayerIndex(playerIndex, pathNode))
+        updateMapForPaths(visibilityMap, mapSize, pathNode, modelUnit:getVisionForPlayerIndex(playerIndex, pathNode), canRevealHidingPlaces)
     end
 
     return self
@@ -283,7 +296,7 @@ function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex, visionModifier)
     visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelTileMap(self.m_SceneWarFileName):forEachModelTile(function(modelTile)
-        updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex) + visionModifier, 1)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex, visionModifier) , 1)
     end)
 
     return self
@@ -312,7 +325,7 @@ function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, visionModifier)
     visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
-        updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex) + visionModifier, 1)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex, visionModifier), 1)
     end)
 
     return self
@@ -333,12 +346,12 @@ end
 function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
     -- This function returns 3 numbers, indicating the visibility calculated with the move paths/tiles/units of the playerIndex.
     -- Each visibility can be 0 or 1:
-    -- 0: The grid is out of vision completly.
-    -- 1: The grid is in vision, but it's not sure that if any unit of the playerIndex is beside it or has passed by it.
+    -- 0: The grid is out of vision completely.
+    -- 1: The grid is in vision, but it's not sure that it is visible or not.
     -- The visibility of paths can also be 2:
-    -- 2: The grid is in vision, and one or more units of the playerIndex are beside it or have passed by it.
+    -- 2: The grid is in vision and is visible to the playerIndex.
 
-    -- The skills that enable the tiles/units to see through the hiding places are ignored here.
+    -- The skills that enable the tiles/units to see through the hiding places are ignored for the maps for tiles/units, while they are considered for the maps for move paths.
     -- To check if a tile/unit is visible to a player, use functions in VisibilityFunctions.
 
     if (not IS_SERVER) then

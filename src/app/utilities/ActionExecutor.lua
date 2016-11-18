@@ -427,15 +427,14 @@ end
 local function executeActivateSkillGroup(action)
     updateTilesAndUnitsBeforeExecutingAction(action)
 
-    local skillGroupID     = action.skillGroupID
     local sceneWarFileName = action.fileName
-    InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
-
+    local skillGroupID     = action.skillGroupID
     local playerIndex = getModelTurnManager(sceneWarFileName):getPlayerIndex()
     local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
     modelPlayer:getModelSkillConfiguration():setActivatingSkillGroupId(skillGroupID)
     modelPlayer:setDamageCost(modelPlayer:getDamageCost() - modelPlayer:getDamageCostForSkillGroupId(skillGroupID))
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
+    InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
 
     if (IS_SERVER) then
         getModelScene(sceneWarFileName):setExecutingAction(false)
