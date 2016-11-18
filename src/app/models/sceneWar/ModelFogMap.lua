@@ -272,7 +272,7 @@ function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origi
     return self
 end
 
-function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
+function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex, visionModifier)
     assert(self:isInitialized(), "ModelFogMap:resetMapForTilesForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForTilesForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
@@ -280,9 +280,10 @@ function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
 
     local visibilityMap = self.m_MapsForTiles[playerIndex]
     local mapSize       = self:getMapSize()
+    visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelTileMap(self.m_SceneWarFileName):forEachModelTile(function(modelTile)
-        updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex), 1)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex) + visionModifier, 1)
     end)
 
     return self
@@ -300,7 +301,7 @@ function ModelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(playerInde
     return self
 end
 
-function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex)
+function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, visionModifier)
     assert(self:isInitialized(), "ModelFogMap:resetMapForUnitsForPlayerIndex() the maps have not been initialized yet.")
     if (not IS_SERVER) then
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
@@ -308,9 +309,10 @@ function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex)
 
     local visibilityMap = self.m_MapsForUnits[playerIndex]
     local mapSize       = self:getMapSize()
+    visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
     getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
-        updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex), 1)
+        updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex) + visionModifier, 1)
     end)
 
     return self

@@ -425,6 +425,8 @@ local function executeRunSceneMain(action)
 end
 
 local function executeActivateSkillGroup(action)
+    updateTilesAndUnitsBeforeExecutingAction(action)
+
     local skillGroupID     = action.skillGroupID
     local sceneWarFileName = action.fileName
     InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
@@ -435,9 +437,11 @@ local function executeActivateSkillGroup(action)
     modelPlayer:setDamageCost(modelPlayer:getDamageCost() - modelPlayer:getDamageCostForSkillGroupId(skillGroupID))
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
 
-    if (not IS_SERVER) then
+    if (IS_SERVER) then
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    else
         local modelGridEffect = getModelGridEffect()
-        local func = function(modelUnit)
+        local func            = function(modelUnit)
             if (modelUnit:getPlayerIndex() == playerIndex) then
                 modelGridEffect:showAnimationSkillActivation(modelUnit:getGridIndex())
                 modelUnit:updateView()
@@ -445,10 +449,12 @@ local function executeActivateSkillGroup(action)
         end
         getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
             :forEachModelUnitLoaded(func)
-    end
+        dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
-    dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
-    getModelScene(sceneWarFileName):setExecutingAction(false)
+        updateTileAndUnitMapOnVisibilityChanged()
+
+        getModelScene(sceneWarFileName):setExecutingAction(false)
+    end
 end
 
 local function executeAttack(action)

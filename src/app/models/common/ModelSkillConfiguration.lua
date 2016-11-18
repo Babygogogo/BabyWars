@@ -19,18 +19,6 @@ local SKILL_GROUP_ID_ACTIVE_2 = 2
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getModelSkillGroupWithId(self, skillGroupID)
-    if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
-        return self.m_ModelSkillGroupPassive
-    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_1) then
-        return self.m_ModelSkillGroupActive1
-    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) then
-        return self.m_ModelSkillGroupActive2
-    else
-        error("ModelSkillConfiguration-getModelSkillGroupWithId() the param skillGroupID is invalid.")
-    end
-end
-
 local function getExtraPointsForPassiveSkills(basePoints, isEnabledActive1, isEnabledActive2)
     local enabledCount = 0
     if (isEnabledActive1) then enabledCount = enabledCount + 1 end
@@ -136,6 +124,18 @@ function ModelSkillConfiguration:getModelSkillGroupActive2()
     return self.m_ModelSkillGroupActive2
 end
 
+function ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID)
+    if (skillGroupID == SKILL_GROUP_ID_PASSIVE) then
+        return self.m_ModelSkillGroupPassive
+    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_1) then
+        return self.m_ModelSkillGroupActive1
+    elseif (skillGroupID == SKILL_GROUP_ID_ACTIVE_2) then
+        return self.m_ModelSkillGroupActive2
+    else
+        error("ModelSkillConfiguration:getModelSkillGroupWithId() the param skillGroupID is invalid.")
+    end
+end
+
 function ModelSkillConfiguration:isEmpty()
     return not self:getBaseSkillPoints()
 end
@@ -164,11 +164,11 @@ function ModelSkillConfiguration:isValid()
 end
 
 function ModelSkillConfiguration:isModelSkillGroupEnabled(skillGroupID)
-    return getModelSkillGroupWithId(self, skillGroupID):isEnabled()
+    return self:getModelSkillGroupWithId(skillGroupID):isEnabled()
 end
 
 function ModelSkillConfiguration:setModelSkillGroupEnabled(skillGroupID, enabled)
-    getModelSkillGroupWithId(self, skillGroupID):setEnabled(enabled)
+    self:getModelSkillGroupWithId(skillGroupID):setEnabled(enabled)
     resetMaxSkillPoints(self)
 
     return self
@@ -180,7 +180,7 @@ function ModelSkillConfiguration:getEnergyRequirement()
 end
 
 function ModelSkillConfiguration:setEnergyRequirement(skillGroupID, requirement)
-    getModelSkillGroupWithId(self, skillGroupID):setEnergyRequirement(requirement)
+    self:getModelSkillGroupWithId(skillGroupID):setEnergyRequirement(requirement)
     resetMaxSkillPoints(self)
 
     return self
@@ -203,7 +203,7 @@ function ModelSkillConfiguration:getActivatingModelSkillGroup()
     if (not id) then
         return nil
     else
-        return getModelSkillGroupWithId(self, id)
+        return self:getModelSkillGroupWithId(id)
     end
 end
 
@@ -221,18 +221,18 @@ function ModelSkillConfiguration:getBaseSkillPoints()
 end
 
 function ModelSkillConfiguration:getAllSkillsInGroup(skillGroupID)
-    return getModelSkillGroupWithId(self, skillGroupID):getAllSkills()
+    return self:getModelSkillGroupWithId(skillGroupID):getAllSkills()
 end
 
 function ModelSkillConfiguration:setSkill(skillGroupID, slotIndex, skillID, level)
-    getModelSkillGroupWithId(self, skillGroupID):setSkill(slotIndex, skillID, level)
+    self:getModelSkillGroupWithId(skillGroupID):setSkill(slotIndex, skillID, level)
     resetMaxSkillPoints(self)
 
     return self
 end
 
 function ModelSkillConfiguration:clearSkill(skillGroupID, slotIndex)
-    getModelSkillGroupWithId(self, skillGroupID):clearSkill(slotIndex)
+    self:getModelSkillGroupWithId(skillGroupID):clearSkill(slotIndex)
     resetMaxSkillPoints(self)
 
     return self

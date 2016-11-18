@@ -7,14 +7,23 @@ local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local TableFunctions         = require("src.app.utilities.TableFunctions")
 
-local canRevealHidingPlacesForTiles = SkillModifierFunctions.canRevealHidingPlacesForTiles
-local canRevealHidingPlacesForUnits = SkillModifierFunctions.canRevealHidingPlacesForUnits
-local getAdjacentGrids              = GridIndexFunctions.getAdjacentGrids
-local getGridsWithinDistance        = GridIndexFunctions.getGridsWithinDistance
-local getModelFogMap                = SingletonGetters.getModelFogMap
-local getModelPlayerManager         = SingletonGetters.getModelPlayerManager
-local getModelTileMap               = SingletonGetters.getModelTileMap
-local getModelUnitMap               = SingletonGetters.getModelUnitMap
+local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
+
+local canRevealHidingPlacesForTilesForSkillGroup = SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup
+local canRevealHidingPlacesForTiles              = SkillModifierFunctions.canRevealHidingPlacesForTiles
+local canRevealHidingPlacesForUnitsForSkillGroup = SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup
+local canRevealHidingPlacesForUnits              = SkillModifierFunctions.canRevealHidingPlacesForUnits
+local getAdjacentGrids                           = GridIndexFunctions.getAdjacentGrids
+local getGridsWithinDistance                     = GridIndexFunctions.getGridsWithinDistance
+local getModelFogMap                             = SingletonGetters.getModelFogMap
+local getModelPlayerManager                      = SingletonGetters.getModelPlayerManager
+local getModelTileMap                            = SingletonGetters.getModelTileMap
+local getModelTurnManager                        = SingletonGetters.getModelTurnManager
+local getModelUnitMap                            = SingletonGetters.getModelUnitMap
+local getVisionModifierForTilesForSkillGroup     = SkillModifierFunctions.getVisionModifierForTilesForSkillGroup
+local getVisionModifierForTiles                  = SkillModifierFunctions.getVisionModifierForTiles
+local getVisionModifierForUnitsForSkillGroup     = SkillModifierFunctions.getVisionModifierForUnitsForSkillGroup
+local getVisionModifierForUnits                  = SkillModifierFunctions.getVisionModifierForUnits
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -86,7 +95,7 @@ local function getVisionForBuiltTile(sceneWarFileName, gridIndex, builder)
     local newTileType             = GameConstantFunctions.getTileTypeWithTiledId(builder:getBuildTiledIdWithTileType(oldTileType))
     local template                = GameConstantFunctions.getTemplateModelTileWithTileType(newTileType).VisionOwner
     local modelSkillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(builder:getPlayerIndex()):getModelSkillConfiguration()
-    return template.vision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
+    return template.vision + getVisionModifierForTiles(modelSkillConfiguration)
 end
 
 local function getVisionForCapturedTile(sceneWarFileName, gridIndex, playerIndex)
@@ -94,7 +103,7 @@ local function getVisionForCapturedTile(sceneWarFileName, gridIndex, playerIndex
     tileType                      = (tileType ~= "Headquarters") and (tileType) or ("City")
     local template                = GameConstantFunctions.getTemplateModelTileWithTileType(tileType).VisionOwner
     local modelSkillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration()
-    return template.vision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
+    return template.vision + getVisionModifierForTiles(modelSkillConfiguration)
 end
 
 local function generateTilesData(modelTile, mapSize)
@@ -160,7 +169,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, unitType, isDiving, unitPlayerIndex, targetPlayerIndex)
+function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, unitType, isDiving, unitPlayerIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
     assert(type(unitType)          == "string", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitType: " .. (unitType or ""))
     assert(type(unitPlayerIndex)   == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
     assert(type(targetPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid targetPlayerIndex: " .. (targetPlayerIndex or ""))
@@ -185,13 +194,15 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, g
             return true
         else
             local skillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
-            return ((visibilityForTiles == 1)                               and (canRevealHidingPlacesForTiles(skillConfiguration))) or
-                (  ((visibilityForPaths == 1) or (visibilityForUnits == 1)) and (canRevealHidingPlacesForUnits(skillConfiguration)))
+            canRevealWithTiles = (not canRevealWithTiles) and (canRevealHidingPlacesForTiles(skillConfiguration)) or (canRevealWithTiles)
+            canRevealWithUnits = (not canRevealWithUnits) and (canRevealHidingPlacesForUnits(skillConfiguration)) or (canRevealWithUnits)
+            return ((visibilityForTiles == 1)                               and (canRevealWithTiles)) or
+                (  ((visibilityForPaths == 1) or (visibilityForUnits == 1)) and (canRevealWithUnits))
         end
     end
 end
 
-function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, targetPlayerIndex)
+function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
     local modelTile = getModelTileMap(sceneWarFileName):getModelTile(gridIndex)
     if (modelTile:getPlayerIndex() == targetPlayerIndex) then
         return true
@@ -208,8 +219,10 @@ function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIn
             return true
         else
             local skillConfiguration = getModelPlayerManager(sceneWarFileName):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
-            return ((visibilityForTiles == 1)                               and (canRevealHidingPlacesForTiles(skillConfiguration))) or
-                (  ((visibilityForPaths == 1) or (visibilityForUnits == 1)) and (canRevealHidingPlacesForUnits(skillConfiguration)))
+            canRevealWithTiles = (not canRevealWithTiles) and (canRevealHidingPlacesForTiles(skillConfiguration)) or (canRevealWithTiles)
+            canRevealWithUnits = (not canRevealWithUnits) and (canRevealHidingPlacesForUnits(skillConfiguration)) or (canRevealWithUnits)
+            return ((visibilityForTiles == 1)                               and (canRevealWithTiles)) or
+                (  ((visibilityForPaths == 1) or (visibilityForUnits == 1)) and (canRevealWithUnits))
         end
     end
 end
@@ -289,6 +302,71 @@ function VisibilityFunctions.getRevealedTilesAndUnitsDataForFlare(sceneWarFileNa
             (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), false, modelUnit:getPlayerIndex(), playerIndex))) then
             revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, modelUnit))
         end
+    end
+
+    return revealedTiles, revealedUnits
+end
+
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForSkillActivation(sceneWarFileName, skillGroupID)
+    local playerIndex            = getModelTurnManager(sceneWarFileName):getPlayerIndex()
+    local modelSkillGroup        = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration():getModelSkillGroupWithId(skillGroupID)
+    local canRevealWithTiles     = canRevealHidingPlacesForTilesForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    local canRevealWithUnits     = canRevealHidingPlacesForUnitsForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    local modelFogMap            = getModelFogMap(sceneWarFileName)
+    local visionModifierForTiles = getVisionModifierForTilesForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    local visionModifierForUnits = getVisionModifierForUnitsForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    if ((not modelFogMap:isFogOfWarCurrently()) and (not canRevealWithTiles) and (not canRevealWithUnits) and (visionModifierForTiles == 0) and (visionModifierForUnits == 0)) then
+        return
+    end
+
+    local modelUnitMap             = getModelUnitMap(sceneWarFileName)
+    local mapSize                  = modelUnitMap:getMapSize()
+    local oldVisibilityMapForTiles = createEmptyMap(mapSize)
+    local oldVisibilityMapForUnits = createEmptyMap(mapSize)
+    local width, height            = mapSize.width, mapSize.height
+    for x = 1, width do
+        for y = 1, height do
+            local gridIndex = {x = x, y = y}
+            if (isTileVisible(sceneWarFileName, gridIndex, playerIndex)) then
+                oldVisibilityMapForTiles[x][y] = true
+            end
+            local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+            if ((modelUnit)                                                                                                                                   and
+                (isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex))) then
+                oldVisibilityMapForUnits[x][y] = true
+            end
+        end
+    end
+
+    if (visionModifierForTiles > 0) then
+        modelFogMap:resetMapForTilesForPlayerIndex(playerIndex, visionModifierForTiles)
+    end
+    if (visionModifierForUnits > 0) then
+        modelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, visionModifierForUnits)
+    end
+    local modelTileMap = getModelTileMap(sceneWarFileName)
+    local revealedTiles, revealedUnits
+    for x = 1, width do
+        for y = 1, height do
+            local gridIndex = {x = x, y = y}
+            if ((not oldVisibilityMapForTiles[x][y])                                                             and
+                (isTileVisible(sceneWarFileName, gridIndex, playerIndex, canRevealWithTiles, canRevealWithUnits))) then
+                revealedTiles = TableFunctions.union(revealedTiles, generateTilesData(modelTileMap:getModelTile(gridIndex), mapSize))
+            end
+
+            local modelUnit = modelUnitMap:getModelUnit(gridIndex)
+            if ((not oldVisibilityMapForUnits[x][y])                                                                                                                                                and
+                (isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex, canRevealWithTiles, canRevealWithUnits))) then
+                revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(sceneWarFileName, modelUnit))
+            end
+        end
+    end
+
+    if (visionModifierForTiles > 0) then
+        modelFogMap:resetMapForTilesForPlayerIndex(playerIndex)
+    end
+    if (visionModifierForUnits > 0) then
+        modelFogMap:resetMapForUnitsForPlayerIndex(playerIndex)
     end
 
     return revealedTiles, revealedUnits
