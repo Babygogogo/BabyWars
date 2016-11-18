@@ -27,7 +27,7 @@ end
 
 local function onEvtModelPlayerUpdated(self, event)
     if ((self.m_PlayerIndex == event.playerIndex) and (self.m_View)) then
-        self.m_View:updateWithModelPlayer(event.modelPlayer)
+        self.m_View:updateWithModelPlayer(event.modelPlayer, event.playerIndex)
     end
 end
 

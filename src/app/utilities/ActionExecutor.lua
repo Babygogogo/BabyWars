@@ -1019,6 +1019,9 @@ local function executeLaunchSilo(action)
     local modelTile         = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
     local targetModelUnits  = {}
     local targetGridIndexes = {}
+    if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+        modelTile:updateAsFogDisabled()
+    end
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
 

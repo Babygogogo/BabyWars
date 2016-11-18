@@ -28,8 +28,11 @@ local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 local ActorManager              = require("src.global.actors.ActorManager")
 
-local round            = require("src.global.functions.round")
-local getLocalizedText = LocalizationFunctions.getLocalizedText
+local round                  = require("src.global.functions.round")
+local getLocalizedText       = LocalizationFunctions.getLocalizedText
+local getModelFogMap         = SingletonGetters.getModelFogMap
+local getModelTurnManager    = SingletonGetters.getModelTurnManager
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -42,7 +45,7 @@ local function generateEmptyDataForEachPlayer()
             local energy, req1, req2 = modelPlayer:getEnergy()
             dataForEachPlayer[playerIndex] = {
                 nickname            = modelPlayer:getNickname(),
-                fund                = modelPlayer:getFund(),
+                fund                = ((getModelFogMap():isFogOfWarCurrently() and (playerIndex ~= getPlayerIndexLoggedIn()))) and ("--") or (modelPlayer:getFund()),
                 energy              = energy,
                 req1                = req1,
                 req2                = req2,
@@ -147,10 +150,11 @@ local function getMapInfo()
         end
     end)
 
-    return string.format("%s: %s      %s: %s      %s: %s\n%s",
-        getLocalizedText(65, "MapName"), modelTileMap:getMapName(),
-        getLocalizedText(65, "Author"),  modelTileMap:getAuthorName(),
-        getLocalizedText(65, "WarID"),   SingletonGetters.getModelScene():getFileName():sub(13),
+    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d\n%s",
+        getLocalizedText(65, "MapName"),   modelTileMap:getMapName(),
+        getLocalizedText(65, "Author"),    modelTileMap:getAuthorName(),
+        getLocalizedText(65, "WarID"),     SingletonGetters.getModelScene():getFileName():sub(13),
+        getLocalizedText(65, "TurnIndex"), getModelTurnManager():getTurnIndex(),
         getTilesInfo(tileTypeCounters)
     )
 end
@@ -168,12 +172,12 @@ local function updateStringWarInfo(self)
         else
             local d              = dataForEachPlayer[i]
             local isPlayerInTurn = i == playerIndexInTurn
-            stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %d\n%s: %d%s      %s: %d\n%s: %d\n%s",
+            stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %s      %s: %d\n%s: %d%s      %s: %d\n%s: %d\n%s",
                 getLocalizedText(65, "Player"),              i,           d.nickname,
                 ((isPlayerInTurn) and (string.format(" (%s)", getLocalizedText(49))) or ("")),
                 getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,
-                getLocalizedText(65, "Fund"),                 d.fund,
+                getLocalizedText(65, "Fund"),                 "" .. d.fund,
                 getLocalizedText(65, "Income"),               d.income,
                 getLocalizedText(65, "UnitsCount"),           d.unitsCount,
                 ((isPlayerInTurn) and (string.format(" (%d)", d.idleUnitsCount)) or ("")),
