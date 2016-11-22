@@ -185,6 +185,10 @@ function GameConstantFunctions.getCommandTowerAttackBonus()
     return GAME_CONSTANT.commandTowerAttackBonus
 end
 
+function GameConstantFunctions.getCommandTowerDefenseBonus()
+    return GAME_CONSTANT.commandTowerDefenseBonus
+end
+
 function GameConstantFunctions.getMaxPromotion()
     return GAME_CONSTANT.maxPromotion
 end

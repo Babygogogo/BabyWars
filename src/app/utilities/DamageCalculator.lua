@@ -6,7 +6,8 @@ local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
-local COMMAND_TOWER_ATTACK_BONUS = GameConstantFunctions.getCommandTowerAttackBonus()
+local COMMAND_TOWER_ATTACK_BONUS  = GameConstantFunctions.getCommandTowerAttackBonus()
+local COMMAND_TOWER_DEFENSE_BONUS = GameConstantFunctions.getCommandTowerDefenseBonus()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -60,6 +61,12 @@ local function getDefenseBonusMultiplier(attacker, attackerGridIndex, target, ta
     local targetTile = modelSceneWar:getModelWarField():getModelTileMap():getModelTile(targetGridIndex)
     local bonus      = 0
 
+    modelSceneWar:getModelWarField():getModelTileMap():forEachModelTile(function(modelTile)
+        if ((modelTile:getPlayerIndex() == target:getPlayerIndex()) and
+            (modelTile:getTileType() == "CommandTower"))            then
+            bonus = bonus + COMMAND_TOWER_DEFENSE_BONUS
+        end
+    end)
     bonus = bonus + ((targetTile.getDefenseBonusAmount)                                                 and
         (targetTile:getDefenseBonusAmount(target:getUnitType()) * target:getNormalizedCurrentHP() / 10) or
         (0))
