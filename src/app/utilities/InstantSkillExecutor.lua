@@ -32,7 +32,7 @@ end
 --------------------------------------------------------------------------------
 -- Modify HPs of all units of the currently-in-turn player.
 s_Executors.execute4 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local modifier     = getSkillModifier(4, level) * 10
+    local modifier     = getSkillModifier(4, level, true) * 10
     local playerIndex  = modelTurnManager:getPlayerIndex()
     local func         = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
@@ -47,7 +47,7 @@ s_Executors.execute4 = function(level, modelWarField, modelPlayerManager, modelT
 end
 
 s_Executors.execute5 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local modifier     = getSkillModifier(5, level) * 10
+    local modifier     = getSkillModifier(5, level, true) * 10
     local playerIndex  = modelTurnManager:getPlayerIndex()
     local func         = function(modelUnit)
         if (modelUnit:getPlayerIndex() ~= playerIndex) then
@@ -79,7 +79,7 @@ end
 
 s_Executors.execute9 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
     local playerIndex  = modelTurnManager:getPlayerIndex()
-    local baseModifier = getSkillModifier(9, level)
+    local baseModifier = getSkillModifier(9, level, true)
     local modifier     = (baseModifier >= 0) and ((100 + baseModifier) / 100) or (100 / (100 - baseModifier))
     local func         = function(modelUnit)
         if (modelUnit:getPlayerIndex() ~= playerIndex) then
@@ -97,7 +97,7 @@ end
 s_Executors.execute12 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
     local playerIndex  = modelTurnManager:getPlayerIndex()
     local modelPlayer  = modelPlayerManager:getModelPlayer(playerIndex)
-    local baseModifier = getSkillModifier(12, level)
+    local baseModifier = getSkillModifier(12, level, true)
     modelPlayer:setFund(round(modelPlayer:getFund() * (baseModifier + 100) / 100))
 
     dispatcher:dispatchEvent({
@@ -110,7 +110,7 @@ end
 s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
     local playerIndex = modelTurnManager:getPlayerIndex()
     local fund        = modelPlayerManager:getModelPlayer(playerIndex):getFund()
-    local modifier    = getSkillModifier(13, level) * fund / 1000000
+    local modifier    = getSkillModifier(13, level, true) * fund / 1000000
 
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, index)
         if ((modelPlayer:isAlive()) and (index ~= playerIndex)) then
@@ -148,7 +148,7 @@ end
 
 s_Executors.execute26 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
     local playerIndex  = modelTurnManager:getPlayerIndex()
-    local modifier     = getSkillModifier(26, level)
+    local modifier     = getSkillModifier(26, level, true)
     local maxPromotion = GameConstantFunctions.getMaxPromotion()
     local func         = function(modelUnit)
         if ((modelUnit:getPlayerIndex() == playerIndex) and

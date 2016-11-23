@@ -5,7 +5,6 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local getSkillEnergyRequirement = GameConstantFunctions.getSkillEnergyRequirement
-local getSkillModifier          = GameConstantFunctions.getSkillModifier
 local getSkillModifierUnit      = GameConstantFunctions.getSkillModifierUnit
 local getSkillPoints            = GameConstantFunctions.getSkillPoints
 local getLocalizedText          = LocalizationFunctions.getLocalizedText
