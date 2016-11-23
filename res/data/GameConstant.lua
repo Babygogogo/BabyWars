@@ -4176,8 +4176,10 @@ GameConstant.activeSkillSlotsCount           = 4
 GameConstant.skills = {
     -- Modify the attack power for all units of a player.
     [1] = {
-        minLevel     = -6,
-        maxLevel     = 12,
+        minLevelPassive     = -6,
+        maxLevelPassive     = 12,
+        minLevelActive      = -6,
+        maxLevelActive      = 10,
         modifierUnit = "%",
         levels = {
             [-10] = {modifier = -50, pointsPassive = -500, pointsActive = -125, minEnergy = 5},
@@ -4208,8 +4210,10 @@ GameConstant.skills = {
 
     -- Modify the defense power for all units of a player.
     [2] = {
-        minLevel     = -6,
-        maxLevel     = 12,
+        minLevelPassive     = -6,
+        maxLevelPassive     = 12,
+        minLevelActive      = -6,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels = {
             [-6] = {modifier = -30, pointsPassive = -300, pointsActive = -75, minEnergy = 3},
@@ -4236,8 +4240,10 @@ GameConstant.skills = {
 
     -- Modify the production cost for all units of a player.
     [3] = {
-        minLevel     = -6,
-        maxLevel     = 20,
+        minLevelPassive     = -6,
+        maxLevelPassive     = 20,
+        minLevelActive      = -6,
+        maxLevelActive      = 20,
         modifierUnit = "%",
         levels = {
             [-6] = {modifier = 30, pointsPassive = -450, pointsActive = -15, minEnergy = 2},
@@ -4272,8 +4278,8 @@ GameConstant.skills = {
 
     -- Instant: Modify HPs of all units of the currently-in-turn player.
     [4] = {
-        minLevel     = -9,
-        maxLevel     = 9,
+        minLevelActive      = -9,
+        maxLevelActive      = 9,
         modifierUnit = "HP",
         levels = {
             [-9] = {modifier = -9, pointsPassive = nil, pointsActive = -540, minEnergy = 9},
@@ -4300,8 +4306,8 @@ GameConstant.skills = {
 
     -- Instant: Modify HPs of all units of the opponents.
     [5] = {
-        minLevel     = -9,
-        maxLevel     = 9,
+        minLevelActive     = -9,
+        maxLevelActive     = 9,
         modifierUnit = "HP",
         levels = {
             [-9] = {modifier = 9, pointsPassive = nil, pointsActive = -270, minEnergy = 9},
@@ -4328,8 +4334,8 @@ GameConstant.skills = {
 
     -- Modify movements of all units of the owner player.
     [6] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [1] = {modifier = 1, pointsPassive = nil, pointsActive = 190, minEnergy = 2},
@@ -4342,8 +4348,10 @@ GameConstant.skills = {
 
     -- Modify max attack range of all indirect units of the owner player.
     [7] = {
-        minLevel     = -1,
-        maxLevel     = 3,
+        minLevelPassive     = -1,
+        maxLevelPassive     = 3,
+        minLevelActive      = -1,
+        maxLevelActive      = 3,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = -80, pointsActive = -20, minEnergy = 3},
@@ -4356,8 +4364,8 @@ GameConstant.skills = {
 
     -- Instant: Set all units, except inf units (Infantry, Mech, Bike), as idle (i.e. move again).
     [8] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelActive     = 1,
+        maxLevelActive     = 1,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = nil, pointsActive = 850, minEnergy = 8},
@@ -4366,8 +4374,8 @@ GameConstant.skills = {
 
     -- Instant: Modify the fuel of the opponents' units.
     [9] = {
-        minLevel     = 1,
-        maxLevel     = 10,
+        minLevelActive     = 1,
+        maxLevelActive     = 10,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = -50, pointsPassive = nil, pointsActive = 60, minEnergy = 1},
@@ -4385,8 +4393,8 @@ GameConstant.skills = {
 
     -- Modify the repair amount of buildings of the owner player.
     [10] = {
-        minLevel     = 1,
-        maxLevel     = 7,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 7,
         modifierUnit = "HP",
         levels       = {
             [1] = {modifier = 1, pointsPassive = 35, pointsActive = nil, minEnergy = nil},
@@ -4401,8 +4409,8 @@ GameConstant.skills = {
 
     -- Modify the repair cost of the owner player.
     [11] = {
-        minLevel     = 1,
-        maxLevel     = 10,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 10,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = -10, pointsPassive = 10, pointsActive = nil, minEnergy = nil},
@@ -4420,8 +4428,8 @@ GameConstant.skills = {
 
     -- Instant: Modify the fund of the owner player.
     [12] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelActive     = 1,
+        maxLevelActive     = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 10, pointsPassive = nil, pointsActive = 75, minEnergy = 1},
@@ -4449,8 +4457,8 @@ GameConstant.skills = {
 
     -- Instant: Modify the energy of the opponent player.
     [13] = {
-        minLevel     = -10,
-        maxLevel     = 10,
+        minLevelActive     = -10,
+        maxLevelActive     = 10,
         modifierUnit = "%",
         levels       = {
             [-10] = {modifier = 50, pointsPassive = nil, pointsActive = -50, minEnergy = 4},
@@ -4479,8 +4487,10 @@ GameConstant.skills = {
 
     -- Modify the upper limit of the luck damage of the owner player.
     [14] = {
-        minLevel = 1,
-        maxLevel = 20,
+        minLevelPassive = 1,
+        maxLevelPassive = 20,
+        minLevelActive  = 1,
+        maxLevelActive  = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 80, pointsActive = 50, minEnergy = 1},
@@ -4508,8 +4518,10 @@ GameConstant.skills = {
 
     -- Modify the capture speed of the owner player.
     [15] = {
-        minLevel     = 1,
-        maxLevel     = 11,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 11,
+        minLevelActive      = 1,
+        maxLevelActive      = 11,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 10, pointsPassive = 25, pointsActive = 12.5, minEnergy = 1},
@@ -4528,8 +4540,8 @@ GameConstant.skills = {
 
     -- Instant: Fills the ammo, fuel, material of all units of the owner player.
     [16] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelActive     = 1,
+        maxLevelActive     = 1,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = nil, pointsActive = 150, minEnergy = 3},
@@ -4538,8 +4550,8 @@ GameConstant.skills = {
 
     -- Modify the income of the owner player.
     [17] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 100, pointsActive = nil, minEnergy = nil},
@@ -4567,8 +4579,8 @@ GameConstant.skills = {
 
     -- Stop the damage cost per the energy requirement from increasing as skills are activated.
     [18] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 1,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = 130, pointsActive = nil, minEnergy = nil},
@@ -4577,8 +4589,8 @@ GameConstant.skills = {
 
     -- Modify the growth rate of the energy of the owner player.
     [19] = {
-        minLevel     = 1,
-        maxLevel     = 10,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 10,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 10, pointsPassive = 40, pointsActive = nil, minEnergy = nil},
@@ -4596,8 +4608,10 @@ GameConstant.skills = {
 
     -- Modify the attack power regarding to money of the owner player.
     [20] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 20,
+        minLevelActive      = 1,
+        maxLevelActive      = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 2, pointsPassive = 65, pointsActive = 40, minEnergy = 1},
@@ -4625,8 +4639,10 @@ GameConstant.skills = {
 
     -- Modify the defense power regarding to money of the owner player.
     [21] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 20,
+        minLevelActive      = 1,
+        maxLevelActive      = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 2, pointsPassive = 65, pointsActive = 40, minEnergy = 1},
@@ -4654,8 +4670,10 @@ GameConstant.skills = {
 
     -- Get money according to the base damage cost that the owner player deal to the opponent with units' attack.
     [22] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 20,
+        minLevelActive      = 1,
+        maxLevelActive      = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 90, pointsActive = 40, minEnergy = 1},
@@ -4683,8 +4701,10 @@ GameConstant.skills = {
 
     -- Tiles offer addional attack power for units on it, according to the base defense bonus.
     [23] = {
-        minLevel     = 1,
-        maxLevel     = 10,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 10,
+        minLevelActive      = 1,
+        maxLevelActive      = 10,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 100, pointsActive = 100, minEnergy = 1},
@@ -4702,8 +4722,10 @@ GameConstant.skills = {
 
     -- Tiles offer addional defense power for units on it, according to the base defense bonus.
     [24] = {
-        minLevel     = 1,
-        maxLevel     = 10,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 10,
+        minLevelActive      = 1,
+        maxLevelActive      = 10,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 100, pointsActive = 100, minEnergy = 1},
@@ -4721,8 +4743,10 @@ GameConstant.skills = {
 
     -- Modify the lower limit of the luck damage of the owner player.
     [25] = {
-        minLevel     = 1,
-        maxLevel     = 20,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 20,
+        minLevelActive      = 1,
+        maxLevelActive      = 20,
         modifierUnit = "%",
         levels       = {
             [1] = {modifier = 5, pointsPassive = 80, pointsActive = 50, minEnergy = 1},
@@ -4750,8 +4774,8 @@ GameConstant.skills = {
 
     -- Modify the promotion of the units of the owner player.
     [26] = {
-        minLevel     = 1,
-        maxLevel     = 3,
+        minLevelActive     = 1,
+        maxLevelActive     = 3,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = 1, pointsPassive = nil, pointsActive = 180, minEnergy = 1},
@@ -4762,8 +4786,8 @@ GameConstant.skills = {
 
     -- Modify the promotion of the newly produced units of the owner player.
     [27] = {
-        minLevel     = 1,
-        maxLevel     = 3,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 3,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = 1, pointsPassive = 95, pointsActive = nil, minEnergy = nil},
@@ -4774,8 +4798,10 @@ GameConstant.skills = {
 
     -- "Perfect Movement".
     [28] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 1,
+        minLevelActive      = 1,
+        maxLevelActive      = 1,
         modifierUnit = "",
         levels       = {
             [1] = {modifier = nil, pointsPassive = 250, pointsActive = 125, minEnergy = 2},
@@ -4784,8 +4810,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the direct units.
     [29] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4810,8 +4838,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the indirect units.
     [30] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4836,8 +4866,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the ground units.
     [31] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4862,8 +4894,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the air units.
     [32] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4888,8 +4922,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the naval units.
     [33] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4914,8 +4950,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the infantry units, including Infantry, Mech and Bike.
     [34] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4940,8 +4978,10 @@ GameConstant.skills = {
 
     -- Modify the attack of the vehicle units.
     [35] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4966,8 +5006,10 @@ GameConstant.skills = {
 
     -- Modify the attack of direct non-infantry units.
     [36] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -4992,8 +5034,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the direct units.
     [37] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5018,8 +5062,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the indirect units.
     [38] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5044,8 +5090,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the ground units.
     [39] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5070,8 +5118,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the air units.
     [40] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5096,8 +5146,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the naval units.
     [41] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5122,8 +5174,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the infantry units, including Infantry, Mech and Bike.
     [42] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5148,8 +5202,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the vehicle units.
     [43] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5174,8 +5230,10 @@ GameConstant.skills = {
 
     -- Modify the defense of direct non-infantry units.
     [44] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5200,8 +5258,10 @@ GameConstant.skills = {
 
     -- Modify the defense of the transport units.
     [45] = {
-        minLevel     = 1,
-        maxLevel     = 12,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 12,
+        minLevelActive      = 1,
+        maxLevelActive      = 12,
         modifierUnit = "%",
         levels       = {
             [-4] = {modifier = -20, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
@@ -5226,8 +5286,8 @@ GameConstant.skills = {
 
     -- Modify movements of direct units of the owner player.
     [46] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5242,8 +5302,8 @@ GameConstant.skills = {
 
     -- Modify movements of indirect units of the owner player.
     [47] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5258,8 +5318,8 @@ GameConstant.skills = {
 
     -- Modify movements of ground units of the owner player.
     [48] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5274,8 +5334,8 @@ GameConstant.skills = {
 
     -- Modify movements of air units of the owner player.
     [49] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5290,8 +5350,8 @@ GameConstant.skills = {
 
     -- Modify movements of naval units of the owner player.
     [50] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5306,8 +5366,8 @@ GameConstant.skills = {
 
     -- Modify movements of infantry units of the owner player.
     [51] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5322,8 +5382,8 @@ GameConstant.skills = {
 
     -- Modify movements of vehicle units of the owner player.
     [52] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5338,8 +5398,8 @@ GameConstant.skills = {
 
     -- Modify movements of direct non-infantry units of the owner player.
     [53] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelActive     = 1,
+        maxLevelActive     = 5,
         modifierUnit = "",
         levels = {
             [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
@@ -5354,11 +5414,13 @@ GameConstant.skills = {
 
     -- Modify movements of transport units of the owner player.
     [54] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 5,
+        minLevelActive      = 1,
+        maxLevelActive      = 5,
         modifierUnit = "",
         levels = {
-            [-1] = {modifier = -1, pointsPassive = nil, pointsActive = 0, minEnergy = 2},
+            [-1] = {modifier = -1, pointsPassive = 0, pointsActive = 0, minEnergy = 2},
             [0] = {modifier = 0, pointsPassive = 0, pointsActive = 0, minEnergy = 0},
             [1] = {modifier = 1, pointsPassive = 100, pointsActive = 50, minEnergy = 2},
             [2] = {modifier = 2, pointsPassive = 200, pointsActive = 100, minEnergy = 4},
@@ -5370,8 +5432,10 @@ GameConstant.skills = {
 
     -- Modify vision of units of the owner player.
     [55] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 5,
+        minLevelActive      = 1,
+        maxLevelActive      = 5,
         modifierUnit = "",
         levels = {
             [1] = {modifier = 1, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
@@ -5384,8 +5448,10 @@ GameConstant.skills = {
 
     -- Modify vision of buildings of the owner player.
     [56] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 5,
+        minLevelActive      = 1,
+        maxLevelActive      = 5,
         modifierUnit = "",
         levels = {
             [1] = {modifier = 1, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
@@ -5398,8 +5464,10 @@ GameConstant.skills = {
 
     -- Modify vision of units and buildings of the owner player.
     [57] = {
-        minLevel     = 1,
-        maxLevel     = 5,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 5,
+        minLevelActive      = 1,
+        maxLevelActive      = 5,
         modifierUnit = "",
         levels = {
             [1] = {modifier = 1, pointsPassive = 300, pointsActive = 150, minEnergy = 1},
@@ -5412,8 +5480,10 @@ GameConstant.skills = {
 
     -- Enable of units of the owner player to reveal the hiding places in distance.
     [58] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 1,
+        minLevelActive      = 1,
+        maxLevelActive      = 1,
         modifierUnit = "",
         levels = {
             [1] = {modifier = nil, pointsPassive = 240, pointsActive = 120, minEnergy = 1},
@@ -5422,8 +5492,10 @@ GameConstant.skills = {
 
     -- Enable of buildings of the owner player to reveal the hiding places in distance.
     [59] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 1,
+        minLevelActive      = 1,
+        maxLevelActive      = 1,
         modifierUnit = "",
         levels = {
             [1] = {modifier = nil, pointsPassive = 160, pointsActive = 80, minEnergy = 1},
@@ -5432,8 +5504,10 @@ GameConstant.skills = {
 
     -- Enable of units and buildings of the owner player to reveal the hiding places in distance.
     [60] = {
-        minLevel     = 1,
-        maxLevel     = 1,
+        minLevelPassive     = 1,
+        maxLevelPassive     = 1,
+        minLevelActive      = 1,
+        maxLevelActive      = 1,
         modifierUnit = "",
         levels = {
             [1] = {modifier = nil, pointsPassive = 300, pointsActive = 150, minEnergy = 1},

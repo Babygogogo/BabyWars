@@ -261,9 +261,13 @@ function GameConstantFunctions.getSkillModifierUnit(id)
     return GAME_CONSTANT.skills[id].modifierUnit
 end
 
-function GameConstantFunctions.getSkillLevelMinMax(id)
+function GameConstantFunctions.getSkillLevelMinMax(id, isActive)
     local skill = GAME_CONSTANT.skills[id]
-    return skill.minLevel, skill.maxLevel
+    if (isActive) then
+        return skill.minLevelActive, skill.maxLevelActive
+    else
+        return skill.minLevelPassive, skill.maxLevelPassive
+    end
 end
 
 function GameConstantFunctions.getSkillPresets()

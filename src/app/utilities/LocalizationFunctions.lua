@@ -43,7 +43,7 @@ local s_LongText3_1 = [[
 --- 关于本作 ---
 《BabyWars》（暂名）是以《Advance Wars》系列的设定为基础的同人作品。本作旨在为高级战争的爱好者们提供一个兼顾公平性和自由度的联网对战平台。
 
-本作的兵种、地形等设定取材于《Advance Wars: Days of Ruin》，不设CO系统，而使用允许玩家自由搭配的技能系统代替（《Advance Wars: Dual Strike》中的技能装备的强化版）。
+本作的兵种、地形等设定取材于《Advance Wars: Days of Ruin》，CO系统则取材于《Advance Wars: Dual Strike》，且允许玩家自由搭配技能。
 
 本作有一定复杂度，建议您可以先游玩一下原作，以便更快上手。
 
