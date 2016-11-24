@@ -4163,7 +4163,7 @@ GameConstant.templateModelUnits = {
 
 GameConstant.minSkillPoints                  = 0
 GameConstant.maxSkillPoints                  = 200
-GameConstant.skillPointsPerStep              = 20
+GameConstant.skillPointsPerStep              = 25
 GameConstant.minEnergyRequirement            = 1
 GameConstant.maxEnergyRequirement            = 15
 GameConstant.skillPointsPerEnergyRequirement = 100
@@ -5691,10 +5691,6 @@ GameConstant.skillPresets = {
                 id    = 6,
                 level = 1,
             },
-            {
-                id    = 1,
-                level = 3,
-            },
         },
         active2 = {
             energyRequirement = 5,
@@ -5704,7 +5700,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = 8,
+                level = 2,
             },
         },
     },
@@ -5712,15 +5708,15 @@ GameConstant.skillPresets = {
     Andy = {
         maxPoints = 100,
         passive = {
-            {
-                id    = 2,
-                level = 2,
-            },
         },
         active1 = {
             energyRequirement = 3,
             {
                 id    = 4,
+                level = 2,
+            },
+            {
+                id    = 1,
                 level = 2,
             },
         },
@@ -5732,7 +5728,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = 4,
+                level = 2,
             },
             {
                 id    = 6,
@@ -5746,11 +5742,11 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 1,
-                level = -2,
+                level = -5,
             },
             {
                 id    = 3,
-                level = 3,
+                level = 13,
             }
         },
         active1 = {
@@ -5764,7 +5760,7 @@ GameConstant.skillPresets = {
             energyRequirement = 6,
             {
                 id    = 20,
-                level = 15,
+                level = 14,
             },
         },
     },
@@ -5797,7 +5793,7 @@ GameConstant.skillPresets = {
             },
         },
         active2 = {
-            energyRequirement = 6,
+            energyRequirement = 7,
             {
                 id    = 5,
                 level = 2,
@@ -5813,12 +5809,8 @@ GameConstant.skillPresets = {
         maxPoints = 100,
         passive = {
             {
-                id    = 32,
-                level = 3,
-            },
-            {
                 id    = 40,
-                level = 2,
+                level = 4,
             },
             {
                 id    = 33,
@@ -5833,11 +5825,11 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 1,
-                level = -10,
+                level = -5,
             },
             {
                 id    = 2,
-                level = -4,
+                level = -2,
             },
         },
         active2 = {
@@ -5848,7 +5840,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 32,
-                level = 4,
+                level = 2,
             },
         },
     },
@@ -5858,25 +5850,25 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 1,
-                level = 6,
+                level = 15,
             },
             {
                 id    = 2,
-                level = -2,
+                level = -5,
             },
         },
         active1 = {
             energyRequirement = 3,
             {
                 id    = 1,
-                level = 6,
+                level = 5,
             },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 1,
-                level = 12,
+                level = 13,
             },
         },
     },
@@ -5892,6 +5884,10 @@ GameConstant.skillPresets = {
                 id    = 36,
                 level = -4,
             },
+            {
+                id    = 30,
+                level = -2,
+            },
         },
         active1 = {
             energyRequirement = 3,
@@ -5912,7 +5908,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 30,
-                level = 4,
+                level = 2,
             },
         },
     },
@@ -5969,7 +5965,7 @@ GameConstant.skillPresets = {
             energyRequirement = 3,
             {
                 id    = 35,
-                level = 4,
+                level = 2,
             },
             {
                 id    = 52,
@@ -5984,7 +5980,7 @@ GameConstant.skillPresets = {
             energyRequirement = 6,
             {
                 id    = 35,
-                level = 8,
+                level = 6,
             },
             {
                 id    = 52,
@@ -6002,19 +5998,11 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 23,
-                level = 2,
+                level = 8,
             },
         },
         active1 = {
             energyRequirement = 4,
-            {
-                id    = 23,
-                level = 2,
-            },
-            {
-                id    = 24,
-                level = 2,
-            },
             {
                 id    = 28,
                 level = 1,
@@ -6053,7 +6041,7 @@ GameConstant.skillPresets = {
             energyRequirement = 3,
             {
                 id    = 36,
-                level = 4,
+                level = 2,
             },
             {
                 id    = 53,
@@ -6064,7 +6052,7 @@ GameConstant.skillPresets = {
             energyRequirement = 6,
             {
                 id    = 36,
-                level = 8,
+                level = 4,
             },
             {
                 id    = 53,
@@ -6078,21 +6066,21 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 14,
-                level = 2,
+                level = 4,
             },
         },
         active1 = {
             energyRequirement = 3,
             {
                 id    = 14,
-                level = 6,
+                level = 3,
             },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 14,
-                level = 12,
+                level = 6,
             },
         },
     },
@@ -6106,7 +6094,7 @@ GameConstant.skillPresets = {
             },
             {
                 id    = 34,
-                level = 6,
+                level = 3,
             },
             {
                 id    = 36,
@@ -6121,7 +6109,7 @@ GameConstant.skillPresets = {
             energyRequirement = 3,
             {
                 id    = 34,
-                level = 6,
+                level = 3,
             },
             {
                 id    = 51,
@@ -6132,11 +6120,11 @@ GameConstant.skillPresets = {
             energyRequirement = 8,
             {
                 id    = 15,
-                level = 11,
+                level = 6,
             },
             {
                 id    = 34,
-                level = 8,
+                level = 6,
             },
             {
                 id    = 51,
@@ -6150,21 +6138,21 @@ GameConstant.skillPresets = {
         passive = {
             {
                 id    = 17,
-                level = 2,
+                level = 4,
             },
         },
         active1 = {
             energyRequirement = 2,
             {
                 id    = 13,
-                level = 4,
+                level = 5,
             },
         },
         active2 = {
             energyRequirement = 6,
             {
                 id    = 22,
-                level = 16,
+                level = 10,
             },
         },
     },
