@@ -4,7 +4,6 @@ local ModelSkillGroupPassive = require("src.global.functions.class")("ModelSkill
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local getSkillModifier     = GameConstantFunctions.getSkillModifier
 local getSkillModifierUnit = GameConstantFunctions.getSkillModifierUnit
 local getSkillPoints       = GameConstantFunctions.getSkillPoints
 local getLocalizedText     = LocalizationFunctions.getLocalizedText
@@ -67,7 +66,7 @@ function ModelSkillGroupPassive:isValid()
         local skill = slots[i]
         if (skill) then
             local id    = skill.id
-            totalPoints = totalPoints + getSkillPoints(id, skill.level)
+            totalPoints = totalPoints + getSkillPoints(id, skill.level, false)
 
             for j = i + 1, SLOTS_COUNT do
                 if ((slots[j]) and (slots[j].id == id)) then
@@ -102,7 +101,7 @@ function ModelSkillGroupPassive:getSkillPoints()
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            totalPoints = totalPoints + getSkillPoints(skill.id, skill.level)
+            totalPoints = totalPoints + getSkillPoints(skill.id, skill.level, false)
         end
     end
 

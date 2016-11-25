@@ -185,6 +185,10 @@ function GameConstantFunctions.getCommandTowerAttackBonus()
     return GAME_CONSTANT.commandTowerAttackBonus
 end
 
+function GameConstantFunctions.getCommandTowerDefenseBonus()
+    return GAME_CONSTANT.commandTowerDefenseBonus
+end
+
 function GameConstantFunctions.getMaxPromotion()
     return GAME_CONSTANT.maxPromotion
 end
@@ -242,6 +246,7 @@ function GameConstantFunctions.getDamageCostGrowthRates()
 end
 
 function GameConstantFunctions.getSkillPoints(id, level, isActive)
+    assert(type(isActive) == "boolean", "GameConstantFunctions.getSkillPoints() invalid param isActive. Boolean expected.")
     if (isActive) then
         return GAME_CONSTANT.skills[id].levels[level].pointsActive
     else
@@ -249,17 +254,26 @@ function GameConstantFunctions.getSkillPoints(id, level, isActive)
     end
 end
 
-function GameConstantFunctions.getSkillModifier(id, level)
-    return GAME_CONSTANT.skills[id].levels[level].modifier
+function GameConstantFunctions.getSkillModifier(id, level, isActive)
+    assert(type(isActive) == "boolean", "GameConstantFunctions.getSkillModifier() invalid param isActive. Boolean expected.")
+    if (isActive) then
+        return GAME_CONSTANT.skills[id].levels[level].modifierActive
+    else
+        return GAME_CONSTANT.skills[id].levels[level].modifierPassive
+    end
 end
 
 function GameConstantFunctions.getSkillModifierUnit(id)
     return GAME_CONSTANT.skills[id].modifierUnit
 end
 
-function GameConstantFunctions.getSkillLevelMinMax(id)
+function GameConstantFunctions.getSkillLevelMinMax(id, isActive)
     local skill = GAME_CONSTANT.skills[id]
-    return skill.minLevel, skill.maxLevel
+    if (isActive) then
+        return skill.minLevelActive, skill.maxLevelActive
+    else
+        return skill.minLevelPassive, skill.maxLevelPassive
+    end
 end
 
 function GameConstantFunctions.getSkillPresets()

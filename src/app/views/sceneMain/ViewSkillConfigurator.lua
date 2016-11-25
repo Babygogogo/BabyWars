@@ -279,6 +279,7 @@ function ViewSkillConfigurator:setMenuTitle(text)
 end
 
 function ViewSkillConfigurator:setMenuItems(items)
+    assert(#items > 0, "ViewSkillConfigurator:setMenuItems() the items are empty.")
     local listView = self.m_MenuListView
     listView:removeAllChildren()
 

@@ -39,8 +39,8 @@ local function transformModifier3(modifier, unit)
     end
 end
 
-local function getSkillModifierForDisplay(id, level)
-    local modifier = getSkillModifier(id, level)
+local function getSkillModifierForDisplay(id, level, isActive)
+    local modifier = getSkillModifier(id, level, isActive)
     if (not modifier) then
         return ""
     end
@@ -106,13 +106,13 @@ local function getFullDescriptionForBaseSkillPoints(points)
     return string.format("%s: %d", getLocalizedText(3, "BasePoints"), points)
 end
 
-local function getFullDescriptionForSingleSkill(id, level, isPassive)
-    if (isPassive) then
+local function getFullDescriptionForSingleSkill(id, level, isActive)
+    if (not isActive) then
         return string.format("%s      %s: %d      %s: %.2f\n%s %s",
             getLocalizedText(5, id),
             getLocalizedText(3, "Level"),       level,
             getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, false),
-            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level)
+            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level, false)
         )
     else
         return string.format("%s      %s: %d      %s: %.2f      %s: %d\n%s %s",
@@ -120,15 +120,15 @@ local function getFullDescriptionForSingleSkill(id, level, isPassive)
             getLocalizedText(3, "Level"),       level,
             getLocalizedText(3, "SkillPoints"), getSkillPoints(id, level, true),
             getLocalizedText(3, "MinEnergy"),   getSkillEnergyRequirement(id, level),
-            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level)
+            getLocalizedText(4, id),            getSkillModifierForDisplay(id, level, true)
         )
     end
 end
 
-local function getBriefDescriptionForSingleSkill(id, level)
+local function getBriefDescriptionForSingleSkill(id, level, isActive)
     return string.format("%s\n%s %s",
         getLocalizedText(5, id),
-        getLocalizedText(4, id), getSkillModifierForDisplay(id, level)
+        getLocalizedText(4, id), getSkillModifierForDisplay(id, level, isActive)
     )
 end
 
@@ -159,7 +159,7 @@ local function getFullDescriptionForSkillGroup(skillGroup, skillGroupID)
     for i = 1, slotsCount do
         local skill = skills[i]
         if (skill) then
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getFullDescriptionForSingleSkill(skill.id, skill.level, isPassive))
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getFullDescriptionForSingleSkill(skill.id, skill.level, not isPassive))
         else
             descriptions[#descriptions + 1] = string.format("%d. %s", i, getLocalizedText(3, "None"))
         end
@@ -191,7 +191,7 @@ local function getBriefDescriptionForSkillGroup(skillGroup, skillGroupID)
     for i = 1, slotsCount do
         local skill = skills[i]
         if (skill) then
-            descriptions[#descriptions + 1] = string.format("%d. %s", i, getBriefDescriptionForSingleSkill(skill.id, skill.level))
+            descriptions[#descriptions + 1] = string.format("%d. %s", i, getBriefDescriptionForSingleSkill(skill.id, skill.level, not isPassive))
         else
             if (i == 1) then
                 descriptions[#descriptions + 1] = string.format("1. %s", getLocalizedText(3, "None"))

@@ -57,7 +57,7 @@ local HELP_LIST_VIEW_POS_Y  = HELP_BACKGROUND_POS_Y + 5
 
 local HELP_TEXT_WIDTH       = HELP_LIST_VIEW_WIDTH
 local HELP_TEXT_HEIGHT      = 1000
-local HELP_TEXT_FONT_SIZE   = 20
+local HELP_TEXT_FONT_SIZE   = 18
 local HELP_TEXT_LINE_HEIGHT = HELP_TEXT_FONT_SIZE / 5 * 8
 
 --------------------------------------------------------------------------------

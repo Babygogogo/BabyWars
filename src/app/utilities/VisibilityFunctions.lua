@@ -7,8 +7,6 @@ local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local TableFunctions         = require("src.app.utilities.TableFunctions")
 
-local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
-
 local canRevealHidingPlacesForTilesForSkillGroup = SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup
 local canRevealHidingPlacesForTiles              = SkillModifierFunctions.canRevealHidingPlacesForTiles
 local canRevealHidingPlacesForUnitsForSkillGroup = SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup
@@ -310,11 +308,11 @@ end
 function VisibilityFunctions.getRevealedTilesAndUnitsDataForSkillActivation(sceneWarFileName, skillGroupID)
     local playerIndex            = getModelTurnManager(sceneWarFileName):getPlayerIndex()
     local modelSkillGroup        = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration():getModelSkillGroupWithId(skillGroupID)
-    local canRevealWithTiles     = canRevealHidingPlacesForTilesForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
-    local canRevealWithUnits     = canRevealHidingPlacesForUnitsForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    local canRevealWithTiles     = canRevealHidingPlacesForTilesForSkillGroup(modelSkillGroup, true)
+    local canRevealWithUnits     = canRevealHidingPlacesForUnitsForSkillGroup(modelSkillGroup, true)
     local modelFogMap            = getModelFogMap(sceneWarFileName)
-    local visionModifierForTiles = getVisionModifierForTilesForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
-    local visionModifierForUnits = getVisionModifierForUnitsForSkillGroup(modelSkillGroup, ACTIVE_SKILL_SLOTS_COUNT)
+    local visionModifierForTiles = getVisionModifierForTilesForSkillGroup(modelSkillGroup, true)
+    local visionModifierForUnits = getVisionModifierForUnitsForSkillGroup(modelSkillGroup, true)
     if ((not modelFogMap:isFogOfWarCurrently()) and (not canRevealWithTiles) and (not canRevealWithUnits) and (visionModifierForTiles == 0) and (visionModifierForUnits == 0)) then
         return
     end

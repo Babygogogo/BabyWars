@@ -49,6 +49,30 @@ local function createItemsSkillSubCategory(self, categoryName)
     return items
 end
 
+local function createItemsSkillLevels(self, skillID, isActive)
+    local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID, isActive)
+    if ((not minLevel) or (not maxLevel)) then
+        return nil
+    end
+
+    local items = {}
+    for i = maxLevel, minLevel, -1 do
+        if (i ~= 0) then
+            items[#items + 1] = {
+                name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
+                callback = function()
+                    self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
+                    if (self.m_View) then
+                        self.m_View:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
+                    end
+                end,
+            }
+        end
+    end
+
+    return items
+end
+
 --------------------------------------------------------------------------------
 -- The functions for setting state.
 --------------------------------------------------------------------------------
@@ -172,8 +196,10 @@ setStateSelectSkillLevel = function(self, skillID)
     self.m_State   = "stateSelectSkillLevel"
     self.m_SkillID = skillID
 
-    if (self.m_View) then
-        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID])
+    if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
+        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID].passive)
+    else
+        self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID].active)
     end
 end
 
@@ -396,23 +422,10 @@ local function initItemsSkillLevels(self)
     for categoryName, _ in pairs(self.m_ItemsSkills) do
         for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
             if (not items[skillID]) then
-                local subItems = {}
-                local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID)
-                for i = maxLevel, minLevel, -1 do
-                    if (i ~= 0) then
-                        subItems[#subItems + 1] = {
-                            name     = string.format("%s %d", getLocalizedText(3, "Level"), i),
-                            callback = function()
-                                self.m_ModelSkillConfiguration:setSkill(self.m_SkillGroupID, self.m_SlotIndex, self.m_SkillID, i)
-                                if (self.m_View) then
-                                    self.m_View:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
-                                end
-                            end,
-                        }
-                    end
-                end
-
-                items[skillID] = subItems
+                items[skillID] = {
+                    passive = createItemsSkillLevels(self, skillID, false),
+                    active  = createItemsSkillLevels(self, skillID, true),
+                }
             end
         end
     end
