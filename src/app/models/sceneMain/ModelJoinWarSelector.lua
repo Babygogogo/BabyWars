@@ -211,6 +211,10 @@ local function createJoinableWarList(self, list)
     local warList = {}
     for sceneWarFileName, configuration in pairs(list) do
         local warFieldFileName = configuration.warFieldFileName
+        if (configuration.isRandomWarField) then
+            warFieldFileName   = "Random" .. require("res.data.templateWarField." .. warFieldFileName).playersCount .. "P"
+        end
+
         warList[#warList + 1] = {
             warFieldName     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             sceneWarFileName = sceneWarFileName,

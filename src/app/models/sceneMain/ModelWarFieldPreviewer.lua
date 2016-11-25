@@ -4,6 +4,13 @@ local ModelWarFieldPreviewer = class("ModelWarFieldPreviewer")
 local Actor = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function isRandomWarField(warFieldFileName)
+    return string.find(warFieldFileName, "Random", 1, true) == 1
+end
+
+--------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initActorTileMap(self, tileMapData)
@@ -22,10 +29,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelWarFieldPreviewer:setWarField(warFieldFileName, isRandom)
+function ModelWarFieldPreviewer:setWarField(warFieldFileName)
     if (self.m_WarFieldFileName ~= warFieldFileName) then
         self.m_WarFieldFileName = warFieldFileName
-        if (isRandom) then
+        if (isRandomWarField(warFieldFileName)) then
             self.m_RandomPlayersCount = require("res.data.templateWarField." .. warFieldFileName).playersCount
         else
             self.m_RandomPlayersCount = nil
