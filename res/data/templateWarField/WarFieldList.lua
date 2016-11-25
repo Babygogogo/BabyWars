@@ -11,7 +11,7 @@ return {
     "GanHeZhiJing",
     "GeBiTan",
     "HaiAnTuJi",
-    "HeiSenLin_2",
+    "HeiSenLin",
     "HuiShengDao",
     "LianYuShengTan",
     "ManShouXueXing",
@@ -25,6 +25,8 @@ return {
     "YanMo",
     "YunShiQun",
     "ZhengZhengFangFang",
+
+    "Random2P",
 
     "JiangQi",
     "QuanMianCeShi",

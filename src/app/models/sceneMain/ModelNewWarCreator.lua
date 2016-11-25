@@ -18,6 +18,10 @@ local function getWarFieldName(fileName)
     return require("res.data.templateWarField." .. fileName).warFieldName
 end
 
+local function isRandomMap(warFieldFileName)
+    return string.find(warFieldFileName, "Random", 1, true) == 1
+end
+
 local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
     local options = {}
     for i = 1, playersCount do
@@ -213,7 +217,7 @@ local function initWarFieldList(self, list)
         list[#list + 1] = {
             name     = getWarFieldName(warFieldFileName),
             callback = function()
-                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName, isRandomMap(warFieldFileName))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)

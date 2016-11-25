@@ -40,6 +40,14 @@ local LABEL_NICKNAMES_FONT_COLOR    = AUTHOR_NAME_LABEL_FONT_COLOR
 local LABEL_NICKNAMES_OUTLINE_COLOR = AUTHOR_NAME_LABEL_OUTLINE_COLOR
 local LABEL_NICKNAMES_OUTLINE_WIDTH = 2
 
+local LABEL_RANDOM_WIDTH         = CLIPPING_NODE_WIDTH
+local LABEL_RANDOM_HEIGHT        = CLIPPING_NODE_HEIGHT
+local LABEL_RANDOM_FONT_NAME     = AUTHOR_NAME_LABEL_FONT_NAME
+local LABEL_RANDOM_FONT_SIZE     = 60
+local LABEL_RANDOM_FONT_COLOR    = AUTHOR_NAME_LABEL_FONT_COLOR
+local LABEL_RANDOM_OUTLINE_COLOR = AUTHOR_NAME_LABEL_OUTLINE_COLOR
+local LABEL_RANDOM_OUTLINE_WIDTH = AUTHOR_NAME_LABEL_OUTLINE_WIDTH
+
 local CLIPPING_RECT = {
     x      = 0,
     y      = 0,
@@ -113,6 +121,20 @@ local function initLabelNicknames(self)
     self:addChild(label, LABEL_NICKNAMES_Z_ORDER)
 end
 
+local function initLabelRandom(self)
+    local label = cc.Label:createWithTTF("", LABEL_RANDOM_FONT_NAME, LABEL_RANDOM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :enableOutline(LABEL_RANDOM_OUTLINE_COLOR, LABEL_RANDOM_OUTLINE_WIDTH)
+
+        :setDimensions(LABEL_RANDOM_WIDTH, LABEL_RANDOM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+
+    self.m_LabelRandom = label
+    self.m_ClippingNode:addChild(label)
+end
+
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
@@ -121,6 +143,7 @@ function ViewWarFieldPreviewer:ctor(param)
     initClippingNode(   self)
     initLabelAuthorName(self)
     initLabelNicknames( self)
+    initLabelRandom(    self)
 
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
@@ -134,6 +157,7 @@ end
 function ViewWarFieldPreviewer:setViewTileMap(view, mapSize)
     if (self.m_ViewTileMap) then
         self.m_ZoomableNode:removeChild(self.m_ViewTileMap)
+        self.m_ViewTileMap = nil
     end
 
     self.m_ViewTileMap = view
@@ -174,9 +198,19 @@ function ViewWarFieldPreviewer:setPlayerNicknames(names, count)
     return self
 end
 
-function ViewWarFieldPreviewer:setEnabled(enabled)
+function ViewWarFieldPreviewer:setEnabled(enabled, randomPlayersCount)
+    if (enabled) then
+        if (randomPlayersCount) then
+            self.m_LabelRandom:setString("??(" .. randomPlayersCount .. "P)")
+                :setVisible(true)
+            self.m_ZoomableNode:setEnabled(false)
+        else
+            self.m_LabelRandom:setVisible(false)
+            self.m_ZoomableNode:setEnabled(true)
+        end
+    end
+
     self:setVisible(enabled)
-    self.m_ZoomableNode:setEnabled(enabled)
 
     return self
 end

@@ -22,15 +22,18 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelWarFieldPreviewer:setWarField(warFieldFileName)
+function ModelWarFieldPreviewer:setWarField(warFieldFileName, isRandom)
     if (self.m_WarFieldFileName ~= warFieldFileName) then
         self.m_WarFieldFileName = warFieldFileName
+        if (isRandom) then
+            self.m_RandomPlayersCount = require("res.data.templateWarField." .. warFieldFileName).playersCount
+        else
+            self.m_RandomPlayersCount = nil
 
-        initActorTileMap(self, {template = warFieldFileName, isPreview = true})
-        if (self.m_View) then
+            initActorTileMap(self, {template = warFieldFileName, isPreview = true})
             self.m_View:setViewTileMap(self.m_ActorTileMap:getView(), self.m_ActorTileMap:getModel():getMapSize())
-                :setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)
         end
+        self.m_View:setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)
     end
 
     return self
@@ -46,7 +49,7 @@ end
 
 function ModelWarFieldPreviewer:setEnabled(enabled)
     if (self.m_View) then
-        self.m_View:setEnabled(enabled)
+        self.m_View:setEnabled(enabled, self.m_RandomPlayersCount)
     end
 
     return self
