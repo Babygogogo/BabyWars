@@ -798,7 +798,8 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
+    if ((self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) or
+        (getModelTurnManager():getTurnPhase() ~= "main"))        then
         return false
     else
         local modelTile = getModelTileMap():getModelTile(gridIndex)
@@ -826,7 +827,8 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    if (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) then
+    if ((self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) or
+        (getModelTurnManager():getTurnPhase() ~= "main"))        then
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
