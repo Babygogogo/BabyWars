@@ -8,7 +8,7 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
-local canRevealHidingPlacesForUnits = SkillModifierFunctions.canRevealHidingPlacesForUnits
+local canRevealHidingPlacesWithUnits = SkillModifierFunctions.canRevealHidingPlacesWithUnits
 local getGridsWithinDistance        = GridIndexFunctions.getGridsWithinDistance
 local getModelPlayerManager         = SingletonGetters.getModelPlayerManager
 local getModelTileMap               = SingletonGetters.getModelTileMap
@@ -262,7 +262,7 @@ function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
         assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
     end
 
-    local canRevealHidingPlaces = canRevealHidingPlacesForUnits(getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local canRevealHidingPlaces = canRevealHidingPlacesWithUnits(getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
     local visibilityMap         = self.m_MapsForPaths[playerIndex]
     local mapSize               = self:getMapSize()
     for _, pathNode in ipairs(path) do

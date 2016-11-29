@@ -481,7 +481,7 @@ function SkillModifierFunctions.getVisionModifierForTiles(configuration)
         SkillModifierFunctions.getVisionModifierForTilesForSkillGroup(configuration:getActivatingModelSkillGroup(), true)
 end
 
-function SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(modelSkillGroup, isActive)
+function SkillModifierFunctions.canRevealHidingPlacesWithUnitsForSkillGroup(modelSkillGroup, isActive)
     if (not modelSkillGroup) then
         return false
     end
@@ -500,12 +500,12 @@ function SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(model
     return false
 end
 
-function SkillModifierFunctions.canRevealHidingPlacesForUnits(configuration)
-    return SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(configuration:getModelSkillGroupPassive(), false) or
-        SkillModifierFunctions.canRevealHidingPlacesForUnitsForSkillGroup(configuration:getActivatingModelSkillGroup(), true)
+function SkillModifierFunctions.canRevealHidingPlacesWithUnits(configuration)
+    return SkillModifierFunctions.canRevealHidingPlacesWithUnitsForSkillGroup(configuration:getModelSkillGroupPassive(), false) or
+        SkillModifierFunctions.canRevealHidingPlacesWithUnitsForSkillGroup(configuration:getActivatingModelSkillGroup(), true)
 end
 
-function SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(modelSkillGroup, isActive)
+function SkillModifierFunctions.canRevealHidingPlacesWithTilesForSkillGroup(modelSkillGroup, isActive)
     if (not modelSkillGroup) then
         return false
     end
@@ -524,9 +524,9 @@ function SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(model
     return false
 end
 
-function SkillModifierFunctions.canRevealHidingPlacesForTiles(configuration)
-    return SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(configuration:getModelSkillGroupPassive(), false) or
-        SkillModifierFunctions.canRevealHidingPlacesForTilesForSkillGroup(configuration:getActivatingModelSkillGroup(), true)
+function SkillModifierFunctions.canRevealHidingPlacesWithTiles(configuration)
+    return SkillModifierFunctions.canRevealHidingPlacesWithTilesForSkillGroup(configuration:getModelSkillGroupPassive(), false) or
+        SkillModifierFunctions.canRevealHidingPlacesWithTilesForSkillGroup(configuration:getActivatingModelSkillGroup(), true)
 end
 
 return SkillModifierFunctions
