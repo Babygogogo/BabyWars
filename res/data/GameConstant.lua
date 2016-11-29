@@ -949,6 +949,7 @@ GameConstant.categories = {
 
     ["SkillCategoryActiveEnergy"] = {
         13,
+        61,
     },
 
     ["SkillCategoryActiveHP"] = {
@@ -5672,6 +5673,19 @@ GameConstant.skills = {
         modifierUnit = "",
         levels = {
             [1] = {modifierPassive = nil, modifierActive = nil, pointsPassive = 250, pointsActive = 150, minEnergy = 1},
+        },
+    },
+
+    -- Add energy instantly.
+    [61] = {
+        minLevelActive = 1,
+        maxLevelActive = 4,
+        modifierUnit = "",
+        levels = {
+            [1] = {modifierPassive = nil, modifierActive = 0.25, pointsPassive = nil, pointsActive = 25, minEnergy = 1},
+            [2] = {modifierPassive = nil, modifierActive = 0.5, pointsPassive = nil, pointsActive = 50, minEnergy = 1},
+            [3] = {modifierPassive = nil, modifierActive = 0.75, pointsPassive = nil, pointsActive = 75, minEnergy = 1},
+            [4] = {modifierPassive = nil, modifierActive = 1, pointsPassive = nil, pointsActive = 100, minEnergy = 1},
         },
     },
 }
