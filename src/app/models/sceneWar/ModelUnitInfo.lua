@@ -15,14 +15,20 @@ local ModelUnitInfo = class("ModelUnitInfo")
 local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 
+local getModelFogMap         = SingletonGetters.getModelFogMap
+local getModelUnitMap        = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateWithModelUnitMap(self)
-    local modelUnitMap = SingletonGetters.getModelUnitMap()
+    local modelUnitMap = getModelUnitMap()
     local modelUnit    = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
     if (modelUnit) then
-        local loadedModelUnits = modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit)
+        local loadedModelUnits = ((not getModelFogMap():isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) and
+            (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                         or
+            (nil)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
         if (self.m_View) then
