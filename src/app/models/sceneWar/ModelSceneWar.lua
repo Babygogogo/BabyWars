@@ -40,10 +40,16 @@ local function onWebSocketOpen(self, param)
     print("ModelSceneWar-onWebSocketOpen()")
     self:getModelMessageIndicator():showMessage(getLocalizedText(30))
 
-    WebSocketManager.sendAction({
-        actionName = "GetSceneWarActionId",
-        fileName   = self:getFileName(),
-    })
+    local modelTurnManager = self:getModelTurnManager()
+    if ((modelTurnManager:getTurnPhase() == "requestToBegin")                                         and
+        (modelTurnManager:getPlayerIndex() == self:getModelPlayerManager():getPlayerIndexLoggedIn())) then
+        modelTurnManager:runTurn()
+    else
+        WebSocketManager.sendAction({
+            actionName = "GetSceneWarActionId",
+            fileName   = self:getFileName(),
+        })
+    end
 end
 
 local function onWebSocketMessage(self, param)

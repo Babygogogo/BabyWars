@@ -6,7 +6,14 @@ local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
+
+local getModelFogMap           = SingletonGetters.getModelFogMap
+local getModelMapCursor        = SingletonGetters.getModelMapCursor
+local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
+local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
+local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
+local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
 local COLOR_IDLE             = {r = 255, g = 255, b = 255}
@@ -28,14 +35,13 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
-    local playerIndex            = self.m_Model:getPlayerIndex()
-    local playerIndexMod         = playerIndex % 2
-    local _, playerIndexLoggedIn = SingletonGetters.getModelPlayerManager():getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
-    local sceneWarFileName       = SingletonGetters.getSceneWarFileName()
-    local isUnitVisible          = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
-    local unitType               = self.m_Model:getUnitType()
-    local steps                  = {cc.CallFunc:create(function()
-        SingletonGetters.getModelMapCursor():setMovableByPlayer(false)
+    local playerIndex         = self.m_Model:getPlayerIndex()
+    local playerIndexMod      = playerIndex % 2
+    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    local sceneWarFileName    = getSceneWarFileName()
+    local unitType            = self.m_Model:getUnitType()
+    local steps               = {cc.CallFunc:create(function()
+        getModelMapCursor():setMovableByPlayer(false)
     end)}
 
     for i = 2, #path do
@@ -79,7 +85,7 @@ end
 local function createActionMoveAlongPath(self, path, isDiving, callback)
     local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
+        getModelMapCursor():setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
         callback()
     end)
@@ -90,16 +96,16 @@ end
 local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
     local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        SingletonGetters.getScriptEventDispatcher():dispatchEvent({
+        getScriptEventDispatcher():dispatchEvent({
             name      = "EvtMapCursorMoved",
             gridIndex = targetGridIndex,
         })
-        SingletonGetters.getModelMapCursor():setNormalCursorVisible(false)
+        getModelMapCursor():setNormalCursorVisible(false)
             :setTargetCursorVisible(true)
     end)
     steps[#steps + 1] = cc.DelayTime:create(0.5)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        SingletonGetters.getModelMapCursor():setMovableByPlayer(true)
+        getModelMapCursor():setMovableByPlayer(true)
             :setNormalCursorVisible(true)
             :setTargetCursorVisible(false)
 
@@ -116,7 +122,7 @@ local function getSkillIndicatorFrame(unit)
     end
 
     local playerIndex = unit:getPlayerIndex()
-    local modelPlayer = SingletonGetters.getModelPlayerManager():getModelPlayer(playerIndex)
+    local modelPlayer = getModelPlayerManager():getModelPlayer(playerIndex)
     local id          = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
     if (not id) then
         return nil
@@ -177,10 +183,21 @@ local function getBuildIndicatorFrame(unit)
 end
 
 local function getLoadIndicatorFrame(unit)
-    if ((unit.getCurrentLoadCount) and (unit:getCurrentLoadCount() ~= 0)) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
-    else
+    if (not unit.getCurrentLoadCount) then
         return nil
+    else
+        local loadCount = unit:getCurrentLoadCount()
+        if (getModelFogMap():isFogOfWarCurrently()) then
+            if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn()) or (loadCount > 0)) then
+                return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
+            else
+                return nil
+            end
+        elseif (loadCount > 0) then
+            return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
+        else
+            return nil
+        end
     end
 end
 

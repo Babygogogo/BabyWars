@@ -191,6 +191,20 @@ s_Executors.execute57 = function(level, modelWarField, modelPlayerManager, model
     end
 end
 
+s_Executors.execute61 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+    local modelPlayer         = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex())
+    local _, req1, req2       = modelPlayer:getEnergy()
+    local damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement()
+    local maxDamageCost       = round(req2 * damageCostPerEnergy)
+    modelPlayer:setDamageCost(math.max(
+        0,
+        math.min(
+            round(modelPlayer:getDamageCost() + round(damageCostPerEnergy * getSkillModifier(61, level, true))),
+            maxDamageCost
+        )
+    ))
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

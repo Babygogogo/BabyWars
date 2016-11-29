@@ -119,6 +119,8 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
 end
 
 function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer, playerIndex)
+    assert(type(playerIndex) == "number", "ViewMoneyEnergyInfo:updateWithModelPlayer() invalid playerIndex: " .. (playerIndex or ""))
+
     local label              = self.m_Label
     local energy, req1, req2 = modelPlayer:getEnergy()
     label:setString(string.format("%s\n%s\n%s",

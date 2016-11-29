@@ -13,15 +13,20 @@ local ModelMoneyEnergyInfo = class("ModelMoneyEnergyInfo")
 
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
+local getModelPlayerManager  = SingletonGetters.getModelPlayerManager
+local getModelTurnManager    = SingletonGetters.getModelTurnManager
+local getModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu
+
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerIndexUpdated(self, event)
-    self.m_PlayerIndex = event.playerIndex
+    local playerIndex = event.playerIndex
+    self.m_PlayerIndex = playerIndex
 
     if (self.m_View) then
-        self.m_View:updateWithModelPlayer(event.modelPlayer)
-            :updateWithPlayerIndex(event.playerIndex)
+        self.m_View:updateWithModelPlayer(event.modelPlayer, playerIndex)
+            :updateWithPlayerIndex(playerIndex)
     end
 end
 
@@ -85,10 +90,11 @@ function ModelMoneyEnergyInfo:onStartRunning(sceneWarFileName)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
 
-    self.m_PlayerIndex = SingletonGetters.getModelTurnManager():getPlayerIndex()
+    local playerIndex  = getModelTurnManager():getPlayerIndex()
+    self.m_PlayerIndex = playerIndex
     if (self.m_View) then
-        self.m_View:updateWithModelPlayer(SingletonGetters.getModelPlayerManager():getModelPlayer(self.m_PlayerIndex))
-            :updateWithPlayerIndex(self.m_PlayerIndex)
+        self.m_View:updateWithModelPlayer(getModelPlayerManager():getModelPlayer(playerIndex), playerIndex)
+            :updateWithPlayerIndex(playerIndex)
     end
 
     return self
@@ -111,7 +117,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    SingletonGetters.getModelWarCommandMenu():setEnabled(true)
+    getModelWarCommandMenu():setEnabled(true)
 
     return self
 end
