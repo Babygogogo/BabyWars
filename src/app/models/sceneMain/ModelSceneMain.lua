@@ -228,6 +228,10 @@ function ModelSceneMain:getModelConfirmBox()
     return self.m_ActorConfirmBox:getModel()
 end
 
+function ModelSceneMain:getModelMainMenu()
+    return self.m_ActorMainMenu:getModel()
+end
+
 function ModelSceneMain:getModelMessageIndicator()
     return self.m_ActorMessageIndicator:getModel()
 end

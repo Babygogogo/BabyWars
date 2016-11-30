@@ -172,6 +172,7 @@ local s_Texts = {
             elseif (textType == "Continue")            then return "继 续"
             elseif (textType == "JoinWar")             then return "参 战"
             elseif (textType == "ConfigSkills")        then return "配 置 技 能"
+            elseif (textType == "ManageReplay")        then return "管 理 回 放"
             elseif (textType == "Login")               then return "注 册 / 登 陆"
             elseif (textType == "SetMessageIndicator") then return "开/关信息提示"
             elseif (textType == "SetMusic")            then return "开 / 关 音 乐"
@@ -194,6 +195,7 @@ local s_Texts = {
             elseif (textType == "Continue")            then return "Continue"
             elseif (textType == "JoinWar")             then return "Join"
             elseif (textType == "ConfigSkills")        then return "Config Skills"
+            elseif (textType == "ManageReplay")        then return "ManageReplay"
             elseif (textType == "Login")               then return "Login"
             elseif (textType == "SetMessageIndicator") then return "Set Message"
             elseif (textType == "SetMusic")            then return "Set Music"
@@ -553,11 +555,25 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [10] = {
-        [1] = function(...) return "战 局 操 作" end,
-        [2] = function(...) return "War Control" end,
+        [1] = function(textType)
+            if     (textType == "Delete")   then return "删 除"
+            elseif (textType == "Download") then return "下 载"
+            elseif (textType == "NextPage") then return "下一页"
+            elseif (textType == "Playback") then return "播 放"
+            else                                 return "未知10:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Delete")   then return "Delete"
+            elseif (textType == "Download") then return "Download"
+            elseif (textType == "NextPage") then return "Next Page"
+            elseif (textType == "Playback") then return "Playback"
+            else                                 return "Unknown10:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [11] = {
         [1] = function(...) return "关 于 本 作" end,
         [2] = function(...) return "About" end,

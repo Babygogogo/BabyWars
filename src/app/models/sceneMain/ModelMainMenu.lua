@@ -76,6 +76,18 @@ local function getActorSkillConfigurator(self)
     return self.m_ActorSkillConfigurator
 end
 
+local function getActorReplayManager(self)
+    if (not self.m_ActorReplayManager) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelReplayManager", nil, "sceneMain.ViewReplayManager")
+        actor:getModel():setEnabled(false)
+
+        self.m_ActorReplayManager = actor
+        self.m_View:setViewReplayManager(actor:getView())
+    end
+
+    return self.m_ActorReplayManager
+end
+
 local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
@@ -152,6 +164,18 @@ local function initItemConfigSkills(self)
     self.m_ItemConfigSkills = item
 end
 
+local function initItemManageReplay(self)
+    local item = {
+        name     = getLocalizedText(1, "ManageReplay"),
+        callback = function()
+            self:setMenuEnabled(false)
+            getActorReplayManager(self):getModel():setEnabled(true)
+        end,
+    }
+
+    self.m_ItemManageReplay = item
+end
+
 local function initItemLogin(self)
     local item = {
         name     = getLocalizedText(1, "Login"),
@@ -211,6 +235,7 @@ function ModelMainMenu:ctor(param)
     initItemContinue(           self)
     initItemJoinWar(            self)
     initItemConfigSkills(       self)
+    initItemManageReplay(       self)
     initItemLogin(              self)
     initItemSetMessageIndicator(self)
     initItemSetMusic(           self)
@@ -315,6 +340,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemContinue,
                 self.m_ItemJoinWar,
                 self.m_ItemConfigSkills,
+                self.m_ItemManageReplay,
                 self.m_ItemLogin,
                 self.m_ItemSetMessageIndicator,
                 self.m_ItemSetMusic,
@@ -323,6 +349,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
         else
             showMenuItems(self,
                 self.m_ItemConfigSkills,
+                self.m_ItemManageReplay,
                 self.m_ItemLogin,
                 self.m_ItemSetMessageIndicator,
                 self.m_ItemSetMusic,

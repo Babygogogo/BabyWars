@@ -24,6 +24,7 @@ local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
 
 local ActionExecutor        = require("src.app.utilities.ActionExecutor")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local TableFunctions        = require("src.app.utilities.TableFunctions")
 local Actor                 = require("src.global.actors.Actor")
 local EventDispatcher       = require("src.global.events.EventDispatcher")
 
@@ -31,7 +32,8 @@ local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isSe
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
-local getLocalizedText = LocalizationFunctions.getLocalizedText
+local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"fileName", "actionID"}
+local getLocalizedText                  = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -124,6 +126,7 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     self.m_ActionID            = sceneData.actionID
+    self.m_ExecutedActions     = sceneData.executedActions
     self.m_FileName            = sceneData.fileName
     self.m_IsWarEnded          = sceneData.isEnded
     self.m_IsFogOfWarByDefault = sceneData.isFogOfWarByDefault
@@ -170,6 +173,7 @@ function ModelSceneWar:toSerializableTable()
         isEnded             = self.m_IsWarEnded,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
         actionID            = self.m_ActionID,
+        executedActions     = self.m_ExecutedActions,
         maxSkillPoints      = self.m_MaxSkillPoints,
         warField            = self:getModelWarField()      :toSerializableTable(),
         turn                = self:getModelTurnManager()   :toSerializableTable(),
@@ -241,6 +245,9 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
     ActionExecutor.execute(action)
+    if ((IS_SERVER) and (self.m_ExecutedActions)) then
+        self.m_ExecutedActions[self.m_ActionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+    end
 
     return self
 end
