@@ -43,6 +43,12 @@ local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerI
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 
+local DEFAULT_TURN_DATA = {
+    turnIndex   = 1,
+    playerIndex = 1,
+    phase       = "requestToBegin",
+}
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -367,6 +373,10 @@ end
 
 function ModelTurnManager:toSerializableTableForPlayerIndex(playerIndex)
     return self:toSerializableTable()
+end
+
+function ModelTurnManager:toSerializableReplayData()
+    return DEFAULT_TURN_DATA
 end
 
 --------------------------------------------------------------------------------

@@ -139,6 +139,18 @@ function ModelWarField:toSerializableTableForPlayerIndex(playerIndex)
     }
 end
 
+function ModelWarField:toSerializableReplayData()
+    local templateName = self:getModelTileMap():getTemplateName()
+    return {
+        tileMap = {
+            template = templateName,
+        },
+        unitMap = {
+            template = templateName,
+        },
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------

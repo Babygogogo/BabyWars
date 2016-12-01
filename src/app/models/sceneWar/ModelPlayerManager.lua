@@ -46,6 +46,15 @@ function ModelPlayerManager:toSerializableTableForPlayerIndex(playerIndex)
     return self:toSerializableTable()
 end
 
+function ModelPlayerManager:toSerializableReplayData()
+    local t = {}
+    self:forEachModelPlayer(function(modelPlayer, playerIndex)
+        t[playerIndex] = modelPlayer:toSerializableReplayData()
+    end)
+
+    return t
+end
+
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------

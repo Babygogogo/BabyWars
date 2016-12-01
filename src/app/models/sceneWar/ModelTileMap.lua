@@ -207,6 +207,10 @@ function ModelTileMap:getMapSize()
     return self.m_MapSize
 end
 
+function ModelTileMap:getTemplateName()
+    return self.m_TemplateName
+end
+
 function ModelTileMap:getMapName()
     return requireMapData(self.m_TemplateName).warFieldName
 end

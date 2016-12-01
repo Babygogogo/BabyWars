@@ -60,6 +60,18 @@ function ModelPlayer:toSerializableTable()
     }
 end
 
+function ModelPlayer:toSerializableReplayData()
+    return {
+        account             = self:getAccount(),
+        nickname            = self:getNickname(),
+        fund                = 0,
+        isAlive             = true,
+        damageCost          = 0,
+        skillActivatedCount = 0,
+        skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
