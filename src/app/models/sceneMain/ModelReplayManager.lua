@@ -163,6 +163,36 @@ local function createMenuItemsForDownload(self, list)
     return items
 end
 
+local function createMenuItemsForPlayback(self)
+    local items = {}
+    for sceneWarFileName, configuration in pairs(self.m_ReplayList) do
+        local warFieldFileName = configuration.warFieldFileName
+        items[#items + 1] = {
+            name             = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            sceneWarFileName = sceneWarFileName,
+
+            callback         = function()
+                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                    :setPlayerNicknames(getPlayerNicknames(configuration))
+                    :setEnabled(true)
+                if (self.m_View) then
+                    self.m_View:setButtonConfirmVisible(true)
+                end
+
+                self.m_OnButtonConfirmTouched = function()
+                    print("replay: " .. sceneWarFileName)
+                end
+            end,
+        }
+    end
+
+    table.sort(items, function(item1, item2)
+        return item1.sceneWarFileName < item2.sceneWarFileName
+    end)
+
+    return items
+end
+
 --------------------------------------------------------------------------------
 -- The functions for managing states.
 --------------------------------------------------------------------------------
@@ -217,10 +247,21 @@ end
 
 local function setStatePlayback(self)
     self.m_State = "statePlayback"
-    if (self.m_View) then
-        self.m_View:setMenuTitle(getLocalizedText(10, "Playback"))
+    local view = self.m_View
+    if (view) then
+        view:setMenuTitle(getLocalizedText(10, "Playback"))
+            :setButtonConfirmText(getLocalizedText(10, "Playback"))
             :setButtonConfirmVisible(false)
+            :enableButtonConfirm()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+
+        local items = createMenuItemsForPlayback(self)
+        if (#items == 0) then
+            view:removeAllMenuItems()
+            getModelMessageIndicator():showMessage(getLocalizedText(10, "NoReplayData"))
+        else
+            view:setMenuItems(items)
+        end
     end
 end
 
@@ -245,6 +286,7 @@ local function initItemPlayback(self)
     local item = {
         name     = getLocalizedText(10, "Playback"),
         callback = function()
+            setStatePlayback(self)
         end,
     }
 
@@ -354,6 +396,8 @@ function ModelReplayManager:onButtonBackTouched()
     elseif (state == "stateDownload") then
         setStateMain(self)
     elseif (state == "stateDelete") then
+        setStateMain(self)
+    elseif (state == "statePlayback") then
         setStateMain(self)
     else
         error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
