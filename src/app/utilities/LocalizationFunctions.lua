@@ -557,19 +557,23 @@ local s_Texts = {
     },
     [10] = {
         [1] = function(textType)
-            if     (textType == "Delete")   then return "删 除"
-            elseif (textType == "Download") then return "下 载"
-            elseif (textType == "NextPage") then return "下一页"
-            elseif (textType == "Playback") then return "播 放"
-            else                                 return "未知10:" .. (textType or "")
+            if     (textType == "Delete")               then return "删 除"
+            elseif (textType == "Download")             then return "下 载"
+            elseif (textType == "DownloadReplay")       then return "下 载 回 放"
+            elseif (textType == "NextPage")             then return "下一页"
+            elseif (textType == "NoDownloadableReplay") then return "当前没有可下载的回放数据。请返回。"
+            elseif (textType == "Playback")             then return "播 放"
+            else                                             return "未知10:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "Delete")   then return "Delete"
-            elseif (textType == "Download") then return "Download"
-            elseif (textType == "NextPage") then return "Next Page"
-            elseif (textType == "Playback") then return "Playback"
-            else                                 return "Unknown10:" .. (textType or "")
+            if     (textType == "Delete")               then return "Delete"
+            elseif (textType == "Download")             then return "Download"
+            elseif (textType == "DownloadReplay")       then return "Download"
+            elseif (textType == "NextPage")             then return "Next Page"
+            elseif (textType == "NoDownloadableReplay") then return "There's no downloadable replay currently."
+            elseif (textType == "Playback")             then return "Playback"
+            else                                             return "Unknown10:" .. (textType or "")
             end
         end,
     },

@@ -169,7 +169,7 @@ local function initItemManageReplay(self)
         name     = getLocalizedText(1, "ManageReplay"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorReplayManager(self):getModel():setEnabled(true)
+                :getModelReplayManager():setEnabled(true)
         end,
     }
 
@@ -367,6 +367,10 @@ function ModelMainMenu:onButtonExitTouched()
             cc.Director:getInstance():endToLua()
         end)
         :setEnabled(true)
+end
+
+function ModelMainMenu:getModelReplayManager()
+    return getActorReplayManager(self):getModel()
 end
 
 return ModelMainMenu

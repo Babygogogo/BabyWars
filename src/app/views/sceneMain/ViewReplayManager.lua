@@ -7,11 +7,11 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local MENU_TITLE_Z_ORDER          = 1
 local BUTTON_BACK_Z_ORDER         = 1
-local BUTTON_SAVE_Z_ORDER         = 1
+local BUTTON_CONFIRM_Z_ORDER      = 1
+local BUTTON_NEXT_PAGE_Z_ORDER    = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
-local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
+local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
-local OVERVIEW_BACKGROUND_Z_ORDER = 0
 
 local BACKGROUND_NAME      = "c03_t01_s01_f01.png"
 local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
@@ -34,6 +34,11 @@ local BUTTON_BACK_HEIGHT     = 50
 local BUTTON_BACK_POS_X      = MENU_BACKGROUND_POS_X
 local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y
 local BUTTON_BACK_FONT_COLOR = {r = 240, g = 80, b = 56}
+
+local BUTTON_NEXT_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_NEXT_HEIGHT = 60
+local BUTTON_NEXT_POS_X  = display.width - BUTTON_NEXT_WIDTH - 30
+local BUTTON_NEXT_POS_Y  = MENU_BACKGROUND_POS_Y
 
 local BUTTON_NEXT_PAGE_WIDTH      = BUTTON_BACK_WIDTH
 local BUTTON_NEXT_PAGE_HEIGHT     = BUTTON_BACK_HEIGHT
@@ -58,6 +63,10 @@ local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local ITEM_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 
+local WAR_NAME_INDICATOR_FONT_SIZE     = 15
+local WAR_NAME_INDICATOR_FONT_COLOR    = {r = 240, g = 80, b = 56}
+local WAR_NAME_INDICATOR_OUTLINE_WIDTH = 1
+
 local BUTTON_COLOR_ENABLED  = {r = 255, g = 255, b = 255}
 local BUTTON_COLOR_DISABLED = {r = 160, g = 160, b = 160}
 
@@ -73,7 +82,21 @@ local function setButtonEnabled(button, enabled)
     end
 end
 
-local function createViewItem(item)
+local function createSceneWarFileNameIndicator(sceneWarFileName)
+    local indicator = cc.Label:createWithTTF(string.sub(sceneWarFileName, 13), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
+    indicator:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
+
+        :setTextColor(WAR_NAME_INDICATOR_FONT_COLOR)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, WAR_NAME_INDICATOR_OUTLINE_WIDTH)
+
+    return indicator
+end
+
+local function createViewMenuItem(item)
     local label = cc.Label:createWithTTF(item.name, ITEM_FONT_NAME, ITEM_FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
 
@@ -92,18 +115,18 @@ local function createViewItem(item)
         :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
 
         :setZoomScale(-0.05)
-        :setCascadeColorEnabled(true)
 
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 item.callback()
             end
         end)
-    view:getRendererNormal():setCascadeColorEnabled(true)
-        :addChild(label)
 
-    if (item.available == false) then
-        setButtonEnabled(view, false)
+    view:setCascadeColorEnabled(true)
+        :getRendererNormal():addChild(label)
+
+    if (item.sceneWarFileName) then
+        view:getRendererNormal():addChild(createSceneWarFileNameIndicator(item.sceneWarFileName))
     end
 
     return view
@@ -166,6 +189,36 @@ local function initButtonBack(self)
     self:addChild(button, BUTTON_BACK_Z_ORDER)
 end
 
+local function initButtonConfirm(self)
+    local button = ccui.Button:create()
+    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(BACKGROUND_CAPINSETS)
+        :setContentSize(BUTTON_NEXT_WIDTH, BUTTON_NEXT_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(180)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_NEXT_POS_X, BUTTON_NEXT_POS_Y)
+
+        :setTitleFontName(ITEM_FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor(ITEM_FONT_COLOR)
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonConfirmTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+
+    self.m_ButtonConfirm = button
+    self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
+end
+
 local function initButtonNextPage(self)
     local button = ccui.Button:create()
     button:ignoreAnchorPointForPosition(true)
@@ -193,7 +246,7 @@ local function initButtonNextPage(self)
     button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
     self.m_ButtonNextPage = button
-    self:addChild(button, BUTTON_SAVE_Z_ORDER)
+    self:addChild(button, BUTTON_NEXT_PAGE_Z_ORDER)
 end
 
 local function initMenuListView(self)
@@ -215,8 +268,17 @@ function ViewReplayManager:ctor()
     initMenuBackground(self)
     initMenuTitle(     self)
     initButtonBack(    self)
+    initButtonConfirm( self)
     initButtonNextPage(self)
     initMenuListView(  self)
+
+    return self
+end
+
+function ViewReplayManager:setViewWarFieldPreviewer(view)
+    assert(self.m_ViewWarFieldPreviewer == nil, "ViewReplayManager:setViewWarFieldPreviewer() the view has been set already.")
+    self.m_ViewWarFieldPreviewer = view
+    self:addChild(view, WAR_FIELD_PREVIEWER_Z_ORDER)
 
     return self
 end
@@ -236,8 +298,14 @@ function ViewReplayManager:setMenuItems(items)
     listView:removeAllChildren()
 
     for _, item in ipairs(items) do
-        listView:pushBackCustomItem(createViewItem(item))
+        listView:pushBackCustomItem(createViewMenuItem(item))
     end
+
+    return self
+end
+
+function ViewReplayManager:removeAllMenuItems()
+    self.m_MenuListView:removeAllChildren()
 
     return self
 end
@@ -252,6 +320,18 @@ function ViewReplayManager:setButtonNextPageVisible(visible)
     end
 
     self.m_ButtonNextPage:setVisible(visible)
+
+    return self
+end
+
+function ViewReplayManager:setButtonConfirmText(text)
+    self.m_ButtonConfirm:setTitleText(text)
+
+    return self
+end
+
+function ViewReplayManager:setButtonConfirmVisible(visible)
+    self.m_ButtonConfirm:setVisible(visible)
 
     return self
 end

@@ -376,6 +376,19 @@ local function executeLogout(action)
     runSceneMain({confirmText = action.message})
 end
 
+local function executeGetReplayList(action)
+    assert(not IS_SERVER, "ActionExecutor-executeGetReplayList() should not be invoked on the server.")
+    local modelScene = getModelScene()
+    if (not modelScene.getModelMainMenu) then
+        return
+    end
+
+    local modelReplayManager = modelScene:getModelMainMenu():getModelReplayManager()
+    if (modelReplayManager:getState() == "stateDownload") then
+        modelReplayManager:setDownloadList(action.list)
+    end
+end
+
 local function executeError(action)
     assert(not IS_SERVER, "ActionExecutor-executeError() should not be invoked on the server.")
     error("ActionExecutor-executeError() " .. (action.error or ""))
@@ -1296,9 +1309,8 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action)
     local actionName = action.actionName
-    if (actionName == "Logout") then
-        executeLogout(action)
-        return
+    if     (actionName == "Logout")        then return executeLogout(       action)
+    elseif (actionName == "GetReplayList") then return executeGetReplayList(action)
     end
 
     local sceneWarFileName = action.fileName

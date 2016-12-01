@@ -307,6 +307,10 @@ function ModelSceneWar:setEnded(ended)
     return self
 end
 
+function ModelSceneWar:canReplay()
+    return (self:isEnded()) and (self.m_ExecutedActions ~= nil)
+end
+
 function ModelSceneWar:getModelConfirmBox()
     return self.m_ActorConfirmBox:getModel()
 end
