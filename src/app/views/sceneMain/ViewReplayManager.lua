@@ -336,4 +336,24 @@ function ViewReplayManager:setButtonConfirmVisible(visible)
     return self
 end
 
+function ViewReplayManager:disableButtonConfirmForSecs(secs)
+    self.m_ButtonConfirm:setEnabled(false)
+        :stopAllActions()
+        :runAction(cc.Sequence:create(
+            cc.DelayTime:create(secs),
+            cc.CallFunc:create(function()
+                self.m_ButtonConfirm:setEnabled(true)
+            end)
+        ))
+
+    return self
+end
+
+function ViewReplayManager:enableButtonConfirm()
+    self.m_ButtonConfirm:stopAllActions()
+        :setEnabled(true)
+
+    return true
+end
+
 return ViewReplayManager
