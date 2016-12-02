@@ -7,6 +7,7 @@ local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
 local SKILL_CONFIGURATOR_Z_ORDER     = 3
+local REPLAY_MANAGER_Z_ORDER         = 3
 local LOGIN_PANEL_Z_ORDER            = 3
 local GAME_HELPER_Z_ORDER            = 3
 local MENU_TITLE_Z_ORDER             = 2
@@ -188,6 +189,14 @@ function ViewMainMenu:setViewSkillConfigurator(view)
     assert(self.m_ViewSkillConfigurator == nil, "ViewMainMenu:setViewSkillConfigurator() the view has been set already.")
     self.m_ViewSkillConfigurator = view
     self:addChild(view, SKILL_CONFIGURATOR_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewReplayManager(view)
+    assert(self.m_ViewReplayManager == nil, "ViewMainMenu:setViewReplayManager() the view has been set already.")
+    self.m_ViewReplayManager = view
+    self:addChild(view, REPLAY_MANAGER_Z_ORDER)
 
     return self
 end

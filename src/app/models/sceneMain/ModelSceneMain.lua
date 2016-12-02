@@ -15,6 +15,7 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
+local ActionExecutor         = require("src.app.utilities.ActionExecutor")
 local AudioManager           = require("src.app.utilities.AudioManager")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
@@ -100,8 +101,7 @@ local function onEvtSystemRequestDoAction(self, event)
     elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, event)
     elseif (actionName == "Message")               then doActionMessage(              self, event)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
-    else
-        print("ModelSceneMain-onEvtSystemRequestDoAction() unrecoginzed action: " .. (actionName or ""))
+    else                                                ActionExecutor.execute(event)
     end
 end
 
@@ -226,6 +226,10 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneMain:getModelConfirmBox()
     return self.m_ActorConfirmBox:getModel()
+end
+
+function ModelSceneMain:getModelMainMenu()
+    return self.m_ActorMainMenu:getModel()
 end
 
 function ModelSceneMain:getModelMessageIndicator()

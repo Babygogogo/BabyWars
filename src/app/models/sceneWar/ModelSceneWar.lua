@@ -24,6 +24,7 @@ local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
 
 local ActionExecutor        = require("src.app.utilities.ActionExecutor")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local TableFunctions        = require("src.app.utilities.TableFunctions")
 local Actor                 = require("src.global.actors.Actor")
 local EventDispatcher       = require("src.global.events.EventDispatcher")
 
@@ -31,7 +32,8 @@ local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isSe
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
-local getLocalizedText = LocalizationFunctions.getLocalizedText
+local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"fileName", "actionID"}
+local getLocalizedText                  = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -124,9 +126,11 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     self.m_ActionID            = sceneData.actionID
+    self.m_ExecutedActions     = sceneData.executedActions
     self.m_FileName            = sceneData.fileName
     self.m_IsWarEnded          = sceneData.isEnded
     self.m_IsFogOfWarByDefault = sceneData.isFogOfWarByDefault
+    self.m_IsTotalReplay       = sceneData.isTotalReplay
     self.m_MaxSkillPoints      = sceneData.maxSkillPoints
     self.m_WarPassword         = sceneData.warPassword
     self.m_CachedActions       = {}
@@ -134,7 +138,7 @@ function ModelSceneWar:ctor(sceneData)
     initScriptEventDispatcher(self)
     initActorPlayerManager(   self, sceneData.players)
     initActorWeatherManager(  self, sceneData.weather)
-    initActorWarField(        self, sceneData.warField)
+    initActorWarField(        self, sceneData.warField, sceneData.isTotalReplay)
     initActorTurnManager(     self, sceneData.turn)
     if (not IS_SERVER) then
         initActorConfirmBox(      self)
@@ -170,6 +174,7 @@ function ModelSceneWar:toSerializableTable()
         isEnded             = self.m_IsWarEnded,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
         actionID            = self.m_ActionID,
+        executedActions     = self.m_ExecutedActions,
         maxSkillPoints      = self.m_MaxSkillPoints,
         warField            = self:getModelWarField()      :toSerializableTable(),
         turn                = self:getModelTurnManager()   :toSerializableTable(),
@@ -193,24 +198,32 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     }
 end
 
+function ModelSceneWar:toSerializableReplayData()
+    return {
+        fileName            = self.m_FileName,
+        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
+        isTotalReplay       = true,
+        executedActions     = self.m_ExecutedActions,
+        maxSkillPoints      = self.m_MaxSkillPoints,
+        warField            = self:getModelWarField()      :toSerializableReplayData(),
+        turn                = self:getModelTurnManager()   :toSerializableReplayData(),
+        players             = self:getModelPlayerManager() :toSerializableReplayData(),
+        weather             = self:getModelWeatherManager():toSerializableReplayData(),
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
     local sceneWarFileName = self:getFileName()
     local modelTurnManager = self:getModelTurnManager()
-    local modelWarField    = self:getModelWarField()
     if (not IS_SERVER) then
         self:getModelWarHud():onStartRunning(sceneWarFileName)
     end
     modelTurnManager            :onStartRunning(sceneWarFileName)
     self:getModelPlayerManager():onStartRunning(sceneWarFileName)
-    modelWarField               :onStartRunning(sceneWarFileName)
-
-    modelWarField:getModelFogMap():initialize()
-    if (not IS_SERVER) then
-        modelWarField:getModelTileMap():updateAsModelFogMapInitialized()
-    end
+    self:getModelWarField()     :onStartRunning(sceneWarFileName)
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
 
@@ -241,6 +254,9 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
     ActionExecutor.execute(action)
+    if ((IS_SERVER) and (self.m_ExecutedActions)) then
+        self.m_ExecutedActions[self.m_ActionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+    end
 
     return self
 end
@@ -298,6 +314,14 @@ function ModelSceneWar:setEnded(ended)
     self.m_IsWarEnded = ended
 
     return self
+end
+
+function ModelSceneWar:canReplay()
+    return (self:isEnded()) and (self.m_ExecutedActions ~= nil)
+end
+
+function ModelSceneWar:isTotalReplay()
+    return self.m_IsTotalReplay
 end
 
 function ModelSceneWar:getModelConfirmBox()

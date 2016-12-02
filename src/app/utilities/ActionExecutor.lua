@@ -371,6 +371,30 @@ end
 --------------------------------------------------------------------------------
 -- The private executors.
 --------------------------------------------------------------------------------
+local function executeDownloadReplayData(action)
+    assert(not IS_SERVER, "ActionExecutor-executeDownloadReplayData() should not be invoked on the server.")
+    local modelScene = getModelScene()
+    if (not modelScene.getModelMainMenu) then
+        return
+    end
+
+    modelScene:getModelMainMenu():getModelReplayManager():serializeReplayData(action.sceneWarFileName, action.data)
+    modelScene:getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
+end
+
+local function executeGetReplayList(action)
+    assert(not IS_SERVER, "ActionExecutor-executeGetReplayList() should not be invoked on the server.")
+    local modelScene = getModelScene()
+    if (not modelScene.getModelMainMenu) then
+        return
+    end
+
+    local modelReplayManager = modelScene:getModelMainMenu():getModelReplayManager()
+    if (modelReplayManager:getState() == "stateDownload") then
+        modelReplayManager:setDownloadList(action.list)
+    end
+end
+
 local function executeLogout(action)
     assert(not IS_SERVER, "ActionExecutor-executeLogout() should not be invoked on the server.")
     runSceneMain({confirmText = action.message})
@@ -1296,9 +1320,9 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action)
     local actionName = action.actionName
-    if (actionName == "Logout") then
-        executeLogout(action)
-        return
+    if     (actionName == "DownloadReplayData") then return executeDownloadReplayData(action)
+    elseif (actionName == "GetReplayList")      then return executeGetReplayList(     action)
+    elseif (actionName == "Logout")             then return executeLogout(            action)
     end
 
     local sceneWarFileName = action.fileName

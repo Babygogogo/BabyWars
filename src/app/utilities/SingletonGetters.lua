@@ -70,12 +70,20 @@ function SingletonGetters.getModelMessageIndicator()
     return SingletonGetters.getModelScene():getModelMessageIndicator()
 end
 
+function SingletonGetters.getModelMainMenu()
+    return SingletonGetters.getModelScene():getModelMainMenu()
+end
+
 function SingletonGetters.getModelWarCommandMenu()
     return SingletonGetters.getModelScene():getModelWarHud():getModelWarCommandMenu()
 end
 
 function SingletonGetters.getPlayerIndexLoggedIn()
     return SingletonGetters.getModelPlayerManager():getPlayerIndexLoggedIn()
+end
+
+function SingletonGetters.isTotalReplay()
+    return SingletonGetters.getModelScene():isTotalReplay()
 end
 
 return SingletonGetters

@@ -47,6 +47,8 @@ local s_LongText3_1 = [[
 
 本作有一定复杂度，建议您可以先游玩一下原作，以便更快上手。
 
+QQ交流群：368142455
+
 作者：Babygogogo
 
 协力（字母序）：
@@ -172,6 +174,7 @@ local s_Texts = {
             elseif (textType == "Continue")            then return "继 续"
             elseif (textType == "JoinWar")             then return "参 战"
             elseif (textType == "ConfigSkills")        then return "配 置 技 能"
+            elseif (textType == "ManageReplay")        then return "管 理 回 放"
             elseif (textType == "Login")               then return "注 册 / 登 陆"
             elseif (textType == "SetMessageIndicator") then return "开/关信息提示"
             elseif (textType == "SetMusic")            then return "开 / 关 音 乐"
@@ -194,6 +197,7 @@ local s_Texts = {
             elseif (textType == "Continue")            then return "Continue"
             elseif (textType == "JoinWar")             then return "Join"
             elseif (textType == "ConfigSkills")        then return "Config Skills"
+            elseif (textType == "ManageReplay")        then return "ManageReplay"
             elseif (textType == "Login")               then return "Login"
             elseif (textType == "SetMessageIndicator") then return "Set Message"
             elseif (textType == "SetMusic")            then return "Set Music"
@@ -553,11 +557,41 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [10] = {
-        [1] = function(...) return "战 局 操 作" end,
-        [2] = function(...) return "War Control" end,
+        [1] = function(textType)
+            if     (textType == "Delete")               then return "删 除"
+            elseif (textType == "DeleteConfirmation")   then return "您是否确认要删除此回放数据？"
+            elseif (textType == "DeleteReplay")         then return "删 除 回 放"
+            elseif (textType == "Download")             then return "下 载"
+            elseif (textType == "DownloadReplay")       then return "下 载 回 放"
+            elseif (textType == "DownloadStarted")      then return "正在下载回放数据，请稍候。若长时间没有反应，请重试。"
+            elseif (textType == "NextPage")             then return "下一页"
+            elseif (textType == "NoReplayData")         then return "本机没有可供播放或删除的回放数据。请返回。"
+            elseif (textType == "NoDownloadableReplay") then return "当前没有可下载的回放数据。请返回。"
+            elseif (textType == "Playback")             then return "播 放"
+            elseif (textType == "ReplayDataExists")     then return "该回放数据已下载完成。"
+            elseif (textType == "ReplayDataNotExists")  then return "该回放数据不存在，无法下载。若一直遇到此问题，请与作者联系。"
+            else                                             return "未知10:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Delete")               then return "Delete"
+            elseif (textType == "DeleteConfirmation")   then return "Are you sure to delete this replay data?"
+            elseif (textType == "DeleteReplay")         then return "Delete"
+            elseif (textType == "Download")             then return "Download"
+            elseif (textType == "DownloadReplay")       then return "Download"
+            elseif (textType == "DownloadStarted")      then return "The download has been started. Please wait."
+            elseif (textType == "NextPage")             then return "Next Page"
+            elseif (textType == "NoReplayData")         then return "There's no replay data on the device."
+            elseif (textType == "NoDownloadableReplay") then return "There's no downloadable replay currently."
+            elseif (textType == "Playback")             then return "Playback"
+            elseif (textType == "ReplayDataExists")     then return "The replay data has been downloaded already."
+            elseif (textType == "ReplayDataNotExists")  then return "The replay data doesn't exist and can't be downloaded."
+            else                                             return "Unknown10:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [11] = {
         [1] = function(...) return "关 于 本 作" end,
         [2] = function(...) return "About" end,

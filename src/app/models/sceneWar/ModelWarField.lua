@@ -46,8 +46,13 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
-local function initActorFogMap(self, fogMapData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData)
+local function initActorFogMap(self, fogMapData, isTotalReplay)
+    local actor
+    if (isTotalReplay) then
+        actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData, "sceneWar.ViewFogMap")
+    else
+        actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData)
+    end
 
     self.m_ActorFogMap = actor
 end
@@ -85,9 +90,9 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelWarField:ctor(warFieldData)
-    initActorFogMap( self, warFieldData.fogMap)
-    initActorTileMap(self, warFieldData.tileMap)
+function ModelWarField:ctor(warFieldData, isTotalReplay)
+    initActorFogMap( self, warFieldData.fogMap,  isTotalReplay)
+    initActorTileMap(self, warFieldData.tileMap, isTotalReplay)
     initActorUnitMap(self, warFieldData.unitMap)
 
     local tileMapSize = self:getModelTileMap():getMapSize()
@@ -117,6 +122,11 @@ function ModelWarField:initView()
 
         :setContentSizeWithMapSize(self:getModelTileMap():getMapSize())
 
+    local viewFogMap = self.m_ActorFogMap:getView()
+    if (viewFogMap) then
+        self.m_View:setViewFogMap(viewFogMap)
+    end
+
     return self
 end
 
@@ -139,17 +149,35 @@ function ModelWarField:toSerializableTableForPlayerIndex(playerIndex)
     }
 end
 
+function ModelWarField:toSerializableReplayData()
+    local templateName = self:getModelTileMap():getTemplateName()
+    return {
+        fogMap  = {
+            template = templateName,
+        },
+        tileMap = {
+            template = templateName,
+        },
+        unitMap = {
+            template = templateName,
+        },
+    }
+end
+
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelWarField:onStartRunning(sceneWarFileName)
-    self:getModelFogMap() :onStartRunning(sceneWarFileName)
     self:getModelTileMap():onStartRunning(sceneWarFileName)
     self:getModelUnitMap():onStartRunning(sceneWarFileName)
+    self:getModelFogMap() :onStartRunning(sceneWarFileName)
+
     if (not IS_SERVER) then
         self.m_ActorActionPlanner:getModel():onStartRunning(sceneWarFileName)
         self.m_ActorGridEffect   :getModel():onStartRunning(sceneWarFileName)
         self.m_ActorMapCursor    :getModel():onStartRunning(sceneWarFileName)
+
+        self:getModelTileMap():updateOnModelFogMapStartedRunning()
     end
 
     SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
