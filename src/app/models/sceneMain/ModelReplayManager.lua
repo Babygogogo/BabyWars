@@ -180,7 +180,7 @@ local function createMenuItemsForPlayback(self)
                 end
 
                 self.m_OnButtonConfirmTouched = function()
-                    print("replay: " .. sceneWarFileName)
+                    getModelMessageIndicator():showMessage("播放功能尚未完成开发，请谅解。")
                 end
             end,
         }
