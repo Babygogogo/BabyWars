@@ -10,8 +10,9 @@ local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.
       BOUNDARY_RECT.width  = BOUNDARY_RECT.upperRightX - BOUNDARY_RECT.lowerLeftX
       BOUNDARY_RECT.height = BOUNDARY_RECT.upperRightY - BOUNDARY_RECT.lowerLeftY
 
-local MAP_CURSOR_Z_ORDER     = 4
-local GRID_EXPLOSION_Z_ORDER = 3
+local MAP_CURSOR_Z_ORDER     = 5
+local GRID_EXPLOSION_Z_ORDER = 4
+local FOG_MAP_Z_ORDER        = 3
 local UNIT_MAP_Z_ORDER       = 2
 local ACTION_PLANNER_Z_ORDER = 1
 local TILE_MAP_Z_ORDER       = 0
@@ -91,6 +92,15 @@ function ViewWarField:ctor(param)
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
     self.m_ContentSize = {}
+
+    return self
+end
+
+function ViewWarField:setViewFogMap(view)
+    assert(self.m_ViewFogMap == nil, "ViewWarField:setViewFogMap() the view has been set already.")
+
+    self.m_ViewFogMap = view
+    self:addChild(view, FOG_MAP_Z_ORDER)
 
     return self
 end

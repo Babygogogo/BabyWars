@@ -148,8 +148,8 @@ function ModelTileMap:initView()
     return self
 end
 
-function ModelTileMap:updateAsModelFogMapInitialized()
-    assert(not IS_SERVER, "ModelTileMap:updateAsModelFogMapInitialized() this shouldn't be called on the server.")
+function ModelTileMap:updateOnModelFogMapStartedRunning()
+    assert(not IS_SERVER, "ModelTileMap:updateOnModelFogMapStartedRunning() this shouldn't be called on the server.")
 
     local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
     local sceneWarFileName = self.m_SceneWarFileName

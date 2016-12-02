@@ -82,4 +82,8 @@ function SingletonGetters.getPlayerIndexLoggedIn()
     return SingletonGetters.getModelPlayerManager():getPlayerIndexLoggedIn()
 end
 
+function SingletonGetters.isTotalReplay()
+    return SingletonGetters.getModelScene():isTotalReplay()
+end
+
 return SingletonGetters
