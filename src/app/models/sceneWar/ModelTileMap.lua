@@ -126,10 +126,6 @@ end
 function ModelTileMap:ctor(param)
     initWithTileActorsMap(self, createTileActorsMap(param))
 
-    if (self.m_View) then
-        self:initView()
-    end
-
     return self
 end
 
@@ -151,12 +147,14 @@ end
 function ModelTileMap:updateOnModelFogMapStartedRunning()
     assert(not IS_SERVER, "ModelTileMap:updateOnModelFogMapStartedRunning() this shouldn't be called on the server.")
 
-    local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
-    local sceneWarFileName = self.m_SceneWarFileName
-    self:forEachModelTile(function(modelTile)
-        modelTile:initHasFog(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
-            :updateView()
-    end)
+    if (not SingletonGetters.isTotalReplay()) then
+        local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
+        local sceneWarFileName = self.m_SceneWarFileName
+        self:forEachModelTile(function(modelTile)
+            modelTile:initHasFog(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
+                :updateView()
+        end)
+    end
 
     return self
 end

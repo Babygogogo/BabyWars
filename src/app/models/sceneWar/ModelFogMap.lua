@@ -12,7 +12,6 @@ local getModelScene                  = SingletonGetters.getModelScene
 local getModelTileMap                = SingletonGetters.getModelTileMap
 local getModelUnitMap                = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn         = SingletonGetters.getPlayerIndexLoggedIn
-local isTotalReplay                  = SingletonGetters.isTotalReplay
 
 local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
@@ -135,6 +134,7 @@ end
 function ModelFogMap:ctor(param, isTotalReplay)
     local templateName                      = param.template
     local mapSize, playersCount             = getMapSizeAndPlayersCountWithTemplate(templateName)
+    self.m_IsTotalReplay                    = isTotalReplay
     self.m_MapSize                          = mapSize
     self.m_TemplateName                     = templateName
     self.m_StateForForcingFog               = param.stateForForcingFog or "None"
@@ -159,10 +159,6 @@ function ModelFogMap:ctor(param, isTotalReplay)
             self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
             self:resetMapForPathsForPlayerIndex(playerIndex, mapData)
         end
-    end
-
-    if (self.m_View) then
-        self:initView()
     end
 
     return self
@@ -204,7 +200,7 @@ function ModelFogMap:onStartRunning(sceneWarFileName)
     self.m_SceneWarFileName    = sceneWarFileName
     self.m_IsFogOfWarByDefault = getModelScene(sceneWarFileName):isFogOfWarByDefault()
 
-    if ((IS_SERVER) or (isTotalReplay())) then
+    if ((IS_SERVER) or (self.m_IsTotalReplay)) then
         for playerIndex = 1, getModelPlayerManager(sceneWarFileName):getPlayersCount() do
             self:resetMapForTilesForPlayerIndex(playerIndex)
                 :resetMapForUnitsForPlayerIndex(playerIndex)
@@ -286,9 +282,8 @@ function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origi
 end
 
 function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex, visionModifier)
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForTilesForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:resetMapForTilesForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForTiles[playerIndex]
     local mapSize       = self:getMapSize()
@@ -314,9 +309,8 @@ function ModelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(playerInde
 end
 
 function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, visionModifier)
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForUnits[playerIndex]
     local mapSize       = self:getMapSize()
@@ -352,9 +346,8 @@ function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
     -- The skills that enable the tiles/units to see through the hiding places are ignored for the maps for tiles/units, while they are considered for the maps for move paths.
     -- To check if a tile/unit is visible to a player, use functions in VisibilityFunctions.
 
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:getVisibilityOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:getVisibilityOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     if (not self:isFogOfWarCurrently()) then
         return 2, 1, 1

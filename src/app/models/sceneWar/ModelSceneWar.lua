@@ -103,8 +103,9 @@ local function initActorWeatherManager(self, weatherData)
     self.m_ActorWeatherManager = actor
 end
 
-local function initActorWarField(self, warFieldData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarField", warFieldData, "sceneWar.ViewWarField")
+local function initActorWarField(self, warFieldData, isTotalReplay)
+    local modelWarField = Actor.createModel("sceneWar.ModelWarField", warFieldData, isTotalReplay)
+    local actor = Actor.createWithModelAndViewInstance(modelWarField, Actor.createView("sceneWar.ViewWarField"))
 
     self.m_ActorWarField = actor
 end
@@ -144,10 +145,6 @@ function ModelSceneWar:ctor(sceneData)
         initActorConfirmBox(      self)
         initActorMessageIndicator(self)
         initActorWarHud(          self)
-    end
-
-    if (self.m_View) then
-        self:initView()
     end
 
     return self
@@ -227,7 +224,9 @@ function ModelSceneWar:onStartRunning()
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
 
-    modelTurnManager:runTurn()
+    if (not self:isTotalReplay()) then
+        modelTurnManager:runTurn()
+    end
     if (not IS_SERVER) then
         AudioManager.playRandomWarMusic()
     end
