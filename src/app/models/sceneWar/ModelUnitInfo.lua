@@ -18,6 +18,7 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 local getModelFogMap         = SingletonGetters.getModelFogMap
 local getModelUnitMap        = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
+local isTotalReplay          = SingletonGetters.isTotalReplay
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -26,8 +27,8 @@ local function updateWithModelUnitMap(self)
     local modelUnitMap = getModelUnitMap()
     local modelUnit    = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
     if (modelUnit) then
-        local loadedModelUnits = ((not getModelFogMap():isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) and
-            (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                         or
+        local loadedModelUnits = ((isTotalReplay()) or (not getModelFogMap():isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) and
+            (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                                              or
             (nil)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
