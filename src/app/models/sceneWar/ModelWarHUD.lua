@@ -67,10 +67,13 @@ local function initActorBattleInfo(self)
     self.m_ActorBattleInfo = Actor.createWithModelAndViewName("sceneWar.ModelBattleInfo", nil, "sceneWar.ViewBattleInfo")
 end
 
+local function initActorReplayController(self)
+end
+
 --------------------------------------------------------------------------------
 -- The contructor and initializers.
 --------------------------------------------------------------------------------
-function ModelWarHUD:ctor(param)
+function ModelWarHUD:ctor(isReplay)
     initActorWarCommandMenu( self)
     initActorMoneyEnergyInfo(self)
     initActorActionMenu(     self)
@@ -79,9 +82,8 @@ function ModelWarHUD:ctor(param)
     initActorTileDetail(     self)
     initActorTileInfo(       self)
     initActorBattleInfo(     self)
-
-    if (self.m_View) then
-        self:initView()
+    if (isReplay) then
+        initActorReplayController(self)
     end
 
     return self
@@ -99,6 +101,9 @@ function ModelWarHUD:initView()
         :setViewUnitDetail(     self.m_ActorUnitDetail:     getView())
         :setViewUnitInfo(       self.m_ActorUnitInfo:       getView())
         :setViewWarCommandMenu( self.m_ActorWarCommandMenu: getView())
+    if (self.m_ActorReplayController) then
+        view:setViewReplayController(self.m_ActorReplayController:getView())
+    end
 
     return self
 end

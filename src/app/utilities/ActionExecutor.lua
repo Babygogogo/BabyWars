@@ -19,27 +19,29 @@ local IS_SERVER             = GameConstantFunctions.isServer()
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
 
-local appendList               = TableFunctions.appendList
-local destroyActorUnitLoaded   = Destroyers.destroyActorUnitLoaded
-local destroyActorUnitOnMap    = Destroyers.destroyActorUnitOnMap
-local getAdjacentGrids         = GridIndexFunctions.getAdjacentGrids
-local getGridsWithinDistance   = GridIndexFunctions.getGridsWithinDistance
-local getLocalizedText         = LocalizationFunctions.getLocalizedText
-local getModelFogMap           = SingletonGetters.getModelFogMap
-local getModelGridEffect       = SingletonGetters.getModelGridEffect
-local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
-local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
-local getModelScene            = SingletonGetters.getModelScene
-local getModelTileMap          = SingletonGetters.getModelTileMap
-local getModelTurnManager      = SingletonGetters.getModelTurnManager
-local getModelUnitMap          = SingletonGetters.getModelUnitMap
-local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
-local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
-local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
-local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
-local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
-local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
-local toErrorMessage           = SerializationFunctions.toErrorMessage
+local appendList                    = TableFunctions.appendList
+local destroyActorUnitLoaded        = Destroyers.destroyActorUnitLoaded
+local destroyActorUnitOnMap         = Destroyers.destroyActorUnitOnMap
+local getAdjacentGrids              = GridIndexFunctions.getAdjacentGrids
+local getGridsWithinDistance        = GridIndexFunctions.getGridsWithinDistance
+local getLocalizedText              = LocalizationFunctions.getLocalizedText
+local getLoggedInAccountAndPassword = (WebSocketManager) and (WebSocketManager.getLoggedInAccountAndPassword) or (nil)
+local getModelFogMap                = SingletonGetters.getModelFogMap
+local getModelGridEffect            = SingletonGetters.getModelGridEffect
+local getModelMessageIndicator      = SingletonGetters.getModelMessageIndicator
+local getModelPlayerManager         = SingletonGetters.getModelPlayerManager
+local getModelScene                 = SingletonGetters.getModelScene
+local getModelTileMap               = SingletonGetters.getModelTileMap
+local getModelTurnManager           = SingletonGetters.getModelTurnManager
+local getModelUnitMap               = SingletonGetters.getModelUnitMap
+local getPlayerIndexLoggedIn        = SingletonGetters.getPlayerIndexLoggedIn
+local getSceneWarFileName           = SingletonGetters.getSceneWarFileName
+local getScriptEventDispatcher      = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay                 = SingletonGetters.isTotalReplay
+local isTileVisible                 = VisibilityFunctions.isTileVisibleToPlayerIndex
+local isUnitVisible                 = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
+local toErrorMessage                = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
 -- The functions for dispatching events.
@@ -163,88 +165,36 @@ end
 
 local function updateTileAndUnitMapOnVisibilityChanged()
     assert(not IS_SERVER, "ActionExecutor-updateTileAndUnitMapOnVisibilityChanged() this shouldn't be called on the server.")
-    local sceneWarFileName = getSceneWarFileName()
-    local playerIndex      = getPlayerIndexLoggedIn()
-    getModelTileMap():forEachModelTile(function(modelTile)
-        if (isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
-            modelTile:updateAsFogDisabled()
-        else
-            modelTile:updateAsFogEnabled()
-        end
-        modelTile:updateView()
-    end)
-    getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        local gridIndex = modelUnit:getGridIndex()
-        if (isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
-            modelUnit:setViewVisible(true)
-        else
-            destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
-        end
-    end)
+    if (isTotalReplay()) then
+        getModelFogMap():updateView()
+    else
+        local sceneWarFileName = getSceneWarFileName()
+        local playerIndex      = getPlayerIndexLoggedIn()
+        getModelTileMap():forEachModelTile(function(modelTile)
+            if (isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
+                modelTile:updateAsFogDisabled()
+            else
+                modelTile:updateAsFogEnabled()
+            end
+            modelTile:updateView()
+        end)
+        getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+            local gridIndex = modelUnit:getGridIndex()
+            if (isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
+                modelUnit:setViewVisible(true)
+            else
+                destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+            end
+        end)
+    end
 end
 
 local function updateTilesAndUnitsBeforeExecutingAction(action)
-    if (not IS_SERVER) then
+    if ((not IS_SERVER) and (not isTotalReplay())) then
         addActorUnitsWithUnitsData(action.actingUnitsData, false)
         addActorUnitsWithUnitsData(action.revealedUnits,   false)
         updateModelTilesWithTilesData(action.actingTilesData, false)
         updateModelTilesWithTilesData(action.revealedTiles,   false)
-    end
-end
-
-local function removeHiddenActorUnitsAfterAction(action)
-    -- 本函数负责处理移动所引起的单位隐藏。某些action可能引起额外的单位隐藏（如attack可能涉及单位的损毁并引起视野变化），约定它们各自的处理函数已经处理了这些额外的单位隐藏。
-    assert(not IS_SERVER, "ActionExecutor-removeHiddenActorUnitsAfterAction() this should not be called on the server.")
-    local path                = action.path
-    assert(path, "ActionExecutor-removeHiddenActorUnitsAfterAction() action.path is expected.")
-    local launchUnitID        = action.launchUnitID
-    local sceneWarFileName    = getSceneWarFileName()
-    local modelUnitMap        = getModelUnitMap()
-    local playerIndexActing   = getModelTurnManager():getPlayerIndex()
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-
-    if (playerIndexLoggedIn == playerIndexActing) then
-        -- 登录的玩家是行动玩家，那么需要清除行动单位在行动前可见、行动后不可见的部队。这些部队只可能在行动单位移动前的位置的四个临近格子中。
-        if (launchUnitID) then
-            -- 有部队被弹射，则装载者还留在原地，因此不会有部队需要隐藏，因此直接返回。
-            return {}
-        else
-            -- 没有部队被弹射，则行动部队可能离开了其原先所在的位置，由此可能导致行动前紧邻的部队变为不可见。因此需要轮询这几个格子。
-            local removedModelUnits = {}
-            for _, adjacentGridIndex in ipairs(getAdjacentGrids(path[1], modelUnitMap:getMapSize())) do
-                local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-                if ((adjacentModelUnit)                                                                                                                                      and
-                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexLoggedIn))) then
-                    appendList(removedModelUnits, destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, false))
-                end
-            end
-            return removedModelUnits
-        end
-    else
-        -- 登录的玩家不是行动玩家，那么唯一可能需要隐藏的就是行动单位本身。
-        local endingGridIndex = path[#path]
-        local modelUnit       = modelUnitMap:getFocusModelUnit(endingGridIndex, launchUnitID)
-        if (not modelUnit) then
-            -- 无法找到行动部队，则唯一可能性是行动部队被消灭了（主动发起进攻并被反击摧毁）。直接返回即可。
-            assert(action.actionName == "Attack", "ActionExecutor-removeHiddenActorUnitsAfterAction() action Attack expected.")
-            return {}
-        elseif (isUnitVisible(sceneWarFileName, endingGridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), playerIndexActing, playerIndexLoggedIn)) then
-            -- 该部队可见，所以直接返回即可。
-            return {}
-        elseif (modelUnitMap:getModelUnit(endingGridIndex)) then
-            return destroyActorUnitOnMap(sceneWarFileName, endingGridIndex, false)
-        else
-            return destroyActorUnitLoaded(sceneWarFileName, launchUnitID, false)
-        end
-    end
-end
-
-local function removeViewUnits(modelUnits)
-    assert(not IS_SERVER, "ActionExecutor-removeViewUnits() this should not be called on the server.")
-    if (modelUnits) then
-        for _, modelUnit in pairs(modelUnits) do
-            modelUnit:removeViewFromParent()
-        end
     end
 end
 
@@ -365,7 +315,8 @@ local function getAdjacentPlasmaGridIndexes(gridIndex, modelTileMap)
 end
 
 local function callbackOnWarEndedForClient()
-    runSceneMain({isPlayerLoggedIn = true}, WebSocketManager.getLoggedInAccountAndPassword())
+    local account, password = getLoggedInAccountAndPassword()
+    runSceneMain({isPlayerLoggedIn = account ~= nil}, account, password)
 end
 
 --------------------------------------------------------------------------------
@@ -414,10 +365,11 @@ local function executeGetSceneWarActionId(action)
     assert(not IS_SERVER, "ActionExecutor-executeGetSceneWarActionId() should not be invoked on the server.")
     local actionID = action.sceneWarActionID
     if (not actionID) then
+        local account, password = getLoggedInAccountAndPassword()
         runSceneMain({
-            isPlayerLoggedIn = true,
-            confirmText      = getLocalizedText(81, "InvalidWarFileName"),
-        }, WebSocketManager.getLoggedInAccountAndPassword())
+                isPlayerLoggedIn = account ~= nil,
+                confirmText      = getLocalizedText(81, "InvalidWarFileName"),
+            }, account, password)
     elseif (actionID > getModelScene():getActionId()) then
         requestReloadSceneWar(getLocalizedText(81, "OutOfSync"))
     end
@@ -441,11 +393,11 @@ end
 
 local function executeRunSceneMain(action)
     assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
-    local param = {
-        isPlayerLoggedIn = true,
-        confirmText      = action.message,
-    }
-    runSceneMain(param, WebSocketManager.getLoggedInAccountAndPassword())
+    local account, password = getLoggedInAccountAndPassword()
+    runSceneMain({
+            isPlayerLoggedIn = account ~= nil,
+            confirmText      = action.message,
+        }, account, password)
 end
 
 local function executeActivateSkillGroup(action)
@@ -666,7 +618,7 @@ local function executeBeginTurn(action)
             end)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
             modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
@@ -790,7 +742,7 @@ local function executeCaptureModelTile(action)
             end)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()
+            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
 
             focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
@@ -1268,7 +1220,7 @@ local function executeSurrender(action)
         updateTileAndUnitMapOnVisibilityChanged()
 
         getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
-        if (modelPlayer:getAccount() == WebSocketManager.getLoggedInAccountAndPassword()) then
+        if (modelPlayer:getAccount() == getLoggedInAccountAndPassword()) then
             modelSceneWar:setEnded(true)
                 :showEffectSurrender(callbackOnWarEndedForClient)
         else
@@ -1343,7 +1295,7 @@ function ActionExecutor.execute(action)
         elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
         elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
         else
-            local account, password = WebSocketManager.getLoggedInAccountAndPassword()
+            local account, password = getLoggedInAccountAndPassword()
             runSceneMain({
                     isPlayerLoggedIn = (account ~= nil),
                     confirmText      = "InvalidAction: " .. toErrorMessage(action)

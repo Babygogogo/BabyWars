@@ -51,6 +51,10 @@ function SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
     return SingletonGetters.getModelScene(sceneWarFileName):getScriptEventDispatcher()
 end
 
+function SingletonGetters.isTotalReplay(sceneWarFileName)
+    return SingletonGetters.getModelScene(sceneWarFileName):isTotalReplay()
+end
+
 --------------------------------------------------------------------------------
 -- The public getters that can be used only on the client.
 --------------------------------------------------------------------------------
@@ -80,10 +84,6 @@ end
 
 function SingletonGetters.getPlayerIndexLoggedIn()
     return SingletonGetters.getModelPlayerManager():getPlayerIndexLoggedIn()
-end
-
-function SingletonGetters.isTotalReplay()
-    return SingletonGetters.getModelScene():isTotalReplay()
 end
 
 return SingletonGetters

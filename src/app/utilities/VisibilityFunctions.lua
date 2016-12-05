@@ -22,6 +22,7 @@ local getVisionModifierForTilesForSkillGroup      = SkillModifierFunctions.getVi
 local getVisionModifierForTiles                   = SkillModifierFunctions.getVisionModifierForTiles
 local getVisionModifierForUnitsForSkillGroup      = SkillModifierFunctions.getVisionModifierForUnitsForSkillGroup
 local getVisionModifierForUnits                   = SkillModifierFunctions.getVisionModifierForUnits
+local isTotalReplay                               = SingletonGetters.isTotalReplay
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -171,7 +172,7 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, g
     assert(type(unitType)          == "string", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitType: " .. (unitType or ""))
     assert(type(unitPlayerIndex)   == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
     assert(type(targetPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid targetPlayerIndex: " .. (targetPlayerIndex or ""))
-    if (unitPlayerIndex == targetPlayerIndex) then
+    if ((isTotalReplay(sceneWarFileName)) or (unitPlayerIndex == targetPlayerIndex)) then
         return true
     elseif (isDiving) then
         return hasUnitWithPlayerIndexOnAdjacentGrid(sceneWarFileName, gridIndex, targetPlayerIndex)

@@ -60,7 +60,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewWarHUD:ctor(param)
-    initWithTouchListener(  self, createTouchListener(self))
+    initWithTouchListener(self, createTouchListener(self))
 
     return self
 end

@@ -13,6 +13,7 @@ local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
@@ -187,7 +188,7 @@ local function getLoadIndicatorFrame(unit)
         return nil
     else
         local loadCount = unit:getCurrentLoadCount()
-        if (getModelFogMap():isFogOfWarCurrently()) then
+        if ((not isTotalReplay()) and (getModelFogMap():isFogOfWarCurrently())) then
             if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn()) or (loadCount > 0)) then
                 return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
             else

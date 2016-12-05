@@ -110,8 +110,8 @@ local function initActorWarField(self, warFieldData, isTotalReplay)
     self.m_ActorWarField = actor
 end
 
-local function initActorWarHud(self)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", nil, "sceneWar.ViewWarHUD")
+local function initActorWarHud(self, isReplay)
+    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", isReplay, "sceneWar.ViewWarHUD")
 
     self.m_ActorWarHud = actor
 end
@@ -144,7 +144,7 @@ function ModelSceneWar:ctor(sceneData)
     if (not IS_SERVER) then
         initActorConfirmBox(      self)
         initActorMessageIndicator(self)
-        initActorWarHud(          self)
+        initActorWarHud(          self, sceneData.isTotalReplay)
     end
 
     return self
