@@ -161,6 +161,16 @@ function ModelFogMap:ctor(param, isTotalReplay)
         end
     end
 
+    if (self.m_View) then
+        self:initView()
+    end
+
+    return self
+end
+
+function ModelFogMap:initView()
+    self.m_View:setMapSize(self:getMapSize())
+
     return self
 end
 
@@ -204,6 +214,8 @@ function ModelFogMap:onStartRunning(sceneWarFileName)
         self:resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
     end
+
+    self:updateView()
 
     return self
 end
@@ -352,6 +364,14 @@ function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
             (self.m_MapsForTiles[playerIndex][x][y] > 0) and (1) or (0),
             (self.m_MapsForUnits[playerIndex][x][y] > 0) and (1) or (0)
     end
+end
+
+function ModelFogMap:updateView()
+    if (self.m_View) then
+        self.m_View:updateWithModelFogMap()
+    end
+
+    return self
 end
 
 return ModelFogMap
