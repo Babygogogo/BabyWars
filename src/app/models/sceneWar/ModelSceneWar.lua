@@ -33,6 +33,7 @@ local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioMa
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
 local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"fileName", "actionID"}
+local TIME_INTERVAL_FOR_ACTIONS         = 1
 local getLocalizedText                  = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
@@ -105,7 +106,8 @@ end
 
 local function initActorWarField(self, warFieldData, isTotalReplay)
     local modelWarField = Actor.createModel("sceneWar.ModelWarField", warFieldData, isTotalReplay)
-    local actor = Actor.createWithModelAndViewInstance(modelWarField, Actor.createView("sceneWar.ViewWarField"))
+    local viewWarField  = (not IS_SERVER) and (Actor.createView("sceneWar.ViewWarField")) or (nil)
+    local actor         = Actor.createWithModelAndViewInstance(modelWarField, viewWarField)
 
     self.m_ActorWarField = actor
 end
@@ -266,12 +268,21 @@ end
 
 function ModelSceneWar:setExecutingAction(executing)
     self.m_IsExecutingAction = executing
+
     if ((not executing) and (not self:isEnded())) then
         local actionID = self:getActionId() + 1
         local action   = self.m_CachedActions[actionID]
         if (action) then
+            assert(not IS_SERVER, "ModelSceneWar:cacheAction() there should not be any cached actions on the server.")
             self.m_CachedActions[actionID] = nil
-            self:executeAction(action)
+            self.m_IsExecutingAction       = true
+            self.m_View:runAction(cc.Sequence:create(
+                cc.DelayTime:create(TIME_INTERVAL_FOR_ACTIONS),
+                cc.CallFunc:create(function()
+                    self.m_IsExecutingAction = false
+                    self:executeAction(action)
+                end)
+            ))
         end
     end
 
@@ -279,6 +290,7 @@ function ModelSceneWar:setExecutingAction(executing)
 end
 
 function ModelSceneWar:cacheAction(action)
+    assert(not IS_SERVER, "ModelSceneWar:cacheAction() this should not happen on the server.")
     local actionID = action.actionID
     if (actionID > self:getActionId()) then
         self.m_CachedActions[actionID] = action
