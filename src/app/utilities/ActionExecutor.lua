@@ -132,7 +132,9 @@ local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridInde
 end
 
 local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
-    assert(not IS_SERVER, "Action-addActorUnitsWithUnitsData() this should not be called on the server.")
+    assert(not IS_SERVER,       "ActionExecutor-addActorUnitsWithUnitsData() this should not be called on the server.")
+    assert(not isTotalReplay(), "ActionExecutor-addActorUnitsWithUnitsData() this shouldn't be called in the replay mode.")
+
     if (unitsData) then
         local sceneWarFileName = getSceneWarFileName()
         local modelUnitMap     = getModelUnitMap()
@@ -152,7 +154,9 @@ local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
 end
 
 local function updateModelTilesWithTilesData(tilesData)
-    assert(not IS_SERVER, "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called on the server.")
+    assert(not IS_SERVER,       "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called on the server.")
+    assert(not isTotalReplay(), "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called in the replay mode.")
+
     if (tilesData) then
         local modelTileMap = getModelTileMap()
         for _, tileData in pairs(tilesData) do
@@ -187,6 +191,10 @@ local function updateTileAndUnitMapOnVisibilityChanged()
             end
         end)
     end
+
+    getScriptEventDispatcher()
+        :dispatchEvent({name = "EvtModelTileMapUpdated"})
+        :dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
 local function updateTilesAndUnitsBeforeExecutingAction(action)
@@ -424,9 +432,9 @@ local function executeActivateSkillGroup(action)
         end
         getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
             :forEachModelUnitLoaded(func)
-        dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
         updateTileAndUnitMapOnVisibilityChanged()
+        dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
         getModelScene(sceneWarFileName):setExecutingAction(false)
     end
@@ -489,7 +497,7 @@ local function executeAttack(action)
             attacker:setCurrentPromotion(math.min(attacker:getMaxPromotion(), attacker:getCurrentPromotion() + 1))
             destroyActorUnitOnMap(sceneWarFileName, targetGridIndex, false, true)
         else
-            if ((not IS_SERVER) and (attackTarget:isFogEnabledOnClient())) then
+            if ((not IS_SERVER) and (not isTotalReplay()) and (attackTarget:isFogEnabledOnClient())) then
                 attackTarget:updateAsFogDisabled()
             end
             attackTarget:updateWithObjectAndBaseId(0)
@@ -497,7 +505,7 @@ local function executeAttack(action)
             plasmaGridIndexes = getAdjacentPlasmaGridIndexes(targetGridIndex, modelTileMap)
             for _, gridIndex in ipairs(plasmaGridIndexes) do
                 local modelTile = modelTileMap:getModelTile(gridIndex)
-                if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+                if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
                     modelTile:updateAsFogDisabled()
                 end
                 modelTile:updateWithObjectAndBaseId(0)
@@ -646,7 +654,7 @@ local function executeBuildModelTile(action)
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
     local modelTile        = getModelTileMap(sceneWarFileName):getModelTile(endingGridIndex)
     local buildPoint       = modelTile:getCurrentBuildPoint() - focusModelUnit:getBuildAmount()
-    if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+    if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
     moveModelUnitWithAction(action)
@@ -672,6 +680,7 @@ local function executeBuildModelTile(action)
         focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+            modelTile:updateView()
 
             updateTileAndUnitMapOnVisibilityChanged()
 
@@ -686,12 +695,13 @@ local function executeCaptureModelTile(action)
     local path                = action.path
     local sceneWarFileName    = action.fileName
     local endingGridIndex     = path[#path]
+    local modelFogMap         = getModelFogMap(sceneWarFileName)
     local modelTile           = getModelTileMap(sceneWarFileName):getModelTile(endingGridIndex)
     local playerIndexLoggedIn = (not IS_SERVER) and (getPlayerIndexLoggedIn()) or (nil)
     local focusModelUnit      = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
     local capturePoint        = modelTile:getCurrentCapturePoint() - focusModelUnit:getCaptureAmount()
-    local modelFogMap, previousVision, previousPlayerIndex
-    if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+    local previousVision, previousPlayerIndex
+    if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
     moveModelUnitWithAction(action)
@@ -701,7 +711,6 @@ local function executeCaptureModelTile(action)
         focusModelUnit:setCapturingModelTile(true)
         modelTile:setCurrentCapturePoint(capturePoint)
     else
-        modelFogMap         = getModelFogMap(sceneWarFileName)
         previousPlayerIndex = modelTile:getPlayerIndex()
         previousVision      = (previousPlayerIndex > 0) and (modelTile:getVisionForPlayerIndex(previousPlayerIndex)) or (nil)
 
@@ -710,7 +719,7 @@ local function executeCaptureModelTile(action)
         modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
             :updateWithPlayerIndex(playerIndexActing)
 
-        if ((IS_SERVER) or (playerIndexActing == playerIndexLoggedIn)) then
+        if ((IS_SERVER) or (isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
             modelFogMap:updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndexActing, endingGridIndex, modelTile:getVisionForPlayerIndex(playerIndexActing))
         end
     end
@@ -719,7 +728,7 @@ local function executeCaptureModelTile(action)
     local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
     local lostPlayerIndex    = action.lostPlayerIndex
     if (IS_SERVER) then
-        if (previousVision) then
+        if (capturePoint <= 0) then
             modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
         end
         if (lostPlayerIndex) then
@@ -732,8 +741,10 @@ local function executeCaptureModelTile(action)
             focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
                 focusModelUnit:updateView()
                     :showNormalAnimation()
+                modelTile:updateView()
 
-                if (previousPlayerIndex == playerIndexLoggedIn) then
+                if ((capturePoint <= 0)                                                  and
+                    ((isTotalReplay()) or (previousPlayerIndex == playerIndexLoggedIn))) then
                     modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
                 end
                 updateTileAndUnitMapOnVisibilityChanged()
@@ -748,6 +759,7 @@ local function executeCaptureModelTile(action)
             focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
                 focusModelUnit:updateView()
                     :showNormalAnimation()
+                modelTile:updateView()
 
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
@@ -1000,7 +1012,7 @@ local function executeLaunchSilo(action)
     local modelTile         = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
     local targetModelUnits  = {}
     local targetGridIndexes = {}
-    if ((not IS_SERVER) and (modelTile:isFogEnabledOnClient())) then
+    if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
     moveModelUnitWithAction(action)
@@ -1348,8 +1360,6 @@ function ActionExecutor.execute(action)
                 name    = "EvtIsWaitingForServerResponse",
                 waiting = false,
             })
-            :dispatchEvent({name = "EvtModelTileMapUpdated"})
-            :dispatchEvent({name = "EvtModelUnitMapUpdated"})
     end
 end
 

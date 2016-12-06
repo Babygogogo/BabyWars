@@ -167,8 +167,6 @@ s_Executors.execute55 = function(level, modelWarField, modelPlayerManager, model
     local playerIndex = modelTurnManager:getPlayerIndex()
     if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
         modelWarField:getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
-        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-            :dispatchEvent({name = "EvtModelTileMapUpdated"})
     end
 end
 
@@ -176,8 +174,6 @@ s_Executors.execute56 = function(level, modelWarField, modelPlayerManager, model
     local playerIndex = modelTurnManager:getPlayerIndex()
     if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
         modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
-        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-            :dispatchEvent({name = "EvtModelTileMapUpdated"})
     end
 end
 
@@ -186,8 +182,6 @@ s_Executors.execute57 = function(level, modelWarField, modelPlayerManager, model
     if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
         modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
-        dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
-            :dispatchEvent({name = "EvtModelTileMapUpdated"})
     end
 end
 

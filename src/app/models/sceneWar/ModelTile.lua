@@ -62,6 +62,7 @@ local IS_SERVER = GameConstantFunctions.isServer()
 local getPlayerIndexLoggedIn       = SingletonGetters.getPlayerIndexLoggedIn
 local getTiledIdWithTileOrUnitName = GameConstantFunctions.getTiledIdWithTileOrUnitName
 local isTileVisibleToPlayerIndex   = VisibilityFunctions.isTileVisibleToPlayerIndex
+local isTotalReplay                = SingletonGetters.isTotalReplay
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -132,10 +133,11 @@ function ModelTile:initView()
     return self
 end
 
-function ModelTile:initHasFog(hasFog)
-    assert(not IS_SERVER, "ModelTile:initHasFog() this shouldn't be called on the server.")
-    assert(type(hasFog) == "boolean", "ModelTile:initHasFog() invalid param hasFog.")
-    assert(self.m_IsFogEnabledOnClient == nil, "ModelTile:initHasFog() self.m_IsFogEnabledOnClient has been initialized already.")
+function ModelTile:initHasFogOnClient(hasFog)
+    assert(not IS_SERVER,                      "ModelTile:initHasFogOnClient() this shouldn't be called on the server.")
+    assert(not isTotalReplay(),                "ModelTile:initHasFogOnClient() this shouldn't be called in replay mode.")
+    assert(type(hasFog) == "boolean",          "ModelTile:initHasFogOnClient() invalid param hasFog.")
+    assert(self.m_IsFogEnabledOnClient == nil, "ModelTile:initHasFogOnClient() self.m_IsFogEnabledOnClient has been initialized already.")
 
     self.m_IsFogEnabledOnClient = hasFog
     return self
@@ -309,14 +311,15 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
 end
 
 function ModelTile:isFogEnabledOnClient()
+    assert(not IS_SERVER,                                  "ModelTile:isFogEnabledOnClient() this shouldn't be called on the server.")
+    assert(not isTotalReplay(),                            "ModelTile:isFogEnabledOnClient() this shouldn't be called in replay mode.")
+    assert(type(self.m_IsFogEnabledOnClient) == "boolean", "ModelTile:isFogEnabledOnClient() self.m_IsFogEnabledOnClient has not been initialized yet.")
+
     return self.m_IsFogEnabledOnClient
 end
 
 function ModelTile:updateAsFogDisabled(data)
-    assert(not IS_SERVER, "ModelTile:updateAsFogDisabled() this shouldn't be called on the server.")
-    assert(type(self.m_IsFogEnabledOnClient) == "boolean", "ModelTile:updateAsFogDisabled() self.m_IsFogEnabledOnClient has not been initialized yet.")
-
-    if (self.m_IsFogEnabledOnClient) then
+    if (self:isFogEnabledOnClient()) then
         self.m_IsFogEnabledOnClient = false
 
         if (not data) then
@@ -339,10 +342,7 @@ function ModelTile:updateAsFogDisabled(data)
 end
 
 function ModelTile:updateAsFogEnabled()
-    assert(not IS_SERVER, "ModelTile:updateAsFogEnabled() this shouldn't be called on the server.")
-    assert(type(self.m_IsFogEnabledOnClient) == "boolean", "ModelTile:updateAsFogEnabled() self.m_IsFogEnabledOnClient has not been initialized yet.")
-
-    if (not self.m_IsFogEnabledOnClient) then
+    if (not self:isFogEnabledOnClient()) then
         self.m_IsFogEnabledOnClient = true
 
         if (self.getCurrentCapturePoint) then

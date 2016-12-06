@@ -151,7 +151,7 @@ function ModelTileMap:updateOnModelFogMapStartedRunning()
         local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
         local sceneWarFileName = self.m_SceneWarFileName
         self:forEachModelTile(function(modelTile)
-            modelTile:initHasFog(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
+            modelTile:initHasFogOnClient(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
                 :updateView()
         end)
     end
