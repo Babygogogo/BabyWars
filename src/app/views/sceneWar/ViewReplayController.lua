@@ -81,6 +81,11 @@ end
 
 local function initButtonPreviousTurn(self)
     local button = createButton(BUTTON_PREVIOUS_TURN_RIGHT_POS_X, BUTTON_PREVIOUS_TURN_RIGHT_POS_Y, "c03_t02_s04_f01.png")
+    button:addTouchEventListener(function(sender, eventType)
+        if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+            self.m_Model:onButtonPreviousTurnTouched()
+        end
+    end)
 
     self.m_ButtonPreviousTurn = button
     self:addChild(button)
@@ -88,6 +93,11 @@ end
 
 local function initButtonNextTurn(self)
     local button = createButton(BUTTON_NEXT_TURN_RIGHT_POS_X, BUTTON_NEXT_TURN_RIGHT_POS_Y, "c03_t02_s03_f01.png")
+    button:addTouchEventListener(function(sender, eventType)
+        if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+            self.m_Model:onButtonNextTurnTouched()
+        end
+    end)
 
     self.m_ButtonNextTurn = button
     self:addChild(button)
@@ -95,6 +105,11 @@ end
 
 local function initButtonPlay(self)
     local button = createButton(BUTTON_PLAY_RIGHT_POS_X, BUTTON_PLAY_RIGHT_POS_Y, "c03_t02_s01_f01.png")
+    button:addTouchEventListener(function(sender, eventType)
+        if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+            self.m_Model:onButtonPlayTouched()
+        end
+    end)
 
     self.m_ButtonPlay = button
     self:addChild(button)
@@ -103,6 +118,11 @@ end
 local function initButtonPause(self)
     local button = createButton(BUTTON_PAUSE_RIGHT_POS_X, BUTTON_PAUSE_RIGHT_POS_Y, "c03_t02_s02_f01.png")
     button:setVisible(false)
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonPauseTouched()
+            end
+        end)
 
     self.m_ButtonPause = button
     self:addChild(button)
@@ -131,6 +151,42 @@ function ViewReplayController:adjustPositionOnTouch(touch)
     else
         moveToLeftSide(self)
     end
+
+    return self
+end
+
+function ViewReplayController:setButtonPreviousTurnEnabled(enabled)
+    self.m_ButtonPreviousTurn:setEnabled(enabled)
+
+    return self
+end
+
+function ViewReplayController:setButtonNextTurnEnabled(enabled)
+    self.m_ButtonPreviousTurn:setEnabled(enabled)
+
+    return self
+end
+
+function ViewReplayController:setButtonPlayEnabled(enabled)
+    self.m_ButtonPlay:setEnabled(enabled)
+
+    return self
+end
+
+function ViewReplayController:setButtonPauseEnabled(enabled)
+    self.m_ButtonPause:setEnabled(enabled)
+
+    return self
+end
+
+function ViewReplayController:setButtonPlayVisible(visible)
+    self.m_ButtonPlay:setVisible(visible)
+
+    return self
+end
+
+function ViewReplayController:setButtonPauseVisible(visible)
+    self.m_ButtonPause:setVisible(visible)
 
     return self
 end

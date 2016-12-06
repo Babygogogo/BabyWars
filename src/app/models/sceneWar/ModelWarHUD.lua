@@ -119,6 +119,9 @@ function ModelWarHUD:onStartRunning(sceneWarFileName)
     self.m_ActorTileInfo       :getModel():onStartRunning(sceneWarFileName)
     self.m_ActorUnitInfo       :getModel():onStartRunning(sceneWarFileName)
     self.m_ActorWarCommandMenu :getModel():onStartRunning(sceneWarFileName)
+    if (self.m_ActorReplayController) then
+        self.m_ActorReplayController:getModel():onStartRunning(sceneWarFileName)
+    end
 
     return self
 end
