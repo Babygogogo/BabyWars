@@ -591,11 +591,19 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [11] = {
-        [1] = function(...) return "关 于 本 作" end,
-        [2] = function(...) return "About" end,
+        [1] = function(textType)
+            if      (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
+            else                                             return "未知11:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if      (textType == "NoMoreReplayActions") then return "The replay is finished."
+            else                                             return "Unknown11:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [12] = {
         [1] = function(...) return s_LongText1_1     end,
         [2] = function(...) return "Untranslated..." end,
@@ -674,8 +682,18 @@ local s_Texts = {
         [2] = function() return "No" end,
     },
     [30] = {
-        [1] = function() return "已成功连接服务器。"       end,
-        [2] = function() return "Connection established." end,
+        [1] = function(textType)
+            if     (textType == "ConnectionEstablished") then return "已成功连接服务器。"
+            elseif (textType == "StartConnecting")       then return "正在连接服务器，请稍候。"
+            else                                              return "未知30:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "ConnectionEstablished") then return "Connection established."
+            elseif (textType == "StartConnecting")       then return "Now connecting to the server. Please wait."
+            else                                              return "Unknown30:" .. (textType or "")
+            end
+        end,
     },
     [31] = {
         [1] = function() return "连接服务器失败，正在尝试重新连接…"       end,

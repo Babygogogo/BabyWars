@@ -37,6 +37,7 @@ local function main()
     local actorSceneMain = require("src.global.actors.Actor").createWithModelAndViewName("sceneMain.ModelSceneMain", nil, "sceneMain.ViewSceneMain")
     require("src.app.utilities.WebSocketManager").init()
     require("src.global.actors.ActorManager").setAndRunRootActor(actorSceneMain)
+    actorSceneMain:getModel():getModelMessageIndicator():showMessage(require("src.app.utilities.LocalizationFunctions").getLocalizedText(30, "StartConnecting"))
 end
 
 local status, msg = xpcall(main, __G__TRACKBACK__)

@@ -3,6 +3,7 @@ local ModelReplayController = class("ModelReplayController")
 
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
+local getModelScene            = SingletonGetters.getModelScene
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 
 --------------------------------------------------------------------------------
@@ -77,6 +78,11 @@ function ModelReplayController:onButtonPreviousTurnTouched()
 end
 
 function ModelReplayController:onButtonPlayTouched()
+    local modelSceneWar = getModelScene()
+    if (not modelSceneWar:isExecutingAction()) then
+        modelSceneWar:executeReplayAction()
+    end
+
     if (self.m_View) then
         self.m_View:setButtonPlayVisible(false)
             :setButtonPauseVisible(true)

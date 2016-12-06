@@ -41,8 +41,13 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
     local playerIndexLoggedIn = getPlayerIndexLoggedIn()
     local sceneWarFileName    = getSceneWarFileName()
     local unitType            = self.m_Model:getUnitType()
+    local isAlwaysVisible     = (isTotalReplay()) or (playerIndex == playerIndexLoggedIn)
+
     local steps               = {cc.CallFunc:create(function()
         getModelMapCursor():setMovableByPlayer(false)
+        if (isAlwaysVisible) then
+            self:setVisible(true)
+        end
     end)}
 
     for i = 2, #path do
@@ -57,11 +62,9 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
             end)
         end
 
-        if (playerIndex == playerIndexLoggedIn) then
-            steps[#steps + 1] = cc.Show:create()
-        else
+        if (not isAlwaysVisible) then
             if (isDiving) then
-                if ((i == #path)                                                                            and
+                if ((i == #path)                                                                                      and
                     (isUnitVisible(sceneWarFileName, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else

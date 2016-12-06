@@ -207,7 +207,7 @@ local function moveModelUnitWithAction(action)
     local launchUnitID       = action.launchUnitID
     local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     local playerIndex        = focusModelUnit:getPlayerIndex()
-    local shouldUpdateFogMap = (IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())
+    local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(sceneWarFileName)) or (playerIndex == getPlayerIndexLoggedIn())
     if (shouldUpdateFogMap) then
         modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, path)
     end

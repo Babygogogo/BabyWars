@@ -237,9 +237,8 @@ function ModelFogMap:isDisablingFogByForce()
 end
 
 function ModelFogMap:resetMapForPathsForPlayerIndex(playerIndex, data)
-    if ((not IS_SERVER) and (self.m_SceneWarFileName)) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:resetMapForPathsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (not self.m_SceneWarFileName) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:resetMapForPathsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForPaths[playerIndex]
     local mapSize       = self:getMapSize()
@@ -254,9 +253,8 @@ end
 
 function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
     local playerIndex = modelUnit:getPlayerIndex()
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local canRevealHidingPlaces = canRevealHidingPlacesWithUnits(getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
     local visibilityMap         = self.m_MapsForPaths[playerIndex]
@@ -269,9 +267,8 @@ function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
 end
 
 function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origin, radius)
-    if (not IS_SERVER) then
-        assert(playerIndex == getPlayerIndexLoggedIn(), "ModelFogMap:updateMapForPathsForPlayerIndexWithFlare() invalid playerIndex on the client: " .. (playerIndex or ""))
-    end
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+        "ModelFogMap:updateMapForPathsForPlayerIndexWithFlare() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForPaths[playerIndex]
     for _, gridIndex in pairs(getGridsWithinDistance(origin, 0, radius, self:getMapSize())) do

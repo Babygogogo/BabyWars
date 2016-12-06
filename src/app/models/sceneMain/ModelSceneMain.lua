@@ -110,7 +110,7 @@ end
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
     print("ModelSceneMain-onWebSocketOpen()")
-    self:getModelMessageIndicator():showMessage(getLocalizedText(30))
+    self:getModelMessageIndicator():showMessage(getLocalizedText(30, "ConnectionEstablished"))
 end
 
 local function onWebSocketMessage(self, param)
