@@ -68,6 +68,7 @@ local function initActorBattleInfo(self)
 end
 
 local function initActorReplayController(self)
+    self.m_ActorReplayController = Actor.createWithModelAndViewName("sceneWar.ModelReplayController", nil, "sceneWar.ViewReplayController")
 end
 
 --------------------------------------------------------------------------------

@@ -2,7 +2,8 @@
 local ViewWarHUD = class("ViewWarHUD", cc.Node)
 
 local CONFIRM_BOX_Z_ORDER       = 99
-local WAR_COMMAND_MENU_Z_ORDER  = 2
+local WAR_COMMAND_MENU_Z_ORDER  = 3
+local REPLAY_CONTROLLER_Z_ORDER = 2
 local TILE_DETAIL_Z_ORDER       = 1
 local UNIT_DETAIL_Z_ORDER       = 1
 local BATTLE_INFO_Z_ORDER       = 0
@@ -20,6 +21,9 @@ local function createTouchListener(self)
         self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
         self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
+        if (self.m_ViewReplayController) then
+            self.m_ViewReplayController:adjustPositionOnTouch(touch)
+        end
 
         return true
     end
@@ -30,6 +34,9 @@ local function createTouchListener(self)
         self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
         self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
+        if (self.m_ViewReplayController) then
+            self.m_ViewReplayController:adjustPositionOnTouch(touch)
+        end
     end
 
     local function onTouchCancelled(touch, event)
@@ -41,6 +48,9 @@ local function createTouchListener(self)
         self.m_ViewTileInfo       :adjustPositionOnTouch(touch)
         self.m_ViewUnitInfo       :adjustPositionOnTouch(touch)
         self.m_ViewBattleInfo     :adjustPositionOnTouch(touch)
+        if (self.m_ViewReplayController) then
+            self.m_ViewReplayController:adjustPositionOnTouch(touch)
+        end
     end
 
     touchListener:registerScriptHandler(onTouchBegan,     cc.Handler.EVENT_TOUCH_BEGAN)
@@ -135,6 +145,15 @@ function ViewWarHUD:setViewBattleInfo(view)
 
     self.m_ViewBattleInfo = view
     self:addChild(view, BATTLE_INFO_Z_ORDER)
+
+    return self
+end
+
+function ViewWarHUD:setViewReplayController(view)
+    assert(self.m_ViewReplayController == nil, "ViewWarHUD:setViewReplayController() the view has been set already.")
+
+    self.m_ViewReplayController = view
+    self:addChild(view, REPLAY_CONTROLLER_Z_ORDER)
 
     return self
 end
