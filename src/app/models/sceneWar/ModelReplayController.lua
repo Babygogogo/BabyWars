@@ -78,15 +78,16 @@ function ModelReplayController:onButtonPreviousTurnTouched()
 end
 
 function ModelReplayController:onButtonPlayTouched()
-    local modelSceneWar = getModelScene()
-    if (not modelSceneWar:isExecutingAction()) then
-        modelSceneWar:executeReplayAction()
-    end
+    getModelScene():setAutoReplay(true)
+    self:setButtonPlayVisible(false)
 
     return self
 end
 
 function ModelReplayController:onButtonPauseTouched()
+    getModelScene():setAutoReplay(false)
+    self:setButtonPlayVisible(true)
+
     return self
 end
 

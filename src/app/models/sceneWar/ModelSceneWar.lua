@@ -325,7 +325,25 @@ function ModelSceneWar:executeReplayAction()
     else
         action.fileName = self:getFileName()
         action.actionID = actionID
+
+        setActionId(self, actionID)
         ActionExecutor.execute(action)
+    end
+
+    return self
+end
+
+function ModelSceneWar:isAutoReplay()
+    assert(self:isTotalReplay(), "ModelSceneWar:isAutoReplay() it's not in replay mode.")
+    return self.m_IsAutoReplay
+end
+
+function ModelSceneWar:setAutoReplay(isAuto)
+    assert(self:isTotalReplay(), "ModelSceneWar:setAutoReplay() it's not in replay mode.")
+    self.m_IsAutoReplay = isAuto
+
+    if ((isAuto) and (not self:isExecutingAction())) then
+        self:executeReplayAction()
     end
 
     return self
@@ -340,18 +358,34 @@ function ModelSceneWar:setExecutingAction(executing)
 
     if ((not executing) and (not self:isEnded())) then
         local actionID = self:getActionId() + 1
-        local action   = self.m_CachedActions[actionID]
-        if (action) then
-            assert(not IS_SERVER, "ModelSceneWar:setExecutingAction() there should not be any cached actions on the server.")
-            self.m_CachedActions[actionID] = nil
-            self.m_IsExecutingAction       = true
-            self.m_View:runAction(cc.Sequence:create(
-                cc.DelayTime:create(TIME_INTERVAL_FOR_ACTIONS),
-                cc.CallFunc:create(function()
-                    self.m_IsExecutingAction = false
-                    self:executeAction(action)
-                end)
-            ))
+        if (not self:isTotalReplay()) then
+            local action = self.m_CachedActions[actionID]
+            if (action) then
+                assert(not IS_SERVER, "ModelSceneWar:setExecutingAction() there should not be any cached actions on the server.")
+                self.m_CachedActions[actionID] = nil
+                self.m_IsExecutingAction       = true
+                self.m_View:runAction(cc.Sequence:create(
+                    cc.DelayTime:create(TIME_INTERVAL_FOR_ACTIONS),
+                    cc.CallFunc:create(function()
+                        self.m_IsExecutingAction = false
+                        self:executeAction(action)
+                    end)
+                ))
+            end
+        else
+            local action = self.m_ExecutedActions[actionID]
+            if ((self:isAutoReplay()) and (action)) then
+                self.m_IsExecutingAction = true
+                self.m_View:runAction(cc.Sequence:create(
+                    cc.DelayTime:create(TIME_INTERVAL_FOR_ACTIONS),
+                    cc.CallFunc:create(function()
+                        self.m_IsExecutingAction = false
+                        if (self:isAutoReplay()) then
+                            self:executeReplayAction()
+                        end
+                    end)
+                ))
+            end
         end
     end
 
