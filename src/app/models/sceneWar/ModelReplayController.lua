@@ -83,18 +83,17 @@ function ModelReplayController:onButtonPlayTouched()
         modelSceneWar:executeReplayAction()
     end
 
-    if (self.m_View) then
-        self.m_View:setButtonPlayVisible(false)
-            :setButtonPauseVisible(true)
-    end
-
     return self
 end
 
 function ModelReplayController:onButtonPauseTouched()
+    return self
+end
+
+function ModelReplayController:setButtonPlayVisible(visible)
     if (self.m_View) then
-        self.m_View:setButtonPauseVisible(false)
-            :setButtonPlayVisible(true)
+        self.m_View:setButtonPlayVisible(visible)
+            :setButtonPauseVisible(not visible)
     end
 
     return self

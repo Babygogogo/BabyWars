@@ -1284,82 +1284,47 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action)
     local actionName = action.actionName
-    if     (actionName == "DownloadReplayData") then return executeDownloadReplayData(action)
-    elseif (actionName == "GetReplayList")      then return executeGetReplayList(     action)
-    elseif (actionName == "Logout")             then return executeLogout(            action)
-    end
-
-    local sceneWarFileName = action.fileName
-    local modelSceneWar    = getModelScene(sceneWarFileName)
-    if ((not modelSceneWar)                                or
-        (not modelSceneWar.getFileName)                    or
-        (modelSceneWar:getFileName() ~= sceneWarFileName)) then
-        return
-    end
-
-    local actionID = action.actionID
-    if (not actionID) then
-        assert(not IS_SERVER, "ActionExecutor.execute() invalid action for the server: " .. toErrorMessage(action))
-        if     (actionName == "Error")               then executeError(              action)
-        elseif (actionName == "Message")             then executeMessage(            action)
+    if (not action.actionID) then
+        if     (actionName == "DownloadReplayData")  then executeDownloadReplayData( action)
+        elseif (actionName == "Error")               then executeError(              action)
+        elseif (actionName == "GetReplayList")       then executeGetReplayList(      action)
         elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
         elseif (actionName == "GetSceneWarData")     then executeGetSceneWarData(    action)
+        elseif (actionName == "Logout")              then executeLogout(             action)
+        elseif (actionName == "Message")             then executeMessage(            action)
         elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
         elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
-        else
-            local account, password = getLoggedInAccountAndPassword()
-            runSceneMain({
-                    isPlayerLoggedIn = (account ~= nil),
-                    confirmText      = "InvalidAction: " .. toErrorMessage(action)
-                }, account, password)
         end
-        return
-    end
-
-    if (modelSceneWar:isEnded()) then
-        return
-    elseif (modelSceneWar:isExecutingAction()) then
-        modelSceneWar:cacheAction(action)
-        return
-    end
-
-    modelSceneWar:setExecutingAction(true)
-    if (actionID == modelSceneWar:getActionId() + 1) then
-        modelSceneWar:setActionId(actionID)
     else
-        assert(not IS_SERVER, "ActionExecutor.execute() the actionID is invalid on the server: " .. (actionID or ""))
-        getModelMessageIndicator():showPersistentMessage(getLocalizedText(81, "OutOfSync"))
-        requestReloadSceneWar()
-        return
-    end
+        getModelScene(action.fileName):setExecutingAction(true)
+        if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
+        elseif (actionName == "Attack")                 then executeAttack(                action)
+        elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
+        elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
+        elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
+        elseif (actionName == "Dive")                   then executeDive(                  action)
+        elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
+        elseif (actionName == "EndTurn")                then executeEndTurn(               action)
+        elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
+        elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
+        elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
+        elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
+        elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
+        elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
+        elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
+        elseif (actionName == "Surface")                then executeSurface(               action)
+        elseif (actionName == "Surrender")              then executeSurrender(             action)
+        elseif (actionName == "TickActionId")           then executeTickActionId(          action)
+        elseif (actionName == "Wait")                   then executeWait(                  action)
+        end
 
-    if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
-    elseif (actionName == "Attack")                 then executeAttack(                action)
-    elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
-    elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
-    elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
-    elseif (actionName == "Dive")                   then executeDive(                  action)
-    elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
-    elseif (actionName == "EndTurn")                then executeEndTurn(               action)
-    elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
-    elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
-    elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
-    elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
-    elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
-    elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
-    elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
-    elseif (actionName == "Surface")                then executeSurface(               action)
-    elseif (actionName == "Surrender")              then executeSurrender(             action)
-    elseif (actionName == "TickActionId")           then executeTickActionId(          action)
-    elseif (actionName == "Wait")                   then executeWait(                  action)
-    end
-
-    if (not IS_SERVER) then
-        getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "TransferingData"))
-        getScriptEventDispatcher():dispatchEvent({
+        if (not IS_SERVER) then
+            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "TransferingData"))
+            getScriptEventDispatcher():dispatchEvent({
                 name    = "EvtIsWaitingForServerResponse",
                 waiting = false,
             })
+        end
     end
 end
 

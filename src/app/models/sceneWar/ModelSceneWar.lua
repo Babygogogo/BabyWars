@@ -35,7 +35,7 @@ local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSock
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"fileName", "actionID"}
-local TIME_INTERVAL_FOR_ACTIONS         = 1
+local TIME_INTERVAL_FOR_ACTIONS         = 1.5
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -71,6 +71,25 @@ end
 local function onWebSocketError(self, param)
     print("ModelSceneWar-onWebSocketError()")
     self:getModelMessageIndicator():showMessage(getLocalizedText(32, param.error))
+end
+
+--------------------------------------------------------------------------------
+-- The private functions for actions.
+--------------------------------------------------------------------------------
+local function setActionId(self, actionID)
+    assert(math.floor(actionID) == actionID, "ModelSceneWar-setActionId() invalid actionID: " .. (actionID or ""))
+    self.m_ActionID = actionID
+end
+
+local function cacheAction(self, action)
+    local actionID = action.actionID
+    assert(not IS_SERVER,                 "ModelSceneWar-cacheAction() this should not happen on the server.")
+    assert(not self:isTotalReplay(),      "ModelSceneWar-cacheAction() this should not happen when replaying.")
+    assert(actionID > self:getActionId(), "ModelSceneWar-cacheAction() the action to be cached has been executed already.")
+
+    self.m_CachedActions[actionID] = action
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -131,7 +150,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_ActionID            = sceneData.actionID or 0
     self.m_ExecutedActions     = sceneData.executedActions
     self.m_FileName            = sceneData.fileName
     self.m_IsWarEnded          = sceneData.isEnded
@@ -140,6 +158,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_MaxSkillPoints      = sceneData.maxSkillPoints
     self.m_WarPassword         = sceneData.warPassword
     self.m_CachedActions       = {}
+    setActionId(self, sceneData.actionID or 0)
 
     initScriptEventDispatcher(self)
     initActorPlayerManager(   self, sceneData.players)
@@ -175,9 +194,9 @@ function ModelSceneWar:toSerializableTable()
         warPassword         = self.m_WarPassword,
         isEnded             = self.m_IsWarEnded,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        actionID            = self.m_ActionID,
         executedActions     = self.m_ExecutedActions,
         maxSkillPoints      = self.m_MaxSkillPoints,
+        actionID            = self:getActionId(),
         warField            = self:getModelWarField()      :toSerializableTable(),
         turn                = self:getModelTurnManager()   :toSerializableTable(),
         players             = self:getModelPlayerManager() :toSerializableTable(),
@@ -191,8 +210,8 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         warPassword         = self.m_WarPassword,
         isEnded             = self.m_IsWarEnded,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        actionID            = self.m_ActionID,
         maxSkillPoints      = self.m_MaxSkillPoints,
+        actionID            = self:getActionId(),
         warField            = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
         turn                = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
         players             = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
@@ -257,9 +276,39 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSceneWar:executeAction(action)
-    ActionExecutor.execute(action)
-    if ((IS_SERVER) and (self.m_ExecutedActions)) then
-        self.m_ExecutedActions[self.m_ActionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+    local sceneWarFileName = action.fileName
+    local actionID         = action.actionID
+    local selfActionID     = self:getActionId()
+    if (IS_SERVER) then
+        assert(sceneWarFileName == self:getFileName(), "ModelSceneWar:executeAction() invalid action.fileName:" .. (sceneWarFileName or ""))
+        assert(actionID == selfActionID + 1,           "ModelSceneWar:executeAction() invalid action.actionID:" .. (actionID or ""))
+        assert(not self:isExecutingAction(),           "ModelSceneWar:executeAction() another action is being executed. This should not happen.")
+
+        setActionId(self, actionID)
+        ActionExecutor.execute(action)
+
+        if (self.m_ExecutedActions) then
+            self.m_ExecutedActions[actionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+        end
+
+    elseif (not sceneWarFileName) then
+        ActionExecutor.execute(action)
+
+    elseif (sceneWarFileName ~= self:getFileName()) then
+        -- The action is not for this war. Do nothing.
+
+    elseif (not actionID) then
+        ActionExecutor.execute(action)
+
+    elseif ((actionID <= selfActionID) or (self:isEnded())) then
+        -- The action has been executed already, or the war is ended for the client. Do nothing.
+
+    elseif ((actionID > selfActionID + 1) or (self:isExecutingAction())) then
+        cacheAction(self, action)
+
+    else
+        setActionId(self, actionID)
+        ActionExecutor.execute(action)
     end
 
     return self
@@ -293,7 +342,7 @@ function ModelSceneWar:setExecutingAction(executing)
         local actionID = self:getActionId() + 1
         local action   = self.m_CachedActions[actionID]
         if (action) then
-            assert(not IS_SERVER, "ModelSceneWar:cacheAction() there should not be any cached actions on the server.")
+            assert(not IS_SERVER, "ModelSceneWar:setExecutingAction() there should not be any cached actions on the server.")
             self.m_CachedActions[actionID] = nil
             self.m_IsExecutingAction       = true
             self.m_View:runAction(cc.Sequence:create(
@@ -309,26 +358,8 @@ function ModelSceneWar:setExecutingAction(executing)
     return self
 end
 
-function ModelSceneWar:cacheAction(action)
-    assert(not IS_SERVER,            "ModelSceneWar:cacheAction() this should not happen on the server.")
-    assert(not self:isTotalReplay(), "ModelSceneWar:cacheAction() this should not happen when replaying.")
-
-    local actionID = action.actionID
-    if (actionID > self:getActionId()) then
-        self.m_CachedActions[actionID] = action
-    end
-
-    return self
-end
-
 function ModelSceneWar:getActionId()
     return self.m_ActionID
-end
-
-function ModelSceneWar:setActionId(actionID)
-    self.m_ActionID = actionID
-
-    return self
 end
 
 function ModelSceneWar:getFileName()
