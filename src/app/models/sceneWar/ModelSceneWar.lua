@@ -273,8 +273,10 @@ function ModelSceneWar:onWebSocketEvent(eventName, param)
 end
 
 --------------------------------------------------------------------------------
--- The public functions.
+-- The public functions/accessors.
 --------------------------------------------------------------------------------
+ModelSceneWar.isModelSceneWar = true
+
 function ModelSceneWar:executeAction(action)
     local sceneWarFileName = action.fileName
     local actionID         = action.actionID

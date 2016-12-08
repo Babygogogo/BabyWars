@@ -41,7 +41,6 @@ local isTotalReplay                 = SingletonGetters.isTotalReplay
 local isTileVisible                 = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible                 = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
-local toErrorMessage                = SerializationFunctions.toErrorMessage
 
 --------------------------------------------------------------------------------
 -- The functions for dispatching events.
@@ -57,13 +56,15 @@ end
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function runSceneMain(modelSceneMainParam, playerAccount, playerPassword)
+local function runSceneMain(isPlayerLoggedIn, confirmText)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", modelSceneMainParam)
+    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
+        isPlayerLoggedIn = isPlayerLoggedIn,
+        confirmText      = confirmText,
+    })
     local viewSceneMain  = Actor.createView( "sceneMain.ViewSceneMain")
 
-    WebSocketManager.setLoggedInAccountAndPassword(playerAccount, playerPassword)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
@@ -323,12 +324,11 @@ local function getAdjacentPlasmaGridIndexes(gridIndex, modelTileMap)
 end
 
 local function callbackOnWarEndedForClient()
-    local account, password = getLoggedInAccountAndPassword()
-    runSceneMain({isPlayerLoggedIn = account ~= nil}, account, password)
+    runSceneMain(getLoggedInAccountAndPassword() ~= nil)
 end
 
 --------------------------------------------------------------------------------
--- The private executors.
+-- The executors for non-war actions.
 --------------------------------------------------------------------------------
 local function executeDownloadReplayData(action)
     assert(not IS_SERVER, "ActionExecutor-executeDownloadReplayData() should not be invoked on the server.")
@@ -339,6 +339,11 @@ local function executeDownloadReplayData(action)
 
     modelScene:getModelMainMenu():getModelReplayManager():serializeReplayData(action.sceneWarFileName, action.data)
     modelScene:getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
+end
+
+local function executeError(action)
+    assert(not IS_SERVER, "ActionExecutor-executeError() should not be invoked on the server.")
+    error("ActionExecutor-executeError() " .. (action.error or ""))
 end
 
 local function executeGetReplayList(action)
@@ -354,30 +359,11 @@ local function executeGetReplayList(action)
     end
 end
 
-local function executeLogout(action)
-    assert(not IS_SERVER, "ActionExecutor-executeLogout() should not be invoked on the server.")
-    runSceneMain({confirmText = action.message})
-end
-
-local function executeError(action)
-    assert(not IS_SERVER, "ActionExecutor-executeError() should not be invoked on the server.")
-    error("ActionExecutor-executeError() " .. (action.error or ""))
-end
-
-local function executeMessage(action)
-    assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
-    getModelMessageIndicator():showMessage(action.message)
-end
-
 local function executeGetSceneWarActionId(action)
     assert(not IS_SERVER, "ActionExecutor-executeGetSceneWarActionId() should not be invoked on the server.")
     local actionID = action.sceneWarActionID
     if (not actionID) then
-        local account, password = getLoggedInAccountAndPassword()
-        runSceneMain({
-                isPlayerLoggedIn = account ~= nil,
-                confirmText      = getLocalizedText(81, "InvalidWarFileName"),
-            }, account, password)
+        runSceneMain(getLoggedInAccountAndPassword() ~= nil, getLocalizedText(81, "InvalidWarFileName"))
     elseif (actionID > getModelScene():getActionId()) then
         requestReloadSceneWar(getLocalizedText(81, "OutOfSync"))
     end
@@ -385,6 +371,45 @@ end
 
 local function executeGetSceneWarData(action)
     -- The "GetSceneWarData" action is now ignored when a war scene is running. Use the "ReloadSceneWar" action instead.
+end
+
+local function executeLogin(action)
+    assert(not IS_SERVER, "ActionExecutor-executeLogin() should not be invoked on the server.")
+    local account, password = action.account, action.password
+    if (account == getLoggedInAccountAndPassword()) then
+        return
+    else
+        WebSocketManager.setLoggedInAccountAndPassword(account, password)
+        SerializationFunctions.serializeAccountAndPassword(account, password)
+
+        local modelScene = getModelScene()
+        if (modelScene.isModelSceneWar) then
+            runSceneMain(true)
+        else
+            local modelMainMenu   = modelScene:getModelMainMenu()
+            local modelLoginPanel = modelMainMenu:getModelLoginPanel()
+            if (not modelLoginPanel:isEnabled()) then
+                runSceneMain(true)
+            else
+                modelLoginPanel:setEnabled(false)
+                modelMainMenu:updateWithIsPlayerLoggedIn(true)
+                    :setMenuEnabled(true)
+            end
+        end
+
+        getModelMessageIndicator():showMessage(getLocalizedText(26, account))
+    end
+end
+
+local function executeLogout(action)
+    assert(not IS_SERVER, "ActionExecutor-executeLogout() should not be invoked on the server.")
+    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
+    runSceneMain(false, action.message)
+end
+
+local function executeMessage(action)
+    assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
+    getModelMessageIndicator():showMessage(action.message)
 end
 
 local function executeReloadSceneWar(action)
@@ -401,13 +426,12 @@ end
 
 local function executeRunSceneMain(action)
     assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
-    local account, password = getLoggedInAccountAndPassword()
-    runSceneMain({
-            isPlayerLoggedIn = account ~= nil,
-            confirmText      = action.message,
-        }, account, password)
+    runSceneMain(getLoggedInAccountAndPassword() ~= nil, action.message)
 end
 
+--------------------------------------------------------------------------------
+-- The executors for war actions.
+--------------------------------------------------------------------------------
 local function executeActivateSkillGroup(action)
     updateTilesAndUnitsBeforeExecutingAction(action)
 
@@ -1305,6 +1329,7 @@ function ActionExecutor.execute(action)
         elseif (actionName == "GetReplayList")       then executeGetReplayList(      action)
         elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
         elseif (actionName == "GetSceneWarData")     then executeGetSceneWarData(    action)
+        elseif (actionName == "Login")               then executeLogin(              action)
         elseif (actionName == "Logout")              then executeLogout(             action)
         elseif (actionName == "Message")             then executeMessage(            action)
         elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)

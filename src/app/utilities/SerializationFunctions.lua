@@ -1,9 +1,16 @@
 
 local SerializationFunctions = {}
 
+local IS_SERVER         = require("src.app.utilities.GameConstantFunctions").isServer()
+local WRITABLE_PATH     = (not IS_SERVER) and (cc.FileUtils:getInstance():getWritablePath() .. "writablePath/") or (nil)
+local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccount.lua")                         or (nil)
+
 local INDENT_SPACES             = " "
 local ERROR_MESSAGE_DEPTH_LIMIT = 2
 
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
 function SerializationFunctions.toString(o, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. INDENT_SPACES
@@ -95,6 +102,32 @@ function SerializationFunctions.toErrorMessage(o, depth)
     else
         return t
     end
+end
+
+--------------------------------------------------------------------------------
+-- The public functions that should only be invoked on the client.
+--------------------------------------------------------------------------------
+function SerializationFunctions.loadAccountAndPassword()
+    local file = io.open(ACCOUNT_FILE_PATH, "r")
+    if (file) then
+        file:close()
+        return dofile(ACCOUNT_FILE_PATH)
+    else
+        return nil
+    end
+end
+
+function SerializationFunctions.serializeAccountAndPassword(account, password)
+    local file = io.open(ACCOUNT_FILE_PATH, "w")
+    if (not file) then
+        cc.FileUtils:getInstance():createDirectory(WRITABLE_PATH)
+        file = io.open(ACCOUNT_FILE_PATH, "w")
+    end
+
+    file:write(string.format("return %q, %q", account, password))
+    file:close()
+
+    return SerializationFunctions
 end
 
 return SerializationFunctions

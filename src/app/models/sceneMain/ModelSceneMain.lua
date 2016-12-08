@@ -30,15 +30,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
-local function doActionLogin(self, action)
-    if (action.account ~= WebSocketManager.getLoggedInAccountAndPassword()) then
-        WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-        self:getModelMessageIndicator():showMessage(getLocalizedText(26, action.account))
-    end
-
-    self.m_ActorMainMenu:getModel():doActionLogin(action)
-end
-
 local function doActionLogout(self, event)
     local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
         confirmText = event.message
@@ -86,26 +77,6 @@ local function doActionMessage(self, action)
 end
 
 --------------------------------------------------------------------------------
--- The private callback function on script events.
---------------------------------------------------------------------------------
-local function onEvtSystemRequestDoAction(self, event)
-    local actionName = event.actionName
-    if     (actionName == "Login")                 then doActionLogin(                self, event)
-    elseif (actionName == "Logout")                then doActionLogout(               self, event)
-    elseif (actionName == "Register")              then doActionRegister(             self, event)
-    elseif (actionName == "NewWar")                then doActionNewWar(               self, event)
-    elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, event)
-    elseif (actionName == "JoinWar")               then doActionJoinWar(              self, event)
-    elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, event)
-    elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, event)
-    elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, event)
-    elseif (actionName == "Message")               then doActionMessage(              self, event)
-    elseif (actionName == "Error")                 then error("ModelSceneMain-onEvtSystemRequestDoAction() Error: " .. event.error)
-    else                                                ActionExecutor.execute(event)
-    end
-end
-
---------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
@@ -115,7 +86,22 @@ end
 
 local function onWebSocketMessage(self, param)
     print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
-    onEvtSystemRequestDoAction(self, param.action)
+
+    local action     = param.action
+    local actionName = action.actionName
+    if     (action.fileName)                       then return
+    elseif (actionName == "Logout")                then doActionLogout(               self, action)
+    elseif (actionName == "Register")              then doActionRegister(             self, action)
+    elseif (actionName == "NewWar")                then doActionNewWar(               self, action)
+    elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, action)
+    elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
+    elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, action)
+    elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
+    elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, action)
+    elseif (actionName == "Message")               then doActionMessage(              self, action)
+    elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
+    else                                                ActionExecutor.execute(action)
+    end
 end
 
 local function onWebSocketClose(self, param)
@@ -133,7 +119,6 @@ end
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
     local dispatcher = EventDispatcher:create()
-    dispatcher:addEventListener("EvtSystemRequestDoAction", self)
 
     self.m_ScriptEventDispatcher = dispatcher
 end
@@ -203,14 +188,6 @@ end
 --------------------------------------------------------------------------------
 -- The callback function on script/web socket events.
 --------------------------------------------------------------------------------
-function ModelSceneMain:onEvent(event)
-    local eventName = event.name
-    if (eventName == "EvtSystemRequestDoAction") then onEvtSystemRequestDoAction(self, event)
-    end
-
-    return self
-end
-
 function ModelSceneMain:onWebSocketEvent(eventName, param)
     if     (eventName == "open")    then onWebSocketOpen(   self, param)
     elseif (eventName == "message") then onWebSocketMessage(self, param)
