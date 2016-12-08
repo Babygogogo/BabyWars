@@ -593,21 +593,67 @@ local s_Texts = {
     },
     [11] = {
         [1] = function(textType)
-            if      (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
-            else                                             return "未知11:" .. (textType or "")
+            if     (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
+            elseif (textType == "Progress")            then return "进度"
+            else                                            return "未知11:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if      (textType == "NoMoreReplayActions") then return "The replay is finished."
-            else                                             return "Unknown11:" .. (textType or "")
+            if     (textType == "NoMoreReplayActions") then return "The replay is finished."
+            elseif (textType == "Progress")            then return "Progress"
+            else                                            return "Unknown11:" .. (textType or "")
+            end
+        end,
+    },
+    [12] = {
+        [1] = function(actionName)
+            if     (actionName == "ActivateSkillGroup")     then return "发动技能"
+            elseif (actionName == "Attack")                 then return "攻击"
+            elseif (actionName == "BeginTurn")              then return "开始回合"
+            elseif (actionName == "BuildModelTile")         then return "建造"
+            elseif (actionName == "CaptureModelTile")       then return "占领"
+            elseif (actionName == "Dive")                   then return "下潜"
+            elseif (actionName == "DropModelUnit")          then return "卸载"
+            elseif (actionName == "EndTurn")                then return "结束回合"
+            elseif (actionName == "JoinModelUnit")          then return "合流"
+            elseif (actionName == "LaunchFlare")            then return "照明弹"
+            elseif (actionName == "LaunchSilo")             then return "发射导弹"
+            elseif (actionName == "LoadModelUnit")          then return "装载"
+            elseif (actionName == "ProduceModelUnitOnTile") then return "生产部队"
+            elseif (actionName == "ProduceModelUnitOnUnit") then return "生产舰载机"
+            elseif (actionName == "SupplyModelUnit")        then return "补给"
+            elseif (actionName == "Surface")                then return "上浮"
+            elseif (actionName == "Surrender")              then return "投降"
+            elseif (actionName == "TickActionId")           then return ""
+            elseif (actionName == "Wait")                   then return "待机"
+            else                                                 return "未知12:" .. (actionName or "")
+            end
+        end,
+        [2] = function(actionName)
+            if     (actionName == "ActivateSkillGroup")     then return "ActivateSkillGroup"
+            elseif (actionName == "Attack")                 then return "Attack"
+            elseif (actionName == "BeginTurn")              then return "BeginTurn"
+            elseif (actionName == "BuildModelTile")         then return "BuildTile"
+            elseif (actionName == "CaptureModelTile")       then return "Capture"
+            elseif (actionName == "Dive")                   then return "Dive"
+            elseif (actionName == "DropModelUnit")          then return "Drop"
+            elseif (actionName == "EndTurn")                then return "EndTurn"
+            elseif (actionName == "JoinModelUnit")          then return "Join"
+            elseif (actionName == "LaunchFlare")            then return "LaunchFlare"
+            elseif (actionName == "LaunchSilo")             then return "LaunchSilo"
+            elseif (actionName == "LoadModelUnit")          then return "Load"
+            elseif (actionName == "ProduceModelUnitOnTile") then return "ProduceUnitOnTile"
+            elseif (actionName == "ProduceModelUnitOnUnit") then return "ProduceUnitOnUnit"
+            elseif (actionName == "SupplyModelUnit")        then return "Supply"
+            elseif (actionName == "Surface")                then return "Surface"
+            elseif (actionName == "Surrender")              then return "Surrender"
+            elseif (actionName == "TickActionId")           then return ""
+            elseif (actionName == "Wait")                   then return "Wait"
+            else                                                 return "Unknown12:" .. (actionName or "")
             end
         end,
     },
     --[[
-    [12] = {
-        [1] = function(...) return s_LongText1_1     end,
-        [2] = function(...) return "Untranslated..." end,
-    },
     [13] = {
         [1] = function(...) return s_LongText2_1     end,
         [2] = function(...) return "Untranslated..." end,

@@ -323,6 +323,9 @@ function ModelSceneWar:executeReplayAction()
     if (not action) then
         self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
     else
+        self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
+            getLocalizedText(11, "Progress"), actionID, #self.m_ExecutedActions, getLocalizedText(12, action.actionName)))
+
         action.fileName = self:getFileName()
         action.actionID = actionID
 

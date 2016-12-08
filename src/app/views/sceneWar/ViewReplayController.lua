@@ -86,6 +86,7 @@ local function initButtonPreviousTurn(self)
             self.m_Model:onButtonPreviousTurnTouched()
         end
     end)
+    button:setVisible(false)
 
     self.m_ButtonPreviousTurn = button
     self:addChild(button)
@@ -98,6 +99,7 @@ local function initButtonNextTurn(self)
             self.m_Model:onButtonNextTurnTouched()
         end
     end)
+    button:setVisible(false)
 
     self.m_ButtonNextTurn = button
     self:addChild(button)
