@@ -982,7 +982,7 @@ local function executeLaunchFlare(action)
     focusModelUnit:setStateActioned()
         :setCurrentFlareAmmo(focusModelUnit:getCurrentFlareAmmo() - 1)
 
-    if ((IS_SERVER) or (playerIndexActing == playerIndexLoggedIn)) then
+    if ((IS_SERVER) or (isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
         getModelFogMap(sceneWarFileName):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
     end
 
@@ -994,7 +994,7 @@ local function executeLaunchFlare(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            if (playerIndexActing == playerIndexLoggedIn) then
+            if ((isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
                 local modelGridEffect = getModelGridEffect()
                 for _, gridIndex in pairs(getGridsWithinDistance(targetGridIndex, 0, flareAreaRadius, modelUnitMap:getMapSize())) do
                     modelGridEffect:showAnimationFlare(gridIndex)
