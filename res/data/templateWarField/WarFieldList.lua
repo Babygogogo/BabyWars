@@ -19,7 +19,7 @@ return {
     "SanHeGu",
     "ShenSeYanCaoZhanZheng",
     "SiTongBaDa",
-    "TanXinWan",
+    "TanXinWan_2",
     "WangPaiKongJun",
     "XiaoGuoZhengBaSai",
     "YanMo",
