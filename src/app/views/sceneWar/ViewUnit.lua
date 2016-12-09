@@ -13,6 +13,7 @@ local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
@@ -40,8 +41,13 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
     local playerIndexLoggedIn = getPlayerIndexLoggedIn()
     local sceneWarFileName    = getSceneWarFileName()
     local unitType            = self.m_Model:getUnitType()
+    local isAlwaysVisible     = (isTotalReplay()) or (playerIndex == playerIndexLoggedIn)
+
     local steps               = {cc.CallFunc:create(function()
         getModelMapCursor():setMovableByPlayer(false)
+        if (isAlwaysVisible) then
+            self:setVisible(true)
+        end
     end)}
 
     for i = 2, #path do
@@ -56,11 +62,9 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
             end)
         end
 
-        if (playerIndex == playerIndexLoggedIn) then
-            steps[#steps + 1] = cc.Show:create()
-        else
+        if (not isAlwaysVisible) then
             if (isDiving) then
-                if ((i == #path)                                                                            and
+                if ((i == #path)                                                                                      and
                     (isUnitVisible(sceneWarFileName, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
@@ -187,7 +191,7 @@ local function getLoadIndicatorFrame(unit)
         return nil
     else
         local loadCount = unit:getCurrentLoadCount()
-        if (getModelFogMap():isFogOfWarCurrently()) then
+        if ((not isTotalReplay()) and (getModelFogMap():isFogOfWarCurrently())) then
             if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn()) or (loadCount > 0)) then
                 return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
             else

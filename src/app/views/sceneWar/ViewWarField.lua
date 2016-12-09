@@ -12,9 +12,9 @@ local BOUNDARY_RECT  = {upperRightX = display.width - 10, upperRightY = display.
 
 local MAP_CURSOR_Z_ORDER     = 5
 local GRID_EXPLOSION_Z_ORDER = 4
-local FOG_MAP_Z_ORDER        = 3
-local UNIT_MAP_Z_ORDER       = 2
-local ACTION_PLANNER_Z_ORDER = 1
+local UNIT_MAP_Z_ORDER       = 3
+local ACTION_PLANNER_Z_ORDER = 2
+local FOG_MAP_Z_ORDER        = 1
 local TILE_MAP_Z_ORDER       = 0
 
 --------------------------------------------------------------------------------

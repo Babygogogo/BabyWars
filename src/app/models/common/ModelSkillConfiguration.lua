@@ -97,6 +97,13 @@ function ModelSkillConfiguration:toSerializableTable()
     }
 end
 
+function ModelSkillConfiguration:toSerializableReplayData()
+    local data = self:toSerializableTable()
+    data.activatingSkillGroupId = nil
+
+    return data
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

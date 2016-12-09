@@ -45,19 +45,19 @@ function Actor.setViewEnabled(enabled)
     return Actor
 end
 
-function Actor.createModel(name, param)
+function Actor.createModel(name, ...)
     if (not name) then
         return nil
     else
-        return require(MODEL_PATH .. name):create(param)
+        return require(MODEL_PATH .. name):create(...)
     end
 end
 
-function Actor.createView(name, param)
+function Actor.createView(name, ...)
     if (not name) then
         return nil
     else
-        return require(VIEW_PATH .. name):create(param)
+        return require(VIEW_PATH .. name):create(...)
     end
 end
 

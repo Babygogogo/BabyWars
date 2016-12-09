@@ -68,7 +68,7 @@ function ModelPlayer:toSerializableReplayData()
         isAlive             = true,
         damageCost          = 0,
         skillActivatedCount = 0,
-        skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
+        skillConfiguration  = self:getModelSkillConfiguration():toSerializableReplayData(),
     }
 end
 

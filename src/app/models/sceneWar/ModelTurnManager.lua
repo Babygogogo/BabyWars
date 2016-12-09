@@ -41,6 +41,7 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
+local isTotalReplay            = SingletonGetters.isTotalReplay
 local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 
 local DEFAULT_TURN_DATA = {
@@ -101,22 +102,26 @@ end
 
 local function resetVisionOnClient()
     assert(not IS_SERVER, "ModelTurnManager-resetVisionOnClient() this shouldn't be called on the server.")
-    local sceneWarFileName = getSceneWarFileName()
-    local playerIndex      = getPlayerIndexLoggedIn()
+    if (isTotalReplay()) then
+        getModelFogMap():updateView()
+    else
+        local sceneWarFileName = getSceneWarFileName()
+        local playerIndex      = getPlayerIndexLoggedIn()
 
-    getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        local gridIndex = modelUnit:getGridIndex()
-        if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
-            destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
-        end
-    end)
+        getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+            local gridIndex = modelUnit:getGridIndex()
+            if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
+                destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+            end
+        end)
 
-    getModelTileMap():forEachModelTile(function(modelTile)
-        if (not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
-            modelTile:updateAsFogEnabled()
-                :updateView()
-        end
-    end)
+        getModelTileMap():forEachModelTile(function(modelTile)
+            if (not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
+                modelTile:updateAsFogEnabled()
+                    :updateView()
+            end
+        end)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -285,7 +290,7 @@ local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
     local playerIndex = self:getPlayerIndex()
     if (IS_SERVER) then
         getModelFogMap(self.m_SceneWarFileName):resetMapForPathsForPlayerIndex(playerIndex)
-    elseif (playerIndex == getPlayerIndexLoggedIn()) then
+    elseif ((isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
         getModelFogMap():resetMapForPathsForPlayerIndex(playerIndex)
         resetVisionOnClient()
     end
@@ -330,7 +335,7 @@ local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
     if (IS_SERVER) then
         getModelFogMap(self.m_SceneWarFileName):resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
-    elseif (playerIndex == getPlayerIndexLoggedIn()) then
+    elseif ((isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
         getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
         resetVisionOnClient()
@@ -340,7 +345,7 @@ local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
 end
 
 local function runTurnPhaseRequestToBegin(self)
-    if ((not IS_SERVER) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
+    if ((not IS_SERVER) and (not isTotalReplay()) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
         WebSocketManager.sendAction({
             actionName       = "BeginTurn",
             actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
@@ -423,7 +428,7 @@ function ModelTurnManager:runTurn()
         self.m_CallbackOnEnterTurnPhaseMainForNextTurn = nil
     end
 
-    if (not IS_SERVER) then
+    if ((not IS_SERVER) and (not isTotalReplay())) then
         if (self:getPlayerIndex() == getPlayerIndexLoggedIn()) then
             getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "NotInTurn"))
         else

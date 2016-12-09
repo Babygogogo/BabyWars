@@ -64,17 +64,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:ctor(param)
-    if (self.m_View) then
-        self:initView()
-    end
-
-    return self
-end
-
-function ModelMoneyEnergyInfo:initView()
-    local view = self.m_View
-    assert(view, "ModelMoneyEnergyInfo:initView() no view is attached to the owner actor of the model.")
-
     return self
 end
 

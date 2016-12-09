@@ -181,7 +181,7 @@ local function initItemLogin(self)
         name     = getLocalizedText(1, "Login"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorLoginPanel(self):getModel():setEnabled(true)
+                :getModelLoginPanel():setEnabled(true)
         end,
     }
 
@@ -260,24 +260,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelMainMenu:doActionLogin(action)
-    self:updateWithIsPlayerLoggedIn(true)
-        :setMenuEnabled(true)
-
-    getActorLoginPanel(self):getModel():doActionLogin(action)
-
-    return self
-end
-
-function ModelMainMenu:doActionRegister(action)
-    self:updateWithIsPlayerLoggedIn(true)
-        :setMenuEnabled(true)
-
-    getActorLoginPanel(self):getModel():doActionRegister(action)
-
-    return self
-end
-
 function ModelMainMenu:doActionNewWar(action)
     self.m_ActorNewWarCreator:getModel():setEnabled(false)
     self:setMenuEnabled(true)
@@ -371,6 +353,10 @@ end
 
 function ModelMainMenu:getModelReplayManager()
     return getActorReplayManager(self):getModel()
+end
+
+function ModelMainMenu:getModelLoginPanel()
+    return getActorLoginPanel(self):getModel()
 end
 
 return ModelMainMenu

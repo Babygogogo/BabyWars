@@ -49,7 +49,8 @@ end
 local function initActorFogMap(self, fogMapData, isTotalReplay)
     local actor
     if (isTotalReplay) then
-        actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData, "sceneWar.ViewFogMap")
+        local modelFogMap = Actor.createModel("sceneWar.ModelFogMap", fogMapData, isTotalReplay)
+        actor = Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap"))
     else
         actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData)
     end
@@ -103,10 +104,6 @@ function ModelWarField:ctor(warFieldData, isTotalReplay)
         initActorActionPlanner(self)
         initActorMapCursor(    self, {mapSize = self:getModelTileMap():getMapSize()})
         initActorGridEffect(   self)
-    end
-
-    if (self.m_View) then
-        self:initView()
     end
 
     return self

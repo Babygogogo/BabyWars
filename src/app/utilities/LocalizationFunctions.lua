@@ -591,15 +591,69 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [11] = {
-        [1] = function(...) return "关 于 本 作" end,
-        [2] = function(...) return "About" end,
+        [1] = function(textType)
+            if     (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
+            elseif (textType == "Progress")            then return "进度"
+            else                                            return "未知11:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "NoMoreReplayActions") then return "The replay is finished."
+            elseif (textType == "Progress")            then return "Progress"
+            else                                            return "Unknown11:" .. (textType or "")
+            end
+        end,
     },
     [12] = {
-        [1] = function(...) return s_LongText1_1     end,
-        [2] = function(...) return "Untranslated..." end,
+        [1] = function(actionName)
+            if     (actionName == "ActivateSkillGroup")     then return "发动技能"
+            elseif (actionName == "Attack")                 then return "攻击"
+            elseif (actionName == "BeginTurn")              then return "开始回合"
+            elseif (actionName == "BuildModelTile")         then return "建造"
+            elseif (actionName == "CaptureModelTile")       then return "占领"
+            elseif (actionName == "Dive")                   then return "下潜"
+            elseif (actionName == "DropModelUnit")          then return "卸载"
+            elseif (actionName == "EndTurn")                then return "结束回合"
+            elseif (actionName == "JoinModelUnit")          then return "合流"
+            elseif (actionName == "LaunchFlare")            then return "照明弹"
+            elseif (actionName == "LaunchSilo")             then return "发射导弹"
+            elseif (actionName == "LoadModelUnit")          then return "装载"
+            elseif (actionName == "ProduceModelUnitOnTile") then return "生产部队"
+            elseif (actionName == "ProduceModelUnitOnUnit") then return "生产舰载机"
+            elseif (actionName == "SupplyModelUnit")        then return "补给"
+            elseif (actionName == "Surface")                then return "上浮"
+            elseif (actionName == "Surrender")              then return "投降"
+            elseif (actionName == "TickActionId")           then return ""
+            elseif (actionName == "Wait")                   then return "待机"
+            else                                                 return "未知12:" .. (actionName or "")
+            end
+        end,
+        [2] = function(actionName)
+            if     (actionName == "ActivateSkillGroup")     then return "ActivateSkillGroup"
+            elseif (actionName == "Attack")                 then return "Attack"
+            elseif (actionName == "BeginTurn")              then return "BeginTurn"
+            elseif (actionName == "BuildModelTile")         then return "BuildTile"
+            elseif (actionName == "CaptureModelTile")       then return "Capture"
+            elseif (actionName == "Dive")                   then return "Dive"
+            elseif (actionName == "DropModelUnit")          then return "Drop"
+            elseif (actionName == "EndTurn")                then return "EndTurn"
+            elseif (actionName == "JoinModelUnit")          then return "Join"
+            elseif (actionName == "LaunchFlare")            then return "LaunchFlare"
+            elseif (actionName == "LaunchSilo")             then return "LaunchSilo"
+            elseif (actionName == "LoadModelUnit")          then return "Load"
+            elseif (actionName == "ProduceModelUnitOnTile") then return "ProduceUnitOnTile"
+            elseif (actionName == "ProduceModelUnitOnUnit") then return "ProduceUnitOnUnit"
+            elseif (actionName == "SupplyModelUnit")        then return "Supply"
+            elseif (actionName == "Surface")                then return "Surface"
+            elseif (actionName == "Surrender")              then return "Surrender"
+            elseif (actionName == "TickActionId")           then return ""
+            elseif (actionName == "Wait")                   then return "Wait"
+            else                                                 return "Unknown12:" .. (actionName or "")
+            end
+        end,
     },
+    --[[
     [13] = {
         [1] = function(...) return s_LongText2_1     end,
         [2] = function(...) return "Untranslated..." end,
@@ -674,8 +728,18 @@ local s_Texts = {
         [2] = function() return "No" end,
     },
     [30] = {
-        [1] = function() return "已成功连接服务器。"       end,
-        [2] = function() return "Connection established." end,
+        [1] = function(textType)
+            if     (textType == "ConnectionEstablished") then return "已成功连接服务器。"
+            elseif (textType == "StartConnecting")       then return "正在连接服务器，请稍候。"
+            else                                              return "未知30:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "ConnectionEstablished") then return "Connection established."
+            elseif (textType == "StartConnecting")       then return "Now connecting to the server. Please wait."
+            else                                              return "Unknown30:" .. (textType or "")
+            end
+        end,
     },
     [31] = {
         [1] = function() return "连接服务器失败，正在尝试重新连接…"       end,
@@ -970,9 +1034,24 @@ local s_Texts = {
         end,
     },
     [73] = {
-        [1] = function() return "您 已 投 降 …"     end,
-        [2] = function() return "You surrender..." end,
+        [1] = function(textType)
+            if     (textType == "Lose")      then return "您 已 战 败 …"
+            elseif (textType == "Win")       then return "您 已 获 胜 !"
+            elseif (textType == "ReplayEnd") then return "回 放 结 束"
+            elseif (textType == "Surrender") then return "您 已 投 降 …"
+            else                                  return "未知73:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Lose")      then return "You lose…"
+            elseif (textType == "Win")       then return "You win!"
+            elseif (textType == "ReplayEnd") then return "Replay ended."
+            elseif (textType == "Surrender") then return "You lose…"
+            else                                  return "Unknown73:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [74] = {
         [1] = function() return "您 已 获 胜 ！" end,
         [2] = function() return "You win!"      end,
@@ -981,6 +1060,7 @@ local s_Texts = {
         [1] = function() return "您 已 战 败 …" end,
         [2] = function() return "You lose..."  end,
     },
+    --]]
     [76] = {
         [1] = function(nickname) return "玩家【" .. nickname .. "】已战败！"        end,
         [2] = function(nickname) return "Player [" .. nickname .. "] is defeated!" end,

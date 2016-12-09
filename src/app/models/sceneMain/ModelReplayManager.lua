@@ -2,6 +2,7 @@
 local ModelReplayManager = class("ModelReplayManager")
 
 local Actor                  = require("src.global.actors.Actor")
+local ActorManager           = require("src.global.actors.ActorManager")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
@@ -20,13 +21,17 @@ local REPLAY_LIST_PATH      = REPLAY_DIRECTORY_PATH .. "ReplayList.lua"
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getReplayDataFileName(sceneWarFileName)
+    return REPLAY_DIRECTORY_PATH .. sceneWarFileName .. ".lua"
+end
+
 local function hasReplayData(self, sceneWarFileName)
     return self.m_ReplayList[sceneWarFileName]
 end
 
 local function deleteReplayData(self, sceneWarFileName)
     if (self.m_ReplayList[sceneWarFileName]) then
-        os.remove(REPLAY_DIRECTORY_PATH .. sceneWarFileName .. ".lua")
+        os.remove(getReplayDataFileName(sceneWarFileName))
 
         self.m_ReplayList[sceneWarFileName] = nil
         local fileForList = io.open(REPLAY_LIST_PATH, "w")
@@ -180,7 +185,8 @@ local function createMenuItemsForPlayback(self)
                 end
 
                 self.m_OnButtonConfirmTouched = function()
-                    getModelMessageIndicator():showMessage("播放功能尚未完成开发，请谅解。")
+                    local actorWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", dofile(getReplayDataFileName(sceneWarFileName)), "sceneWar.ViewSceneWar")
+                    ActorManager.setAndRunRootActor(actorWar, "FADE", 1)
                 end
             end,
         }
@@ -376,7 +382,7 @@ function ModelReplayManager:serializeReplayData(sceneWarFileName, data)
         return
     end
 
-    local fileNameForData = REPLAY_DIRECTORY_PATH .. sceneWarFileName .. ".lua"
+    local fileNameForData = getReplayDataFileName(sceneWarFileName)
     local fileForData = io.open(fileNameForData, "w")
     fileForData:write(data)
     fileForData:close()

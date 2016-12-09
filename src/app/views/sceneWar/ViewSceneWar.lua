@@ -30,6 +30,8 @@ local END_WAR_EFFECT_FONT_COLOR         = {r = 255, g = 255, b = 255}
 local END_WAR_EFFECT_FONT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local END_WAR_EFFECT_FONT_OUTLINE_WIDTH = math.ceil(END_WAR_EFFECT_FONT_SIZE / 15)
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -178,7 +180,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewSceneWar:showEffectSurrender(callback)
-    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(73), callback)
+    local effect = createEndWarEffect(getLocalizedText(73, "Surrender"), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 
@@ -186,7 +188,7 @@ function ViewSceneWar:showEffectSurrender(callback)
 end
 
 function ViewSceneWar:showEffectWin(callback)
-    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(74), callback)
+    local effect = createEndWarEffect(getLocalizedText(73, "Win"), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 
@@ -194,7 +196,15 @@ function ViewSceneWar:showEffectWin(callback)
 end
 
 function ViewSceneWar:showEffectLose(callback)
-    local effect = createEndWarEffect(LocalizationFunctions.getLocalizedText(75), callback)
+    local effect = createEndWarEffect(getLocalizedText(73, "Lose"), callback)
+    self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
+    effect:runAction(createEndWarEffectMoveInAction(effect))
+
+    return self
+end
+
+function ViewSceneWar:showEffectReplayEnd(callback)
+    local effect = createEndWarEffect(getLocalizedText(73, "ReplayEnd"), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
     effect:runAction(createEndWarEffectMoveInAction(effect))
 

@@ -27,14 +27,18 @@ local WebSocketManager            = require("src.app.utilities.WebSocketManager"
 local Actor                       = require("src.global.actors.Actor")
 
 local createPathForDispatch    = MovePathFunctions.createPathForDispatch
+local getActionId              = SingletonGetters.getActionId
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelFogMap           = SingletonGetters.getModelFogMap
+local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
+local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay            = SingletonGetters.isTotalReplay
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -216,11 +220,11 @@ end
 -- The functions for sending actions to the server.
 --------------------------------------------------------------------------------
 local function createAndSendAction(rawAction)
-    rawAction.actionID         = SingletonGetters.getActionId() + 1
-    rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName()
+    rawAction.actionID         = getActionId() + 1
+    rawAction.sceneWarFileName = getSceneWarFileName()
     WebSocketManager.sendAction(rawAction)
 
-    SingletonGetters.getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
+    getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
     getScriptEventDispatcher():dispatchEvent({
         name    = "EvtIsWaitingForServerResponse",
         waiting = true,
@@ -622,7 +626,7 @@ local function getActionProduceModelUnitOnUnit(self)
         return nil
     else
         local produceTiledId = focusModelUnit:getMovableProductionTiledId()
-        local fund           = getModelPlayerManager():getModelPlayer(self.m_PlayerIndexLoggedIn):getFund()
+        local fund           = getModelPlayerManager():getModelPlayer(getPlayerIndexLoggedIn()):getFund()
         local icon           = cc.Sprite:create()
         icon:setAnchorPoint(0, 0)
             :setScale(0.5)
@@ -746,9 +750,9 @@ end
 
 local function canSetStatePreviewingAttackableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
-    return (modelUnit)                                             and
-        (modelUnit.getAttackRangeMinMax)                           and
-        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
+    return (modelUnit)                                                                  and
+        (modelUnit.getAttackRangeMinMax)                                                and
+        ((isTotalReplay()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn()))
 end
 
 setStatePreviewingAttackableArea = function(self, gridIndex)
@@ -772,9 +776,9 @@ end
 
 local function canSetStatePreviewingReachableArea(self, gridIndex)
     local modelUnit = getModelUnitMap():getModelUnit(gridIndex)
-    return (modelUnit)                                             and
-        (not modelUnit.getAttackRangeMinMax)                       and
-        (modelUnit:getPlayerIndex() ~= self.m_PlayerIndexLoggedIn)
+    return (modelUnit)                                                                  and
+        (not modelUnit.getAttackRangeMinMax)                                            and
+        ((isTotalReplay()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn()))
 end
 
 setStatePreviewingReachableArea = function(self, gridIndex)
@@ -798,13 +802,15 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    if ((self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))        then
+    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    if ((isTotalReplay())                                               or
+        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+        (getModelTurnManager():getTurnPhase() ~= "main"))               then
         return false
     else
         local modelTile = getModelTileMap():getModelTile(gridIndex)
-        return (not getModelUnitMap():getModelUnit(gridIndex))       and
-            (modelTile:getPlayerIndex() == self.m_PlayerIndexLoggedIn) and
+        return (not getModelUnitMap():getModelUnit(gridIndex))  and
+            (modelTile:getPlayerIndex() == playerIndexLoggedIn) and
             (modelTile.getProductionList)
     end
 end
@@ -827,12 +833,14 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    if ((self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))        then
+    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    if ((isTotalReplay())                                               or
+        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+        (getModelTurnManager():getTurnPhase() ~= "main"))               then
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:canDoAction(self.m_PlayerIndexLoggedIn))
+        return (modelUnit) and (modelUnit:getState() == "idle") and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
     end
 end
 
@@ -967,7 +975,6 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerIndexUpdated(self, event)
-    self.m_PlayerIndexInTurn = event.playerIndex
     setStateIdle(self, true)
 end
 
@@ -983,8 +990,9 @@ local function onEvtWarCommandMenuUpdated(self, event)
 end
 
 local function onEvtMapCursorMoved(self, event)
-    if ((self.m_IsWaitingForServerResponse)                       or
-        (self.m_PlayerIndexInTurn ~= self.m_PlayerIndexLoggedIn)) then
+    if ((isTotalReplay())                                                     or
+        (self.m_IsWaitingForServerResponse)                                   or
+        (getModelTurnManager():getPlayerIndex() ~= getPlayerIndexLoggedIn())) then
         return
     end
 
@@ -1118,10 +1126,6 @@ function ModelActionPlanner:ctor(param)
     return self
 end
 
-function ModelActionPlanner:initView()
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
@@ -1132,9 +1136,6 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
         :addEventListener("EvtPlayerIndexUpdated",         self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
-
-    self.m_PlayerIndexLoggedIn = getPlayerIndexLoggedIn()
-    self.m_PlayerIndexInTurn   = getModelTurnManager():getPlayerIndex()
 
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap():getMapSize())
