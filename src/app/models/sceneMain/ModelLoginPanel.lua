@@ -36,19 +36,6 @@ function ModelLoginPanel:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelLoginPanel:doActionRegister(action)
-    serializeAccountAndPassword(action.account, action.password)
-
-    if (self.m_IsEnabled) then
-        self:setEnabled(false)
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:isEnabled()

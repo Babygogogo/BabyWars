@@ -260,15 +260,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelMainMenu:doActionRegister(action)
-    self:updateWithIsPlayerLoggedIn(true)
-        :setMenuEnabled(true)
-
-    getActorLoginPanel(self):getModel():doActionRegister(action)
-
-    return self
-end
-
 function ModelMainMenu:doActionNewWar(action)
     self.m_ActorNewWarCreator:getModel():setEnabled(false)
     self:setMenuEnabled(true)

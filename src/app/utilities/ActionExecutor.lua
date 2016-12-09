@@ -376,9 +376,7 @@ end
 local function executeLogin(action)
     assert(not IS_SERVER, "ActionExecutor-executeLogin() should not be invoked on the server.")
     local account, password = action.account, action.password
-    if (account == getLoggedInAccountAndPassword()) then
-        return
-    else
+    if (account ~= getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(account, password)
         SerializationFunctions.serializeAccountAndPassword(account, password)
 
@@ -410,6 +408,32 @@ end
 local function executeMessage(action)
     assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
     getModelMessageIndicator():showMessage(action.message)
+end
+
+local function executeRegister(action)
+    assert(not IS_SERVER, "ActionExecutor-executeRegister() should not be invoked on the server.")
+    local account, password = action.account, action.password
+    if (account ~= getLoggedInAccountAndPassword()) then
+        WebSocketManager.setLoggedInAccountAndPassword(account, password)
+        SerializationFunctions.serializeAccountAndPassword(account, password)
+
+        local modelScene = getModelScene()
+        if (modelScene.isModelSceneWar) then
+            runSceneMain(true)
+        else
+            local modelMainMenu   = modelScene:getModelMainMenu()
+            local modelLoginPanel = modelMainMenu:getModelLoginPanel()
+            if (not modelLoginPanel:isEnabled()) then
+                runSceneMain(true)
+            else
+                modelLoginPanel:setEnabled(false)
+                modelMainMenu:updateWithIsPlayerLoggedIn(true)
+                    :setMenuEnabled(true)
+            end
+        end
+
+        getModelMessageIndicator():showMessage(getLocalizedText(27, account))
+    end
 end
 
 local function executeReloadSceneWar(action)
@@ -1332,6 +1356,7 @@ function ActionExecutor.execute(action)
         elseif (actionName == "Login")               then executeLogin(              action)
         elseif (actionName == "Logout")              then executeLogout(             action)
         elseif (actionName == "Message")             then executeMessage(            action)
+        elseif (actionName == "Register")            then executeRegister(           action)
         elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
         elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
         end

@@ -30,23 +30,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
-local function doActionLogout(self, event)
-    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {
-        confirmText = event.message
-    })
-    local viewSceneMain  = Actor.createView("sceneMain.ViewSceneMain")
-
-    WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
-end
-
-local function doActionRegister(self, action)
-    WebSocketManager.setLoggedInAccountAndPassword(action.account, action.password)
-    self:getModelMessageIndicator():showMessage(getLocalizedText(27, action.account))
-
-    self.m_ActorMainMenu:getModel():doActionRegister(action)
-end
-
 local function doActionNewWar(self, action)
     self.m_ActorMainMenu:getModel():doActionNewWar(action)
     self:getModelMessageIndicator():showMessage(action.message)
@@ -72,10 +55,6 @@ local function doActionGetSkillConfiguration(self, action)
     self.m_ActorMainMenu:getModel():doActionGetSkillConfiguration(action)
 end
 
-local function doActionMessage(self, action)
-    self:getModelMessageIndicator():showMessage(action.message)
-end
-
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
@@ -90,15 +69,12 @@ local function onWebSocketMessage(self, param)
     local action     = param.action
     local actionName = action.actionName
     if     (action.fileName)                       then return
-    elseif (actionName == "Logout")                then doActionLogout(               self, action)
-    elseif (actionName == "Register")              then doActionRegister(             self, action)
     elseif (actionName == "NewWar")                then doActionNewWar(               self, action)
     elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, action)
     elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
     elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, action)
     elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
     elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, action)
-    elseif (actionName == "Message")               then doActionMessage(              self, action)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
     else                                                ActionExecutor.execute(action)
     end
