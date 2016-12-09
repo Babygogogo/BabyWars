@@ -567,11 +567,10 @@ local function executeAttack(action)
     local lostPlayerIndex    = action.lostPlayerIndex
     local isInTurnPlayerLost = (lostPlayerIndex == attackerPlayerIndex)
     if (IS_SERVER) then
-        if (not lostPlayerIndex) then
-            if (targetVision) then
-                getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
-            end
-        else
+        if (targetVision) then
+            getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
+        end
+        if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
             if (modelPlayerManager:getAlivePlayersCount() <= 1) then
                 modelSceneWar:setEnded(true)
@@ -581,8 +580,11 @@ local function executeAttack(action)
         end
         modelSceneWar:setExecutingAction(false)
     else
-        local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-        local callbackAfterMoveAnimation = function()
+        local playerIndexLoggedIn  = getPlayerIndexLoggedIn()
+        local isLoggedInPlayerLost = (lostPlayerIndex) and (lostPlayerIndex == playerIndexLoggedIn)
+        modelSceneWar:setEnded((isLoggedInPlayerLost) or ((modelPlayerManager:getAlivePlayersCount() <= 2) and (lostPlayerIndex)))
+
+        attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
             attacker:updateView()
                 :showNormalAnimation()
             attackTarget:updateView()
@@ -591,11 +593,6 @@ local function executeAttack(action)
             elseif ((targetNewHP == 0) and (attackTarget.getUnitType)) then
                 attackTarget:removeViewFromParent()
             end
-
-            if ((targetVision) and (targetPlayerIndex == playerIndexLoggedIn) and (not lostPlayerIndex)) then
-                getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
-            end
-            updateTileAndUnitMapOnVisibilityChanged()
 
             local modelGridEffect = getModelGridEffect()
             if (attackerNewHP == 0) then
@@ -614,35 +611,29 @@ local function executeAttack(action)
                     end
                 end
             end
-        end
 
-        if (not lostPlayerIndex) then
-            attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
-                callbackAfterMoveAnimation()
-                modelSceneWar:setExecutingAction(false)
-            end)
-        else
-            local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-            local isLoggedInPlayerLost = (lostPlayerIndex == playerIndexLoggedIn)
-            modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
-
-            attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
+            if ((targetVision)                                                     and
+                ((isTotalReplay()) or (targetPlayerIndex == playerIndexLoggedIn))) then
+                getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
+            end
+            if (lostPlayerIndex) then
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
-                callbackAfterMoveAnimation()
+                getModelMessageIndicator():showMessage(getLocalizedText(76, modelPlayerManager:getModelPlayer(lostPlayerIndex):getNickname()))
+            end
 
-                getModelMessageIndicator():showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+            updateTileAndUnitMapOnVisibilityChanged()
 
-                if (isLoggedInPlayerLost) then
-                    modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
-                elseif (modelSceneWar:isEnded()) then
-                    modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
-                elseif (isInTurnPlayerLost) then
-                    modelTurnManager:endTurnPhaseMain()
+            if (modelSceneWar:isEnded()) then
+                if     (isTotalReplay())      then modelSceneWar:showEffectReplayEnd(callbackOnWarEndedForClient)
+                elseif (isLoggedInPlayerLost) then modelSceneWar:showEffectLose(     callbackOnWarEndedForClient)
+                else                               modelSceneWar:showEffectWin(      callbackOnWarEndedForClient)
                 end
+            elseif (isInTurnPlayerLost) then
+                modelTurnManager:endTurnPhaseMain()
+            end
 
-                modelSceneWar:setExecutingAction(false)
-            end)
-        end
+            modelSceneWar:setExecutingAction(false)
+        end)
     end
 end
 

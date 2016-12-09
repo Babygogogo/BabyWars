@@ -480,4 +480,11 @@ function ModelSceneWar:showEffectLose(callback)
     return self
 end
 
+function ModelSceneWar:showEffectReplayEnd(callback)
+    assert(not IS_SERVER, "ModelSceneWar:showEffectReplayEnd() should not be invoked on the server.")
+    self.m_View:showEffectReplayEnd(callback)
+
+    return self
+end
+
 return ModelSceneWar

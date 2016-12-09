@@ -1034,9 +1034,24 @@ local s_Texts = {
         end,
     },
     [73] = {
-        [1] = function() return "您 已 投 降 …"     end,
-        [2] = function() return "You surrender..." end,
+        [1] = function(textType)
+            if     (textType == "Lose")      then return "您 已 战 败 …"
+            elseif (textType == "Win")       then return "您 已 获 胜 !"
+            elseif (textType == "ReplayEnd") then return "回 放 结 束"
+            elseif (textType == "Surrender") then return "您 已 投 降 …"
+            else                                  return "未知73:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Lose")      then return "You lose…"
+            elseif (textType == "Win")       then return "You win!"
+            elseif (textType == "ReplayEnd") then return "Replay ended."
+            elseif (textType == "Surrender") then return "You lose…"
+            else                                  return "Unknown73:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [74] = {
         [1] = function() return "您 已 获 胜 ！" end,
         [2] = function() return "You win!"      end,
@@ -1045,6 +1060,7 @@ local s_Texts = {
         [1] = function() return "您 已 战 败 …" end,
         [2] = function() return "You lose..."  end,
     },
+    --]]
     [76] = {
         [1] = function(nickname) return "玩家【" .. nickname .. "】已战败！"        end,
         [2] = function(nickname) return "Player [" .. nickname .. "] is defeated!" end,
