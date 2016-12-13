@@ -227,6 +227,7 @@ navmesh/CCNavMeshUtils.cpp \
 ../external/poly2tri/sweep/sweep_context.cc \
 ../external/poly2tri/sweep/sweep.cc \
 ../external/clipper/clipper.cpp \
+../external/sproto/sproto.c
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) \
                     $(LOCAL_PATH)/. \

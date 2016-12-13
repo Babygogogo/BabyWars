@@ -132,6 +132,10 @@ LOCAL_SRC_FILES += ../manual/navmesh/lua_cocos2dx_navmesh_conversions.cpp \
                    ../manual/navmesh/lua_cocos2dx_navmesh_manual.cpp \
                    ../auto/lua_cocos2dx_navmesh_auto.cpp \
 
+#sproto
+LOCAL_SRC_FILES += ../manual/sproto/lua_cocos2dx_sproto_manual.cpp \
+                   ../manual/sproto/lsproto.c
+
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../../external/lua/tolua \
                     $(LOCAL_PATH)/../../../../external/lua/luajit/include \
                     $(LOCAL_PATH)/../../../2d \
