@@ -1,4 +1,4 @@
-local core = require "sproto.core"
+local core = require "sprotocore"
 local assert = assert
 
 local sproto = {}

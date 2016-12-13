@@ -13,7 +13,7 @@ extern "C" {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	int luaopen_sproto_core(lua_State *L);
+	int luaopen_sprotocore(lua_State *L);
 #ifdef __cplusplus
 }
 #endif

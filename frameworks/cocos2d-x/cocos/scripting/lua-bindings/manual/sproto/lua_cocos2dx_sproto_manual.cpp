@@ -23,7 +23,7 @@ TOLUA_API int register_sproto_module(lua_State* L)
 	if (lua_istable(L, -1))//stack:...,_G,
 	{
 		lua_register(L, "read_sproto_file_c", read_sproto_file);
-		luaopen_sproto_core(L);
+		luaopen_sprotocore(L);
 	}
 	lua_pop(L, 1);
 	return 1;
