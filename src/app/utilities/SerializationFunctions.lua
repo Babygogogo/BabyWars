@@ -1,6 +1,8 @@
 
 local SerializationFunctions = {}
 
+local sproto = require("src.global.functions.sproto")
+
 local IS_SERVER         = require("src.app.utilities.GameConstantFunctions").isServer()
 local WRITABLE_PATH     = (not IS_SERVER) and (cc.FileUtils:getInstance():getWritablePath() .. "writablePath/") or (nil)
 local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccount.lua")                         or (nil)
@@ -8,9 +10,37 @@ local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccoun
 local INDENT_SPACES             = " "
 local ERROR_MESSAGE_DEPTH_LIMIT = 2
 
+local s_IsInitialized
+local s_Sproto
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function loadBinarySprotoSchema()
+    if (not IS_SERVER) then
+        local filename = cc.FileUtils:getInstance():fullPathForFilename("sproto/BabyWarsSprotoSchema.sp")
+        return read_sproto_file_c(filename)
+    else
+        local f            = io.open("babyWars/res/sproto/BabyWarsSprotoSchema.sp", "r")
+        local binarySchema = f:read("*a")
+        f:close()
+
+        return binarySchema
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function SerializationFunctions.init()
+    assert(not s_IsInitialized, "SerializationFunctions.init() this module has been initialized already.")
+    s_IsInitialized = true
+
+    s_Sproto = sproto.new(loadBinarySprotoSchema())
+
+    return
+end
+
 function SerializationFunctions.toString(o, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. INDENT_SPACES
