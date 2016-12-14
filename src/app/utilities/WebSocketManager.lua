@@ -4,6 +4,9 @@ local WebSocketManager = {}
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local ActorManager           = require("src.global.actors.ActorManager")
 
+local encode = SerializationFunctions.encode
+local decode = SerializationFunctions.decode
+
 local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --[[
 local SERVER_URL = "localhost:19297/BabyWars"
@@ -48,6 +51,11 @@ local function cleanup()
         s_Scheduler:unscheduleScriptEntry(s_HeartbeatScheduleID)
         s_HeartbeatScheduleID = nil
     end
+end
+
+local function sendString(str)
+    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendString() the socket hasn't been initialized.")
+    s_Socket:sendString(str)
 end
 
 --------------------------------------------------------------------------------
@@ -107,13 +115,6 @@ end
 
 function WebSocketManager.getLoggedInAccountAndPassword()
     return s_Account, s_Password
-end
-
-function WebSocketManager.sendString(str)
-    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendString() the socket hasn't been initialized.")
-    s_Socket:sendString(str)
-
-    return WebSocketManager
 end
 
 function WebSocketManager.sendAction(action)

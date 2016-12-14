@@ -1,25 +1,27 @@
-.Person {
-    name 0 : string
-    id 1 : integer
-    email 2 : string
-
-    .PhoneNumber {
-        number 0 : string
-        type 1 : integer
-    }
-
-    phone 3 : *PhoneNumber
-}
-
-.AddressBook {
-    person 0 : *Person(id)
-    others 1 : *Person
-}
+# official example of sproto
+# .Person {
+#     name 0 : string
+#     id 1 : integer
+#     email 2 : string
+#
+#     .PhoneNumber {
+#         number 0 : string
+#         type 1 : integer
+#     }
+#
+#     phone 3 : *PhoneNumber
+# }
+#
+# .AddressBook {
+#     person 0 : *Person(id)
+#     others 1 : *Person
+# }
 
 .TransferAction {
     actionName      0 : string
-    playerAccount   1 : string
-    playerPassword  2 : string
+    actionCode      1 : integer
+    playerAccount   2 : string
+    playerPassword  3 : string
 
     heartbeatCounter 101 : integer
 }

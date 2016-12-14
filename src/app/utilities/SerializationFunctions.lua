@@ -21,7 +21,7 @@ local function loadBinarySprotoSchema()
         local filename = cc.FileUtils:getInstance():fullPathForFilename("sproto/BabyWarsSprotoSchema.sp")
         return read_sproto_file_c(filename)
     else
-        local f            = io.open("babyWars/res/sproto/BabyWarsSprotoSchema.sp", "r")
+        local f            = io.open("babyWars/res/sproto/BabyWarsSprotoSchema.sp", "rb")
         local binarySchema = f:read("*a")
         f:close()
 
@@ -132,6 +132,14 @@ function SerializationFunctions.toErrorMessage(o, depth)
     else
         return t
     end
+end
+
+function SerializationFunctions.encode(typeName, t)
+    return s_Sproto:pencode(typeName, t)
+end
+
+function SerializationFunctions.decode(typeName, msg)
+    return s_Sproto:pdecode(typeName, msg)
 end
 
 --------------------------------------------------------------------------------

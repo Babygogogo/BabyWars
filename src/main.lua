@@ -29,6 +29,7 @@ local function main()
 
     require("src.app.utilities.AnimationLoader")       .load()
     require("src.app.utilities.GameConstantFunctions") .init()
+    require("src.app.utilities.SerializationFunctions").init()
 
     math.randomseed(os.time())
 
