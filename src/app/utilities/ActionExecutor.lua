@@ -14,6 +14,7 @@ local TableFunctions         = require("src.app.utilities.TableFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
+local ACTION_CODES          = require("src.app.utilities.ActionCodeFunctions").getFullList()
 local UNIT_MAX_HP           = GameConstantFunctions.getUnitMaxHP()
 local IS_SERVER             = GameConstantFunctions.isServer()
 local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
@@ -410,14 +411,13 @@ local function executeMessage(action)
     getModelMessageIndicator():showMessage(action.message)
 end
 
-local function executeRegister(action)
+local function executeRegister(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeRegister() should not be invoked on the server.")
-    local account, password = action.account, action.password
+    local account, password = action.registerAccount, action.registerPassword
     if (account ~= getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(account, password)
         SerializationFunctions.serializeAccountAndPassword(account, password)
 
-        local modelScene = getModelScene()
         if (modelScene.isModelSceneWar) then
             runSceneMain(true)
         else
@@ -432,7 +432,7 @@ local function executeRegister(action)
             end
         end
 
-        getModelMessageIndicator():showMessage(getLocalizedText(27, account))
+        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(27, account))
     end
 end
 
@@ -1336,7 +1336,24 @@ end
 --------------------------------------------------------------------------------
 -- The public function.
 --------------------------------------------------------------------------------
-function ActionExecutor.execute(action)
+function ActionExecutor.execute(action, modelScene)
+    local actionCode = action.actionCode
+    if (not action.actionID) then
+        if     (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
+        end
+    else
+        getModelScene(action.fileName):setExecutingAction(true)
+
+        if (not IS_SERVER) then
+            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "TransferingData"))
+            getScriptEventDispatcher():dispatchEvent({
+                name    = "EvtIsWaitingForServerResponse",
+                waiting = false,
+            })
+        end
+    end
+
+    --[[
     local actionName = action.actionName
     if (not action.actionID) then
         if     (actionName == "DownloadReplayData")  then executeDownloadReplayData( action)
@@ -1382,6 +1399,7 @@ function ActionExecutor.execute(action)
             })
         end
     end
+    --]]
 end
 
 return ActionExecutor

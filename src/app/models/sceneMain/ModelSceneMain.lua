@@ -76,7 +76,7 @@ local function onWebSocketMessage(self, param)
     elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
     elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, action)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
-    else                                                ActionExecutor.execute(action)
+    else                                                ActionExecutor.execute(action, self)
     end
 end
 

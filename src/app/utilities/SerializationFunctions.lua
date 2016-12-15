@@ -29,6 +29,14 @@ local function loadBinarySprotoSchema()
     end
 end
 
+local function decode(typeName, msg)
+    return s_Sproto:pdecode(typeName, msg)
+end
+
+local function encode(typeName, t)
+    return s_Sproto:pencode(typeName, t)
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -134,35 +142,32 @@ function SerializationFunctions.toErrorMessage(o, depth)
     end
 end
 
-function SerializationFunctions.encode(typeName, t)
-    return s_Sproto:pencode(typeName, t)
-end
-
-function SerializationFunctions.decode(typeName, msg)
-    return s_Sproto:pdecode(typeName, msg)
-end
+SerializationFunctions.decode = decode
+SerializationFunctions.encode = encode
 
 --------------------------------------------------------------------------------
 -- The public functions that should only be invoked on the client.
 --------------------------------------------------------------------------------
 function SerializationFunctions.loadAccountAndPassword()
-    local file = io.open(ACCOUNT_FILE_PATH, "r")
-    if (file) then
-        file:close()
-        return dofile(ACCOUNT_FILE_PATH)
-    else
+    local file = io.open(ACCOUNT_FILE_PATH, "rb")
+    if (not file) then
         return nil
+    else
+        local data = decode("AccountAndPassword", file:read("*a"))
+        file:close()
+
+        return data.account, data.password
     end
 end
 
 function SerializationFunctions.serializeAccountAndPassword(account, password)
-    local file = io.open(ACCOUNT_FILE_PATH, "w")
+    local file = io.open(ACCOUNT_FILE_PATH, "wb")
     if (not file) then
         cc.FileUtils:getInstance():createDirectory(WRITABLE_PATH)
-        file = io.open(ACCOUNT_FILE_PATH, "w")
+        file = io.open(ACCOUNT_FILE_PATH, "wb")
     end
 
-    file:write(string.format("return %q, %q", account, password))
+    file:write(encode("AccountAndPassword", {account = account, password = password}))
     file:close()
 
     return SerializationFunctions

@@ -7,12 +7,17 @@ local SerializationFunctions = require("src.app.utilities.SerializationFunctions
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 
-local getModelMessageIndicator    = SingletonGetters.getModelMessageIndicator
-local getLocalizedText            = LocalizationFunctions.getLocalizedText
-local loadAccountAndPassword      = SerializationFunctions.loadAccountAndPassword
-local serializeAccountAndPassword = SerializationFunctions.serializeAccountAndPassword
+local getActionCode                 = require("src.app.utilities.ActionCodeFunctions").getActionCode
+local getModelMessageIndicator      = SingletonGetters.getModelMessageIndicator
+local getLocalizedText              = LocalizationFunctions.getLocalizedText
+local getLoggedInAccountAndPassword = WebSocketManager.getLoggedInAccountAndPassword
+local loadAccountAndPassword        = SerializationFunctions.loadAccountAndPassword
+local sendAction                    = WebSocketManager.sendAction
+local serializeAccountAndPassword   = SerializationFunctions.serializeAccountAndPassword
 
-local GAME_VERSION      = GameConstantFunctions.getGameVersion()
+local ACTION_CODE_LOGIN    = getActionCode("Login")
+local ACTION_CODE_REGISTER = getActionCode("Register")
+local GAME_VERSION         = GameConstantFunctions.getGameVersion()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -49,10 +54,7 @@ function ModelLoginPanel:setEnabled(enabled)
     if (view) then
         view:setEnabled(enabled)
         if (enabled) then
-            local account, password = loadAccountAndPassword()
-            if (account) then
-                view:setAccountAndPassword(account, password)
-            end
+            view:setAccountAndPassword(loadAccountAndPassword())
         end
     end
 
@@ -62,7 +64,7 @@ end
 function ModelLoginPanel:onButtonRegisterTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
         getModelMessageIndicator():showMessage(getLocalizedText(19))
-    elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
+    elseif (account == getLoggedInAccountAndPassword()) then
         getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
@@ -72,11 +74,11 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
         local modelConfirmBox = SingletonGetters.getModelConfirmBox()
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
-                WebSocketManager.sendAction({
-                    actionName     = "Register",
-                    version        = GAME_VERSION,
-                    playerAccount  = account,
-                    playerPassword = password,
+                sendAction({
+                    actionCode       = ACTION_CODE_REGISTER,
+                    clientVersion    = GAME_VERSION,
+                    registerAccount  = account,
+                    registerPassword = password,
                 })
                 modelConfirmBox:setEnabled(false)
             end)
@@ -89,13 +91,13 @@ end
 function ModelLoginPanel:onButtonLoginTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
         getModelMessageIndicator():showMessage(getLocalizedText(19))
-    elseif (account == WebSocketManager.getLoggedInAccountAndPassword()) then
+    elseif (account == getLoggedInAccountAndPassword()) then
         getModelMessageIndicator():showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)
         end
-        WebSocketManager.sendAction({
+        sendAction({
             actionName     = "Login",
             version        = GAME_VERSION,
             playerAccount  = account,

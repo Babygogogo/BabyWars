@@ -23,5 +23,52 @@
     playerAccount   2 : string
     playerPassword  3 : string
 
-    heartbeatCounter 101 : integer
+    heartbeatCounter 100 : integer
+    clientVersion    101 : string
+    registerAccount  102 : string
+    registerPassword 103 : string
+}
+
+.AccountAndPassword {
+    account  1 : string
+    password 2 : string
+}
+
+.PlayerProfile {
+    .SingleGameRecord {
+        playersCount 0 : integer
+        win          1 : integer
+        lose         2 : integer
+        draw         3 : integer
+    }
+
+    .SingleSkillConfiguration {
+        .SingleSkill {
+            id    0 : integer
+            level 1 : integer
+        }
+
+        maxPoints 0 : integer
+        passive   1 : *SingleSkill
+        active1   2 : *SingleSkill
+        active2   3 : *SingleSkill
+    }
+
+    .WarLists {
+        .SingleWarItem {
+            sceneWarFileName 0 : string
+        }
+
+        ongoing 0 : *SingleWarItem(sceneWarFileName)
+        created 1 : *SingleWarItem(sceneWarFileName)
+    }
+
+    account             0 : string
+    password            1 : string
+    nickname            2 : string
+    rankScore           3 : integer
+    gameRecords         4 : *SingleGameRecord(playersCount)
+    skillConfigurations 5 : *SingleSkillConfiguration
+
+
 }
