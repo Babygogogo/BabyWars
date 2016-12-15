@@ -4,15 +4,16 @@ local WebSocketManager = {}
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local ActorManager           = require("src.global.actors.ActorManager")
 
-local encode = SerializationFunctions.encode
 local decode = SerializationFunctions.decode
+local encode = SerializationFunctions.encode
 
-local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --[[
-local SERVER_URL = "localhost:19297/BabyWars"
+local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --]]
+local SERVER_URL = "localhost:19297/BabyWars"
 
-local HEARTBEAT_INTERVAL = 10
+local HEARTBEAT_INTERVAL    = 10
+local HEARTBEAT_ACTION_CODE = require("src.app.utilities.ActionCodeFunctions").getActionCode("NetworkHeartbeat")
 
 local s_Socket
 local s_Account, s_Password
@@ -34,7 +35,7 @@ local function heartbeat()
         s_HeartbeatCounter    = s_HeartbeatCounter + 1
         s_IsHeartbeatAnswered = false
         WebSocketManager.sendAction({
-            actionName       = "NetworkHeartbeat",
+            actionCode       = HEARTBEAT_ACTION_CODE,
             heartbeatCounter = s_HeartbeatCounter,
         })
     end
@@ -79,8 +80,8 @@ function WebSocketManager.init()
     end, cc.WEBSOCKET_OPEN)
 
     s_Socket:registerScriptHandler(function(msg)
-        local action = assert(loadstring("return " .. msg))()
-        if (action.actionName == "NetworkHeartbeat") then
+        local action = decode("Action", msg)
+        if (action.actionCode == HEARTBEAT_ACTION_CODE) then
             s_IsHeartbeatAnswered = action.heartbeatCounter == s_HeartbeatCounter
         else
             ActorManager.getRootActor():getModel():onWebSocketEvent("message", {
@@ -118,10 +119,11 @@ function WebSocketManager.getLoggedInAccountAndPassword()
 end
 
 function WebSocketManager.sendAction(action)
+    assert(type(action.actionCode) == "number", "WebSocketManager.sendAction() invalid actionCode.")
     action.playerAccount  = action.playerAccount  or s_Account
     action.playerPassword = action.playerPassword or s_Password
 
-    WebSocketManager.sendString(SerializationFunctions.toString(action))
+    sendString(encode("Action", action))
 
     return WebSocketManager
 end

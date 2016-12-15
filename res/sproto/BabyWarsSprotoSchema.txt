@@ -17,7 +17,7 @@
 #     others 1 : *Person
 # }
 
-.TransferAction {
+.Action {
     actionName      0 : string
     actionCode      1 : integer
     playerAccount   2 : string
