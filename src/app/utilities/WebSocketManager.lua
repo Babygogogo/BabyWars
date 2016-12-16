@@ -36,7 +36,7 @@ local function heartbeat()
         WebSocketManager.sendAction({
             actionCode       = HEARTBEAT_ACTION_CODE,
             heartbeatCounter = s_HeartbeatCounter,
-        })
+        }, true)
     end
 end
 
@@ -112,12 +112,14 @@ function WebSocketManager.getLoggedInAccountAndPassword()
     return s_Account, s_Password
 end
 
-function WebSocketManager.sendAction(action)
+function WebSocketManager.sendAction(action, ignoreAccountAndPassword)
     assert(type(action.actionCode) == "number", "WebSocketManager.sendAction() invalid actionCode.")
     assert(WebSocketManager.isInitialized(), "WebSocketManager.sendAction() the socket hasn't been initialized.")
 
-    action.playerAccount  = action.playerAccount  or s_Account
-    action.playerPassword = action.playerPassword or s_Password
+    if (not ignoreAccountAndPassword) then
+        action.playerAccount  = action.playerAccount  or s_Account
+        action.playerPassword = action.playerPassword or s_Password
+    end
     s_Socket:sendString(encode("Action", action))
 
     return WebSocketManager

@@ -402,7 +402,7 @@ end
 local function executeLogout(action)
     assert(not IS_SERVER, "ActionExecutor-executeLogout() should not be invoked on the server.")
     WebSocketManager.setLoggedInAccountAndPassword(nil, nil)
-    runSceneMain(false, action.message)
+    runSceneMain(false, getLocalizedText(action.messageCode, unpack(action.messageParams or {})))
 end
 
 local function executeMessage(action, modelScene)
@@ -1340,6 +1340,7 @@ function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
     if     (not actionCode)                      then error("ActionExecutor.execute() invalid actionCode.")
     elseif (actionCode == ACTION_CODES.Login)    then executeLogin(   action, modelScene)
+    elseif (actionCode == ACTION_CODES.Logout)   then executeLogout(  action, modelScene)
     elseif (actionCode == ACTION_CODES.Message)  then executeMessage( action, modelScene)
     elseif (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
     end
@@ -1352,10 +1353,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "GetReplayList")       then executeGetReplayList(      action)
         elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
         elseif (actionName == "GetSceneWarData")     then executeGetSceneWarData(    action)
-        elseif (actionName == "Login")               then executeLogin(              action)
-        elseif (actionName == "Logout")              then executeLogout(             action)
-        elseif (actionName == "Message")             then executeMessage(            action)
-        elseif (actionName == "Register")            then executeRegister(           action)
         elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
         elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
         end
