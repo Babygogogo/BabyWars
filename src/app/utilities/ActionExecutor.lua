@@ -1338,19 +1338,7 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
-    if (not action.actionID) then
-        if     (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
-        end
-    else
-        getModelScene(action.fileName):setExecutingAction(true)
-
-        if (not IS_SERVER) then
-            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "TransferingData"))
-            getScriptEventDispatcher():dispatchEvent({
-                name    = "EvtIsWaitingForServerResponse",
-                waiting = false,
-            })
-        end
+    if     (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
     end
 
     --[[

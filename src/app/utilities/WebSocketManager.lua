@@ -28,7 +28,6 @@ local s_Scheduler = cc.Director:getInstance():getScheduler()
 -- The util functions.
 --------------------------------------------------------------------------------
 local function heartbeat()
-    print("WebSocketManager-heartbeat", s_HeartbeatCounter)
     if (not s_IsHeartbeatAnswered) then
         WebSocketManager.close()
     else
@@ -52,11 +51,6 @@ local function cleanup()
         s_Scheduler:unscheduleScriptEntry(s_HeartbeatScheduleID)
         s_HeartbeatScheduleID = nil
     end
-end
-
-local function sendString(str)
-    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendString() the socket hasn't been initialized.")
-    s_Socket:sendString(str)
 end
 
 --------------------------------------------------------------------------------
@@ -120,10 +114,11 @@ end
 
 function WebSocketManager.sendAction(action)
     assert(type(action.actionCode) == "number", "WebSocketManager.sendAction() invalid actionCode.")
+    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendAction() the socket hasn't been initialized.")
+
     action.playerAccount  = action.playerAccount  or s_Account
     action.playerPassword = action.playerPassword or s_Password
-
-    sendString(encode("Action", action))
+    s_Socket:sendString(encode("Action", action))
 
     return WebSocketManager
 end

@@ -64,7 +64,7 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
+    print("ModelSceneMain-onWebSocketMessage(): " .. string.len(param.message))
 
     local action     = param.action
     local actionName = action.actionName

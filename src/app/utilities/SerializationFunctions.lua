@@ -1,6 +1,7 @@
 
 local SerializationFunctions = {}
 
+local io     = io
 local sproto = require("src.global.functions.sproto")
 
 local IS_SERVER         = require("src.app.utilities.GameConstantFunctions").isServer()
