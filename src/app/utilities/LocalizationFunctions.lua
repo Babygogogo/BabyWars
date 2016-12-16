@@ -691,10 +691,12 @@ local s_Texts = {
         [1] = function(account) return "您已使用账号【" .. account .. "】进行了登陆。"      end,
         [2] = function(account) return "You have already logged in as " .. account .. "." end,
     },
+    --[[
     [22] = {
         [1] = function() return "账号或密码错误，请重试。"    end,
         [2] = function() return "Invalid account/password." end,
     },
+    --]]
     [23] = {
         [1] = function(account) return "您的账号【" .. account .. "】在另一台设备上被登陆，您已被迫下线！"     end,
         [2] = function(account) return "Another device is logging in with your account!" .. account .. "." end,
@@ -707,10 +709,12 @@ local s_Texts = {
             return "Are you sure to register with the following account and password:\n" .. account .. "\n" .. password
         end,
     },
+    --[[
     [25] = {
         [1] = function() return "该账号已被注册，请使用其他账号。"                                  end,
         [2] = function() return "The account is registered already. Please use another account." end,
     },
+    --]]
     [26] = {
         [1] = function(account) return "欢迎登陆，【" .. account .. "】！" end,
         [2] = function(account) return "Welcome, " .. account .. "!"      end,
@@ -1129,28 +1133,32 @@ local s_Texts = {
         [1] = function(errType, text)
             text = (text) and (" " .. text) or ("")
             if     (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
-            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
-            elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
-            elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
-            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
+            elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
+            elseif (errType == "InvalidLogin")                   then return "账号/密码不正确，请检查后重试。"
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
-            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
+            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
+            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
+            elseif (errType == "RegisteredAccount")              then return "该账号已被注册，请使用其他账号。"
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
             else                                                      return "未知81:" .. (errType or "")
             end
         end,
         [2] = function(errType, text)
             text = (text) and (" " .. text) or ("")
             if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
-            elseif (errType == "InvalidGameVersion")             then return "Your game version is invalid. Please download the latest version:" .. text
-            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
-            elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
-            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
             elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
+            elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
+            elseif (errType == "InvalidGameVersion")             then return "Your game version is invalid. Please download the latest version:" .. text
+            elseif (errType == "InvalidLogin")                   then return "Invalid account/password for login. Please check and retry."
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
-            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
+            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
+            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
+            elseif (errType == "RegisteredAccount")              then return "The account is registered already. Please use another account."
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
             else                                                      return "Unknown81:" .. (errType or "")
             end
         end,

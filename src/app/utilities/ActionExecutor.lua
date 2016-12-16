@@ -405,9 +405,10 @@ local function executeLogout(action)
     runSceneMain(false, action.message)
 end
 
-local function executeMessage(action)
+local function executeMessage(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
-    getModelMessageIndicator():showMessage(action.message)
+    local message = getLocalizedText(action.messageCode, unpack(action.messageParams or {}))
+    getModelMessageIndicator(modelScene):showMessage(message)
 end
 
 local function executeRegister(action, modelScene)
@@ -1337,7 +1338,9 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
-    if     (actionCode == ACTION_CODES.Login)    then executeLogin(   action, modelScene)
+    if     (not actionCode)                      then error("ActionExecutor.execute() invalid actionCode.")
+    elseif (actionCode == ACTION_CODES.Login)    then executeLogin(   action, modelScene)
+    elseif (actionCode == ACTION_CODES.Message)  then executeMessage( action, modelScene)
     elseif (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
     end
 

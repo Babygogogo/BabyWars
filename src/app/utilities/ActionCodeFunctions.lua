@@ -8,6 +8,7 @@ local s_ActionCodes = {
     Register         = 2,
     Login            = 3,
     Logout           = 4,
+    Message          = 5,
 }
 local s_ActionNames
 
