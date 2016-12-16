@@ -15,6 +15,7 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local ActionExecutor         = require("src.app.utilities.ActionExecutor")
 local AudioManager           = require("src.app.utilities.AudioManager")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
@@ -26,6 +27,7 @@ local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+local string           = string
 
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
@@ -64,7 +66,11 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneMain-onWebSocketMessage(): " .. string.len(param.message))
+    print(string.format("ModelSceneMain-onWebSocketMessage() name: %s  length: %d",
+        ActionCodeFunctions.getActionName(param.action.actionCode or -1) or "Invalid!!",
+        string.len(param.message))
+    )
+    print(SerializationFunctions.toString(param.action))
 
     local action     = param.action
     local actionName = action.actionName

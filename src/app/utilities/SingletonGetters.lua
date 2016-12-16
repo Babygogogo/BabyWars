@@ -63,6 +63,10 @@ function SingletonGetters.getModelWeatherManager(param)
     return getModelScene(param):getModelWeatherManager()
 end
 
+function SingletonGetters.getSceneWarFileName(param)
+    return getModelScene(param):getFileName()
+end
+
 function SingletonGetters.getScriptEventDispatcher(param)
     return getModelScene(param):getScriptEventDispatcher()
 end
@@ -74,36 +78,32 @@ end
 --------------------------------------------------------------------------------
 -- The public getters that can be used only on the client.
 --------------------------------------------------------------------------------
-function SingletonGetters.getModelConfirmBox()
-    return getModelScene():getModelConfirmBox()
+function SingletonGetters.getModelConfirmBox(param)
+    return getModelScene(param):getModelConfirmBox()
 end
 
-function SingletonGetters.getModelGridEffect()
-    return SingletonGetters.getModelWarField():getModelGridEffect()
+function SingletonGetters.getModelGridEffect(param)
+    return SingletonGetters.getModelWarField(param):getModelGridEffect()
 end
 
-function SingletonGetters.getModelMapCursor()
-    return SingletonGetters.getModelWarField():getModelMapCursor()
+function SingletonGetters.getModelMapCursor(param)
+    return SingletonGetters.getModelWarField(param):getModelMapCursor()
 end
 
-function SingletonGetters.getModelMessageIndicator()
-    return getModelScene():getModelMessageIndicator()
+function SingletonGetters.getModelMessageIndicator(param)
+    return getModelScene(param):getModelMessageIndicator()
 end
 
-function SingletonGetters.getModelMainMenu()
-    return getModelScene():getModelMainMenu()
+function SingletonGetters.getModelMainMenu(param)
+    return getModelScene(param):getModelMainMenu()
 end
 
-function SingletonGetters.getModelWarCommandMenu()
-    return getModelScene():getModelWarHud():getModelWarCommandMenu()
+function SingletonGetters.getModelWarCommandMenu(param)
+    return getModelScene(param):getModelWarHud():getModelWarCommandMenu()
 end
 
-function SingletonGetters.getPlayerIndexLoggedIn()
-    return SingletonGetters.getModelPlayerManager():getPlayerIndexLoggedIn()
-end
-
-function SingletonGetters.getSceneWarFileName()
-    return getModelScene():getFileName()
+function SingletonGetters.getPlayerIndexLoggedIn(param)
+    return SingletonGetters.getModelPlayerManager(param):getPlayerIndexLoggedIn()
 end
 
 return SingletonGetters

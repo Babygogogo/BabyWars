@@ -1,7 +1,6 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
@@ -17,7 +16,7 @@ local serializeAccountAndPassword   = SerializationFunctions.serializeAccountAnd
 
 local ACTION_CODE_LOGIN    = getActionCode("Login")
 local ACTION_CODE_REGISTER = getActionCode("Register")
-local GAME_VERSION         = GameConstantFunctions.getGameVersion()
+local GAME_VERSION         = require("src.app.utilities.GameConstantFunctions").getGameVersion()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -98,10 +97,10 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
             self.m_View:disableButtonLoginForSecs(5)
         end
         sendAction({
-            actionName     = "Login",
-            version        = GAME_VERSION,
-            playerAccount  = account,
-            playerPassword = password,
+            actionCode    = ACTION_CODE_LOGIN,
+            clientVersion = GAME_VERSION,
+            loginAccount  = account,
+            loginPassword = password,
         })
     end
 

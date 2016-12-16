@@ -374,18 +374,17 @@ local function executeGetSceneWarData(action)
     -- The "GetSceneWarData" action is now ignored when a war scene is running. Use the "ReloadSceneWar" action instead.
 end
 
-local function executeLogin(action)
+local function executeLogin(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeLogin() should not be invoked on the server.")
-    local account, password = action.account, action.password
+    local account, password = action.loginAccount, action.loginPassword
     if (account ~= getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(account, password)
         SerializationFunctions.serializeAccountAndPassword(account, password)
 
-        local modelScene = getModelScene()
         if (modelScene.isModelSceneWar) then
             runSceneMain(true)
         else
-            local modelMainMenu   = modelScene:getModelMainMenu()
+            local modelMainMenu   = SingletonGetters.getModelMainMenu(modelScene)
             local modelLoginPanel = modelMainMenu:getModelLoginPanel()
             if (not modelLoginPanel:isEnabled()) then
                 runSceneMain(true)
@@ -396,7 +395,7 @@ local function executeLogin(action)
             end
         end
 
-        getModelMessageIndicator():showMessage(getLocalizedText(26, account))
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(26, account))
     end
 end
 
@@ -1338,7 +1337,8 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
-    if     (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
+    if     (actionCode == ACTION_CODES.Login)    then executeLogin(   action, modelScene)
+    elseif (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
     end
 
     --[[

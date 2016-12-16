@@ -27,6 +27,13 @@
     clientVersion    101 : string
     registerAccount  102 : string
     registerPassword 103 : string
+    loginAccount     104 : string
+    loginPassword    105 : string
+}
+
+.RedisAction {
+    actionCode    0 : integer
+    encodedAction 1 : string
 }
 
 .AccountAndPassword {
