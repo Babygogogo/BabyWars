@@ -2,6 +2,7 @@
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
 local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
@@ -216,8 +217,8 @@ local function initItemsAllConfigurations(self)
                 setStateOverviewConfiguration(self, i)
                 if (WebSocketManager.getLoggedInAccountAndPassword()) then
                     WebSocketManager.sendAction({
-                        actionName      = "GetSkillConfiguration",
-                        configurationID = i,
+                        actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
+                        skillConfigurationID = i,
                     })
                 end
             end,

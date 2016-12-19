@@ -21,7 +21,7 @@ local SKILL_GROUP_ID_ACTIVE2 = ModelSkillConfiguration.getSkillGroupIdActive2()
 -- The util functions.
 --------------------------------------------------------------------------------
 local function transformModifier1(modifier, unit)
-    return string.format("%d%s", 100 + modifier, unit)
+    return string.format("%.2f%s", 100 + modifier, unit)
 end
 
 local function transformModifier2(modifier, unit)

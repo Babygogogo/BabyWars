@@ -1,6 +1,7 @@
 
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
@@ -94,8 +95,8 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                     modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                         :setPopUpPanelEnabled(true)
                     WebSocketManager.sendAction({
-                        actionName      = "GetSkillConfiguration",
-                        configurationID = i,
+                        actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
+                        skillConfigurationID = i,
                     })
                 end,
             }

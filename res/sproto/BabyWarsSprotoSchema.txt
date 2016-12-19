@@ -1,21 +1,15 @@
-# official example of sproto
-# .Person {
-#     name 0 : string
-#     id 1 : integer
-#     email 2 : string
-#
-#     .PhoneNumber {
-#         number 0 : string
-#         type 1 : integer
-#     }
-#
-#     phone 3 : *PhoneNumber
-# }
-#
-# .AddressBook {
-#     person 0 : *Person(id)
-#     others 1 : *Person
-# }
+
+.SingleSkillConfiguration {
+    .SingleSkill {
+        id    0 : integer
+        level 1 : integer
+    }
+
+    basePoints 0 : integer
+    passive    1 : *SingleSkill
+    active1    2 : *SingleSkill
+    active2    3 : *SingleSkill
+}
 
 .Action {
     actionName      0 : string
@@ -23,14 +17,16 @@
     playerAccount   2 : string
     playerPassword  3 : string
 
-    heartbeatCounter 100 : integer
-    clientVersion    101 : string
-    registerAccount  102 : string
-    registerPassword 103 : string
-    loginAccount     104 : string
-    loginPassword    105 : string
-    messageCode      106 : integer
-    messageParams    107 : *string
+    heartbeatCounter     100 : integer
+    clientVersion        101 : string
+    registerAccount      102 : string
+    registerPassword     103 : string
+    loginAccount         104 : string
+    loginPassword        105 : string
+    messageCode          106 : integer
+    messageParams        107 : *string
+    skillConfigurationID 108 : integer
+    skillConfiguration   109 : SingleSkillConfiguration
 }
 
 .RedisAction {
@@ -49,18 +45,6 @@
         win          1 : integer
         lose         2 : integer
         draw         3 : integer
-    }
-
-    .SingleSkillConfiguration {
-        .SingleSkill {
-            id    0 : integer
-            level 1 : integer
-        }
-
-        maxPoints 0 : integer
-        passive   1 : *SingleSkill
-        active1   2 : *SingleSkill
-        active2   3 : *SingleSkill
     }
 
     .WarLists {

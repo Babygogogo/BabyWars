@@ -2,8 +2,8 @@
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
 local WarFieldList              = require("res.data.templateWarField.WarFieldList")
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
@@ -103,7 +103,7 @@ local function initSelectorSkill(self, modelWarConfigurator)
         text = getLocalizedText(3, "Disable"),
     }}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
-    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+    for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
         options[#options + 1] = {
             text = prefix .. i,
             data = i,
@@ -111,17 +111,17 @@ local function initSelectorSkill(self, modelWarConfigurator)
                 modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
                 WebSocketManager.sendAction({
-                    actionName      = "GetSkillConfiguration",
-                    configurationID = i,
+                    actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
+                    skillConfigurationID = i,
                 })
             end,
         }
     end
-    local presetOptions = {}
-    for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
-        presetOptions[#presetOptions + 1] = {
+    for i, presetData in ipairs(SkillDataAccessors.getSkillPresets()) do
+        local presetName = presetData.name
+        options[#options + 1] = {
             text = presetName,
-            data = presetName,
+            data = i,
             callbackOnOptionIndicatorTouched = function()
                 local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
                 modelWarConfigurator:setPopUpPanelEnabled(true)
@@ -131,12 +131,6 @@ local function initSelectorSkill(self, modelWarConfigurator)
                     ))
             end,
         }
-    end
-    table.sort(presetOptions, function(option1, option2)
-        return option1.text < option2.text
-    end)
-    for _, presetOption in ipairs(presetOptions) do
-        options[#options + 1] = presetOption
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
