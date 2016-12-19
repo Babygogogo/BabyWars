@@ -3,7 +3,6 @@ local ModelSkillConfiguration = require("src.global.functions.class")("ModelSkil
 
 local ModelSkillGroupPassive = require("src.app.models.common.ModelSkillGroupPassive")
 local ModelSkillGroupActive  = require("src.app.models.common.ModelSkillGroupActive")
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SkillDataAccessors     = require("src.app.utilities.SkillDataAccessors")
 
@@ -11,7 +10,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 local round            = require("src.global.functions.round")
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
-local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = GameConstantFunctions.getSkillPointsPerEnergyRequirement()
+local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = SkillDataAccessors.getSkillPointsPerEnergyRequirement()
 
 local SKILL_GROUP_ID_PASSIVE  = 0
 local SKILL_GROUP_ID_ACTIVE_1 = 1

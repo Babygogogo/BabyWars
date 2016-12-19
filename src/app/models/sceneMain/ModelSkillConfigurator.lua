@@ -3,7 +3,6 @@ local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
 local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
@@ -11,12 +10,13 @@ local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription
+local getSkillCategory   = SkillDataAccessors.getSkillCategory
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 local SKILL_GROUP_ID_PASSIVE                  = ModelSkillConfiguration.getSkillGroupIdPassive()
 local SKILL_GROUP_ID_ACTIVE_1                 = ModelSkillConfiguration.getSkillGroupIdActive1()
 local SKILL_GROUP_ID_ACTIVE_2                 = ModelSkillConfiguration.getSkillGroupIdActive2()
-local ACTIVE_SKILL_SLOTS_COUNT                = GameConstantFunctions.getActiveSkillSlotsCount()
+local ACTIVE_SKILL_SLOTS_COUNT                = SkillDataAccessors.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -38,7 +38,7 @@ end
 local setStateSelectSkillLevel
 local function createItemsSkillSubCategory(self, categoryName)
     local items = {}
-    for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+    for _, skillID in ipairs(getSkillCategory(categoryName)) do
         items[#items + 1] = {
             name     = getLocalizedText(5, skillID),
             callback = function()
@@ -51,7 +51,7 @@ local function createItemsSkillSubCategory(self, categoryName)
 end
 
 local function createItemsSkillLevels(self, skillID, isActive)
-    local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID, isActive)
+    local minLevel, maxLevel = SkillDataAccessors.getSkillLevelMinMax(skillID, isActive)
     if ((not minLevel) or (not maxLevel)) then
         return nil
     end
@@ -209,7 +209,7 @@ end
 --------------------------------------------------------------------------------
 local function initItemsAllConfigurations(self)
     local items = {}
-    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+    for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
         items[#items + 1] = {
             name     = getConfigurationTitle(i),
             callback = function()
@@ -277,7 +277,7 @@ end
 
 local function initItemsEnergyRequirement(self)
     local items          = {}
-    local minReq, maxReq = GameConstantFunctions.getEnergyRequirementMinMax()
+    local minReq, maxReq = SkillDataAccessors.getEnergyRequirementMinMax()
     for requirement = minReq, maxReq do
         items[#items + 1] = {
             name     = "" .. requirement,
@@ -296,7 +296,7 @@ end
 
 local function initItemsSkillGroupPassive(self)
     local items = {}
-    for i = 1, GameConstantFunctions.getPassiveSkillSlotsCount() do
+    for i = 1, SkillDataAccessors.getPassiveSkillSlotsCount() do
         items[#items + 1] = {
             name     = string.format("%s %d", getLocalizedText(3, "Skill"), i),
             callback = function()
@@ -363,7 +363,7 @@ local function initItemsSkillCategoriesForPassive(self)
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForPassive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -389,7 +389,7 @@ local function initItemsSkillCategoriesForActive(self)
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForActive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -403,13 +403,13 @@ end
 
 local function initItemsSkills(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForPassive")) do
         if (not items[categoryName]) then
             print(categoryName)
             items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
     end
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForActive")) do
         if (not items[categoryName]) then
             items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
@@ -421,7 +421,7 @@ end
 local function initItemsSkillLevels(self)
     local items = {}
     for categoryName, _ in pairs(self.m_ItemsSkills) do
-        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+        for _, skillID in ipairs(getSkillCategory(categoryName)) do
             if (not items[skillID]) then
                 items[skillID] = {
                     passive = createItemsSkillLevels(self, skillID, false),

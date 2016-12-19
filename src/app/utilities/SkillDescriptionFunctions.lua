@@ -2,17 +2,17 @@
 local SkillDescriptionFunctions = {}
 
 local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
-local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions   = require("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors      = require("src.app.utilities.SkillDataAccessors")
 
-local getSkillPoints            = GameConstantFunctions.getSkillPoints
-local getSkillEnergyRequirement = GameConstantFunctions.getSkillEnergyRequirement
-local getSkillModifier          = GameConstantFunctions.getSkillModifier
-local getSkillModifierUnit      = GameConstantFunctions.getSkillModifierUnit
+local getSkillPoints            = SkillDataAccessors.getSkillPoints
+local getSkillEnergyRequirement = SkillDataAccessors.getSkillEnergyRequirement
+local getSkillModifier          = SkillDataAccessors.getSkillModifier
+local getSkillModifierUnit      = SkillDataAccessors.getSkillModifierUnit
 local getLocalizedText          = LocalizationFunctions.getLocalizedText
 
-local PASSIVE_SLOTS_COUNT    = GameConstantFunctions.getPassiveSkillSlotsCount()
-local ACTIVE_SLOTS_COUNT     = GameConstantFunctions.getActiveSkillSlotsCount()
+local PASSIVE_SLOTS_COUNT    = SkillDataAccessors.getPassiveSkillSlotsCount()
+local ACTIVE_SLOTS_COUNT     = SkillDataAccessors.getActiveSkillSlotsCount()
 local SKILL_GROUP_ID_PASSIVE = ModelSkillConfiguration.getSkillGroupIdPassive()
 local SKILL_GROUP_ID_ACTIVE1 = ModelSkillConfiguration.getSkillGroupIdActive1()
 local SKILL_GROUP_ID_ACTIVE2 = ModelSkillConfiguration.getSkillGroupIdActive2()

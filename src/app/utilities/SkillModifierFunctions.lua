@@ -1,13 +1,13 @@
 
 local SkillModifierFunctions = {}
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
 
-local getSkillModifier = GameConstantFunctions.getSkillModifier
-local isTypeInCategory = GameConstantFunctions.isTypeInCategory
+local getSkillModifier = SkillDataAccessors.getSkillModifier
+local isTypeInCategory = require("src.app.utilities.GameConstantFunctions").isTypeInCategory
 
-local PASSIVE_SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
-local ACTIVE_SLOTS_COUNT  = GameConstantFunctions.getActiveSkillSlotsCount()
+local PASSIVE_SLOTS_COUNT = SkillDataAccessors.getPassiveSkillSlotsCount()
+local ACTIVE_SLOTS_COUNT  = SkillDataAccessors.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
