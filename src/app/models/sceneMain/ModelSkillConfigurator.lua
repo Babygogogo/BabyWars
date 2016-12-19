@@ -5,17 +5,18 @@ local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfi
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription
 
-local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local SKILL_GROUP_ID_PASSIVE   = ModelSkillConfiguration.getSkillGroupIdPassive()
-local SKILL_GROUP_ID_ACTIVE_1  = ModelSkillConfiguration.getSkillGroupIdActive1()
-local SKILL_GROUP_ID_ACTIVE_2  = ModelSkillConfiguration.getSkillGroupIdActive2()
-local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
+local SKILL_GROUP_ID_PASSIVE                  = ModelSkillConfiguration.getSkillGroupIdPassive()
+local SKILL_GROUP_ID_ACTIVE_1                 = ModelSkillConfiguration.getSkillGroupIdActive1()
+local SKILL_GROUP_ID_ACTIVE_2                 = ModelSkillConfiguration.getSkillGroupIdActive2()
+local ACTIVE_SKILL_SLOTS_COUNT                = GameConstantFunctions.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.

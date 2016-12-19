@@ -5,11 +5,14 @@ local WarFieldList              = require("res.data.templateWarField.WarFieldLis
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -32,8 +35,7 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
 end
 
 local function resetSelectorMaxSkillPoints(modelWarConfigurator)
-    local minPoints, _, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex((100 - minPoints) / pointsPerStep + 2)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex((100 - MIN_POINTS) / POINTS_PER_STEP + 2)
 end
 
 local function resetModelWarConfigurator(model, warFieldFileName)
@@ -152,8 +154,7 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
                 :setOptionIndicatorTouchEnabled(false)
         end,
     }}
-    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    for points = minPoints, maxPoints, pointsPerStep do
+    for points = MIN_POINTS, MAX_POINTS, POINTS_PER_STEP do
         options[#options + 1] = {
             data = points,
             text = "" .. points,
