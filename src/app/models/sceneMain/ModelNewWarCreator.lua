@@ -260,22 +260,6 @@ function ModelNewWarCreator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelNewWarCreator:doActionGetSkillConfiguration(action)
-    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    if (modelWarConfigurator:isPopUpPanelEnabled()) then
-        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
-        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
-            getLocalizedText(3, "Configuration"), action.configurationID,
-            SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
-        ))
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelNewWarCreator:setEnabled(enabled)
@@ -289,6 +273,20 @@ function ModelNewWarCreator:setEnabled(enabled)
     end
 
     return self
+end
+
+function ModelNewWarCreator:isRetrievingSkillConfiguration(skillConfigurationID)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isPopUpPanelEnabled())                                                           and
+        (modelWarConfigurator:getModelOptionSelectorWithName("Skill"):getCurrentOption() == skillConfigurationID)
+end
+
+function ModelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    getActorWarConfigurator(self):getModel():setPopUpPanelText(string.format("%s %d:\n%s",
+        getLocalizedText(3, "Configuration"),
+        skillConfigurationID,
+        SkillDescriptionFunctions.getFullDescription(Actor.createModel("common.ModelSkillConfiguration", skillConfiguration))
+    ))
 end
 
 function ModelNewWarCreator:onButtonBackTouched()

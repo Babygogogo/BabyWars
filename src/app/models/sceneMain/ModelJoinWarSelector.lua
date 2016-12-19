@@ -298,19 +298,6 @@ function ModelJoinWarSelector:doActionJoinWar(action)
     return self
 end
 
-function ModelJoinWarSelector:doActionGetSkillConfiguration(action)
-    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    if (modelWarConfigurator:isPopUpPanelEnabled()) then
-        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
-        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
-            getLocalizedText(3, "Configuration"), action.configurationID,
-            SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
-        ))
-    end
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -334,6 +321,20 @@ function ModelJoinWarSelector:setEnabled(enabled)
     getActorWarConfigurator(self):getModel():setEnabled(false)
 
     return self
+end
+
+function ModelJoinWarSelector:isRetrievingSkillConfiguration(skillConfigurationID)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isPopUpPanelEnabled())                                                           and
+        (modelWarConfigurator:getModelOptionSelectorWithName("Skill"):getCurrentOption() == skillConfigurationID)
+end
+
+function ModelJoinWarSelector:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    getActorWarConfigurator(self):getModel():setPopUpPanelText(string.format("%s %d:\n%s",
+        getLocalizedText(3, "Configuration"),
+        skillConfigurationID,
+        SkillDescriptionFunctions.getFullDescription(Actor.createModel("common.ModelSkillConfiguration", skillConfiguration))
+    ))
 end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)

@@ -143,15 +143,7 @@ function ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID)
     end
 end
 
-function ModelSkillConfiguration:isEmpty()
-    return not self:getBaseSkillPoints()
-end
-
 function ModelSkillConfiguration:isValid()
-    if (self:isEmpty()) then
-        return false
-    end
-
     local valid, err = self.m_ModelSkillGroupPassive:isValid()
     if (not valid) then
         return false, getLocalizedText(7, "InvalidSkillGroupPassive", err)

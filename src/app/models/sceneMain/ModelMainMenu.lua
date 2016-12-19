@@ -121,7 +121,7 @@ local function initItemNewWar(self)
         name     = getLocalizedText(1, "NewGame"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorNewWarCreator(self):getModel():setEnabled(true)
+                :getModelNewWarCreator():setEnabled(true)
         end,
     }
 
@@ -145,7 +145,7 @@ local function initItemJoinWar(self)
         name     = getLocalizedText(1, "JoinWar"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorJoinWarSelector(self):getModel():setEnabled(true)
+                :getModelJoinWarSelector():setEnabled(true)
         end,
     }
 
@@ -157,7 +157,7 @@ local function initItemConfigSkills(self)
         name     = getLocalizedText(1, "ConfigSkills"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorSkillConfigurator(self):getModel():setEnabled(true)
+                :getModelSkillConfigurator():setEnabled(true)
         end,
     }
 
@@ -268,11 +268,11 @@ function ModelMainMenu:doActionNewWar(action)
 end
 
 function ModelMainMenu:doActionGetJoinableWarList(action)
-    getActorJoinWarSelector(self):getModel():doActionGetJoinableWarList(action)
+    self:getModelJoinWarSelector():doActionGetJoinableWarList(action)
 end
 
 function ModelMainMenu:doActionJoinWar(action)
-    getActorJoinWarSelector(self):getModel():doActionJoinWar(action)
+    self:getModelJoinWarSelector():doActionJoinWar(action)
 end
 
 function ModelMainMenu:doActionGetOngoingWarList(action)
@@ -283,14 +283,6 @@ end
 
 function ModelMainMenu:doActionGetSceneWarData(action)
     getActorContinueWarSelector(self):getModel():doActionGetSceneWarData(action)
-
-    return self
-end
-
-function ModelMainMenu:doActionGetSkillConfiguration(action)
-    getActorSkillConfigurator(self):getModel():doActionGetSkillConfiguration(action)
-    getActorNewWarCreator(    self):getModel():doActionGetSkillConfiguration(action)
-    getActorJoinWarSelector(  self):getModel():doActionGetSkillConfiguration(action)
 
     return self
 end
@@ -330,7 +322,6 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
             )
         else
             showMenuItems(self,
-                self.m_ItemConfigSkills,
                 self.m_ItemManageReplay,
                 self.m_ItemLogin,
                 self.m_ItemSetMessageIndicator,
@@ -351,12 +342,24 @@ function ModelMainMenu:onButtonExitTouched()
         :setEnabled(true)
 end
 
-function ModelMainMenu:getModelReplayManager()
-    return getActorReplayManager(self):getModel()
+function ModelMainMenu:getModelJoinWarSelector()
+    return getActorJoinWarSelector(self):getModel()
 end
 
 function ModelMainMenu:getModelLoginPanel()
     return getActorLoginPanel(self):getModel()
+end
+
+function ModelMainMenu:getModelNewWarCreator()
+    return getActorNewWarCreator(self):getModel()
+end
+
+function ModelMainMenu:getModelReplayManager()
+    return getActorReplayManager(self):getModel()
+end
+
+function ModelMainMenu:getModelSkillConfigurator()
+    return getActorSkillConfigurator(self):getModel()
 end
 
 return ModelMainMenu

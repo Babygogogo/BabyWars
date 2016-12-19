@@ -53,10 +53,6 @@ local function doActionGetSceneWarData(self, action)
     self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
 end
 
-local function doActionGetSkillConfiguration(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetSkillConfiguration(action)
-end
-
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
@@ -80,7 +76,6 @@ local function onWebSocketMessage(self, param)
     elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
     elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, action)
     elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
-    elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, action)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
     else                                                ActionExecutor.execute(action, self)
     end

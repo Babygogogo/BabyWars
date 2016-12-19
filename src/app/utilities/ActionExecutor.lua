@@ -360,6 +360,25 @@ local function executeGetReplayList(action)
     end
 end
 
+local function executeGetSkillConfiguration(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetSkillConfiguration() should not be invoked on the server.")
+
+    local skillConfigurationID   = action.skillConfigurationID
+    local skillConfiguration     = action.skillConfiguration
+    local modelMainMenu          = modelScene:getModelMainMenu()
+    local modelSkillConfigurator = modelMainMenu:getModelSkillConfigurator()
+    local modelNewWarCreator     = modelMainMenu:getModelNewWarCreator()
+    local modelJoinWarSelector   = modelMainMenu:getModelJoinWarSelector()
+
+    if (modelSkillConfigurator:isRetrievingSkillConfiguration(skillConfigurationID)) then
+        modelSkillConfigurator:updateWithSkillConfiguration(skillConfiguration)
+    elseif (modelNewWarCreator:isRetrievingSkillConfiguration(skillConfigurationID)) then
+        modelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    elseif (modelJoinWarSelector:isRetrievingSkillConfiguration(skillConfigurationID)) then
+        modelJoinWarSelector:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    end
+end
+
 local function executeGetSceneWarActionId(action)
     assert(not IS_SERVER, "ActionExecutor-executeGetSceneWarActionId() should not be invoked on the server.")
     local actionID = action.sceneWarActionID
@@ -1338,11 +1357,13 @@ end
 --------------------------------------------------------------------------------
 function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
-    if     (not actionCode)                      then error("ActionExecutor.execute() invalid actionCode.")
-    elseif (actionCode == ACTION_CODES.Login)    then executeLogin(   action, modelScene)
-    elseif (actionCode == ACTION_CODES.Logout)   then executeLogout(  action, modelScene)
-    elseif (actionCode == ACTION_CODES.Message)  then executeMessage( action, modelScene)
-    elseif (actionCode == ACTION_CODES.Register) then executeRegister(action, modelScene)
+    if     (not actionCode)                                   then error("ActionExecutor.execute() invalid actionCode.")
+    elseif (actionCode == ACTION_CODES.GetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
+    elseif (actionCode == ACTION_CODES.Login)                 then executeLogin(                action, modelScene)
+    elseif (actionCode == ACTION_CODES.Logout)                then executeLogout(               action, modelScene)
+    elseif (actionCode == ACTION_CODES.Message)               then executeMessage(              action, modelScene)
+    elseif (actionCode == ACTION_CODES.Register)              then executeRegister(             action, modelScene)
+    else                                                           error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
     --[[

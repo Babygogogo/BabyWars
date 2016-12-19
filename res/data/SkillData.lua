@@ -1727,7 +1727,7 @@ SkillData.skillPresets = {
     -- Adder
     {
         name      = "Adder",
-        maxPoints = 100,
+        basePoints = 100,
         passive   = {
             {
                 id    = 18,
@@ -1757,7 +1757,7 @@ SkillData.skillPresets = {
     -- Andy
     {
         name      = "Andy",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
         },
         active1 = {
@@ -1791,7 +1791,7 @@ SkillData.skillPresets = {
     -- Colin
     {
         name      = "Colin",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 1,
@@ -1821,7 +1821,7 @@ SkillData.skillPresets = {
     -- Drake
     {
         name      = "Drake",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 41,
@@ -1859,7 +1859,7 @@ SkillData.skillPresets = {
     -- Eagle
     {
         name      = "Eagle",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 40,
@@ -1901,7 +1901,7 @@ SkillData.skillPresets = {
     -- Grimm
     {
         name      = "Grimm",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 1,
@@ -1931,7 +1931,7 @@ SkillData.skillPresets = {
     -- Grit
     {
         name      = "Grit",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 7,
@@ -1973,7 +1973,7 @@ SkillData.skillPresets = {
     -- Hawke
     {
         name      = "Hawke",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 1,
@@ -2007,7 +2007,7 @@ SkillData.skillPresets = {
     -- Jess
     {
         name      = "Jess",
-        maxPoints = 100,
+        basePoints = 100,
         passive   = {
             {
                 id    = 35,
@@ -2057,7 +2057,7 @@ SkillData.skillPresets = {
     -- Lash
     {
         name      = "Lash",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 23,
@@ -2091,7 +2091,7 @@ SkillData.skillPresets = {
     -- Max
     {
         name      = "Max",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 36,
@@ -2129,7 +2129,7 @@ SkillData.skillPresets = {
     -- Nell
     {
         name      = "Nell",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 14,
@@ -2155,7 +2155,7 @@ SkillData.skillPresets = {
     -- Sami
     {
         name      = "Sami",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 15,
@@ -2205,7 +2205,7 @@ SkillData.skillPresets = {
     -- Sasha
     {
         name      = "Sasha",
-        maxPoints = 100,
+        basePoints = 100,
         passive = {
             {
                 id    = 17,

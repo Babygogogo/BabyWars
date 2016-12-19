@@ -8,6 +8,7 @@ local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription
@@ -81,7 +82,6 @@ end
 local function setStateMain(self)
     self.m_State           = "stateMain"
     self.m_ConfigurationID = nil
-    self.m_ModelSkillConfiguration:ctor()
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(1, "ConfigSkills"))
@@ -113,20 +113,20 @@ local function setStateOverviewConfiguration(self, configurationID)
             :setEnabled(true)
 
         local configuration = self.m_ModelSkillConfiguration
-        if (configuration:isEmpty()) then
+        if (configuration) then
+            view:setOverviewString(getFullDescription(configuration))
+        else
             view:setOverviewString(getLocalizedText(3, "GettingConfiguration"))
                 :setButtonSaveEnabled(false)
             for i = 1, #self.m_ItemsOverview do
                 view:setItemEnabled(i, false)
             end
-        else
-            view:setOverviewString(getFullDescription(configuration))
         end
     end
 end
 
 local function setStateSelectMaxPoint(self)
-    self.m_State = "stateSelectMaxPoint"
+    self.m_State = "stateSelectBasePoint"
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "BasePoints"))
@@ -214,7 +214,9 @@ local function initItemsAllConfigurations(self)
         items[#items + 1] = {
             name     = getConfigurationTitle(i),
             callback = function()
+                self.m_ModelSkillConfiguration = nil
                 setStateOverviewConfiguration(self, i)
+
                 if (WebSocketManager.getLoggedInAccountAndPassword()) then
                     WebSocketManager.sendAction({
                         actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
@@ -439,8 +441,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:ctor()
-    self.m_State                   = "stateDisabled"
-    self.m_ModelSkillConfiguration = ModelSkillConfiguration:create()
+    self.m_State = "stateDisabled"
 
     initItemsAllConfigurations(        self)
     initItemsOverview(                 self)
@@ -468,27 +469,6 @@ function ModelSkillConfigurator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
-    if ((self.m_State           == "stateOverviewConfiguration") and
-        (self.m_ConfigurationID == action.configurationID))      then
-        self.m_ModelSkillConfiguration:ctor(action.configuration)
-
-        local view = self.m_View
-        if (view) then
-            view:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
-                :setButtonSaveEnabled(true)
-            for i = 1, #self.m_ItemsOverview do
-                view:setItemEnabled(i, true)
-            end
-        end
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:setEnabled(enabled)
@@ -496,6 +476,27 @@ function ModelSkillConfigurator:setEnabled(enabled)
         setStateMain(self)
     else
         setStateDisabled(self)
+    end
+
+    return self
+end
+
+function ModelSkillConfigurator:isRetrievingSkillConfiguration(skillConfigurationID)
+    return (self.m_State == "stateOverviewConfiguration") and
+        (self.m_ConfigurationID == skillConfigurationID)  and
+        (not self.m_ModelSkillConfiguration)
+end
+
+function ModelSkillConfigurator:updateWithSkillConfiguration(skillConfiguration)
+    self.m_ModelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", skillConfiguration)
+
+    local view = self.m_View
+    if (view) then
+        view:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
+            :setButtonSaveEnabled(true)
+        for i = 1, #self.m_ItemsOverview do
+            view:setItemEnabled(i, true)
+        end
     end
 
     return self
@@ -519,7 +520,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
         if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then setStateOverviewSkillGroupPassive(self)
         else                                                    setStateOverviewSkillGroupActive(self, self.m_SkillGroupID)
         end
-    elseif (state == "stateSelectMaxPoint")            then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
+    elseif (state == "stateSelectBasePoint")           then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupPassive") then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupActive")  then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateSelectEnergyRequirement")   then setStateOverviewSkillGroupActive(self, self.m_SkillGroupID)
