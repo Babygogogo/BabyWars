@@ -5,10 +5,16 @@
         level 1 : integer
     }
 
-    basePoints 0 : integer
-    passive    1 : *SingleSkill
-    active1    2 : *SingleSkill
-    active2    3 : *SingleSkill
+    .ActiveSkillGroup {
+        energyRequirement 0 : integer
+        skills            1 : *SingleSkill
+    }
+
+    basePoints             0 : integer
+    activatingSkillGroupID 1 : integer
+    passive                2 : *SingleSkill
+    active1                3 : ActiveSkillGroup
+    active2                4 : ActiveSkillGroup
 }
 
 .Action {

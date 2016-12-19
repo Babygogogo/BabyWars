@@ -29,8 +29,9 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:ctor(param)
-    self:setEnergyRequirement((param) and (param.energyRequirement) or (nil))
-    initSlots(self, param)
+    param = param or {}
+    self:setEnergyRequirement(param.energyRequirement)
+    initSlots(self, param.skills)
 
     return self
 end
@@ -43,22 +44,22 @@ function ModelSkillGroupActive:toSerializableTable()
         return {}
     end
 
-    local t = {
-        energyRequirement = self:getEnergyRequirement(),
-    }
-
-    local slots = self.m_Slots
+    local skills = {}
+    local slots  = self.m_Slots
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            t[#t + 1] = {
+            skills[#skills + 1] = {
                 id    = skill.id,
                 level = skill.level,
             }
         end
     end
 
-    return t
+    return {
+        energyRequirement = self:getEnergyRequirement(),
+        skills            = skills,
+    }
 end
 
 --------------------------------------------------------------------------------

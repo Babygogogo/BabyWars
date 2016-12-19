@@ -10,6 +10,7 @@ local s_ActionCodes = {
     Logout                = 4,
     Message               = 5,
     GetSkillConfiguration = 6,
+    SetSkillConfiguration = 7,
 }
 local s_ActionNames
 

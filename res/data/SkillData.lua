@@ -1736,20 +1736,24 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 2,
-            {
-                id    = 6,
-                level = 1,
-            },
+            skills            = {
+                {
+                    id    = 6,
+                    level = 1,
+                },
+            }
         },
         active2 = {
             energyRequirement = 5,
-            {
-                id    = 6,
-                level = 2,
-            },
-            {
-                id    = 1,
-                level = 2,
+            skills            = {
+                {
+                    id    = 6,
+                    level = 2,
+                },
+                {
+                    id    = 1,
+                    level = 2,
+                },
             },
         },
     },
@@ -1762,28 +1766,32 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 4,
-                level = 2,
-            },
-            {
-                id    = 1,
-                level = 2,
+            skills            = {
+                {
+                    id    = 4,
+                    level = 2,
+                },
+                {
+                    id    = 1,
+                    level = 2,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 4,
-                level = 5,
-            },
-            {
-                id    = 1,
-                level = 2,
-            },
-            {
-                id    = 6,
-                level = 1,
+            skills            = {
+                {
+                    id    = 4,
+                    level = 5,
+                },
+                {
+                    id    = 1,
+                    level = 2,
+                },
+                {
+                    id    = 6,
+                    level = 1,
+                },
             },
         },
     },
@@ -1804,16 +1812,20 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 2,
-            {
-                id    = 12,
-                level = 4,
+            skills            = {
+                {
+                    id    = 12,
+                    level = 4,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 20,
-                level = 14,
+            skills            = {
+                {
+                    id    = 20,
+                    level = 14,
+                },
             },
         },
     },
@@ -1834,24 +1846,28 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 5,
-                level = 1,
-            },
-            {
-                id    = 9,
-                level = 2,
+            skills            = {
+                {
+                    id    = 5,
+                    level = 1,
+                },
+                {
+                    id    = 9,
+                    level = 2,
+                },
             },
         },
         active2 = {
             energyRequirement = 7,
-            {
-                id    = 5,
-                level = 2,
-            },
-            {
-                id    = 9,
-                level = 4,
+            skills            = {
+                {
+                    id    = 5,
+                    level = 2,
+                },
+                {
+                    id    = 9,
+                    level = 4,
+                },
             },
         },
     },
@@ -1872,28 +1888,32 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 8,
-                level = 1,
-            },
-            {
-                id    = 1,
-                level = -5,
-            },
-            {
-                id    = 2,
-                level = -2,
+            skills            = {
+                {
+                    id    = 8,
+                    level = 1,
+                },
+                {
+                    id    = 1,
+                    level = -5,
+                },
+                {
+                    id    = 2,
+                    level = -2,
+                },
             },
         },
         active2 = {
             energyRequirement = 9,
-            {
-                id    = 8,
-                level = 1,
-            },
-            {
-                id    = 32,
-                level = 2,
+            skills            = {
+                {
+                    id    = 8,
+                    level = 1,
+                },
+                {
+                    id    = 32,
+                    level = 2,
+                },
             },
         },
     },
@@ -1914,16 +1934,20 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 1,
-                level = 5,
+            skills            = {
+                {
+                    id    = 1,
+                    level = 5,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 1,
-                level = 10,
+            skills            = {
+                {
+                    id    = 1,
+                    level = 10,
+                },
             },
         },
     },
@@ -1948,24 +1972,28 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 7,
-                level = 1,
-            },
-            {
-                id    = 30,
-                level = 2,
+            skills            = {
+                {
+                    id    = 7,
+                    level = 1,
+                },
+                {
+                    id    = 30,
+                    level = 2,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 7,
-                level = 2,
-            },
-            {
-                id    = 30,
-                level = 2,
+            skills            = {
+                {
+                    id    = 7,
+                    level = 2,
+                },
+                {
+                    id    = 30,
+                    level = 2,
+                },
             },
         },
     },
@@ -1982,24 +2010,28 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 5,
-            {
-                id    = 4,
-                level = 1,
-            },
-            {
-                id    = 5,
-                level = 1,
+            skills            = {
+                {
+                    id    = 4,
+                    level = 1,
+                },
+                {
+                    id    = 5,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 9,
-            {
-                id    = 4,
-                level = 2,
-            },
-            {
-                id    = 5,
-                level = 2,
+            skills            = {
+                {
+                    id    = 4,
+                    level = 2,
+                },
+                {
+                    id    = 5,
+                    level = 2,
+                },
             },
         },
     },
@@ -2024,32 +2056,36 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 35,
-                level = 2,
-            },
-            {
-                id    = 52,
-                level = 1,
-            },
-            {
-                id    = 16,
-                level = 1,
+            skills            = {
+                {
+                    id    = 35,
+                    level = 2,
+                },
+                {
+                    id    = 52,
+                    level = 1,
+                },
+                {
+                    id    = 16,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 35,
-                level = 4,
-            },
-            {
-                id    = 52,
-                level = 2,
-            },
-            {
-                id    = 16,
-                level = 1,
+            skills            = {
+                {
+                    id    = 35,
+                    level = 4,
+                },
+                {
+                    id    = 52,
+                    level = 2,
+                },
+                {
+                    id    = 16,
+                    level = 1,
+                },
             },
         },
     },
@@ -2066,24 +2102,28 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 4,
-            {
-                id    = 28,
-                level = 1,
+            skills            = {
+                {
+                    id    = 28,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 7,
-            {
-                id    = 23,
-                level = 3,
-            },
-            {
-                id    = 24,
-                level = 3,
-            },
-            {
-                id    = 28,
-                level = 1,
+            skills            = {
+                {
+                    id    = 23,
+                    level = 3,
+                },
+                {
+                    id    = 24,
+                    level = 3,
+                },
+                {
+                    id    = 28,
+                    level = 1,
+                },
             },
         },
     },
@@ -2104,24 +2144,28 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 36,
-                level = 2,
-            },
-            {
-                id    = 53,
-                level = 1,
+            skills            = {
+                {
+                    id    = 36,
+                    level = 2,
+                },
+                {
+                    id    = 53,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 36,
-                level = 4,
-            },
-            {
-                id    = 53,
-                level = 2,
+            skills            = {
+                {
+                    id    = 36,
+                    level = 4,
+                },
+                {
+                    id    = 53,
+                    level = 2,
+                },
             },
         },
     },
@@ -2138,16 +2182,20 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 14,
-                level = 3,
+            skills            = {
+                {
+                    id    = 14,
+                    level = 3,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 14,
-                level = 6,
+            skills            = {
+                {
+                    id    = 14,
+                    level = 6,
+                },
             },
         },
     },
@@ -2176,28 +2224,32 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 3,
-            {
-                id    = 34,
-                level = 3,
-            },
-            {
-                id    = 51,
-                level = 1,
+            skills            = {
+                {
+                    id    = 34,
+                    level = 3,
+                },
+                {
+                    id    = 51,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 8,
-            {
-                id    = 15,
-                level = 6,
-            },
-            {
-                id    = 34,
-                level = 6,
-            },
-            {
-                id    = 51,
-                level = 2,
+            skills            = {
+                {
+                    id    = 15,
+                    level = 6,
+                },
+                {
+                    id    = 34,
+                    level = 6,
+                },
+                {
+                    id    = 51,
+                    level = 2,
+                },
             },
         },
     },
@@ -2214,16 +2266,20 @@ SkillData.skillPresets = {
         },
         active1 = {
             energyRequirement = 2,
-            {
-                id    = 13,
-                level = 5,
+            skills            = {
+                {
+                    id    = 13,
+                    level = 5,
+                },
             },
         },
         active2 = {
             energyRequirement = 6,
-            {
-                id    = 22,
-                level = 10,
+            skills            = {
+                {
+                    id    = 22,
+                    level = 10,
+                },
             },
         },
     },

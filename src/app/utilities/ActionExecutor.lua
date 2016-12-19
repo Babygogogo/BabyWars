@@ -14,11 +14,12 @@ local TableFunctions         = require("src.app.utilities.TableFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local ACTION_CODES          = require("src.app.utilities.ActionCodeFunctions").getFullList()
-local UNIT_MAX_HP           = GameConstantFunctions.getUnitMaxHP()
-local IS_SERVER             = GameConstantFunctions.isServer()
-local WebSocketManager      = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
-local ActorManager          = (not IS_SERVER) and (require("src.global.actors.ActorManager"))     or (nil)
+local ACTION_CODES         = require("src.app.utilities.ActionCodeFunctions").getFullList()
+local UNIT_MAX_HP          = GameConstantFunctions.getUnitMaxHP()
+local IS_SERVER            = GameConstantFunctions.isServer()
+local PlayerProfileManager = (    IS_SERVER) and (require("src.app.utilities.PlayerProfileManager")) or (nil)
+local WebSocketManager     = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager"))     or (nil)
+local ActorManager         = (not IS_SERVER) and (require("src.global.actors.ActorManager"))         or (nil)
 
 local appendList                    = TableFunctions.appendList
 local destroyActorUnitLoaded        = Destroyers.destroyActorUnitLoaded
@@ -431,9 +432,10 @@ local function executeMessage(action, modelScene)
 end
 
 local function executeRegister(action, modelScene)
-    assert(not IS_SERVER, "ActionExecutor-executeRegister() should not be invoked on the server.")
     local account, password = action.registerAccount, action.registerPassword
-    if (account ~= getLoggedInAccountAndPassword()) then
+    if (IS_SERVER) then
+        PlayerProfileManager.createPlayerProfile(account, password)
+    elseif (account ~= getLoggedInAccountAndPassword()) then
         WebSocketManager.setLoggedInAccountAndPassword(account, password)
         SerializationFunctions.serializeAccountAndPassword(account, password)
 
@@ -452,6 +454,14 @@ local function executeRegister(action, modelScene)
         end
 
         modelScene:getModelMessageIndicator():showMessage(getLocalizedText(27, account))
+    end
+end
+
+local function executeSetSkillConfiguration(action, modelScene)
+    if (IS_SERVER) then
+        PlayerProfileManager.setSkillConfiguration(action.playerAccount, action.skillConfigurationID, action.skillConfiguration)
+    else
+        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(81, "SucceedToSetSkillConfiguration"))
     end
 end
 
@@ -1363,6 +1373,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.Logout)                then executeLogout(               action, modelScene)
     elseif (actionCode == ACTION_CODES.Message)               then executeMessage(              action, modelScene)
     elseif (actionCode == ACTION_CODES.Register)              then executeRegister(             action, modelScene)
+    elseif (actionCode == ACTION_CODES.SetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
     else                                                           error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
