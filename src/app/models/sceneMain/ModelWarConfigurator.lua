@@ -4,6 +4,8 @@ local ModelWarConfigurator = class("ModelWarConfigurator")
 local Actor                 = require("src.global.actors.Actor")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
@@ -15,34 +17,34 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initActorSelectorPlayerIndex(self)
-    local actor = createSelector(LocalizationFunctions.getLocalizedText(34))
+    local actor = createSelector(getLocalizedText(34, "PlayerIndex"))
 
     self.m_ActorSelectorPlayerIndex = actor
 end
 
 local function initActorSelectorFog(self)
-    local actor = createSelector(LocalizationFunctions.getLocalizedText(35))
+    local actor = createSelector(getLocalizedText(34, "FogOfWar"))
     actor:getModel():setButtonsEnabled(false)
 
     self.m_ActorSelectorFog = actor
 end
 
 local function initActorSelectorWeather(self)
-    local actor = createSelector(LocalizationFunctions.getLocalizedText(36))
+    local actor = createSelector(getLocalizedText(34, "Weather"))
     actor:getModel():setButtonsEnabled(false)
 
     self.m_ActorSelectorWeather = actor
 end
 
 local function initActorSelectorSkill(self)
-    local actor = createSelector(LocalizationFunctions.getLocalizedText(37))
+    local actor = createSelector(getLocalizedText(34, "SkillConfiguration"))
     actor:getModel():setButtonsEnabled(false)
 
     self.m_ActorSelectorSkill = actor
 end
 
 local function initActorSelectorMaxSkillPoints(self)
-    local actor = createSelector(LocalizationFunctions.getLocalizedText(38))
+    local actor = createSelector(getLocalizedText(34, "BaseSkillPoints"))
     actor:getModel():setButtonsEnabled(false)
 
     self.m_ActorSelectorMaxSkillPoints = actor

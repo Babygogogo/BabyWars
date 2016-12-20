@@ -4,6 +4,8 @@ local ViewWarConfigurator = class("ViewWarConfigurator", cc.Node)
 local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+
 local POPUP_SCROLLVIEW_Z_ORDER = 3
 local POPUP_BACKGROUND_Z_ORDER = 2
 local POPUP_GREY_MASK_Z_ORDER  = 1
@@ -85,7 +87,7 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initEditBoxPassword(self)
-    local titleLabel = cc.Label:createWithTTF(LocalizationFunctions.getLocalizedText(39), FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
+    local titleLabel = cc.Label:createWithTTF(getLocalizedText(34, "Password"), FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
     titleLabel:ignoreAnchorPointForPosition(true)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
@@ -104,7 +106,7 @@ local function initEditBoxPassword(self)
 
         :setPlaceholderFontSize(EDIT_BOX_PASSWORD_FONT_SIZE)
         :setPlaceholderFontColor({r = 0, g = 0, b = 0})
-        :setPlaceHolder(LocalizationFunctions.getLocalizedText(47))
+        :setPlaceHolder(getLocalizedText(47))
 
         :setMaxLength(4)
         :setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
@@ -117,7 +119,7 @@ local function initEditBoxPassword(self)
 end
 
 local function initButtonBack(self)
-    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, LocalizationFunctions.getLocalizedText(1, "Back"))
+    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, getLocalizedText(1, "Back"))
     button:addTouchEventListener(function(sender, eventType)
         if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
             self.m_Model:onButtonBackTouched()
@@ -129,7 +131,7 @@ local function initButtonBack(self)
 end
 
 local function initButtonConfirm(self)
-    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, LocalizationFunctions.getLocalizedText(46))
+    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, getLocalizedText(46))
     button:addTouchEventListener(function(sender, eventType)
         if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
             self.m_Model:onButtonConfirmTouched()

@@ -47,10 +47,10 @@
 
 .PlayerProfile {
     .SingleGameRecord {
-        playersCount 0 : integer
-        win          1 : integer
-        lose         2 : integer
-        draw         3 : integer
+        rankScore 0 : integer
+        win       1 : integer
+        lose      2 : integer
+        draw      3 : integer
     }
 
     .WarLists {
@@ -65,7 +65,7 @@
     account             0 : string
     password            1 : string
     nickname            2 : string
-    rankScore           3 : integer
-    gameRecords         4 : *SingleGameRecord(playersCount)
-    skillConfigurations 5 : *SingleSkillConfiguration
+    gameRecords         3 : *SingleGameRecord
+    skillConfigurations 4 : *SingleSkillConfiguration
+    warLists            5 : WarLists
 }
