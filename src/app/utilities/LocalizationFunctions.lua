@@ -876,8 +876,16 @@ local s_Texts = {
         [2] = function(err) return "Failed to create the war:\n" .. (err or "")         end,
     },
     [51] = {
-        [1] = function(warShortName) return "【" .. warShortName .. "】战局已创建，请等待其他玩家参战。"                                          end,
-        [2] = function(warShortName) return "The war [" .. warShortName .. "] is created successfully. Please wait for other players to join." end,
+        [1] = function(textType, additionalText)
+            if     (textType == "NewWarCreated") then return "[" .. additionalText .. "] 战局已创建，请等待其他玩家参战。"
+            else                                      return "未知51:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType, additionalText)
+            if     (textType == "NewWarCreated") then return "The war [" .. additionalText .. "] is created successfully. Please wait for other players to join."
+            else                                      return "Unknown51:" .. (textType or "")
+            end
+        end,
     },
     [52] = {
         [1] = function() return "无法进入战局，可能因为该战局已结束。"                           end,

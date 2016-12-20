@@ -260,13 +260,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelMainMenu:doActionNewWar(action)
-    self.m_ActorNewWarCreator:getModel():setEnabled(false)
-    self:setMenuEnabled(true)
-
-    return self
-end
-
 function ModelMainMenu:doActionGetJoinableWarList(action)
     self:getModelJoinWarSelector():doActionGetJoinableWarList(action)
 end

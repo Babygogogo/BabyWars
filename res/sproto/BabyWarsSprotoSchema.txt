@@ -33,6 +33,12 @@
     messageParams        107 : *string
     skillConfigurationID 108 : integer
     skillConfiguration   109 : SingleSkillConfiguration
+    maxBaseSkillPoints   110 : integer
+    playerIndex          111 : integer
+    warPassword          112 : string
+    warFieldFileName     113 : string
+    sceneWarFileName     114 : string
+    isFogOfWarByDefault  115 : boolean
 }
 
 .RedisAction {

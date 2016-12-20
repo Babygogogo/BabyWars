@@ -11,6 +11,7 @@ local s_ActionCodes = {
     Message               = 5,
     GetSkillConfiguration = 6,
     SetSkillConfiguration = 7,
+    NewWar                = 8,
 }
 local s_ActionNames
 

@@ -18,6 +18,7 @@ local ACTION_CODES         = require("src.app.utilities.ActionCodeFunctions").ge
 local UNIT_MAX_HP          = GameConstantFunctions.getUnitMaxHP()
 local IS_SERVER            = GameConstantFunctions.isServer()
 local PlayerProfileManager = (    IS_SERVER) and (require("src.app.utilities.PlayerProfileManager")) or (nil)
+local SceneWarManager      = (    IS_SERVER) and (require("src.app.utilities.SceneWarManager"))      or (nil)
 local WebSocketManager     = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager"))     or (nil)
 local ActorManager         = (not IS_SERVER) and (require("src.global.actors.ActorManager"))         or (nil)
 
@@ -429,6 +430,22 @@ local function executeMessage(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeMessage() should not be invoked on the server.")
     local message = getLocalizedText(action.messageCode, unpack(action.messageParams or {}))
     getModelMessageIndicator(modelScene):showMessage(message)
+end
+
+local function executeNewWar(action, modelScene)
+    if (IS_SERVER) then
+        SceneWarManager.createNewWar(action)
+    else
+        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(51, "NewWarCreated", action.sceneWarFileName:sub(13)))
+        if (not modelScene.isModelSceneWar) then
+            local modelMainMenu      = modelScene:getModelMainMenu()
+            local modelNewWarCreator = modelMainMenu:getModelNewWarCreator()
+            if (modelNewWarCreator:isEnabled()) then
+                modelNewWarCreator:setEnabled(false)
+                modelMainMenu:setMenuEnabled(true)
+            end
+        end
+    end
 end
 
 local function executeRegister(action, modelScene)
@@ -1372,6 +1389,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.Login)                 then executeLogin(                action, modelScene)
     elseif (actionCode == ACTION_CODES.Logout)                then executeLogout(               action, modelScene)
     elseif (actionCode == ACTION_CODES.Message)               then executeMessage(              action, modelScene)
+    elseif (actionCode == ACTION_CODES.NewWar)                then executeNewWar(               action, modelScene)
     elseif (actionCode == ACTION_CODES.Register)              then executeRegister(             action, modelScene)
     elseif (actionCode == ACTION_CODES.SetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
     else                                                           error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))

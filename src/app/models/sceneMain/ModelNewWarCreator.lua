@@ -85,12 +85,12 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
             modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
-                actionName           = "NewWar",
+                actionCode           = ActionCodeFunctions.getActionCode("NewWar"),
                 warPassword          = password,
                 warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
                 playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
                 skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                maxSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
                 isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
             })
         end
@@ -99,8 +99,8 @@ end
 
 local function initSelectorSkill(self, modelWarConfigurator)
     local options = {{
-        data = 0,
-        text = getLocalizedText(3, "Disable"),
+        data = nil,
+        text = getLocalizedText(3, "None"),
     }}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
     for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
@@ -121,7 +121,7 @@ local function initSelectorSkill(self, modelWarConfigurator)
         local presetName = presetData.name
         options[#options + 1] = {
             text = presetName,
-            data = i,
+            data = -i,
             callbackOnOptionIndicatorTouched = function()
                 local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
                 modelWarConfigurator:setPopUpPanelEnabled(true)
@@ -262,7 +262,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelNewWarCreator:isEnabled()
+    return self.m_IsEnabled
+end
+
 function ModelNewWarCreator:setEnabled(enabled)
+    self.m_IsEnabled = enabled
     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     getActorWarConfigurator(self):getModel():setEnabled(false)
 
