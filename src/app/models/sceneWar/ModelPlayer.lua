@@ -34,6 +34,7 @@ local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGr
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
+    self.m_PlayerIndex             = param.playerIndex
     self.m_Account                 = param.account
     self.m_Nickname                = param.nickname
     self.m_Fund                    = param.fund
@@ -50,6 +51,7 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toSerializableTable()
     return {
+        playerIndex         = self.m_PlayerIndex,
         account             = self:getAccount(),
         nickname            = self:getNickname(),
         fund                = self:getFund(),
@@ -62,6 +64,7 @@ end
 
 function ModelPlayer:toSerializableReplayData()
     return {
+        playerIndex         = self.m_PlayerIndex,
         account             = self:getAccount(),
         nickname            = self:getNickname(),
         fund                = 0,

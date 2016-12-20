@@ -805,7 +805,7 @@ local function canSetStateChoosingProductionTarget(self, gridIndex)
     local playerIndexLoggedIn = getPlayerIndexLoggedIn()
     if ((isTotalReplay())                                               or
         (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))               then
+        (not getModelTurnManager():isTurnPhaseMain()))                  then
         return false
     else
         local modelTile = getModelTileMap():getModelTile(gridIndex)
@@ -836,7 +836,7 @@ local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
     local playerIndexLoggedIn = getPlayerIndexLoggedIn()
     if ((isTotalReplay())                                               or
         (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))               then
+        (not getModelTurnManager():isTurnPhaseMain()))                  then
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)

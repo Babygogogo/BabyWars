@@ -18,10 +18,9 @@
 }
 
 .Action {
-    actionName      0 : string
-    actionCode      1 : integer
-    playerAccount   2 : string
-    playerPassword  3 : string
+    actionCode      0 : integer
+    playerAccount   1 : string
+    playerPassword  2 : string
 
     heartbeatCounter     100 : integer
     clientVersion        101 : string
@@ -74,4 +73,43 @@
     gameRecords         3 : *SingleGameRecord
     skillConfigurations 4 : *SingleSkillConfiguration
     warLists            5 : WarLists
+}
+
+.SceneWar {
+    .SinglePlayerData {
+        playerIndex         0 : integer
+        account             1 : string
+        nickname            2 : string
+        fund                3 : integer
+        isAlive             4 : boolean
+        damageCost          5 : integer
+        skillActivatedCount 6 : integer
+        skillConfiguration  7 : SingleSkillConfiguration
+    }
+
+    .TurnData {
+        turnIndex     0 : integer
+        playerIndex   1 : integer
+        turnPhaseCode 2 : integer
+    }
+
+    .WarFieldData {
+    }
+
+    .WeatherData {
+    }
+
+    sceneWarFileName     0 : string
+    actionID             1 : integer
+    maxBaseSkillPoints   2 : integer
+    isWarEnded           3 : boolean
+    isRandomWarField     4 : boolean
+    isFogOfWarByDefault  5 : boolean
+    isTotalReplay        6 : boolean
+    warPassword          7 : string
+    executedActions      8 : *Action
+    players              9 : *SinglePlayerData(playerIndex)
+    turn                10 : TurnData
+    warField            11 : WarFieldData
+    weather             12 : WeatherData
 }
