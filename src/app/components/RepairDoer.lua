@@ -36,7 +36,6 @@ RepairDoer.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 function RepairDoer:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -47,10 +46,6 @@ function RepairDoer:loadTemplate(template)
 
     self.m_Template = template
 
-    return self
-end
-
-function RepairDoer:loadInstantialData(data)
     return self
 end
 

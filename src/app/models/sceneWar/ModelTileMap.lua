@@ -181,9 +181,6 @@ function ModelTileMap:getMapSize()
 end
 
 function ModelTileMap:getModelTile(gridIndex)
-    assert(GridIndexFunctions.isWithinMap(gridIndex, self:getMapSize()),
-        "ModelTileMap-getModelTile() invalid param gridIndex: " .. toErrMsg(gridIndex))
-
     return self.m_ActorTilesMap[gridIndex.x][gridIndex.y]:getModel()
 end
 

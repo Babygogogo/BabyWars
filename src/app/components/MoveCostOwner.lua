@@ -28,7 +28,6 @@ MoveCostOwner.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 function MoveCostOwner:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -37,10 +36,6 @@ function MoveCostOwner:loadTemplate(template)
     assert(type(template) == "table", "MoveCostOwner:loadTemplate() the param template is invalid.")
     self.m_Template = template
 
-    return self
-end
-
-function MoveCostOwner:loadInstantialData(data)
     return self
 end
 

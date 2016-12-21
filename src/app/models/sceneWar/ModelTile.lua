@@ -59,6 +59,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 
 local IS_SERVER = GameConstantFunctions.isServer()
 
+local string                       = string
 local getPlayerIndexLoggedIn       = SingletonGetters.getPlayerIndexLoggedIn
 local getTiledIdWithTileOrUnitName = GameConstantFunctions.getTiledIdWithTileOrUnitName
 local isTileVisibleToPlayerIndex   = VisibilityFunctions.isTileVisibleToPlayerIndex
@@ -98,10 +99,7 @@ local function loadInstantialData(self, param, isPreview)
     else
         for name, data in pairs(param) do
             if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-                local component = ComponentManager.getComponent(self, name)
-                assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
-
-                component:loadInstantialData(data)
+                ComponentManager.getComponent(self, name):loadInstantialData(data)
             end
         end
     end
@@ -147,7 +145,7 @@ function ModelTile:toSerializableTable()
     local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if ((name ~= "GridIndexable") and (component.toSerializableTable)) then
+        if (component.toSerializableTable) then
             local componentTable = component:toSerializableTable()
             if (componentTable) then
                 t[name]         = componentTable
@@ -157,19 +155,19 @@ function ModelTile:toSerializableTable()
     end
 
     local objectID, baseID = self:getObjectAndBaseId()
-    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount == 0)) then
+    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        t.baseID   = (baseID   ~= self.m_InitialBaseID)   and (baseID)   or (nil)
-        t.objectID = (objectID ~= self.m_InitialObjectID) and (objectID) or (nil)
+        t.positionIndex = self.m_PositionIndex
+        t.baseID        = (baseID   ~= self.m_InitialBaseID)   and (baseID)   or (nil)
+        t.objectID      = (objectID ~= self.m_InitialObjectID) and (objectID) or (nil)
 
         return t
     end
 end
 
 function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
-    local gridIndex = self:getGridIndex()
-    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, gridIndex, playerIndex)) then
+    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, self:getGridIndex(), playerIndex)) then
         return self:toSerializableTable()
     end
 
@@ -185,8 +183,10 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
                 return nil
             else
                 return {
-                    baseID   = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
-                    objectID = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    positionIndex = self.m_PositionIndex,
+                    baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
+                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    GridIndexable = ComponentManager.getComponent(self, "GridIndexable"):toSerializableTable(),
                 }
             end
         end
@@ -204,11 +204,12 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
         end
     end
 
-    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount == 0)) then
+    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        t.baseID   = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
-        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
+        t.positionIndex = self.m_PositionIndex,
+        t.baseID        = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+        t.objectID      = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
 
         return t
     end

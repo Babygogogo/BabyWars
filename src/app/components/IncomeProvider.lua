@@ -30,7 +30,6 @@ end
 --------------------------------------------------------------------------------
 function IncomeProvider:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -39,10 +38,6 @@ function IncomeProvider:loadTemplate(template)
     assert(template.amount, "IncomeProvider:loadTemplate() the param template.amount is invalid.")
     self.m_Template = template
 
-    return self
-end
-
-function IncomeProvider:loadInstantialData(data)
     return self
 end
 

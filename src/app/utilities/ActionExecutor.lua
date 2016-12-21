@@ -109,7 +109,7 @@ local function produceActorUnit(sceneWarFileName, tiledID, unitID, gridIndex)
     local actorData = {
         tiledID       = tiledID,
         unitID        = unitID,
-        GridIndexable = {gridIndex = gridIndex},
+        GridIndexable = {x = gridIndex.x, y = gridIndex.y},
     }
     local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
     local modelUnit = actorUnit:getModel()
@@ -164,7 +164,7 @@ local function updateModelTilesWithTilesData(tilesData)
     if (tilesData) then
         local modelTileMap = getModelTileMap()
         for _, tileData in pairs(tilesData) do
-            local modelTile = modelTileMap:getModelTile(tileData.GridIndexable.gridIndex)
+            local modelTile = modelTileMap:getModelTile(tileData.GridIndexable)
             assert(modelTile:isFogEnabledOnClient(), "ActionExecutor-updateModelTilesWithTilesData() the tile has no fog.")
             modelTile:updateAsFogDisabled(tileData)
         end

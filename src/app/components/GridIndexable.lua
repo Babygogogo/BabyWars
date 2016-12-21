@@ -34,9 +34,9 @@ function GridIndexable:ctor(param)
 end
 
 function GridIndexable:loadInstantialData(data)
-    if (data.gridIndex) then
-        self:setGridIndex(data.gridIndex)
-    end
+    local gridIndex = self.m_GridIndex
+    gridIndex.x = data.x or gridIndex.x
+    gridIndex.y = data.y or gridIndex.y
 
     return self
 end
@@ -46,10 +46,8 @@ end
 --------------------------------------------------------------------------------
 function GridIndexable:toSerializableTable()
     return {
-        gridIndex = {
-            x = self.m_GridIndex.x,
-            y = self.m_GridIndex.y,
-        },
+        x = self.m_GridIndex.x,
+        y = self.m_GridIndex.y,
     }
 end
 

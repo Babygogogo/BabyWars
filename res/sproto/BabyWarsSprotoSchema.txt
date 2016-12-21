@@ -106,17 +106,41 @@
         mapsForPaths                     3 : *SingleFogMapForPaths(playerIndex)
     }
 
+    .AttackTaker {
+        currentHP 0 : integer
+    }
+
+    .Buildable {
+        currentBuildPoint 0 : integer
+    }
+
+    .Capturable {
+        currentCapturePoint 0 : integer
+    }
+
+    .GridIndexable {
+        x 0 : integer
+        y 1 : integer
+    }
+
     .TileData {
-        tileID 0 : integer
+        positionIndex 0 : integer
+        baseID        1 : integer
+        objectID      2 : integer
+        AttackTaker   3 : AttackTaker
+        Buildable     4 : Buildable
+        Capturable    5 : Capturable
+        GridIndexable 6 : GridIndexable
     }
 
     .TileMapData {
-        tiles 0 : *TileData(tileID)
+        tiles 0 : *TileData(positionIndex)
     }
 
     .WarFieldData {
         warFieldFileName 0 : string
-        tileMap          1 : TileMapData
+        fogMap           1 : FogMapData
+        tileMap          2 : TileMapData
     }
 
     .WeatherData {
