@@ -92,8 +92,8 @@ local function initWithTiledID(self, objectID, baseID, isPreview)
     end
 end
 
-local function loadInstantialData(self, param)
-    if (param.isPreview) then
+local function loadInstantialData(self, param, isPreview)
+    if (isPreview) then
         ComponentManager.bindComponent(self, "GridIndexable", {instantialData = param.GridIndexable})
     else
         for name, data in pairs(param) do
@@ -110,15 +110,12 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelTile:ctor(param)
+function ModelTile:ctor(param, isPreview)
+    self.m_PositionIndex = param.positionIndex
     if ((param.objectID) or (param.baseID)) then
-        initWithTiledID(self, param.objectID, param.baseID, param.isPreview)
+        initWithTiledID(self, param.objectID, param.baseID, isPreview)
     end
-    loadInstantialData(self, param)
-
-    if (self.m_View) then
-        self:initView()
-    end
+    loadInstantialData(self, param, isPreview)
 
     return self
 end
@@ -147,11 +144,10 @@ end
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function ModelTile:toSerializableTable()
-    local t = {}
-
+    local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toSerializableTable) then
+        if ((name ~= "GridIndexable") and (component.toSerializableTable)) then
             local componentTable = component:toSerializableTable()
             if (componentTable) then
                 t[name]         = componentTable
@@ -160,11 +156,12 @@ function ModelTile:toSerializableTable()
         end
     end
 
-    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+    local objectID, baseID = self:getObjectAndBaseId()
+    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount == 0)) then
         return nil
     else
-        t.objectID = (self.m_ObjectID ~= self.m_InitialObjectID) and (self.m_ObjectID) or (nil)
-        t.baseID   = (self.m_BaseID   ~= self.m_InitialBaseID)   and (self.m_BaseID)   or (nil)
+        t.baseID   = (baseID   ~= self.m_InitialBaseID)   and (baseID)   or (nil)
+        t.objectID = (objectID ~= self.m_InitialObjectID) and (objectID) or (nil)
 
         return t
     end
@@ -188,9 +185,8 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
                 return nil
             else
                 return {
-                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
-                    baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
-                    GridIndexable = {gridIndex = gridIndex},
+                    baseID   = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
+                    objectID = (objectID ~= initialObjectID)    and (objectID)      or (nil),
                 }
             end
         end
@@ -199,7 +195,7 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
     local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toSerializableTableWithFog) then
+        if ((name ~= "GridIndexable") and (component.toSerializableTableWithFog)) then
             local componentTable = component:toSerializableTableWithFog()
             if (componentTable) then
                 t[name]         = componentTable
@@ -208,11 +204,11 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
         end
     end
 
-    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount == 0)) then
         return nil
     else
-        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
         t.baseID   = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
 
         return t
     end
@@ -239,6 +235,10 @@ function ModelTile:updateView()
     end
 
     return self
+end
+
+function ModelTile:getPositionIndex()
+    return self.m_PositionIndex
 end
 
 function ModelTile:getTiledId()
@@ -270,7 +270,7 @@ function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
     baseID                   = baseID or self.m_BaseID
 
     initWithTiledID(self, objectID, baseID)
-    loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
+    loadInstantialData(self, {GridIndexable = {x = gridIndex.x, y = gridIndex.y}})
     self:onStartRunning(self.m_SceneWarFileName)
 
     return self
@@ -301,7 +301,7 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
 
         initWithTiledID(self, getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
-            GridIndexable = {gridIndex           = gridIndex},
+            GridIndexable = {x = gridIndex.x, y = gridIndex.y},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
         self:onStartRunning(self.m_SceneWarFileName)

@@ -106,9 +106,17 @@
         mapsForPaths                     3 : *SingleFogMapForPaths(playerIndex)
     }
 
+    .TileData {
+        tileID 0 : integer
+    }
+
+    .TileMapData {
+        tiles 0 : *TileData(tileID)
+    }
+
     .WarFieldData {
         warFieldFileName 0 : string
-
+        tileMap          1 : TileMapData
     }
 
     .WeatherData {

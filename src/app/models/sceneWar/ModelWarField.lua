@@ -19,7 +19,8 @@ local ModelWarField = require("src.global.functions.class")("ModelWarField")
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 local Actor            = require("src.global.actors.Actor")
 
-local IS_SERVER = require("src.app.utilities.GameConstantFunctions").isServer()
+local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
+local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -126,33 +127,24 @@ end
 --------------------------------------------------------------------------------
 function ModelWarField:toSerializableTable()
     return {
-        fogMap  = self:getModelFogMap() :toSerializableTable(),
-        tileMap = self:getModelTileMap():toSerializableTable(),
-        unitMap = self:getModelUnitMap():toSerializableTable(),
+        warFieldFileName = self.m_WarFieldFileName,
+        fogMap           = self:getModelFogMap() :toSerializableTable(),
+        tileMap          = self:getModelTileMap():toSerializableTable(),
+        unitMap          = self:getModelUnitMap():toSerializableTable(),
     }
 end
 
 function ModelWarField:toSerializableTableForPlayerIndex(playerIndex)
     return {
-        fogMap  = self:getModelFogMap() :toSerializableTableForPlayerIndex(playerIndex),
-        tileMap = self:getModelTileMap():toSerializableTableForPlayerIndex(playerIndex),
-        unitMap = self:getModelUnitMap():toSerializableTableForPlayerIndex(playerIndex),
+        warFieldFileName = self.m_WarFieldFileName,
+        fogMap           = self:getModelFogMap() :toSerializableTableForPlayerIndex(playerIndex),
+        tileMap          = self:getModelTileMap():toSerializableTableForPlayerIndex(playerIndex),
+        unitMap          = self:getModelUnitMap():toSerializableTableForPlayerIndex(playerIndex),
     }
 end
 
 function ModelWarField:toSerializableReplayData()
-    local templateName = self:getModelTileMap():getTemplateName()
-    return {
-        fogMap  = {
-            template = templateName,
-        },
-        tileMap = {
-            template = templateName,
-        },
-        unitMap = {
-            template = templateName,
-        },
-    }
+    return {warFieldFileName = self.m_WarFieldFileName}
 end
 
 --------------------------------------------------------------------------------
@@ -192,6 +184,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarField:getWarFieldDisplayName()
+    return require(TEMPLATE_WAR_FIELD_PATH .. self.m_WarFieldFileName).warFieldName
+end
+
+function ModelWarField:getWarFieldAuthorName()
+    return require(TEMPLATE_WAR_FIELD_PATH .. self.m_WarFieldFileName).authorName
+end
+
 function ModelWarField:getModelFogMap()
     return self.m_ActorFogMap:getModel()
 end

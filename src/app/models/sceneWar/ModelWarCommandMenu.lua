@@ -143,7 +143,8 @@ local function getTilesInfo(tileTypeCounters, showIdleTilesCount)
 end
 
 local function getMapInfo()
-    local modelTileMap = getModelTileMap()
+    local modelWarField = SingletonGetters.getModelWarField()
+    local modelTileMap  = modelWarField:getModelTileMap()
     local tileTypeCounters = {
         Headquarters = 0,
         City         = 0,
@@ -163,8 +164,8 @@ local function getMapInfo()
     end)
 
     return string.format("%s: %s      %s: %s\n%s: %s      %s: %d\n%s",
-        getLocalizedText(65, "MapName"),   modelTileMap:getMapName(),
-        getLocalizedText(65, "Author"),    modelTileMap:getAuthorName(),
+        getLocalizedText(65, "MapName"),   modelWarField:getWarFieldDisplayName(),
+        getLocalizedText(65, "Author"),    modelWarField:getWarFieldAuthorName(),
         getLocalizedText(65, "WarID"),     getSceneWarFileName():sub(13),
         getLocalizedText(65, "TurnIndex"), getModelTurnManager():getTurnIndex(),
         getTilesInfo(tileTypeCounters)
