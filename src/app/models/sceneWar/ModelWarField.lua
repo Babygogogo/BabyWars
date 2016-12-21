@@ -57,13 +57,19 @@ local function initActorFogMap(self, fogMapData, isTotalReplay)
 end
 
 local function initActorTileMap(self, tileMapData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelTileMap", tileMapData, "sceneWar.ViewTileMap")
+    local modelTileMap = Actor.createModel("sceneWar.ModelTileMap", tileMapData, self.m_WarFieldFileName)
+    local actor = (IS_SERVER)                                                                          and
+        (Actor.createWithModelAndViewInstance(modelTileMap))                                           or
+        (Actor.createWithModelAndViewInstance(modelTileMap, Actor.createView("sceneWar.ViewTileMap")))
 
     self.m_ActorTileMap = actor
 end
 
 local function initActorUnitMap(self, unitMapData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelUnitMap", unitMapData, "sceneWar.ViewUnitMap")
+    local modelUnitMap = Actor.createModel("sceneWar.ModelUnitMap", unitMapData, self.m_WarFieldFileName)
+    local actor        = (IS_SERVER)                                                                   and
+        (Actor.createWithModelAndViewInstance(modelUnitMap))                                           or
+        (Actor.createWithModelAndViewInstance(modelUnitMap, Actor.createView("sceneWar.ViewUnitMap")))
 
     self.m_ActorUnitMap = actor
 end
@@ -92,7 +98,7 @@ end
 function ModelWarField:ctor(warFieldData, isTotalReplay)
     self.m_WarFieldFileName = warFieldData.warFieldFileName
     initActorFogMap( self, warFieldData.fogMap,  isTotalReplay)
-    initActorTileMap(self, warFieldData.tileMap, isTotalReplay)
+    initActorTileMap(self, warFieldData.tileMap)
     initActorUnitMap(self, warFieldData.unitMap)
 
     if (not IS_SERVER) then

@@ -53,73 +53,67 @@ local function createEmptyMap(width)
     return map
 end
 
-local function createActorUnit(tiledID, unitID, gridIndex)
+local function createActorUnit(tiledID, unitID, x, y)
     local actorData = {
         tiledID       = tiledID,
         unitID        = unitID,
-        GridIndexable = {gridIndex = gridIndex},
+        GridIndexable = {x = x, y = y},
     }
 
-    return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit", actorData)
+    return Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
 end
 
 --------------------------------------------------------------------------------
 -- The unit actors map.
 --------------------------------------------------------------------------------
-local function createActorUnitsMapWithTemplate(mapData)
-    local layer               = require(TEMPLATE_WAR_FIELD_PATH .. mapData.template).layers[3]
+local function createActorUnitsMapWithWarFieldFileName(warFieldFileName)
+    local layer               = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
     local data, width, height = layer.data, layer.width, layer.height
-    local map                 = createEmptyMap(width)
-    local availableUnitId     = 1
+    local actorUnitsMap       = createEmptyMap(width)
+    local availableUnitID     = 1
 
     for x = 1, width do
         for y = 1, height do
             local tiledID = data[x + (height - y) * width]
             if (tiledID > 0) then
-                map[x][y]       = createActorUnit(tiledID, availableUnitId, {x = x, y = y})
-                availableUnitId = availableUnitId + 1
+                actorUnitsMap[x][y] = createActorUnit(tiledID, availableUnitID, x, y)
+                availableUnitID     = availableUnitID + 1
             end
         end
     end
 
-    return map, {width = width, height = height}, availableUnitId, {}
+    return actorUnitsMap, {width = width, height = height}, availableUnitID, {}
 end
 
-local function createActorUnitsMapWithoutTemplate(mapData)
-    -- If the map is created without template, then we build the map with mapData.grids only.
-    local mapSize = mapData.mapSize
-    local map     = createEmptyMap(mapSize.width)
-    for _, gridData in pairs(mapData.grids) do
-        local gridIndex = gridData.GridIndexable.gridIndex
-        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createActorUnitsMapWithoutTemplate() the gridIndex is invalid.")
+local function createActorUnitsMapWithUnitMapData(unitMapData, warFieldFileName)
+    local layer         = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
+    local width, height = layer.width, layer.height
+    local mapSize       = {width = width, height = height}
 
-        map[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", gridData, "sceneWar.ViewUnit", gridData)
+    local actorUnitsMap = createEmptyMap(width)
+    for _, unitData in pairs(unitMapData.unitsOnMap) do
+        local gridIndex = unitData.GridIndexable
+        assert(GridIndexFunctions.isWithinMap(gridIndex, mapSize), "ModelUnitMap-createActorUnitsMapWithUnitMapData() the gridIndex is invalid.")
+
+        actorUnitsMap[gridIndex.x][gridIndex.y] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
     end
 
     local loadedActorUnits = {}
-    for unitID, unitData in pairs(mapData.loaded or {}) do
-        loadedActorUnits[unitID] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit", unitData)
+    for unitID, unitData in pairs(unitMapData.unitsLoaded or {}) do
+        loadedActorUnits[unitID] = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
     end
 
-    return map, mapSize, mapData.availableUnitId, loadedActorUnits
-end
-
-local function initActorUnitsMap(self, mapData)
-    if (mapData.template) then
-        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithTemplate(mapData)
-    else
-        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithoutTemplate(mapData)
-    end
+    return actorUnitsMap, mapSize, unitMapData.availableUnitID, loadedActorUnits
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelUnitMap:ctor(mapData)
-    initActorUnitsMap(self, mapData)
-
-    if (self.m_View) then
-        self:initView()
+function ModelUnitMap:ctor(unitMapData, warFieldFileName)
+    if (unitMapData) then
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithUnitMapData(unitMapData, warFieldFileName)
+    else
+        self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithWarFieldFileName(warFieldFileName)
     end
 
     return self
@@ -153,42 +147,40 @@ end
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function ModelUnitMap:toSerializableTable()
-    local grids = {}
+    local unitsOnMap = {}
     self:forEachModelUnitOnMap(function(modelUnit)
-        grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+        unitsOnMap[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
     end)
 
-    local loaded = {}
+    local unitsLoaded = {}
     self:forEachModelUnitLoaded(function(modelUnit)
-        loaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+        unitsLoaded[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
     end)
 
     return {
-        mapSize         = self:getMapSize(),
-        availableUnitId = self.m_AvailableUnitID,
-        grids           = grids,
-        loaded          = loaded,
+        availableUnitID = self.m_AvailableUnitID,
+        unitsOnMap      = unitsOnMap,
+        unitsLoaded     = unitsLoaded,
     }
 end
 
 function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
-    local sceneWarFileName = self.m_SceneWarFileName
-    local grids, loaded    = {}, {}
+    local sceneWarFileName        = self.m_SceneWarFileName
+    local unitsOnMap, unitsLoaded = {}, {}
     self:forEachModelUnitOnMap(function(modelUnit)
         if (isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, modelUnit:getGridIndex(), modelUnit:getUnitType(), (modelUnit.isDiving) and (modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
-            grids[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
+            unitsOnMap[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
 
             for _, loadedModelUnit in pairs(self:getLoadedModelUnitsWithLoader(modelUnit, true) or {}) do
-                loaded[loadedModelUnit:getUnitId()] = loadedModelUnit:toSerializableTable()
+                unitsLoaded[loadedModelUnit:getUnitId()] = loadedModelUnit:toSerializableTable()
             end
         end
     end)
 
     return {
-        mapSize         = self:getMapSize(),
-        availableUnitId = self:getAvailableUnitId(),
-        grids           = grids,
-        loaded          = loaded,
+        availableUnitID = self:getAvailableUnitId(),
+        unitsOnMap      = unitsOnMap,
+        unitsLoaded     = unitsLoaded,
     }
 end
 

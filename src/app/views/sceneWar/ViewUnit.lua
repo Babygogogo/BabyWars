@@ -328,7 +328,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function ViewUnit:ctor(param)
+function ViewUnit:ctor()
     self:ignoreAnchorPointForPosition(true)
         :setCascadeColorEnabled(true)
     self.m_IsShowingNormalAnimation = true
