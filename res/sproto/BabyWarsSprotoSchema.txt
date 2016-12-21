@@ -6,15 +6,15 @@
     }
 
     .ActiveSkillGroup {
-        energyRequirement 0 : integer
+        energyRequirement 0 :  integer
         skills            1 : *SingleSkill
     }
 
-    basePoints             0 : integer
-    activatingSkillGroupID 1 : integer
+    basePoints             0 :  integer
+    activatingSkillGroupID 1 :  integer
     passive                2 : *SingleSkill
-    active1                3 : ActiveSkillGroup
-    active2                4 : ActiveSkillGroup
+    active1                3 :  ActiveSkillGroup
+    active2                4 :  ActiveSkillGroup
 }
 
 .Action {
@@ -22,22 +22,23 @@
     playerAccount   1 : string
     playerPassword  2 : string
 
-    heartbeatCounter     100 : integer
-    clientVersion        101 : string
-    registerAccount      102 : string
-    registerPassword     103 : string
-    loginAccount         104 : string
-    loginPassword        105 : string
-    messageCode          106 : integer
+    heartbeatCounter     100 :  integer
+    clientVersion        101 :  string
+    registerAccount      102 :  string
+    registerPassword     103 :  string
+    loginAccount         104 :  string
+    loginPassword        105 :  string
+    messageCode          106 :  integer
     messageParams        107 : *string
-    skillConfigurationID 108 : integer
-    skillConfiguration   109 : SingleSkillConfiguration
-    maxBaseSkillPoints   110 : integer
-    playerIndex          111 : integer
-    warPassword          112 : string
-    warFieldFileName     113 : string
-    sceneWarFileName     114 : string
-    isFogOfWarByDefault  115 : boolean
+    skillConfigurationID 108 :  integer
+    skillConfiguration   109 :  SingleSkillConfiguration
+    maxBaseSkillPoints   110 :  integer
+    playerIndex          111 :  integer
+    warPassword          112 :  string
+    warFieldFileName     113 :  string
+    sceneWarFileName     114 :  string
+    isFogOfWarByDefault  115 :  boolean
+    defaultWeatherCode   116 :  integer
 }
 
 .RedisAction {
@@ -67,12 +68,12 @@
         created 1 : *SingleWarItem(sceneWarFileName)
     }
 
-    account             0 : string
-    password            1 : string
-    nickname            2 : string
+    account             0 :  string
+    password            1 :  string
+    nickname            2 :  string
     gameRecords         3 : *SingleGameRecord
     skillConfigurations 4 : *SingleSkillConfiguration
-    warLists            5 : WarLists
+    warLists            5 :  WarLists
 }
 
 .SceneWar {
@@ -93,23 +94,41 @@
         turnPhaseCode 2 : integer
     }
 
+    .SingleFogMapForPaths {
+        playerIndex           0 : integer
+        encodedFogMapForPaths 1 : string
+    }
+
+    .FogMapData {
+        forcingFogCode                   0 :  integer
+        expiringPlayerIndexForForcingFog 1 :  integer
+        expiringTurnIndexForForcingFog   2 :  integer
+        mapsForPaths                     3 : *SingleFogMapForPaths(playerIndex)
+    }
+
     .WarFieldData {
+        warFieldFileName 0 : string
+
     }
 
     .WeatherData {
+        currentWeatherCode            0 : integer
+        defaultWeatherCode            1 : integer
+        expiringPlayerIndexForWeather 2 : integer
+        expiringTurnIndexForWeather   3 : integer
     }
 
-    sceneWarFileName     0 : string
-    actionID             1 : integer
-    maxBaseSkillPoints   2 : integer
-    isWarEnded           3 : boolean
-    isRandomWarField     4 : boolean
-    isFogOfWarByDefault  5 : boolean
-    isTotalReplay        6 : boolean
-    warPassword          7 : string
+    sceneWarFileName     0 :  string
+    actionID             1 :  integer
+    maxBaseSkillPoints   2 :  integer
+    isWarEnded           3 :  boolean
+    isRandomWarField     4 :  boolean
+    isFogOfWarByDefault  5 :  boolean
+    isTotalReplay        6 :  boolean
+    warPassword          7 :  string
     executedActions      8 : *Action
     players              9 : *SinglePlayerData(playerIndex)
-    turn                10 : TurnData
-    warField            11 : WarFieldData
-    weather             12 : WeatherData
+    turn                10 :  TurnData
+    warField            11 :  WarFieldData
+    weather             12 :  WeatherData
 }

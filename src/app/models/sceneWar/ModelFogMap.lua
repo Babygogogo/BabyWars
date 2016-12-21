@@ -15,12 +15,17 @@ local getPlayerIndexLoggedIn         = SingletonGetters.getPlayerIndexLoggedIn
 
 local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
+local FORCING_FOG_CODE        = {
+    None  = 0,
+    Fog   = 1,
+    Clear = 2,
+}
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getMapSizeAndPlayersCountWithTemplate(templateName)
-    local mapData = require(TEMPLATE_WAR_FIELD_PATH .. templateName)
+local function getMapSizeAndPlayersCountWithWarFieldFileName(warFieldFileName)
+    local mapData = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName)
     return {width = mapData.width, height = mapData.height}, mapData.playersCount
 end
 
@@ -61,7 +66,7 @@ local function createSingleMap(mapSize, defaultValue)
     return map
 end
 
-local function createSerializableDataForSingleMapForPaths(map, mapSize)
+local function createSerializableDataForSingleMapForPaths(map, mapSize, playerIndex)
     local width, height = mapSize.width, mapSize.height
     local array         = {}
     for x = 1, width do
@@ -72,16 +77,19 @@ local function createSerializableDataForSingleMapForPaths(map, mapSize)
         end
     end
 
-    return table.concat(array)
+    return {
+        playerIndex           = playerIndex,
+        encodedFogMapForPaths = table.concat(array),
+    }
 end
 
 local function createSerializableDataForMapsForPaths(maps, mapSize, playerIndex)
     if (playerIndex) then
-        return {[playerIndex] = createSerializableDataForSingleMapForPaths(maps[playerIndex], mapSize)}
+        return {[playerIndex] = createSerializableDataForSingleMapForPaths(maps[playerIndex], mapSize, playerIndex)}
     else
         local data = {}
         for index, map in ipairs(maps) do
-            data[index] = createSerializableDataForSingleMapForPaths(map, mapSize)
+            data[index] = createSerializableDataForSingleMapForPaths(map, mapSize, index)
         end
         return data
     end
@@ -131,13 +139,12 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelFogMap:ctor(param, isTotalReplay)
-    local templateName                      = param.template
-    local mapSize, playersCount             = getMapSizeAndPlayersCountWithTemplate(templateName)
+function ModelFogMap:ctor(param, warFieldFileName, isTotalReplay)
+    param = param or {}
+    local mapSize, playersCount             = getMapSizeAndPlayersCountWithWarFieldFileName(warFieldFileName)
     self.m_IsTotalReplay                    = isTotalReplay
     self.m_MapSize                          = mapSize
-    self.m_TemplateName                     = templateName
-    self.m_StateForForcingFog               = param.stateForForcingFog or "None"
+    self.m_ForcingFogCode                   = param.forcingFogCode or FORCING_FOG_CODE.None
     self.m_ExpiringPlayerIndexForForcingFog = param.expiringPlayerIndexForForcingFog
     self.m_ExpiringTurnIndexForForcingFog   = param.expiringTurnIndexForForcingFog
     self.m_MapsForPaths                     = {}
@@ -150,14 +157,14 @@ function ModelFogMap:ctor(param, isTotalReplay)
             self.m_MapsForPaths[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForPathsForPlayerIndex(playerIndex, mapsForPaths and mapsForPaths[playerIndex] or nil)
+            self:resetMapForPathsForPlayerIndex(playerIndex, (mapsForPaths) and (mapsForPaths[playerIndex].encodedFogMapForPaths) or (nil))
         end
     else
         for playerIndex, mapData in pairs(mapsForPaths) do
             self.m_MapsForPaths[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForTiles[playerIndex] = createSingleMap(mapSize, 0)
             self.m_MapsForUnits[playerIndex] = createSingleMap(mapSize, 0)
-            self:resetMapForPathsForPlayerIndex(playerIndex, mapData)
+            self:resetMapForPathsForPlayerIndex(playerIndex, mapData.encodedFogMapForPaths)
         end
     end
 
@@ -175,8 +182,7 @@ end
 --------------------------------------------------------------------------------
 function ModelFogMap:toSerializableTable()
     return {
-        template                         = self.m_TemplateName,
-        stateForForcingFog               = self.m_StateForForcingFog,
+        forcingFogCode                   = self.m_ForcingFogCode,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
         mapsForPaths                     = createSerializableDataForMapsForPaths(self.m_MapsForPaths, self:getMapSize()),
@@ -185,8 +191,7 @@ end
 
 function ModelFogMap:toSerializableTableForPlayerIndex(playerIndex)
     return {
-        template                         = self.m_TemplateName,
-        stateForForcingFog               = self.m_StateForForcingFog,
+        forcingFogCode                   = self.m_ForcingFogCode,
         expiringTurnIndexForForcingFog   = self.m_ExpiringTurnIndexForForcingFog,
         expiringPlayerIndexForForcingFog = self.m_ExpiringPlayerIndexForForcingFog,
         mapsForPaths                     = createSerializableDataForMapsForPaths(self.m_MapsForPaths, self:getMapSize(), playerIndex),
@@ -229,11 +234,11 @@ function ModelFogMap:isFogOfWarCurrently()
 end
 
 function ModelFogMap:isEnablingFogByForce()
-    return self.m_StateForForcingFog == "Enabled"
+    return self.m_ForcingFogCode == "Enabled"
 end
 
 function ModelFogMap:isDisablingFogByForce()
-    return self.m_StateForForcingFog == "Disabled"
+    return self.m_ForcingFogCode == "Disabled"
 end
 
 function ModelFogMap:resetMapForPathsForPlayerIndex(playerIndex, data)

@@ -92,6 +92,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
                 skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
                 maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
                 isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
             })
         end
     end)
@@ -176,7 +177,7 @@ local function initSelectorWeather(modelWarConfigurator)
     -- TODO: enable the selector.
     modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
         :setOptions({
-            {data = "Clear", text = getLocalizedText(40, "Clear"),},
+            {data = 1, text = getLocalizedText(40, "Clear"),},
         })
 end
 

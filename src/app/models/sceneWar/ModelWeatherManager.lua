@@ -15,13 +15,23 @@
 
 local ModelWeatherManager = require("src.global.functions.class")("ModelWeatherManager")
 
-local TableFunctions      = require("src.app.utilities.TableFunctions")
+local WEATHER_CODES = {
+    Clear = 1,
+    Rainy = 2,
+    Snowy = 3,
+    Sandy = 4,
+}
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWeatherManager:ctor(param)
-    self.m_CurrentWeather = param.current
+    self.m_CurrentWeatherCode            = param.currentWeatherCode
+    self.m_DefaultWeatherCode            = param.defaultWeatherCode
+    self.m_ExpiringPlayerIndexForWeather = param.expiringPlayerIndexForWeather
+    self.m_ExpiringTurnIndexForWeather   = param.expiringTurnIndexForWeather
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -29,7 +39,10 @@ end
 --------------------------------------------------------------------------------
 function ModelWeatherManager:toSerializableTable()
     return {
-        current = self:getCurrentWeather(),
+        currentWeatherCode            = self.m_CurrentWeatherCode,
+        defaultWeatherCode            = self.m_DefaultWeatherCode,
+        expiringPlayerIndexForWeather = self.m_ExpiringPlayerIndexForWeather,
+        expiringTurnIndexForWeather   = self.m_ExpiringTurnIndexForWeather,
     }
 end
 
@@ -44,18 +57,5 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelWeatherManager:getCurrentWeather()
-    return self.m_CurrentWeather
-end
-
-function ModelWeatherManager:getNextWeather()
-    -- TODO: add code to do the real job.
-    return self.m_CurrentWeather
-end
-
-function ModelWeatherManager:isInFog()
-    -- TODO: add code to do the real job.
-    return false
-end
 
 return ModelWeatherManager

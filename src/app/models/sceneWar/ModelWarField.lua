@@ -47,13 +47,10 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initActorFogMap(self, fogMapData, isTotalReplay)
-    local actor
-    if (isTotalReplay) then
-        local modelFogMap = Actor.createModel("sceneWar.ModelFogMap", fogMapData, isTotalReplay)
-        actor = Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap"))
-    else
-        actor = Actor.createWithModelAndViewName("sceneWar.ModelFogMap", fogMapData)
-    end
+    local modelFogMap = Actor.createModel("sceneWar.ModelFogMap", fogMapData, self.m_WarFieldFileName, isTotalReplay)
+    local actor       = (IS_SERVER)                                                                  and
+        (Actor.createWithModelAndViewInstance(modelFogMap))                                          or
+        (Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap")))
 
     self.m_ActorFogMap = actor
 end
@@ -92,13 +89,10 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarField:ctor(warFieldData, isTotalReplay)
+    self.m_WarFieldFileName = warFieldData.warFieldFileName
     initActorFogMap( self, warFieldData.fogMap,  isTotalReplay)
     initActorTileMap(self, warFieldData.tileMap, isTotalReplay)
     initActorUnitMap(self, warFieldData.unitMap)
-
-    local tileMapSize = self:getModelTileMap():getMapSize()
-    local unitMapSize = self:getModelUnitMap():getMapSize()
-    assert((tileMapSize.width == unitMapSize.width) and (tileMapSize.height == unitMapSize.height))
 
     if (not IS_SERVER) then
         initActorActionPlanner(self)
