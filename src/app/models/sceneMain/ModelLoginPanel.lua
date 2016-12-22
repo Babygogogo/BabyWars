@@ -11,11 +11,10 @@ local getModelMessageIndicator      = SingletonGetters.getModelMessageIndicator
 local getLocalizedText              = LocalizationFunctions.getLocalizedText
 local getLoggedInAccountAndPassword = WebSocketManager.getLoggedInAccountAndPassword
 local loadAccountAndPassword        = SerializationFunctions.loadAccountAndPassword
-local sendAction                    = WebSocketManager.sendAction
 local serializeAccountAndPassword   = SerializationFunctions.serializeAccountAndPassword
 
-local ACTION_CODE_LOGIN    = getActionCode("Login")
-local ACTION_CODE_REGISTER = getActionCode("Register")
+local ACTION_CODE_LOGIN    = getActionCode("ActionLogin")
+local ACTION_CODE_REGISTER = getActionCode("ActionRegister")
 local GAME_VERSION         = require("src.app.utilities.GameConstantFunctions").getGameVersion()
 
 --------------------------------------------------------------------------------
@@ -73,12 +72,11 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
         local modelConfirmBox = SingletonGetters.getModelConfirmBox()
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
-                sendAction({
-                    actionCode       = ACTION_CODE_REGISTER,
+                WebSocketManager.sendAction({
                     clientVersion    = GAME_VERSION,
                     registerAccount  = account,
                     registerPassword = password,
-                })
+                }, ACTION_CODE_REGISTER)
                 modelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
@@ -96,12 +94,11 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)
         end
-        sendAction({
-            actionCode    = ACTION_CODE_LOGIN,
+        WebSocketManager.sendAction({
             clientVersion = GAME_VERSION,
             loginAccount  = account,
             loginPassword = password,
-        })
+        }, ACTION_CODE_LOGIN)
     end
 
     return self

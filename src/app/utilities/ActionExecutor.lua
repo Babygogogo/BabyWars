@@ -1386,13 +1386,13 @@ end
 function ActionExecutor.execute(action, actionCode, modelScene)
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
-    if     (actionCode == ACTION_CODES.GetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
-    elseif (actionCode == ACTION_CODES.Login)                 then executeLogin(                action, modelScene)
-    elseif (actionCode == ACTION_CODES.Logout)                then executeLogout(               action, modelScene)
-    elseif (actionCode == ACTION_CODES.Message)               then executeMessage(              action, modelScene)
-    elseif (actionCode == ACTION_CODES.NewWar)                then executeNewWar(               action, modelScene)
-    elseif (actionCode == ACTION_CODES.Register)              then executeRegister(             action, modelScene)
-    elseif (actionCode == ACTION_CODES.SetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
+    if     (actionCode == ACTION_CODES.ActionGetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLogin)                 then executeLogin(                action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLogout)                then executeLogout(               action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionMessage)               then executeMessage(              action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionNewWar)                then executeNewWar(               action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionRegister)              then executeRegister(             action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
     else                                                           error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 

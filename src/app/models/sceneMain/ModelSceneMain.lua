@@ -57,8 +57,9 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
-    print(string.format("ModelSceneMain-onWebSocketMessage() name: %s  length: %d",
-        ActionCodeFunctions.getActionName(param.actionCode or -1) or "Invalid!!",
+    print(string.format("ModelSceneMain-onWebSocketMessage() code: %d  name: %s  length: %d",
+        param.actionCode,
+        ActionCodeFunctions.getActionName(param.actionCode),
         string.len(param.message))
     )
     print(SerializationFunctions.toString(param.action))
