@@ -1,6 +1,7 @@
 
 local WebSocketManager = {}
 
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local ActorManager           = require("src.global.actors.ActorManager")
 
@@ -13,7 +14,7 @@ local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 local SERVER_URL = "localhost:19297/BabyWars"
 
 local HEARTBEAT_INTERVAL    = 10
-local HEARTBEAT_ACTION_CODE = require("src.app.utilities.ActionCodeFunctions").getActionCode("NetworkHeartbeat")
+local ACTION_CODE_HEARTBEAT = ActionCodeFunctions.getActionCode("ActionNetworkHeartbeat")
 
 local s_Socket
 local s_Account, s_Password
@@ -33,10 +34,7 @@ local function heartbeat()
     else
         s_HeartbeatCounter    = s_HeartbeatCounter + 1
         s_IsHeartbeatAnswered = false
-        WebSocketManager.sendAction({
-            actionCode       = HEARTBEAT_ACTION_CODE,
-            heartbeatCounter = s_HeartbeatCounter,
-        }, true)
+        WebSocketManager.sendAction({heartbeatCounter = s_HeartbeatCounter}, ACTION_CODE_HEARTBEAT, true)
     end
 end
 
@@ -74,13 +72,17 @@ function WebSocketManager.init()
     end, cc.WEBSOCKET_OPEN)
 
     s_Socket:registerScriptHandler(function(msg)
-        local action = decode("Action", msg)
-        if (action.actionCode == HEARTBEAT_ACTION_CODE) then
-            s_IsHeartbeatAnswered = action.heartbeatCounter == s_HeartbeatCounter
+        local actionGeneric  = decode("ActionGeneric", msg)
+        local actionCode     = actionGeneric.actionCode
+        local actionConcrete = decode(ActionCodeFunctions.getActionName(actionCode), actionGeneric.encodedAction)
+
+        if (actionCode == ACTION_CODE_HEARTBEAT) then
+            s_IsHeartbeatAnswered = (actionConcrete.heartbeatCounter == s_HeartbeatCounter)
         else
             ActorManager.getRootActor():getModel():onWebSocketEvent("message", {
-                message = msg,
-                action  = action,
+                message    = msg,
+                actionCode = actionCode,
+                action     = actionConcrete,
             })
         end
     end, cc.WEBSOCKET_MESSAGE)
@@ -112,15 +114,18 @@ function WebSocketManager.getLoggedInAccountAndPassword()
     return s_Account, s_Password
 end
 
-function WebSocketManager.sendAction(action, ignoreAccountAndPassword)
-    assert(type(action.actionCode) == "number", "WebSocketManager.sendAction() invalid actionCode.")
+function WebSocketManager.sendAction(action, actionCode, ignoreAccountAndPassword)
     assert(WebSocketManager.isInitialized(), "WebSocketManager.sendAction() the socket hasn't been initialized.")
 
     if (not ignoreAccountAndPassword) then
         action.playerAccount  = action.playerAccount  or s_Account
         action.playerPassword = action.playerPassword or s_Password
     end
-    s_Socket:sendString(encode("Action", action))
+
+    s_Socket:sendString(encode("ActionGeneric", {
+        actionCode    = actionCode,
+        encodedAction = encode(ActionCodeFunctions.getActionName(actionCode), action),
+    }))
 
     return WebSocketManager
 end

@@ -1,6 +1,7 @@
 
 local ActionExecutor = {}
 
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local Destroyers             = require("src.app.utilities.Destroyers")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
@@ -14,7 +15,7 @@ local TableFunctions         = require("src.app.utilities.TableFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local ACTION_CODES         = require("src.app.utilities.ActionCodeFunctions").getFullList()
+local ACTION_CODES         = ActionCodeFunctions.getFullList()
 local UNIT_MAX_HP          = GameConstantFunctions.getUnitMaxHP()
 local IS_SERVER            = GameConstantFunctions.isServer()
 local PlayerProfileManager = (    IS_SERVER) and (require("src.app.utilities.PlayerProfileManager")) or (nil)
@@ -1382,10 +1383,10 @@ end
 --------------------------------------------------------------------------------
 -- The public function.
 --------------------------------------------------------------------------------
-function ActionExecutor.execute(action, modelScene)
-    local actionCode = action.actionCode
-    if     (not actionCode)                                   then error("ActionExecutor.execute() invalid actionCode.")
-    elseif (actionCode == ACTION_CODES.GetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
+function ActionExecutor.execute(action, actionCode, modelScene)
+    assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
+
+    if     (actionCode == ACTION_CODES.GetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
     elseif (actionCode == ACTION_CODES.Login)                 then executeLogin(                action, modelScene)
     elseif (actionCode == ACTION_CODES.Logout)                then executeLogout(               action, modelScene)
     elseif (actionCode == ACTION_CODES.Message)               then executeMessage(              action, modelScene)

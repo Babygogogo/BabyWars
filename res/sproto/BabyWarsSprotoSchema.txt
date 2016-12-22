@@ -1,4 +1,51 @@
 
+.ActionGeneric {
+    actionCode    0 : integer
+    encodedAction 1 : string
+}
+
+.ActionNetworkHeartbeat {
+    heartbeatCounter 0 : integer
+}
+
+.Action {
+    .PlayerInfo {
+        playerIndex 0 : integer
+        account     1 : string
+        nickname    2 : string
+    }
+
+    .WarConfiguration {
+        sceneWarFileName    0 :  string
+        warFieldFileName    1 :  string
+        warPassword         2 :  string
+        maxBaseSkillPoints  3 :  integer
+        isFogOfWarByDefault 4 :  boolean
+        defaultWeatherCode  5 :  integer
+        isRandomWarField    6 :  boolean
+        players             7 : *PlayerInfo(playerIndex)
+    }
+
+    actionCode      0 : integer
+    playerAccount   1 : string
+    playerPassword  2 : string
+
+    heartbeatCounter          100 :  integer
+    clientVersion             101 :  string
+    registerAccount           102 :  string
+    registerPassword          103 :  string
+    loginAccount              104 :  string
+    loginPassword             105 :  string
+    messageCode               106 :  integer
+    messageParams             107 : *string
+    skillConfigurationID      108 :  integer
+    skillConfiguration        109 :  SingleSkillConfiguration
+    sceneWarFileName          110 :  string
+    sceneWarShortName         111 :  string
+    warConfiguration          112 :  WarConfiguration
+    joinableWarConfigurations 113 : *WarConfiguration(sceneWarFileName)
+}
+
 .SingleSkillConfiguration {
     .SingleSkill {
         id    0 : integer
@@ -15,35 +62,6 @@
     passive                2 : *SingleSkill
     active1                3 :  ActiveSkillGroup
     active2                4 :  ActiveSkillGroup
-}
-
-.Action {
-    actionCode      0 : integer
-    playerAccount   1 : string
-    playerPassword  2 : string
-
-    heartbeatCounter     100 :  integer
-    clientVersion        101 :  string
-    registerAccount      102 :  string
-    registerPassword     103 :  string
-    loginAccount         104 :  string
-    loginPassword        105 :  string
-    messageCode          106 :  integer
-    messageParams        107 : *string
-    skillConfigurationID 108 :  integer
-    skillConfiguration   109 :  SingleSkillConfiguration
-    maxBaseSkillPoints   110 :  integer
-    playerIndex          111 :  integer
-    warPassword          112 :  string
-    warFieldFileName     113 :  string
-    sceneWarFileName     114 :  string
-    isFogOfWarByDefault  115 :  boolean
-    defaultWeatherCode   116 :  integer
-}
-
-.RedisAction {
-    actionCode    0 : integer
-    encodedAction 1 : string
 }
 
 .AccountAndPassword {

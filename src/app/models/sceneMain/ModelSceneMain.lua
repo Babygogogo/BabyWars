@@ -58,13 +58,14 @@ end
 
 local function onWebSocketMessage(self, param)
     print(string.format("ModelSceneMain-onWebSocketMessage() name: %s  length: %d",
-        ActionCodeFunctions.getActionName(param.action.actionCode or -1) or "Invalid!!",
+        ActionCodeFunctions.getActionName(param.actionCode or -1) or "Invalid!!",
         string.len(param.message))
     )
     print(SerializationFunctions.toString(param.action))
 
-    local action     = param.action
-    local actionName = action.actionName
+    ActionExecutor.execute(param.action, param.actionCode, self)
+
+    --[[
     if     (action.fileName)                       then return
     elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, action)
     elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
@@ -73,6 +74,7 @@ local function onWebSocketMessage(self, param)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
     else                                                ActionExecutor.execute(action, self)
     end
+    --]]
 end
 
 local function onWebSocketClose(self, param)

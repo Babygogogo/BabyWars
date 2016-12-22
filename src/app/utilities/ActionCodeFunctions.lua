@@ -4,14 +4,15 @@ local ActionCodeFunctions = {}
 local TableFunctions = require("src.app.utilities.TableFunctions")
 
 local s_ActionCodes = {
-    NetworkHeartbeat      = 1,
-    Register              = 2,
-    Login                 = 3,
-    Logout                = 4,
-    Message               = 5,
-    GetSkillConfiguration = 6,
-    SetSkillConfiguration = 7,
-    NewWar                = 8,
+    ActionNetworkHeartbeat             = 1,
+    ActionRegister                     = 2,
+    ActionLogin                        = 3,
+    ActionLogout                       = 4,
+    ActionMessage                      = 5,
+    ActionGetSkillConfiguration        = 6,
+    ActionSetSkillConfiguration        = 7,
+    ActionNewWar                       = 8,
+    ActionGetJoinableWarConfigurations = 9,
 }
 local s_ActionNames
 
@@ -21,7 +22,6 @@ local s_ActionNames
 function ActionCodeFunctions.getActionCode(actionName)
     local code = s_ActionCodes[actionName]
     assert(code, "ActionCodeFunctions.getActionCode() invalid actionName: " .. (actionName or nil))
-
     return code
 end
 
@@ -33,7 +33,9 @@ function ActionCodeFunctions.getActionName(actionCode)
         end
     end
 
-    return s_ActionNames[actionCode]
+    local name = s_ActionNames[actionCode]
+    assert(name, "ActionCodeFunctions.getActionName() invalid actionCode: " .. (actionCode or nil))
+    return name
 end
 
 function ActionCodeFunctions.getFullList()
