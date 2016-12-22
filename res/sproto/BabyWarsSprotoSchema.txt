@@ -106,6 +106,14 @@
         mapsForPaths                     3 : *SingleFogMapForPaths(playerIndex)
     }
 
+    .AttackDoer {
+        .PrimaryWeaponCurrentAmmo {
+            currentAmmo 0 : integer
+        }
+
+        primaryWeapon 0 : PrimaryWeaponCurrentAmmo
+    }
+
     .AttackTaker {
         currentHP 0 : integer
     }
@@ -118,9 +126,41 @@
         currentCapturePoint 0 : integer
     }
 
+    .Capturer {
+        isCapturing 0 : boolean
+    }
+
+    .Diver {
+        isDiving 0 : boolean
+    }
+
+    .FlareLauncher {
+        currentAmmo 0 : integer
+    }
+
+    .FuelOwner {
+        current 0 : integer
+    }
+
     .GridIndexable {
         x 0 : integer
         y 1 : integer
+    }
+
+    .MaterialOwner {
+        current 0 : integer
+    }
+
+    .Promotable {
+        current 0 : integer
+    }
+
+    .TileBuilder {
+        isBuildingModelTile 0 : boolean
+    }
+
+    .UnitLoader {
+        loaded 0 : *integer
     }
 
     .TileData {
@@ -137,10 +177,34 @@
         tiles 0 : *TileData(positionIndex)
     }
 
+    .UnitData {
+        unitID         0 : integer
+        tiledID        1 : integer
+        stateCode      2 : integer
+        AttackDoer     3 : AttackDoer
+        AttackTaker    4 : AttackTaker
+        Capturer       5 : Capturer
+        Diver          6 : Diver
+        FlareLauncher  7 : FlareLauncher
+        FuelOwner      8 : FuelOwner
+        GridIndexable  9 : GridIndexable
+        MaterialOwner 10 : MaterialOwner
+        Promotable    11 : Promotable
+        TileBuilder   12 : TileBuilder
+        UnitLoader    13 : UnitLoader
+    }
+
+    .UnitMapData {
+        availableUnitID 0 :  integer
+        unitsOnMap      1 : *UnitData(unitID)
+        unitsLoaded     2 : *UnitData(unitID)
+    }
+
     .WarFieldData {
         warFieldFileName 0 : string
         fogMap           1 : FogMapData
         tileMap          2 : TileMapData
+        unitMap          3 : UnitMapData
     }
 
     .WeatherData {

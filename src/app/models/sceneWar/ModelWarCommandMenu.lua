@@ -91,7 +91,7 @@ local function updateUnitsData(dataForEachPlayer)
     local updateUnitCountAndValue = function(modelUnit)
         local data          = dataForEachPlayer[modelUnit:getPlayerIndex()]
         data.unitsCount     = data.unitsCount + 1
-        data.idleUnitsCount = data.idleUnitsCount + (modelUnit:getState() == "idle" and 1 or 0)
+        data.idleUnitsCount = data.idleUnitsCount + (modelUnit:isStateIdle() and 1 or 0)
         data.unitsValue     = data.unitsValue + round(modelUnit:getNormalizedCurrentHP() * modelUnit:getBaseProductionCost() / 10)
     end
 
@@ -372,7 +372,7 @@ local function getIdleUnitsCount(self)
     local count       = 0
     local playerIndex = getModelTurnManager():getPlayerIndex()
     getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:isStateIdle())) then
             count = count + 1
         end
     end)
@@ -503,7 +503,7 @@ local function initItemFindIdleUnit(self)
                     local modelUnit = modelUnitMap:getModelUnit(gridIndex)
                     if ((modelUnit)                                         and
                         (modelUnit:getPlayerIndex() == playerIndexLoggedIn) and
-                        (modelUnit:getState() == "idle"))                   then
+                        (modelUnit:isStateIdle()))                          then
                         if ((y > cursorY)                       or
                             ((y == cursorY) and (x > cursorX))) then
                             dispatchEvtMapCursorMoved(self, gridIndex)

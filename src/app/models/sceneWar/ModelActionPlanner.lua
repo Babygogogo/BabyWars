@@ -531,7 +531,7 @@ local function getActionsLaunchModelUnit(self)
     local modelTile    = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-        if ((launchModelUnit:getState() == "idle")                 and
+        if ((launchModelUnit:isStateIdle())                        and
             (modelTile:getMoveCostWithModelUnit(launchModelUnit))) then
             actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
         end
@@ -840,7 +840,7 @@ local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
         return false
     else
         local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:getState() == "idle") and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
+        return (modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
     end
 end
 

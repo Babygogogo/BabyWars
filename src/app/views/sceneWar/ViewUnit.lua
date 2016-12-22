@@ -250,11 +250,11 @@ end
 --------------------------------------------------------------------------------
 -- The unit state.
 --------------------------------------------------------------------------------
-local function updateUnitState(self, state)
-    if (self.m_State ~= state) then
-        if (state == "idle") then
+local function updateUnitState(self, isStateIdle)
+    if (self.m_IsStateIdle ~= isStateIdle) then
+        if (isStateIdle) then
             self:setColor(COLOR_IDLE)
-        elseif (state == "actioned") then
+        else
             self:setColor(COLOR_ACTIONED)
         end
     end
@@ -344,15 +344,15 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    local tiledID = unit:getTiledId()
-    local state   = unit:getState()
+    local tiledID     = unit:getTiledId()
+    local isStateIdle = unit:isStateIdle()
     updateUnitSprite(    self,               tiledID)
-    updateUnitState(     self,               state)
+    updateUnitState(     self,               isStateIdle)
     updateHpIndicator(   self.m_HpIndicator, unit:getNormalizedCurrentHP())
     updateStateIndicator(self,               unit)
 
     self.m_TiledID     = tiledID
-    self.m_State       = state
+    self.m_IsStateIdle = isStateIdle
 
     return self
 end
