@@ -76,7 +76,7 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
                     clientVersion    = GAME_VERSION,
                     registerAccount  = account,
                     registerPassword = password,
-                }, ACTION_CODE_REGISTER)
+                }, ACTION_CODE_REGISTER, true)
                 modelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
@@ -98,7 +98,7 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
             clientVersion = GAME_VERSION,
             loginAccount  = account,
             loginPassword = password,
-        }, ACTION_CODE_LOGIN)
+        }, ACTION_CODE_LOGIN, true)
     end
 
     return self

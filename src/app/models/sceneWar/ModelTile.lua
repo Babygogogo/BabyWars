@@ -207,7 +207,7 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
     if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        t.positionIndex = self.m_PositionIndex,
+        t.positionIndex = self.m_PositionIndex
         t.baseID        = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
         t.objectID      = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
 

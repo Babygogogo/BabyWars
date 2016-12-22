@@ -12,6 +12,7 @@ local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
+local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 --------------------------------------------------------------------------------
@@ -111,10 +112,7 @@ local function initSelectorSkill(self, modelWarConfigurator)
             callbackOnOptionIndicatorTouched = function()
                 modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
-                WebSocketManager.sendAction({
-                    actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
-                    skillConfigurationID = i,
-                })
+                WebSocketManager.sendAction({skillConfigurationID = i}, ACTION_CODE_GET_SKILL_CONFIGURATION)
             end,
         }
     end

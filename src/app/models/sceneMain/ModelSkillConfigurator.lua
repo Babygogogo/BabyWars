@@ -20,8 +20,8 @@ local SKILL_GROUP_ID_ACTIVE_1                 = ModelSkillConfiguration.getSkill
 local SKILL_GROUP_ID_ACTIVE_2                 = ModelSkillConfiguration.getSkillGroupIdActive2()
 local ACTIVE_SKILL_SLOTS_COUNT                = SkillDataAccessors.getActiveSkillSlotsCount()
 
-local ACTION_CODE_GET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("GetSkillConfiguration")
-local ACTION_CODE_SET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("SetSkillConfiguration")
+local ACTION_CODE_GET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_SET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("ActionSetSkillConfiguration")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -221,10 +221,7 @@ local function initItemsAllConfigurations(self)
                 setStateOverviewConfiguration(self, i)
 
                 if (WebSocketManager.getLoggedInAccountAndPassword()) then
-                    WebSocketManager.sendAction({
-                        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
-                        skillConfigurationID = i,
-                    })
+                    WebSocketManager.sendAction({skillConfigurationID = i}, ACTION_CODE_GET_SKILL_CONFIGURATION)
                 end
             end,
         }
@@ -543,10 +540,9 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     else
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
-            actionCode           = ACTION_CODE_SET_SKILL_CONFIGURATION,
             skillConfigurationID = self.m_ConfigurationID,
             skillConfiguration   = self.m_ModelSkillConfiguration:toSerializableTable(),
-        })
+        }, ACTION_CODE_SET_SKILL_CONFIGURATION)
 
         if (self.m_View) then
             self.m_View:disableButtonSaveForSecs()
