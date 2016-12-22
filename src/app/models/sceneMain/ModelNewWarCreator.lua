@@ -13,6 +13,7 @@ local Actor                     = require("src.global.actors.Actor")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 --------------------------------------------------------------------------------
@@ -86,7 +87,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
             modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
-                actionCode           = ActionCodeFunctions.getActionCode("NewWar"),
+                actionCode           = ACTION_CODE_NEW_WAR,
                 warPassword          = password,
                 warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
                 playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),

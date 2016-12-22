@@ -26,7 +26,7 @@ local WEATHER_CODES = {
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWeatherManager:ctor(param)
-    self.m_CurrentWeatherCode            = param.currentWeatherCode
+    self.m_CurrentWeatherCode            = param.currentWeatherCode or param.defaultWeatherCode
     self.m_DefaultWeatherCode            = param.defaultWeatherCode
     self.m_ExpiringPlayerIndexForWeather = param.expiringPlayerIndexForWeather
     self.m_ExpiringTurnIndexForWeather   = param.expiringTurnIndexForWeather
@@ -39,7 +39,7 @@ end
 --------------------------------------------------------------------------------
 function ModelWeatherManager:toSerializableTable()
     return {
-        currentWeatherCode            = self.m_CurrentWeatherCode,
+        currentWeatherCode            = (self.m_CurrentWeatherCode ~= self.m_DefaultWeatherCode) and (self.m_CurrentWeatherCode) or (nil),
         defaultWeatherCode            = self.m_DefaultWeatherCode,
         expiringPlayerIndexForWeather = self.m_ExpiringPlayerIndexForWeather,
         expiringTurnIndexForWeather   = self.m_ExpiringTurnIndexForWeather,
