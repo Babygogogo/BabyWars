@@ -57,14 +57,15 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
+    local actionCode = param.action.actionCode
     print(string.format("ModelSceneMain-onWebSocketMessage() code: %d  name: %s  length: %d",
-        param.actionCode,
-        ActionCodeFunctions.getActionName(param.actionCode),
+        actionCode,
+        ActionCodeFunctions.getActionName(actionCode),
         string.len(param.message))
     )
     print(SerializationFunctions.toString(param.action))
 
-    ActionExecutor.execute(param.action, param.actionCode, self)
+    ActionExecutor.execute(param.action, self)
 
     --[[
     if     (action.fileName)                       then return

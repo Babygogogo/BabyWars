@@ -21,7 +21,7 @@ local s_ActionNames
 --------------------------------------------------------------------------------
 function ActionCodeFunctions.getActionCode(actionName)
     local code = s_ActionCodes[actionName]
-    assert(code, "ActionCodeFunctions.getActionCode() invalid actionName: " .. (actionName or nil))
+    assert(code, "ActionCodeFunctions.getActionCode() invalid actionName: " .. (actionName or ""))
     return code
 end
 
@@ -34,7 +34,7 @@ function ActionCodeFunctions.getActionName(actionCode)
     end
 
     local name = s_ActionNames[actionCode]
-    assert(name, "ActionCodeFunctions.getActionName() invalid actionCode: " .. (actionCode or nil))
+    assert(name, "ActionCodeFunctions.getActionName() invalid actionCode: " .. (actionCode or ""))
     return name
 end
 

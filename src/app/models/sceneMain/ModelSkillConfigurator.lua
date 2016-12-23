@@ -221,7 +221,10 @@ local function initItemsAllConfigurations(self)
                 setStateOverviewConfiguration(self, i)
 
                 if (WebSocketManager.getLoggedInAccountAndPassword()) then
-                    WebSocketManager.sendAction({skillConfigurationID = i}, ACTION_CODE_GET_SKILL_CONFIGURATION)
+                    WebSocketManager.sendAction({
+                            actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+                            skillConfigurationID = i,
+                        })
                 end
             end,
         }
@@ -540,9 +543,10 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     else
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
-            skillConfigurationID = self.m_ConfigurationID,
-            skillConfiguration   = self.m_ModelSkillConfiguration:toSerializableTable(),
-        }, ACTION_CODE_SET_SKILL_CONFIGURATION)
+                actionCode           = ACTION_CODE_SET_SKILL_CONFIGURATION,
+                skillConfigurationID = self.m_ConfigurationID,
+                skillConfiguration   = self.m_ModelSkillConfiguration:toSerializableTable(),
+            })
 
         if (self.m_View) then
             self.m_View:disableButtonSaveForSecs()

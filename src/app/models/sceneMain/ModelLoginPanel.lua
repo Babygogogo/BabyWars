@@ -73,10 +73,11 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 WebSocketManager.sendAction({
-                    clientVersion    = GAME_VERSION,
-                    registerAccount  = account,
-                    registerPassword = password,
-                }, ACTION_CODE_REGISTER, true)
+                        actionCode       = ACTION_CODE_REGISTER,
+                        clientVersion    = GAME_VERSION,
+                        registerAccount  = account,
+                        registerPassword = password,
+                    }, true)
                 modelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
@@ -95,10 +96,11 @@ function ModelLoginPanel:onButtonLoginTouched(account, password)
             self.m_View:disableButtonLoginForSecs(5)
         end
         WebSocketManager.sendAction({
-            clientVersion = GAME_VERSION,
-            loginAccount  = account,
-            loginPassword = password,
-        }, ACTION_CODE_LOGIN, true)
+                actionCode    = ACTION_CODE_LOGIN,
+                clientVersion = GAME_VERSION,
+                loginAccount  = account,
+                loginPassword = password,
+            }, true)
     end
 
     return self

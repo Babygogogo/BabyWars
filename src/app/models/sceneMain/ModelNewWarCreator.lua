@@ -87,15 +87,15 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
             modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
-                actionCode           = ACTION_CODE_NEW_WAR,
-                warPassword          = password,
-                warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
-                playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
-                skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
-                defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
-            })
+                    actionCode           = ACTION_CODE_NEW_WAR,
+                    warPassword          = password,
+                    warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                    playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                    skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                    maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                    isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                    defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
+                })
         end
     end)
 end
@@ -113,7 +113,10 @@ local function initSelectorSkill(self, modelWarConfigurator)
             callbackOnOptionIndicatorTouched = function()
                 modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
-                WebSocketManager.sendAction({skillConfigurationID = i}, ACTION_CODE_GET_SKILL_CONFIGURATION)
+                WebSocketManager.sendAction({
+                        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+                        skillConfigurationID = i
+                    })
             end,
         }
     end

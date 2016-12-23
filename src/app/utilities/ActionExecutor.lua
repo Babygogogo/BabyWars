@@ -1383,7 +1383,8 @@ end
 --------------------------------------------------------------------------------
 -- The public function.
 --------------------------------------------------------------------------------
-function ActionExecutor.execute(action, actionCode, modelScene)
+function ActionExecutor.execute(action, modelScene)
+    local actionCode = action.actionCode
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
     if     (actionCode == ACTION_CODES.ActionGetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
@@ -1393,7 +1394,7 @@ function ActionExecutor.execute(action, actionCode, modelScene)
     elseif (actionCode == ACTION_CODES.ActionNewWar)                then executeNewWar(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRegister)              then executeRegister(             action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
-    else                                                           error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
+    else                                                                 error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
     --[[
