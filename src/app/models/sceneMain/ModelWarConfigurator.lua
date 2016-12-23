@@ -89,7 +89,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarConfigurator:isEnabled()
+    return self.m_IsEnabled
+end
+
 function ModelWarConfigurator:setEnabled(enabled)
+    self.m_IsEnabled = enabled
     if (self.m_View) then
         self.m_View:setVisible(enabled)
             :setPopUpPanelEnabled(false)

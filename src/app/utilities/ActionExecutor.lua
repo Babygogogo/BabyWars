@@ -44,6 +44,7 @@ local getScriptEventDispatcher      = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay                 = SingletonGetters.isTotalReplay
 local isTileVisible                 = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible                 = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
+local next, pairs, ipairs           = next, pairs, ipairs
 local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
 
 --------------------------------------------------------------------------------
@@ -360,6 +361,19 @@ local function executeGetReplayList(action)
     local modelReplayManager = modelScene:getModelMainMenu():getModelReplayManager()
     if (modelReplayManager:getState() == "stateDownload") then
         modelReplayManager:setDownloadList(action.list)
+    end
+end
+
+local function executeGetJoinableWarConfigurations(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetSkillConfiguration() should not be invoked on the server.")
+
+    if (modelScene.isModelSceneWar) then
+        return
+    end
+
+    local modelJoinWarSelector = modelScene:getModelMainMenu():getModelJoinWarSelector()
+    if (modelJoinWarSelector:isRetrievingJoinableWarConfigurations()) then
+        modelJoinWarSelector:updateWithJoinableWarConfigurations(action.warConfigurations)
     end
 end
 
@@ -1387,14 +1401,15 @@ function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
-    if     (actionCode == ACTION_CODES.ActionGetSkillConfiguration) then executeGetSkillConfiguration(action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionLogin)                 then executeLogin(                action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionLogout)                then executeLogout(               action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionMessage)               then executeMessage(              action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionNewWar)                then executeNewWar(               action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionRegister)              then executeRegister(             action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration) then executeSetSkillConfiguration(action, modelScene)
-    else                                                                 error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
+    if     (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLogin)                        then executeLogin(                       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLogout)                       then executeLogout(                      action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionMessage)                      then executeMessage(                     action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionNewWar)                       then executeNewWar(                      action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionRegister)                     then executeRegister(                    action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
+    else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
     --[[

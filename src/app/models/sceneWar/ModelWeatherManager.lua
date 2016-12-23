@@ -21,6 +21,7 @@ local WEATHER_CODES = {
     Snowy = 3,
     Sandy = 4,
 }
+local s_WeatherNames
 
 --------------------------------------------------------------------------------
 -- The constructor.
@@ -57,5 +58,17 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWeatherManager.getWeatherName(weatherCode)
+    if (not s_WeatherNames) then
+        s_WeatherNames = {}
+        for name, code in pairs(WEATHER_CODES) do
+            s_WeatherNames[code] = name
+        end
+    end
+
+    local name = s_WeatherNames[weatherCode]
+    assert(name, "ModelWeatherManager.getWeatherName() invalid weatherCode: " .. (weatherCode or ""))
+    return name
+end
 
 return ModelWeatherManager

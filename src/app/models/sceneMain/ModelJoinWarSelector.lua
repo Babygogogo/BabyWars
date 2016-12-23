@@ -5,11 +5,16 @@ local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local ModelWeatherManager       = require("src.app.models.sceneWar.ModelWeatherManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+
+local ACTION_CODE_GET_SKILL_CONFIGURATION         = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetJoinableWarConfigurations")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -55,21 +60,21 @@ local function resetSelectorFog(modelWarConfigurator, warConfiguration)
 end
 
 local function resetSelectorWeather(modelWarConfigurator, warConfiguration)
-    local weather = warConfiguration.weather
+    local weatherCode = warConfiguration.defaultWeatherCode
     local options = {{
-        data = weather,
-        text = getLocalizedText(40, weather),
+        data = weatherCode,
+        text = getLocalizedText(40, ModelWeatherManager.getWeatherName(weatherCode)),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setOptions(options)
 end
 
 local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguration)
-    local maxSkillPoints = warConfiguration.maxSkillPoints
+    local maxBaseSkillPoints = warConfiguration.maxBaseSkillPoints
     local options = {{
-        data = maxSkillPoints,
-        text = (maxSkillPoints)              and
-            ("" .. maxSkillPoints)           or
+        data = maxBaseSkillPoints,
+        text = (maxBaseSkillPoints)              and
+            ("" .. maxBaseSkillPoints)           or
             (getLocalizedText(3, "Disable")),
     }}
 
@@ -81,13 +86,13 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
         data = 0,
         text = getLocalizedText(3, "Disable"),
     }}
-    if (not warConfiguration.maxSkillPoints) then
+    if (not warConfiguration.maxBaseSkillPoints) then
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
             :setButtonsEnabled(false)
             :setOptionIndicatorTouchEnabled(false)
     else
         local prefix  = getLocalizedText(3, "Configuration") .. " "
-        for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+        for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
             options[#options + 1] = {
                 data = i,
                 text = prefix .. i,
@@ -95,14 +100,14 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                     modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                         :setPopUpPanelEnabled(true)
                     WebSocketManager.sendAction({
-                        actionCode           = ActionCodeFunctions.getActionCode("GetSkillConfiguration"),
+                        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
                         skillConfigurationID = i,
                     })
                 end,
             }
         end
         local presetOptions = {}
-        for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
+        for presetName, presetData in pairs(SkillDataAccessors.getSkillPresets()) do
             presetOptions[#presetOptions + 1] = {
                 text = presetName,
                 data = presetName,
@@ -210,7 +215,7 @@ end
 
 local function createJoinableWarList(self, list)
     local warList = {}
-    for sceneWarFileName, configuration in pairs(list) do
+    for sceneWarFileName, configuration in pairs(list or {}) do
         local warFieldFileName = configuration.warFieldFileName
         if (configuration.isRandomWarField) then
             warFieldFileName   = "Random" .. require("res.data.templateWarField." .. warFieldFileName).playersCount .. "P"
@@ -251,10 +256,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:ctor(param)
-    if (self.m_View) then
-        self:initView()
-    end
-
     return self
 end
 
@@ -277,19 +278,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelJoinWarSelector:doActionGetJoinableWarList(action)
-    if ((self.m_View) and (self.m_IsEnabled)) then
-        local warList = createJoinableWarList(self, action.list)
-        if (#warList == 0) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(60))
-        else
-            self.m_View:showWarList(warList)
-        end
-    end
-
-    return self
-end
-
 function ModelJoinWarSelector:doActionJoinWar(action)
     self:setEnabled(false)
     self.m_ModelMainMenu:setMenuEnabled(true)
@@ -305,9 +293,7 @@ function ModelJoinWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        WebSocketManager.sendAction({
-            actionName = "GetJoinableWarList",
-        })
+        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS})
     end
 
     if (self.m_View) then
@@ -337,6 +323,21 @@ function ModelJoinWarSelector:updateWithSkillConfiguration(skillConfiguration, s
     ))
 end
 
+function ModelJoinWarSelector:isRetrievingJoinableWarConfigurations()
+    return (self.m_IsEnabled) and (not getActorWarConfigurator(self):getModel():isEnabled())
+end
+
+function ModelJoinWarSelector:updateWithJoinableWarConfigurations(warConfigurations)
+    local warList = createJoinableWarList(self, warConfigurations)
+    if (#warList == 0) then
+        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(60))
+    elseif (self.m_View) then
+        self.m_View:showWarList(warList)
+    end
+
+    return self
+end
+
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
     if (#editBoxText ~= 4) then
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(59))
@@ -348,7 +349,7 @@ function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
         end
 
         WebSocketManager.sendAction({
-            actionName        = "GetJoinableWarList",
+            actionCode        = ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS,
             sceneWarShortName = editBoxText:lower(),
         })
     end

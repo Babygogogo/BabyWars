@@ -260,10 +260,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelMainMenu:doActionGetJoinableWarList(action)
-    self:getModelJoinWarSelector():doActionGetJoinableWarList(action)
-end
-
 function ModelMainMenu:doActionJoinWar(action)
     self:getModelJoinWarSelector():doActionJoinWar(action)
 end
