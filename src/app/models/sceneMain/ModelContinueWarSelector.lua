@@ -9,13 +9,17 @@
 
 local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
+local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local ModelWeatherManager   = require("src.app.models.sceneWar.ModelWeatherManager")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+
+local ACTION_CODE_GET_ONGOING_WAR_LIST = ActionCodeFunctions.getActionCode("ActionGetOngoingWarList")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -65,33 +69,35 @@ local function resetSelectorFog(modelWarConfigurator, warConfiguration)
 end
 
 local function resetSelectorWeather(modelWarConfigurator, warConfiguration)
-    local weather = warConfiguration.weather
+    local weatherCode = warConfiguration.defaultWeatherCode
     local options = {{
-        data = weather,
-        text = getLocalizedText(40, weather),
+        data = weatherCode,
+        text = getLocalizedText(40, ModelWeatherManager.getWeatherName(weatherCode)),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setOptions(options)
 end
 
 local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguration)
-    local maxSkillPoints = warConfiguration.maxSkillPoints
+    local maxBaseSkillPoints = warConfiguration.maxBaseSkillPoints
     local options = {{
-        data = maxSkillPoints,
-        text = (maxSkillPoints) and ("" .. maxSkillPoints) or (getLocalizedText(3, "Disable")),
+        data = maxBaseSkillPoints,
+        text = (maxBaseSkillPoints)              and
+            ("" .. maxBaseSkillPoints)           or
+            (getLocalizedText(3, "Disable")),
     }}
 
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
 end
 
-local function resetModelWarConfigurator(model, sceneWarFileName, configuration)
+local function resetModelWarConfigurator(model, sceneWarFileName, warConfiguration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
 
-    resetSelectorPlayerIndex(   model, configuration)
-    resetSelectorFog(           model, configuration)
-    resetSelectorWeather(       model, configuration)
-    resetSelectorMaxSkillPoints(model, configuration)
+    resetSelectorPlayerIndex(   model, warConfiguration)
+    resetSelectorFog(           model, warConfiguration)
+    resetSelectorWeather(       model, warConfiguration)
+    resetSelectorMaxSkillPoints(model, warConfiguration)
 end
 
 --------------------------------------------------------------------------------
@@ -162,19 +168,18 @@ local function getActorWarConfigurator(self)
 end
 
 local function createOngoingWarList(self, list)
-    assert(type(list) == "table", "ModelContinueWarSelector-createOngoingWarList() failed to require list data from the server.")
-
     local warList = {}
-    for sceneWarFileName, item in pairs(list) do
-        local configuration    = item.configuration
-        local warFieldFileName = configuration.warFieldFileName
+    for _, item in pairs(list) do
+        local warConfiguration = item.warConfiguration
+        local sceneWarFileName = warConfiguration.sceneWarFileName
+        local warFieldFileName = warConfiguration.warFieldFileName
         warList[#warList + 1] = {
             sceneWarFileName = sceneWarFileName,
             warFieldName     = getWarFieldName(warFieldFileName),
             isInTurn         = item.isInTurn,
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(configuration))
+                    :setPlayerNicknames(getPlayerNicknames(warConfiguration))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)
@@ -182,7 +187,7 @@ local function createOngoingWarList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, configuration)
+                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, warConfiguration)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)
@@ -229,19 +234,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelContinueWarSelector:doActionGetOngoingWarList(action)
-    if ((self.m_View) and (self.m_IsEnabled)) then
-        local warList = createOngoingWarList(self, action.list)
-        if (#warList == 0) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
-        else
-            self.m_View:showWarList(warList)
-        end
-    end
-
-    return self
-end
-
 function ModelContinueWarSelector:doActionGetSceneWarData(action)
     if (self.m_IsEnabled) then
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
@@ -259,9 +251,7 @@ function ModelContinueWarSelector:setEnabled(enabled)
 
     if (enabled) then
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
-        WebSocketManager.sendAction({
-            actionName = "GetOngoingWarList",
-        })
+        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_LIST})
     end
 
     if (self.m_View) then
@@ -273,6 +263,23 @@ function ModelContinueWarSelector:setEnabled(enabled)
 
     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     getActorWarConfigurator(self):getModel():setEnabled(false)
+
+    return self
+end
+
+function ModelContinueWarSelector:isRetrievingOngoingWarList()
+    return self.m_IsEnabled
+end
+
+function ModelContinueWarSelector:updateWithOngoingWarList(list)
+    if ((self.m_View) and (self.m_IsEnabled)) then
+        local warList = createOngoingWarList(self, list)
+        if (#warList == 0) then
+            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+        else
+            self.m_View:showWarList(warList)
+        end
+    end
 
     return self
 end

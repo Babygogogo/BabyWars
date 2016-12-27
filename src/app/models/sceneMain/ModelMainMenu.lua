@@ -133,7 +133,7 @@ local function initItemContinue(self)
         name     = getLocalizedText(1, "Continue"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorContinueWarSelector(self):getModel():setEnabled(true)
+                :getModelContinueWarSelector():setEnabled(true)
         end,
     }
 
@@ -260,12 +260,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelMainMenu:doActionGetOngoingWarList(action)
-    getActorContinueWarSelector(self):getModel():doActionGetOngoingWarList(action)
-
-    return self
-end
-
 function ModelMainMenu:doActionGetSceneWarData(action)
     getActorContinueWarSelector(self):getModel():doActionGetSceneWarData(action)
 
@@ -325,6 +319,10 @@ function ModelMainMenu:onButtonExitTouched()
             cc.Director:getInstance():endToLua()
         end)
         :setEnabled(true)
+end
+
+function ModelMainMenu:getModelContinueWarSelector()
+    return getActorContinueWarSelector(self):getModel()
 end
 
 function ModelMainMenu:getModelJoinWarSelector()

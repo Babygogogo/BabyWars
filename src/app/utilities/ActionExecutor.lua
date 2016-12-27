@@ -377,6 +377,18 @@ local function executeGetJoinableWarConfigurations(action, modelScene)
     end
 end
 
+local function executeGetOngoingWarList(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetOngoingWarList() should not be invoked on the server.")
+    if (modelScene.isModelSceneWar) then
+        return
+    end
+
+    local modelContinueWarSelector = modelScene:getModelMainMenu():getModelContinueWarSelector()
+    if (modelContinueWarSelector:isRetrievingOngoingWarList()) then
+        modelContinueWarSelector:updateWithOngoingWarList(action.ongoingWarList)
+    end
+end
+
 local function executeGetSkillConfiguration(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeGetSkillConfiguration() should not be invoked on the server.")
 
@@ -1420,6 +1432,7 @@ function ActionExecutor.execute(action, modelScene)
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
     if     (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetOngoingWarList)            then executeGetOngoingWarList(           action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinWar)                      then executeJoinWar(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogin)                        then executeLogin(                       action, modelScene)
