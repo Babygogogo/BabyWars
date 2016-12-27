@@ -904,8 +904,20 @@ local s_Texts = {
         [2] = function() return "Join war successfully. Please wait for more players to join." end,
     },
     [56] = {
-        [1] = function(warShortName) return "【" .. warShortName .. '】参战成功。战局已开始，您可以通过"继续"选项进入战局。' end,
-        [2] = function(warShortName) return "Join war [" .. warShortName .. "] successfully. The war has started."      end,
+        [1] = function(textType, additionalText)
+            if     (textType == "JoinWarNotStarted")   then return "该战局尚未开始，请耐心等待更多玩家加入。"
+            elseif (textType == "JoinWarStarted")      then return "该战局已开始，您可以通过[继续]选项进入战局。"
+            elseif (textType == "JoinWarSuccessfully") then return "您已成功参战 [" .. additionalText .. "]。"
+            else                                            return "未知56:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType, additionalText)
+            if     (textType == "JoinWarNotStarted")   then return "The war is not started. Please wait for more players to join."
+            elseif (textType == "JoinWarStarted")      then return "The war is started."
+            elseif (textType == "JoinWarSuccessfully") then return "Join war [" .. additionalText .. "] successfully."
+            else                                            return "Unknown56:" .. (textType or "")
+            end
+        end,
     },
     [57] = {
         [1] = function() return "查 找："   end,
@@ -1167,7 +1179,11 @@ local s_Texts = {
             elseif (errType == "InvalidLogin")                   then return "账号/密码不正确，请检查后重试。"
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
             elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
+            elseif (errType == "InvalidWarPassword")             then return "战局密码不正确，请检查后重试。"
+            elseif (errType == "MultiJoinWar")                   then return "您已参战。"
             elseif (errType == "MultiLogin")                     then return "您的账号[" .. text .. "]在另一台设备上被登陆，您已被迫下线！"
+            elseif (errType == "NotJoinableWar")                 then return "战局可能已经开始，无法参战。请选择其他战局。"
+            elseif (errType == "OccupiedPlayerIndex")            then return "您指定的行动顺序已被其他玩家占用。请使用其他顺序。"
             elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
             elseif (errType == "RegisteredAccount")              then return "该账号已被注册，请使用其他账号。"
@@ -1184,7 +1200,11 @@ local s_Texts = {
             elseif (errType == "InvalidLogin")                   then return "Invalid account/password for login. Please check and retry."
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
             elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidWarPassword")             then return "The war password is invalid. Please check and retry."
+            elseif (errType == "MultiJoinWar")                   then return "You have already joined the war."
             elseif (errType == "MultiLogin")                     then return "Another device is logging in with your account [" .. account .. "], and you're kicked offline!"
+            elseif (errType == "NotJoinableWar")                 then return "The war has begun already. Please join another war."
+            elseif (errType == "OccupiedPlayerIndex")            then return "The player index has been used by another player."
             elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
             elseif (errType == "RegisteredAccount")              then return "The account is registered already. Please use another account."

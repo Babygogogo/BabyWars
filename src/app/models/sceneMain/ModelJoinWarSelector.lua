@@ -15,6 +15,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTION_CODE_GET_SKILL_CONFIGURATION         = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetJoinableWarConfigurations")
+local ACTION_CODE_JOIN_WAR                        = ActionCodeFunctions.getActionCode("ActionJoinWar")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -83,15 +84,15 @@ end
 
 local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
     local options = {{
-        data = 0,
-        text = getLocalizedText(3, "Disable"),
+        data = nil,
+        text = getLocalizedText(3, "None"),
     }}
     if (not warConfiguration.maxBaseSkillPoints) then
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
             :setButtonsEnabled(false)
             :setOptionIndicatorTouchEnabled(false)
     else
-        local prefix  = getLocalizedText(3, "Configuration") .. " "
+        local prefix = getLocalizedText(3, "Configuration") .. " "
         for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
             options[#options + 1] = {
                 data = i,
@@ -100,32 +101,25 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
                     modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                         :setPopUpPanelEnabled(true)
                     WebSocketManager.sendAction({
-                        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
-                        skillConfigurationID = i,
-                    })
+                            actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+                            skillConfigurationID = i,
+                        })
                 end,
             }
         end
-        local presetOptions = {}
-        for presetName, presetData in pairs(SkillDataAccessors.getSkillPresets()) do
-            presetOptions[#presetOptions + 1] = {
-                text = presetName,
-                data = presetName,
+        for i, presetData in pairs(SkillDataAccessors.getSkillPresets()) do
+            options[#options + 1] = {
+                text = presetData.name,
+                data = -i,
                 callbackOnOptionIndicatorTouched = function()
                     local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
                     modelWarConfigurator:setPopUpPanelEnabled(true)
                         :setPopUpPanelText(string.format("%s %s:\n%s",
-                            getLocalizedText(3, "Configuration"), presetName,
+                            getLocalizedText(3, "Configuration"), i,
                             SkillDescriptionFunctions.getBriefDescription(modelSkillConfiguration)
                         ))
                 end,
             }
-        end
-        table.sort(presetOptions, function(option1, option2)
-            return option1.text < option2.text
-        end)
-        for _, presetOption in ipairs(presetOptions) do
-            options[#options + 1] = presetOption
         end
 
         modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
@@ -185,7 +179,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
             modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
-                actionName           = "JoinWar",
+                actionCode           = ACTION_CODE_JOIN_WAR,
                 sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
                 playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
                 skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")      :getCurrentOption(),
@@ -276,17 +270,6 @@ function ModelJoinWarSelector:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelJoinWarSelector:doActionJoinWar(action)
-    self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
-    SingletonGetters.getModelMessageIndicator():showMessage(action.message)
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:setEnabled(enabled)
@@ -336,6 +319,11 @@ function ModelJoinWarSelector:updateWithJoinableWarConfigurations(warConfigurati
     end
 
     return self
+end
+
+function ModelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getSceneWarFileName() == sceneWarFileName)
 end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)

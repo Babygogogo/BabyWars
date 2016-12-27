@@ -21,14 +21,14 @@
 local ModelPlayer = require("src.global.functions.class")("ModelPlayer")
 
 local ModelSkillConfiguration = require("src.app.models.common.ModelSkillConfiguration")
-local GameConstantFunctions   = require("src.app.utilities.GameConstantFunctions")
 local SerializationFunctions  = require("src.app.utilities.SerializationFunctions")
+local SkillDataAccessors      = require("src.app.utilities.SkillDataAccessors")
 local SkillModifierFunctions  = require("src.app.utilities.SkillModifierFunctions")
 
 local round = require("src.global.functions.round")
 
-local DAMAGE_COST_PER_ENERGY_REQUIREMENT = GameConstantFunctions.getDamageCostPerEnergyRequirement()
-local DAMAGE_COST_GROWTH_RATES           = GameConstantFunctions.getDamageCostGrowthRates()
+local DAMAGE_COST_PER_ENERGY_REQUIREMENT = SkillDataAccessors.getDamageCostPerEnergyRequirement()
+local DAMAGE_COST_GROWTH_RATES           = SkillDataAccessors.getDamageCostGrowthRates()
 
 --------------------------------------------------------------------------------
 -- The constructor.

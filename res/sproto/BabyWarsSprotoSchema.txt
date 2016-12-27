@@ -1,31 +1,120 @@
 
 .ActionGeneric {
+    ActionGetSkillConfiguration         1 : ActionGetSkillConfiguration
+    ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
+    ActionJoinWar                       3 : ActionJoinWar
+    ActionLogin                         4 : ActionLogin
+    ActionLogout                        5 : ActionLogout
+    ActionMessage                       6 : ActionMessage
+    ActionNewWar                        7 : ActionNewWar
+    ActionNetworkHeartbeat              8 : ActionNetworkHeartbeat
+    ActionRegister                      9 : ActionRegister
+    ActionSetSkillConfiguration        10 : ActionSetSkillConfiguration
+}
+
+.ActionRedis {
+    actionCode           0 : integer
+    encodedActionGeneric 1 : string
+}
+
+.ActionGetJoinableWarConfigurations {
+    actionCode        0 : integer
+    playerAccount     1 : string
+    playerPassword    2 : string
+    sceneWarShortName 3 : string
+    warConfigurations 4 : *WarConfiguration(sceneWarFileName)
+}
+
+.ActionGetSkillConfiguration {
+    actionCode           0 : integer
+    playerAccount        1 : string
+    playerPassword       2 : string
+    skillConfigurationID 3 : integer
+    skillConfiguration   4 : SingleSkillConfiguration
+}
+
+.ActionJoinWar {
+    actionCode           0 : integer
+    playerAccount        1 : string
+    playerPassword       2 : string
+    sceneWarFileName     3 : string
+    playerIndex          4 : integer
+    skillConfigurationID 5 : integer
+    warPassword          6 : string
+    isWarStarted         7 : boolean
+}
+
+.ActionLogin {
     actionCode    0 : integer
-    encodedAction 1 : string
+    clientVersion 1 : string
+    loginAccount  2 : string
+    loginPassword 3 : string
+}
+
+.ActionLogout {
+    actionCode    0 :  integer
+    messageCode   1 :  integer
+    messageParams 2 : *string
+}
+
+.ActionMessage {
+    actionCode    0 :  integer
+    messageCode   1 :  integer
+    messageParams 2 : *string
+}
+
+.ActionNewWar {
+    actionCode            0 : integer
+    playerAccount         1 : string
+    playerPassword        2 : string
+    sceneWarFileName      3 : string
+    warPassword           4 : string
+    warFieldFileName      5 : string
+    playerIndex           6 : integer
+    skillConfigurationID  7 : integer
+    maxBaseSkillPoints    8 : integer
+    isFogOfWarByDefault   9 : boolean
+    defaultWeatherCode   10 : integer
 }
 
 .ActionNetworkHeartbeat {
-    heartbeatCounter 0 : integer
+    actionCode       0 : integer
+    heartbeatCounter 1 : integer
+}
+
+.ActionRegister {
+    actionCode       0 : integer
+    clientVersion    1 : string
+    registerAccount  2 : string
+    registerPassword 3 : string
+}
+
+.ActionSetSkillConfiguration {
+    actionCode           0 : integer
+    playerAccount        1 : string
+    playerPassword       2 : string
+    skillConfigurationID 3 : integer
+    skillConfiguration   4 : SingleSkillConfiguration
+}
+
+.PlayerInfo {
+    playerIndex 0 : integer
+    account     1 : string
+    nickname    2 : string
+}
+
+.WarConfiguration {
+    sceneWarFileName    0 :  string
+    warFieldFileName    1 :  string
+    warPassword         2 :  string
+    maxBaseSkillPoints  3 :  integer
+    isFogOfWarByDefault 4 :  boolean
+    defaultWeatherCode  5 :  integer
+    isRandomWarField    6 :  boolean
+    players             7 : *PlayerInfo(playerIndex)
 }
 
 .Action {
-    .PlayerInfo {
-        playerIndex 0 : integer
-        account     1 : string
-        nickname    2 : string
-    }
-
-    .WarConfiguration {
-        sceneWarFileName    0 :  string
-        warFieldFileName    1 :  string
-        warPassword         2 :  string
-        maxBaseSkillPoints  3 :  integer
-        isFogOfWarByDefault 4 :  boolean
-        defaultWeatherCode  5 :  integer
-        isRandomWarField    6 :  boolean
-        players             7 : *PlayerInfo(playerIndex)
-    }
-
     actionCode      0 : integer
     playerAccount   1 : string
     playerPassword  2 : string

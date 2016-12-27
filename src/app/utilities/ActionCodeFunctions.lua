@@ -13,6 +13,7 @@ local s_ActionCodes = {
     ActionSetSkillConfiguration        = 7,
     ActionNewWar                       = 8,
     ActionGetJoinableWarConfigurations = 9,
+    ActionJoinWar                      = 10,
 }
 local s_ActionNames
 

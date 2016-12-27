@@ -410,6 +410,24 @@ local function executeGetSceneWarData(action)
     -- The "GetSceneWarData" action is now ignored when a war scene is running. Use the "ReloadSceneWar" action instead.
 end
 
+local function executeJoinWar(action, modelScene)
+    if (IS_SERVER) then
+        SceneWarManager.joinWar(action)
+    else
+        local sceneWarFileName = action.sceneWarFileName
+        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(56, "JoinWarSuccessfully", sceneWarFileName:sub(13)))
+            :showMessage(getLocalizedText(56, (action.isWarStarted) and ("JoinWarStarted") or ("JoinWarNotStarted")))
+        if (not modelScene.isModelSceneWar) then
+            local modelMainMenu        = modelScene:getModelMainMenu()
+            local modelJoinWarSelector = modelMainMenu:getModelJoinWarSelector()
+            if (modelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)) then
+                modelJoinWarSelector:setEnabled(false)
+                modelMainMenu:setMenuEnabled(true)
+            end
+        end
+    end
+end
+
 local function executeLogin(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeLogin() should not be invoked on the server.")
     local account, password = action.loginAccount, action.loginPassword
@@ -1403,6 +1421,7 @@ function ActionExecutor.execute(action, modelScene)
 
     if     (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionJoinWar)                      then executeJoinWar(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogin)                        then executeLogin(                       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogout)                       then executeLogout(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionMessage)                      then executeMessage(                     action, modelScene)

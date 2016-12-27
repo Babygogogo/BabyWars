@@ -32,10 +32,6 @@ local string           = string
 --------------------------------------------------------------------------------
 -- The functions for doing actions.
 --------------------------------------------------------------------------------
-local function doActionJoinWar(self, action)
-    self.m_ActorMainMenu:getModel():doActionJoinWar(action)
-end
-
 local function doActionGetOngoingWarList(self, action)
     self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
 end
@@ -65,7 +61,6 @@ local function onWebSocketMessage(self, param)
 
     --[[
     if     (action.fileName)                       then return
-    elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
     elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, action)
     elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
     elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
