@@ -258,15 +258,6 @@ function ModelMainMenu:initView()
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelMainMenu:doActionGetSceneWarData(action)
-    getActorContinueWarSelector(self):getModel():doActionGetSceneWarData(action)
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMainMenu:setEnabled(enabled)

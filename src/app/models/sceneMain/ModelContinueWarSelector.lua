@@ -20,6 +20,7 @@ local ActorManager          = require("src.global.actors.ActorManager")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTION_CODE_GET_ONGOING_WAR_LIST = ActionCodeFunctions.getActionCode("ActionGetOngoingWarList")
+local ACTION_CODE_RUN_SCENE_WAR        = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -133,8 +134,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
         modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
-            actionName = "GetSceneWarData",
-            fileName   = modelWarConfigurator:getSceneWarFileName(),
+            actionCode       = ACTION_CODE_RUN_SCENE_WAR,
+            sceneWarFileName = modelWarConfigurator:getSceneWarFileName(),
         })
     end)
 end
@@ -232,18 +233,6 @@ function ModelContinueWarSelector:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelContinueWarSelector:doActionGetSceneWarData(action)
-    if (self.m_IsEnabled) then
-        local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
-        ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:setEnabled(enabled)
@@ -282,6 +271,15 @@ function ModelContinueWarSelector:updateWithOngoingWarList(list)
     end
 
     return self
+end
+
+function ModelContinueWarSelector:isRetrievingOngoingWarData()
+    return self.m_IsEnabled
+end
+
+function ModelContinueWarSelector:updateWithOngoingWarData(warData)
+    local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", warData, "sceneWar.ViewSceneWar")
+    ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
 end
 
 function ModelContinueWarSelector:onButtonBackTouched()

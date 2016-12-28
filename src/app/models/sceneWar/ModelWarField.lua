@@ -49,7 +49,7 @@ end
 --------------------------------------------------------------------------------
 local function initActorFogMap(self, fogMapData, isTotalReplay)
     local modelFogMap = Actor.createModel("sceneWar.ModelFogMap", fogMapData, self.m_WarFieldFileName, isTotalReplay)
-    local actor       = (IS_SERVER)                                                                  and
+    local actor       = ((IS_SERVER) or (not isTotalReplay))                                         and
         (Actor.createWithModelAndViewInstance(modelFogMap))                                          or
         (Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap")))
 

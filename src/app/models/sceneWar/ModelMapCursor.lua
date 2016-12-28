@@ -178,7 +178,7 @@ end
 --------------------------------------------------------------------------------
 function ModelMapCursor:ctor(param)
     if (not ComponentManager:getComponent(self, "GridIndexable")) then
-        ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {gridIndex = param.gridIndex or {x = 1, y = 1}}})
+        ComponentManager.bindComponent(self, "GridIndexable", {instantialData = {x = 1, y = 1}})
     end
 
     self.m_MapSize = {

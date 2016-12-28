@@ -519,6 +519,16 @@ local function executeRegister(action, modelScene)
     end
 end
 
+local function executeRunSceneWar(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeRunSceneWar() this shouldn't be invoked on the server.")
+    if (not modelScene.isModelSceneWar) then
+        local modelContinueWarSelector = modelScene:getModelMainMenu():getModelContinueWarSelector()
+        if (modelContinueWarSelector:isRetrievingOngoingWarData()) then
+            modelContinueWarSelector:updateWithOngoingWarData(action.warData)
+        end
+    end
+end
+
 local function executeSetSkillConfiguration(action, modelScene)
     if (IS_SERVER) then
         PlayerProfileManager.setSkillConfiguration(action.playerAccount, action.skillConfigurationID, action.skillConfiguration)
@@ -1440,6 +1450,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionMessage)                      then executeMessage(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionNewWar)                       then executeNewWar(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRegister)                     then executeRegister(                    action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end

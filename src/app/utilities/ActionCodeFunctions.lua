@@ -15,6 +15,7 @@ local s_ActionCodes = {
     ActionGetJoinableWarConfigurations = 9,
     ActionJoinWar                      = 10,
     ActionGetOngoingWarList            = 11,
+    ActionRunSceneWar                  = 12,
 }
 local s_ActionNames
 

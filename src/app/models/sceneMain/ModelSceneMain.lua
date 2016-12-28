@@ -30,13 +30,6 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 local string           = string
 
 --------------------------------------------------------------------------------
--- The functions for doing actions.
---------------------------------------------------------------------------------
-local function doActionGetSceneWarData(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
-end
-
---------------------------------------------------------------------------------
 -- The private callback function on web socket events.
 --------------------------------------------------------------------------------
 local function onWebSocketOpen(self, param)
@@ -54,14 +47,6 @@ local function onWebSocketMessage(self, param)
     print(SerializationFunctions.toString(param.action))
 
     ActionExecutor.execute(param.action, self)
-
-    --[[
-    if     (action.fileName)                       then return
-    elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
-    elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
-    else                                                ActionExecutor.execute(action, self)
-    end
-    --]]
 end
 
 local function onWebSocketClose(self, param)
