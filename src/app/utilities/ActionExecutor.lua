@@ -332,6 +332,15 @@ local function callbackOnWarEndedForClient()
     runSceneMain(getLoggedInAccountAndPassword() ~= nil)
 end
 
+local function cleanupOnFinishExecutingOnClient(modelSceneWar)
+    assert(not IS_SERVER, "ActionExecutor-cleanupOnFinishExecutingOnClient() this shouldn't be invoked on the server.")
+    getModelMessageIndicator(modelSceneWar):hidePersistentMessage(getLocalizedText(80, "TransferingData"))
+    getScriptEventDispatcher(modelSceneWar):dispatchEvent({
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = false,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- The executors for non-war actions.
 --------------------------------------------------------------------------------
@@ -416,10 +425,6 @@ local function executeGetSceneWarActionId(action)
     elseif (actionID > getModelScene():getActionId()) then
         requestReloadSceneWar(getLocalizedText(81, "OutOfSync"))
     end
-end
-
-local function executeGetSceneWarData(action)
-    -- The "GetSceneWarData" action is now ignored when a war scene is running. Use the "ReloadSceneWar" action instead.
 end
 
 local function executeJoinWar(action, modelScene)
@@ -537,21 +542,26 @@ local function executeSetSkillConfiguration(action, modelScene)
     end
 end
 
-local function executeReloadSceneWar(action)
+local function executeReloadSceneWar(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeReloadSceneWar() should not be invoked on the server.")
-    if (action.data.actionID >= getModelScene():getActionId()) then
-        if (action.message) then
-            getModelMessageIndicator():showPersistentMessage(action.message)
+
+    local warData = action.warData
+    if ((modelScene.isModelSceneWar)                           and
+        (modelScene:getFileName() == warData.sceneWarFileName) and
+        (modelScene:getActionId() <= warData.actionID))        then
+        if (action.messageCode) then
+            getModelMessageIndicator(modelScene):showPersistentMessage(getLocalizedText(action.messageCode, action.messageParams))
         end
 
-        local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", action.data, "sceneWar.ViewSceneWar")
+        local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", warData, "sceneWar.ViewSceneWar")
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
 end
 
 local function executeRunSceneMain(action)
     assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
-    runSceneMain(getLoggedInAccountAndPassword() ~= nil, action.message)
+    local message = (action.messageCode) and (getLocalizedText(action.messageCode, action.messageParams)) or (nil)
+    runSceneMain(getLoggedInAccountAndPassword() ~= nil, message)
 end
 
 --------------------------------------------------------------------------------
@@ -738,12 +748,16 @@ local function executeAttack(action)
     end
 end
 
-local function executeBeginTurn(action)
-    local sceneWarFileName   = action.fileName
-    local modelSceneWar      = getModelScene(sceneWarFileName)
-    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+local function executeBeginTurn(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+
+    local sceneWarFileName   = action.sceneWarFileName
+    local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
-    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+    local modelPlayerManager = getModelPlayerManager(modelSceneWar)
 
     if (IS_SERVER) then
         if (not lostPlayerIndex) then
@@ -770,7 +784,7 @@ local function executeBeginTurn(action)
             local isLoggedInPlayerLost = lostModelPlayer:getAccount() == getLoggedInAccountAndPassword()
             modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
             modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
-                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
 
                 if (isLoggedInPlayerLost) then
@@ -783,6 +797,7 @@ local function executeBeginTurn(action)
                 modelSceneWar:setExecutingAction(false)
             end)
         end
+        cleanupOnFinishExecutingOnClient(modelSceneWar)
     end
 end
 
@@ -1450,8 +1465,11 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionMessage)                      then executeMessage(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionNewWar)                       then executeNewWar(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRegister)                     then executeRegister(                    action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionReloadSceneWar)               then executeReloadSceneWar(              action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionRunSceneMain)                 then executeRunSceneMain(                action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
@@ -1462,15 +1480,11 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "Error")               then executeError(              action)
         elseif (actionName == "GetReplayList")       then executeGetReplayList(      action)
         elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
-        elseif (actionName == "GetSceneWarData")     then executeGetSceneWarData(    action)
-        elseif (actionName == "ReloadSceneWar")      then executeReloadSceneWar(     action)
-        elseif (actionName == "RunSceneMain")        then executeRunSceneMain(       action)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
         if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
         elseif (actionName == "Attack")                 then executeAttack(                action)
-        elseif (actionName == "BeginTurn")              then executeBeginTurn(             action)
         elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
         elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
         elseif (actionName == "Dive")                   then executeDive(                  action)

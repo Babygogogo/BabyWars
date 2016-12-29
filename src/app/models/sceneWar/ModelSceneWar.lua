@@ -22,11 +22,13 @@
 
 local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
 
-local ActionExecutor        = require("src.app.utilities.ActionExecutor")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
-local Actor                 = require("src.global.actors.Actor")
-local EventDispatcher       = require("src.global.events.EventDispatcher")
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
+local ActionExecutor         = require("src.app.utilities.ActionExecutor")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
+local Actor                  = require("src.global.actors.Actor")
+local EventDispatcher        = require("src.global.events.EventDispatcher")
 
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
@@ -59,7 +61,14 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
+    local actionCode = param.action.actionCode
+    print(string.format("ModelSceneWar-onWebSocketMessage() code: %d  name: %s  length: %d",
+        actionCode,
+        ActionCodeFunctions.getActionName(actionCode),
+        string.len(param.message))
+    )
+    print(SerializationFunctions.toString(param.action))
+
     self:executeAction(param.action)
 end
 
@@ -300,7 +309,9 @@ function ModelSceneWar:executeAction(action)
         ActionExecutor.execute(action, self)
 
         if (self.m_ExecutedActions) then
-            self.m_ExecutedActions[actionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+            self.m_ExecutedActions[actionID] = {
+                [ActionCodeFunctions.getActionName(action.actionCode)] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+            }
         end
 
     elseif (not sceneWarFileName) then

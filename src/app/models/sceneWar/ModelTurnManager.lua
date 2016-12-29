@@ -20,6 +20,7 @@
 local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
 local IS_SERVER             = require("src.app.utilities.GameConstantFunctions").isServer()
+local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
 local Destroyers            = require("src.app.utilities.Destroyers")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
@@ -44,6 +45,7 @@ local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 
+local ACTION_CODE_BEGIN_TURN = ActionCodeFunctions.getActionCode("ActionBeginTurn")
 local TURN_PHASE_CODES = {
     RequestToBegin                    = 1,
     Beginning                         = 2,
@@ -58,7 +60,6 @@ local TURN_PHASE_CODES = {
     ResetSkillState                   = 11,
     ResetVisionForBeginningTurnPlayer = 12,
 }
-
 local DEFAULT_TURN_DATA = {
     turnIndex     = 1,
     playerIndex   = 1,
@@ -362,7 +363,7 @@ end
 local function runTurnPhaseRequestToBegin(self)
     if ((not IS_SERVER) and (not isTotalReplay()) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
         WebSocketManager.sendAction({
-            actionName       = "BeginTurn",
+            actionCode       = ACTION_CODE_BEGIN_TURN,
             actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
             sceneWarFileName = self.m_SceneWarFileName,
         })

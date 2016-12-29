@@ -16,6 +16,9 @@ local s_ActionCodes = {
     ActionJoinWar                      = 10,
     ActionGetOngoingWarList            = 11,
     ActionRunSceneWar                  = 12,
+    ActionRunSceneMain                 = 13,
+    ActionReloadSceneWar               = 14,
+    ActionBeginTurn                    = 15,
 }
 local s_ActionNames
 
