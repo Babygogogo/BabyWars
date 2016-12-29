@@ -21,6 +21,7 @@ local s_ActionCodes = {
     ActionSyncSceneWar                 = 15,
     ActionBeginTurn                    = 16,
     ActionEndTurn                      = 17,
+    ActionWait                         = 18,
 }
 local s_ActionNames
 

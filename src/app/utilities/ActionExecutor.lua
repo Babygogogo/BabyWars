@@ -73,22 +73,6 @@ local function runSceneMain(isPlayerLoggedIn, confirmText)
     ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneMain, viewSceneMain), "FADE", 1)
 end
 
-local function requestReloadSceneWar(message)
-    assert(not IS_SERVER, "ActionExecutor-requestReloadSceneWar() the server shouldn't request reload.")
-
-    getModelMessageIndicator():showMessage(message or "")
-        :showPersistentMessage(getLocalizedText(80, "TransferingData"))
-    getScriptEventDispatcher():dispatchEvent({
-        name    = "EvtIsWaitingForServerResponse",
-        waiting = true,
-    })
-
-    WebSocketManager.sendAction({
-        actionName = "ReloadSceneWar",
-        fileName   = getSceneWarFileName(),
-    })
-end
-
 local function isModelUnitDiving(modelUnit)
     return (modelUnit.isDiving) and (modelUnit:isDiving())
 end
@@ -214,8 +198,9 @@ end
 
 local function moveModelUnitWithAction(action)
     local path               = action.path
-    local sceneWarFileName   = action.fileName
-    local beginningGridIndex = path[1]
+    local pathNodes          = path.pathNodes
+    local sceneWarFileName   = action.sceneWarFileName
+    local beginningGridIndex = pathNodes[1]
     local modelFogMap        = getModelFogMap(sceneWarFileName)
     local modelUnitMap       = getModelUnitMap(sceneWarFileName)
     local launchUnitID       = action.launchUnitID
@@ -223,16 +208,16 @@ local function moveModelUnitWithAction(action)
     local playerIndex        = focusModelUnit:getPlayerIndex()
     local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(sceneWarFileName)) or (playerIndex == getPlayerIndexLoggedIn())
     if (shouldUpdateFogMap) then
-        modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, path)
+        modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, pathNodes)
     end
 
-    local pathLength = #path
+    local pathLength = #pathNodes
     if (pathLength <= 1) then
         return
     end
 
     local actionName         = action.actionName
-    local endingGridIndex    = path[pathLength]
+    local endingGridIndex    = pathNodes[pathLength]
     if (focusModelUnit.setCapturingModelTile) then
         focusModelUnit:setCapturingModelTile(false)
     end
@@ -1419,12 +1404,17 @@ local function executeTickActionId(action)
     getModelScene():setExecutingAction(false)
 end
 
-local function executeWait(action)
+local function executeWait(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action)
 
-    local sceneWarFileName = action.fileName
+    local sceneWarFileName = action.sceneWarFileName
     local path             = action.path
-    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
+    local pathNodes        = path.pathNodes
+    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(pathNodes[1], action.launchUnitID)
     moveModelUnitWithAction(action)
     focusModelUnit:setStateActioned()
 
@@ -1432,18 +1422,19 @@ local function executeWait(action)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
             updateTileAndUnitMapOnVisibilityChanged()
 
             if (path.isBlocked) then
-                getModelGridEffect():showAnimationBlock(path[#path])
+                getModelGridEffect():showAnimationBlock(pathNodes[#pathNodes])
             end
 
             modelSceneWar:setExecutingAction(false)
         end)
+        cleanupOnFinishExecutingOnClient(modelSceneWar)
     end
 end
 
@@ -1470,6 +1461,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSyncSceneWar)                 then executeSyncSceneWar(                action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
@@ -1497,7 +1489,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "Surface")                then executeSurface(               action)
         elseif (actionName == "Surrender")              then executeSurrender(             action)
         elseif (actionName == "TickActionId")           then executeTickActionId(          action)
-        elseif (actionName == "Wait")                   then executeWait(                  action)
         end
 
         if (not IS_SERVER) then

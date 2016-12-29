@@ -20,8 +20,12 @@ local function getModelScene(param)
         else                        error("SingletonGetters-getModelScene() invalid param type on the server: " .. t)
         end
     else
-        if   (t == "table")  then return param
-        else                      return getRootActor():getModel()
+        if (t == "table") then
+            return param
+        else
+            local modelScene = getRootActor():getModel()
+            assert((not param) or (param == modelScene:getFileName()), "SingletonGetters-getModelScene() invalid param on the client.")
+            return modelScene
         end
     end
 end

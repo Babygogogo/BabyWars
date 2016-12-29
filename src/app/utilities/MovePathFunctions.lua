@@ -15,27 +15,21 @@ local MovePathFunctions = {}
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local ReachableAreaFunctions = require("src.app.utilities.ReachableAreaFunctions")
 
-function MovePathFunctions.createReversedPath(path)
-    local newPath, length = {}, #path
+--------------------------------------------------------------------------------
+-- The private functions.
+--------------------------------------------------------------------------------
+local function createReversedPathNodes(pathNodes)
+    local reversedPathNodes, length = {}, #pathNodes
     for i = 1, length do
-        newPath[i] = path[length - i + 1]
+        reversedPathNodes[i] = pathNodes[length - i + 1]
     end
 
-    return newPath
+    return reversedPathNodes
 end
 
-function MovePathFunctions.createPathForDispatch(path)
-    local newPath = {}
-    for i, node in ipairs(path) do
-        newPath[i] = path[i].gridIndex
-    end
-
-    return newPath
-end
-
-function MovePathFunctions.hasGridIndex(path, gridIndex)
-    for i, pathNode in ipairs(path) do
-        if (GridIndexFunctions.isEqual(gridIndex, pathNode.gridIndex)) then
+local function hasGridIndexInPathNodes(pathNodes, gridIndex)
+    for i, node in ipairs(pathNodes) do
+        if (GridIndexFunctions.isEqual(gridIndex, node)) then
             return true, i
         end
     end
@@ -43,30 +37,45 @@ function MovePathFunctions.hasGridIndex(path, gridIndex)
     return false
 end
 
-function MovePathFunctions.truncateToGridIndex(path, gridIndex)
-    local hasGridIndex, index = MovePathFunctions.hasGridIndex(path, gridIndex)
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function MovePathFunctions.createPathForDispatch(pathNodes)
+    local newPathNodes = {}
+    for i, node in ipairs(pathNodes) do
+        newPathNodes[i] = {
+            x = node.x,
+            y = node.y,
+        }
+    end
+
+    return {pathNodes = newPathNodes}
+end
+
+function MovePathFunctions.truncateToGridIndex(pathNodes, gridIndex)
+    local hasGridIndex, index = hasGridIndexInPathNodes(pathNodes, gridIndex)
     if (not hasGridIndex) then
         return false
     else
-        for i = index + 1, #path do
-            path[i] = nil
+        for i = index + 1, #pathNodes do
+            pathNodes[i] = nil
         end
 
         return true
     end
 end
 
-function MovePathFunctions.extendToGridIndex(path, gridIndex, nextMoveCost, maxMoveCost)
-    local length = #path
-    local totalMoveCost = path[length].totalMoveCost + nextMoveCost
-
-    if ((totalMoveCost > maxMoveCost) or
-        (not GridIndexFunctions.isAdjacent(path[length].gridIndex, gridIndex)) or
-        (MovePathFunctions.hasGridIndex(path, gridIndex))) then
+function MovePathFunctions.extendToGridIndex(pathNodes, gridIndex, nextMoveCost, maxMoveCost)
+    local length        = #pathNodes
+    local totalMoveCost = pathNodes[length].totalMoveCost + nextMoveCost
+    if ((totalMoveCost > maxMoveCost)                                     or
+        (not GridIndexFunctions.isAdjacent(pathNodes[length], gridIndex)) or
+        (hasGridIndexInPathNodes(pathNodes, gridIndex)))                  then
         return false
     else
-        path[length + 1] = {
-            gridIndex     = GridIndexFunctions.clone(gridIndex),
+        pathNodes[length + 1] = {
+            x             = gridIndex.x,
+            y             = gridIndex.y,
             totalMoveCost = totalMoveCost,
         }
 
@@ -78,18 +87,19 @@ function MovePathFunctions.createShortestPath(destination, reachableArea)
     local areaNode = ReachableAreaFunctions.getAreaNode(reachableArea, destination)
     assert(areaNode, "MovePathFunctions.createShortestPath() the destination is not reachable.")
 
-    local reversedPath, gridIndex = {}, destination
+    local reversedPathNodes, gridIndex = {}, destination
     while (areaNode) do
-        reversedPath[#reversedPath + 1] = {
-            gridIndex     = GridIndexFunctions.clone(gridIndex),
-            totalMoveCost = areaNode.totalMoveCost
+        reversedPathNodes[#reversedPathNodes + 1] = {
+            x             = gridIndex.x,
+            y             = gridIndex.y,
+            totalMoveCost = areaNode.totalMoveCost,
         }
 
         gridIndex = areaNode.prevGridIndex
         areaNode  = ReachableAreaFunctions.getAreaNode(reachableArea, gridIndex)
     end
 
-    return MovePathFunctions.createReversedPath(reversedPath)
+    return createReversedPathNodes(reversedPathNodes)
 end
 
 return MovePathFunctions

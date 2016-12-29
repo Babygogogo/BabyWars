@@ -54,13 +54,13 @@ function AttackableGridListFunctions.getListNode(list, gridIndex)
     return nil
 end
 
-function AttackableGridListFunctions.createList(movePath, launchUnitID)
+function AttackableGridListFunctions.createList(pathNodes, launchUnitID)
     local modelSceneWar = ActorManager.getRootActor():getModel()
     local modelWarField = modelSceneWar:getModelWarField()
     local modelUnitMap  = modelWarField:getModelUnitMap()
-    local attacker      = modelUnitMap:getFocusModelUnit(movePath[1], launchUnitID)
+    local attacker      = modelUnitMap:getFocusModelUnit(pathNodes[1], launchUnitID)
     if ((not attacker.canAttackAfterMove)                          or
-        ((not attacker:canAttackAfterMove()) and (#movePath > 1))) then
+        ((not attacker:canAttackAfterMove()) and (#pathNodes > 1))) then
         return {}
     end
 
@@ -68,13 +68,13 @@ function AttackableGridListFunctions.createList(movePath, launchUnitID)
     local mapSize            = modelTileMap:getMapSize()
     local minRange, maxRange = attacker:getAttackRangeMinMax()
     return GridIndexFunctions.getGridsWithinDistance(
-        movePath[#movePath],
+        pathNodes[#pathNodes],
         minRange,
         maxRange,
         mapSize,
         function(targetGridIndex)
             targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage =
-                DamageCalculator.getEstimatedBattleDamage(movePath, launchUnitID, targetGridIndex, modelSceneWar)
+                DamageCalculator.getEstimatedBattleDamage(pathNodes, launchUnitID, targetGridIndex, modelSceneWar)
 
             return targetGridIndex.estimatedAttackDamage ~= nil
         end
