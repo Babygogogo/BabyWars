@@ -355,11 +355,6 @@ local function executeDownloadReplayData(action)
     modelScene:getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
 end
 
-local function executeError(action)
-    assert(not IS_SERVER, "ActionExecutor-executeError() should not be invoked on the server.")
-    error("ActionExecutor-executeError() " .. (action.error or ""))
-end
-
 local function executeGetReplayList(action)
     assert(not IS_SERVER, "ActionExecutor-executeGetReplayList() should not be invoked on the server.")
     local modelScene = getModelScene()
@@ -414,16 +409,6 @@ local function executeGetSkillConfiguration(action, modelScene)
         modelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
     elseif (modelJoinWarSelector:isRetrievingSkillConfiguration(skillConfigurationID)) then
         modelJoinWarSelector:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
-    end
-end
-
-local function executeGetSceneWarActionId(action)
-    assert(not IS_SERVER, "ActionExecutor-executeGetSceneWarActionId() should not be invoked on the server.")
-    local actionID = action.sceneWarActionID
-    if (not actionID) then
-        runSceneMain(getLoggedInAccountAndPassword() ~= nil, getLocalizedText(81, "InvalidWarFileName"))
-    elseif (actionID > getModelScene():getActionId()) then
-        requestReloadSceneWar(getLocalizedText(81, "OutOfSync"))
     end
 end
 
@@ -534,14 +519,6 @@ local function executeRunSceneWar(action, modelScene)
     end
 end
 
-local function executeSetSkillConfiguration(action, modelScene)
-    if (IS_SERVER) then
-        PlayerProfileManager.setSkillConfiguration(action.playerAccount, action.skillConfigurationID, action.skillConfiguration)
-    else
-        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(81, "SucceedToSetSkillConfiguration"))
-    end
-end
-
 local function executeReloadSceneWar(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeReloadSceneWar() should not be invoked on the server.")
 
@@ -562,6 +539,19 @@ local function executeRunSceneMain(action)
     assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
     local message = (action.messageCode) and (getLocalizedText(action.messageCode, action.messageParams)) or (nil)
     runSceneMain(getLoggedInAccountAndPassword() ~= nil, message)
+end
+
+local function executeSetSkillConfiguration(action, modelScene)
+    if (IS_SERVER) then
+        PlayerProfileManager.setSkillConfiguration(action.playerAccount, action.skillConfigurationID, action.skillConfiguration)
+    else
+        modelScene:getModelMessageIndicator():showMessage(getLocalizedText(81, "SucceedToSetSkillConfiguration"))
+    end
+end
+
+local function executeSyncSceneWar(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeSyncSceneWar() should not be invoked on the server.")
+    -- Nothing to do.
 end
 
 --------------------------------------------------------------------------------
@@ -1477,6 +1467,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneMain)                 then executeRunSceneMain(                action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSyncSceneWar)                 then executeSyncSceneWar(                action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
@@ -1486,9 +1477,7 @@ function ActionExecutor.execute(action, modelScene)
     local actionName = action.actionName
     if (not action.actionID) then
         if     (actionName == "DownloadReplayData")  then executeDownloadReplayData( action)
-        elseif (actionName == "Error")               then executeError(              action)
         elseif (actionName == "GetReplayList")       then executeGetReplayList(      action)
-        elseif (actionName == "GetSceneWarActionId") then executeGetSceneWarActionId(action)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)

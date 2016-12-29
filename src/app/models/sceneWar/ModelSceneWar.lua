@@ -53,7 +53,8 @@ local function onWebSocketOpen(self, param)
             modelTurnManager:runTurn()
         else
             WebSocketManager.sendAction({
-                actionName       = "GetSceneWarActionId",
+                actionCode       = ActionCodeFunctions.getActionCode("ActionSyncSceneWar"),
+                actionID         = self:getActionId(),
                 sceneWarFileName = self:getFileName(),
             })
         end

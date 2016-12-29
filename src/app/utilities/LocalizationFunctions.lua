@@ -1172,7 +1172,8 @@ local s_Texts = {
     [81] = {
         [1] = function(errType, text)
             text = (text) and ("" .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
+            if     (errType == "AutoSyncWar")                    then return "检测到数据不同步，正在自动重新载入。"
+            elseif (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
             elseif (errType == "DefeatedPlayer")                 then return "您在该战局中已被打败，无法再次进入。"
             elseif (errType == "EndedWar")                       then return "该战局已结束，无法再次进入。"
             elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
@@ -1195,7 +1196,8 @@ local s_Texts = {
         end,
         [2] = function(errType, text)
             text = (text) and ("" .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
+            if     (errType == "AutoSyncWar")                    then return "The war is out-of-sync. Now synchronizing."
+            elseif (errType == "CorruptedAction")                then return "Data transfer error." .. text
             elseif (errType == "DefeatedPlayer")                 then return "You have been defeated in the war."
             elseif (errType == "EndedWar")                       then return "The war is ended."
             elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
