@@ -1039,10 +1039,18 @@ local function executeDropModelUnit(action)
     end
 end
 
-local function executeEndTurn(action)
-    local sceneWarFileName = action.fileName
-    getModelTurnManager(sceneWarFileName):endTurnPhaseMain()
-    getModelScene(sceneWarFileName):setExecutingAction(false)
+local function executeEndTurn(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+
+    getModelTurnManager(modelSceneWar):endTurnPhaseMain()
+    modelSceneWar:setExecutingAction(false)
+
+    if (not IS_SERVER) then
+        cleanupOnFinishExecutingOnClient(modelSceneWar)
+    end
 end
 
 local function executeJoinModelUnit(action)
@@ -1470,6 +1478,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
@@ -1489,7 +1498,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
         elseif (actionName == "Dive")                   then executeDive(                  action)
         elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
-        elseif (actionName == "EndTurn")                then executeEndTurn(               action)
         elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
         elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
         elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)

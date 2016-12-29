@@ -19,6 +19,7 @@ local s_ActionCodes = {
     ActionRunSceneMain                 = 13,
     ActionReloadSceneWar               = 14,
     ActionBeginTurn                    = 15,
+    ActionEndTurn                      = 16,
 }
 local s_ActionNames
 

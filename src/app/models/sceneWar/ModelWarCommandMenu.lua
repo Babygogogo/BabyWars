@@ -18,6 +18,7 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
@@ -43,6 +44,9 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
+
+local ACTION_CODE_END_TURN         = ActionCodeFunctions.getActionCode("ActionEndTurn")
+local ACTION_CODE_RELOAD_SCENE_WAR = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -314,13 +318,13 @@ local function sendActionSurrender()
 end
 
 local function sendActionEndTurn()
-    createAndSendAction({actionName = "EndTurn"}, true)
+    createAndSendAction({actionCode = ACTION_CODE_END_TURN}, true)
 end
 
 local function sendActionReloadSceneWar()
     createAndSendAction({
-        actionName = "ReloadSceneWar",
-        fileName   = getSceneWarFileName(),
+        actionCode       = ACTION_CODE_RELOAD_SCENE_WAR,
+        sceneWarFileName = getSceneWarFileName(),
     }, false)
 end
 
