@@ -157,14 +157,14 @@ local function updateModelTilesWithTilesData(tilesData)
     end
 end
 
-local function updateTileAndUnitMapOnVisibilityChanged()
+local function updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
     assert(not IS_SERVER, "ActionExecutor-updateTileAndUnitMapOnVisibilityChanged() this shouldn't be called on the server.")
-    if (isTotalReplay()) then
-        getModelFogMap():updateView()
+    if (modelSceneWar:isTotalReplay()) then
+        getModelFogMap(modelSceneWar):updateView()
     else
-        local sceneWarFileName = getSceneWarFileName()
-        local playerIndex      = getPlayerIndexLoggedIn()
-        getModelTileMap():forEachModelTile(function(modelTile)
+        local sceneWarFileName = modelSceneWar:getFileName()
+        local playerIndex      = getPlayerIndexLoggedIn(modelSceneWar)
+        getModelTileMap(modelSceneWar):forEachModelTile(function(modelTile)
             if (isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
                 modelTile:updateAsFogDisabled()
             else
@@ -172,7 +172,7 @@ local function updateTileAndUnitMapOnVisibilityChanged()
             end
             modelTile:updateView()
         end)
-        getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(function(modelUnit)
             local gridIndex = modelUnit:getGridIndex()
             if (isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
                 modelUnit:setViewVisible(true)
@@ -196,17 +196,16 @@ local function updateTilesAndUnitsBeforeExecutingAction(action)
     end
 end
 
-local function moveModelUnitWithAction(action)
+local function moveModelUnitWithAction(action, modelSceneWar)
     local path               = action.path
     local pathNodes          = path.pathNodes
-    local sceneWarFileName   = action.sceneWarFileName
     local beginningGridIndex = pathNodes[1]
-    local modelFogMap        = getModelFogMap(sceneWarFileName)
-    local modelUnitMap       = getModelUnitMap(sceneWarFileName)
+    local modelFogMap        = getModelFogMap(modelSceneWar)
+    local modelUnitMap       = getModelUnitMap(modelSceneWar)
     local launchUnitID       = action.launchUnitID
     local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     local playerIndex        = focusModelUnit:getPlayerIndex()
-    local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(sceneWarFileName)) or (playerIndex == getPlayerIndexLoggedIn())
+    local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn())
     if (shouldUpdateFogMap) then
         modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, pathNodes)
     end
@@ -216,8 +215,8 @@ local function moveModelUnitWithAction(action)
         return
     end
 
-    local actionName         = action.actionName
-    local endingGridIndex    = pathNodes[pathLength]
+    local actionCode      = action.actionCode
+    local endingGridIndex = pathNodes[pathLength]
     if (focusModelUnit.setCapturingModelTile) then
         focusModelUnit:setCapturingModelTile(false)
     end
@@ -236,7 +235,7 @@ local function moveModelUnitWithAction(action)
         modelFogMap:updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, beginningGridIndex, focusModelUnit:getVisionForPlayerIndex(playerIndex))
     end
     focusModelUnit:setGridIndex(endingGridIndex, false)
-    if ((shouldUpdateFogMap) and (actionName ~= "LoadModelUnit")) then
+    if ((shouldUpdateFogMap) and (actionCode ~= ACTION_CODES.ActionLoadModelUnit)) then
         modelFogMap:updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, endingGridIndex, focusModelUnit:getVisionForPlayerIndex(playerIndex))
     end
 
@@ -250,17 +249,17 @@ local function moveModelUnitWithAction(action)
             assert(not IS_SERVER, "ActionExecutor-moveModelUnitWithAction() failed to get the loader for the launching unit, on the server.")
         end
 
-        if (actionName ~= "LoadModelUnit") then
+        if (actionCode ~= ACTION_CODES.ActionLoadModelUnit) then
             modelUnitMap:setActorUnitUnloaded(launchUnitID, endingGridIndex)
         end
     else
-        if (actionName == "LoadModelUnit") then
+        if (actionCode == ACTION_CODES.ActionLoadModelUnit) then
             modelUnitMap:setActorUnitLoaded(beginningGridIndex)
         else
             modelUnitMap:swapActorUnit(beginningGridIndex, endingGridIndex)
         end
 
-        local modelTile = getModelTileMap(sceneWarFileName):getModelTile(beginningGridIndex)
+        local modelTile = getModelTileMap(modelSceneWar):getModelTile(beginningGridIndex)
         if (modelTile.setCurrentBuildPoint) then
             modelTile:setCurrentBuildPoint(modelTile:getMaxBuildPoint())
         end
@@ -317,8 +316,10 @@ local function callbackOnWarEndedForClient()
     runSceneMain(getLoggedInAccountAndPassword() ~= nil)
 end
 
-local function cleanupOnFinishExecutingOnClient(modelSceneWar)
-    assert(not IS_SERVER, "ActionExecutor-cleanupOnFinishExecutingOnClient() this shouldn't be invoked on the server.")
+local function cleanupOnReceivingResponseFromServer(modelSceneWar)
+    assert(not IS_SERVER, "ActionExecutor-cleanupOnReceivingResponseFromServer() this shouldn't be invoked on the server.")
+    assert(not modelSceneWar:isTotalReplay(), "ActionExecutor-cleanupOnReceivingResponseFromServer() this shouldn't be invoked in replay mode.")
+
     getModelMessageIndicator(modelSceneWar):hidePersistentMessage(getLocalizedText(80, "TransferingData"))
     getScriptEventDispatcher(modelSceneWar):dispatchEvent({
         name    = "EvtIsWaitingForServerResponse",
@@ -590,7 +591,7 @@ local function executeAttack(action)
     local attackTarget        = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
     local attackerPlayerIndex = attacker:getPlayerIndex()
     local targetPlayerIndex   = attackTarget:getPlayerIndex()
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     attacker:setStateActioned()
 
     if (attacker:getPrimaryWeaponBaseDamage(attackTarget:getDefenseType())) then
@@ -749,7 +750,31 @@ local function executeBeginTurn(action, modelSceneWar)
                 modelSceneWar:setExecutingAction(false)
             end)
         end
+
+    elseif (modelSceneWar:isTotalReplay()) then
+        if (not lostPlayerIndex) then
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+                modelSceneWar:setExecutingAction(false)
+            end)
+        else
+            local lostModelPlayer = modelPlayerManager:getModelPlayer(lostPlayerIndex)
+            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 2)
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+                getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
+                updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
+
+                if (modelSceneWar:isEnded()) then
+                    modelSceneWar:showEffectReplayEnd(callbackOnWarEndedForClient)
+                else
+                    modelTurnManager:endTurnPhaseMain()
+                end
+                modelSceneWar:setExecutingAction(false)
+            end)
+        end
+
     else
+        cleanupOnReceivingResponseFromServer(modelSceneWar)
         if (not lostPlayerIndex) then
             modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
                 modelSceneWar:setExecutingAction(false)
@@ -763,6 +788,7 @@ local function executeBeginTurn(action, modelSceneWar)
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
 
                 if (isLoggedInPlayerLost) then
+                    updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
                     modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
                 elseif (modelSceneWar:isEnded()) then
                     modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
@@ -772,7 +798,6 @@ local function executeBeginTurn(action, modelSceneWar)
                 modelSceneWar:setExecutingAction(false)
             end)
         end
-        cleanupOnFinishExecutingOnClient(modelSceneWar)
     end
 end
 
@@ -788,7 +813,7 @@ local function executeBuildModelTile(action)
     if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
     if (buildPoint > 0) then
@@ -836,7 +861,7 @@ local function executeCaptureModelTile(action)
     if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
     if (capturePoint > 0) then
@@ -917,7 +942,7 @@ local function executeDive(action)
     local launchUnitID     = action.launchUnitID
     local path             = action.path
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(true)
 
@@ -951,7 +976,7 @@ local function executeDropModelUnit(action)
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local endingGridIndex  = path[#path]
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
     local playerIndex        = focusModelUnit:getPlayerIndex()
@@ -1020,12 +1045,12 @@ local function executeEndTurn(action, modelSceneWar)
     end
     modelSceneWar:setExecutingAction(true)
 
+    if ((not IS_SERVER) and (not modelSceneWar:isTotalReplay())) then
+        cleanupOnReceivingResponseFromServer(modelSceneWar)
+    end
+
     getModelTurnManager(modelSceneWar):endTurnPhaseMain()
     modelSceneWar:setExecutingAction(false)
-
-    if (not IS_SERVER) then
-        cleanupOnFinishExecutingOnClient(modelSceneWar)
-    end
 end
 
 local function executeJoinModelUnit(action)
@@ -1039,7 +1064,7 @@ local function executeJoinModelUnit(action)
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], launchUnitID)
     local targetModelUnit  = modelUnitMap:getModelUnit(endingGridIndex)
     modelUnitMap:removeActorUnitOnMap(endingGridIndex)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
     if ((focusModelUnit.hasPrimaryWeapon) and (focusModelUnit:hasPrimaryWeapon())) then
@@ -1116,7 +1141,7 @@ local function executeLaunchFlare(action)
     local playerIndexActing   = focusModelUnit:getPlayerIndex()
     local flareAreaRadius     = focusModelUnit:getFlareAreaRadius()
     local playerIndexLoggedIn = (not IS_SERVER) and (getPlayerIndexLoggedIn()) or (nil)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setCurrentFlareAmmo(focusModelUnit:getCurrentFlareAmmo() - 1)
 
@@ -1159,7 +1184,7 @@ local function executeLaunchSilo(action)
     if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
     modelTile:updateWithObjectAndBaseId(focusModelUnit:getTileObjectIdAfterLaunch())
@@ -1205,7 +1230,7 @@ local function executeLoadModelUnit(action)
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
     local loaderModelUnit  = modelUnitMap:getModelUnit(path[#path])
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
     if (loaderModelUnit) then
         loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
@@ -1270,7 +1295,7 @@ local function executeProduceModelUnitOnUnit(action)
     local path             = action.path
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
     local producer         = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     producer:setStateActioned()
 
     local producedUnitID    = modelUnitMap:getAvailableUnitId()
@@ -1305,7 +1330,7 @@ local function executeSupplyModelUnit(action)
     local launchUnitID     = action.launchUnitID
     local path             = action.path
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
     local targetModelUnits = getAndSupplyAdjacentModelUnits(sceneWarFileName, path[#path], focusModelUnit:getPlayerIndex())
 
@@ -1337,7 +1362,7 @@ local function executeSurface(action)
     local launchUnitID     = action.launchUnitID
     local path             = action.path
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(false)
 
@@ -1363,15 +1388,18 @@ local function executeSurface(action)
     end
 end
 
-local function executeSurrender(action)
-    local sceneWarFileName   = action.fileName
-    local modelSceneWar      = getModelScene(sceneWarFileName)
-    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
-    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+local function executeSurrender(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+
+    local modelPlayerManager = getModelPlayerManager(modelSceneWar)
+    local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local playerIndex        = modelTurnManager:getPlayerIndex()
     local modelPlayer        = modelPlayerManager:getModelPlayer(playerIndex)
 
-    Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
+    Destroyers.destroyPlayerForce(action.sceneWarFileName, playerIndex)
     if (IS_SERVER) then
         if (modelPlayerManager:getAlivePlayersCount() <= 1) then
             modelSceneWar:setEnded(true)
@@ -1379,22 +1407,33 @@ local function executeSurrender(action)
             modelTurnManager:endTurnPhaseMain()
         end
         modelSceneWar:setExecutingAction(false)
-    else
-        updateTileAndUnitMapOnVisibilityChanged()
 
-        getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
+    elseif (modelSceneWar:isTotalReplay()) then
+        updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
+        getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
+
+        if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+            modelSceneWar:setEnded(true)
+                :showEffectReplayEnd(callbackOnWarEndedForClient)
+        else
+            modelTurnManager:endTurnPhaseMain()
+        end
+        modelSceneWar:setExecutingAction(false)
+
+    else
+        cleanupOnReceivingResponseFromServer(modelSceneWar)
+        getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
+
         if (modelPlayer:getAccount() == getLoggedInAccountAndPassword()) then
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
             modelSceneWar:setEnded(true)
                 :showEffectSurrender(callbackOnWarEndedForClient)
+        elseif (modelPlayerManager:getAlivePlayersCount() <= 1) then
+            modelSceneWar:setEnded(true)
+                :showEffectWin(callbackOnWarEndedForClient)
         else
-            if (modelPlayerManager:getAlivePlayersCount() <= 1) then
-                modelSceneWar:setEnded(true)
-                    :showEffectWin(callbackOnWarEndedForClient)
-            else
-                modelTurnManager:endTurnPhaseMain()
-            end
+            modelTurnManager:endTurnPhaseMain()
         end
-
         modelSceneWar:setExecutingAction(false)
     end
 end
@@ -1415,18 +1454,21 @@ local function executeWait(action, modelSceneWar)
     local path             = action.path
     local pathNodes        = path.pathNodes
     local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(pathNodes[1], action.launchUnitID)
-    moveModelUnitWithAction(action)
+    moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
         focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             if (path.isBlocked) then
                 getModelGridEffect():showAnimationBlock(pathNodes[#pathNodes])
@@ -1434,7 +1476,6 @@ local function executeWait(action, modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
-        cleanupOnFinishExecutingOnClient(modelSceneWar)
     end
 end
 
@@ -1462,6 +1503,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 
@@ -1487,7 +1529,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
         elseif (actionName == "Surface")                then executeSurface(               action)
-        elseif (actionName == "Surrender")              then executeSurrender(             action)
         elseif (actionName == "TickActionId")           then executeTickActionId(          action)
         end
 

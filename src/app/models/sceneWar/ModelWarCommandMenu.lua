@@ -47,6 +47,7 @@ local round                    = require("src.global.functions.round")
 
 local ACTION_CODE_END_TURN         = ActionCodeFunctions.getActionCode("ActionEndTurn")
 local ACTION_CODE_RELOAD_SCENE_WAR = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
+local ACTION_CODE_SURRENDER        = ActionCodeFunctions.getActionCode("ActionSurrender")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -314,7 +315,7 @@ local function sendActionActivateSkillGroup(skillGroupID)
 end
 
 local function sendActionSurrender()
-    createAndSendAction({actionName = "Surrender"}, true)
+    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
 end
 
 local function sendActionEndTurn()

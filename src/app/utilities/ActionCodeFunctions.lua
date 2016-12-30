@@ -4,24 +4,26 @@ local ActionCodeFunctions = {}
 local TableFunctions = require("src.app.utilities.TableFunctions")
 
 local s_ActionCodes = {
-    ActionNetworkHeartbeat             = 1,
-    ActionRegister                     = 2,
-    ActionLogin                        = 3,
-    ActionLogout                       = 4,
-    ActionMessage                      = 5,
-    ActionGetSkillConfiguration        = 6,
-    ActionSetSkillConfiguration        = 7,
-    ActionNewWar                       = 8,
-    ActionGetJoinableWarConfigurations = 9,
-    ActionJoinWar                      = 10,
-    ActionGetOngoingWarList            = 11,
-    ActionRunSceneWar                  = 12,
-    ActionRunSceneMain                 = 13,
-    ActionReloadSceneWar               = 14,
+    ActionGetJoinableWarConfigurations = 1,
+    ActionGetOngoingWarList            = 2,
+    ActionGetSkillConfiguration        = 3,
+    ActionJoinWar                      = 4,
+    ActionLogin                        = 5,
+    ActionLogout                       = 6,
+    ActionMessage                      = 7,
+    ActionNetworkHeartbeat             = 8,
+    ActionNewWar                       = 9,
+    ActionRegister                     = 10,
+    ActionReloadSceneWar               = 11,
+    ActionRunSceneMain                 = 12,
+    ActionRunSceneWar                  = 13,
+    ActionSetSkillConfiguration        = 14,
     ActionSyncSceneWar                 = 15,
+
     ActionBeginTurn                    = 16,
     ActionEndTurn                      = 17,
-    ActionWait                         = 18,
+    ActionSurrender                    = 18,
+    ActionWait                         = 19,
 }
 local s_ActionNames
 
