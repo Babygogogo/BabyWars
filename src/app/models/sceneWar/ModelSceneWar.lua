@@ -102,6 +102,27 @@ local function cacheAction(self, action)
     return self
 end
 
+local function executeReplayAction(self)
+    assert(self:isTotalReplay(), "ModelSceneWar-executeReplayAction() the scene is not in replay mode.")
+    assert(not self:isExecutingAction(), "ModelSceneWar-executeReplayAction() another action is being executed.")
+
+    local actionID = self:getActionId() + 1
+    local action   = self.m_ExecutedActions[actionID]
+    if (not action) then
+        self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
+    else
+        self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
+            getLocalizedText(11, "Progress"), actionID, #self.m_ExecutedActions, getLocalizedText(12, action.actionName)))
+
+        action.actionID = actionID
+        setActionId(self, actionID)
+
+        ActionExecutor.execute(action, self)
+    end
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -338,27 +359,6 @@ function ModelSceneWar:executeAction(action)
     return self
 end
 
-function ModelSceneWar:executeReplayAction()
-    assert(self:isTotalReplay(), "ModelSceneWar:executeReplayAction() the scene is not in replay mode.")
-    assert(not self:isExecutingAction(), "ModelSceneWar:executeReplayAction() another action is being executed.")
-
-    local actionID = self:getActionId() + 1
-    local action   = self.m_ExecutedActions[actionID]
-    if (not action) then
-        self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
-    else
-        self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
-            getLocalizedText(11, "Progress"), actionID, #self.m_ExecutedActions, getLocalizedText(12, action.actionName)))
-
-        action.actionID = actionID
-        setActionId(self, actionID)
-
-        ActionExecutor.execute(action, self)
-    end
-
-    return self
-end
-
 function ModelSceneWar:isAutoReplay()
     assert(self:isTotalReplay(), "ModelSceneWar:isAutoReplay() it's not in replay mode.")
     return self.m_IsAutoReplay
@@ -369,7 +369,7 @@ function ModelSceneWar:setAutoReplay(isAuto)
     self.m_IsAutoReplay = isAuto
 
     if ((isAuto) and (not self:isExecutingAction())) then
-        self:executeReplayAction()
+        executeReplayAction(self)
     end
 
     return self
@@ -380,6 +380,7 @@ function ModelSceneWar:isExecutingAction()
 end
 
 function ModelSceneWar:setExecutingAction(executing)
+    assert(self.m_IsExecutingAction ~= executing)
     self.m_IsExecutingAction = executing
 
     if ((not executing) and (not self:isEnded())) then
@@ -407,7 +408,7 @@ function ModelSceneWar:setExecutingAction(executing)
                     cc.CallFunc:create(function()
                         self.m_IsExecutingAction = false
                         if (self:isAutoReplay()) then
-                            self:executeReplayAction()
+                            executeReplayAction(self)
                         end
                     end)
                 ))
