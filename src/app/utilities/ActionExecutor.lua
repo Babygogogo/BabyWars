@@ -330,15 +330,16 @@ end
 --------------------------------------------------------------------------------
 -- The executors for non-war actions.
 --------------------------------------------------------------------------------
-local function executeDownloadReplayData(action)
+local function executeDownloadReplayData(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeDownloadReplayData() should not be invoked on the server.")
-    local modelScene = getModelScene()
-    if (not modelScene.getModelMainMenu) then
+    if (modelScene.isModelSceneWar) then
         return
     end
 
-    modelScene:getModelMainMenu():getModelReplayManager():serializeReplayData(action.sceneWarFileName, action.data)
-    modelScene:getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
+    local modelReplayManager = modelScene:getModelMainMenu():getModelReplayManager()
+    if (modelReplayManager:isRetrievingEncodedReplayData()) then
+        modelReplayManager:updateWithEncodedReplayData(action.encodedReplayData)
+    end
 end
 
 local function executeGetReplayConfigurations(action, modelScene)
@@ -1485,7 +1486,8 @@ function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
-    if     (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
+    if     (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetOngoingWarList)            then executeGetOngoingWarList(           action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetReplayConfigurations)      then executeGetReplayConfigurations(     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
@@ -1510,7 +1512,6 @@ function ActionExecutor.execute(action, modelScene)
     --[[
     local actionName = action.actionName
     if (not action.actionID) then
-        if     (actionName == "DownloadReplayData")  then executeDownloadReplayData( action)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)

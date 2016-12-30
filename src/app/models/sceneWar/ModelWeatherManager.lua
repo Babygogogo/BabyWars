@@ -52,7 +52,7 @@ function ModelWeatherManager:toSerializableTableForPlayerIndex(playerIndex)
 end
 
 function ModelWeatherManager:toSerializableReplayData()
-    return self:toSerializableTable()
+    return {defaultWeatherCode = self.m_DefaultWeatherCode}
 end
 
 --------------------------------------------------------------------------------

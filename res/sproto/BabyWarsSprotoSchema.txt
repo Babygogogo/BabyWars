@@ -1,20 +1,41 @@
 
+################################################################################
+# actions
+################################################################################
 .ActionGeneric {
-    ActionGetSkillConfiguration         1 : ActionGetSkillConfiguration
+    ActionDownloadReplayData            1 : ActionDownloadReplayData
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
-    ActionJoinWar                       3 : ActionJoinWar
-    ActionLogin                         4 : ActionLogin
-    ActionLogout                        5 : ActionLogout
-    ActionMessage                       6 : ActionMessage
-    ActionNewWar                        7 : ActionNewWar
-    ActionNetworkHeartbeat              8 : ActionNetworkHeartbeat
-    ActionRegister                      9 : ActionRegister
-    ActionSetSkillConfiguration        10 : ActionSetSkillConfiguration
+    ActionGetOngoingWarList             3 : ActionGetOngoingWarList
+    ActionGetReplayConfigurations       4 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         5 : ActionGetSkillConfiguration
+    ActionJoinWar                       6 : ActionJoinWar
+    ActionLogin                         7 : ActionLogin
+    ActionLogout                        8 : ActionLogout
+    ActionMessage                       9 : ActionMessage
+    ActionNetworkHeartbeat             10 : ActionNetworkHeartbeat
+    ActionNewWar                       11 : ActionNewWar
+    ActionRegister                     12 : ActionRegister
+    ActionReloadSceneWar               13 : ActionReloadSceneWar
+    ActionRunSceneMain                 14 : ActionRunSceneMain
+    ActionRunSceneWar                  15 : ActionRunSceneWar
+    ActionSetSkillConfiguration        16 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 17 : ActionSyncSceneWar
+
+    ActionBeginTurn                    18 : ActionBeginTurn
+    ActionEndTurn                      19 : ActionEndTurn
+    ActionSurrender                    20 : ActionSurrender
+    ActionWait                         21 : ActionWait
 }
 
 .ActionRedis {
     actionCode           0 : integer
     encodedActionGeneric 1 : string
+}
+
+.ActionDownloadReplayData {
+    actionCode        0 : integer
+    sceneWarFileName  1 : string
+    encodedReplayData 2 : string
 }
 
 .ActionGetJoinableWarConfigurations {
@@ -23,6 +44,24 @@
     playerPassword    2 : string
     sceneWarShortName 3 : string
     warConfigurations 4 : *WarConfiguration(sceneWarFileName)
+}
+
+.ActionGetOngoingWarList {
+    .OngoingWarListItem {
+        warConfiguration 0 : WarConfiguration
+        isInTurn         1 : boolean
+    }
+
+    actionCode     0 :  integer
+    playerAccount  1 :  string
+    playerPassword 2 :  string
+    ongoingWarList 3 : *OngoingWarListItem
+}
+
+.ActionGetReplayConfigurations {
+    actionCode           0 :  integer
+    pageIndex            1 :  integer
+    replayConfigurations 2 : *ReplayConfiguration
 }
 
 .ActionGetSkillConfiguration {
@@ -63,6 +102,11 @@
     messageParams 2 : *string
 }
 
+.ActionNetworkHeartbeat {
+    actionCode       0 : integer
+    heartbeatCounter 1 : integer
+}
+
 .ActionNewWar {
     actionCode            0 : integer
     playerAccount         1 : string
@@ -77,16 +121,33 @@
     defaultWeatherCode   10 : integer
 }
 
-.ActionNetworkHeartbeat {
-    actionCode       0 : integer
-    heartbeatCounter 1 : integer
-}
-
 .ActionRegister {
     actionCode       0 : integer
     clientVersion    1 : string
     registerAccount  2 : string
     registerPassword 3 : string
+}
+
+.ActionReloadSceneWar {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    warData          4 : SceneWar
+}
+
+.ActionRunSceneMain {
+    actionCode    0 :  integer
+    messageCode   1 :  integer
+    messageParams 2 : *string
+}
+
+.ActionRunSceneWar {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    warData          4 : SceneWar
 }
 
 .ActionSetSkillConfiguration {
@@ -97,65 +158,163 @@
     skillConfiguration   4 : SingleSkillConfiguration
 }
 
+.ActionSyncSceneWar {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    actionID         4 : integer
+}
+
+.ActionBeginTurn {
+    .RepairData {
+        .RepairDataOnMap {
+            unitID       0 : integer
+            repairAmount 1 : integer
+            gridIndex    2 : GridIndex
+        }
+
+        .RepairDataLoaded {
+            unitID       0 : integer
+            repairAmount 1 : integer
+        }
+
+        remainingFund 0 :  integer
+        onMapData     1 : *RepairDataOnMap(unitID)
+        loadedData    2 : *RepairDataLoaded(unitID)
+    }
+
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    actionID         4 : integer
+    income           5 : integer
+    lostPlayerIndex  6 : integer
+    repairData       7 : RepairData
+}
+
+.ActionEndTurn {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    actionID         4 : integer
+}
+
+.ActionSurrender {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    actionID         4 : integer
+}
+
+.ActionWait {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    path              5 :  MovePath
+    launchUnitID      6 :  integer
+    revealedUnits     7 : *UnitData(unitID)
+    revealedTiles     8 : *TileData(positionIndex)
+    actingUnitsData   9 : *UnitData(unitID)
+    actingTilesData  10 : *TileData(positionIndex)
+}
+
+################################################################################
+# components
+################################################################################
+.AttackDoer {
+    .PrimaryWeaponCurrentAmmo {
+        currentAmmo 0 : integer
+    }
+
+    primaryWeapon 0 : PrimaryWeaponCurrentAmmo
+}
+
+.AttackTaker {
+    currentHP 0 : integer
+}
+
+.Buildable {
+    currentBuildPoint 0 : integer
+}
+
+.Capturable {
+    currentCapturePoint 0 : integer
+}
+
+.Capturer {
+    isCapturing 0 : boolean
+}
+
+.Diver {
+    isDiving 0 : boolean
+}
+
+.FlareLauncher {
+    currentAmmo 0 : integer
+}
+
+.FuelOwner {
+    current 0 : integer
+}
+
+.GridIndexable {
+    x 0 : integer
+    y 1 : integer
+}
+
+.MaterialOwner {
+    current 0 : integer
+}
+
+.Promotable {
+    current 0 : integer
+}
+
+.TileBuilder {
+    isBuildingModelTile 0 : boolean
+}
+
+.UnitLoader {
+    loaded 0 : *integer
+}
+
+################################################################################
+# others
+################################################################################
+.AccountAndPassword {
+    account  1 : string
+    password 2 : string
+}
+
+.GridIndex {
+    x 0 : integer
+    y 1 : integer
+}
+
+.JoinableWarList {
+    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+}
+
+.MovePath {
+    pathNodes       0 : *GridIndex
+    fuelConsumption 1 :  integer
+    isBlocked       2 :  boolean
+}
+
+.OngoingWarListForServer {
+    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+}
+
 .PlayerInfo {
     playerIndex 0 : integer
     account     1 : string
     nickname    2 : string
-}
-
-.WarConfiguration {
-    sceneWarFileName    0 :  string
-    warFieldFileName    1 :  string
-    warPassword         2 :  string
-    maxBaseSkillPoints  3 :  integer
-    isFogOfWarByDefault 4 :  boolean
-    defaultWeatherCode  5 :  integer
-    isRandomWarField    6 :  boolean
-    players             7 : *PlayerInfo(playerIndex)
-}
-
-.Action {
-    actionCode      0 : integer
-    playerAccount   1 : string
-    playerPassword  2 : string
-
-    heartbeatCounter          100 :  integer
-    clientVersion             101 :  string
-    registerAccount           102 :  string
-    registerPassword          103 :  string
-    loginAccount              104 :  string
-    loginPassword             105 :  string
-    messageCode               106 :  integer
-    messageParams             107 : *string
-    skillConfigurationID      108 :  integer
-    skillConfiguration        109 :  SingleSkillConfiguration
-    sceneWarFileName          110 :  string
-    sceneWarShortName         111 :  string
-    warConfiguration          112 :  WarConfiguration
-    joinableWarConfigurations 113 : *WarConfiguration(sceneWarFileName)
-}
-
-.SingleSkillConfiguration {
-    .SingleSkill {
-        id    0 : integer
-        level 1 : integer
-    }
-
-    .ActiveSkillGroup {
-        energyRequirement 0 :  integer
-        skills            1 : *SingleSkill
-    }
-
-    basePoints             0 :  integer
-    activatingSkillGroupID 1 :  integer
-    passive                2 : *SingleSkill
-    active1                3 :  ActiveSkillGroup
-    active2                4 :  ActiveSkillGroup
-}
-
-.AccountAndPassword {
-    account  1 : string
-    password 2 : string
 }
 
 .PlayerProfile {
@@ -167,12 +326,8 @@
     }
 
     .WarLists {
-        .SingleWarItem {
-            sceneWarFileName 0 : string
-        }
-
-        ongoing 0 : *SingleWarItem(sceneWarFileName)
-        created 1 : *SingleWarItem(sceneWarFileName)
+        ongoing 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+        created 1 : *SceneWarFileNameForIndex(sceneWarFileName)
     }
 
     account             0 :  string
@@ -181,6 +336,20 @@
     gameRecords         3 : *SingleGameRecord
     skillConfigurations 4 : *SingleSkillConfiguration
     warLists            5 :  WarLists
+}
+
+.ReplayConfiguration {
+    sceneWarFileName    0 :  string
+    warFieldFileName    1 :  string
+    players             2 : *PlayerInfo
+}
+
+.ReplayListForClient {
+    list 0 : *ReplayConfiguration(sceneWarFileName)
+}
+
+.ReplayListForServer {
+    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
 }
 
 .SceneWar {
@@ -213,92 +382,8 @@
         mapsForPaths                     3 : *SingleFogMapForPaths(playerIndex)
     }
 
-    .AttackDoer {
-        .PrimaryWeaponCurrentAmmo {
-            currentAmmo 0 : integer
-        }
-
-        primaryWeapon 0 : PrimaryWeaponCurrentAmmo
-    }
-
-    .AttackTaker {
-        currentHP 0 : integer
-    }
-
-    .Buildable {
-        currentBuildPoint 0 : integer
-    }
-
-    .Capturable {
-        currentCapturePoint 0 : integer
-    }
-
-    .Capturer {
-        isCapturing 0 : boolean
-    }
-
-    .Diver {
-        isDiving 0 : boolean
-    }
-
-    .FlareLauncher {
-        currentAmmo 0 : integer
-    }
-
-    .FuelOwner {
-        current 0 : integer
-    }
-
-    .GridIndexable {
-        x 0 : integer
-        y 1 : integer
-    }
-
-    .MaterialOwner {
-        current 0 : integer
-    }
-
-    .Promotable {
-        current 0 : integer
-    }
-
-    .TileBuilder {
-        isBuildingModelTile 0 : boolean
-    }
-
-    .UnitLoader {
-        loaded 0 : *integer
-    }
-
-    .TileData {
-        positionIndex 0 : integer
-        baseID        1 : integer
-        objectID      2 : integer
-        AttackTaker   3 : AttackTaker
-        Buildable     4 : Buildable
-        Capturable    5 : Capturable
-        GridIndexable 6 : GridIndexable
-    }
-
     .TileMapData {
         tiles 0 : *TileData(positionIndex)
-    }
-
-    .UnitData {
-        unitID         0 : integer
-        tiledID        1 : integer
-        stateCode      2 : integer
-        AttackDoer     3 : AttackDoer
-        AttackTaker    4 : AttackTaker
-        Capturer       5 : Capturer
-        Diver          6 : Diver
-        FlareLauncher  7 : FlareLauncher
-        FuelOwner      8 : FuelOwner
-        GridIndexable  9 : GridIndexable
-        MaterialOwner 10 : MaterialOwner
-        Promotable    11 : Promotable
-        TileBuilder   12 : TileBuilder
-        UnitLoader    13 : UnitLoader
     }
 
     .UnitMapData {
@@ -329,9 +414,71 @@
     isFogOfWarByDefault  5 :  boolean
     isTotalReplay        6 :  boolean
     warPassword          7 :  string
-    executedActions      8 : *Action
+    executedActions      8 : *ActionGeneric
     players              9 : *SinglePlayerData(playerIndex)
     turn                10 :  TurnData
     warField            11 :  WarFieldData
     weather             12 :  WeatherData
+}
+
+.SceneWarFileNameForIndex {
+    sceneWarFileName 0 : string
+}
+
+.SingleSkillConfiguration {
+    .SingleSkill {
+        id    0 : integer
+        level 1 : integer
+    }
+
+    .ActiveSkillGroup {
+        energyRequirement 0 :  integer
+        skills            1 : *SingleSkill
+    }
+
+    basePoints             0 :  integer
+    activatingSkillGroupID 1 :  integer
+    passive                2 : *SingleSkill
+    active1                3 :  ActiveSkillGroup
+    active2                4 :  ActiveSkillGroup
+}
+
+.TileData {
+    positionIndex 0 : integer
+    baseID        1 : integer
+    objectID      2 : integer
+    AttackTaker   3 : AttackTaker
+    Buildable     4 : Buildable
+    Capturable    5 : Capturable
+    GridIndexable 6 : GridIndexable
+}
+
+.UnitData {
+    unitID         0 : integer
+    tiledID        1 : integer
+    stateCode      2 : integer
+    isLoaded       3 : boolean
+
+    AttackDoer     4 : AttackDoer
+    AttackTaker    5 : AttackTaker
+    Capturer       6 : Capturer
+    Diver          7 : Diver
+    FlareLauncher  8 : FlareLauncher
+    FuelOwner      9 : FuelOwner
+    GridIndexable 10 : GridIndexable
+    MaterialOwner 11 : MaterialOwner
+    Promotable    12 : Promotable
+    TileBuilder   13 : TileBuilder
+    UnitLoader    14 : UnitLoader
+}
+
+.WarConfiguration {
+    sceneWarFileName    0 :  string
+    warFieldFileName    1 :  string
+    warPassword         2 :  string
+    maxBaseSkillPoints  3 :  integer
+    isFogOfWarByDefault 4 :  boolean
+    defaultWeatherCode  5 :  integer
+    isRandomWarField    6 :  boolean
+    players             7 : *PlayerInfo(playerIndex)
 }

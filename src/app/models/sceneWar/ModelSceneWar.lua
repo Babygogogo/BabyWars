@@ -106,13 +106,18 @@ local function executeReplayAction(self)
     assert(self:isTotalReplay(), "ModelSceneWar-executeReplayAction() the scene is not in replay mode.")
     assert(not self:isExecutingAction(), "ModelSceneWar-executeReplayAction() another action is being executed.")
 
-    local actionID = self:getActionId() + 1
-    local action   = self.m_ExecutedActions[actionID]
+    self.m_ExecutedActionsCount = self.m_ExecutedActionsCount or #self.m_ExecutedActions
+    local actionID  = self:getActionId() + 1
+    local _, action = next(self.m_ExecutedActions[actionID])
     if (not action) then
         self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
     else
         self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
-            getLocalizedText(11, "Progress"), actionID, #self.m_ExecutedActions, getLocalizedText(12, action.actionName)))
+            getLocalizedText(11, "Progress"),
+            actionID,
+            self.m_ExecutedActionsCount,
+            getLocalizedText(12, ActionCodeFunctions.getActionName(action.actionCode))
+        ))
 
         action.actionID = actionID
         setActionId(self, actionID)
