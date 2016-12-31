@@ -3,13 +3,13 @@ local InstantSkillExecutor = {}
 
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
 local SupplyFunctions       = require("src.app.utilities.SupplyFunctions")
 
 local IS_SERVER = GameConstantFunctions.isServer()
 
 local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
-local getSkillModifier       = GameConstantFunctions.getSkillModifier
-local supplyWithAmmoAndFuel  = SupplyFunctions.supplyWithAmmoAndFuel
+local getSkillModifier       = SkillDataAccessors.getSkillModifier
 
 local s_Executors = {}
 
@@ -31,38 +31,38 @@ end
 -- The functions for executing instant skills.
 --------------------------------------------------------------------------------
 -- Modify HPs of all units of the currently-in-turn player.
-s_Executors.execute4 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+s_Executors.execute4 = function(modelSceneWar, level)
     local modifier     = getSkillModifier(4, level, true) * 10
-    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local func         = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             modifyModelUnitHp(modelUnit, modifier)
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute5 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+s_Executors.execute5 = function(modelSceneWar, level)
     local modifier     = getSkillModifier(5, level, true) * 10
-    local playerIndex  = modelTurnManager:getPlayerIndex()
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local func         = function(modelUnit)
         if (modelUnit:getPlayerIndex() ~= playerIndex) then
             modifyModelUnitHp(modelUnit, modifier)
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute8 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
+s_Executors.execute8 = function(modelSceneWar, level)
+    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local func        = function(modelUnit)
         if ((modelUnit:getPlayerIndex() == playerIndex)                                             and
             (not GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "InfantryUnits"))) then
@@ -71,14 +71,14 @@ s_Executors.execute8 = function(level, modelWarField, modelPlayerManager, modelT
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute9 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex  = modelTurnManager:getPlayerIndex()
+s_Executors.execute9 = function(modelSceneWar, level)
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local baseModifier = getSkillModifier(9, level, true)
     local modifier     = (baseModifier >= 0) and ((100 + baseModifier) / 100) or (100 / (100 - baseModifier))
     local func         = function(modelUnit)
@@ -88,29 +88,30 @@ s_Executors.execute9 = function(level, modelWarField, modelPlayerManager, modelT
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute12 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex  = modelTurnManager:getPlayerIndex()
-    local modelPlayer  = modelPlayerManager:getModelPlayer(playerIndex)
+s_Executors.execute12 = function(modelSceneWar, level)
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    local modelPlayer  = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex)
     local baseModifier = getSkillModifier(12, level, true)
     modelPlayer:setFund(round(modelPlayer:getFund() * (baseModifier + 100) / 100))
 
-    dispatcher:dispatchEvent({
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({
         name        = "EvtModelPlayerUpdated",
         modelPlayer = modelPlayer,
         playerIndex = playerIndex,
     })
 end
 
-s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
-    local fund        = modelPlayerManager:getModelPlayer(playerIndex):getFund()
-    local modifier    = getSkillModifier(13, level, true) * fund / 1000000
+s_Executors.execute13 = function(modelSceneWar, level)
+    local modelPlayerManager = modelSceneWar:getModelPlayerManager()
+    local playerIndex        = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    local fund               = modelPlayerManager:getModelPlayer(playerIndex):getFund()
+    local modifier           = getSkillModifier(13, level, true) * fund / 1000000
 
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, index)
         if ((modelPlayer:isAlive()) and (index ~= playerIndex)) then
@@ -129,25 +130,25 @@ s_Executors.execute13 = function(level, modelWarField, modelPlayerManager, model
     end)
 end
 
-s_Executors.execute16 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
+s_Executors.execute16 = function(modelSceneWar, level)
+    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local func        = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
-            supplyWithAmmoAndFuel(modelUnit)
+            SupplyFunctions.supplyWithAmmoAndFuel(modelUnit)
             if (modelUnit.setCurrentMaterial) then
                 modelUnit:setCurrentMaterial(modelUnit:getMaxMaterial())
             end
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute26 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex  = modelTurnManager:getPlayerIndex()
+s_Executors.execute26 = function(modelSceneWar, level)
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
     local modifier     = getSkillModifier(26, level, true)
     local maxPromotion = GameConstantFunctions.getMaxPromotion()
     local func         = function(modelUnit)
@@ -157,36 +158,36 @@ s_Executors.execute26 = function(level, modelWarField, modelPlayerManager, model
         end
     end
 
-    modelWarField:getModelUnitMap():forEachModelUnitOnMap(func)
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    dispatcher:dispatchEvent({name = "EvtModelUnitMapUpdated"})
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
 end
 
-s_Executors.execute55 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
-    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
-        modelWarField:getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
+s_Executors.execute55 = function(modelSceneWar, level)
+    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelSceneWar:getModelWarField():getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
     end
 end
 
-s_Executors.execute56 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
-    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
-        modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+s_Executors.execute56 = function(modelSceneWar, level)
+    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
     end
 end
 
-s_Executors.execute57 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local playerIndex = modelTurnManager:getPlayerIndex()
-    if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
-        modelWarField:getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+s_Executors.execute57 = function(modelSceneWar, level)
+    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+        modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
     end
 end
 
-s_Executors.execute61 = function(level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
-    local modelPlayer         = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex())
+s_Executors.execute61 = function(modelSceneWar, level)
+    local modelPlayer         = modelSceneWar:getModelPlayerManager():getModelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex())
     local _, req1, req2       = modelPlayer:getEnergy()
     local damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement()
     local maxDamageCost       = round(req2 * damageCostPerEnergy)
@@ -203,18 +204,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function InstantSkillExecutor.activateSkillGroup(modelSceneWar, skillGroupID)
-    local modelWarField           = SingletonGetters.getModelWarField(        modelSceneWar)
-    local modelPlayerManager      = SingletonGetters.getModelPlayerManager(   modelSceneWar)
-    local modelTurnManager        = SingletonGetters.getModelTurnManager(     modelSceneWar)
-    local modelWeatherManager     = SingletonGetters.getModelWeatherManager(  modelSceneWar)
-    local dispatcher              = SingletonGetters.getScriptEventDispatcher(modelSceneWar)
-    local modelSkillConfiguration = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex()):getModelSkillConfiguration()
-
+    local modelSkillConfiguration = modelSceneWar:getModelPlayerManager():getModelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex()):getModelSkillConfiguration()
     for _, skill in pairs(modelSkillConfiguration:getAllSkillsInGroup(skillGroupID)) do
         local id, level  = skill.id, skill.level
         local methodName = "execute" .. id
         if (s_Executors[methodName]) then
-            s_Executors[methodName](skill.level, modelWarField, modelPlayerManager, modelTurnManager, modelWeatherManager, dispatcher)
+            s_Executors[methodName](modelSceneWar, skill.level)
         end
     end
 
