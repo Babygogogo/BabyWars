@@ -121,13 +121,13 @@ local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridInde
     return targets
 end
 
-local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
+local function addActorUnitsWithUnitsData(modelSceneWar, unitsData, isViewVisible)
     assert(not IS_SERVER,       "ActionExecutor-addActorUnitsWithUnitsData() this should not be called on the server.")
     assert(not isTotalReplay(), "ActionExecutor-addActorUnitsWithUnitsData() this shouldn't be called in the replay mode.")
 
     if (unitsData) then
-        local sceneWarFileName = getSceneWarFileName()
-        local modelUnitMap     = getModelUnitMap()
+        local sceneWarFileName = modelSceneWar:getFileName()
+        local modelUnitMap     = getModelUnitMap(modelSceneWar)
         for unitID, unitData in pairs(unitsData) do
             local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
             actorUnit:getModel():onStartRunning(sceneWarFileName)
@@ -143,12 +143,12 @@ local function addActorUnitsWithUnitsData(unitsData, isViewVisible)
     end
 end
 
-local function updateModelTilesWithTilesData(tilesData)
+local function updateModelTilesWithTilesData(modelSceneWar, tilesData)
     assert(not IS_SERVER,       "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called on the server.")
     assert(not isTotalReplay(), "ActionExecutor-updateModelTilesWithTilesData() this shouldn't be called in the replay mode.")
 
     if (tilesData) then
-        local modelTileMap = getModelTileMap()
+        local modelTileMap = getModelTileMap(modelSceneWar)
         for _, tileData in pairs(tilesData) do
             local modelTile = modelTileMap:getModelTile(tileData.GridIndexable)
             assert(modelTile:isFogEnabledOnClient(), "ActionExecutor-updateModelTilesWithTilesData() the tile has no fog.")
@@ -157,8 +157,17 @@ local function updateModelTilesWithTilesData(tilesData)
     end
 end
 
+local function updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
+    if ((not IS_SERVER) and (not modelSceneWar:isTotalReplay())) then
+        addActorUnitsWithUnitsData(   modelSceneWar, action.actingUnitsData, false)
+        addActorUnitsWithUnitsData(   modelSceneWar, action.revealedUnits,   false)
+        updateModelTilesWithTilesData(modelSceneWar, action.actingTilesData)
+        updateModelTilesWithTilesData(modelSceneWar, action.revealedTiles)
+    end
+end
+
 local function updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
-    assert(not IS_SERVER, "ActionExecutor-updateTileAndUnitMapOnVisibilityChanged() this shouldn't be called on the server.")
+    assert(not IS_SERVER, "ActionExecutor-updateTileAndUnitMapOnVisibilityChanged(modelSceneWar) this shouldn't be called on the server.")
     if (modelSceneWar:isTotalReplay()) then
         getModelFogMap(modelSceneWar):updateView()
     else
@@ -185,15 +194,6 @@ local function updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
     getScriptEventDispatcher()
         :dispatchEvent({name = "EvtModelTileMapUpdated"})
         :dispatchEvent({name = "EvtModelUnitMapUpdated"})
-end
-
-local function updateTilesAndUnitsBeforeExecutingAction(action)
-    if ((not IS_SERVER) and (not isTotalReplay())) then
-        addActorUnitsWithUnitsData(action.actingUnitsData, false)
-        addActorUnitsWithUnitsData(action.revealedUnits,   false)
-        updateModelTilesWithTilesData(action.actingTilesData, false)
-        updateModelTilesWithTilesData(action.revealedTiles,   false)
-    end
 end
 
 local function moveModelUnitWithAction(action, modelSceneWar)
@@ -544,7 +544,7 @@ end
 -- The executors for war actions.
 --------------------------------------------------------------------------------
 local function executeActivateSkillGroup(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local skillGroupID     = action.skillGroupID
@@ -569,25 +569,29 @@ local function executeActivateSkillGroup(action)
         getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
             :forEachModelUnitLoaded(func)
 
-        updateTileAndUnitMapOnVisibilityChanged()
+        updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
         dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
 
         modelSceneWar:setExecutingAction(false)
     end
 end
 
-local function executeAttack(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+local function executeAttack(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local path                = action.path
-    local sceneWarFileName    = action.fileName
+    local pathNodes           = action.path.pathNodes
+    local sceneWarFileName    = action.sceneWarFileName
     local attackDamage        = action.attackDamage
     local counterDamage       = action.counterDamage
-    local attackerGridIndex   = path[#path]
+    local attackerGridIndex   = pathNodes[#pathNodes]
     local targetGridIndex     = action.targetGridIndex
-    local modelUnitMap        = getModelUnitMap(sceneWarFileName)
-    local modelTileMap        = getModelTileMap(sceneWarFileName)
-    local attacker            = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local modelUnitMap        = getModelUnitMap(modelSceneWar)
+    local modelTileMap        = getModelTileMap(modelSceneWar)
+    local attacker            = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
     local attackTarget        = modelUnitMap:getModelUnit(targetGridIndex) or modelTileMap:getModelTile(targetGridIndex)
     local attackerPlayerIndex = attacker:getPlayerIndex()
     local targetPlayerIndex   = attackTarget:getPlayerIndex()
@@ -601,7 +605,7 @@ local function executeAttack(action)
         attackTarget:setPrimaryWeaponCurrentAmmo(attackTarget:getPrimaryWeaponCurrentAmmo() - 1)
     end
 
-    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+    local modelPlayerManager = getModelPlayerManager(modelSceneWar)
     if (attackTarget.getUnitType) then
         local attackerDamageCost  = getBaseDamageCostWithTargetAndDamage(attacker,     counterDamage or 0)
         local targetDamageCost    = getBaseDamageCostWithTargetAndDamage(attackTarget, attackDamage)
@@ -649,13 +653,12 @@ local function executeAttack(action)
         end
     end
 
-    local modelSceneWar      = getModelScene(sceneWarFileName)
-    local modelTurnManager   = getModelTurnManager(sceneWarFileName)
+    local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
     local isInTurnPlayerLost = (lostPlayerIndex == attackerPlayerIndex)
     if (IS_SERVER) then
         if (targetVision) then
-            getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
+            getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
         end
         if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
@@ -666,12 +669,20 @@ local function executeAttack(action)
             end
         end
         modelSceneWar:setExecutingAction(false)
-    else
-        local playerIndexLoggedIn  = getPlayerIndexLoggedIn()
-        local isLoggedInPlayerLost = (lostPlayerIndex) and (lostPlayerIndex == playerIndexLoggedIn)
-        modelSceneWar:setEnded((isLoggedInPlayerLost) or ((modelPlayerManager:getAlivePlayersCount() <= 2) and (lostPlayerIndex)))
 
-        attacker:moveViewAlongPathAndFocusOnTarget(path, isModelUnitDiving(attacker), targetGridIndex, function()
+    else
+        local isReplay             = modelSceneWar:isTotalReplay()
+        local playerIndexLoggedIn  = (not isReplay) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+        local isLoggedInPlayerLost = (lostPlayerIndex) and (lostPlayerIndex == playerIndexLoggedIn)
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+        if ((isLoggedInPlayerLost)                                                    or
+            ((lostPlayerIndex) and (modelPlayerManager:getAlivePlayersCount() <= 2))) then
+            modelSceneWar:setEnded(true)
+        end
+
+        attacker:moveViewAlongPathAndFocusOnTarget(pathNodes, isModelUnitDiving(attacker), targetGridIndex, function()
             attacker:updateView()
                 :showNormalAnimation()
             attackTarget:updateView()
@@ -681,7 +692,7 @@ local function executeAttack(action)
                 attackTarget:removeViewFromParent()
             end
 
-            local modelGridEffect = getModelGridEffect()
+            local modelGridEffect = getModelGridEffect(modelSceneWar)
             if (attackerNewHP == 0) then
                 modelGridEffect:showAnimationExplosion(attackerGridIndex)
             elseif ((counterDamage) and (targetNewHP > 0)) then
@@ -699,19 +710,19 @@ local function executeAttack(action)
                 end
             end
 
-            if ((targetVision)                                                     and
-                ((isTotalReplay()) or (targetPlayerIndex == playerIndexLoggedIn))) then
-                getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
+            if ((targetVision)                                              and
+                ((isReplay) or (targetPlayerIndex == playerIndexLoggedIn))) then
+                getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
             end
             if (lostPlayerIndex) then
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 getModelMessageIndicator():showMessage(getLocalizedText(76, modelPlayerManager:getModelPlayer(lostPlayerIndex):getNickname()))
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             if (modelSceneWar:isEnded()) then
-                if     (isTotalReplay())      then modelSceneWar:showEffectReplayEnd(callbackOnWarEndedForClient)
+                if     (isReplay)             then modelSceneWar:showEffectReplayEnd(callbackOnWarEndedForClient)
                 elseif (isLoggedInPlayerLost) then modelSceneWar:showEffectLose(     callbackOnWarEndedForClient)
                 else                               modelSceneWar:showEffectWin(      callbackOnWarEndedForClient)
                 end
@@ -802,7 +813,7 @@ local function executeBeginTurn(action, modelSceneWar)
 end
 
 local function executeBuildModelTile(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local path             = action.path
     local sceneWarFileName = action.fileName
@@ -839,7 +850,7 @@ local function executeBuildModelTile(action)
                 :showNormalAnimation()
             modelTile:updateView()
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -847,7 +858,7 @@ local function executeBuildModelTile(action)
 end
 
 local function executeCaptureModelTile(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local path                = action.path
     local sceneWarFileName    = action.fileName
@@ -904,7 +915,7 @@ local function executeCaptureModelTile(action)
                     ((isTotalReplay()) or (previousPlayerIndex == playerIndexLoggedIn))) then
                     modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
                 end
-                updateTileAndUnitMapOnVisibilityChanged()
+                updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
                 modelSceneWar:setExecutingAction(false)
             end)
@@ -927,7 +938,7 @@ local function executeCaptureModelTile(action)
                     modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
                 end
 
-                updateTileAndUnitMapOnVisibilityChanged()
+                updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
                 modelSceneWar:setExecutingAction(false)
             end)
@@ -936,7 +947,7 @@ local function executeCaptureModelTile(action)
 end
 
 local function executeDive(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
@@ -961,7 +972,7 @@ local function executeDive(action)
                 getModelGridEffect():showAnimationDive(endingGridIndex)
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -969,7 +980,7 @@ local function executeDive(action)
 end
 
 local function executeDropModelUnit(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local path             = action.path
     local sceneWarFileName = action.fileName
@@ -1032,7 +1043,7 @@ local function executeDropModelUnit(action)
                 end)
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1054,7 +1065,7 @@ local function executeEndTurn(action, modelSceneWar)
 end
 
 local function executeJoinModelUnit(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
@@ -1123,7 +1134,7 @@ local function executeJoinModelUnit(action)
                 :showNormalAnimation()
             targetModelUnit:removeViewFromParent()
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1131,7 +1142,7 @@ local function executeJoinModelUnit(action)
 end
 
 local function executeLaunchFlare(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local path                = action.path
     local sceneWarFileName    = action.fileName
@@ -1164,7 +1175,7 @@ local function executeLaunchFlare(action)
                 end
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1172,7 +1183,7 @@ local function executeLaunchFlare(action)
 end
 
 local function executeLaunchSilo(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local path              = action.path
     local sceneWarFileName  = action.fileName
@@ -1215,7 +1226,7 @@ local function executeLaunchSilo(action)
                 modelGridEffect:showAnimationSiloAttack(gridIndex)
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1223,7 +1234,7 @@ local function executeLaunchSilo(action)
 end
 
 local function executeLoadModelUnit(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local path             = action.path
@@ -1250,7 +1261,7 @@ local function executeLoadModelUnit(action)
                 loaderModelUnit:updateView()
             end
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1258,7 +1269,7 @@ local function executeLoadModelUnit(action)
 end
 
 local function executeProduceModelUnitOnTile(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local modelUnitMap     = getModelUnitMap(sceneWarFileName)
@@ -1282,14 +1293,14 @@ local function executeProduceModelUnitOnTile(action)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        updateTileAndUnitMapOnVisibilityChanged()
+        updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
         modelSceneWar:setExecutingAction(false)
     end
 end
 
 local function executeProduceModelUnitOnUnit(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local path             = action.path
@@ -1316,7 +1327,7 @@ local function executeProduceModelUnitOnUnit(action)
             producer:updateView()
                 :showNormalAnimation()
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1324,7 +1335,7 @@ local function executeProduceModelUnitOnUnit(action)
 end
 
 local function executeSupplyModelUnit(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
@@ -1342,7 +1353,7 @@ local function executeSupplyModelUnit(action)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             local modelGridEffect = getModelGridEffect()
             for _, targetModelUnit in pairs(targetModelUnits) do
@@ -1356,7 +1367,7 @@ local function executeSupplyModelUnit(action)
 end
 
 local function executeSurface(action)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
@@ -1377,7 +1388,7 @@ local function executeSurface(action)
                 :showNormalAnimation()
                 :setViewVisible(isVisible)
 
-            updateTileAndUnitMapOnVisibilityChanged()
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             if (isVisible) then
                 getModelGridEffect():showAnimationSurface(endingGridIndex)
@@ -1448,7 +1459,7 @@ local function executeWait(action, modelSceneWar)
         return
     end
     modelSceneWar:setExecutingAction(true)
-    updateTilesAndUnitsBeforeExecutingAction(action)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local sceneWarFileName = action.sceneWarFileName
     local path             = action.path
@@ -1502,6 +1513,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSyncSceneWar)                 then executeSyncSceneWar(                action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionAttack)                       then executeAttack(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
@@ -1516,7 +1528,6 @@ function ActionExecutor.execute(action, modelScene)
     else
         getModelScene(action.fileName):setExecutingAction(true)
         if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
-        elseif (actionName == "Attack")                 then executeAttack(                action)
         elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
         elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
         elseif (actionName == "Dive")                   then executeDive(                  action)

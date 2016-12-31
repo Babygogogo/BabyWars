@@ -243,7 +243,7 @@ end
 
 local function sendActionAttack(self, targetGridIndex)
     createAndSendAction({
-        actionName      = "Attack",
+        actionCode      = ActionCodeFunctions.getActionCode("ActionAttack"),
         path            = createPathForDispatch(self.m_PathNodes),
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
         launchUnitID    = self.m_LaunchUnitID,
