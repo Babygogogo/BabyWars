@@ -45,9 +45,10 @@ local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
 
-local ACTION_CODE_END_TURN         = ActionCodeFunctions.getActionCode("ActionEndTurn")
-local ACTION_CODE_RELOAD_SCENE_WAR = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
-local ACTION_CODE_SURRENDER        = ActionCodeFunctions.getActionCode("ActionSurrender")
+local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")
+local ACTION_CODE_END_TURN             = ActionCodeFunctions.getActionCode("ActionEndTurn")
+local ACTION_CODE_RELOAD_SCENE_WAR     = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
+local ACTION_CODE_SURRENDER            = ActionCodeFunctions.getActionCode("ActionSurrender")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -309,7 +310,7 @@ end
 
 local function sendActionActivateSkillGroup(skillGroupID)
     createAndSendAction({
-        actionName   = "ActivateSkillGroup",
+        actionCode   = ACTION_CODE_ACTIVATE_SKILL_GROUP,
         skillGroupID = skillGroupID,
     }, true)
 end

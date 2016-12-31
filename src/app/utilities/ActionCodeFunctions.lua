@@ -22,6 +22,7 @@ local s_ActionCodes = {
     ActionSetSkillConfiguration        = 16,
     ActionSyncSceneWar                 = 17,
 
+    ActionActivateSkillGroup           = 18,
     ActionAttack                       = 19,
     ActionBeginTurn                    = 20,
     ActionEndTurn                      = 21,

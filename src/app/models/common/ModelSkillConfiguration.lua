@@ -69,7 +69,7 @@ function ModelSkillConfiguration:ctor(param)
     self.m_ModelSkillGroupActive1:ctor(param.active1)
     self.m_ModelSkillGroupActive2:ctor(param.active2)
     self:setBaseSkillPoints(       param.basePoints or 100)
-        :setActivatingSkillGroupId(param.activatingSkillGroupId)
+        :setActivatingSkillGroupId(param.activatingSkillGroupID)
 
     return self
 end
@@ -89,7 +89,7 @@ function ModelSkillConfiguration:toSerializableTable()
 
     return {
         basePoints             = self:getBaseSkillPoints(),
-        activatingSkillGroupId = self:getActivatingSkillGroupId(),
+        activatingSkillGroupID = self:getActivatingSkillGroupId(),
 
         passive                = self.m_ModelSkillGroupPassive:toSerializableTable(),
         active1                = active1:toSerializableTable(),
@@ -99,7 +99,7 @@ end
 
 function ModelSkillConfiguration:toSerializableReplayData()
     local data = self:toSerializableTable()
-    data.activatingSkillGroupId = nil
+    data.activatingSkillGroupID = nil
 
     return data
 end

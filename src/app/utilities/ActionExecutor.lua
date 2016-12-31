@@ -50,10 +50,10 @@ local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
 --------------------------------------------------------------------------------
 -- The functions for dispatching events.
 --------------------------------------------------------------------------------
-local function dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+local function dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
+    getScriptEventDispatcher(modelSceneWar):dispatchEvent({
         name        = "EvtModelPlayerUpdated",
-        modelPlayer = modelPlayer,
+        modelPlayer = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex),
         playerIndex = playerIndex,
     })
 end
@@ -85,10 +85,10 @@ local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
     end
 end
 
-local function updateFundWithCost(sceneWarFileName, playerIndex, cost)
-    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+local function updateFundWithCost(modelSceneWar, playerIndex, cost)
+    local modelPlayer = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - cost)
-    dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+    dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
 end
 
 local function produceActorUnit(sceneWarFileName, tiledID, unitID, gridIndex)
@@ -543,34 +543,40 @@ end
 --------------------------------------------------------------------------------
 -- The executors for war actions.
 --------------------------------------------------------------------------------
-local function executeActivateSkillGroup(action)
+local function executeActivateSkillGroup(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
-    local skillGroupID     = action.skillGroupID
-    local modelSceneWar    = getModelScene(sceneWarFileName)
-    local playerIndex      = getModelTurnManager(sceneWarFileName):getPlayerIndex()
-    local modelPlayer      = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+    local skillGroupID = action.skillGroupID
+    local playerIndex  = getModelTurnManager(modelSceneWar):getPlayerIndex()
+    local modelPlayer  = getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex)
     modelPlayer:getModelSkillConfiguration():setActivatingSkillGroupId(skillGroupID)
     modelPlayer:setDamageCost(modelPlayer:getDamageCost() - modelPlayer:getDamageCostForSkillGroupId(skillGroupID))
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
-    InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
+    InstantSkillExecutor.activateSkillGroup(modelSceneWar, skillGroupID)
 
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        local modelGridEffect = getModelGridEffect()
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        local modelGridEffect = getModelGridEffect(modelSceneWar)
         local func            = function(modelUnit)
             if (modelUnit:getPlayerIndex() == playerIndex) then
                 modelGridEffect:showAnimationSkillActivation(modelUnit:getGridIndex())
                 modelUnit:updateView()
             end
         end
-        getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
+        getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(func)
             :forEachModelUnitLoaded(func)
 
         updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
-        dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+        dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
 
         modelSceneWar:setExecutingAction(false)
     end
@@ -617,7 +623,7 @@ local function executeAttack(action, modelSceneWar)
         attackerModelPlayer:setFund(attackerModelPlayer:getFund() + getIncomeWithDamageCost(targetDamageCost,   attackerModelPlayer))
         targetModelPlayer  :setFund(targetModelPlayer  :getFund() + getIncomeWithDamageCost(attackerDamageCost, targetModelPlayer))
 
-        dispatchEvtModelPlayerUpdated(sceneWarFileName, attackerModelPlayer, attackerPlayerIndex)
+        dispatchEvtModelPlayerUpdated(modelSceneWar, attackerPlayerIndex)
     end
 
     local attackerNewHP = math.max(0, attacker:getCurrentHP() - (counterDamage or 0))
@@ -1090,7 +1096,7 @@ local function executeJoinModelUnit(action)
             local playerIndex = focusModelUnit:getPlayerIndex()
             local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
             modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
-            dispatchEvtModelPlayerUpdated(sceneWarFileName, modelPlayer, playerIndex)
+            dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
         end
     end
     if (focusModelUnit.setCurrentHP) then
@@ -1287,7 +1293,7 @@ local function executeProduceModelUnitOnTile(action)
     end
 
     modelUnitMap:setAvailableUnitId(producedUnitID + 1)
-    updateFundWithCost(sceneWarFileName, playerIndex, action.cost)
+    updateFundWithCost(modelSceneWar, playerIndex, action.cost)
 
     local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
@@ -1317,7 +1323,7 @@ local function executeProduceModelUnitOnUnit(action)
     if (producer.setCurrentMaterial) then
         producer:setCurrentMaterial(producer:getCurrentMaterial() - 1)
     end
-    updateFundWithCost(sceneWarFileName, producer:getPlayerIndex(), action.cost)
+    updateFundWithCost(modelSceneWar, producer:getPlayerIndex(), action.cost)
 
     local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
@@ -1513,6 +1519,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneWar)                  then executeRunSceneWar(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSetSkillConfiguration)        then executeSetSkillConfiguration(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSyncSceneWar)                 then executeSyncSceneWar(                action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionActivateSkillGroup)           then executeActivateSkillGroup(          action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionAttack)                       then executeAttack(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
@@ -1527,7 +1534,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        if     (actionName == "ActivateSkillGroup")     then executeActivateSkillGroup(    action)
         elseif (actionName == "BuildModelTile")         then executeBuildModelTile(        action)
         elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
         elseif (actionName == "Dive")                   then executeDive(                  action)

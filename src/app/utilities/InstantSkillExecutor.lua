@@ -202,12 +202,12 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function InstantSkillExecutor.activateSkillGroup(skillGroupID, sceneWarFileName)
-    local modelWarField           = SingletonGetters.getModelWarField(        sceneWarFileName)
-    local modelPlayerManager      = SingletonGetters.getModelPlayerManager(   sceneWarFileName)
-    local modelTurnManager        = SingletonGetters.getModelTurnManager(     sceneWarFileName)
-    local modelWeatherManager     = SingletonGetters.getModelWeatherManager(  sceneWarFileName)
-    local dispatcher              = SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+function InstantSkillExecutor.activateSkillGroup(modelSceneWar, skillGroupID)
+    local modelWarField           = SingletonGetters.getModelWarField(        modelSceneWar)
+    local modelPlayerManager      = SingletonGetters.getModelPlayerManager(   modelSceneWar)
+    local modelTurnManager        = SingletonGetters.getModelTurnManager(     modelSceneWar)
+    local modelWeatherManager     = SingletonGetters.getModelWeatherManager(  modelSceneWar)
+    local dispatcher              = SingletonGetters.getScriptEventDispatcher(modelSceneWar)
     local modelSkillConfiguration = modelPlayerManager:getModelPlayer(modelTurnManager:getPlayerIndex()):getModelSkillConfiguration()
 
     for _, skill in pairs(modelSkillConfiguration:getAllSkillsInGroup(skillGroupID)) do
