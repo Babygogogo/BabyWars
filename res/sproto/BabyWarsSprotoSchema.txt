@@ -25,10 +25,11 @@
     ActionAttack                      101 : ActionAttack
     ActionBeginTurn                   102 : ActionBeginTurn
     ActionBuildModelTile              103 : ActionBuildModelTile
-    ActionEndTurn                     104 : ActionEndTurn
-    ActionProduceModelUnitOnTile      105 : ActionProduceModelUnitOnTile
-    ActionSurrender                   106 : ActionSurrender
-    ActionWait                        107 : ActionWait
+    ActionCaptureModelTile            104 : ActionCaptureModelTile
+    ActionEndTurn                     105 : ActionEndTurn
+    ActionProduceModelUnitOnTile      106 : ActionProduceModelUnitOnTile
+    ActionSurrender                   107 : ActionSurrender
+    ActionWait                        108 : ActionWait
 }
 
 .ActionRedis {
@@ -241,6 +242,21 @@
     actingTilesData   8 : *TileData(positionIndex)
     path              9 :  MovePath
     launchUnitID     10 :  integer
+}
+
+.ActionCaptureModelTile {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    path              9 :  MovePath
+    launchUnitID     10 :  integer
+    lostPlayerIndex  11 :  integer
 }
 
 .ActionEndTurn {

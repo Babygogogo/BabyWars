@@ -856,24 +856,28 @@ local function executeBuildModelTile(action, modelSceneWar)
     end
 end
 
-local function executeCaptureModelTile(action)
+local function executeCaptureModelTile(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local path                = action.path
-    local sceneWarFileName    = action.fileName
-    local endingGridIndex     = path[#path]
-    local modelFogMap         = getModelFogMap(sceneWarFileName)
-    local modelTile           = getModelTileMap(sceneWarFileName):getModelTile(endingGridIndex)
-    local playerIndexLoggedIn = (not IS_SERVER) and (getPlayerIndexLoggedIn()) or (nil)
-    local focusModelUnit      = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], action.launchUnitID)
-    local capturePoint        = modelTile:getCurrentCapturePoint() - focusModelUnit:getCaptureAmount()
-    local previousVision, previousPlayerIndex
-    if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
+    local pathNodes       = action.path.pathNodes
+    local endingGridIndex = pathNodes[#pathNodes]
+    local modelTile       = getModelTileMap(modelSceneWar):getModelTile(endingGridIndex)
+    local focusModelUnit  = getModelUnitMap(modelSceneWar):getFocusModelUnit(pathNodes[1], action.launchUnitID)
+    local isReplay        = modelSceneWar:isTotalReplay()
+    if ((not IS_SERVER) and (not isReplay) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
+    local modelFogMap         = getModelFogMap(modelSceneWar)
+    local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+    local capturePoint        = modelTile:getCurrentCapturePoint() - focusModelUnit:getCaptureAmount()
+    local previousVision, previousPlayerIndex
     if (capturePoint > 0) then
         focusModelUnit:setCapturingModelTile(true)
         modelTile:setCurrentCapturePoint(capturePoint)
@@ -886,13 +890,13 @@ local function executeCaptureModelTile(action)
         modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
             :updateWithPlayerIndex(playerIndexActing)
 
-        if ((IS_SERVER) or (isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
+        if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
             modelFogMap:updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndexActing, endingGridIndex, modelTile:getVisionForPlayerIndex(playerIndexActing))
         end
     end
 
-    local modelSceneWar      = getModelScene(sceneWarFileName)
-    local modelPlayerManager = getModelPlayerManager(sceneWarFileName)
+    local sceneWarFileName   = action.sceneWarFileName
+    local modelPlayerManager = getModelPlayerManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
     if (IS_SERVER) then
         if (capturePoint <= 0) then
@@ -900,18 +904,22 @@ local function executeCaptureModelTile(action)
         end
         if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
-            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() < 2)
+            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 1)
         end
         modelSceneWar:setExecutingAction(false)
     else
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
         if (not lostPlayerIndex) then
-            focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+            focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
                 focusModelUnit:updateView()
                     :showNormalAnimation()
                 modelTile:updateView()
 
-                if ((capturePoint <= 0)                                                  and
-                    ((isTotalReplay()) or (previousPlayerIndex == playerIndexLoggedIn))) then
+                if ((capturePoint <= 0)                                           and
+                    ((isReplay) or (previousPlayerIndex == playerIndexLoggedIn))) then
                     modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
                 end
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
@@ -920,24 +928,25 @@ local function executeCaptureModelTile(action)
             end)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
-            local isLoggedInPlayerLost = lostModelPlayer:getAccount() == getLoggedInAccountAndPassword()
-            modelSceneWar:setEnded((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2))
+            local isLoggedInPlayerLost = (not isReplay) and (lostModelPlayer:getAccount() == getLoggedInAccountAndPassword())
+            if ((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2)) then
+                modelSceneWar:setEnded(true)
+            end
 
-            focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+            focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
                 focusModelUnit:updateView()
                     :showNormalAnimation()
                 modelTile:updateView()
 
                 getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
-
-                if (isLoggedInPlayerLost) then
-                    modelSceneWar:showEffectLose(callbackOnWarEndedForClient)
-                elseif (modelSceneWar:isEnded()) then
-                    modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
-                end
-
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
+
+                if     (not modelSceneWar:isEnded()) then -- do nothing.
+                elseif (isReplay)                    then modelSceneWar:showEffectReplayEnd(callbackOnWarEndedForClient)
+                elseif (isLoggedInPlayerLost)        then modelSceneWar:showEffectLose(     callbackOnWarEndedForClient)
+                else                                      modelSceneWar:showEffectWin(      callbackOnWarEndedForClient)
+                end
 
                 modelSceneWar:setExecutingAction(false)
             end)
@@ -1519,6 +1528,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionAttack)                       then executeAttack(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBuildModelTile)               then executeBuildModelTile(              action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionCaptureModelTile)             then executeCaptureModelTile(            action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
@@ -1532,7 +1542,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "CaptureModelTile")       then executeCaptureModelTile(      action)
         elseif (actionName == "Dive")                   then executeDive(                  action)
         elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
         elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)

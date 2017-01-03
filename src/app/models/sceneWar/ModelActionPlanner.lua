@@ -260,7 +260,7 @@ end
 
 local function sendActionCaptureModelTile(self)
     createAndSendAction({
-        actionName   = "CaptureModelTile",
+        actionCode   = ActionCodeFunctions.getActionCode("ActionCaptureModelTile"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
