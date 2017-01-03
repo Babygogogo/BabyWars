@@ -36,12 +36,13 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
+    local isReplay            = isTotalReplay()
     local playerIndex         = self.m_Model:getPlayerIndex()
     local playerIndexMod      = playerIndex % 2
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn()) or (nil)
     local sceneWarFileName    = getSceneWarFileName()
     local unitType            = self.m_Model:getUnitType()
-    local isAlwaysVisible     = (isTotalReplay()) or (playerIndex == playerIndexLoggedIn)
+    local isAlwaysVisible     = (isReplay) or (playerIndex == playerIndexLoggedIn)
 
     local steps               = {cc.CallFunc:create(function()
         getModelMapCursor():setMovableByPlayer(false)

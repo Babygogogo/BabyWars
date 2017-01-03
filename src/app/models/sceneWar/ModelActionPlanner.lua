@@ -250,6 +250,14 @@ local function sendActionAttack(self, targetGridIndex)
     })
 end
 
+local function sendActionBuildModelTile(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionBuildModelTile"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function sendActionCaptureModelTile(self)
     createAndSendAction({
         actionName   = "CaptureModelTile",
@@ -261,14 +269,6 @@ end
 local function sendActionDive(self)
     createAndSendAction({
         actionName   = "Dive",
-        path         = createPathForDispatch(self.m_PathNodes),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionBuildModelTile(self)
-    createAndSendAction({
-        actionName   = "BuildModelTile",
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })

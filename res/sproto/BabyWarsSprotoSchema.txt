@@ -24,10 +24,11 @@
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
     ActionBeginTurn                   102 : ActionBeginTurn
-    ActionEndTurn                     103 : ActionEndTurn
-    ActionProduceModelUnitOnTile      104 : ActionProduceModelUnitOnTile
-    ActionSurrender                   105 : ActionSurrender
-    ActionWait                        106 : ActionWait
+    ActionBuildModelTile              103 : ActionBuildModelTile
+    ActionEndTurn                     104 : ActionEndTurn
+    ActionProduceModelUnitOnTile      105 : ActionProduceModelUnitOnTile
+    ActionSurrender                   106 : ActionSurrender
+    ActionWait                        107 : ActionWait
 }
 
 .ActionRedis {
@@ -226,6 +227,20 @@
     income           5 : integer
     lostPlayerIndex  6 : integer
     repairData       7 : RepairData
+}
+
+.ActionBuildModelTile {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    path              9 :  MovePath
+    launchUnitID     10 :  integer
 }
 
 .ActionEndTurn {
