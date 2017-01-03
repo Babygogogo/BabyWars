@@ -1131,7 +1131,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelActionPlanner:onStartRunning(sceneWarFileName)
+function ModelActionPlanner:onStartRunning(modelSceneWar, sceneWarFileName)
     getScriptEventDispatcher()
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)

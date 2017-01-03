@@ -201,7 +201,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelFogMap:onStartRunning(sceneWarFileName)
+function ModelFogMap:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName    = sceneWarFileName
     self.m_IsFogOfWarByDefault = getModelScene(sceneWarFileName):isFogOfWarByDefault()
 
@@ -211,7 +211,7 @@ function ModelFogMap:onStartRunning(sceneWarFileName)
                 :resetMapForUnitsForPlayerIndex(playerIndex)
         end
     else
-        local playerIndex = getPlayerIndexLoggedIn()
+        local playerIndex = getPlayerIndexLoggedIn(modelSceneWar)
         self:resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
     end

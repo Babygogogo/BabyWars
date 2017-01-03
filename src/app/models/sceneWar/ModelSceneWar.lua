@@ -285,11 +285,11 @@ end
 function ModelSceneWar:onStartRunning()
     local sceneWarFileName = self:getFileName()
     local modelTurnManager = self:getModelTurnManager()
-    modelTurnManager            :onStartRunning(sceneWarFileName)
-    self:getModelPlayerManager():onStartRunning(sceneWarFileName)
-    self:getModelWarField()     :onStartRunning(sceneWarFileName)
+    modelTurnManager            :onStartRunning(self, sceneWarFileName)
+    self:getModelPlayerManager():onStartRunning(self, sceneWarFileName)
+    self:getModelWarField()     :onStartRunning(self, sceneWarFileName)
     if (not IS_SERVER) then
-        self:getModelWarHud():onStartRunning(sceneWarFileName)
+        self:getModelWarHud():onStartRunning(self, sceneWarFileName)
     end
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})

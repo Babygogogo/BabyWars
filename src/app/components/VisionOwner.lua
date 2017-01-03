@@ -28,7 +28,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function VisionOwner:onStartRunning(sceneWarFileName)
+function VisionOwner:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self

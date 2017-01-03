@@ -403,8 +403,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelTurnManager:onStartRunning(sceneWarFileName)
-    assert(string.len(sceneWarFileName) == 16, "ModelTurnManager:onStartRunning() invalid name: " .. (sceneWarFileName or ""))
+function ModelTurnManager:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self

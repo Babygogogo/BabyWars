@@ -44,7 +44,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function IncomeProvider:onStartRunning(sceneWarFileName)
+function IncomeProvider:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self

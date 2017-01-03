@@ -218,9 +218,9 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function ModelTile:onStartRunning(sceneWarFileName)
+function ModelTile:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
-    ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
 
     return self
 end
@@ -272,7 +272,7 @@ function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
 
     initWithTiledID(self, objectID, baseID)
     loadInstantialData(self, {GridIndexable = {x = gridIndex.x, y = gridIndex.y}})
-    self:onStartRunning(self.m_SceneWarFileName)
+    self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
 
     return self
 end
@@ -305,7 +305,7 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
             GridIndexable = {x = gridIndex.x, y = gridIndex.y},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
-        self:onStartRunning(self.m_SceneWarFileName)
+        self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
     end
 
     return self
@@ -334,7 +334,7 @@ function ModelTile:updateAsFogDisabled(data)
             else
                 initWithTiledID(self, objectID, baseID)
                 loadInstantialData(self, data)
-                self:onStartRunning(self.m_SceneWarFileName)
+                self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
             end
         end
     end

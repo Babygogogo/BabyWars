@@ -43,7 +43,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelReplayController:onStartRunning(sceneWarFileName)
+function ModelReplayController:onStartRunning(modelSceneWar, sceneWarFileName)
     getScriptEventDispatcher()
         :addEventListener("EvtWarCommandMenuUpdated", self)
         :addEventListener("EvtHideUI",                self)

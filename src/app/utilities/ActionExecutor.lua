@@ -101,7 +101,7 @@ local function produceActorUnit(sceneWarFileName, tiledID, unitID, gridIndex)
     local modelUnit = actorUnit:getModel()
     promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
     modelUnit:setStateActioned()
-        :onStartRunning(sceneWarFileName)
+        :onStartRunning(SingletonGetters.getModelScene(sceneWarFileName), sceneWarFileName)
 
     return actorUnit
 end
@@ -130,7 +130,7 @@ local function addActorUnitsWithUnitsData(modelSceneWar, unitsData, isViewVisibl
         local modelUnitMap     = getModelUnitMap(modelSceneWar)
         for unitID, unitData in pairs(unitsData) do
             local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
-            actorUnit:getModel():onStartRunning(sceneWarFileName)
+            actorUnit:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
                 :updateView()
                 :setViewVisible(isViewVisible)
 

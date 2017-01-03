@@ -748,7 +748,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running or script events.
 --------------------------------------------------------------------------------
-function ModelWarCommandMenu:onStartRunning(sceneWarFileName)
+function ModelWarCommandMenu:onStartRunning(modelSceneWar, sceneWarFileName)
     getScriptEventDispatcher()
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)
