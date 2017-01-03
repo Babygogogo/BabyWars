@@ -268,7 +268,7 @@ end
 
 local function sendActionDive(self)
     createAndSendAction({
-        actionName   = "Dive",
+        actionCode   = ActionCodeFunctions.getActionCode("ActionDive"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
@@ -804,16 +804,19 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-    if ((isTotalReplay())                                               or
-        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (not getModelTurnManager():isTurnPhaseMain()))                  then
+    if (isTotalReplay()) then
         return false
     else
-        local modelTile = getModelTileMap():getModelTile(gridIndex)
-        return (not getModelUnitMap():getModelUnit(gridIndex))  and
-            (modelTile:getPlayerIndex() == playerIndexLoggedIn) and
-            (modelTile.getProductionList)
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+        if ((getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+            (not getModelTurnManager():isTurnPhaseMain()))                  then
+            return false
+        else
+            local modelTile = getModelTileMap():getModelTile(gridIndex)
+            return (not getModelUnitMap():getModelUnit(gridIndex))  and
+                (modelTile:getPlayerIndex() == playerIndexLoggedIn) and
+                (modelTile.getProductionList)
+        end
     end
 end
 
@@ -835,14 +838,17 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-    if ((isTotalReplay())                                               or
-        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (not getModelTurnManager():isTurnPhaseMain()))                  then
+    if (isTotalReplay()) then
         return false
     else
-        local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+        if ((getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+            (not getModelTurnManager():isTurnPhaseMain()))                  then
+            return false
+        else
+            local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
+            return (modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
+        end
     end
 end
 

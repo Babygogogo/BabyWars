@@ -954,30 +954,45 @@ local function executeCaptureModelTile(action, modelSceneWar)
     end
 end
 
-local function executeDive(action)
+local function executeDive(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
-    local path             = action.path
-    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
+    local pathNodes        = action.pathNodes
+    local focusModelUnit   = getModelUnitMap(modelSceneWar):getFocusModelUnit(pathNodes[1], launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(true)
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, false, function()
-            local endingGridIndex = path[#path]
-            local isVisible       =
+        local isReplay = modelSceneWar:isTotalReplay()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        local sceneWarFileName = action.sceneWarFileName
+        focusModelUnit:moveViewAlongPath(pathNodes, false, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
-                :setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), true, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn()))
 
-            if (isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn())) then
-                getModelGridEffect():showAnimationDive(endingGridIndex)
+            local endingGridIndex = pathNodes[#pathNodes]
+            if (isReplay) then
+                getModelGridEffect(modelSceneWar):showAnimationDive(endingGridIndex)
+            else
+                local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+                local unitType            = focusModelUnit:getUnitType()
+                local playerIndexActing   = focusModelUnit:getPlayerIndex()
+                focusModelUnit:setViewVisible(isUnitVisible(sceneWarFileName, endingGridIndex, unitType, true, playerIndexActing, playerIndexLoggedIn))
+
+                if (isUnitVisible(sceneWarFileName, endingGridIndex, unitType, false, playerIndexActing, playerIndexLoggedIn)) then
+                    getModelGridEffect(modelSceneWar):showAnimationDive(endingGridIndex)
+                end
             end
 
             updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
@@ -1529,6 +1544,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBuildModelTile)               then executeBuildModelTile(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionCaptureModelTile)             then executeCaptureModelTile(            action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionDive)                         then executeDive(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
@@ -1542,7 +1558,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "Dive")                   then executeDive(                  action)
         elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
         elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
         elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
