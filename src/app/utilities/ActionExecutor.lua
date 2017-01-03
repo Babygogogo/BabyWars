@@ -77,21 +77,21 @@ local function isModelUnitDiving(modelUnit)
     return (modelUnit.isDiving) and (modelUnit:isDiving())
 end
 
-local function promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
-    local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
-    local modifier    = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
-    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
-        modelUnit:setCurrentPromotion(modifier)
-    end
-end
-
 local function updateFundWithCost(modelSceneWar, playerIndex, cost)
     local modelPlayer = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex)
     modelPlayer:setFund(modelPlayer:getFund() - cost)
     dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
 end
 
-local function produceActorUnit(sceneWarFileName, tiledID, unitID, gridIndex)
+local function promoteModelUnitOnProduce(modelUnit, modelSceneWar)
+    local modelPlayer = getModelPlayerManager(modelSceneWar):getModelPlayer(modelUnit:getPlayerIndex())
+    local modifier    = SkillModifierFunctions.getPassivePromotionModifier(modelPlayer:getModelSkillConfiguration())
+    if ((modifier > 0) and (modelUnit.setCurrentPromotion)) then
+        modelUnit:setCurrentPromotion(modifier)
+    end
+end
+
+local function produceActorUnit(modelSceneWar, tiledID, unitID, gridIndex)
     local actorData = {
         tiledID       = tiledID,
         unitID        = unitID,
@@ -99,9 +99,9 @@ local function produceActorUnit(sceneWarFileName, tiledID, unitID, gridIndex)
     }
     local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", actorData, "sceneWar.ViewUnit")
     local modelUnit = actorUnit:getModel()
-    promoteModelUnitOnProduce(modelUnit, sceneWarFileName)
+    promoteModelUnitOnProduce(modelUnit, modelSceneWar)
     modelUnit:setStateActioned()
-        :onStartRunning(SingletonGetters.getModelScene(sceneWarFileName), sceneWarFileName)
+        :onStartRunning(modelSceneWar, modelSceneWar:getFileName())
 
     return actorUnit
 end
@@ -1274,31 +1274,37 @@ local function executeLoadModelUnit(action)
     end
 end
 
-local function executeProduceModelUnitOnTile(action)
+local function executeProduceModelUnitOnTile(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
+    local modelUnitMap     = getModelUnitMap(modelSceneWar)
     local producedUnitID   = modelUnitMap:getAvailableUnitId()
-    local playerIndex      = getModelTurnManager(sceneWarFileName):getPlayerIndex()
+    local playerIndex      = getModelTurnManager(modelSceneWar):getPlayerIndex()
 
     if (action.tiledID) then
         local gridIndex         = action.gridIndex
-        local producedActorUnit = produceActorUnit(sceneWarFileName, action.tiledID, producedUnitID, gridIndex)
+        local producedActorUnit = produceActorUnit(modelSceneWar, action.tiledID, producedUnitID, gridIndex)
         modelUnitMap:addActorUnitOnMap(producedActorUnit)
 
-        if ((IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())) then
-            getModelFogMap(sceneWarFileName):updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, producedActorUnit:getModel():getVisionForPlayerIndex(playerIndex))
+        if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+            getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, producedActorUnit:getModel():getVisionForPlayerIndex(playerIndex))
         end
     end
 
     modelUnitMap:setAvailableUnitId(producedUnitID + 1)
     updateFundWithCost(modelSceneWar, playerIndex, action.cost)
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
         updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
         modelSceneWar:setExecutingAction(false)
@@ -1316,7 +1322,7 @@ local function executeProduceModelUnitOnUnit(action)
     producer:setStateActioned()
 
     local producedUnitID    = modelUnitMap:getAvailableUnitId()
-    local producedActorUnit = produceActorUnit(sceneWarFileName, producer:getMovableProductionTiledId(), producedUnitID, path[#path])
+    local producedActorUnit = produceActorUnit(modelSceneWar, producer:getMovableProductionTiledId(), producedUnitID, path[#path])
     modelUnitMap:addActorUnitLoaded(producedActorUnit)
         :setAvailableUnitId(producedUnitID + 1)
     producer:addLoadUnitId(producedUnitID)
@@ -1523,6 +1529,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionAttack)                       then executeAttack(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
@@ -1542,7 +1549,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
         elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
         elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
-        elseif (actionName == "ProduceModelUnitOnTile") then executeProduceModelUnitOnTile(action)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
         elseif (actionName == "Surface")                then executeSurface(               action)

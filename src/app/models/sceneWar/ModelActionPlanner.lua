@@ -274,6 +274,14 @@ local function sendActionBuildModelTile(self)
     })
 end
 
+local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
+    createAndSendAction({
+        actionCode = ActionCodeFunctions.getActionCode("ActionProduceModelUnitOnTile"),
+        gridIndex  = GridIndexFunctions.clone(gridIndex),
+        tiledID    = tiledID,
+    })
+end
+
 local function sendActionProduceModelUnitOnUnit(self)
     createAndSendAction({
         actionName = "ProduceModelUnitOnUnit",
@@ -294,14 +302,6 @@ local function sendActionSurface(self)
         actionName   = "Surface",
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
-    createAndSendAction({
-        actionName = "ProduceModelUnitOnTile",
-        gridIndex  = GridIndexFunctions.clone(gridIndex),
-        tiledID    = tiledID,
     })
 end
 
@@ -1140,7 +1140,7 @@ function ModelActionPlanner:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
     if (self.m_View) then
-        self.m_View:setMapSize(getModelTileMap():getMapSize())
+        self.m_View:setMapSize(getModelTileMap(modelSceneWar):getMapSize())
     end
     setStateIdle(self, true)
 

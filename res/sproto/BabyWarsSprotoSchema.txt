@@ -21,12 +21,13 @@
     ActionSetSkillConfiguration        16 : ActionSetSkillConfiguration
     ActionSyncSceneWar                 17 : ActionSyncSceneWar
 
-    ActionActivateSkillGroup           18 : ActionActivateSkillGroup
-    ActionAttack                       19 : ActionAttack
-    ActionBeginTurn                    20 : ActionBeginTurn
-    ActionEndTurn                      21 : ActionEndTurn
-    ActionSurrender                    22 : ActionSurrender
-    ActionWait                         23 : ActionWait
+    ActionActivateSkillGroup          100 : ActionActivateSkillGroup
+    ActionAttack                      101 : ActionAttack
+    ActionBeginTurn                   102 : ActionBeginTurn
+    ActionEndTurn                     103 : ActionEndTurn
+    ActionProduceModelUnitOnTile      104 : ActionProduceModelUnitOnTile
+    ActionSurrender                   105 : ActionSurrender
+    ActionWait                        106 : ActionWait
 }
 
 .ActionRedis {
@@ -233,6 +234,19 @@
     playerPassword   2 : string
     sceneWarFileName 3 : string
     actionID         4 : integer
+}
+
+.ActionProduceModelUnitOnTile {
+    actionCode       0 : integer
+    playerAccount    1 : string
+    playerPassword   2 : string
+    sceneWarFileName 3 : string
+    actionID         4 : integer
+    revealedUnits    5 : *UnitData(unitID)
+    revealedTiles    6 : *TileData(positionIndex)
+    tiledID          7 : integer
+    gridIndex        8 : GridIndex
+    cost             9 : integer
 }
 
 .ActionSurrender {

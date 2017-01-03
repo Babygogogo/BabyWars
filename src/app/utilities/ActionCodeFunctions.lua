@@ -22,12 +22,13 @@ local s_ActionCodes = {
     ActionSetSkillConfiguration        = 16,
     ActionSyncSceneWar                 = 17,
 
-    ActionActivateSkillGroup           = 18,
-    ActionAttack                       = 19,
-    ActionBeginTurn                    = 20,
-    ActionEndTurn                      = 21,
-    ActionSurrender                    = 22,
-    ActionWait                         = 23,
+    ActionActivateSkillGroup           = 100,
+    ActionAttack                       = 101,
+    ActionBeginTurn                    = 102,
+    ActionEndTurn                      = 103,
+    ActionProduceModelUnitOnTile       = 104,
+    ActionSurrender                    = 105,
+    ActionWait                         = 106,
 }
 local s_ActionNames
 
