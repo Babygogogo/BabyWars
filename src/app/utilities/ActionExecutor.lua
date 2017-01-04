@@ -1375,18 +1375,21 @@ local function executeProduceModelUnitOnTile(action, modelSceneWar)
     end
 end
 
-local function executeProduceModelUnitOnUnit(action)
+local function executeProduceModelUnitOnUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
-    local path             = action.path
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local producer         = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local pathNodes    = action.path.pathNodes
+    local modelUnitMap = getModelUnitMap(modelSceneWar)
+    local producer     = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     producer:setStateActioned()
 
     local producedUnitID    = modelUnitMap:getAvailableUnitId()
-    local producedActorUnit = produceActorUnit(modelSceneWar, producer:getMovableProductionTiledId(), producedUnitID, path[#path])
+    local producedActorUnit = produceActorUnit(modelSceneWar, producer:getMovableProductionTiledId(), producedUnitID, pathNodes[#pathNodes])
     modelUnitMap:addActorUnitLoaded(producedActorUnit)
         :setAvailableUnitId(producedUnitID + 1)
     producer:addLoadUnitId(producedUnitID)
@@ -1395,11 +1398,14 @@ local function executeProduceModelUnitOnUnit(action)
     end
     updateFundWithCost(modelSceneWar, producer:getPlayerIndex(), action.cost)
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        producer:moveViewAlongPath(path, isModelUnitDiving(producer), function()
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        producer:moveViewAlongPath(pathNodes, isModelUnitDiving(producer), function()
             producer:updateView()
                 :showNormalAnimation()
 
@@ -1610,6 +1616,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLaunchSilo)                   then executeLaunchSilo(                  action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLoadModelUnit)                then executeLoadModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnUnit)       then executeProduceModelUnitOnUnit(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
@@ -1622,7 +1629,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
         elseif (actionName == "TickActionId")           then executeTickActionId(          action)
         end

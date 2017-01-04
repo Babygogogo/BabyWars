@@ -35,9 +35,10 @@ local s_ActionCodes = {
     ActionLaunchSilo                   = 110,
     ActionLoadModelUnit                = 111,
     ActionProduceModelUnitOnTile       = 112,
-    ActionSurface                      = 113,
-    ActionSurrender                    = 114,
-    ActionWait                         = 115,
+    ActionProduceModelUnitOnUnit       = 113,
+    ActionSurface                      = 114,
+    ActionSurrender                    = 115,
+    ActionWait                         = 116,
 }
 local s_ActionNames
 

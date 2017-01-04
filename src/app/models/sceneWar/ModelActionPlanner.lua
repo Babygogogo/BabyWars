@@ -327,7 +327,7 @@ end
 
 local function sendActionProduceModelUnitOnUnit(self)
     createAndSendAction({
-        actionName = "ProduceModelUnitOnUnit",
+        actionCode = ActionCodeFunctions.getActionCode("ActionProduceModelUnitOnUnit"),
         path       = createPathForDispatch(self.m_PathNodes),
     })
 end
