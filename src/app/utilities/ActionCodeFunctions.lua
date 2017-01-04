@@ -30,10 +30,11 @@ local s_ActionCodes = {
     ActionDive                         = 105,
     ActionDropModelUnit                = 106,
     ActionEndTurn                      = 107,
-    ActionProduceModelUnitOnTile       = 108,
-    ActionSurface                      = 109,
-    ActionSurrender                    = 110,
-    ActionWait                         = 111,
+    ActionJoinModelUnit                = 108,
+    ActionProduceModelUnitOnTile       = 109,
+    ActionSurface                      = 110,
+    ActionSurrender                    = 111,
+    ActionWait                         = 112,
 }
 local s_ActionNames
 

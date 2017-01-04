@@ -233,14 +233,6 @@ local function createAndSendAction(rawAction)
     })
 end
 
-local function sendActionJoinModelUnit(self)
-    createAndSendAction({
-        actionName   = "JoinModelUnit",
-        path         = createPathForDispatch(self.m_PathNodes),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
 local function sendActionAttack(self, targetGridIndex)
     createAndSendAction({
         actionCode      = ActionCodeFunctions.getActionCode("ActionAttack"),
@@ -274,6 +266,48 @@ local function sendActionDive(self)
     })
 end
 
+local function sendActionDropModelUnit(self)
+    local dropDestinations = {}
+    for _, dropDestination in ipairs(self.m_SelectedDropDestinations) do
+        dropDestinations[#dropDestinations + 1] = {
+            unitID    = dropDestination.unitID,
+            gridIndex = dropDestination.gridIndex,
+        }
+    end
+
+    createAndSendAction({
+        actionCode       = ActionCodeFunctions.getActionCode("ActionDropModelUnit"),
+        path             = createPathForDispatch(self.m_PathNodes),
+        dropDestinations = dropDestinations,
+        launchUnitID     = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionJoinModelUnit(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionJoinModelUnit"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionLoadModelUnit(self)
+    createAndSendAction({
+        actionName   = "LoadModelUnit",
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionLaunchFlare(self, gridIndex)
+    createAndSendAction({
+        actionName      = "LaunchFlare",
+        path            = createPathForDispatch(self.m_PathNodes),
+        launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = gridIndex,
+    })
+end
+
 local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
     createAndSendAction({
         actionCode = ActionCodeFunctions.getActionCode("ActionProduceModelUnitOnTile"),
@@ -302,40 +336,6 @@ local function sendActionSurface(self)
         actionCode   = ActionCodeFunctions.getActionCode("ActionSurface"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionLoadModelUnit(self)
-    createAndSendAction({
-        actionName   = "LoadModelUnit",
-        path         = createPathForDispatch(self.m_PathNodes),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionDropModelUnit(self)
-    local dropDestinations = {}
-    for _, dropDestination in ipairs(self.m_SelectedDropDestinations) do
-        dropDestinations[#dropDestinations + 1] = {
-            unitID    = dropDestination.unitID,
-            gridIndex = dropDestination.gridIndex,
-        }
-    end
-
-    createAndSendAction({
-        actionCode       = ActionCodeFunctions.getActionCode("ActionDropModelUnit"),
-        path             = createPathForDispatch(self.m_PathNodes),
-        dropDestinations = dropDestinations,
-        launchUnitID     = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionLaunchFlare(self, gridIndex)
-    createAndSendAction({
-        actionName      = "LaunchFlare",
-        path            = createPathForDispatch(self.m_PathNodes),
-        launchUnitID    = self.m_LaunchUnitID,
-        targetGridIndex = gridIndex,
     })
 end
 

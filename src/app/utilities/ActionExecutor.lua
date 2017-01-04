@@ -1107,15 +1107,18 @@ local function executeEndTurn(action, modelSceneWar)
     modelSceneWar:setExecutingAction(false)
 end
 
-local function executeJoinModelUnit(action)
+local function executeJoinModelUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
-    local path             = action.path
-    local endingGridIndex  = path[#path]
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], launchUnitID)
+    local pathNodes        = action.path.pathNodes
+    local endingGridIndex  = pathNodes[#pathNodes]
+    local modelUnitMap     = getModelUnitMap(modelSceneWar)
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(pathNodes[1], launchUnitID)
     local targetModelUnit  = modelUnitMap:getModelUnit(endingGridIndex)
     modelUnitMap:removeActorUnitOnMap(endingGridIndex)
     moveModelUnitWithAction(action, modelSceneWar)
@@ -1131,7 +1134,7 @@ local function executeJoinModelUnit(action)
         local joinIncome = focusModelUnit:getJoinIncome(targetModelUnit)
         if (joinIncome ~= 0) then
             local playerIndex = focusModelUnit:getPlayerIndex()
-            local modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex)
+            local modelPlayer = getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex)
             modelPlayer:setFund(modelPlayer:getFund() + joinIncome)
             dispatchEvtModelPlayerUpdated(modelSceneWar, playerIndex)
         end
@@ -1168,11 +1171,14 @@ local function executeJoinModelUnit(action)
         focusModelUnit:setCapturingModelTile(targetModelUnit:isCapturingModelTile())
     end
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             targetModelUnit:removeViewFromParent()
@@ -1539,7 +1545,7 @@ local function executeWait(action, modelSceneWar)
             updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             if (path.isBlocked) then
-                getModelGridEffect():showAnimationBlock(pathNodes[#pathNodes])
+                getModelGridEffect(modelSceneWar):showAnimationBlock(pathNodes[#pathNodes])
             end
 
             modelSceneWar:setExecutingAction(false)
@@ -1578,6 +1584,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDive)                         then executeDive(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDropModelUnit)                then executeDropModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionJoinModelUnit)                then executeJoinModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
@@ -1591,7 +1598,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
         elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
         elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
         elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
