@@ -28,11 +28,12 @@ local s_ActionCodes = {
     ActionBuildModelTile               = 103,
     ActionCaptureModelTile             = 104,
     ActionDive                         = 105,
-    ActionEndTurn                      = 106,
-    ActionProduceModelUnitOnTile       = 107,
-    ActionSurface                      = 108,
-    ActionSurrender                    = 109,
-    ActionWait                         = 110,
+    ActionDropModelUnit                = 106,
+    ActionEndTurn                      = 107,
+    ActionProduceModelUnitOnTile       = 108,
+    ActionSurface                      = 109,
+    ActionSurrender                    = 110,
+    ActionWait                         = 111,
 }
 local s_ActionNames
 

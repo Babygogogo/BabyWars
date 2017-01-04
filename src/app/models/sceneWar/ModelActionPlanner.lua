@@ -323,7 +323,7 @@ local function sendActionDropModelUnit(self)
     end
 
     createAndSendAction({
-        actionName       = "DropModelUnit",
+        actionCode       = ActionCodeFunctions.getActionCode("ActionDropModelUnit"),
         path             = createPathForDispatch(self.m_PathNodes),
         dropDestinations = dropDestinations,
         launchUnitID     = self.m_LaunchUnitID,

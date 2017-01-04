@@ -1002,20 +1002,24 @@ local function executeDive(action, modelSceneWar)
     end
 end
 
-local function executeDropModelUnit(action)
+local function executeDropModelUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local path             = action.path
-    local sceneWarFileName = action.fileName
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local endingGridIndex  = path[#path]
-    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local pathNodes        = action.path.pathNodes
+    local modelUnitMap     = getModelUnitMap(modelSceneWar)
+    local endingGridIndex  = pathNodes[#pathNodes]
+    local focusModelUnit   = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
+    local isReplay           = modelSceneWar:isTotalReplay()
     local playerIndex        = focusModelUnit:getPlayerIndex()
-    local shouldUpdateFogMap = (IS_SERVER) or (playerIndex == getPlayerIndexLoggedIn())
-    local modelFogMap        = getModelFogMap(sceneWarFileName)
+    local shouldUpdateFogMap = (IS_SERVER) or (isReplay) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))
+    local modelFogMap        = getModelFogMap(modelSceneWar)
     local dropModelUnits     = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
         local gridIndex     = dropDestination.gridIndex
@@ -1039,31 +1043,47 @@ local function executeDropModelUnit(action)
         end
     end
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
+            if (action.isDropBlocked) then
+                getModelGridEffect(modelSceneWar):showAnimationBlock(endingGridIndex)
+            end
 
-            local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-            for _, dropModelUnit in ipairs(dropModelUnits) do
-                local isDiving  = isModelUnitDiving(dropModelUnit)
-                local gridIndex = dropModelUnit:getGridIndex()
-                local isVisible = isUnitVisible(sceneWarFileName, gridIndex, dropModelUnit:getUnitType(), isDiving, playerIndex, playerIndexLoggedIn)
-                if (not isVisible) then
-                    destroyActorUnitOnMap(sceneWarFileName, gridIndex, false)
+            if (isReplay) then
+                for _, dropModelUnit in ipairs(dropModelUnits) do
+                    dropModelUnit:moveViewAlongPath({endingGridIndex, dropModelUnit:getGridIndex()}, isModelUnitDiving(dropModelUnit), function()
+                        dropModelUnit:updateView()
+                            :showNormalAnimation()
+                    end)
                 end
-
-                dropModelUnit:moveViewAlongPath({endingGridIndex, gridIndex}, isDiving, function()
-                    dropModelUnit:updateView()
-                        :showNormalAnimation()
-
+            else
+                local sceneWarFileName    = action.sceneWarFileName
+                local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+                for _, dropModelUnit in ipairs(dropModelUnits) do
+                    local isDiving  = isModelUnitDiving(dropModelUnit)
+                    local gridIndex = dropModelUnit:getGridIndex()
+                    local isVisible = isUnitVisible(sceneWarFileName, gridIndex, dropModelUnit:getUnitType(), isDiving, playerIndex, playerIndexLoggedIn)
                     if (not isVisible) then
-                        dropModelUnit:removeViewFromParent()
+                        destroyActorUnitOnMap(sceneWarFileName, gridIndex, false)
                     end
-                end)
+
+                    dropModelUnit:moveViewAlongPath({endingGridIndex, gridIndex}, isDiving, function()
+                        dropModelUnit:updateView()
+                            :showNormalAnimation()
+
+                        if (not isVisible) then
+                            dropModelUnit:removeViewFromParent()
+                        end
+                    end)
+                end
             end
 
             updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
@@ -1556,6 +1576,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBuildModelTile)               then executeBuildModelTile(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionCaptureModelTile)             then executeCaptureModelTile(            action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDive)                         then executeDive(                        action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionDropModelUnit)                then executeDropModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
@@ -1570,7 +1591,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "DropModelUnit")          then executeDropModelUnit(         action)
         elseif (actionName == "JoinModelUnit")          then executeJoinModelUnit(         action)
         elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
         elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
