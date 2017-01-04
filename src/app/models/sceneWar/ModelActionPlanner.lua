@@ -291,20 +291,20 @@ local function sendActionJoinModelUnit(self)
     })
 end
 
+local function sendActionLaunchFlare(self, gridIndex)
+    createAndSendAction({
+        actionCode      = ActionCodeFunctions.getActionCode("ActionLaunchFlare"),
+        path            = createPathForDispatch(self.m_PathNodes),
+        launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = gridIndex,
+    })
+end
+
 local function sendActionLoadModelUnit(self)
     createAndSendAction({
         actionName   = "LoadModelUnit",
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionLaunchFlare(self, gridIndex)
-    createAndSendAction({
-        actionName      = "LaunchFlare",
-        path            = createPathForDispatch(self.m_PathNodes),
-        launchUnitID    = self.m_LaunchUnitID,
-        targetGridIndex = gridIndex,
     })
 end
 

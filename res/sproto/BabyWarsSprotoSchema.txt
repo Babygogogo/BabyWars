@@ -30,10 +30,11 @@
     ActionDropModelUnit               106 : ActionDropModelUnit
     ActionEndTurn                     107 : ActionEndTurn
     ActionJoinModelUnit               108 : ActionJoinModelUnit
-    ActionProduceModelUnitOnTile      109 : ActionProduceModelUnitOnTile
-    ActionSurface                     110 : ActionSurface
-    ActionSurrender                   111 : ActionSurrender
-    ActionWait                        112 : ActionWait
+    ActionLaunchFlare                 109 : ActionLaunchFlare
+    ActionProduceModelUnitOnTile      110 : ActionProduceModelUnitOnTile
+    ActionSurface                     111 : ActionSurface
+    ActionSurrender                   112 : ActionSurrender
+    ActionWait                        113 : ActionWait
 }
 
 .ActionRedis {
@@ -313,6 +314,21 @@
     actingTilesData   8 : *TileData(positionIndex)
     path              9 :  MovePath
     launchUnitID     10 :  integer
+}
+
+.ActionLaunchFlare {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    path              9 :  MovePath
+    launchUnitID     10 :  integer
+    targetGridIndex  11 :  GridIndex
 }
 
 .ActionProduceModelUnitOnTile {

@@ -1190,35 +1190,42 @@ local function executeJoinModelUnit(action, modelSceneWar)
     end
 end
 
-local function executeLaunchFlare(action)
+local function executeLaunchFlare(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local path                = action.path
-    local sceneWarFileName    = action.fileName
+    local pathNodes           = action.path.pathNodes
     local targetGridIndex     = action.targetGridIndex
-    local modelUnitMap        = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit      = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
+    local modelUnitMap        = getModelUnitMap(modelSceneWar)
+    local focusModelUnit      = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
     local playerIndexActing   = focusModelUnit:getPlayerIndex()
     local flareAreaRadius     = focusModelUnit:getFlareAreaRadius()
-    local playerIndexLoggedIn = (not IS_SERVER) and (getPlayerIndexLoggedIn()) or (nil)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setCurrentFlareAmmo(focusModelUnit:getCurrentFlareAmmo() - 1)
 
-    if ((IS_SERVER) or (isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
-        getModelFogMap(sceneWarFileName):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
+    local isReplay            = modelSceneWar:isTotalReplay()
+    local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+    if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+        getModelFogMap(modelSceneWar):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
     end
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            if ((isTotalReplay()) or (playerIndexActing == playerIndexLoggedIn)) then
-                local modelGridEffect = getModelGridEffect()
+            if ((isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+                local modelGridEffect = getModelGridEffect(modelSceneWar)
                 for _, gridIndex in pairs(getGridsWithinDistance(targetGridIndex, 0, flareAreaRadius, modelUnitMap:getMapSize())) do
                     modelGridEffect:showAnimationFlare(gridIndex)
                 end
@@ -1585,6 +1592,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDropModelUnit)                then executeDropModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinModelUnit)                then executeJoinModelUnit(               action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLaunchFlare)                  then executeLaunchFlare(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
@@ -1598,7 +1606,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "LaunchFlare")            then executeLaunchFlare(           action)
         elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
         elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
