@@ -962,7 +962,7 @@ local function executeDive(action, modelSceneWar)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
     local launchUnitID     = action.launchUnitID
-    local pathNodes        = action.pathNodes
+    local pathNodes        = action.path.pathNodes
     local focusModelUnit   = getModelUnitMap(modelSceneWar):getFocusModelUnit(pathNodes[1], launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
@@ -976,7 +976,6 @@ local function executeDive(action, modelSceneWar)
             cleanupOnReceivingResponseFromServer(modelSceneWar)
         end
 
-        local sceneWarFileName = action.sceneWarFileName
         focusModelUnit:moveViewAlongPath(pathNodes, false, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
@@ -985,6 +984,7 @@ local function executeDive(action, modelSceneWar)
             if (isReplay) then
                 getModelGridEffect(modelSceneWar):showAnimationDive(endingGridIndex)
             else
+                local sceneWarFileName    = action.sceneWarFileName
                 local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
                 local unitType            = focusModelUnit:getUnitType()
                 local playerIndexActing   = focusModelUnit:getPlayerIndex()
@@ -1395,33 +1395,44 @@ local function executeSupplyModelUnit(action)
     end
 end
 
-local function executeSurface(action)
+local function executeSurface(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
-    local path             = action.path
-    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
+    local pathNodes        = action.path.pathNodes
+    local focusModelUnit   = getModelUnitMap(modelSceneWar):getFocusModelUnit(pathNodes[1], launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(false)
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, true, function()
-            local endingGridIndex = path[#path]
-            local isVisible       = isUnitVisible(sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn())
+        local isReplay = modelSceneWar:isTotalReplay()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, true, function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
-                :setViewVisible(isVisible)
+
+            local endingGridIndex = pathNodes[#pathNodes]
+            if (isReplay) then
+                getModelGridEffect(modelSceneWar):showAnimationSurface(endingGridIndex)
+            else
+                local isVisible = isUnitVisible(action.sceneWarFileName, endingGridIndex, focusModelUnit:getUnitType(), false, focusModelUnit:getPlayerIndex(), getPlayerIndexLoggedIn())
+                focusModelUnit:setViewVisible(isVisible)
+                if (isVisible) then
+                    getModelGridEffect(modelSceneWar):showAnimationSurface(endingGridIndex)
+                end
+            end
 
             updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
-
-            if (isVisible) then
-                getModelGridEffect():showAnimationSurface(endingGridIndex)
-            end
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1548,6 +1559,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
@@ -1565,7 +1577,6 @@ function ActionExecutor.execute(action, modelScene)
         elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
-        elseif (actionName == "Surface")                then executeSurface(               action)
         elseif (actionName == "TickActionId")           then executeTickActionId(          action)
         end
 

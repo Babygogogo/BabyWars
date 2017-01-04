@@ -29,8 +29,9 @@
     ActionDive                        105 : ActionDive
     ActionEndTurn                     106 : ActionEndTurn
     ActionProduceModelUnitOnTile      107 : ActionProduceModelUnitOnTile
-    ActionSurrender                   108 : ActionSurrender
-    ActionWait                        109 : ActionWait
+    ActionSurface                     108 : ActionSurface
+    ActionSurrender                   109 : ActionSurrender
+    ActionWait                        110 : ActionWait
 }
 
 .ActionRedis {
@@ -293,6 +294,20 @@
     tiledID          7 : integer
     gridIndex        8 : GridIndex
     cost             9 : integer
+}
+
+.ActionSurface {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    path              9 :  MovePath
+    launchUnitID     10 :  integer
 }
 
 .ActionSurrender {

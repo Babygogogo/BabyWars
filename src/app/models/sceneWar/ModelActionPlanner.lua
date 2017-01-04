@@ -299,7 +299,7 @@ end
 
 local function sendActionSurface(self)
     createAndSendAction({
-        actionName   = "Surface",
+        actionCode   = ActionCodeFunctions.getActionCode("ActionSurface"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
