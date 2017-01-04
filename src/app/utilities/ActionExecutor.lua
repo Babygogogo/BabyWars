@@ -1295,27 +1295,35 @@ local function executeLaunchSilo(action, modelSceneWar)
     end
 end
 
-local function executeLoadModelUnit(action)
+local function executeLoadModelUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
-    local path             = action.path
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit   = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    local loaderModelUnit  = modelUnitMap:getModelUnit(path[#path])
+    local pathNodes      = action.path.pathNodes
+    local modelUnitMap   = getModelUnitMap(modelSceneWar)
+    local focusModelUnit = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
+
+    local isReplay        = modelSceneWar:isTotalReplay()
+    local loaderModelUnit = modelUnitMap:getModelUnit(pathNodes[#pathNodes])
     if (loaderModelUnit) then
         loaderModelUnit:addLoadUnitId(focusModelUnit:getUnitId())
     else
-        assert(not IS_SERVER, "ActionExecutor-executeLoadModelUnit() failed to get the target loader on the server.")
+        assert((not IS_SERVER) and (not isReplay), "ActionExecutor-executeLoadModelUnit() failed to get the target loader on the server or in replay.")
     end
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
                 :setViewVisible(false)
@@ -1600,6 +1608,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinModelUnit)                then executeJoinModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLaunchFlare)                  then executeLaunchFlare(                 action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLaunchSilo)                   then executeLaunchSilo(                  action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLoadModelUnit)                then executeLoadModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
@@ -1613,7 +1622,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
         elseif (actionName == "TickActionId")           then executeTickActionId(          action)

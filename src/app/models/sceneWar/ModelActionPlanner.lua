@@ -311,7 +311,7 @@ end
 
 local function sendActionLoadModelUnit(self)
     createAndSendAction({
-        actionName   = "LoadModelUnit",
+        actionCode   = ActionCodeFunctions.getActionCode("ActionLoadModelUnit"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
