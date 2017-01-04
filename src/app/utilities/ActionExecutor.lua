@@ -1238,23 +1238,26 @@ local function executeLaunchFlare(action, modelSceneWar)
     end
 end
 
-local function executeLaunchSilo(action)
+local function executeLaunchSilo(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local path              = action.path
-    local sceneWarFileName  = action.fileName
-    local modelUnitMap      = getModelUnitMap(sceneWarFileName)
-    local focusModelUnit    = modelUnitMap:getFocusModelUnit(path[1], action.launchUnitID)
-    local modelTile         = getModelTileMap(sceneWarFileName):getModelTile(path[#path])
-    local targetModelUnits  = {}
-    local targetGridIndexes = {}
-    if ((not IS_SERVER) and (not isTotalReplay()) and (modelTile:isFogEnabledOnClient())) then
+    local pathNodes      = action.path.pathNodes
+    local modelUnitMap   = getModelUnitMap(modelSceneWar)
+    local focusModelUnit = modelUnitMap:getFocusModelUnit(pathNodes[1], action.launchUnitID)
+    local modelTile      = getModelTileMap(modelSceneWar):getModelTile(pathNodes[#pathNodes])
+    local isReplay       = modelSceneWar:isTotalReplay()
+    if ((not IS_SERVER) and (not isReplay) and (modelTile:isFogEnabledOnClient())) then
         modelTile:updateAsFogDisabled()
     end
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
-
     modelTile:updateWithObjectAndBaseId(focusModelUnit:getTileObjectIdAfterLaunch())
+
+    local targetGridIndexes, targetModelUnits = {}, {}
     for _, gridIndex in pairs(getGridsWithinDistance(action.targetGridIndex, 0, 2, modelUnitMap:getMapSize())) do
         targetGridIndexes[#targetGridIndexes + 1] = gridIndex
 
@@ -1265,11 +1268,14 @@ local function executeLaunchSilo(action)
         end
     end
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
             modelTile:updateView()
@@ -1277,7 +1283,7 @@ local function executeLaunchSilo(action)
                 modelUnit:updateView()
             end
 
-            local modelGridEffect = getModelGridEffect()
+            local modelGridEffect = getModelGridEffect(modelSceneWar)
             for _, gridIndex in ipairs(targetGridIndexes) do
                 modelGridEffect:showAnimationSiloAttack(gridIndex)
             end
@@ -1593,6 +1599,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinModelUnit)                then executeJoinModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLaunchFlare)                  then executeLaunchFlare(                 action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionLaunchSilo)                   then executeLaunchSilo(                  action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
@@ -1606,7 +1613,6 @@ function ActionExecutor.execute(action, modelScene)
         end
     else
         getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "LaunchSilo")             then executeLaunchSilo(            action)
         elseif (actionName == "LoadModelUnit")          then executeLoadModelUnit(         action)
         elseif (actionName == "ProduceModelUnitOnUnit") then executeProduceModelUnitOnUnit(action)
         elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)

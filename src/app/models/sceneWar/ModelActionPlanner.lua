@@ -300,6 +300,15 @@ local function sendActionLaunchFlare(self, gridIndex)
     })
 end
 
+local function sendActionLaunchSilo(self, targetGridIndex)
+    createAndSendAction({
+        actionCode      = ActionCodeFunctions.getActionCode("ActionLaunchSilo"),
+        path            = createPathForDispatch(self.m_PathNodes),
+        launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = targetGridIndex,
+    })
+end
+
 local function sendActionLoadModelUnit(self)
     createAndSendAction({
         actionName   = "LoadModelUnit",
@@ -336,15 +345,6 @@ local function sendActionSurface(self)
         actionCode   = ActionCodeFunctions.getActionCode("ActionSurface"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionLaunchSilo(self, targetGridIndex)
-    createAndSendAction({
-        actionName      = "LaunchSilo",
-        path            = createPathForDispatch(self.m_PathNodes),
-        targetGridIndex = targetGridIndex,
-        launchUnitID    = self.m_LaunchUnitID,
     })
 end
 
