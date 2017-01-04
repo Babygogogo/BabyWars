@@ -106,10 +106,10 @@ local function produceActorUnit(modelSceneWar, tiledID, unitID, gridIndex)
     return actorUnit
 end
 
-local function getAndSupplyAdjacentModelUnits(sceneWarFileName, supplierGridIndex, playerIndex)
+local function getAndSupplyAdjacentModelUnits(modelSceneWar, supplierGridIndex, playerIndex)
     assert(type(playerIndex) == "number", "ActionExecutor-getAndSupplyAdjacentModelUnits() invalid playerIndex: " .. (playerIndex or ""))
 
-    local modelUnitMap = getModelUnitMap(sceneWarFileName)
+    local modelUnitMap = getModelUnitMap(modelSceneWar)
     local targets      = {}
     for _, adjacentGridIndex in pairs(getAdjacentGrids(supplierGridIndex, modelUnitMap:getMapSize())) do
         local target = modelUnitMap:getModelUnit(adjacentGridIndex)
@@ -1416,32 +1416,38 @@ local function executeProduceModelUnitOnUnit(action, modelSceneWar)
     end
 end
 
-local function executeSupplyModelUnit(action)
+local function executeSupplyModelUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
     updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
 
-    local sceneWarFileName = action.fileName
     local launchUnitID     = action.launchUnitID
-    local path             = action.path
-    local focusModelUnit   = getModelUnitMap(sceneWarFileName):getFocusModelUnit(path[1], launchUnitID)
+    local pathNodes        = action.path.pathNodes
+    local focusModelUnit   = getModelUnitMap(modelSceneWar):getFocusModelUnit(pathNodes[1], launchUnitID)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
-    local targetModelUnits = getAndSupplyAdjacentModelUnits(sceneWarFileName, path[#path], focusModelUnit:getPlayerIndex())
+    local targetModelUnits = getAndSupplyAdjacentModelUnits(modelSceneWar, pathNodes[#pathNodes], focusModelUnit:getPlayerIndex())
 
-    local modelSceneWar = getModelScene(sceneWarFileName)
     if (IS_SERVER) then
         modelSceneWar:setExecutingAction(false)
     else
-        focusModelUnit:moveViewAlongPath(path, isModelUnitDiving(focusModelUnit), function()
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        focusModelUnit:moveViewAlongPath(pathNodes, isModelUnitDiving(focusModelUnit), function()
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
-
-            local modelGridEffect = getModelGridEffect()
+            local modelGridEffect = getModelGridEffect(modelSceneWar)
             for _, targetModelUnit in pairs(targetModelUnits) do
                 targetModelUnit:updateView()
                 modelGridEffect:showAnimationSupply(targetModelUnit:getGridIndex())
             end
+
+            updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
             modelSceneWar:setExecutingAction(false)
         end)
@@ -1539,11 +1545,6 @@ local function executeSurrender(action, modelSceneWar)
     end
 end
 
-local function executeTickActionId(action)
-    assert(not IS_SERVER, "ActionExecutor-executeTickActionId() this should not be called on the server.")
-    getModelScene():setExecutingAction(false)
-end
-
 local function executeWait(action, modelSceneWar)
     if (not modelSceneWar.isModelSceneWar) then
         return
@@ -1617,31 +1618,12 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLoadModelUnit)                then executeLoadModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnUnit)       then executeProduceModelUnitOnUnit(      action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionSupplyModelUnit)              then executeSupplyModelUnit(             action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
-
-    --[[
-    local actionName = action.actionName
-    if (not action.actionID) then
-        end
-    else
-        getModelScene(action.fileName):setExecutingAction(true)
-        elseif (actionName == "SupplyModelUnit")        then executeSupplyModelUnit(       action)
-        elseif (actionName == "TickActionId")           then executeTickActionId(          action)
-        end
-
-        if (not IS_SERVER) then
-            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "TransferingData"))
-            getScriptEventDispatcher():dispatchEvent({
-                name    = "EvtIsWaitingForServerResponse",
-                waiting = false,
-            })
-        end
-    end
-    --]]
 end
 
 return ActionExecutor

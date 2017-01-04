@@ -334,7 +334,7 @@ end
 
 local function sendActionSupplyModelUnit(self)
     createAndSendAction({
-        actionName   = "SupplyModelUnit",
+        actionCode   = ActionCodeFunctions.getActionCode("ActionSupplyModelUnit"),
         path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })

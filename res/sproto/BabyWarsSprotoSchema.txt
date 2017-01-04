@@ -35,9 +35,10 @@
     ActionLoadModelUnit               111 : ActionLoadModelUnit
     ActionProduceModelUnitOnTile      112 : ActionProduceModelUnitOnTile
     ActionProduceModelUnitOnUnit      113 : ActionProduceModelUnitOnUnit
-    ActionSurface                     114 : ActionSurface
-    ActionSurrender                   115 : ActionSurrender
-    ActionWait                        116 : ActionWait
+    ActionSupplyModelUnit             114 : ActionSupplyModelUnit
+    ActionSurface                     115 : ActionSurface
+    ActionSurrender                   116 : ActionSurrender
+    ActionWait                        117 : ActionWait
 }
 
 .ActionRedis {
@@ -389,6 +390,20 @@
     path              9 :  MovePath
     launchUnitID     10 :  integer
     cost             11 :  integer
+}
+
+.ActionSupplyModelUnit {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    path              9 :  MovePath
+    launchUnitID     10 :  integer
 }
 
 .ActionSurface {
