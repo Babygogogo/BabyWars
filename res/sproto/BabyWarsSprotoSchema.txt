@@ -229,6 +229,20 @@
         loadedData    2 : *RepairDataLoaded(unitID)
     }
 
+    .SupplyData {
+        .SupplyDataOnMap {
+            unitID    0 : integer
+            gridIndex 1 : GridIndex
+        }
+
+        .SupplyDataLoaded {
+            unitID 0 : integer
+        }
+
+        onMapData  0 : *SupplyDataOnMap(unitID)
+        loadedData 1 : *SupplyDataLoaded(unitID)
+    }
+
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
@@ -237,6 +251,7 @@
     income           5 : integer
     lostPlayerIndex  6 : integer
     repairData       7 : RepairData
+    supplyData       8 : SupplyData
 }
 
 .ActionBuildModelTile {

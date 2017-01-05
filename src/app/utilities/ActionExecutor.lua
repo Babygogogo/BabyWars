@@ -754,12 +754,12 @@ local function executeBeginTurn(action, modelSceneWar)
 
     if (IS_SERVER) then
         if (not lostPlayerIndex) then
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
                 modelSceneWar:setExecutingAction(false)
             end)
         else
             modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 2)
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 if (not modelSceneWar:isEnded()) then
                     modelTurnManager:endTurnPhaseMain()
@@ -774,7 +774,7 @@ local function executeBeginTurn(action, modelSceneWar)
         end
 
         if (not lostPlayerIndex) then
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
                 modelSceneWar:setExecutingAction(false)
             end)
         else
@@ -784,7 +784,7 @@ local function executeBeginTurn(action, modelSceneWar)
                 modelSceneWar:setEnded(true)
             end
 
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, function()
+            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
                 getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)

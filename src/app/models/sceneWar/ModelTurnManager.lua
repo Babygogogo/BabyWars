@@ -94,13 +94,6 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
     end
 end
 
-local function dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
-    dispatcher:dispatchEvent({
-        name      = "EvtSupplyViewUnit",
-        gridIndex = gridIndex,
-    })
-end
-
 local function repairModelUnit(modelUnit, repairAmount)
     modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
     local hasSupplied = supplyWithAmmoAndFuel(modelUnit, true)
@@ -214,16 +207,22 @@ end
 local function runTurnPhaseRepairUnit(self)
     local repairData = self.m_RepairDataForNextTurn
     if (repairData) then
-        local sceneWarFileName = self.m_SceneWarFileName
-        local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-        for unitID, data in pairs(repairData.onMapData) do
-            repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
-        end
-        for unitID, data in pairs(repairData.loadedData) do
-            repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelUnitMap  = getModelUnitMap(modelSceneWar)
+
+        if (repairData.onMapData) then
+            for unitID, data in pairs(repairData.onMapData) do
+                repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
+            end
         end
 
-        getModelPlayerManager(sceneWarFileName):getModelPlayer(self.m_PlayerIndex):setFund(repairData.remainingFund)
+        if (repairData.loadedData) then
+            for unitID, data in pairs(repairData.loadedData) do
+                repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
+            end
+        end
+
+        getModelPlayerManager(modelSceneWar):getModelPlayer(self.m_PlayerIndex):setFund(repairData.remainingFund)
         self.m_RepairDataForNextTurn = nil
     end
 
@@ -231,45 +230,34 @@ local function runTurnPhaseRepairUnit(self)
 end
 
 local function runTurnPhaseSupplyUnit(self)
-    local sceneWarFileName = self.m_SceneWarFileName
-    local playerIndex      = self.m_PlayerIndex
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
-    local mapSize          = modelUnitMap:getMapSize()
+    local supplyData = self.m_SupplyDataForNextTurn
+    if (supplyData) then
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelUnitMap  = getModelUnitMap(modelSceneWar)
+        local modelGridEffect = (not IS_SERVER) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
 
-    local supplyLoadedModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyLoadedModelUnit)        and
-            (modelUnit:canSupplyLoadedModelUnit())      and
-            (not modelUnit:canRepairLoadedModelUnit())) then
-
-            local hasSupplied = false
-            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-                hasSupplied = supplyWithAmmoAndFuel(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), true) or hasSupplied
-            end
-            if (hasSupplied) then
-                dispatchEvtSupplyViewUnit(dispatcher, modelUnit:getGridIndex())
-            end
-        end
-    end
-
-    local supplyAdjacentModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyModelUnit))             then
-            for _, gridIndex in pairs(getAdjacentGrids(modelUnit:getGridIndex(), mapSize)) do
-                local supplyTarget = modelUnitMap:getModelUnit(gridIndex)
-                if ((supplyTarget)                               and
-                    (modelUnit:canSupplyModelUnit(supplyTarget)) and
-                    (supplyWithAmmoAndFuel(supplyTarget, true))) then
-                    dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
+        if (supplyData.onMapData) then
+            for unitID, data in pairs(supplyData.onMapData) do
+                local gridIndex = data.gridIndex
+                supplyWithAmmoAndFuel(modelUnitMap:getModelUnit(gridIndex), true)
+                if (modelGridEffect) then
+                    modelGridEffect:showAnimationSupply(gridIndex)
                 end
             end
         end
-    end
 
-    modelUnitMap:forEachModelUnitOnMap(supplyAdjacentModelUnits)
-        :forEachModelUnitOnMap(        supplyLoadedModelUnits)
-        :forEachModelUnitLoaded(       supplyLoadedModelUnits)
+        if (supplyData.loadedData) then
+            for unitID, data in pairs(supplyData.loadedData) do
+                local modelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+                supplyWithAmmoAndFuel(modelUnit, true)
+                if (modelGridEffect) then
+                    modelGridEffect:showAnimationSupply(modelUnit:getGridIndex())
+                end
+            end
+        end
+
+        self.m_SupplyDataForNextTurn = nil
+    end
 
     self.m_TurnPhaseCode = TURN_PHASE_CODES.Main
 end
@@ -458,11 +446,12 @@ function ModelTurnManager:runTurn()
     return self
 end
 
-function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, callbackOnEnterTurnPhaseMain)
+function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, supplyData, callbackOnEnterTurnPhaseMain)
     assert(self:isTurnPhaseRequestToBegin(), "ModelTurnManager:beginTurnPhaseBeginning() invalid turn phase code: " .. self.m_TurnPhaseCode)
 
     self.m_IncomeForNextTurn                       = income
     self.m_RepairDataForNextTurn                   = repairData
+    self.m_SupplyDataForNextTurn                   = supplyData
     self.m_CallbackOnEnterTurnPhaseMainForNextTurn = callbackOnEnterTurnPhaseMain
 
     runTurnPhaseBeginning(self)
