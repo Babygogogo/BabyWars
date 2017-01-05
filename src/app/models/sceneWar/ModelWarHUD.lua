@@ -112,15 +112,15 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function ModelWarHUD:onStartRunning(sceneWarFileName)
-    self.m_ActorActionMenu     :getModel():onStartRunning(sceneWarFileName)
-    self.m_ActorBattleInfo     :getModel():onStartRunning(sceneWarFileName)
-    self.m_ActorMoneyEnergyInfo:getModel():onStartRunning(sceneWarFileName)
-    self.m_ActorTileInfo       :getModel():onStartRunning(sceneWarFileName)
-    self.m_ActorUnitInfo       :getModel():onStartRunning(sceneWarFileName)
-    self.m_ActorWarCommandMenu :getModel():onStartRunning(sceneWarFileName)
+function ModelWarHUD:onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorActionMenu     :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorBattleInfo     :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorMoneyEnergyInfo:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorTileInfo       :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorUnitInfo       :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ActorWarCommandMenu :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
     if (self.m_ActorReplayController) then
-        self.m_ActorReplayController:getModel():onStartRunning(sceneWarFileName)
+        self.m_ActorReplayController:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
     end
 
     return self

@@ -99,7 +99,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelUnitInfo:onStartRunning(sceneWarFileName)
+function ModelUnitInfo:onStartRunning(modelSceneWar, sceneWarFileName)
     SingletonGetters.getScriptEventDispatcher()
         :addEventListener("EvtModelUnitMapUpdated",   self)
         :addEventListener("EvtGridSelected",          self)

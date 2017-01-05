@@ -16,6 +16,7 @@
 local ModelActionPlanner = class("ModelActionPlanner")
 
 local Producible                  = require("src.app.components.Producible")
+local ActionCodeFunctions         = require("src.app.utilities.ActionCodeFunctions")
 local AnimationLoader             = require("src.app.utilities.AnimationLoader")
 local AttackableGridListFunctions = require("src.app.utilities.AttackableGridListFunctions")
 local GridIndexFunctions          = require("src.app.utilities.GridIndexFunctions")
@@ -43,8 +44,8 @@ local isTotalReplay            = SingletonGetters.isTotalReplay
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getMovePathDestination(movePath)
-    return movePath[#movePath].gridIndex
+local function getPathNodesDestination(pathNodes)
+    return pathNodes[#pathNodes]
 end
 
 local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
@@ -149,7 +150,7 @@ local function canDoAdditionalDropAction(self)
     local modelUnitMap             = getModelUnitMap()
     local modelTileMap             = getModelTileMap()
     local loaderBeginningGridIndex = focusModelUnit:getGridIndex()
-    local loaderEndingGridIndex    = getMovePathDestination(self.m_MovePath)
+    local loaderEndingGridIndex    = getPathNodesDestination(self.m_PathNodes)
     for _, unitID in pairs(focusModelUnit:getLoadUnitIdList()) do
         if ((not isModelUnitDropped(unitID, dropDestinations)) and
             (#getAvailableDropGrids(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), loaderBeginningGridIndex, loaderEndingGridIndex, modelUnitMap, modelTileMap, dropDestinations) > 0)) then
@@ -167,23 +168,24 @@ local function updateMovePathWithDestinationGrid(self, gridIndex)
     local maxRange     = math.min(self.m_FocusModelUnit:getMoveRange(), self.m_FocusModelUnit:getCurrentFuel())
     local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, getModelUnitMap(), getModelTileMap())
 
-    if ((not MovePathFunctions.truncateToGridIndex(self.m_MovePath, gridIndex))                        and
-        (not MovePathFunctions.extendToGridIndex(self.m_MovePath, gridIndex, nextMoveCost, maxRange))) then
-        self.m_MovePath = MovePathFunctions.createShortestPath(gridIndex, self.m_ReachableArea)
+    if ((not MovePathFunctions.truncateToGridIndex(self.m_PathNodes, gridIndex))                        and
+        (not MovePathFunctions.extendToGridIndex(self.m_PathNodes, gridIndex, nextMoveCost, maxRange))) then
+        self.m_PathNodes = MovePathFunctions.createShortestPath(gridIndex, self.m_ReachableArea)
     end
 
     if (self.m_View) then
-        self.m_View:setMovePath(self.m_MovePath)
+        self.m_View:setMovePath(self.m_PathNodes)
     end
 end
 
 local function resetMovePath(self, gridIndex)
-    self.m_MovePath       = {{
-        gridIndex     = GridIndexFunctions.clone(gridIndex),
+    self.m_PathNodes = {{
+        x             = gridIndex.x,
+        y             = gridIndex.y,
         totalMoveCost = 0,
     }}
     if (self.m_View) then
-        self.m_View:setMovePath(self.m_MovePath)
+        self.m_View:setMovePath(self.m_PathNodes)
     end
 end
 
@@ -231,90 +233,35 @@ local function createAndSendAction(rawAction)
     })
 end
 
-local function sendActionJoinModelUnit(self)
-    createAndSendAction({
-        actionName   = "JoinModelUnit",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
 local function sendActionAttack(self, targetGridIndex)
     createAndSendAction({
-        actionName      = "Attack",
-        path            = createPathForDispatch(self.m_MovePath),
+        actionCode      = ActionCodeFunctions.getActionCode("ActionAttack"),
+        path            = createPathForDispatch(self.m_PathNodes),
         targetGridIndex = GridIndexFunctions.clone(targetGridIndex),
         launchUnitID    = self.m_LaunchUnitID,
     })
 end
 
+local function sendActionBuildModelTile(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionBuildModelTile"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function sendActionCaptureModelTile(self)
     createAndSendAction({
-        actionName   = "CaptureModelTile",
-        path         = createPathForDispatch(self.m_MovePath),
+        actionCode   = ActionCodeFunctions.getActionCode("ActionCaptureModelTile"),
+        path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
 
 local function sendActionDive(self)
     createAndSendAction({
-        actionName   = "Dive",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionBuildModelTile(self)
-    createAndSendAction({
-        actionName   = "BuildModelTile",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionProduceModelUnitOnUnit(self)
-    createAndSendAction({
-        actionName = "ProduceModelUnitOnUnit",
-        path       = createPathForDispatch(self.m_MovePath),
-    })
-end
-
-local function sendActionSupplyModelUnit(self)
-    createAndSendAction({
-        actionName   = "SupplyModelUnit",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionSurface(self)
-    createAndSendAction({
-        actionName   = "Surface",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionWait(self)
-    createAndSendAction({
-        actionName   = "Wait",
-        path         = createPathForDispatch(self.m_MovePath),
-        launchUnitID = self.m_LaunchUnitID,
-    })
-end
-
-local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
-    createAndSendAction({
-        actionName = "ProduceModelUnitOnTile",
-        gridIndex  = GridIndexFunctions.clone(gridIndex),
-        tiledID    = tiledID,
-    })
-end
-
-local function sendActionLoadModelUnit(self)
-    createAndSendAction({
-        actionName   = "LoadModelUnit",
-        path         = createPathForDispatch(self.m_MovePath),
+        actionCode   = ActionCodeFunctions.getActionCode("ActionDive"),
+        path         = createPathForDispatch(self.m_PathNodes),
         launchUnitID = self.m_LaunchUnitID,
     })
 end
@@ -329,17 +276,25 @@ local function sendActionDropModelUnit(self)
     end
 
     createAndSendAction({
-        actionName       = "DropModelUnit",
-        path             = createPathForDispatch(self.m_MovePath),
+        actionCode       = ActionCodeFunctions.getActionCode("ActionDropModelUnit"),
+        path             = createPathForDispatch(self.m_PathNodes),
         dropDestinations = dropDestinations,
         launchUnitID     = self.m_LaunchUnitID,
     })
 end
 
+local function sendActionJoinModelUnit(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionJoinModelUnit"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
 local function sendActionLaunchFlare(self, gridIndex)
     createAndSendAction({
-        actionName      = "LaunchFlare",
-        path            = createPathForDispatch(self.m_MovePath),
+        actionCode      = ActionCodeFunctions.getActionCode("ActionLaunchFlare"),
+        path            = createPathForDispatch(self.m_PathNodes),
         launchUnitID    = self.m_LaunchUnitID,
         targetGridIndex = gridIndex,
     })
@@ -347,10 +302,57 @@ end
 
 local function sendActionLaunchSilo(self, targetGridIndex)
     createAndSendAction({
-        actionName      = "LaunchSilo",
-        path            = createPathForDispatch(self.m_MovePath),
-        targetGridIndex = targetGridIndex,
+        actionCode      = ActionCodeFunctions.getActionCode("ActionLaunchSilo"),
+        path            = createPathForDispatch(self.m_PathNodes),
         launchUnitID    = self.m_LaunchUnitID,
+        targetGridIndex = targetGridIndex,
+    })
+end
+
+local function sendActionLoadModelUnit(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionLoadModelUnit"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionProduceModelUnitOnTile(self, gridIndex, tiledID)
+    createAndSendAction({
+        actionCode = ActionCodeFunctions.getActionCode("ActionProduceModelUnitOnTile"),
+        gridIndex  = GridIndexFunctions.clone(gridIndex),
+        tiledID    = tiledID,
+    })
+end
+
+local function sendActionProduceModelUnitOnUnit(self)
+    createAndSendAction({
+        actionCode = ActionCodeFunctions.getActionCode("ActionProduceModelUnitOnUnit"),
+        path       = createPathForDispatch(self.m_PathNodes),
+    })
+end
+
+local function sendActionSupplyModelUnit(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionSupplyModelUnit"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionSurface(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionSurface"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
+    })
+end
+
+local function sendActionWait(self)
+    createAndSendAction({
+        actionCode   = ActionCodeFunctions.getActionCode("ActionWait"),
+        path         = createPathForDispatch(self.m_PathNodes),
+        launchUnitID = self.m_LaunchUnitID,
     })
 end
 
@@ -370,7 +372,7 @@ local setStateChoosingDropDestination
 local setStateChoosingAdditionalDropAction
 
 local function getActionLoadModelUnit(self)
-    local destination = getMovePathDestination(self.m_MovePath)
+    local destination = getPathNodesDestination(self.m_PathNodes)
     if (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), destination)) then
         return nil
     else
@@ -390,8 +392,8 @@ local function getActionLoadModelUnit(self)
 end
 
 local function getActionJoinModelUnit(self)
-    local existingModelUnit = getModelUnitMap():getModelUnit(getMovePathDestination(self.m_MovePath))
-    if ((#self.m_MovePath > 1)                                       and
+    local existingModelUnit = getModelUnitMap():getModelUnit(getPathNodesDestination(self.m_PathNodes))
+    if ((#self.m_PathNodes > 1)                                      and
         (existingModelUnit)                                          and
         (self.m_FocusModelUnit:canJoinModelUnit(existingModelUnit))) then
         return {
@@ -412,14 +414,14 @@ local function getActionAttack(self)
         return {
             name     = getLocalizedText(78, "Attack"),
             callback = function()
-                setStateChoosingAttackTarget(self, getMovePathDestination(self.m_MovePath))
+                setStateChoosingAttackTarget(self, getPathNodesDestination(self.m_PathNodes))
             end,
         }
     end
 end
 
 local function getActionCapture(self)
-    local modelTile = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
+    local modelTile = getModelTileMap():getModelTile(getPathNodesDestination(self.m_PathNodes))
     if ((self.m_FocusModelUnit.canCaptureModelTile) and (self.m_FocusModelUnit:canCaptureModelTile(modelTile))) then
         return {
             name     = getLocalizedText(78, "CaptureModelTile"),
@@ -445,7 +447,7 @@ local function getActionDive(self)
 end
 
 local function getActionBuildModelTile(self)
-    local tileType       = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath)):getTileType()
+    local tileType       = getModelTileMap():getModelTile(getPathNodesDestination(self.m_PathNodes)):getTileType()
     local focusModelUnit = self.m_FocusModelUnit
 
     if ((focusModelUnit.canBuildOnTileType)           and
@@ -474,7 +476,7 @@ local function getActionSupplyModelUnit(self)
     end
 
     local modelUnitMap = getModelUnitMap()
-    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getMovePathDestination(self.m_MovePath), modelUnitMap:getMapSize())) do
+    for _, gridIndex in pairs(GridIndexFunctions.getAdjacentGrids(getPathNodesDestination(self.m_PathNodes), modelUnitMap:getMapSize())) do
         local modelUnit = modelUnitMap:getModelUnit(gridIndex)
         if ((modelUnit)                                     and
             (modelUnit ~= focusModelUnit)                   and
@@ -504,7 +506,7 @@ local function getActionSurface(self)
 end
 
 local function getSingleActionLaunchModelUnit(self, unitID)
-    local beginningGridIndex = self.m_MovePath[1].gridIndex
+    local beginningGridIndex = self.m_PathNodes[1]
     local icon               = Actor.createView("sceneWar.ViewUnit")
     icon:updateWithModelUnit(getModelUnitMap():getFocusModelUnit(beginningGridIndex, unitID))
         :setScale(0.5)
@@ -520,7 +522,7 @@ end
 
 local function getActionsLaunchModelUnit(self)
     local focusModelUnit = self.m_FocusModelUnit
-    if ((#self.m_MovePath ~= 1)                    or
+    if ((#self.m_PathNodes ~= 1)                   or
         (not focusModelUnit.canLaunchModelUnit)    or
         (not focusModelUnit:canLaunchModelUnit())) then
         return {}
@@ -528,10 +530,10 @@ local function getActionsLaunchModelUnit(self)
 
     local actions      = {}
     local modelUnitMap = getModelUnitMap()
-    local modelTile    = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
+    local modelTile    = getModelTileMap():getModelTile(getPathNodesDestination(self.m_PathNodes))
     for _, unitID in ipairs(focusModelUnit:getLoadUnitIdList()) do
         local launchModelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
-        if ((launchModelUnit:getState() == "idle")                 and
+        if ((launchModelUnit:isStateIdle())                        and
             (modelTile:getMoveCostWithModelUnit(launchModelUnit))) then
             actions[#actions + 1] = getSingleActionLaunchModelUnit(self, unitID)
         end
@@ -558,7 +560,7 @@ local function getActionsDropModelUnit(self)
     local focusModelUnit        = self.m_FocusModelUnit
     local dropDestinations      = self.m_SelectedDropDestinations
     local modelTileMap          = getModelTileMap()
-    local loaderEndingGridIndex = getMovePathDestination(self.m_MovePath)
+    local loaderEndingGridIndex = getPathNodesDestination(self.m_PathNodes)
 
     if ((not focusModelUnit.getCurrentLoadCount)                                                               or
         (focusModelUnit:getCurrentLoadCount() <= #dropDestinations)                                            or
@@ -585,7 +587,7 @@ end
 local function getActionLaunchFlare(self)
     local focusModelUnit = self.m_FocusModelUnit
     if ((not getModelFogMap():isFogOfWarCurrently()) or
-        (#self.m_MovePath ~= 1)                      or
+        (#self.m_PathNodes ~= 1)                     or
         (not focusModelUnit.getCurrentFlareAmmo)     or
         (focusModelUnit:getCurrentFlareAmmo() == 0)) then
         return nil
@@ -601,7 +603,7 @@ end
 
 local function getActionLaunchSilo(self)
     local focusModelUnit = self.m_FocusModelUnit
-    local modelTile      = getModelTileMap():getModelTile(getMovePathDestination(self.m_MovePath))
+    local modelTile      = getModelTileMap():getModelTile(getPathNodesDestination(self.m_PathNodes))
 
     if ((focusModelUnit.canLaunchSiloOnTileType) and
         (focusModelUnit:canLaunchSiloOnTileType(modelTile:getTileType()))) then
@@ -619,7 +621,7 @@ end
 local function getActionProduceModelUnitOnUnit(self)
     local focusModelUnit = self.m_FocusModelUnit
     if ((self.m_LaunchUnitID)                            or
-        (#self.m_MovePath ~= 1)                          or
+        (#self.m_PathNodes ~= 1)                         or
         (not focusModelUnit.getCurrentMaterial)          or
         (not focusModelUnit.getMovableProductionTiledId) or
         (not focusModelUnit.getCurrentLoadCount))        then
@@ -649,7 +651,7 @@ local function getActionProduceModelUnitOnUnit(self)
 end
 
 local function getActionWait(self)
-    local existingUnitModel = getModelUnitMap():getModelUnit(getMovePathDestination(self.m_MovePath))
+    local existingUnitModel = getModelUnitMap():getModelUnit(getPathNodesDestination(self.m_PathNodes))
     if (not existingUnitModel) or (self.m_FocusModelUnit == existingUnitModel) then
         return {
             name     = getLocalizedText(78, "Wait"),
@@ -802,16 +804,19 @@ setStatePreviewingReachableArea = function(self, gridIndex)
 end
 
 local function canSetStateChoosingProductionTarget(self, gridIndex)
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-    if ((isTotalReplay())                                               or
-        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))               then
+    if (isTotalReplay()) then
         return false
     else
-        local modelTile = getModelTileMap():getModelTile(gridIndex)
-        return (not getModelUnitMap():getModelUnit(gridIndex))  and
-            (modelTile:getPlayerIndex() == playerIndexLoggedIn) and
-            (modelTile.getProductionList)
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+        if ((getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+            (not getModelTurnManager():isTurnPhaseMain()))                  then
+            return false
+        else
+            local modelTile = getModelTileMap():getModelTile(gridIndex)
+            return (not getModelUnitMap():getModelUnit(gridIndex))  and
+                (modelTile:getPlayerIndex() == playerIndexLoggedIn) and
+                (modelTile.getProductionList)
+        end
     end
 end
 
@@ -833,14 +838,17 @@ setStateChoosingProductionTarget = function(self, gridIndex)
 end
 
 local function canSetStateMakingMovePath(self, beginningGridIndex, launchUnitID)
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
-    if ((isTotalReplay())                                               or
-        (getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
-        (getModelTurnManager():getTurnPhase() ~= "main"))               then
+    if (isTotalReplay()) then
         return false
     else
-        local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
-        return (modelUnit) and (modelUnit:getState() == "idle") and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+        if ((getModelTurnManager():getPlayerIndex() ~= playerIndexLoggedIn) or
+            (not getModelTurnManager():isTurnPhaseMain()))                  then
+            return false
+        else
+            local modelUnit = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
+            return (modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)
+        end
     end
 end
 
@@ -874,7 +882,7 @@ setStateMakingMovePath = function(self, beginningGridIndex, launchUnitID)
 end
 
 setStateChoosingAction = function(self, destination, launchUnitID)
-    local beginningGridIndex = self.m_MovePath[1].gridIndex
+    local beginningGridIndex = self.m_PathNodes[1]
     local focusModelUnit     = getModelUnitMap():getFocusModelUnit(beginningGridIndex, launchUnitID)
     if (self.m_FocusModelUnit ~= focusModelUnit) then
         self.m_FocusModelUnit  = focusModelUnit
@@ -884,7 +892,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
 
     updateMovePathWithDestinationGrid(self, destination)
     self.m_State              = "choosingAction"
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(createPathForDispatch(self.m_MovePath), launchUnitID)
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_PathNodes, launchUnitID)
     self.m_LaunchUnitID       = launchUnitID
 
     if (self.m_View) then
@@ -924,7 +932,7 @@ setStateChoosingFlareTarget = function(self)
     self.m_State = "choosingFlareTarget"
 
     if (self.m_View) then
-        self.m_View:setFlareGrids(getMovePathDestination(self.m_MovePath), self.m_FocusModelUnit:getMaxFlareRange())
+        self.m_View:setFlareGrids(getPathNodesDestination(self.m_PathNodes), self.m_FocusModelUnit:getMaxFlareRange())
             :setFlareGridsVisible(true)
     end
 
@@ -941,7 +949,7 @@ setStateChoosingDropDestination = function(self, unitID)
     self.m_State = "choosingDropDestination"
 
     local droppingModelUnit   = getModelUnitMap():getLoadedModelUnitWithUnitId(unitID)
-    self.m_AvailableDropGrids = getAvailableDropGrids(droppingModelUnit, self.m_FocusModelUnit:getGridIndex(), getMovePathDestination(self.m_MovePath), getModelUnitMap(), getModelTileMap(), self.m_SelectedDropDestinations)
+    self.m_AvailableDropGrids = getAvailableDropGrids(droppingModelUnit, self.m_FocusModelUnit:getGridIndex(), getPathNodesDestination(self.m_PathNodes), getModelUnitMap(), getModelTileMap(), self.m_SelectedDropDestinations)
     self.m_DroppingUnitID     = unitID
 
     if (self.m_View) then
@@ -1045,23 +1053,23 @@ local function onEvtGridSelected(self, event)
     elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             if (self.m_LaunchUnitID) then
-                setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
+                setStateChoosingAction(self, self.m_PathNodes[1])
             else
                 setStateIdle(self, true)
             end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, getModelUnitMap(), getModelTileMap())) then
             if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
-                setStateChoosingAction(self, self.m_MovePath[1].gridIndex)
+                setStateChoosingAction(self, self.m_PathNodes[1])
             else
                 setStateChoosingAction(self, gridIndex, self.m_LaunchUnitID)
             end
         end
     elseif (state == "choosingAction") then
-        setStateMakingMovePath(self, self.m_MovePath[1].gridIndex, self.m_LaunchUnitID)
+        setStateMakingMovePath(self, self.m_PathNodes[1], self.m_LaunchUnitID)
     elseif (state == "choosingAttackTarget") then
         local listNode = AttackableGridListFunctions.getListNode(self.m_AttackableGridList, gridIndex)
         if (not listNode) then
-            setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+            setStateChoosingAction(self, getPathNodesDestination(self.m_PathNodes), self.m_LaunchUnitID)
         else
             if (GridIndexFunctions.isEqual(self.m_CursorGridIndex, gridIndex)) then
                 sendActionAttack(self, gridIndex)
@@ -1070,7 +1078,7 @@ local function onEvtGridSelected(self, event)
             end
         end
     elseif (state == "choosingFlareTarget") then
-        local destination = getMovePathDestination(self.m_MovePath)
+        local destination = getPathNodesDestination(self.m_PathNodes)
         if (GridIndexFunctions.getDistance(gridIndex, destination) > self.m_FocusModelUnit:getMaxFlareRange()) then
             setStateChoosingAction(self, destination, self.m_LaunchUnitID)
         elseif (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
@@ -1080,7 +1088,7 @@ local function onEvtGridSelected(self, event)
         if (GridIndexFunctions.isEqual(gridIndex, self.m_CursorGridIndex)) then
             sendActionLaunchSilo(self, gridIndex)
         elseif (GridIndexFunctions.getDistance(gridIndex, self.m_CursorGridIndex) > 2) then
-            setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+            setStateChoosingAction(self, getPathNodesDestination(self.m_PathNodes), self.m_LaunchUnitID)
         end
     elseif (state == "choosingDropDestination") then
         if (isDropGridAvailable(gridIndex, self.m_AvailableDropGrids)) then
@@ -1092,7 +1100,7 @@ local function onEvtGridSelected(self, event)
             end
         else
             if (#self.m_SelectedDropDestinations == 0) then
-                setStateChoosingAction(self, getMovePathDestination(self.m_MovePath), self.m_LaunchUnitID)
+                setStateChoosingAction(self, getPathNodesDestination(self.m_PathNodes), self.m_LaunchUnitID)
             else
                 setStateChoosingAdditionalDropAction(self)
             end
@@ -1129,7 +1137,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelActionPlanner:onStartRunning(sceneWarFileName)
+function ModelActionPlanner:onStartRunning(modelSceneWar, sceneWarFileName)
     getScriptEventDispatcher()
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)
@@ -1138,7 +1146,7 @@ function ModelActionPlanner:onStartRunning(sceneWarFileName)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
     if (self.m_View) then
-        self.m_View:setMapSize(getModelTileMap():getMapSize())
+        self.m_View:setMapSize(getModelTileMap(modelSceneWar):getMapSize())
     end
     setStateIdle(self, true)
 

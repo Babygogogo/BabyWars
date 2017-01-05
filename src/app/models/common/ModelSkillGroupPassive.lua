@@ -1,14 +1,14 @@
 
 local ModelSkillGroupPassive = require("src.global.functions.class")("ModelSkillGroupPassive")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
 
-local getSkillModifierUnit = GameConstantFunctions.getSkillModifierUnit
-local getSkillPoints       = GameConstantFunctions.getSkillPoints
+local getSkillModifierUnit = SkillDataAccessors.getSkillModifierUnit
+local getSkillPoints       = SkillDataAccessors.getSkillPoints
 local getLocalizedText     = LocalizationFunctions.getLocalizedText
 
-local SLOTS_COUNT = GameConstantFunctions.getPassiveSkillSlotsCount()
+local SLOTS_COUNT = SkillDataAccessors.getPassiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.

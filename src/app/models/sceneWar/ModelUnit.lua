@@ -19,39 +19,40 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
+local UNIT_STATE_CODE = {
+    Idle     = 1,
+    Actioned = 2,
+}
+
 --------------------------------------------------------------------------------
 -- The functions that loads the data for the model from a TiledID/lua table.
 --------------------------------------------------------------------------------
 local function initWithTiledID(self, tiledID)
+    self.m_TiledID = tiledID
+
     local template = GameConstantFunctions.getTemplateModelUnitWithTiledId(tiledID)
     assert(template, "ModelUnit-initWithTiledID() failed to get the template model unit with param tiledID." .. tiledID)
 
-    self.m_TiledID = tiledID
-    if (template == self.m_Template) then
-        return
-    end
+    if (template ~= self.m_Template) then
+        self.m_Template  = template
+        self.m_StateCode = UNIT_STATE_CODE.Idle
 
-    self.m_Template = template
-    self.m_State    = "idle"
-
-    ComponentManager.unbindAllComponents(self)
-    for name, data in pairs(template) do
-        if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-            ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+        ComponentManager.unbindAllComponents(self)
+        for name, data in pairs(template) do
+            if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
+                ComponentManager.bindComponent(self, name, {template = data, instantialData = data})
+            end
         end
     end
 end
 
 local function loadInstantialData(self, param)
-    self.m_State  = param.state  or self.m_State
-    self.m_UnitID = param.unitID or self.m_UnitID
+    self.m_StateCode = param.stateCode or self.m_StateCode
+    self.m_UnitID    = param.unitID    or self.m_UnitID
 
     for name, data in pairs(param) do
         if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-            local component = ComponentManager.getComponent(self, name)
-            assert(component, "ModelUnit-loadInstantialData() attempting to update a component that the model hasn't bound with.")
-
-            component:loadInstantialData(data)
+            ComponentManager.getComponent(self, name):loadInstantialData(data)
         end
     end
 end
@@ -60,15 +61,8 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelUnit:ctor(param)
-    if (param.tiledID) then
-        initWithTiledID(self, param.tiledID)
-    end
-
+    initWithTiledID(   self, param.tiledID)
     loadInstantialData(self, param)
-
-    if (self.m_View) then
-        self:initView()
-    end
 
     return self
 end
@@ -95,9 +89,9 @@ function ModelUnit:toSerializableTable()
 
     t.tiledID = self:getTiledId()
     t.unitID  = self:getUnitId()
-    local state = self:getState()
-    if (state ~= "idle") then
-        t.state = state
+    local stateCode = self.m_StateCode
+    if (stateCode ~= UNIT_STATE_CODE.Idle) then
+        t.stateCode = stateCode
     end
 
     return t
@@ -106,9 +100,9 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelUnit:onStartRunning(sceneWarFileName)
+function ModelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
-    ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
 
     self:updateView()
 
@@ -195,18 +189,18 @@ function ModelUnit:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
 end
 
-function ModelUnit:getState()
-    return self.m_State
+function ModelUnit:isStateIdle()
+    return self.m_StateCode == UNIT_STATE_CODE.Idle
 end
 
 function ModelUnit:setStateIdle()
-    self.m_State = "idle"
+    self.m_StateCode = UNIT_STATE_CODE.Idle
 
     return self
 end
 
 function ModelUnit:setStateActioned()
-    self.m_State = "actioned"
+    self.m_StateCode = UNIT_STATE_CODE.Actioned
 
     return self
 end

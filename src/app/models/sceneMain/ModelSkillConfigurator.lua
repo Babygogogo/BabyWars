@@ -2,20 +2,26 @@
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
 local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription
+local getSkillCategory   = SkillDataAccessors.getSkillCategory
 
-local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local SKILL_GROUP_ID_PASSIVE   = ModelSkillConfiguration.getSkillGroupIdPassive()
-local SKILL_GROUP_ID_ACTIVE_1  = ModelSkillConfiguration.getSkillGroupIdActive1()
-local SKILL_GROUP_ID_ACTIVE_2  = ModelSkillConfiguration.getSkillGroupIdActive2()
-local ACTIVE_SKILL_SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
+local SKILL_GROUP_ID_PASSIVE                  = ModelSkillConfiguration.getSkillGroupIdPassive()
+local SKILL_GROUP_ID_ACTIVE_1                 = ModelSkillConfiguration.getSkillGroupIdActive1()
+local SKILL_GROUP_ID_ACTIVE_2                 = ModelSkillConfiguration.getSkillGroupIdActive2()
+local ACTIVE_SKILL_SLOTS_COUNT                = SkillDataAccessors.getActiveSkillSlotsCount()
+
+local ACTION_CODE_GET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_SET_SKILL_CONFIGURATION = ActionCodeFunctions.getActionCode("ActionSetSkillConfiguration")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -37,7 +43,7 @@ end
 local setStateSelectSkillLevel
 local function createItemsSkillSubCategory(self, categoryName)
     local items = {}
-    for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+    for _, skillID in ipairs(getSkillCategory(categoryName)) do
         items[#items + 1] = {
             name     = getLocalizedText(5, skillID),
             callback = function()
@@ -50,7 +56,7 @@ local function createItemsSkillSubCategory(self, categoryName)
 end
 
 local function createItemsSkillLevels(self, skillID, isActive)
-    local minLevel, maxLevel = GameConstantFunctions.getSkillLevelMinMax(skillID, isActive)
+    local minLevel, maxLevel = SkillDataAccessors.getSkillLevelMinMax(skillID, isActive)
     if ((not minLevel) or (not maxLevel)) then
         return nil
     end
@@ -79,7 +85,6 @@ end
 local function setStateMain(self)
     self.m_State           = "stateMain"
     self.m_ConfigurationID = nil
-    self.m_ModelSkillConfiguration:ctor()
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(1, "ConfigSkills"))
@@ -111,20 +116,20 @@ local function setStateOverviewConfiguration(self, configurationID)
             :setEnabled(true)
 
         local configuration = self.m_ModelSkillConfiguration
-        if (configuration:isEmpty()) then
+        if (configuration) then
+            view:setOverviewString(getFullDescription(configuration))
+        else
             view:setOverviewString(getLocalizedText(3, "GettingConfiguration"))
                 :setButtonSaveEnabled(false)
             for i = 1, #self.m_ItemsOverview do
                 view:setItemEnabled(i, false)
             end
-        else
-            view:setOverviewString(getFullDescription(configuration))
         end
     end
 end
 
 local function setStateSelectMaxPoint(self)
-    self.m_State = "stateSelectMaxPoint"
+    self.m_State = "stateSelectBasePoint"
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "BasePoints"))
@@ -208,16 +213,18 @@ end
 --------------------------------------------------------------------------------
 local function initItemsAllConfigurations(self)
     local items = {}
-    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+    for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
         items[#items + 1] = {
             name     = getConfigurationTitle(i),
             callback = function()
+                self.m_ModelSkillConfiguration = nil
                 setStateOverviewConfiguration(self, i)
+
                 if (WebSocketManager.getLoggedInAccountAndPassword()) then
                     WebSocketManager.sendAction({
-                        actionName      = "GetSkillConfiguration",
-                        configurationID = i,
-                    })
+                            actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+                            skillConfigurationID = i,
+                        })
                 end
             end,
         }
@@ -276,7 +283,7 @@ end
 
 local function initItemsEnergyRequirement(self)
     local items          = {}
-    local minReq, maxReq = GameConstantFunctions.getEnergyRequirementMinMax()
+    local minReq, maxReq = SkillDataAccessors.getEnergyRequirementMinMax()
     for requirement = minReq, maxReq do
         items[#items + 1] = {
             name     = "" .. requirement,
@@ -295,7 +302,7 @@ end
 
 local function initItemsSkillGroupPassive(self)
     local items = {}
-    for i = 1, GameConstantFunctions.getPassiveSkillSlotsCount() do
+    for i = 1, SkillDataAccessors.getPassiveSkillSlotsCount() do
         items[#items + 1] = {
             name     = string.format("%s %d", getLocalizedText(3, "Skill"), i),
             callback = function()
@@ -362,7 +369,7 @@ local function initItemsSkillCategoriesForPassive(self)
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForPassive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -388,7 +395,7 @@ local function initItemsSkillCategoriesForActive(self)
         }
     }
 
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForActive")) do
         items[#items + 1] = {
             name     = getLocalizedText(6, categoryName),
             callback = function()
@@ -402,13 +409,13 @@ end
 
 local function initItemsSkills(self)
     local items = {}
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForPassive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForPassive")) do
         if (not items[categoryName]) then
             print(categoryName)
             items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
     end
-    for _, categoryName in ipairs(GameConstantFunctions.getCategory("SkillCategoriesForActive")) do
+    for _, categoryName in ipairs(getSkillCategory("SkillCategoriesForActive")) do
         if (not items[categoryName]) then
             items[categoryName] = createItemsSkillSubCategory(self, categoryName)
         end
@@ -420,7 +427,7 @@ end
 local function initItemsSkillLevels(self)
     local items = {}
     for categoryName, _ in pairs(self.m_ItemsSkills) do
-        for _, skillID in ipairs(GameConstantFunctions.getCategory(categoryName)) do
+        for _, skillID in ipairs(getSkillCategory(categoryName)) do
             if (not items[skillID]) then
                 items[skillID] = {
                     passive = createItemsSkillLevels(self, skillID, false),
@@ -437,8 +444,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:ctor()
-    self.m_State                   = "stateDisabled"
-    self.m_ModelSkillConfiguration = ModelSkillConfiguration:create()
+    self.m_State = "stateDisabled"
 
     initItemsAllConfigurations(        self)
     initItemsOverview(                 self)
@@ -466,27 +472,6 @@ function ModelSkillConfigurator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelSkillConfigurator:doActionGetSkillConfiguration(action)
-    if ((self.m_State           == "stateOverviewConfiguration") and
-        (self.m_ConfigurationID == action.configurationID))      then
-        self.m_ModelSkillConfiguration:ctor(action.configuration)
-
-        local view = self.m_View
-        if (view) then
-            view:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
-                :setButtonSaveEnabled(true)
-            for i = 1, #self.m_ItemsOverview do
-                view:setItemEnabled(i, true)
-            end
-        end
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:setEnabled(enabled)
@@ -494,6 +479,27 @@ function ModelSkillConfigurator:setEnabled(enabled)
         setStateMain(self)
     else
         setStateDisabled(self)
+    end
+
+    return self
+end
+
+function ModelSkillConfigurator:isRetrievingSkillConfiguration(skillConfigurationID)
+    return (self.m_State == "stateOverviewConfiguration") and
+        (self.m_ConfigurationID == skillConfigurationID)  and
+        (not self.m_ModelSkillConfiguration)
+end
+
+function ModelSkillConfigurator:updateWithSkillConfiguration(skillConfiguration)
+    self.m_ModelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", skillConfiguration)
+
+    local view = self.m_View
+    if (view) then
+        view:setOverviewString(getFullDescription(self.m_ModelSkillConfiguration))
+            :setButtonSaveEnabled(true)
+        for i = 1, #self.m_ItemsOverview do
+            view:setItemEnabled(i, true)
+        end
     end
 
     return self
@@ -517,7 +523,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
         if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then setStateOverviewSkillGroupPassive(self)
         else                                                    setStateOverviewSkillGroupActive(self, self.m_SkillGroupID)
         end
-    elseif (state == "stateSelectMaxPoint")            then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
+    elseif (state == "stateSelectBasePoint")           then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupPassive") then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateOverviewSkillGroupActive")  then setStateOverviewConfiguration(   self, self.m_ConfigurationID)
     elseif (state == "stateSelectEnergyRequirement")   then setStateOverviewSkillGroupActive(self, self.m_SkillGroupID)
@@ -537,10 +543,10 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     else
         SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
-            actionName      = "SetSkillConfiguration",
-            configurationID = self.m_ConfigurationID,
-            configuration   = self.m_ModelSkillConfiguration:toSerializableTable(),
-        })
+                actionCode           = ACTION_CODE_SET_SKILL_CONFIGURATION,
+                skillConfigurationID = self.m_ConfigurationID,
+                skillConfiguration   = self.m_ModelSkillConfiguration:toSerializableTable(),
+            })
 
         if (self.m_View) then
             self.m_View:disableButtonSaveForSecs()

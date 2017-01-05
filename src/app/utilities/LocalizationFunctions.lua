@@ -607,48 +607,48 @@ local s_Texts = {
     },
     [12] = {
         [1] = function(actionName)
-            if     (actionName == "ActivateSkillGroup")     then return "发动技能"
-            elseif (actionName == "Attack")                 then return "攻击"
-            elseif (actionName == "BeginTurn")              then return "开始回合"
-            elseif (actionName == "BuildModelTile")         then return "建造"
-            elseif (actionName == "CaptureModelTile")       then return "占领"
-            elseif (actionName == "Dive")                   then return "下潜"
-            elseif (actionName == "DropModelUnit")          then return "卸载"
-            elseif (actionName == "EndTurn")                then return "结束回合"
-            elseif (actionName == "JoinModelUnit")          then return "合流"
-            elseif (actionName == "LaunchFlare")            then return "照明弹"
-            elseif (actionName == "LaunchSilo")             then return "发射导弹"
-            elseif (actionName == "LoadModelUnit")          then return "装载"
-            elseif (actionName == "ProduceModelUnitOnTile") then return "生产部队"
-            elseif (actionName == "ProduceModelUnitOnUnit") then return "生产舰载机"
-            elseif (actionName == "SupplyModelUnit")        then return "补给"
-            elseif (actionName == "Surface")                then return "上浮"
-            elseif (actionName == "Surrender")              then return "投降"
-            elseif (actionName == "TickActionId")           then return ""
-            elseif (actionName == "Wait")                   then return "待机"
+            if     (actionName == "ActionActivateSkillGroup")     then return "发动技能"
+            elseif (actionName == "ActionAttack")                 then return "攻击"
+            elseif (actionName == "ActionBeginTurn")              then return "开始回合"
+            elseif (actionName == "ActionBuildModelTile")         then return "建造"
+            elseif (actionName == "ActionCaptureModelTile")       then return "占领"
+            elseif (actionName == "ActionDive")                   then return "下潜"
+            elseif (actionName == "ActionDropModelUnit")          then return "卸载"
+            elseif (actionName == "ActionEndTurn")                then return "结束回合"
+            elseif (actionName == "ActionJoinModelUnit")          then return "合流"
+            elseif (actionName == "ActionLaunchFlare")            then return "照明弹"
+            elseif (actionName == "ActionLaunchSilo")             then return "发射导弹"
+            elseif (actionName == "ActionLoadModelUnit")          then return "装载"
+            elseif (actionName == "ActionProduceModelUnitOnTile") then return "生产部队"
+            elseif (actionName == "ActionProduceModelUnitOnUnit") then return "生产舰载机"
+            elseif (actionName == "ActionSupplyModelUnit")        then return "补给"
+            elseif (actionName == "ActionSurface")                then return "上浮"
+            elseif (actionName == "ActionSurrender")              then return "投降"
+            elseif (actionName == "ActionTickActionId")           then return ""
+            elseif (actionName == "ActionWait")                   then return "待机"
             else                                                 return "未知12:" .. (actionName or "")
             end
         end,
         [2] = function(actionName)
-            if     (actionName == "ActivateSkillGroup")     then return "ActivateSkillGroup"
-            elseif (actionName == "Attack")                 then return "Attack"
-            elseif (actionName == "BeginTurn")              then return "BeginTurn"
-            elseif (actionName == "BuildModelTile")         then return "BuildTile"
-            elseif (actionName == "CaptureModelTile")       then return "Capture"
-            elseif (actionName == "Dive")                   then return "Dive"
-            elseif (actionName == "DropModelUnit")          then return "Drop"
-            elseif (actionName == "EndTurn")                then return "EndTurn"
-            elseif (actionName == "JoinModelUnit")          then return "Join"
-            elseif (actionName == "LaunchFlare")            then return "LaunchFlare"
-            elseif (actionName == "LaunchSilo")             then return "LaunchSilo"
-            elseif (actionName == "LoadModelUnit")          then return "Load"
-            elseif (actionName == "ProduceModelUnitOnTile") then return "ProduceUnitOnTile"
-            elseif (actionName == "ProduceModelUnitOnUnit") then return "ProduceUnitOnUnit"
-            elseif (actionName == "SupplyModelUnit")        then return "Supply"
-            elseif (actionName == "Surface")                then return "Surface"
-            elseif (actionName == "Surrender")              then return "Surrender"
-            elseif (actionName == "TickActionId")           then return ""
-            elseif (actionName == "Wait")                   then return "Wait"
+            if     (actionName == "ActionActivateSkillGroup")     then return "ActivateSkillGroup"
+            elseif (actionName == "ActionAttack")                 then return "Attack"
+            elseif (actionName == "ActionBeginTurn")              then return "BeginTurn"
+            elseif (actionName == "ActionBuildModelTile")         then return "BuildTile"
+            elseif (actionName == "ActionCaptureModelTile")       then return "Capture"
+            elseif (actionName == "ActionDive")                   then return "Dive"
+            elseif (actionName == "ActionDropModelUnit")          then return "Drop"
+            elseif (actionName == "ActionEndTurn")                then return "EndTurn"
+            elseif (actionName == "ActionJoinModelUnit")          then return "Join"
+            elseif (actionName == "ActionLaunchFlare")            then return "LaunchFlare"
+            elseif (actionName == "ActionLaunchSilo")             then return "LaunchSilo"
+            elseif (actionName == "ActionLoadModelUnit")          then return "Load"
+            elseif (actionName == "ActionProduceModelUnitOnTile") then return "ProduceUnitOnTile"
+            elseif (actionName == "ActionProduceModelUnitOnUnit") then return "ProduceUnitOnUnit"
+            elseif (actionName == "ActionSupplyModelUnit")        then return "Supply"
+            elseif (actionName == "ActionSurface")                then return "Surface"
+            elseif (actionName == "ActionSurrender")              then return "Surrender"
+            elseif (actionName == "ActionTickActionId")           then return ""
+            elseif (actionName == "ActionWait")                   then return "Wait"
             else                                                 return "Unknown12:" .. (actionName or "")
             end
         end,
@@ -691,6 +691,7 @@ local s_Texts = {
         [1] = function(account) return "您已使用账号【" .. account .. "】进行了登陆。"      end,
         [2] = function(account) return "You have already logged in as " .. account .. "." end,
     },
+    --[[
     [22] = {
         [1] = function() return "账号或密码错误，请重试。"    end,
         [2] = function() return "Invalid account/password." end,
@@ -699,6 +700,7 @@ local s_Texts = {
         [1] = function(account) return "您的账号【" .. account .. "】在另一台设备上被登陆，您已被迫下线！"     end,
         [2] = function(account) return "Another device is logging in with your account!" .. account .. "." end,
     },
+    --]]
     [24] = {
         [1] = function(account, password)
             return "您确定要用以下账号和密码进行注册吗？\n" .. account .. "\n" .. password
@@ -707,10 +709,12 @@ local s_Texts = {
             return "Are you sure to register with the following account and password:\n" .. account .. "\n" .. password
         end,
     },
+    --[[
     [25] = {
         [1] = function() return "该账号已被注册，请使用其他账号。"                                  end,
         [2] = function() return "The account is registered already. Please use another account." end,
     },
+    --]]
     [26] = {
         [1] = function(account) return "欢迎登陆，【" .. account .. "】！" end,
         [2] = function(account) return "Welcome, " .. account .. "!"      end,
@@ -754,9 +758,28 @@ local s_Texts = {
         [2] = function() return "Next"  end,
     },
     [34] = {
-        [1] = function() return "行 动 次 序"  end,
-        [2] = function() return "Player Index" end,
+        [1] = function(textType)
+            if     (textType == "PlayerIndex")        then return "行 动 次 序"
+            elseif (textType == "FogOfWar")           then return "战 争 迷 雾"
+            elseif (textType == "Weather")            then return "天 气"
+            elseif (textType == "SkillConfiguration") then return "我方技能配置(可点击查看)"
+            elseif (textType == "BaseSkillPoints")    then return "全员技能基准点上限"
+            elseif (textType == "Password")           then return "密 码 (可 选)"
+            else                                           return "未知34:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "PlayerIndex")        then return "Player Index"
+            elseif (textType == "FogOfWar")           then return "Fog of War"
+            elseif (textType == "Weather")            then return "Weather"
+            elseif (textType == "SkillConfiguration") then return "Skill Configuration"
+            elseif (textType == "BaseSkillPoints")    then return "Max Base Skill Points"
+            elseif (textType == "Password")           then return "Password (optional)"
+            else                                           return "Unknown34:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [35] = {
         [1] = function() return "战 争 迷 雾" end,
         [2] = function() return "Fog of War" end,
@@ -777,6 +800,7 @@ local s_Texts = {
         [1] = function() return "密 码（可 选）"       end,
         [2] = function() return "Password (optional)" end,
     },
+    --]]
     [40] = {
         [1] = function(weatherType)
             if     (weatherType == "Clear")  then return "正 常"
@@ -852,8 +876,16 @@ local s_Texts = {
         [2] = function(err) return "Failed to create the war:\n" .. (err or "")         end,
     },
     [51] = {
-        [1] = function(warShortName) return "【" .. warShortName .. "】战局已创建，请等待其他玩家参战。"                                          end,
-        [2] = function(warShortName) return "The war [" .. warShortName .. "] is created successfully. Please wait for other players to join." end,
+        [1] = function(textType, additionalText)
+            if     (textType == "NewWarCreated") then return "[" .. additionalText .. "] 战局已创建，请等待其他玩家参战。"
+            else                                      return "未知51:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType, additionalText)
+            if     (textType == "NewWarCreated") then return "The war [" .. additionalText .. "] is created successfully. Please wait for other players to join."
+            else                                      return "Unknown51:" .. (textType or "")
+            end
+        end,
     },
     [52] = {
         [1] = function() return "无法进入战局，可能因为该战局已结束。"                           end,
@@ -872,8 +904,20 @@ local s_Texts = {
         [2] = function() return "Join war successfully. Please wait for more players to join." end,
     },
     [56] = {
-        [1] = function(warShortName) return "【" .. warShortName .. '】参战成功。战局已开始，您可以通过"继续"选项进入战局。' end,
-        [2] = function(warShortName) return "Join war [" .. warShortName .. "] successfully. The war has started."      end,
+        [1] = function(textType, additionalText)
+            if     (textType == "JoinWarNotStarted")   then return "该战局尚未开始，请耐心等待更多玩家加入。"
+            elseif (textType == "JoinWarStarted")      then return "该战局已开始，您可以通过[继续]选项进入战局。"
+            elseif (textType == "JoinWarSuccessfully") then return "您已成功参战 [" .. additionalText .. "]。"
+            else                                            return "未知56:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType, additionalText)
+            if     (textType == "JoinWarNotStarted")   then return "The war is not started. Please wait for more players to join."
+            elseif (textType == "JoinWarStarted")      then return "The war is started."
+            elseif (textType == "JoinWarSuccessfully") then return "Join war [" .. additionalText .. "] successfully."
+            else                                            return "Unknown56:" .. (textType or "")
+            end
+        end,
     },
     [57] = {
         [1] = function() return "查 找："   end,
@@ -1127,30 +1171,52 @@ local s_Texts = {
     },
     [81] = {
         [1] = function(errType, text)
-            text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
-            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
-            elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
-            elseif (errType == "InvalidAccount")                 then return "账号/密码不正确。将自动回到主界面。" .. text
-            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
+            text = (text) and ("" .. text) or ("")
+            if     (errType == "AutoSyncWar")                    then return "检测到数据不同步，正在自动重新载入。"
+            elseif (errType == "CorruptedAction")                then return "网络传输出现错误。请重试或刷新场景。" .. text
+            elseif (errType == "DefeatedPlayer")                 then return "您在该战局中已被打败，无法再次进入。"
+            elseif (errType == "EndedWar")                       then return "该战局已结束，无法再次进入。"
             elseif (errType == "FailToGetSkillConfiguration")    then return "无法获取技能配置，请重试。\n" .. text
+            elseif (errType == "InvalidAccountOrPassword")       then return "账号/密码不正确。将自动回到主界面。" .. text
+            elseif (errType == "InvalidGameVersion")             then return "游戏版本无效，请下载新版。\n新版版本号：" .. text
+            elseif (errType == "InvalidLogin")                   then return "账号/密码不正确，请检查后重试。"
             elseif (errType == "InvalidSkillConfiguration")      then return "技能配置无效，请检查后重试。" .. text
-            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
+            elseif (errType == "InvalidWarFileName")             then return "战局不存在，或已结束。" .. text
+            elseif (errType == "InvalidWarPassword")             then return "战局密码不正确，请检查后重试。"
+            elseif (errType == "MultiJoinWar")                   then return "您已参战。"
+            elseif (errType == "MultiLogin")                     then return "您的账号[" .. text .. "]在另一台设备上被登陆，您已被迫下线！"
+            elseif (errType == "NoReplayData")                   then return "该回放数据不存在，无法下载。若一直遇到此问题，请与作者联系。"
+            elseif (errType == "NotJoinableWar")                 then return "战局可能已经开始，无法参战。请选择其他战局。"
+            elseif (errType == "OccupiedPlayerIndex")            then return "您指定的行动顺序已被其他玩家占用。请使用其他顺序。"
+            elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
+            elseif (errType == "RegisteredAccount")              then return "该账号已被注册，请使用其他账号。"
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
             else                                                      return "未知81:" .. (errType or "")
             end
         end,
         [2] = function(errType, text)
-            text = (text) and (" " .. text) or ("")
-            if     (errType == "CorruptedAction")                then return "Data transfer error." .. text
-            elseif (errType == "InvalidGameVersion")             then return "Your game version is invalid. Please download the latest version:" .. text
-            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
-            elseif (errType == "InvalidAccount")                 then return "Invalid account/password." .. text
-            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
+            text = (text) and ("" .. text) or ("")
+            if     (errType == "AutoSyncWar")                    then return "The war is out-of-sync. Now synchronizing."
+            elseif (errType == "CorruptedAction")                then return "Data transfer error." .. text
+            elseif (errType == "DefeatedPlayer")                 then return "You have been defeated in the war."
+            elseif (errType == "EndedWar")                       then return "The war is ended."
             elseif (errType == "FailToGetSkillConfiguration")    then return "Failed to get the skill configuration. Please retry.\n" .. text
+            elseif (errType == "InvalidAccountOrPassword")       then return "Invalid account/password." .. text
+            elseif (errType == "InvalidGameVersion")             then return "Your game version is invalid. Please download the latest version:" .. text
+            elseif (errType == "InvalidLogin")                   then return "Invalid account/password for login. Please check and retry."
             elseif (errType == "InvalidSkillConfiguration")      then return "The skill configuration is invalid. Please check and retry.\n" .. text
-            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
+            elseif (errType == "InvalidWarFileName")             then return "The war is ended or invalid." .. text
+            elseif (errType == "InvalidWarPassword")             then return "The war password is invalid. Please check and retry."
+            elseif (errType == "MultiJoinWar")                   then return "You have already joined the war."
+            elseif (errType == "MultiLogin")                     then return "Another device is logging in with your account [" .. account .. "], and you're kicked offline!"
+            elseif (errType == "NoReplayData")                   then return "The replay data doesn't exist."
+            elseif (errType == "NotJoinableWar")                 then return "The war has begun already. Please join another war."
+            elseif (errType == "OccupiedPlayerIndex")            then return "The player index has been used by another player."
+            elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
+            elseif (errType == "RegisteredAccount")              then return "The account is registered already. Please use another account."
+            elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
             else                                                      return "Unknown81:" .. (errType or "")
             end
         end,

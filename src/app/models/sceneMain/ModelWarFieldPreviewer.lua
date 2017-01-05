@@ -13,8 +13,9 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
-local function initActorTileMap(self, tileMapData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelTileMap", tileMapData, "sceneWar.ViewTileMap")
+local function initActorTileMap(self, warFieldFileName)
+    local modelTileMap = Actor.createModel("sceneWar.ModelTileMap", nil, warFieldFileName, true)
+    local actor        = Actor.createWithModelAndViewInstance(modelTileMap, Actor.createView("sceneWar.ViewTileMap"))
 
     self.m_ActorTileMap = actor
 end
@@ -37,7 +38,7 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
         else
             self.m_RandomPlayersCount = nil
 
-            initActorTileMap(self, {template = warFieldFileName, isPreview = true})
+            initActorTileMap(self, warFieldFileName)
             self.m_View:setViewTileMap(self.m_ActorTileMap:getView(), self.m_ActorTileMap:getModel():getMapSize())
         end
         self.m_View:setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)

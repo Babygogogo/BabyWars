@@ -36,12 +36,13 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
+    local isReplay            = isTotalReplay()
     local playerIndex         = self.m_Model:getPlayerIndex()
     local playerIndexMod      = playerIndex % 2
-    local playerIndexLoggedIn = getPlayerIndexLoggedIn()
+    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn()) or (nil)
     local sceneWarFileName    = getSceneWarFileName()
     local unitType            = self.m_Model:getUnitType()
-    local isAlwaysVisible     = (isTotalReplay()) or (playerIndex == playerIndexLoggedIn)
+    local isAlwaysVisible     = (isReplay) or (playerIndex == playerIndexLoggedIn)
 
     local steps               = {cc.CallFunc:create(function()
         getModelMapCursor():setMovableByPlayer(false)
@@ -250,11 +251,11 @@ end
 --------------------------------------------------------------------------------
 -- The unit state.
 --------------------------------------------------------------------------------
-local function updateUnitState(self, state)
-    if (self.m_State ~= state) then
-        if (state == "idle") then
+local function updateUnitState(self, isStateIdle)
+    if (self.m_IsStateIdle ~= isStateIdle) then
+        if (isStateIdle) then
             self:setColor(COLOR_IDLE)
-        elseif (state == "actioned") then
+        else
             self:setColor(COLOR_ACTIONED)
         end
     end
@@ -328,7 +329,7 @@ end
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function ViewUnit:ctor(param)
+function ViewUnit:ctor()
     self:ignoreAnchorPointForPosition(true)
         :setCascadeColorEnabled(true)
     self.m_IsShowingNormalAnimation = true
@@ -344,15 +345,15 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnit:updateWithModelUnit(unit)
-    local tiledID = unit:getTiledId()
-    local state   = unit:getState()
+    local tiledID     = unit:getTiledId()
+    local isStateIdle = unit:isStateIdle()
     updateUnitSprite(    self,               tiledID)
-    updateUnitState(     self,               state)
+    updateUnitState(     self,               isStateIdle)
     updateHpIndicator(   self.m_HpIndicator, unit:getNormalizedCurrentHP())
     updateStateIndicator(self,               unit)
 
     self.m_TiledID     = tiledID
-    self.m_State       = state
+    self.m_IsStateIdle = isStateIdle
 
     return self
 end

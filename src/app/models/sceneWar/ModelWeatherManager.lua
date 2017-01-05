@@ -15,13 +15,24 @@
 
 local ModelWeatherManager = require("src.global.functions.class")("ModelWeatherManager")
 
-local TableFunctions      = require("src.app.utilities.TableFunctions")
+local WEATHER_CODES = {
+    Clear = 1,
+    Rainy = 2,
+    Snowy = 3,
+    Sandy = 4,
+}
+local s_WeatherNames
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelWeatherManager:ctor(param)
-    self.m_CurrentWeather = param.current
+    self.m_CurrentWeatherCode            = param.currentWeatherCode or param.defaultWeatherCode
+    self.m_DefaultWeatherCode            = param.defaultWeatherCode
+    self.m_ExpiringPlayerIndexForWeather = param.expiringPlayerIndexForWeather
+    self.m_ExpiringTurnIndexForWeather   = param.expiringTurnIndexForWeather
+
+    return self
 end
 
 --------------------------------------------------------------------------------
@@ -29,7 +40,10 @@ end
 --------------------------------------------------------------------------------
 function ModelWeatherManager:toSerializableTable()
     return {
-        current = self:getCurrentWeather(),
+        currentWeatherCode            = (self.m_CurrentWeatherCode ~= self.m_DefaultWeatherCode) and (self.m_CurrentWeatherCode) or (nil),
+        defaultWeatherCode            = self.m_DefaultWeatherCode,
+        expiringPlayerIndexForWeather = self.m_ExpiringPlayerIndexForWeather,
+        expiringTurnIndexForWeather   = self.m_ExpiringTurnIndexForWeather,
     }
 end
 
@@ -38,24 +52,23 @@ function ModelWeatherManager:toSerializableTableForPlayerIndex(playerIndex)
 end
 
 function ModelWeatherManager:toSerializableReplayData()
-    return self:toSerializableTable()
+    return {defaultWeatherCode = self.m_DefaultWeatherCode}
 end
 
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelWeatherManager:getCurrentWeather()
-    return self.m_CurrentWeather
-end
+function ModelWeatherManager.getWeatherName(weatherCode)
+    if (not s_WeatherNames) then
+        s_WeatherNames = {}
+        for name, code in pairs(WEATHER_CODES) do
+            s_WeatherNames[code] = name
+        end
+    end
 
-function ModelWeatherManager:getNextWeather()
-    -- TODO: add code to do the real job.
-    return self.m_CurrentWeather
-end
-
-function ModelWeatherManager:isInFog()
-    -- TODO: add code to do the real job.
-    return false
+    local name = s_WeatherNames[weatherCode]
+    assert(name, "ModelWeatherManager.getWeatherName() invalid weatherCode: " .. (weatherCode or ""))
+    return name
 end
 
 return ModelWeatherManager

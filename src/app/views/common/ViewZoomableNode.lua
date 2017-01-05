@@ -138,8 +138,12 @@ function ViewZoomableNode:ctor(boundaryRect)
     self:ignoreAnchorPointForPosition(true)
         :setAnchorPoint(0, 0)
 
-    self.m_ContentSize = {}
     self.m_BoundaryRect = boundaryRect or DEFAULT_BOUNDARY_RECT
+    self.m_ContentSize = {
+        width = self.m_BoundaryRect.width,
+        height = self.m_BoundaryRect.height,
+    }
+    self.m_MaxScale, self.m_MinScale = 1, 1
 
     return self
 end

@@ -18,6 +18,7 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local AudioManager              = require("src.app.utilities.AudioManager")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
@@ -43,6 +44,11 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
+
+local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")
+local ACTION_CODE_END_TURN             = ActionCodeFunctions.getActionCode("ActionEndTurn")
+local ACTION_CODE_RELOAD_SCENE_WAR     = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
+local ACTION_CODE_SURRENDER            = ActionCodeFunctions.getActionCode("ActionSurrender")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -91,7 +97,7 @@ local function updateUnitsData(dataForEachPlayer)
     local updateUnitCountAndValue = function(modelUnit)
         local data          = dataForEachPlayer[modelUnit:getPlayerIndex()]
         data.unitsCount     = data.unitsCount + 1
-        data.idleUnitsCount = data.idleUnitsCount + (modelUnit:getState() == "idle" and 1 or 0)
+        data.idleUnitsCount = data.idleUnitsCount + (modelUnit:isStateIdle() and 1 or 0)
         data.unitsValue     = data.unitsValue + round(modelUnit:getNormalizedCurrentHP() * modelUnit:getBaseProductionCost() / 10)
     end
 
@@ -143,7 +149,8 @@ local function getTilesInfo(tileTypeCounters, showIdleTilesCount)
 end
 
 local function getMapInfo()
-    local modelTileMap = getModelTileMap()
+    local modelWarField = SingletonGetters.getModelWarField()
+    local modelTileMap  = modelWarField:getModelTileMap()
     local tileTypeCounters = {
         Headquarters = 0,
         City         = 0,
@@ -163,8 +170,8 @@ local function getMapInfo()
     end)
 
     return string.format("%s: %s      %s: %s\n%s: %s      %s: %d\n%s",
-        getLocalizedText(65, "MapName"),   modelTileMap:getMapName(),
-        getLocalizedText(65, "Author"),    modelTileMap:getAuthorName(),
+        getLocalizedText(65, "MapName"),   modelWarField:getWarFieldDisplayName(),
+        getLocalizedText(65, "Author"),    modelWarField:getWarFieldAuthorName(),
         getLocalizedText(65, "WarID"),     getSceneWarFileName():sub(13),
         getLocalizedText(65, "TurnIndex"), getModelTurnManager():getTurnIndex(),
         getTilesInfo(tileTypeCounters)
@@ -303,23 +310,23 @@ end
 
 local function sendActionActivateSkillGroup(skillGroupID)
     createAndSendAction({
-        actionName   = "ActivateSkillGroup",
+        actionCode   = ACTION_CODE_ACTIVATE_SKILL_GROUP,
         skillGroupID = skillGroupID,
     }, true)
 end
 
 local function sendActionSurrender()
-    createAndSendAction({actionName = "Surrender"}, true)
+    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
 end
 
 local function sendActionEndTurn()
-    createAndSendAction({actionName = "EndTurn"}, true)
+    createAndSendAction({actionCode = ACTION_CODE_END_TURN}, true)
 end
 
 local function sendActionReloadSceneWar()
     createAndSendAction({
-        actionName = "ReloadSceneWar",
-        fileName   = getSceneWarFileName(),
+        actionCode       = ACTION_CODE_RELOAD_SCENE_WAR,
+        sceneWarFileName = getSceneWarFileName(),
     }, false)
 end
 
@@ -371,7 +378,7 @@ local function getIdleUnitsCount(self)
     local count       = 0
     local playerIndex = getModelTurnManager():getPlayerIndex()
     getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:getState() == "idle")) then
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:isStateIdle())) then
             count = count + 1
         end
     end)
@@ -502,7 +509,7 @@ local function initItemFindIdleUnit(self)
                     local modelUnit = modelUnitMap:getModelUnit(gridIndex)
                     if ((modelUnit)                                         and
                         (modelUnit:getPlayerIndex() == playerIndexLoggedIn) and
-                        (modelUnit:getState() == "idle"))                   then
+                        (modelUnit:isStateIdle()))                          then
                         if ((y > cursorY)                       or
                             ((y == cursorY) and (x > cursorX))) then
                             dispatchEvtMapCursorMoved(self, gridIndex)
@@ -741,7 +748,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running or script events.
 --------------------------------------------------------------------------------
-function ModelWarCommandMenu:onStartRunning(sceneWarFileName)
+function ModelWarCommandMenu:onStartRunning(modelSceneWar, sceneWarFileName)
     getScriptEventDispatcher()
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)

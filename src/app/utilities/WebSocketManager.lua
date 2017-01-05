@@ -1,15 +1,21 @@
 
 local WebSocketManager = {}
 
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local ActorManager           = require("src.global.actors.ActorManager")
+
+local decode = SerializationFunctions.decode
+local encode = SerializationFunctions.encode
+local next   = next
 
 local SERVER_URL = "e1t5268499.imwork.net:27370/BabyWars"
 --[[
 local SERVER_URL = "localhost:19297/BabyWars"
 --]]
 
-local HEARTBEAT_INTERVAL = 10
+local HEARTBEAT_INTERVAL    = 10
+local ACTION_CODE_HEARTBEAT = ActionCodeFunctions.getActionCode("ActionNetworkHeartbeat")
 
 local s_Socket
 local s_Account, s_Password
@@ -24,16 +30,15 @@ local s_Scheduler = cc.Director:getInstance():getScheduler()
 -- The util functions.
 --------------------------------------------------------------------------------
 local function heartbeat()
-    print("WebSocketManager-heartbeat", s_HeartbeatCounter)
     if (not s_IsHeartbeatAnswered) then
         WebSocketManager.close()
     else
         s_HeartbeatCounter    = s_HeartbeatCounter + 1
         s_IsHeartbeatAnswered = false
         WebSocketManager.sendAction({
-            actionName       = "NetworkHeartbeat",
-            heartbeatCounter = s_HeartbeatCounter,
-        })
+                actionCode       = ACTION_CODE_HEARTBEAT,
+                heartbeatCounter = s_HeartbeatCounter,
+            }, true)
     end
 end
 
@@ -71,9 +76,9 @@ function WebSocketManager.init()
     end, cc.WEBSOCKET_OPEN)
 
     s_Socket:registerScriptHandler(function(msg)
-        local action = assert(loadstring("return " .. msg))()
-        if (action.actionName == "NetworkHeartbeat") then
-            s_IsHeartbeatAnswered = action.heartbeatCounter == s_HeartbeatCounter
+        local _, action = next(decode("ActionGeneric", msg), nil)
+        if (action.actionCode == ACTION_CODE_HEARTBEAT) then
+            s_IsHeartbeatAnswered = (action.heartbeatCounter == s_HeartbeatCounter)
         else
             ActorManager.getRootActor():getModel():onWebSocketEvent("message", {
                 message = msg,
@@ -109,18 +114,15 @@ function WebSocketManager.getLoggedInAccountAndPassword()
     return s_Account, s_Password
 end
 
-function WebSocketManager.sendString(str)
-    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendString() the socket hasn't been initialized.")
-    s_Socket:sendString(str)
+function WebSocketManager.sendAction(action, ignoreAccountAndPassword)
+    assert(WebSocketManager.isInitialized(), "WebSocketManager.sendAction() the socket hasn't been initialized.")
 
-    return WebSocketManager
-end
+    if (not ignoreAccountAndPassword) then
+        action.playerAccount  = action.playerAccount  or s_Account
+        action.playerPassword = action.playerPassword or s_Password
+    end
 
-function WebSocketManager.sendAction(action)
-    action.playerAccount  = action.playerAccount  or s_Account
-    action.playerPassword = action.playerPassword or s_Password
-
-    WebSocketManager.sendString(SerializationFunctions.toString(action))
+    s_Socket:sendString(encode("ActionGeneric", {[ActionCodeFunctions.getActionName(action.actionCode)] = action}))
 
     return WebSocketManager
 end

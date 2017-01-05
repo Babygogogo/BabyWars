@@ -1,6 +1,9 @@
 
 local SerializationFunctions = {}
 
+local io     = io
+local sproto = require("src.global.functions.sproto")
+
 local IS_SERVER         = require("src.app.utilities.GameConstantFunctions").isServer()
 local WRITABLE_PATH     = (not IS_SERVER) and (cc.FileUtils:getInstance():getWritablePath() .. "writablePath/") or (nil)
 local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccount.lua")                         or (nil)
@@ -8,9 +11,45 @@ local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccoun
 local INDENT_SPACES             = " "
 local ERROR_MESSAGE_DEPTH_LIMIT = 2
 
+local s_IsInitialized
+local s_Sproto
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function loadBinarySprotoSchema()
+    if (not IS_SERVER) then
+        local filename = cc.FileUtils:getInstance():fullPathForFilename("sproto/BabyWarsSprotoSchema.sp")
+        return read_sproto_file_c(filename)
+    else
+        local f            = io.open("babyWars/res/sproto/BabyWarsSprotoSchema.sp", "rb")
+        local binarySchema = f:read("*a")
+        f:close()
+
+        return binarySchema
+    end
+end
+
+local function decode(typeName, msg)
+    return s_Sproto:pdecode(typeName, msg)
+end
+
+local function encode(typeName, t)
+    return s_Sproto:pencode(typeName, t)
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function SerializationFunctions.init()
+    assert(not s_IsInitialized, "SerializationFunctions.init() this module has been initialized already.")
+    s_IsInitialized = true
+
+    s_Sproto = sproto.new(loadBinarySprotoSchema())
+
+    return
+end
+
 function SerializationFunctions.toString(o, spaces)
     spaces = spaces or ""
     local subSpaces = spaces .. INDENT_SPACES
@@ -104,27 +143,32 @@ function SerializationFunctions.toErrorMessage(o, depth)
     end
 end
 
+SerializationFunctions.decode = decode
+SerializationFunctions.encode = encode
+
 --------------------------------------------------------------------------------
 -- The public functions that should only be invoked on the client.
 --------------------------------------------------------------------------------
 function SerializationFunctions.loadAccountAndPassword()
-    local file = io.open(ACCOUNT_FILE_PATH, "r")
-    if (file) then
-        file:close()
-        return dofile(ACCOUNT_FILE_PATH)
-    else
+    local file = io.open(ACCOUNT_FILE_PATH, "rb")
+    if (not file) then
         return nil
+    else
+        local data = decode("AccountAndPassword", file:read("*a"))
+        file:close()
+
+        return data.account, data.password
     end
 end
 
 function SerializationFunctions.serializeAccountAndPassword(account, password)
-    local file = io.open(ACCOUNT_FILE_PATH, "w")
+    local file = io.open(ACCOUNT_FILE_PATH, "wb")
     if (not file) then
         cc.FileUtils:getInstance():createDirectory(WRITABLE_PATH)
-        file = io.open(ACCOUNT_FILE_PATH, "w")
+        file = io.open(ACCOUNT_FILE_PATH, "wb")
     end
 
-    file:write(string.format("return %q, %q", account, password))
+    file:write(encode("AccountAndPassword", {account = account, password = password}))
     file:close()
 
     return SerializationFunctions

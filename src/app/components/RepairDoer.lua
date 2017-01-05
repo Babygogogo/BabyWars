@@ -36,7 +36,6 @@ RepairDoer.EXPORTED_METHODS = {
 --------------------------------------------------------------------------------
 function RepairDoer:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -50,14 +49,10 @@ function RepairDoer:loadTemplate(template)
     return self
 end
 
-function RepairDoer:loadInstantialData(data)
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function RepairDoer:onStartRunning(sceneWarFileName)
+function RepairDoer:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self

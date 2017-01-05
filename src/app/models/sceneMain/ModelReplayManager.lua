@@ -3,6 +3,7 @@ local ModelReplayManager = class("ModelReplayManager")
 
 local Actor                  = require("src.global.actors.Actor")
 local ActorManager           = require("src.global.actors.ActorManager")
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
@@ -15,6 +16,9 @@ local getModelMainMenu         = SingletonGetters.getModelMainMenu
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local sendAction               = WebSocketManager.sendAction
 
+local ACTION_CODE_DOWNLOAD_REPLAY_DATA      = ActionCodeFunctions.getActionCode("ActionDownloadReplayData")
+local ACTION_CODE_GET_REPLAY_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetReplayConfigurations")
+
 local REPLAY_DIRECTORY_PATH = cc.FileUtils:getInstance():getWritablePath() .. "writablePath/replay/"
 local REPLAY_LIST_PATH      = REPLAY_DIRECTORY_PATH .. "ReplayList.lua"
 
@@ -25,8 +29,44 @@ local function getReplayDataFileName(sceneWarFileName)
     return REPLAY_DIRECTORY_PATH .. sceneWarFileName .. ".lua"
 end
 
-local function hasReplayData(self, sceneWarFileName)
-    return self.m_ReplayList[sceneWarFileName]
+local function loadReplayList()
+    local file = io.open(REPLAY_LIST_PATH, "rb")
+    if (not file) then
+        return nil
+    else
+        local replayList = SerializationFunctions.decode("ReplayListForClient", file:read("*a")).list
+        file:close()
+
+        return replayList
+    end
+end
+
+local function serializeReplayList(replayList)
+    local file = io.open(REPLAY_LIST_PATH, "wb")
+    if (not file) then
+        cc.FileUtils:getInstance():createDirectory(REPLAY_DIRECTORY_PATH)
+        file = io.open(REPLAY_LIST_PATH, "wb")
+    end
+    file:write(SerializationFunctions.encode("ReplayListForClient", {list = replayList}))
+    file:close()
+end
+
+local function loadReplayData(sceneWarFileName)
+    local file = io.open(getReplayDataFileName(sceneWarFileName), "rb")
+    local replayData = SerializationFunctions.decode("SceneWar", file:read("*a"))
+    file:close()
+    return replayData
+end
+
+local function serializeReplayData(replayData)
+    local fileName = getReplayDataFileName(replayData.sceneWarFileName)
+    local file     = io.open(fileName, "wb")
+    if (not file) then
+        cc.FileUtils:getInstance():createDirectory(REPLAY_DIRECTORY_PATH)
+        file = io.open(fileName, "wb")
+    end
+    file:write(SerializationFunctions.encode("SceneWar", replayData))
+    file:close()
 end
 
 local function deleteReplayData(self, sceneWarFileName)
@@ -51,20 +91,16 @@ local function generateReplayConfiguration(warData)
     end
 
     return {
-        warFieldFileName    = warData.warField.tileMap.template,
-        maxSkillPoints      = warData.maxSkillPoints,
-        isFogOfWarByDefault = warData.isFogOfWarByDefault,
-        players             = players,
-
-        -- TODO: add code to generate the real configuration of the weather/fog.
-        weather          = "Clear",
+        sceneWarFileName = warData.sceneWarFileName,
+        warFieldFileName = warData.warField.warFieldFileName,
+        players          = players,
     }
 end
 
-local function getPlayerNicknames(warConfiguration)
-    local playersCount = require("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
+local function getPlayerNicknames(replayConfiguration)
+    local playersCount = require("res.data.templateWarField." .. replayConfiguration.warFieldFileName).playersCount
     local names        = {}
-    local players      = warConfiguration.players
+    local players      = replayConfiguration.players
 
     for i = 1, playersCount do
         if (players[i]) then
@@ -91,15 +127,14 @@ end
 local setStateDelete
 local function createMenuItemsForDelete(self)
     local items = {}
-    for sceneWarFileName, configuration in pairs(self.m_ReplayList) do
-        local warFieldFileName = configuration.warFieldFileName
+    for sceneWarFileName, replayConfiguration in pairs(self.m_ReplayList) do
+        local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
             name             = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             sceneWarFileName = sceneWarFileName,
-
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(configuration))
+                    :setPlayerNicknames(getPlayerNicknames(replayConfiguration))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonConfirmVisible(true)
@@ -128,26 +163,25 @@ end
 
 local function createMenuItemsForDownload(self, list)
     local items = {}
-    for sceneWarFileName, configuration in pairs(list) do
-        local warFieldFileName = configuration.warFieldFileName
-        items[#items + 1] = {
-            name             = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
-            sceneWarFileName = sceneWarFileName,
+    for _, replayConfiguration in pairs(list) do
+        local sceneWarFileName = replayConfiguration.sceneWarFileName
+        local warFieldFileName = replayConfiguration.warFieldFileName
+        if (not self.m_ReplayList[sceneWarFileName]) then
+            items[#items + 1] = {
+                name             = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+                sceneWarFileName = sceneWarFileName,
 
-            callback         = function()
-                getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(configuration))
-                    :setEnabled(true)
-                if (self.m_View) then
-                    self.m_View:setButtonConfirmVisible(true)
-                end
+                callback         = function()
+                    getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
+                        :setPlayerNicknames(getPlayerNicknames(replayConfiguration))
+                        :setEnabled(true)
+                    if (self.m_View) then
+                        self.m_View:setButtonConfirmVisible(true)
+                    end
 
-                self.m_OnButtonConfirmTouched = function()
-                    if (hasReplayData(self, sceneWarFileName)) then
-                        getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
-                    else
-                        sendAction({
-                            actionName       = "DownloadReplayData",
+                    self.m_OnButtonConfirmTouched = function()
+                        WebSocketManager.sendAction({
+                            actionCode       = ACTION_CODE_DOWNLOAD_REPLAY_DATA,
                             sceneWarFileName = sceneWarFileName,
                         })
                         if (self.m_View) then
@@ -156,9 +190,9 @@ local function createMenuItemsForDownload(self, list)
 
                         getModelMessageIndicator():showMessage(getLocalizedText(10, "DownloadStarted"))
                     end
-                end
-            end,
-        }
+                end,
+            }
+        end
     end
 
     table.sort(items, function(item1, item2)
@@ -170,22 +204,22 @@ end
 
 local function createMenuItemsForPlayback(self)
     local items = {}
-    for sceneWarFileName, configuration in pairs(self.m_ReplayList) do
-        local warFieldFileName = configuration.warFieldFileName
+    for sceneWarFileName, replayConfiguration in pairs(self.m_ReplayList) do
+        local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
             name             = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             sceneWarFileName = sceneWarFileName,
 
             callback         = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(configuration))
+                    :setPlayerNicknames(getPlayerNicknames(replayConfiguration))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonConfirmVisible(true)
                 end
 
                 self.m_OnButtonConfirmTouched = function()
-                    local actorWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", dofile(getReplayDataFileName(sceneWarFileName)), "sceneWar.ViewSceneWar")
+                    local actorWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", loadReplayData(sceneWarFileName), "sceneWar.ViewSceneWar")
                     ActorManager.setAndRunRootActor(actorWar, "FADE", 1)
                 end
             end,
@@ -275,16 +309,10 @@ end
 -- The composition items.
 --------------------------------------------------------------------------------
 local function initReplayList(self)
-    local file = io.open(REPLAY_LIST_PATH, "r")
-    if (file) then
-        file:close()
-        self.m_ReplayList = dofile(REPLAY_LIST_PATH)
-    else
-        cc.FileUtils:getInstance():createDirectory(REPLAY_DIRECTORY_PATH)
-        file = io.open(REPLAY_LIST_PATH, "w")
-        file:write("return {}")
-        file:close()
+    self.m_ReplayList = loadReplayList()
+    if (not self.m_ReplayList) then
         self.m_ReplayList = {}
+        serializeReplayList(self.m_ReplayList)
     end
 end
 
@@ -304,8 +332,8 @@ local function initItemDownload(self)
         name     = getLocalizedText(10, "Download"),
         callback = function()
             setStateDownload(self)
-            sendAction({
-                actionName = "GetReplayList",
+            WebSocketManager.sendAction({
+                actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
                 pageIndex  = 1,
             })
         end,
@@ -351,10 +379,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelReplayManager:getState()
-    return self.m_State
-end
-
 function ModelReplayManager:setEnabled(enabled)
     if (enabled) then
         setStateMain(self)
@@ -365,8 +389,12 @@ function ModelReplayManager:setEnabled(enabled)
     return self
 end
 
-function ModelReplayManager:setDownloadList(list)
-    local items = createMenuItemsForDownload(self, list)
+function ModelReplayManager:isRetrievingReplayConfigurations()
+    return self.m_State == "stateDownload"
+end
+
+function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations)
+    local items = createMenuItemsForDownload(self, replayConfigurations)
     if (#items == 0) then
         getModelMessageIndicator():showMessage(getLocalizedText(10, "NoDownloadableReplay"))
     elseif (self.m_View) then
@@ -377,21 +405,22 @@ function ModelReplayManager:setDownloadList(list)
     return self
 end
 
-function ModelReplayManager:serializeReplayData(sceneWarFileName, data)
-    if (hasReplayData(self, sceneWarFileName)) then
-        return
+function ModelReplayManager:isRetrievingEncodedReplayData()
+    return self.m_State ~= "stateDisabled"
+end
+
+function ModelReplayManager:updateWithEncodedReplayData(encodedReplayData)
+    local replayData       = SerializationFunctions.decode("SceneWar", encodedReplayData)
+    local sceneWarFileName = replayData.sceneWarFileName
+    if (not self.m_ReplayList[sceneWarFileName]) then
+        serializeReplayData(replayData)
+
+        self.m_ReplayList[sceneWarFileName] = generateReplayConfiguration(replayData)
+        serializeReplayList(self.m_ReplayList)
     end
+    getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
 
-    local fileNameForData = getReplayDataFileName(sceneWarFileName)
-    local fileForData = io.open(fileNameForData, "w")
-    fileForData:write(data)
-    fileForData:close()
-
-    local fileForList = io.open(REPLAY_LIST_PATH, "w")
-    fileForList:write("return ")
-    self.m_ReplayList[sceneWarFileName] = generateReplayConfiguration(dofile(fileNameForData))
-    appendToFile(self.m_ReplayList, "", fileForList)
-    fileForList:close()
+    return self
 end
 
 function ModelReplayManager:onButtonBackTouched()
@@ -406,7 +435,7 @@ function ModelReplayManager:onButtonBackTouched()
     elseif (state == "statePlayback") then
         setStateMain(self)
     else
-        error("ModelSkillConfigurator:onButtonBackTouched() the current state is invalid: " .. state)
+        error("ModelReplayManager:onButtonBackTouched() the current state is invalid: " .. state)
     end
 
     return self

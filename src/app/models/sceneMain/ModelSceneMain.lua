@@ -15,6 +15,7 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
 local ActionExecutor         = require("src.app.utilities.ActionExecutor")
 local AudioManager           = require("src.app.utilities.AudioManager")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
@@ -26,34 +27,7 @@ local ActorManager           = require("src.global.actors.ActorManager")
 local EventDispatcher        = require("src.global.events.EventDispatcher")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
-
---------------------------------------------------------------------------------
--- The functions for doing actions.
---------------------------------------------------------------------------------
-local function doActionNewWar(self, action)
-    self.m_ActorMainMenu:getModel():doActionNewWar(action)
-    self:getModelMessageIndicator():showMessage(action.message)
-end
-
-local function doActionGetJoinableWarList(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetJoinableWarList(action)
-end
-
-local function doActionJoinWar(self, action)
-    self.m_ActorMainMenu:getModel():doActionJoinWar(action)
-end
-
-local function doActionGetOngoingWarList(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetOngoingWarList(action)
-end
-
-local function doActionGetSceneWarData(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetSceneWarData(action)
-end
-
-local function doActionGetSkillConfiguration(self, action)
-    self.m_ActorMainMenu:getModel():doActionGetSkillConfiguration(action)
-end
+local string           = string
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -64,20 +38,15 @@ local function onWebSocketOpen(self, param)
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneMain-onWebSocketMessage():\n" .. param.message)
+    local actionCode = param.action.actionCode
+    print(string.format("ModelSceneMain-onWebSocketMessage() code: %d  name: %s  length: %d",
+        actionCode,
+        ActionCodeFunctions.getActionName(actionCode),
+        string.len(param.message))
+    )
+    print(SerializationFunctions.toString(param.action))
 
-    local action     = param.action
-    local actionName = action.actionName
-    if     (action.fileName)                       then return
-    elseif (actionName == "NewWar")                then doActionNewWar(               self, action)
-    elseif (actionName == "GetJoinableWarList")    then doActionGetJoinableWarList(   self, action)
-    elseif (actionName == "JoinWar")               then doActionJoinWar(              self, action)
-    elseif (actionName == "GetOngoingWarList")     then doActionGetOngoingWarList(    self, action)
-    elseif (actionName == "GetSceneWarData")       then doActionGetSceneWarData(      self, action)
-    elseif (actionName == "GetSkillConfiguration") then doActionGetSkillConfiguration(self, action)
-    elseif (actionName == "Error")                 then error("ModelSceneMain-onWebSocketMessage() Error: " .. action.error)
-    else                                                ActionExecutor.execute(action)
-    end
+    ActionExecutor.execute(param.action, self)
 end
 
 local function onWebSocketClose(self, param)

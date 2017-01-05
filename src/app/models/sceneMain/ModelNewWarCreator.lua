@@ -2,14 +2,19 @@
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
 local WarFieldList              = require("res.data.templateWarField.WarFieldList")
+local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+
+local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -32,8 +37,7 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
 end
 
 local function resetSelectorMaxSkillPoints(modelWarConfigurator)
-    local minPoints, _, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex((100 - minPoints) / pointsPerStep + 2)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setCurrentOptionIndex((100 - MIN_POINTS) / POINTS_PER_STEP + 2)
 end
 
 local function resetModelWarConfigurator(model, warFieldFileName)
@@ -83,25 +87,26 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
             SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
             modelWarConfigurator:disableButtonConfirmForSecs(5)
             WebSocketManager.sendAction({
-                actionName           = "NewWar",
-                warPassword          = password,
-                warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
-                playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
-                skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                maxSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
-            })
+                    actionCode           = ACTION_CODE_NEW_WAR,
+                    warPassword          = password,
+                    warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                    playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                    skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                    maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                    isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                    defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
+                })
         end
     end)
 end
 
 local function initSelectorSkill(self, modelWarConfigurator)
     local options = {{
-        data = 0,
-        text = getLocalizedText(3, "Disable"),
+        data = nil,
+        text = getLocalizedText(3, "None"),
     }}
     local prefix  = getLocalizedText(3, "Configuration") .. " "
-    for i = 1, GameConstantFunctions.getSkillConfigurationsCount() do
+    for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
         options[#options + 1] = {
             text = prefix .. i,
             data = i,
@@ -109,17 +114,17 @@ local function initSelectorSkill(self, modelWarConfigurator)
                 modelWarConfigurator:setPopUpPanelText(getLocalizedText(3, "GettingConfiguration"))
                     :setPopUpPanelEnabled(true)
                 WebSocketManager.sendAction({
-                    actionName      = "GetSkillConfiguration",
-                    configurationID = i,
-                })
+                        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+                        skillConfigurationID = i
+                    })
             end,
         }
     end
-    local presetOptions = {}
-    for presetName, presetData in pairs(GameConstantFunctions.getSkillPresets()) do
-        presetOptions[#presetOptions + 1] = {
+    for i, presetData in ipairs(SkillDataAccessors.getSkillPresets()) do
+        local presetName = presetData.name
+        options[#options + 1] = {
             text = presetName,
-            data = presetName,
+            data = -i,
             callbackOnOptionIndicatorTouched = function()
                 local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
                 modelWarConfigurator:setPopUpPanelEnabled(true)
@@ -129,12 +134,6 @@ local function initSelectorSkill(self, modelWarConfigurator)
                     ))
             end,
         }
-    end
-    table.sort(presetOptions, function(option1, option2)
-        return option1.text < option2.text
-    end)
-    for _, presetOption in ipairs(presetOptions) do
-        options[#options + 1] = presetOption
     end
 
     modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions(options)
@@ -152,8 +151,7 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
                 :setOptionIndicatorTouchEnabled(false)
         end,
     }}
-    local minPoints, maxPoints, pointsPerStep = GameConstantFunctions.getSkillPointsMinMaxStep()
-    for points = minPoints, maxPoints, pointsPerStep do
+    for points = MIN_POINTS, MAX_POINTS, POINTS_PER_STEP do
         options[#options + 1] = {
             data = points,
             text = "" .. points,
@@ -181,7 +179,7 @@ local function initSelectorWeather(modelWarConfigurator)
     -- TODO: enable the selector.
     modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
         :setOptions({
-            {data = "Clear", text = getLocalizedText(40, "Clear"),},
+            {data = 1, text = getLocalizedText(40, "Clear"),},
         })
 end
 
@@ -265,25 +263,14 @@ function ModelNewWarCreator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
--- The public functions for doing actions.
---------------------------------------------------------------------------------
-function ModelNewWarCreator:doActionGetSkillConfiguration(action)
-    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    if (modelWarConfigurator:isPopUpPanelEnabled()) then
-        local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", action.configuration)
-        modelWarConfigurator:setPopUpPanelText(string.format("%s %d:\n%s",
-            getLocalizedText(3, "Configuration"), action.configurationID,
-            SkillDescriptionFunctions.getFullDescription(modelSkillConfiguration)
-        ))
-    end
-
-    return self
-end
-
---------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelNewWarCreator:isEnabled()
+    return self.m_IsEnabled
+end
+
 function ModelNewWarCreator:setEnabled(enabled)
+    self.m_IsEnabled = enabled
     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     getActorWarConfigurator(self):getModel():setEnabled(false)
 
@@ -294,6 +281,20 @@ function ModelNewWarCreator:setEnabled(enabled)
     end
 
     return self
+end
+
+function ModelNewWarCreator:isRetrievingSkillConfiguration(skillConfigurationID)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isPopUpPanelEnabled())                                                           and
+        (modelWarConfigurator:getModelOptionSelectorWithName("Skill"):getCurrentOption() == skillConfigurationID)
+end
+
+function ModelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    getActorWarConfigurator(self):getModel():setPopUpPanelText(string.format("%s %d:\n%s",
+        getLocalizedText(3, "Configuration"),
+        skillConfigurationID,
+        SkillDescriptionFunctions.getFullDescription(Actor.createModel("common.ModelSkillConfiguration", skillConfiguration))
+    ))
 end
 
 function ModelNewWarCreator:onButtonBackTouched()

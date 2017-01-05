@@ -20,6 +20,7 @@
 local ModelTurnManager = require("src.global.functions.class")("ModelTurnManager")
 
 local IS_SERVER             = require("src.app.utilities.GameConstantFunctions").isServer()
+local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
 local Destroyers            = require("src.app.utilities.Destroyers")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
@@ -44,10 +45,25 @@ local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local supplyWithAmmoAndFuel    = SupplyFunctions.supplyWithAmmoAndFuel
 
+local ACTION_CODE_BEGIN_TURN = ActionCodeFunctions.getActionCode("ActionBeginTurn")
+local TURN_PHASE_CODES = {
+    RequestToBegin                    = 1,
+    Beginning                         = 2,
+    GetFund                           = 3,
+    ConsumeUnitFuel                   = 4,
+    RepairUnit                        = 5,
+    SupplyUnit                        = 6,
+    Main                              = 7,
+    ResetUnitState                    = 8,
+    ResetVisionForEndingTurnPlayer    = 9,
+    TickTurnAndPlayerIndex            = 10,
+    ResetSkillState                   = 11,
+    ResetVisionForBeginningTurnPlayer = 12,
+}
 local DEFAULT_TURN_DATA = {
-    turnIndex   = 1,
-    playerIndex = 1,
-    phase       = "requestToBegin",
+    turnIndex     = 1,
+    playerIndex   = 1,
+    turnPhaseCode = TURN_PHASE_CODES.RequestToBegin,
 }
 
 --------------------------------------------------------------------------------
@@ -76,13 +92,6 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
             nextPlayerIndex = nextPlayerIndex + 1
         end
     end
-end
-
-local function dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
-    dispatcher:dispatchEvent({
-        name      = "EvtSupplyViewUnit",
-        gridIndex = gridIndex,
-    })
 end
 
 local function repairModelUnit(modelUnit, repairAmount)
@@ -130,7 +139,7 @@ end
 local function runTurnPhaseBeginning(self)
     local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
-        self.m_TurnPhase = "getFund"
+        self.m_TurnPhaseCode = TURN_PHASE_CODES.GetFund
         self:runTurn()
     end
 
@@ -148,7 +157,7 @@ local function runTurnPhaseGetFund(self)
         self.m_IncomeForNextTurn = nil
     end
 
-    self.m_TurnPhase = "consumeUnitFuel"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ConsumeUnitFuel
 end
 
 local function runTurnPhaseConsumeUnitFuel(self)
@@ -192,70 +201,65 @@ local function runTurnPhaseConsumeUnitFuel(self)
         end)
     end
 
-    self.m_TurnPhase = "repairUnit"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.RepairUnit
 end
 
 local function runTurnPhaseRepairUnit(self)
     local repairData = self.m_RepairDataForNextTurn
     if (repairData) then
-        local sceneWarFileName = self.m_SceneWarFileName
-        local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-        for unitID, data in pairs(repairData.onMapData) do
-            repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
-        end
-        for unitID, data in pairs(repairData.loadedData) do
-            repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelUnitMap  = getModelUnitMap(modelSceneWar)
+
+        if (repairData.onMapData) then
+            for unitID, data in pairs(repairData.onMapData) do
+                repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
+            end
         end
 
-        getModelPlayerManager(sceneWarFileName):getModelPlayer(self.m_PlayerIndex):setFund(repairData.remainingFund)
+        if (repairData.loadedData) then
+            for unitID, data in pairs(repairData.loadedData) do
+                repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
+            end
+        end
+
+        getModelPlayerManager(modelSceneWar):getModelPlayer(self.m_PlayerIndex):setFund(repairData.remainingFund)
         self.m_RepairDataForNextTurn = nil
     end
 
-    self.m_TurnPhase = "supplyUnit"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.SupplyUnit
 end
 
 local function runTurnPhaseSupplyUnit(self)
-    local sceneWarFileName = self.m_SceneWarFileName
-    local playerIndex      = self.m_PlayerIndex
-    local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-    local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
-    local mapSize          = modelUnitMap:getMapSize()
+    local supplyData = self.m_SupplyDataForNextTurn
+    if (supplyData) then
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelUnitMap  = getModelUnitMap(modelSceneWar)
+        local modelGridEffect = (not IS_SERVER) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
 
-    local supplyLoadedModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyLoadedModelUnit)        and
-            (modelUnit:canSupplyLoadedModelUnit())      and
-            (not modelUnit:canRepairLoadedModelUnit())) then
-
-            local hasSupplied = false
-            for _, unitID in pairs(modelUnit:getLoadUnitIdList()) do
-                hasSupplied = supplyWithAmmoAndFuel(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), true) or hasSupplied
-            end
-            if (hasSupplied) then
-                dispatchEvtSupplyViewUnit(dispatcher, modelUnit:getGridIndex())
-            end
-        end
-    end
-
-    local supplyAdjacentModelUnits = function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and
-            (modelUnit.canSupplyModelUnit))             then
-            for _, gridIndex in pairs(getAdjacentGrids(modelUnit:getGridIndex(), mapSize)) do
-                local supplyTarget = modelUnitMap:getModelUnit(gridIndex)
-                if ((supplyTarget)                               and
-                    (modelUnit:canSupplyModelUnit(supplyTarget)) and
-                    (supplyWithAmmoAndFuel(supplyTarget, true))) then
-                    dispatchEvtSupplyViewUnit(dispatcher, gridIndex)
+        if (supplyData.onMapData) then
+            for unitID, data in pairs(supplyData.onMapData) do
+                local gridIndex = data.gridIndex
+                supplyWithAmmoAndFuel(modelUnitMap:getModelUnit(gridIndex), true)
+                if (modelGridEffect) then
+                    modelGridEffect:showAnimationSupply(gridIndex)
                 end
             end
         end
+
+        if (supplyData.loadedData) then
+            for unitID, data in pairs(supplyData.loadedData) do
+                local modelUnit = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
+                supplyWithAmmoAndFuel(modelUnit, true)
+                if (modelGridEffect) then
+                    modelGridEffect:showAnimationSupply(modelUnit:getGridIndex())
+                end
+            end
+        end
+
+        self.m_SupplyDataForNextTurn = nil
     end
 
-    modelUnitMap:forEachModelUnitOnMap(supplyAdjacentModelUnits)
-        :forEachModelUnitOnMap(        supplyLoadedModelUnits)
-        :forEachModelUnitLoaded(       supplyLoadedModelUnits)
-
-    self.m_TurnPhase = "main"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.Main
 end
 
 local function runTurnPhaseMain(self)
@@ -283,7 +287,7 @@ local function runTurnPhaseResetUnitState(self)
     getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
-    self.m_TurnPhase = "resetVisionForEndingTurnPlayer"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetVisionForEndingTurnPlayer
 end
 
 local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
@@ -295,7 +299,7 @@ local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
         resetVisionOnClient()
     end
 
-    self.m_TurnPhase = "tickTurnAndPlayerIndex"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.TickTurnAndPlayerIndex
 end
 
 local function runTurnPhaseTickTurnAndPlayerIndex(self)
@@ -308,8 +312,8 @@ local function runTurnPhaseTickTurnAndPlayerIndex(self)
         modelPlayer = modelPlayerManager:getModelPlayer(self.m_PlayerIndex),
     })
 
-    -- TODO: Change the vision, weather and so on.
-    self.m_TurnPhase = "resetSkillState"
+    -- TODO: Change the weather.
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetSkillState
 end
 
 local function runTurnPhaseResetSkillState(self)
@@ -327,7 +331,7 @@ local function runTurnPhaseResetSkillState(self)
             :forEachModelUnitLoaded(func)
     end
 
-    self.m_TurnPhase = "resetVisionForBeginningTurnPlayer"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetVisionForBeginningTurnPlayer
 end
 
 local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
@@ -341,13 +345,13 @@ local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
         resetVisionOnClient()
     end
 
-    self.m_TurnPhase = "requestToBegin"
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.RequestToBegin
 end
 
 local function runTurnPhaseRequestToBegin(self)
     if ((not IS_SERVER) and (not isTotalReplay()) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
         WebSocketManager.sendAction({
-            actionName       = "BeginTurn",
+            actionCode       = ACTION_CODE_BEGIN_TURN,
             actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
             sceneWarFileName = self.m_SceneWarFileName,
         })
@@ -358,9 +362,9 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTurnManager:ctor(param)
-    self.m_TurnIndex   = param.turnIndex
-    self.m_PlayerIndex = param.playerIndex
-    self.m_TurnPhase   = param.phase
+    self.m_TurnIndex     = param.turnIndex
+    self.m_PlayerIndex   = param.playerIndex
+    self.m_TurnPhaseCode = param.turnPhaseCode
 
     return self
 end
@@ -370,9 +374,9 @@ end
 --------------------------------------------------------------------------------
 function ModelTurnManager:toSerializableTable()
     return {
-        turnIndex   = self:getTurnIndex(),
-        playerIndex = self:getPlayerIndex(),
-        phase       = self:getTurnPhase(),
+        turnIndex     = self:getTurnIndex(),
+        playerIndex   = self:getPlayerIndex(),
+        turnPhaseCode = self.m_TurnPhaseCode,
     }
 end
 
@@ -387,8 +391,7 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelTurnManager:onStartRunning(sceneWarFileName)
-    assert(string.len(sceneWarFileName) == 16, "ModelTurnManager:onStartRunning() invalid name: " .. (sceneWarFileName or ""))
+function ModelTurnManager:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self
@@ -401,29 +404,33 @@ function ModelTurnManager:getTurnIndex()
     return self.m_TurnIndex
 end
 
-function ModelTurnManager:getTurnPhase()
-    return self.m_TurnPhase
-end
-
 function ModelTurnManager:getPlayerIndex()
     return self.m_PlayerIndex
 end
 
-function ModelTurnManager:runTurn()
-    if (self.m_TurnPhase == "beginning")                         then runTurnPhaseBeginning(                        self) end
-    if (self.m_TurnPhase == "getFund")                           then runTurnPhaseGetFund(                          self) end
-    if (self.m_TurnPhase == "consumeUnitFuel")                   then runTurnPhaseConsumeUnitFuel(                  self) end
-    if (self.m_TurnPhase == "repairUnit")                        then runTurnPhaseRepairUnit(                       self) end
-    if (self.m_TurnPhase == "supplyUnit")                        then runTurnPhaseSupplyUnit(                       self) end
-    if (self.m_TurnPhase == "main")                              then runTurnPhaseMain(                             self) end
-    if (self.m_TurnPhase == "resetUnitState")                    then runTurnPhaseResetUnitState(                   self) end
-    if (self.m_TurnPhase == "resetVisionForEndingTurnPlayer")    then runTurnPhaseResetVisionForEndingTurnPlayer(   self) end
-    if (self.m_TurnPhase == "tickTurnAndPlayerIndex")            then runTurnPhaseTickTurnAndPlayerIndex(           self) end
-    if (self.m_TurnPhase == "resetSkillState")                   then runTurnPhaseResetSkillState(                  self) end
-    if (self.m_TurnPhase == "resetVisionForBeginningTurnPlayer") then runTurnPhaseResetVisionForBeginningTurnPlayer(self) end
-    if (self.m_TurnPhase == "requestToBegin")                    then runTurnPhaseRequestToBegin(                   self) end
+function ModelTurnManager:isTurnPhaseRequestToBegin()
+    return self.m_TurnPhaseCode == TURN_PHASE_CODES.RequestToBegin
+end
 
-    if ((self.m_TurnPhase == "main") and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then
+function ModelTurnManager:isTurnPhaseMain()
+    return self.m_TurnPhaseCode == TURN_PHASE_CODES.Main
+end
+
+function ModelTurnManager:runTurn()
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.Beginning)                         then runTurnPhaseBeginning(                        self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.GetFund)                           then runTurnPhaseGetFund(                          self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ConsumeUnitFuel)                   then runTurnPhaseConsumeUnitFuel(                  self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.RepairUnit)                        then runTurnPhaseRepairUnit(                       self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.SupplyUnit)                        then runTurnPhaseSupplyUnit(                       self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.Main)                              then runTurnPhaseMain(                             self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetUnitState)                    then runTurnPhaseResetUnitState(                   self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVisionForEndingTurnPlayer)    then runTurnPhaseResetVisionForEndingTurnPlayer(   self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.TickTurnAndPlayerIndex)            then runTurnPhaseTickTurnAndPlayerIndex(           self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetSkillState)                   then runTurnPhaseResetSkillState(                  self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVisionForBeginningTurnPlayer) then runTurnPhaseResetVisionForBeginningTurnPlayer(self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.RequestToBegin)                    then runTurnPhaseRequestToBegin(                   self) end
+
+    if ((self.m_TurnPhaseCode == TURN_PHASE_CODES.Main) and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then
         self.m_CallbackOnEnterTurnPhaseMainForNextTurn()
         self.m_CallbackOnEnterTurnPhaseMainForNextTurn = nil
     end
@@ -439,11 +446,12 @@ function ModelTurnManager:runTurn()
     return self
 end
 
-function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, callbackOnEnterTurnPhaseMain)
-    assert(self.m_TurnPhase == "requestToBegin", "ModelTurnManager:beginTurnPhaseBeginning() invalid turn phase: " .. self.m_TurnPhase)
+function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, supplyData, callbackOnEnterTurnPhaseMain)
+    assert(self:isTurnPhaseRequestToBegin(), "ModelTurnManager:beginTurnPhaseBeginning() invalid turn phase code: " .. self.m_TurnPhaseCode)
 
     self.m_IncomeForNextTurn                       = income
     self.m_RepairDataForNextTurn                   = repairData
+    self.m_SupplyDataForNextTurn                   = supplyData
     self.m_CallbackOnEnterTurnPhaseMainForNextTurn = callbackOnEnterTurnPhaseMain
 
     runTurnPhaseBeginning(self)
@@ -452,8 +460,8 @@ function ModelTurnManager:beginTurnPhaseBeginning(income, repairData, callbackOn
 end
 
 function ModelTurnManager:endTurnPhaseMain()
-    assert(self.m_TurnPhase == "main", "ModelTurnManager:endTurnPhaseMain() invalid turn phase: " .. self.m_TurnPhase)
-    self.m_TurnPhase = "resetUnitState"
+    assert(self:isTurnPhaseMain(), "ModelTurnManager:endTurnPhaseMain() invalid turn phase code: " .. self.m_TurnPhaseCode)
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetUnitState
     self:runTurn()
 
     return self

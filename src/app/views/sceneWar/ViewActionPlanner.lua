@@ -295,14 +295,11 @@ function ViewActionPlanner:setAttackableGridsVisible(visible)
     return self
 end
 
-function ViewActionPlanner:setMovePath(path)
+function ViewActionPlanner:setMovePath(pathNodes)
     self.m_ViewMovePath:removeAllChildren()
 
-    for i = 1, #path do
-        local prevGridIndex = path[i - 1] and path[i - 1].gridIndex or nil
-        local nextGridIndex = path[i + 1] and path[i + 1].gridIndex or nil
-
-        local gridView = createViewSingleMovePathGrid(path[i].gridIndex, prevGridIndex, nextGridIndex)
+    for i = 1, #pathNodes do
+        local gridView = createViewSingleMovePathGrid(pathNodes[i], pathNodes[i - 1], pathNodes[i + 1])
         if (gridView) then
             self.m_ViewMovePath:addChild(gridView)
         end

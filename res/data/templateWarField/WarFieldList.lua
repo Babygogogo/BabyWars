@@ -1,10 +1,8 @@
 return {
     "BaZhenTuEr",
-    "BeiPan",
     "BeiZhong",
     "BiFengGang",
     "DiXiaShui",
-    "DuiKangZhaoTianTong",
     "DuoYanPingYuan",
     "FengBaoQianXian",
     "GaoLaMiJia",
@@ -19,12 +17,15 @@ return {
     "SanHeGu",
     "ShenSeYanCaoZhanZheng",
     "SiTongBaDa",
-    "TanXinWan_2",
+    "TanXinWan",
     "WangPaiKongJun",
-    "XiaoGuoZhengBaSai",
     "YanMo",
     "YunShiQun",
     "ZhengZhengFangFang",
+
+    "BeiPan",                   -- 4p
+    "DuiKangZhaoTianTong",      -- 4p
+    "XiaoGuoZhengBaSai",        -- 4p
 
     "Random2P",
 

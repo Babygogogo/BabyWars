@@ -3,14 +3,14 @@ local ModelSkillConfiguration = require("src.global.functions.class")("ModelSkil
 
 local ModelSkillGroupPassive = require("src.app.models.common.ModelSkillGroupPassive")
 local ModelSkillGroupActive  = require("src.app.models.common.ModelSkillGroupActive")
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors     = require("src.app.utilities.SkillDataAccessors")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 local round            = require("src.global.functions.round")
 
-local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = GameConstantFunctions.getSkillPointsMinMaxStep()
-local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = GameConstantFunctions.getSkillPointsPerEnergyRequirement()
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
+local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = SkillDataAccessors.getSkillPointsPerEnergyRequirement()
 
 local SKILL_GROUP_ID_PASSIVE  = 0
 local SKILL_GROUP_ID_ACTIVE_1 = 1
@@ -69,7 +69,7 @@ function ModelSkillConfiguration:ctor(param)
     self.m_ModelSkillGroupActive1:ctor(param.active1)
     self.m_ModelSkillGroupActive2:ctor(param.active2)
     self:setBaseSkillPoints(       param.basePoints or 100)
-        :setActivatingSkillGroupId(param.activatingSkillGroupId)
+        :setActivatingSkillGroupId(param.activatingSkillGroupID)
 
     return self
 end
@@ -89,7 +89,7 @@ function ModelSkillConfiguration:toSerializableTable()
 
     return {
         basePoints             = self:getBaseSkillPoints(),
-        activatingSkillGroupId = self:getActivatingSkillGroupId(),
+        activatingSkillGroupID = self:getActivatingSkillGroupId(),
 
         passive                = self.m_ModelSkillGroupPassive:toSerializableTable(),
         active1                = active1:toSerializableTable(),
@@ -99,7 +99,7 @@ end
 
 function ModelSkillConfiguration:toSerializableReplayData()
     local data = self:toSerializableTable()
-    data.activatingSkillGroupId = nil
+    data.activatingSkillGroupID = nil
 
     return data
 end
@@ -143,15 +143,7 @@ function ModelSkillConfiguration:getModelSkillGroupWithId(skillGroupID)
     end
 end
 
-function ModelSkillConfiguration:isEmpty()
-    return not self:getBaseSkillPoints()
-end
-
 function ModelSkillConfiguration:isValid()
-    if (self:isEmpty()) then
-        return false
-    end
-
     local valid, err = self.m_ModelSkillGroupPassive:isValid()
     if (not valid) then
         return false, getLocalizedText(7, "InvalidSkillGroupPassive", err)

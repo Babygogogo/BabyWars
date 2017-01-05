@@ -1,15 +1,15 @@
 
 local ModelSkillGroupActive = require("src.global.functions.class")("ModelSkillGroupActive")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
 
-local getSkillEnergyRequirement = GameConstantFunctions.getSkillEnergyRequirement
-local getSkillModifierUnit      = GameConstantFunctions.getSkillModifierUnit
-local getSkillPoints            = GameConstantFunctions.getSkillPoints
+local getSkillEnergyRequirement = SkillDataAccessors.getSkillEnergyRequirement
+local getSkillModifierUnit      = SkillDataAccessors.getSkillModifierUnit
+local getSkillPoints            = SkillDataAccessors.getSkillPoints
 local getLocalizedText          = LocalizationFunctions.getLocalizedText
 
-local SLOTS_COUNT = GameConstantFunctions.getActiveSkillSlotsCount()
+local SLOTS_COUNT = SkillDataAccessors.getActiveSkillSlotsCount()
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -29,8 +29,9 @@ end
 -- The constructor and initializer.
 --------------------------------------------------------------------------------
 function ModelSkillGroupActive:ctor(param)
-    self:setEnergyRequirement((param) and (param.energyRequirement) or (nil))
-    initSlots(self, param)
+    param = param or {}
+    self:setEnergyRequirement(param.energyRequirement)
+    initSlots(self, param.skills)
 
     return self
 end
@@ -43,22 +44,22 @@ function ModelSkillGroupActive:toSerializableTable()
         return {}
     end
 
-    local t = {
-        energyRequirement = self:getEnergyRequirement(),
-    }
-
-    local slots = self.m_Slots
+    local skills = {}
+    local slots  = self.m_Slots
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
-            t[#t + 1] = {
+            skills[#skills + 1] = {
                 id    = skill.id,
                 level = skill.level,
             }
         end
     end
 
-    return t
+    return {
+        energyRequirement = self:getEnergyRequirement(),
+        skills            = skills,
+    }
 end
 
 --------------------------------------------------------------------------------

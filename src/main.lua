@@ -27,8 +27,9 @@ local function main()
     display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.png")
     display.loadSpriteFrames("BabyWarsTextureGallery.plist", "BabyWarsTextureGallery.png")
 
-    require("src.app.utilities.AnimationLoader").load()
-    require("src.app.utilities.GameConstantFunctions").init()
+    require("src.app.utilities.AnimationLoader")       .load()
+    require("src.app.utilities.GameConstantFunctions") .init()
+    require("src.app.utilities.SerializationFunctions").init()
 
     math.randomseed(os.time())
 

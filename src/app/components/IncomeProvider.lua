@@ -30,7 +30,6 @@ end
 --------------------------------------------------------------------------------
 function IncomeProvider:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -42,14 +41,10 @@ function IncomeProvider:loadTemplate(template)
     return self
 end
 
-function IncomeProvider:loadInstantialData(data)
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function IncomeProvider:onStartRunning(sceneWarFileName)
+function IncomeProvider:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
 
     return self

@@ -22,11 +22,13 @@
 
 local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
 
-local ActionExecutor        = require("src.app.utilities.ActionExecutor")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
-local Actor                 = require("src.global.actors.Actor")
-local EventDispatcher       = require("src.global.events.EventDispatcher")
+local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
+local ActionExecutor         = require("src.app.utilities.ActionExecutor")
+local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
+local Actor                  = require("src.global.actors.Actor")
+local EventDispatcher        = require("src.global.events.EventDispatcher")
 
 local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
@@ -34,7 +36,7 @@ local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSock
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"fileName", "actionID"}
+local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"sceneWarFileName", "actionID"}
 local TIME_INTERVAL_FOR_ACTIONS         = 1.5
 
 --------------------------------------------------------------------------------
@@ -46,20 +48,28 @@ local function onWebSocketOpen(self, param)
 
     if (not self:isTotalReplay()) then
         local modelTurnManager = self:getModelTurnManager()
-        if ((modelTurnManager:getTurnPhase() == "requestToBegin")                                         and
+        if ((modelTurnManager:isTurnPhaseRequestToBegin())                                                and
             (modelTurnManager:getPlayerIndex() == self:getModelPlayerManager():getPlayerIndexLoggedIn())) then
             modelTurnManager:runTurn()
         else
             WebSocketManager.sendAction({
-                actionName = "GetSceneWarActionId",
-                fileName   = self:getFileName(),
+                actionCode       = ActionCodeFunctions.getActionCode("ActionSyncSceneWar"),
+                actionID         = self:getActionId(),
+                sceneWarFileName = self:getFileName(),
             })
         end
     end
 end
 
 local function onWebSocketMessage(self, param)
-    print("ModelSceneWar-onWebSocketMessage():\n" .. param.message)
+    local actionCode = param.action.actionCode
+    print(string.format("ModelSceneWar-onWebSocketMessage() code: %d  name: %s  length: %d",
+        actionCode,
+        ActionCodeFunctions.getActionName(actionCode),
+        string.len(param.message))
+    )
+    print(SerializationFunctions.toString(param.action))
+
     self:executeAction(param.action)
 end
 
@@ -88,6 +98,32 @@ local function cacheAction(self, action)
     assert(actionID > self:getActionId(), "ModelSceneWar-cacheAction() the action to be cached has been executed already.")
 
     self.m_CachedActions[actionID] = action
+
+    return self
+end
+
+local function executeReplayAction(self)
+    assert(self:isTotalReplay(), "ModelSceneWar-executeReplayAction() the scene is not in replay mode.")
+    assert(not self:isExecutingAction(), "ModelSceneWar-executeReplayAction() another action is being executed.")
+
+    self.m_ExecutedActionsCount = self.m_ExecutedActionsCount or #self.m_ExecutedActions
+    local actionID  = self:getActionId() + 1
+    local _, action = next(self.m_ExecutedActions[actionID])
+    if (not action) then
+        self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
+    else
+        self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
+            getLocalizedText(11, "Progress"),
+            actionID,
+            self.m_ExecutedActionsCount,
+            getLocalizedText(12, ActionCodeFunctions.getActionName(action.actionCode))
+        ))
+
+        action.actionID = actionID
+        setActionId(self, actionID)
+
+        ActionExecutor.execute(action, self)
+    end
 
     return self
 end
@@ -151,14 +187,15 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     self.m_ExecutedActions     = sceneData.executedActions
-    self.m_FileName            = sceneData.fileName
-    self.m_IsWarEnded          = sceneData.isEnded
+    self.m_SceneWarFileName    = sceneData.sceneWarFileName
+    self.m_IsWarEnded          = sceneData.isWarEnded
     self.m_IsFogOfWarByDefault = sceneData.isFogOfWarByDefault
+    self.m_IsRandomWarField    = sceneData.isRandomWarField
     self.m_IsTotalReplay       = sceneData.isTotalReplay
-    self.m_MaxSkillPoints      = sceneData.maxSkillPoints
+    self.m_MaxBaseSkillPoints  = sceneData.maxBaseSkillPoints
     self.m_WarPassword         = sceneData.warPassword
     self.m_CachedActions       = {}
-    setActionId(self, sceneData.actionID or 0)
+    setActionId(self, sceneData.actionID)
 
     initScriptEventDispatcher(self)
     initActorPlayerManager(   self, sceneData.players)
@@ -190,45 +227,54 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:toSerializableTable()
     return {
-        fileName            = self.m_FileName,
+        sceneWarFileName    = self.m_SceneWarFileName,
         warPassword         = self.m_WarPassword,
-        isEnded             = self.m_IsWarEnded,
+        isWarEnded          = self.m_IsWarEnded,
+        isRandomWarField    = self.m_IsRandomWarField,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
+        isTotalReplay       = false,
         executedActions     = self.m_ExecutedActions,
-        maxSkillPoints      = self.m_MaxSkillPoints,
+        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
         actionID            = self:getActionId(),
-        warField            = self:getModelWarField()      :toSerializableTable(),
-        turn                = self:getModelTurnManager()   :toSerializableTable(),
         players             = self:getModelPlayerManager() :toSerializableTable(),
+        turn                = self:getModelTurnManager()   :toSerializableTable(),
+        warField            = self:getModelWarField()      :toSerializableTable(),
         weather             = self:getModelWeatherManager():toSerializableTable(),
     }
 end
 
 function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     return {
-        fileName            = self.m_FileName,
+        sceneWarFileName    = self.m_SceneWarFileName,
         warPassword         = self.m_WarPassword,
-        isEnded             = self.m_IsWarEnded,
+        isWarEnded          = self.m_IsWarEnded,
+        isRandomWarField    = self.m_IsRandomWarField,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        maxSkillPoints      = self.m_MaxSkillPoints,
+        isTotalReplay       = false,
+        executedActions     = nil,
+        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
         actionID            = self:getActionId(),
-        warField            = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
-        turn                = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
         players             = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
+        turn                = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
+        warField            = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
         weather             = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
     }
 end
 
 function ModelSceneWar:toSerializableReplayData()
     return {
-        fileName            = self.m_FileName,
+        sceneWarFileName    = self.m_SceneWarFileName,
+        warPassword         = self.m_WarPassword,
+        isWarEnded          = false,
+        isRandomWarField    = self.m_IsRandomWarField,
         isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
         isTotalReplay       = true,
         executedActions     = self.m_ExecutedActions,
-        maxSkillPoints      = self.m_MaxSkillPoints,
-        warField            = self:getModelWarField()      :toSerializableReplayData(),
-        turn                = self:getModelTurnManager()   :toSerializableReplayData(),
+        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
+        actionID            = 0,
         players             = self:getModelPlayerManager() :toSerializableReplayData(),
+        turn                = self:getModelTurnManager()   :toSerializableReplayData(),
+        warField            = self:getModelWarField()      :toSerializableReplayData(),
         weather             = self:getModelWeatherManager():toSerializableReplayData(),
     }
 end
@@ -239,12 +285,12 @@ end
 function ModelSceneWar:onStartRunning()
     local sceneWarFileName = self:getFileName()
     local modelTurnManager = self:getModelTurnManager()
+    modelTurnManager            :onStartRunning(self, sceneWarFileName)
+    self:getModelPlayerManager():onStartRunning(self, sceneWarFileName)
+    self:getModelWarField()     :onStartRunning(self, sceneWarFileName)
     if (not IS_SERVER) then
-        self:getModelWarHud():onStartRunning(sceneWarFileName)
+        self:getModelWarHud():onStartRunning(self, sceneWarFileName)
     end
-    modelTurnManager            :onStartRunning(sceneWarFileName)
-    self:getModelPlayerManager():onStartRunning(sceneWarFileName)
-    self:getModelWarField()     :onStartRunning(sceneWarFileName)
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
 
@@ -278,29 +324,31 @@ end
 ModelSceneWar.isModelSceneWar = true
 
 function ModelSceneWar:executeAction(action)
-    local sceneWarFileName = action.fileName
+    local sceneWarFileName = action.sceneWarFileName
     local actionID         = action.actionID
     local selfActionID     = self:getActionId()
     if (IS_SERVER) then
-        assert(sceneWarFileName == self:getFileName(), "ModelSceneWar:executeAction() invalid action.fileName:" .. (sceneWarFileName or ""))
+        assert(sceneWarFileName == self:getFileName(), "ModelSceneWar:executeAction() invalid action.sceneWarFileName:" .. (sceneWarFileName or ""))
         assert(actionID == selfActionID + 1,           "ModelSceneWar:executeAction() invalid action.actionID:" .. (actionID or ""))
         assert(not self:isExecutingAction(),           "ModelSceneWar:executeAction() another action is being executed. This should not happen.")
 
         setActionId(self, actionID)
-        ActionExecutor.execute(action)
+        ActionExecutor.execute(action, self)
 
         if (self.m_ExecutedActions) then
-            self.m_ExecutedActions[actionID] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+            self.m_ExecutedActions[actionID] = {
+                [ActionCodeFunctions.getActionName(action.actionCode)] = TableFunctions.clone(action, IGNORED_KEYS_FOR_EXECUTED_ACTIONS)
+            }
         end
 
     elseif (not sceneWarFileName) then
-        ActionExecutor.execute(action)
+        ActionExecutor.execute(action, self)
 
     elseif (sceneWarFileName ~= self:getFileName()) then
         -- The action is not for this war. Do nothing.
 
     elseif (not actionID) then
-        ActionExecutor.execute(action)
+        ActionExecutor.execute(action, self)
 
     elseif ((actionID <= selfActionID) or (self:isEnded())) then
         -- The action has been executed already, or the war is ended for the client. Do nothing.
@@ -310,29 +358,7 @@ function ModelSceneWar:executeAction(action)
 
     else
         setActionId(self, actionID)
-        ActionExecutor.execute(action)
-    end
-
-    return self
-end
-
-function ModelSceneWar:executeReplayAction()
-    assert(self:isTotalReplay(), "ModelSceneWar:executeReplayAction() the scene is not in replay mode.")
-    assert(not self:isExecutingAction(), "ModelSceneWar:executeReplayAction() another action is being executed.")
-
-    local actionID = self:getActionId() + 1
-    local action   = self.m_ExecutedActions[actionID]
-    if (not action) then
-        self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
-    else
-        self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
-            getLocalizedText(11, "Progress"), actionID, #self.m_ExecutedActions, getLocalizedText(12, action.actionName)))
-
-        action.fileName = self:getFileName()
-        action.actionID = actionID
-
-        setActionId(self, actionID)
-        ActionExecutor.execute(action)
+        ActionExecutor.execute(action, self)
     end
 
     return self
@@ -348,7 +374,7 @@ function ModelSceneWar:setAutoReplay(isAuto)
     self.m_IsAutoReplay = isAuto
 
     if ((isAuto) and (not self:isExecutingAction())) then
-        self:executeReplayAction()
+        executeReplayAction(self)
     end
 
     return self
@@ -359,6 +385,7 @@ function ModelSceneWar:isExecutingAction()
 end
 
 function ModelSceneWar:setExecutingAction(executing)
+    assert(self.m_IsExecutingAction ~= executing)
     self.m_IsExecutingAction = executing
 
     if ((not executing) and (not self:isEnded())) then
@@ -386,7 +413,7 @@ function ModelSceneWar:setExecutingAction(executing)
                     cc.CallFunc:create(function()
                         self.m_IsExecutingAction = false
                         if (self:isAutoReplay()) then
-                            self:executeReplayAction()
+                            executeReplayAction(self)
                         end
                     end)
                 ))
@@ -402,7 +429,7 @@ function ModelSceneWar:getActionId()
 end
 
 function ModelSceneWar:getFileName()
-    return self.m_FileName
+    return self.m_SceneWarFileName
 end
 
 function ModelSceneWar:isEnded()

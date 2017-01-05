@@ -41,7 +41,6 @@ end
 --------------------------------------------------------------------------------
 function DefenseBonusProvider:ctor(param)
     self:loadTemplate(param.template)
-        :loadInstantialData(param.instantialData)
 
     return self
 end
@@ -52,10 +51,6 @@ function DefenseBonusProvider:loadTemplate(template)
 
     self.m_Template = template
 
-    return self
-end
-
-function DefenseBonusProvider:loadInstantialData(data)
     return self
 end
 

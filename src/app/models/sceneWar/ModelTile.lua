@@ -59,6 +59,7 @@ local ComponentManager      = require("src.global.components.ComponentManager")
 
 local IS_SERVER = GameConstantFunctions.isServer()
 
+local string                       = string
 local getPlayerIndexLoggedIn       = SingletonGetters.getPlayerIndexLoggedIn
 local getTiledIdWithTileOrUnitName = GameConstantFunctions.getTiledIdWithTileOrUnitName
 local isTileVisibleToPlayerIndex   = VisibilityFunctions.isTileVisibleToPlayerIndex
@@ -92,16 +93,13 @@ local function initWithTiledID(self, objectID, baseID, isPreview)
     end
 end
 
-local function loadInstantialData(self, param)
-    if (param.isPreview) then
+local function loadInstantialData(self, param, isPreview)
+    if (isPreview) then
         ComponentManager.bindComponent(self, "GridIndexable", {instantialData = param.GridIndexable})
     else
         for name, data in pairs(param) do
             if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-                local component = ComponentManager.getComponent(self, name)
-                assert(component, "ModelTile-loadInstantialData() attempting to update a component that the model hasn't bound with.")
-
-                component:loadInstantialData(data)
+                ComponentManager.getComponent(self, name):loadInstantialData(data)
             end
         end
     end
@@ -110,15 +108,12 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelTile:ctor(param)
+function ModelTile:ctor(param, isPreview)
+    self.m_PositionIndex = param.positionIndex
     if ((param.objectID) or (param.baseID)) then
-        initWithTiledID(self, param.objectID, param.baseID, param.isPreview)
+        initWithTiledID(self, param.objectID, param.baseID, isPreview)
     end
-    loadInstantialData(self, param)
-
-    if (self.m_View) then
-        self:initView()
-    end
+    loadInstantialData(self, param, isPreview)
 
     return self
 end
@@ -147,8 +142,7 @@ end
 -- The function for serialization.
 --------------------------------------------------------------------------------
 function ModelTile:toSerializableTable()
-    local t = {}
-
+    local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
         if (component.toSerializableTable) then
@@ -160,19 +154,20 @@ function ModelTile:toSerializableTable()
         end
     end
 
-    if ((self.m_InitialBaseID == self.m_BaseID) and (self.m_InitialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+    local objectID, baseID = self:getObjectAndBaseId()
+    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        t.objectID = (self.m_ObjectID ~= self.m_InitialObjectID) and (self.m_ObjectID) or (nil)
-        t.baseID   = (self.m_BaseID   ~= self.m_InitialBaseID)   and (self.m_BaseID)   or (nil)
+        t.positionIndex = self.m_PositionIndex
+        t.baseID        = (baseID   ~= self.m_InitialBaseID)   and (baseID)   or (nil)
+        t.objectID      = (objectID ~= self.m_InitialObjectID) and (objectID) or (nil)
 
         return t
     end
 end
 
 function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
-    local gridIndex = self:getGridIndex()
-    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, gridIndex, playerIndex)) then
+    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, self:getGridIndex(), playerIndex)) then
         return self:toSerializableTable()
     end
 
@@ -188,9 +183,10 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
                 return nil
             else
                 return {
-                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    positionIndex = self.m_PositionIndex,
                     baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
-                    GridIndexable = {gridIndex = gridIndex},
+                    objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
+                    GridIndexable = ComponentManager.getComponent(self, "GridIndexable"):toSerializableTable(),
                 }
             end
         end
@@ -199,7 +195,7 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
     local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toSerializableTableWithFog) then
+        if ((name ~= "GridIndexable") and (component.toSerializableTableWithFog)) then
             local componentTable = component:toSerializableTableWithFog()
             if (componentTable) then
                 t[name]         = componentTable
@@ -211,8 +207,9 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
     if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
         return nil
     else
-        t.objectID = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
-        t.baseID   = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+        t.positionIndex = self.m_PositionIndex
+        t.baseID        = (self.m_BaseID   ~= initialBaseID)   and (self.m_BaseID)   or (nil)
+        t.objectID      = (self.m_ObjectID ~= initialObjectID) and (self.m_ObjectID) or (nil)
 
         return t
     end
@@ -221,9 +218,9 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function ModelTile:onStartRunning(sceneWarFileName)
+function ModelTile:onStartRunning(modelSceneWar, sceneWarFileName)
     self.m_SceneWarFileName = sceneWarFileName
-    ComponentManager.callMethodForAllComponents(self, "onStartRunning", sceneWarFileName)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
 
     return self
 end
@@ -239,6 +236,10 @@ function ModelTile:updateView()
     end
 
     return self
+end
+
+function ModelTile:getPositionIndex()
+    return self.m_PositionIndex
 end
 
 function ModelTile:getTiledId()
@@ -270,8 +271,8 @@ function ModelTile:updateWithObjectAndBaseId(objectID, baseID)
     baseID                   = baseID or self.m_BaseID
 
     initWithTiledID(self, objectID, baseID)
-    loadInstantialData(self, {GridIndexable = {gridIndex = gridIndex}})
-    self:onStartRunning(self.m_SceneWarFileName)
+    loadInstantialData(self, {GridIndexable = {x = gridIndex.x, y = gridIndex.y}})
+    self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
 
     return self
 end
@@ -301,10 +302,10 @@ function ModelTile:updateWithPlayerIndex(playerIndex)
 
         initWithTiledID(self, getTiledIdWithTileOrUnitName("City", playerIndex), self.m_BaseID)
         loadInstantialData(self, {
-            GridIndexable = {gridIndex           = gridIndex},
+            GridIndexable = {x = gridIndex.x, y = gridIndex.y},
             Capturable    = {currentCapturePoint = currentCapturePoint},
         })
-        self:onStartRunning(self.m_SceneWarFileName)
+        self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
     end
 
     return self
@@ -333,7 +334,7 @@ function ModelTile:updateAsFogDisabled(data)
             else
                 initWithTiledID(self, objectID, baseID)
                 loadInstantialData(self, data)
-                self:onStartRunning(self.m_SceneWarFileName)
+                self:onStartRunning(SingletonGetters.getModelScene(self.m_SceneWarFileName), self.m_SceneWarFileName)
             end
         end
     end
