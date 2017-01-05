@@ -150,7 +150,7 @@ local function updateModelTilesWithTilesData(modelSceneWar, tilesData)
     if (tilesData) then
         local modelTileMap = getModelTileMap(modelSceneWar)
         for _, tileData in pairs(tilesData) do
-            local modelTile = modelTileMap:getModelTile(tileData.GridIndexable)
+            local modelTile = modelTileMap:getModelTileWithPositionIndex(tileData.positionIndex)
             assert(modelTile:isFogEnabledOnClient(), "ActionExecutor-updateModelTilesWithTilesData() the tile has no fog.")
             modelTile:updateAsFogDisabled(tileData)
         end

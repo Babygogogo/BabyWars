@@ -145,7 +145,7 @@ function ModelTile:toSerializableTable()
     local t               = {}
     local componentsCount = 0
     for name, component in pairs(ComponentManager.getAllComponents(self)) do
-        if (component.toSerializableTable) then
+        if ((name ~= "GridIndexable") and (component.toSerializableTable)) then
             local componentTable = component:toSerializableTable()
             if (componentTable) then
                 t[name]         = componentTable
@@ -155,7 +155,7 @@ function ModelTile:toSerializableTable()
     end
 
     local objectID, baseID = self:getObjectAndBaseId()
-    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount <= 1)) then
+    if ((baseID == self.m_InitialBaseID) and (objectID == self.m_InitialObjectID) and (componentsCount == 0)) then
         return nil
     else
         t.positionIndex = self.m_PositionIndex
@@ -186,7 +186,6 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
                     positionIndex = self.m_PositionIndex,
                     baseID        = (self.m_BaseID ~= initialBaseID) and (self.m_BaseID) or (nil),
                     objectID      = (objectID ~= initialObjectID)    and (objectID)      or (nil),
-                    GridIndexable = ComponentManager.getComponent(self, "GridIndexable"):toSerializableTable(),
                 }
             end
         end
@@ -204,7 +203,7 @@ function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
         end
     end
 
-    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount <= 1)) then
+    if ((initialBaseID == self.m_BaseID) and (initialObjectID == self.m_ObjectID) and (componentsCount == 0)) then
         return nil
     else
         t.positionIndex = self.m_PositionIndex

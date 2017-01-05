@@ -92,6 +92,7 @@ local function updateActorTilesMapWithTilesData(map, height, tiles)
     if (tiles) then
         for positionIndex, singleTileData in pairs(tiles) do
             local x, y = getXYWithPositionIndex(positionIndex, height)
+            singleTileData.GridIndexable = (singleTileData.GridIndexable) or ({x = x, y = y})
             map[x][y]:getModel():ctor(singleTileData)
         end
     end
@@ -182,6 +183,11 @@ end
 
 function ModelTileMap:getModelTile(gridIndex)
     return self.m_ActorTilesMap[gridIndex.x][gridIndex.y]:getModel()
+end
+
+function ModelTileMap:getModelTileWithPositionIndex(positionIndex)
+    local x, y = getXYWithPositionIndex(positionIndex, self:getMapSize().height)
+    return self.m_ActorTilesMap[x][y]:getModel()
 end
 
 function ModelTileMap:forEachModelTile(func)
