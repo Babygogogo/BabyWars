@@ -40,7 +40,9 @@
 /frameworks/cocos2d-x/cocos/physics
 /frameworks/cocos2d-x/cocos/physics3d
 /frameworks/cocos2d-x/cocos/platform
-/frameworks/cocos2d-x/cocos/renderer
+/frameworks/cocos2d-x/cocos/renderer/*.cpp
+/frameworks/cocos2d-x/cocos/renderer/*.h
+/frameworks/cocos2d-x/cocos/renderer/*.txt
 /frameworks/cocos2d-x/cocos/scripting/lua-bindings/auto
 /frameworks/cocos2d-x/cocos/scripting/lua-bindings/CMakeLists.txt
 /frameworks/cocos2d-x/cocos/scripting/lua-bindings/manual/3d
