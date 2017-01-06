@@ -224,34 +224,28 @@ end
 local function getAvailableMainItems(self)
     local modelSceneWar     = SingletonGetters.getModelScene(self.m_SceneWarFileName)
     local playerIndexInTurn = getModelTurnManager(modelSceneWar):getPlayerIndex()
-    if (isTotalReplay(modelSceneWar)) then
+    if ((isTotalReplay(modelSceneWar))                               or
+        (playerIndexInTurn ~= getPlayerIndexLoggedIn(modelSceneWar)) or
+        (self.m_IsWaitingForServerResponse))                         then
         return {
             self.m_ItemQuit,
             self.m_ItemWarInfo,
             self.m_ItemSkillInfo,
             self.m_ItemAuxiliaryCommands,
-            self.m_ItemUnitPropertyList,
-        }
-    elseif ((playerIndexInTurn ~= getPlayerIndexLoggedIn(modelSceneWar)) or (self.m_IsWaitingForServerResponse)) then
-        return {
-            self.m_ItemQuit,
-            self.m_ItemWarInfo,
-            self.m_ItemSkillInfo,
-            self.m_ItemAuxiliaryCommands,
-            self.m_ItemUnitPropertyList,
+            self.m_ItemHelp,
         }
     else
         local modelPlayer = getModelPlayerManager():getModelPlayer(playerIndexInTurn)
         local items = {
             self.m_ItemQuit,
-            self.m_ItemSurrender,
+            self.m_ItemDrawOrSurrender,
             self.m_ItemWarInfo,
             self.m_ItemSkillInfo,
         }
         items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
         items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
         items[#items + 1] = self.m_ItemAuxiliaryCommands
-        items[#items + 1] = self.m_ItemUnitPropertyList
+        items[#items + 1] = self.m_ItemHelp
         items[#items + 1] = self.m_ItemEndTurn
 
         return items
@@ -447,6 +441,38 @@ local function setStateDisabled(self)
     end
 end
 
+local function setStateDrawOrSurrender(self)
+    self.m_State = "DrawOrSurrender"
+
+    if (self.m_View) then
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        assert((not modelSceneWar:isTotalReplay())                                                          and
+            (getPlayerIndexLoggedIn(modelSceneWar) == modelSceneWar:getModelTurnManager():getPlayerIndex()) and
+            (not self.m_IsWaitingForServerResponse)
+        )
+
+        self.m_View:setItems({
+            -- TODO: enable to set draw.
+            self.m_ItemSurrender,
+        })
+    end
+end
+
+local function setStateHelp(self)
+    self.m_State = "Help"
+
+    if (self.m_View) then
+        self.m_View:setItems({
+            self.m_ItemUnitPropertyList,
+            self.m_ItemGameFlow,
+            self.m_ItemWarControl,
+            self.m_ItemEssentialConcept,
+            self.m_ItemSkillSystem,
+            self.m_ItemAbout,
+        })
+    end
+end
+
 local function setStateMain(self)
     self.m_State = "Main"
     updateStringWarInfo(  self)
@@ -485,6 +511,17 @@ end
 --------------------------------------------------------------------------------
 -- The composition items.
 --------------------------------------------------------------------------------
+local function initItemAbout(self)
+    local item = {
+        name     = getLocalizedText(1, "About"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 3))
+        end,
+    }
+
+    self.m_ItemAbout = item
+end
+
 local function createItemActivateSkill(self, skillGroupID)
     return {
         name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
@@ -514,6 +551,17 @@ local function initItemAuxiliaryCommands(self)
     self.m_ItemAuxiliaryCommands = item
 end
 
+local function initItemDrawOrSurrender(self)
+    local item = {
+        name     = getLocalizedText(65, "DrawOrSurrender"),
+        callback = function()
+            setStateDrawOrSurrender(self)
+        end
+    }
+
+    self.m_ItemDrawOrSurrender = item
+end
+
 local function initItemEndTurn(self)
     local item = {
         name     = getLocalizedText(65, "EndTurn"),
@@ -530,6 +578,17 @@ local function initItemEndTurn(self)
     }
 
     self.m_ItemEndTurn = item
+end
+
+local function initItemEssentialConcept(self)
+    local item = {
+        name     = getLocalizedText(1, "EssentialConcept"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 4))
+        end,
+    }
+
+    self.m_ItemEssentialConcept = item
 end
 
 local function initItemFindIdleUnit(self)
@@ -615,6 +674,30 @@ local function initItemFindIdleTile(self)
     self.m_ItemFindIdleTile = item
 end
 
+local function initItemGameFlow(self)
+    local item = {
+        name     = getLocalizedText(1, "GameFlow"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(getLocalizedText(2, 1))
+            end
+        end,
+    }
+
+    self.m_ItemGameFlow = item
+end
+
+local function initItemHelp(self)
+    local item = {
+        name     = getLocalizedText(65, "Help"),
+        callback = function()
+            setStateHelp(self)
+        end
+    }
+
+    self.m_ItemHelp = item
+end
+
 local function initItemHideUI(self)
     local item = {
         name     = getLocalizedText(65, "HideUI"),
@@ -627,6 +710,17 @@ local function initItemHideUI(self)
     }
 
     self.m_ItemHideUI = item
+end
+
+local function initItemWarControl(self)
+    local item = {
+        name     = getLocalizedText(1, "WarControl"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 2))
+        end,
+    }
+
+    self.m_ItemWarControl = item
 end
 
 local function initItemWarInfo(self)
@@ -653,6 +747,17 @@ local function initItemSkillInfo(self)
     }
 
     self.m_ItemSkillInfo = item
+end
+
+local function initItemSkillSystem(self)
+    local item = {
+        name     = getLocalizedText(1, "SkillSystem"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 5))
+        end,
+    }
+
+    self.m_ItemSkillSystem = item
 end
 
 local function initItemUnitPropertyList(self)
@@ -757,21 +862,28 @@ end
 function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
+    initItemAbout(            self)
     initItemActivateSkill1(   self)
     initItemActivateSkill2(   self)
     initItemAuxiliaryCommands(self)
+    initItemDrawOrSurrender(  self)
     initItemEndTurn(          self)
+    initItemEssentialConcept( self)
     initItemFindIdleUnit(     self)
     initItemFindIdleTile(     self)
+    initItemGameFlow(         self)
+    initItemHelp(             self)
     initItemHideUI(           self)
     initItemWarInfo(          self)
     initItemSkillInfo(        self)
+    initItemSkillSystem(      self)
     initItemUnitPropertyList( self)
     initItemsUnitProperties(  self)
     initItemQuit(             self)
     initItemReload(           self)
     initItemSetMusic(         self)
     initItemSurrender(        self)
+    initItemWarControl(       self)
 
     return self
 end
@@ -820,8 +932,10 @@ end
 function ModelWarCommandMenu:onButtonBackTouched()
     local state = self.m_State
     if     (state == "AuxiliaryCommands") then setStateMain(self)
+    elseif (state == "DrawOrSurrender")   then setStateMain(self)
+    elseif (state == "Help")              then setStateMain(self)
     elseif (state == "Main")              then self:setEnabled(false)
-    elseif (state == "UnitPropertyList")  then setStateMain(self)
+    elseif (state == "UnitPropertyList")  then setStateHelp(self)
     else                                  error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
     end
 

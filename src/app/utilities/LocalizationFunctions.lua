@@ -30,6 +30,9 @@ local s_LongText2_1 = [[
 点击您的未行动的部队将出现移动范围，由此您可以规划其移动路线及进一步的动作。当您完全规划好一个部队的行动后，它就将按照此规划进行行动。
 在规划完全确定前，您都可以通过点击无关的棋盘格子来中途撤销，部队不会有任何动作；但若完全确定了规划，则部队将立刻进行行动，您无法撤销。
 
+指定移动路线：选中想要移动的部队，将光标从部队身上拖动出来，则游戏将按照您的拖动来画出移动路线。
+该部队将严格按照路线来移动，由此您可以侦查或避开特定目标。
+
 战局画面的左（右）上角有一个关于玩家简要信息的标识框。点击它将弹出战局菜单，您可以通过菜单实现退出、结束回合等操作。
 战局画面的左（右）下角有光标所在的地形（部队）的标识框。点击它会弹出该地形（部队）的详细信息框。
 
@@ -960,8 +963,10 @@ local s_Texts = {
             elseif (textType == "WarInfo")             then return "战 场 信 息"
             elseif (textType == "SkillInfo")           then return "技 能 信 息"
             elseif (textType == "ActivateSkill")       then return "发 动 技 能"
+            elseif (textType == "Help")                then return "帮 助"
             elseif (textType == "HideUI")              then return "隐 藏 界 面"
             elseif (textType == "DamageChart")         then return "基础伤害表"
+            elseif (textType == "DrawOrSurrender")     then return "求 和 / 投 降"
             elseif (textType == "UnitPropertyList")    then return "部队基础属性表"
             elseif (textType == "Surrender")           then return "投 降"
             elseif (textType == "ReloadWar")           then return "重 新 载 入"
@@ -994,8 +999,10 @@ local s_Texts = {
             elseif (textType == "WarInfo")             then return "War Info"
             elseif (textType == "SkillInfo")           then return "Skill Info"
             elseif (textType == "ActivateSkill")       then return "ActivateSkill"
+            elseif (textType == "Help")                then return "Help"
             elseif (textType == "HideUI")              then return "Hide UI"
             elseif (textType == "DamageChart")         then return "DamageChart"
+            elseif (textType == "DrawOrSurrender")     then return "Set draw / surrender"
             elseif (textType == "UnitPropertyList")    then return "UnitProperties"
             elseif (textType == "Surrender")           then return "Surrender"
             elseif (textType == "ReloadWar")           then return "Reload"
