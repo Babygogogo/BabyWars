@@ -35,7 +35,6 @@ local getModelConfirmBox       = SingletonGetters.getModelConfirmBox
 local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
-local getModelScene            = SingletonGetters.getModelScene
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelTurnManager      = SingletonGetters.getModelTurnManager
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
@@ -46,6 +45,7 @@ local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
 
 local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")
+local ACTION_CODE_DESTROY_OWNED_UNIT   = ActionCodeFunctions.getActionCode("ActionDestroyOwnedModelUnit")
 local ACTION_CODE_END_TURN             = ActionCodeFunctions.getActionCode("ActionEndTurn")
 local ACTION_CODE_RELOAD_SCENE_WAR     = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
 local ACTION_CODE_SURRENDER            = ActionCodeFunctions.getActionCode("ActionSurrender")
@@ -223,111 +223,34 @@ local function updateStringSkillInfo(self)
 end
 
 local function getAvailableMainItems(self)
-    local playerIndexInTurn = getModelTurnManager():getPlayerIndex()
-    if (isTotalReplay()) then
+    local modelSceneWar     = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local playerIndexInTurn = getModelTurnManager(modelSceneWar):getPlayerIndex()
+    if ((isTotalReplay(modelSceneWar))                               or
+        (playerIndexInTurn ~= getPlayerIndexLoggedIn(modelSceneWar)) or
+        (self.m_IsWaitingForServerResponse))                         then
         return {
             self.m_ItemQuit,
             self.m_ItemWarInfo,
             self.m_ItemSkillInfo,
-            self.m_ItemHideUI,
-            self.m_ItemSetMusic,
-            self.m_ItemUnitPropertyList,
-        }
-    elseif ((playerIndexInTurn ~= getPlayerIndexLoggedIn()) or
-        (self.m_IsWaitingForServerResponse))                then
-        return {
-            self.m_ItemQuit,
-            self.m_ItemWarInfo,
-            self.m_ItemSkillInfo,
-            self.m_ItemHideUI,
-            self.m_ItemSetMusic,
-            self.m_ItemReload,
-            self.m_ItemUnitPropertyList,
+            self.m_ItemAuxiliaryCommands,
+            self.m_ItemHelp,
         }
     else
         local modelPlayer = getModelPlayerManager():getModelPlayer(playerIndexInTurn)
         local items = {
             self.m_ItemQuit,
-            self.m_ItemFindIdleUnit,
-            self.m_ItemFindIdleTile,
-            self.m_ItemSurrender,
+            self.m_ItemDrawOrSurrender,
             self.m_ItemWarInfo,
             self.m_ItemSkillInfo,
         }
         items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
         items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
-        items[#items + 1] = self.m_ItemHideUI
-        items[#items + 1] = self.m_ItemSetMusic
-        items[#items + 1] = self.m_ItemReload
-        items[#items + 1] = self.m_ItemUnitPropertyList
+        items[#items + 1] = self.m_ItemAuxiliaryCommands
+        items[#items + 1] = self.m_ItemHelp
         items[#items + 1] = self.m_ItemEndTurn
 
         return items
     end
-end
-
-local function setStateDisabled(self)
-    self.m_State = "disabled"
-
-    if (self.m_View) then
-        self.m_View:setEnabled(false)
-    end
-end
-
-local function setStateMain(self)
-    self.m_State = "main"
-    updateStringWarInfo(  self)
-    updateStringSkillInfo(self)
-
-    if (self.m_View) then
-        self.m_View:setItems(getAvailableMainItems(self))
-            :setOverviewString(self.m_StringWarInfo)
-            :setEnabled(true)
-    end
-end
-
-local function setStateUnitPropertyList(self)
-    self.m_State = "unitPropertyList"
-
-    if (self.m_View) then
-        self.m_View:setItems(self.m_ItemsUnitProperties)
-    end
-end
-
-local function createAndSendAction(rawAction, needActionID)
-    if (needActionID) then
-        rawAction.actionID         = getActionId() + 1
-        rawAction.sceneWarFileName = getSceneWarFileName()
-    end
-
-    WebSocketManager.sendAction(rawAction)
-    getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
-    getScriptEventDispatcher():dispatchEvent({
-        name    = "EvtIsWaitingForServerResponse",
-        waiting = true,
-    })
-end
-
-local function sendActionActivateSkillGroup(skillGroupID)
-    createAndSendAction({
-        actionCode   = ACTION_CODE_ACTIVATE_SKILL_GROUP,
-        skillGroupID = skillGroupID,
-    }, true)
-end
-
-local function sendActionSurrender()
-    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
-end
-
-local function sendActionEndTurn()
-    createAndSendAction({actionCode = ACTION_CODE_END_TURN}, true)
-end
-
-local function sendActionReloadSceneWar()
-    createAndSendAction({
-        actionCode       = ACTION_CODE_RELOAD_SCENE_WAR,
-        sceneWarFileName = getSceneWarFileName(),
-    }, false)
 end
 
 local function dispatchEvtHideUI()
@@ -346,16 +269,6 @@ local function dispatchEvtWarCommandMenuUpdated(self)
         name                = "EvtWarCommandMenuUpdated",
         modelWarCommandMenu = self,
     })
-end
-
-local function createItemActivateSkill(self, skillGroupID)
-    return {
-        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
-        callback = function()
-            sendActionActivateSkillGroup(skillGroupID)
-            self:setEnabled(false)
-        end,
-    }
 end
 
 local function getEmptyProducersCount(self)
@@ -459,6 +372,145 @@ local function createUnitPropertyText(unitType)
 end
 
 --------------------------------------------------------------------------------
+-- The functions for sending actions.
+--------------------------------------------------------------------------------
+local function createAndSendAction(rawAction, needActionID)
+    if (needActionID) then
+        rawAction.actionID         = getActionId() + 1
+        rawAction.sceneWarFileName = getSceneWarFileName()
+    end
+
+    WebSocketManager.sendAction(rawAction)
+    getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "TransferingData"))
+    getScriptEventDispatcher():dispatchEvent({
+        name    = "EvtIsWaitingForServerResponse",
+        waiting = true,
+    })
+end
+
+local function sendActionActivateSkillGroup(skillGroupID)
+    createAndSendAction({
+        actionCode   = ACTION_CODE_ACTIVATE_SKILL_GROUP,
+        skillGroupID = skillGroupID,
+    }, true)
+end
+
+local function sendActionDestroyOwnedModelUnit(self)
+    createAndSendAction({
+        actionCode = ACTION_CODE_DESTROY_OWNED_UNIT,
+        gridIndex  = self.m_MapCursorGridIndex,
+    }, true)
+end
+
+local function sendActionSurrender()
+    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
+end
+
+local function sendActionEndTurn()
+    createAndSendAction({actionCode = ACTION_CODE_END_TURN}, true)
+end
+
+local function sendActionReloadSceneWar()
+    createAndSendAction({
+        actionCode       = ACTION_CODE_RELOAD_SCENE_WAR,
+        sceneWarFileName = getSceneWarFileName(),
+    }, false)
+end
+
+--------------------------------------------------------------------------------
+-- The state setters.
+--------------------------------------------------------------------------------
+local function setStateAuxiliaryCommands(self)
+    self.m_State = "AuxiliaryCommands"
+
+    if (self.m_View) then
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local items         = {}
+        if (not modelSceneWar:isTotalReplay()) then
+            items[#items + 1] = self.m_ItemReload
+
+            local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+            if ((playerIndexLoggedIn == modelSceneWar:getModelTurnManager():getPlayerIndex()) and
+                (not self.m_IsWaitingForServerResponse))                                      then
+
+                local gridIndex = self.m_MapCursorGridIndex
+                local modelUnit = getModelUnitMap(modelSceneWar):getModelUnit(self.m_MapCursorGridIndex)
+                if ((modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)) then
+                    items[#items + 1] = self.m_ItemDestroyOwnedUnit
+                end
+
+                items[#items + 1] = self.m_ItemFindIdleUnit
+                items[#items + 1] = self.m_ItemFindIdleTile
+            end
+        end
+        items[#items + 1] = self.m_ItemHideUI
+        items[#items + 1] = self.m_ItemSetMusic
+
+        self.m_View:setItems(items)
+    end
+end
+
+local function setStateDisabled(self)
+    self.m_State = "Disabled"
+
+    if (self.m_View) then
+        self.m_View:setEnabled(false)
+    end
+end
+
+local function setStateDrawOrSurrender(self)
+    self.m_State = "DrawOrSurrender"
+
+    if (self.m_View) then
+        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        assert((not modelSceneWar:isTotalReplay())                                                          and
+            (getPlayerIndexLoggedIn(modelSceneWar) == modelSceneWar:getModelTurnManager():getPlayerIndex()) and
+            (not self.m_IsWaitingForServerResponse)
+        )
+
+        self.m_View:setItems({
+            -- TODO: enable to set draw.
+            self.m_ItemSurrender,
+        })
+    end
+end
+
+local function setStateHelp(self)
+    self.m_State = "Help"
+
+    if (self.m_View) then
+        self.m_View:setItems({
+            self.m_ItemUnitPropertyList,
+            self.m_ItemGameFlow,
+            self.m_ItemWarControl,
+            self.m_ItemEssentialConcept,
+            self.m_ItemSkillSystem,
+            self.m_ItemAbout,
+        })
+    end
+end
+
+local function setStateMain(self)
+    self.m_State = "Main"
+    updateStringWarInfo(  self)
+    updateStringSkillInfo(self)
+
+    if (self.m_View) then
+        self.m_View:setItems(getAvailableMainItems(self))
+            :setOverviewString(self.m_StringWarInfo)
+            :setEnabled(true)
+    end
+end
+
+local function setStateUnitPropertyList(self)
+    self.m_State = "UnitPropertyList"
+
+    if (self.m_View) then
+        self.m_View:setItems(self.m_ItemsUnitProperties)
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtGridSelected(self, event)
@@ -476,21 +528,102 @@ end
 --------------------------------------------------------------------------------
 -- The composition items.
 --------------------------------------------------------------------------------
-local function initItemQuit(self)
+local function initItemAbout(self)
     local item = {
-        name     = getLocalizedText(65, "QuitWar"),
+        name     = getLocalizedText(1, "About"),
         callback = function()
-            getModelConfirmBox():setConfirmText(getLocalizedText(66, "QuitWar"))
+            self.m_View:setOverviewString(getLocalizedText(2, 3))
+        end,
+    }
+
+    self.m_ItemAbout = item
+end
+
+local function createItemActivateSkill(self, skillGroupID)
+    return {
+        name     = string.format("%s %d", getLocalizedText(65, "ActivateSkill"), skillGroupID),
+        callback = function()
+            sendActionActivateSkillGroup(skillGroupID)
+            self:setEnabled(false)
+        end,
+    }
+end
+
+local function initItemActivateSkill1(self)
+    self.m_ItemActiveSkill1 = createItemActivateSkill(self, 1)
+end
+
+local function initItemActivateSkill2(self)
+    self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
+end
+
+local function initItemAuxiliaryCommands(self)
+    local item = {
+        name     = getLocalizedText(65, "AuxiliaryCommands"),
+        callback = function()
+            setStateAuxiliaryCommands(self)
+        end,
+    }
+
+    self.m_ItemAuxiliaryCommands = item
+end
+
+local function initItemDestroyOwnedUnit(self)
+    local item = {
+        name     = getLocalizedText(65, "DestroyOwnedUnit"),
+        callback = function()
+            local modelConfirmBox = getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "DestroyOwnedUnit"))
                 :setOnConfirmYes(function()
-                    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {isPlayerLoggedIn = WebSocketManager.getLoggedInAccountAndPassword() ~= nil})
-                    local actorSceneMain = Actor.createWithModelAndViewInstance(modelSceneMain, Actor.createView("sceneMain.ViewSceneMain"))
-                    ActorManager.setAndRunRootActor(actorSceneMain, "FADE", 1)
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    sendActionDestroyOwnedModelUnit(self)
                 end)
                 :setEnabled(true)
         end,
     }
 
-    self.m_ItemQuit = item
+    self.m_ItemDestroyOwnedUnit = item
+end
+
+local function initItemDrawOrSurrender(self)
+    local item = {
+        name     = getLocalizedText(65, "DrawOrSurrender"),
+        callback = function()
+            setStateDrawOrSurrender(self)
+        end
+    }
+
+    self.m_ItemDrawOrSurrender = item
+end
+
+local function initItemEndTurn(self)
+    local item = {
+        name     = getLocalizedText(65, "EndTurn"),
+        callback = function()
+            local modelConfirmBox = getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+                :setOnConfirmYes(function()
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    sendActionEndTurn()
+                end)
+                :setEnabled(true)
+        end,
+    }
+
+    self.m_ItemEndTurn = item
+end
+
+local function initItemEssentialConcept(self)
+    local item = {
+        name     = getLocalizedText(1, "EssentialConcept"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 4))
+        end,
+    }
+
+    self.m_ItemEssentialConcept = item
 end
 
 local function initItemFindIdleUnit(self)
@@ -576,6 +709,55 @@ local function initItemFindIdleTile(self)
     self.m_ItemFindIdleTile = item
 end
 
+local function initItemGameFlow(self)
+    local item = {
+        name     = getLocalizedText(1, "GameFlow"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(getLocalizedText(2, 1))
+            end
+        end,
+    }
+
+    self.m_ItemGameFlow = item
+end
+
+local function initItemHelp(self)
+    local item = {
+        name     = getLocalizedText(65, "Help"),
+        callback = function()
+            setStateHelp(self)
+        end
+    }
+
+    self.m_ItemHelp = item
+end
+
+local function initItemHideUI(self)
+    local item = {
+        name     = getLocalizedText(65, "HideUI"),
+        callback = function()
+            setStateDisabled(self)
+
+            dispatchEvtWarCommandMenuUpdated(self)
+            dispatchEvtHideUI()
+        end,
+    }
+
+    self.m_ItemHideUI = item
+end
+
+local function initItemWarControl(self)
+    local item = {
+        name     = getLocalizedText(1, "WarControl"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 2))
+        end,
+    }
+
+    self.m_ItemWarControl = item
+end
+
 local function initItemWarInfo(self)
     local item = {
         name     = getLocalizedText(65, "WarInfo"),
@@ -602,12 +784,15 @@ local function initItemSkillInfo(self)
     self.m_ItemSkillInfo = item
 end
 
-local function initItemActivateSkill1(self)
-    self.m_ItemActiveSkill1 = createItemActivateSkill(self, 1)
-end
+local function initItemSkillSystem(self)
+    local item = {
+        name     = getLocalizedText(1, "SkillSystem"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 5))
+        end,
+    }
 
-local function initItemActivateSkill2(self)
-    self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
+    self.m_ItemSkillSystem = item
 end
 
 local function initItemUnitPropertyList(self)
@@ -638,33 +823,21 @@ local function initItemsUnitProperties(self)
     self.m_ItemsUnitProperties = items
 end
 
-local function initItemHideUI(self)
+local function initItemQuit(self)
     local item = {
-        name     = getLocalizedText(65, "HideUI"),
+        name     = getLocalizedText(65, "QuitWar"),
         callback = function()
-            setStateDisabled(self)
-
-            dispatchEvtWarCommandMenuUpdated(self)
-            dispatchEvtHideUI()
+            getModelConfirmBox():setConfirmText(getLocalizedText(66, "QuitWar"))
+                :setOnConfirmYes(function()
+                    local modelSceneMain = Actor.createModel("sceneMain.ModelSceneMain", {isPlayerLoggedIn = WebSocketManager.getLoggedInAccountAndPassword() ~= nil})
+                    local actorSceneMain = Actor.createWithModelAndViewInstance(modelSceneMain, Actor.createView("sceneMain.ViewSceneMain"))
+                    ActorManager.setAndRunRootActor(actorSceneMain, "FADE", 1)
+                end)
+                :setEnabled(true)
         end,
     }
 
-    self.m_ItemHideUI = item
-end
-
-local function initItemSetMusic(self)
-    local item = {
-        name     = getLocalizedText(1, "SetMusic"),
-        callback = function()
-            local isEnabled = not AudioManager.isEnabled()
-            AudioManager.setEnabled(isEnabled)
-            if (isEnabled) then
-                AudioManager.playRandomWarMusic()
-            end
-        end,
-    }
-
-    self.m_ItemSetMusic = item
+    self.m_ItemQuit = item
 end
 
 local function initItemReload(self)
@@ -685,6 +858,21 @@ local function initItemReload(self)
     self.m_ItemReload = item
 end
 
+local function initItemSetMusic(self)
+    local item = {
+        name     = getLocalizedText(1, "SetMusic"),
+        callback = function()
+            local isEnabled = not AudioManager.isEnabled()
+            AudioManager.setEnabled(isEnabled)
+            if (isEnabled) then
+                AudioManager.playRandomWarMusic()
+            end
+        end,
+    }
+
+    self.m_ItemSetMusic = item
+end
+
 local function initItemSurrender(self)
     local item = {
         name     = getLocalizedText(65, "Surrender"),
@@ -703,44 +891,35 @@ local function initItemSurrender(self)
     self.m_ItemSurrender = item
 end
 
-local function initItemEndTurn(self)
-    local item = {
-        name     = getLocalizedText(65, "EndTurn"),
-        callback = function()
-            local modelConfirmBox = getModelConfirmBox()
-            modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
-                :setOnConfirmYes(function()
-                    modelConfirmBox:setEnabled(false)
-                    self:setEnabled(false)
-                    sendActionEndTurn()
-                end)
-                :setEnabled(true)
-        end,
-    }
-
-    self.m_ItemEndTurn = item
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
 
-    initItemQuit(            self)
-    initItemFindIdleUnit(    self)
-    initItemFindIdleTile(    self)
-    initItemWarInfo(         self)
-    initItemSkillInfo(       self)
-    initItemActivateSkill1(  self)
-    initItemActivateSkill2(  self)
-    initItemUnitPropertyList(self)
-    initItemsUnitProperties( self)
-    initItemHideUI(          self)
-    initItemSetMusic(        self)
-    initItemReload(          self)
-    initItemSurrender(       self)
-    initItemEndTurn(         self)
+    initItemAbout(            self)
+    initItemActivateSkill1(   self)
+    initItemActivateSkill2(   self)
+    initItemAuxiliaryCommands(self)
+    initItemDestroyOwnedUnit( self)
+    initItemDrawOrSurrender(  self)
+    initItemEndTurn(          self)
+    initItemEssentialConcept( self)
+    initItemFindIdleUnit(     self)
+    initItemFindIdleTile(     self)
+    initItemGameFlow(         self)
+    initItemHelp(             self)
+    initItemHideUI(           self)
+    initItemWarInfo(          self)
+    initItemSkillInfo(        self)
+    initItemSkillSystem(      self)
+    initItemUnitPropertyList( self)
+    initItemsUnitProperties(  self)
+    initItemQuit(             self)
+    initItemReload(           self)
+    initItemSetMusic(         self)
+    initItemSurrender(        self)
+    initItemWarControl(       self)
 
     return self
 end
@@ -749,6 +928,7 @@ end
 -- The public callback function on start running or script events.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
     getScriptEventDispatcher()
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)
@@ -771,7 +951,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:isEnabled()
-    return self.m_State ~= "disabled"
+    return self.m_State ~= "Disabled"
 end
 
 function ModelWarCommandMenu:setEnabled(enabled)
@@ -787,9 +967,12 @@ end
 
 function ModelWarCommandMenu:onButtonBackTouched()
     local state = self.m_State
-    if     (state == "main")             then self:setEnabled(false)
-    elseif (state == "unitPropertyList") then setStateMain(self)
-    else                                 error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
+    if     (state == "AuxiliaryCommands") then setStateMain(self)
+    elseif (state == "DrawOrSurrender")   then setStateMain(self)
+    elseif (state == "Help")              then setStateMain(self)
+    elseif (state == "Main")              then self:setEnabled(false)
+    elseif (state == "UnitPropertyList")  then setStateHelp(self)
+    else                                  error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
     end
 
     return self

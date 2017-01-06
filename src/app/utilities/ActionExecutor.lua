@@ -954,6 +954,54 @@ local function executeCaptureModelTile(action, modelSceneWar)
     end
 end
 
+local function executeDestroyOwnedModelUnit(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+    updateTilesAndUnitsBeforeExecutingAction(action, modelSceneWar)
+
+    local sceneWarFileName    = action.sceneWarFileName
+    local gridIndex           = action.gridIndex
+    local modelUnitMap        = getModelUnitMap(modelSceneWar)
+    local isReplay            = modelSceneWar:isTotalReplay()
+    local playerIndexActing   = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+
+    if (gridIndex) then
+        if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+            getModelFogMap(modelSceneWar):updateMapForPathsWithModelUnitAndPath(modelUnitMap:getModelUnit(gridIndex), {gridIndex})
+        end
+        destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+    else
+        assert((not IS_SERVER) and (not isReplay), "ActionExecutor-executeDestroyOwnedModelUnit() the gridIndex must exist on server or in replay.")
+    end
+
+    if (IS_SERVER) then
+        modelSceneWar:setExecutingAction(false)
+    else
+        if (not isReplay) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        if (gridIndex) then
+            getModelGridEffect(modelSceneWar):showAnimationExplosion(gridIndex)
+
+            if (playerIndexActing == playerIndexLoggedIn) then
+                for _, adjacentGridIndex in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
+                    local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
+                    if ((adjacentModelUnit)                                                                                                                                                                     and
+                        (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexActing))) then
+                        destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, true)
+                    end
+                end
+            end
+        end
+
+        modelSceneWar:setExecutingAction(false)
+    end
+end
+
 local function executeDive(action, modelSceneWar)
     if (not modelSceneWar.isModelSceneWar) then
         return
@@ -1609,6 +1657,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBeginTurn)                    then executeBeginTurn(                   action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionBuildModelTile)               then executeBuildModelTile(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionCaptureModelTile)             then executeCaptureModelTile(            action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionDestroyOwnedModelUnit)        then executeDestroyOwnedModelUnit(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDive)                         then executeDive(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionDropModelUnit)                then executeDropModelUnit(               action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionEndTurn)                      then executeEndTurn(                     action, modelScene)

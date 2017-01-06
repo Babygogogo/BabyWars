@@ -2283,6 +2283,28 @@ SkillData.skillPresets = {
             },
         },
     },
+
+    -- Zhaotiantong
+    {
+        name       = "Zhaotiantong",
+        basePoints = 100,
+        passive    = {
+            {
+                id    = 1,
+                level = 3,
+            },
+            {
+                id    = 2,
+                level = 3,
+            },
+            {
+                id    = 3,
+                level = 4,
+            },
+        },
+        active1 = {},
+        active2 = {},
+    },
 }
 
 return SkillData
