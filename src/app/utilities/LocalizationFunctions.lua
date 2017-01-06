@@ -615,6 +615,7 @@ local s_Texts = {
             elseif (actionName == "ActionBeginTurn")              then return "开始回合"
             elseif (actionName == "ActionBuildModelTile")         then return "建造"
             elseif (actionName == "ActionCaptureModelTile")       then return "占领"
+            elseif (actionName == "ActionDestroyOwnedModelUnit")  then return "自爆"
             elseif (actionName == "ActionDive")                   then return "下潜"
             elseif (actionName == "ActionDropModelUnit")          then return "卸载"
             elseif (actionName == "ActionEndTurn")                then return "结束回合"
@@ -638,6 +639,7 @@ local s_Texts = {
             elseif (actionName == "ActionBeginTurn")              then return "BeginTurn"
             elseif (actionName == "ActionBuildModelTile")         then return "BuildTile"
             elseif (actionName == "ActionCaptureModelTile")       then return "Capture"
+            elseif (actionName == "ActionDestroyOwnedModelUnit")  then return "SelfDestruction"
             elseif (actionName == "ActionDive")                   then return "Dive"
             elseif (actionName == "ActionDropModelUnit")          then return "Drop"
             elseif (actionName == "ActionEndTurn")                then return "EndTurn"
@@ -966,6 +968,7 @@ local s_Texts = {
             elseif (textType == "Help")                then return "帮 助"
             elseif (textType == "HideUI")              then return "隐 藏 界 面"
             elseif (textType == "DamageChart")         then return "基础伤害表"
+            elseif (textType == "DestroyOwnedUnit")    then return "摧毁光标所在部队"
             elseif (textType == "DrawOrSurrender")     then return "求 和 / 投 降"
             elseif (textType == "UnitPropertyList")    then return "部队基础属性表"
             elseif (textType == "Surrender")           then return "投 降"
@@ -1002,6 +1005,7 @@ local s_Texts = {
             elseif (textType == "Help")                then return "Help"
             elseif (textType == "HideUI")              then return "Hide UI"
             elseif (textType == "DamageChart")         then return "DamageChart"
+            elseif (textType == "DestroyOwnedUnit")    then return "Destroy Unit"
             elseif (textType == "DrawOrSurrender")     then return "Set draw / surrender"
             elseif (textType == "UnitPropertyList")    then return "UnitProperties"
             elseif (textType == "Surrender")           then return "Surrender"
@@ -1030,23 +1034,25 @@ local s_Texts = {
     },
     [66] = {
         [1] = function(textType)
-            if     (textType == "QuitWar")    then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (textType == "Surrender")  then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
-            elseif (textType == "ReloadWar")  then return "是否确定要重新载入战局？"
-            elseif (textType == "ExitGame")   then return "是否确定退出游戏？"
-            elseif (textType == "NoIdleUnit") then return "您的所有部队均已行动。"
-            elseif (textType == "NoIdleTile") then return "您的所有建筑均已被占用。"
-            else                                   return "未知66:" .. (textType or "")
+            if     (textType == "QuitWar")          then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (textType == "DestroyOwnedUnit") then return "摧毁部队将没有任何补偿！\n您确定要这样做吗？"
+            elseif (textType == "Surrender")        then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            elseif (textType == "ReloadWar")        then return "是否确定要重新载入战局？"
+            elseif (textType == "ExitGame")         then return "是否确定退出游戏？"
+            elseif (textType == "NoIdleUnit")       then return "您的所有部队均已行动。"
+            elseif (textType == "NoIdleTile")       then return "您的所有建筑均已被占用。"
+            else                                         return "未知66:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "QuitWar")    then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (textType == "Surrender")  then return "You will lose the game by surrendering!\nAre you sure?"
-            elseif (textType == "ReloadWar")  then return "Are you sure to reload the war?"
-            elseif (textType == "ExitGame")   then return "Are you sure to exit the game?"
-            elseif (textType == "NoIdleUnit") then return "None of your units is idle."
-            elseif (textType == "NoIdleTile") then return "None of your tiles is idle."
-            else                                   return "Unrecognized:[66]" .. textType
+            if     (textType == "QuitWar")          then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (textType == "DestroyOwnedUnit") then return "You won't get anything in return!\nAre you sure to destroy it?"
+            elseif (textType == "Surrender")        then return "You will lose the game by surrendering!\nAre you sure?"
+            elseif (textType == "ReloadWar")        then return "Are you sure to reload the war?"
+            elseif (textType == "ExitGame")         then return "Are you sure to exit the game?"
+            elseif (textType == "NoIdleUnit")       then return "None of your units is idle."
+            elseif (textType == "NoIdleTile")       then return "None of your tiles is idle."
+            else                                         return "Unrecognized:[66]" .. textType
             end
         end,
     },

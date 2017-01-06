@@ -162,16 +162,21 @@ end
 
 local function runTurnPhaseConsumeUnitFuel(self)
     if (self.m_TurnIndex > 1) then
-        local sceneWarFileName = self.m_SceneWarFileName
-        local playerIndex      = self.m_PlayerIndex
-        local modelTileMap     = getModelTileMap(sceneWarFileName)
-        local modelUnitMap     = getModelUnitMap(sceneWarFileName)
-        local mapSize          = modelTileMap:getMapSize()
-        local dispatcher       = getScriptEventDispatcher(sceneWarFileName)
+        local sceneWarFileName    = self.m_SceneWarFileName
+        local modelSceneWar       = SingletonGetters.getModelScene(sceneWarFileName)
+        local playerIndexActing   = self.m_PlayerIndex
+        local modelTileMap        = getModelTileMap(modelSceneWar)
+        local modelUnitMap        = getModelUnitMap(modelSceneWar)
+        local modelFogMap         = getModelFogMap( modelSceneWar)
+        local mapSize             = modelTileMap:getMapSize()
+        local dispatcher          = getScriptEventDispatcher(modelSceneWar)
+        local isReplay            = modelSceneWar:isTotalReplay()
+        local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+        local shouldUpdateFogMap  = (IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)
 
         modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
-            if ((modelUnit:getPlayerIndex() == playerIndex) and
-                (modelUnit.setCurrentFuel))                 then
+            if ((modelUnit:getPlayerIndex() == playerIndexActing) and
+                (modelUnit.setCurrentFuel))                       then
                 local newFuel = math.max(modelUnit:getCurrentFuel() - modelUnit:getFuelConsumptionPerTurn(), 0)
                 modelUnit:setCurrentFuel(newFuel)
                     :updateView()
@@ -181,16 +186,20 @@ local function runTurnPhaseConsumeUnitFuel(self)
                     local modelTile = modelTileMap:getModelTile(gridIndex)
 
                     if ((not modelTile.canRepairTarget) or (not modelTile:canRepairTarget(modelUnit))) then
+                        if (shouldUpdateFogMap) then
+                            modelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, {gridIndex})
+                        end
                         destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
                         dispatcher:dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,
                         })
-                        if (not IS_SERVER) then
+
+                        if (playerIndexActing == playerIndexLoggedIn) then
                             for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, mapSize)) do
                                 local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-                                if ((adjacentModelUnit)                                                                                                                                                               and
-                                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndex))) then
+                                if ((adjacentModelUnit)                                                                                                                                                                     and
+                                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexActing))) then
                                     destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, true)
                                 end
                             end

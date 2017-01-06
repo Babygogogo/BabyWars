@@ -45,6 +45,7 @@ local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
 
 local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")
+local ACTION_CODE_DESTROY_OWNED_UNIT   = ActionCodeFunctions.getActionCode("ActionDestroyOwnedModelUnit")
 local ACTION_CODE_END_TURN             = ActionCodeFunctions.getActionCode("ActionEndTurn")
 local ACTION_CODE_RELOAD_SCENE_WAR     = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
 local ACTION_CODE_SURRENDER            = ActionCodeFunctions.getActionCode("ActionSurrender")
@@ -394,6 +395,13 @@ local function sendActionActivateSkillGroup(skillGroupID)
     }, true)
 end
 
+local function sendActionDestroyOwnedModelUnit(self)
+    createAndSendAction({
+        actionCode = ACTION_CODE_DESTROY_OWNED_UNIT,
+        gridIndex  = self.m_MapCursorGridIndex,
+    }, true)
+end
+
 local function sendActionSurrender()
     createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
 end
@@ -421,7 +429,16 @@ local function setStateAuxiliaryCommands(self)
         if (not modelSceneWar:isTotalReplay()) then
             items[#items + 1] = self.m_ItemReload
 
-            if (getPlayerIndexLoggedIn(modelSceneWar) == modelSceneWar:getModelTurnManager():getPlayerIndex()) then
+            local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+            if ((playerIndexLoggedIn == modelSceneWar:getModelTurnManager():getPlayerIndex()) and
+                (not self.m_IsWaitingForServerResponse))                                      then
+
+                local gridIndex = self.m_MapCursorGridIndex
+                local modelUnit = getModelUnitMap(modelSceneWar):getModelUnit(self.m_MapCursorGridIndex)
+                if ((modelUnit) and (modelUnit:isStateIdle()) and (modelUnit:getPlayerIndex() == playerIndexLoggedIn)) then
+                    items[#items + 1] = self.m_ItemDestroyOwnedUnit
+                end
+
                 items[#items + 1] = self.m_ItemFindIdleUnit
                 items[#items + 1] = self.m_ItemFindIdleTile
             end
@@ -549,6 +566,24 @@ local function initItemAuxiliaryCommands(self)
     }
 
     self.m_ItemAuxiliaryCommands = item
+end
+
+local function initItemDestroyOwnedUnit(self)
+    local item = {
+        name     = getLocalizedText(65, "DestroyOwnedUnit"),
+        callback = function()
+            local modelConfirmBox = getModelConfirmBox()
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "DestroyOwnedUnit"))
+                :setOnConfirmYes(function()
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                    sendActionDestroyOwnedModelUnit(self)
+                end)
+                :setEnabled(true)
+        end,
+    }
+
+    self.m_ItemDestroyOwnedUnit = item
 end
 
 local function initItemDrawOrSurrender(self)
@@ -866,6 +901,7 @@ function ModelWarCommandMenu:ctor(param)
     initItemActivateSkill1(   self)
     initItemActivateSkill2(   self)
     initItemAuxiliaryCommands(self)
+    initItemDestroyOwnedUnit( self)
     initItemDrawOrSurrender(  self)
     initItemEndTurn(          self)
     initItemEssentialConcept( self)

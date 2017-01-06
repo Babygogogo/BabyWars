@@ -26,19 +26,20 @@
     ActionBeginTurn                   102 : ActionBeginTurn
     ActionBuildModelTile              103 : ActionBuildModelTile
     ActionCaptureModelTile            104 : ActionCaptureModelTile
-    ActionDive                        105 : ActionDive
-    ActionDropModelUnit               106 : ActionDropModelUnit
-    ActionEndTurn                     107 : ActionEndTurn
-    ActionJoinModelUnit               108 : ActionJoinModelUnit
-    ActionLaunchFlare                 109 : ActionLaunchFlare
-    ActionLaunchSilo                  110 : ActionLaunchSilo
-    ActionLoadModelUnit               111 : ActionLoadModelUnit
-    ActionProduceModelUnitOnTile      112 : ActionProduceModelUnitOnTile
-    ActionProduceModelUnitOnUnit      113 : ActionProduceModelUnitOnUnit
-    ActionSupplyModelUnit             114 : ActionSupplyModelUnit
-    ActionSurface                     115 : ActionSurface
-    ActionSurrender                   116 : ActionSurrender
-    ActionWait                        117 : ActionWait
+    ActionDestroyOwnedModelUnit       105 : ActionDestroyOwnedModelUnit
+    ActionDive                        106 : ActionDive
+    ActionDropModelUnit               107 : ActionDropModelUnit
+    ActionEndTurn                     108 : ActionEndTurn
+    ActionJoinModelUnit               109 : ActionJoinModelUnit
+    ActionLaunchFlare                 110 : ActionLaunchFlare
+    ActionLaunchSilo                  111 : ActionLaunchSilo
+    ActionLoadModelUnit               112 : ActionLoadModelUnit
+    ActionProduceModelUnitOnTile      113 : ActionProduceModelUnitOnTile
+    ActionProduceModelUnitOnUnit      114 : ActionProduceModelUnitOnUnit
+    ActionSupplyModelUnit             115 : ActionSupplyModelUnit
+    ActionSurface                     116 : ActionSurface
+    ActionSurrender                   117 : ActionSurrender
+    ActionWait                        118 : ActionWait
 }
 
 .ActionRedis {
@@ -281,6 +282,19 @@
     path              9 :  MovePath
     launchUnitID     10 :  integer
     lostPlayerIndex  11 :  integer
+}
+
+.ActionDestroyOwnedModelUnit {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    sceneWarFileName  3 :  string
+    actionID          4 :  integer
+    revealedUnits     5 : *UnitData(unitID)
+    revealedTiles     6 : *TileData(positionIndex)
+    actingUnitsData   7 : *UnitData(unitID)
+    actingTilesData   8 : *TileData(positionIndex)
+    gridIndex         9 :  GridIndex
 }
 
 .ActionDive {
