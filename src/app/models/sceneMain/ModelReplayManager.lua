@@ -9,7 +9,6 @@ local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 
-local appendToFile             = SerializationFunctions.appendToFile
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelConfirmBox       = SingletonGetters.getModelConfirmBox
 local getModelMainMenu         = SingletonGetters.getModelMainMenu
@@ -74,10 +73,7 @@ local function deleteReplayData(self, sceneWarFileName)
         os.remove(getReplayDataFileName(sceneWarFileName))
 
         self.m_ReplayList[sceneWarFileName] = nil
-        local fileForList = io.open(REPLAY_LIST_PATH, "w")
-        fileForList:write("return ")
-        appendToFile(self.m_ReplayList, "", fileForList)
-        fileForList:close()
+        serializeReplayList(self.m_ReplayList)
     end
 end
 
