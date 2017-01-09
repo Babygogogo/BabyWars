@@ -59,6 +59,7 @@ local TURN_PHASE_CODES = {
     TickTurnAndPlayerIndex            = 10,
     ResetSkillState                   = 11,
     ResetVisionForBeginningTurnPlayer = 12,
+    ResetVotedForDraw                 = 13,
 }
 local DEFAULT_TURN_DATA = {
     turnIndex     = 1,
@@ -354,6 +355,13 @@ local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
         resetVisionOnClient()
     end
 
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetVotedForDraw
+end
+
+local function runTurnPhaseResetVotedForDraw(self)
+    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    modelSceneWar:getModelPlayerManager():getModelPlayer(self.m_PlayerIndex):setVotedForDraw(false)
+
     self.m_TurnPhaseCode = TURN_PHASE_CODES.RequestToBegin
 end
 
@@ -437,6 +445,7 @@ function ModelTurnManager:runTurn()
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.TickTurnAndPlayerIndex)            then runTurnPhaseTickTurnAndPlayerIndex(           self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetSkillState)                   then runTurnPhaseResetSkillState(                  self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVisionForBeginningTurnPlayer) then runTurnPhaseResetVisionForBeginningTurnPlayer(self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVotedForDraw)                 then runTurnPhaseResetVotedForDraw(                self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.RequestToBegin)                    then runTurnPhaseRequestToBegin(                   self) end
 
     if ((self.m_TurnPhaseCode == TURN_PHASE_CODES.Main) and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then

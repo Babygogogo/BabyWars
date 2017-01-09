@@ -41,6 +41,7 @@ local s_ActionCodes = {
     ActionSurface                      = 116,
     ActionSurrender                    = 117,
     ActionWait                         = 118,
+    ActionVoteForDraw                  = 119,
 }
 local s_ActionNames
 

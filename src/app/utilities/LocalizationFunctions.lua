@@ -958,101 +958,115 @@ local s_Texts = {
     },
     [65] = {
         [1] = function(textType)
-            if     (textType == "WarMenu")             then return "战 场 菜 单"
-            elseif (textType == "QuitWar")             then return "退 出"
-            elseif (textType == "FindIdleUnit")        then return "寻 找 空 闲 部 队"
-            elseif (textType == "FindIdleTile")        then return "寻 找 空 闲 建 筑"
-            elseif (textType == "WarInfo")             then return "战 场 信 息"
-            elseif (textType == "SkillInfo")           then return "技 能 信 息"
-            elseif (textType == "ActivateSkill")       then return "发 动 技 能"
-            elseif (textType == "Help")                then return "帮 助"
-            elseif (textType == "HideUI")              then return "隐 藏 界 面"
-            elseif (textType == "DamageChart")         then return "基础伤害表"
-            elseif (textType == "DestroyOwnedUnit")    then return "摧毁光标所在部队"
-            elseif (textType == "DrawOrSurrender")     then return "求 和 / 投 降"
-            elseif (textType == "UnitPropertyList")    then return "部队基础属性表"
-            elseif (textType == "Surrender")           then return "投 降"
-            elseif (textType == "ReloadWar")           then return "重 新 载 入"
-            elseif (textType == "EndTurn")             then return "结 束 回 合"
-            elseif (textType == "MapName")             then return "地图"
+            if     (textType == "ActivateSkill")       then return "发 动 技 能"
+            elseif (textType == "AgreeDraw")           then return "同 意 和 局"
             elseif (textType == "Author")              then return "作者"
             elseif (textType == "AuxiliaryCommands")   then return "辅 助 功 能"
-            elseif (textType == "WarID")               then return "战局代号"
-            elseif (textType == "Player")              then return "玩 家"
-            elseif (textType == "Nickname")            then return "昵 称"
-            elseif (textType == "Fund")                then return "资 金"
-            elseif (textType == "Income")              then return "收 入"
-            elseif (textType == "Energy")              then return "能 量"
+            elseif (textType == "DamageChart")         then return "基础伤害表"
             elseif (textType == "DamageCostPerEnergy") then return "每单位能量价值"
-            elseif (textType == "UnitsCount")          then return "部队数量"
-            elseif (textType == "UnitsValue")          then return "部队基础价值"
-            elseif (textType == "TilesCount")          then return "据点数量"
-            elseif (textType == "TurnIndex")           then return "回合数"
+            elseif (textType == "DestroyOwnedUnit")    then return "摧毁光标所在部队"
+            elseif (textType == "DisagreeDraw")        then return "拒 绝 和 局"
+            elseif (textType == "DrawOrSurrender")     then return "求 和 / 投 降"
+            elseif (textType == "EndTurn")             then return "结 束 回 合"
+            elseif (textType == "Energy")              then return "能 量"
+            elseif (textType == "FindIdleUnit")        then return "寻 找 空 闲 部 队"
+            elseif (textType == "FindIdleTile")        then return "寻 找 空 闲 建 筑"
+            elseif (textType == "Fund")                then return "资 金"
+            elseif (textType == "Help")                then return "帮 助"
+            elseif (textType == "HideUI")              then return "隐 藏 界 面"
+            elseif (textType == "Income")              then return "收 入"
             elseif (textType == "Lost")                then return "已战败"
             elseif (textType == "MainWeapon")          then return "主武器"
+            elseif (textType == "MapName")             then return "地图"
+            elseif (textType == "Nickname")            then return "昵 称"
+            elseif (textType == "Player")              then return "玩 家"
+            elseif (textType == "ProposeDraw")         then return "求 和"
+            elseif (textType == "QuitWar")             then return "退 出"
+            elseif (textType == "ReloadWar")           then return "重 新 载 入"
+            elseif (textType == "SkillInfo")           then return "技 能 信 息"
             elseif (textType == "SubWeapon")           then return "副武器"
+            elseif (textType == "Surrender")           then return "投 降"
+            elseif (textType == "TilesCount")          then return "据点数量"
+            elseif (textType == "TurnIndex")           then return "回合数"
+            elseif (textType == "UnitPropertyList")    then return "部队基础属性表"
+            elseif (textType == "UnitsCount")          then return "部队数量"
+            elseif (textType == "UnitsValue")          then return "部队基础价值"
+            elseif (textType == "WarID")               then return "战局代号"
+            elseif (textType == "WarInfo")             then return "战 场 信 息"
+            elseif (textType == "WarMenu")             then return "战 场 菜 单"
             else                                            return "未知65:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "WarMenu")             then return "War Menu"
-            elseif (textType == "QuitWar")             then return "Quit"
-            elseif (textType == "FindIdleUnit")        then return "FindIdleUnit"
-            elseif (textType == "FindIdleTile")        then return "FildIdleTile"
-            elseif (textType == "WarInfo")             then return "War Info"
-            elseif (textType == "SkillInfo")           then return "Skill Info"
-            elseif (textType == "ActivateSkill")       then return "ActivateSkill"
-            elseif (textType == "Help")                then return "Help"
-            elseif (textType == "HideUI")              then return "Hide UI"
-            elseif (textType == "DamageChart")         then return "DamageChart"
-            elseif (textType == "DestroyOwnedUnit")    then return "Destroy Unit"
-            elseif (textType == "DrawOrSurrender")     then return "Set draw / surrender"
-            elseif (textType == "UnitPropertyList")    then return "UnitProperties"
-            elseif (textType == "Surrender")           then return "Surrender"
-            elseif (textType == "ReloadWar")           then return "Reload"
-            elseif (textType == "EndTurn")             then return "End Turn"
-            elseif (textType == "MapName")             then return "Map Name"
+            if     (textType == "ActivateSkill")       then return "ActivateSkill"
+            elseif (textType == "AgreeDraw")           then return "AgreeDraw"
             elseif (textType == "Author")              then return "Author"
             elseif (textType == "AuxiliaryCommands")   then return "AuxiliaryCmds"
-            elseif (textType == "WarID")               then return "War ID"
-            elseif (textType == "Player")              then return "Player"
-            elseif (textType == "Nickname")            then return "Nickname"
-            elseif (textType == "Fund")                then return "Fund"
-            elseif (textType == "Income")              then return "Income"
-            elseif (textType == "Energy")              then return "Energy"
+            elseif (textType == "DamageChart")         then return "DamageChart"
             elseif (textType == "DamageCostPerEnergy") then return "DamageCostPerEnergy"
-            elseif (textType == "UnitsCount")          then return "Num of units"
-            elseif (textType == "UnitsValue")          then return "Value of units"
-            elseif (textType == "TilesCount")          then return "Num of bases"
-            elseif (textType == "TurnIndex")           then return "Turn"
+            elseif (textType == "DestroyOwnedUnit")    then return "Destroy Unit"
+            elseif (textType == "DisagreeDraw")        then return "DisagreeDraw"
+            elseif (textType == "DrawOrSurrender")     then return "Set draw / surrender"
+            elseif (textType == "EndTurn")             then return "End Turn"
+            elseif (textType == "Energy")              then return "Energy"
+            elseif (textType == "FindIdleTile")        then return "FildIdleTile"
+            elseif (textType == "FindIdleUnit")        then return "FindIdleUnit"
+            elseif (textType == "Fund")                then return "Fund"
+            elseif (textType == "Help")                then return "Help"
+            elseif (textType == "HideUI")              then return "Hide UI"
+            elseif (textType == "Income")              then return "Income"
             elseif (textType == "Lost")                then return "Lost"
             elseif (textType == "MainWeapon")          then return "Main"
+            elseif (textType == "MapName")             then return "Map Name"
+            elseif (textType == "Nickname")            then return "Nickname"
+            elseif (textType == "Player")              then return "Player"
+            elseif (textType == "ProposeDraw")         then return "ProposeDraw"
+            elseif (textType == "QuitWar")             then return "Quit"
+            elseif (textType == "ReloadWar")           then return "Reload"
+            elseif (textType == "SkillInfo")           then return "Skill Info"
             elseif (textType == "SubWeapon")           then return "Sub"
+            elseif (textType == "Surrender")           then return "Surrender"
+            elseif (textType == "TilesCount")          then return "Num of bases"
+            elseif (textType == "TurnIndex")           then return "Turn"
+            elseif (textType == "UnitPropertyList")    then return "UnitProperties"
+            elseif (textType == "UnitsCount")          then return "Num of units"
+            elseif (textType == "UnitsValue")          then return "Value of units"
+            elseif (textType == "WarID")               then return "War ID"
+            elseif (textType == "WarInfo")             then return "War Info"
+            elseif (textType == "WarMenu")             then return "War Menu"
             else                                            return "Unknown65:" .. (textType or "")
             end
         end,
     },
     [66] = {
         [1] = function(textType)
-            if     (textType == "QuitWar")          then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (textType == "DestroyOwnedUnit") then return "摧毁部队将没有任何补偿！\n您确定要这样做吗？"
-            elseif (textType == "Surrender")        then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
-            elseif (textType == "ReloadWar")        then return "是否确定要重新载入战局？"
-            elseif (textType == "ExitGame")         then return "是否确定退出游戏？"
-            elseif (textType == "NoIdleUnit")       then return "您的所有部队均已行动。"
-            elseif (textType == "NoIdleTile")       then return "您的所有建筑均已被占用。"
-            else                                         return "未知66:" .. (textType or "")
+            if     (textType == "AgreeDraw")          then return "您确定要同意和局吗？"
+            elseif (textType == "DestroyOwnedUnit")   then return "摧毁部队将没有任何补偿！\n您确定要这样做吗？"
+            elseif (textType == "DisagreeDraw")       then return "您确定要拒绝和局吗？"
+            elseif (textType == "ExitGame")           then return "是否确定退出游戏？"
+            elseif (textType == "NoIdleTile")         then return "您的所有建筑均已被占用。"
+            elseif (textType == "NoIdleUnit")         then return "您的所有部队均已行动。"
+            elseif (textType == "ProposeDraw")        then return "求和需要战局内所有玩家一致同意才能生效。\n若中途有玩家战败，则需要重新求和。\n您确定要求和吗？"
+            elseif (textType == "RequireVoteForDraw") then return "已有玩家提出求和。您需要先表决是否同意和局，才能结束本回合。"
+            elseif (textType == "QuitWar")            then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (textType == "ReloadWar")          then return "是否确定要重新载入战局？"
+            elseif (textType == "Surrender")          then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            else                                           return "未知66:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "QuitWar")          then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (textType == "DestroyOwnedUnit") then return "You won't get anything in return!\nAre you sure to destroy it?"
-            elseif (textType == "Surrender")        then return "You will lose the game by surrendering!\nAre you sure?"
-            elseif (textType == "ReloadWar")        then return "Are you sure to reload the war?"
-            elseif (textType == "ExitGame")         then return "Are you sure to exit the game?"
-            elseif (textType == "NoIdleUnit")       then return "None of your units is idle."
-            elseif (textType == "NoIdleTile")       then return "None of your tiles is idle."
-            else                                         return "Unrecognized:[66]" .. textType
+            if     (textType == "AgreeDraw")          then return "Are you sure to approve the draw?"
+            elseif (textType == "DestroyOwnedUnit")   then return "You won't get anything in return!\nAre you sure to destroy it?"
+            elseif (textType == "DisagreeDraw")       then return "Are you sure to decline the draw?"
+            elseif (textType == "ExitGame")           then return "Are you sure to exit the game?"
+            elseif (textType == "NoIdleTile")         then return "None of your tiles is idle."
+            elseif (textType == "NoIdleUnit")         then return "None of your units is idle."
+            elseif (textType == "ProposeDraw")        then return "Are you sure to propose a draw?"
+            elseif (textType == "RequireVoteForDraw") then return "A draw has been proposed. You must approve/decline it before ending your turn."
+            elseif (textType == "QuitWar")            then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (textType == "ReloadWar")          then return "Are you sure to reload the war?"
+            elseif (textType == "Surrender")          then return "You will lose the game by surrendering!\nAre you sure?"
+            else                                           return "Unrecognized:[66]" .. textType
             end
         end,
     },
@@ -1094,7 +1108,8 @@ local s_Texts = {
     },
     [73] = {
         [1] = function(textType)
-            if     (textType == "Lose")      then return "您 已 战 败 …"
+            if     (textType == "Draw")      then return "握 手 言 和"
+            elseif (textType == "Lose")      then return "您 已 战 败 …"
             elseif (textType == "Win")       then return "您 已 获 胜 !"
             elseif (textType == "ReplayEnd") then return "回 放 结 束"
             elseif (textType == "Surrender") then return "您 已 投 降 …"
@@ -1102,7 +1117,8 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "Lose")      then return "You lose…"
+            if     (textType == "Draw")      then return "End with draw."
+            elseif (textType == "Lose")      then return "You lose…"
             elseif (textType == "Win")       then return "You win!"
             elseif (textType == "ReplayEnd") then return "Replay ended."
             elseif (textType == "Surrender") then return "You lose…"
@@ -1110,16 +1126,31 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [74] = {
-        [1] = function() return "您 已 获 胜 ！" end,
-        [2] = function() return "You win!"      end,
+        [1] = function(textType, additionalText)
+            if     (textType == "AgreeDraw")    then return "玩家[" .. additionalText .. "]已提议和局。"
+            elseif (textType == "DisagreeDraw") then return "玩家[" .. additionalText .. "]已否决和局。"
+            elseif (textType == "EndWithDraw")  then return "所有玩家均已同意和局！"
+            elseif (textType == "Lose")         then return "玩家[" .. additionalText .. "]已战败！"
+            elseif (textType == "Surrender")    then return "玩家[" .. additionalText .. "]已投降！"
+            else                                     return "未知74:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType, additionalText)
+            if     (textType == "AgreeDraw")    then return "Player [" .. additionalText .. "] proposed a draw."
+            elseif (textType == "DisagreeDraw") then return "Player [" .. additionalText .. "] declined the draw."
+            elseif (textType == "EndWithDraw")  then return "All the players have approved the draw!"
+            elseif (textType == "Lose")         then return "Player [" .. additionalText .. "] is defeated!"
+            elseif (textType == "Surrender")    then return "Player [" .. additionalText .. "] surrendered!"
+            else                                     return "Unknown74:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [75] = {
         [1] = function() return "您 已 战 败 …" end,
         [2] = function() return "You lose..."  end,
     },
-    --]]
     [76] = {
         [1] = function(nickname) return "玩家【" .. nickname .. "】已战败！"        end,
         [2] = function(nickname) return "Player [" .. nickname .. "] is defeated!" end,
@@ -1128,6 +1159,7 @@ local s_Texts = {
         [1] = function(nickname) return "玩家【" .. nickname .. "】已投降！"        end,
         [2] = function(nickname) return "Player [" .. nickname .. "] surrendered!" end,
     },
+    --]]
     [78] = {
         [1] = function(actionType)
             if     (actionType == "Wait")                   then return "待 机"

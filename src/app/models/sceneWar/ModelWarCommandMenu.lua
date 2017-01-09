@@ -49,6 +49,7 @@ local ACTION_CODE_DESTROY_OWNED_UNIT   = ActionCodeFunctions.getActionCode("Acti
 local ACTION_CODE_END_TURN             = ActionCodeFunctions.getActionCode("ActionEndTurn")
 local ACTION_CODE_RELOAD_SCENE_WAR     = ActionCodeFunctions.getActionCode("ActionReloadSceneWar")
 local ACTION_CODE_SURRENDER            = ActionCodeFunctions.getActionCode("ActionSurrender")
+local ACTION_CODE_VOTE_FOR_DRAW        = ActionCodeFunctions.getActionCode("ActionVoteForDraw")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -402,12 +403,15 @@ local function sendActionDestroyOwnedModelUnit(self)
     }, true)
 end
 
-local function sendActionSurrender()
-    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
-end
-
 local function sendActionEndTurn()
     createAndSendAction({actionCode = ACTION_CODE_END_TURN}, true)
+end
+
+local function sendActionVoteForDraw(self, doesAgree)
+    createAndSendAction({
+        actionCode = ACTION_CODE_VOTE_FOR_DRAW,
+        doesAgree  = doesAgree,
+    }, true)
 end
 
 local function sendActionReloadSceneWar()
@@ -417,11 +421,15 @@ local function sendActionReloadSceneWar()
     }, false)
 end
 
+local function sendActionSurrender()
+    createAndSendAction({actionCode = ACTION_CODE_SURRENDER}, true)
+end
+
 --------------------------------------------------------------------------------
 -- The state setters.
 --------------------------------------------------------------------------------
 local function setStateAuxiliaryCommands(self)
-    self.m_State = "AuxiliaryCommands"
+    self.m_State = "stateAuxiliaryCommands"
 
     if (self.m_View) then
         local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
@@ -451,7 +459,7 @@ local function setStateAuxiliaryCommands(self)
 end
 
 local function setStateDisabled(self)
-    self.m_State = "Disabled"
+    self.m_State = "stateDisabled"
 
     if (self.m_View) then
         self.m_View:setEnabled(false)
@@ -459,24 +467,29 @@ local function setStateDisabled(self)
 end
 
 local function setStateDrawOrSurrender(self)
-    self.m_State = "DrawOrSurrender"
+    self.m_State = "stateDrawOrSurrender"
 
     if (self.m_View) then
-        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
-        assert((not modelSceneWar:isTotalReplay())                                                          and
-            (getPlayerIndexLoggedIn(modelSceneWar) == modelSceneWar:getModelTurnManager():getPlayerIndex()) and
-            (not self.m_IsWaitingForServerResponse)
-        )
+        local modelSceneWar     = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local playerIndexInTurn = modelSceneWar:getModelTurnManager():getPlayerIndex()
+        assert((not modelSceneWar:isTotalReplay()) and (getPlayerIndexLoggedIn(modelSceneWar) == playerIndexInTurn) and (not self.m_IsWaitingForServerResponse))
 
-        self.m_View:setItems({
-            -- TODO: enable to set draw.
-            self.m_ItemSurrender,
-        })
+        local modelPlayer = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndexInTurn)
+        local items       = {self.m_ItemSurrender}
+        if (modelPlayer:hasVotedForDraw()) then
+            -- do nothing.
+        elseif (not modelSceneWar:getRemainingVotesForDraw()) then
+            items[#items + 1] = self.m_ItemProposeDraw
+        else
+            items[#items + 1] = self.m_ItemAgreeDraw
+            items[#items + 1] = self.m_ItemDisagreeDraw
+        end
+        self.m_View:setItems(items)
     end
 end
 
 local function setStateHelp(self)
-    self.m_State = "Help"
+    self.m_State = "stateHelp"
 
     if (self.m_View) then
         self.m_View:setItems({
@@ -491,7 +504,7 @@ local function setStateHelp(self)
 end
 
 local function setStateMain(self)
-    self.m_State = "Main"
+    self.m_State = "stateMain"
     updateStringWarInfo(  self)
     updateStringSkillInfo(self)
 
@@ -503,7 +516,7 @@ local function setStateMain(self)
 end
 
 local function setStateUnitPropertyList(self)
-    self.m_State = "UnitPropertyList"
+    self.m_State = "stateUnitPropertyList"
 
     if (self.m_View) then
         self.m_View:setItems(self.m_ItemsUnitProperties)
@@ -529,14 +542,12 @@ end
 -- The composition items.
 --------------------------------------------------------------------------------
 local function initItemAbout(self)
-    local item = {
+    self.m_ItemAbout = {
         name     = getLocalizedText(1, "About"),
         callback = function()
             self.m_View:setOverviewString(getLocalizedText(2, 3))
         end,
     }
-
-    self.m_ItemAbout = item
 end
 
 local function createItemActivateSkill(self, skillGroupID)
@@ -557,19 +568,33 @@ local function initItemActivateSkill2(self)
     self.m_ItemActiveSkill2 = createItemActivateSkill(self, 2)
 end
 
+local function initItemAgreeDraw(self)
+    self.m_ItemAgreeDraw = {
+        name = getLocalizedText(65, "AgreeDraw"),
+        callback = function()
+            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "AgreeDraw"))
+                :setOnConfirmYes(function()
+                    sendActionVoteForDraw(self, true)
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                end)
+                :setEnabled(true)
+        end,
+    }
+end
+
 local function initItemAuxiliaryCommands(self)
-    local item = {
+    self.m_ItemAuxiliaryCommands = {
         name     = getLocalizedText(65, "AuxiliaryCommands"),
         callback = function()
             setStateAuxiliaryCommands(self)
         end,
     }
-
-    self.m_ItemAuxiliaryCommands = item
 end
 
 local function initItemDestroyOwnedUnit(self)
-    local item = {
+    self.m_ItemDestroyOwnedUnit = {
         name     = getLocalizedText(65, "DestroyOwnedUnit"),
         callback = function()
             local modelConfirmBox = getModelConfirmBox()
@@ -582,48 +607,62 @@ local function initItemDestroyOwnedUnit(self)
                 :setEnabled(true)
         end,
     }
+end
 
-    self.m_ItemDestroyOwnedUnit = item
+local function initItemDisagreeDraw(self)
+    self.m_ItemDisagreeDraw = {
+        name = getLocalizedText(65, "DisagreeDraw"),
+        callback = function()
+            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "DisagreeDraw"))
+                :setOnConfirmYes(function()
+                    sendActionVoteForDraw(self, false)
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                end)
+                :setEnabled(true)
+        end,
+    }
 end
 
 local function initItemDrawOrSurrender(self)
-    local item = {
+    self.m_ItemDrawOrSurrender = {
         name     = getLocalizedText(65, "DrawOrSurrender"),
         callback = function()
             setStateDrawOrSurrender(self)
         end
     }
-
-    self.m_ItemDrawOrSurrender = item
 end
 
 local function initItemEndTurn(self)
-    local item = {
+    self.m_ItemEndTurn = {
         name     = getLocalizedText(65, "EndTurn"),
         callback = function()
-            local modelConfirmBox = getModelConfirmBox()
-            modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
-                :setOnConfirmYes(function()
-                    modelConfirmBox:setEnabled(false)
-                    self:setEnabled(false)
-                    sendActionEndTurn()
-                end)
-                :setEnabled(true)
+            local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+            if ((modelSceneWar:getRemainingVotesForDraw())                                                                                          and
+                (not modelSceneWar:getModelPlayerManager():getModelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex()):hasVotedForDraw())) then
+                getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(66, "RequireVoteForDraw"))
+            else
+                local modelConfirmBox = getModelConfirmBox(modelSceneWar)
+                modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+                    :setOnConfirmYes(function()
+                        modelConfirmBox:setEnabled(false)
+                        self:setEnabled(false)
+                        sendActionEndTurn()
+                    end)
+                    :setEnabled(true)
+            end
         end,
     }
-
-    self.m_ItemEndTurn = item
 end
 
 local function initItemEssentialConcept(self)
-    local item = {
+    self.m_ItemEssentialConcept = {
         name     = getLocalizedText(1, "EssentialConcept"),
         callback = function()
             self.m_View:setOverviewString(getLocalizedText(2, 4))
         end,
     }
-
-    self.m_ItemEssentialConcept = item
 end
 
 local function initItemFindIdleUnit(self)
@@ -747,28 +786,20 @@ local function initItemHideUI(self)
     self.m_ItemHideUI = item
 end
 
-local function initItemWarControl(self)
-    local item = {
-        name     = getLocalizedText(1, "WarControl"),
+local function initItemProposeDraw(self)
+    self.m_ItemProposeDraw = {
+        name     = getLocalizedText(65, "ProposeDraw"),
         callback = function()
-            self.m_View:setOverviewString(getLocalizedText(2, 2))
+            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            modelConfirmBox:setConfirmText(getLocalizedText(66, "ProposeDraw"))
+                :setOnConfirmYes(function()
+                    sendActionVoteForDraw(self, true)
+                    modelConfirmBox:setEnabled(false)
+                    self:setEnabled(false)
+                end)
+                :setEnabled(true)
         end,
     }
-
-    self.m_ItemWarControl = item
-end
-
-local function initItemWarInfo(self)
-    local item = {
-        name     = getLocalizedText(65, "WarInfo"),
-        callback = function()
-            if (self.m_View) then
-                self.m_View:setOverviewString(self.m_StringWarInfo)
-            end
-        end,
-    }
-
-    self.m_ItemWarInfo = item
 end
 
 local function initItemSkillInfo(self)
@@ -891,6 +922,30 @@ local function initItemSurrender(self)
     self.m_ItemSurrender = item
 end
 
+local function initItemWarControl(self)
+    local item = {
+        name     = getLocalizedText(1, "WarControl"),
+        callback = function()
+            self.m_View:setOverviewString(getLocalizedText(2, 2))
+        end,
+    }
+
+    self.m_ItemWarControl = item
+end
+
+local function initItemWarInfo(self)
+    local item = {
+        name     = getLocalizedText(65, "WarInfo"),
+        callback = function()
+            if (self.m_View) then
+                self.m_View:setOverviewString(self.m_StringWarInfo)
+            end
+        end,
+    }
+
+    self.m_ItemWarInfo = item
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -900,26 +955,29 @@ function ModelWarCommandMenu:ctor(param)
     initItemAbout(            self)
     initItemActivateSkill1(   self)
     initItemActivateSkill2(   self)
+    initItemAgreeDraw(        self)
     initItemAuxiliaryCommands(self)
     initItemDestroyOwnedUnit( self)
+    initItemDisagreeDraw(     self)
     initItemDrawOrSurrender(  self)
     initItemEndTurn(          self)
     initItemEssentialConcept( self)
-    initItemFindIdleUnit(     self)
     initItemFindIdleTile(     self)
+    initItemFindIdleUnit(     self)
     initItemGameFlow(         self)
     initItemHelp(             self)
     initItemHideUI(           self)
-    initItemWarInfo(          self)
-    initItemSkillInfo(        self)
-    initItemSkillSystem(      self)
-    initItemUnitPropertyList( self)
-    initItemsUnitProperties(  self)
+    initItemProposeDraw(      self)
     initItemQuit(             self)
     initItemReload(           self)
+    initItemSkillInfo(        self)
+    initItemSkillSystem(      self)
     initItemSetMusic(         self)
     initItemSurrender(        self)
+    initItemsUnitProperties(  self)
+    initItemUnitPropertyList( self)
     initItemWarControl(       self)
+    initItemWarInfo(          self)
 
     return self
 end
@@ -951,7 +1009,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:isEnabled()
-    return self.m_State ~= "Disabled"
+    return self.m_State ~= "stateDisabled"
 end
 
 function ModelWarCommandMenu:setEnabled(enabled)
@@ -967,12 +1025,12 @@ end
 
 function ModelWarCommandMenu:onButtonBackTouched()
     local state = self.m_State
-    if     (state == "AuxiliaryCommands") then setStateMain(self)
-    elseif (state == "DrawOrSurrender")   then setStateMain(self)
-    elseif (state == "Help")              then setStateMain(self)
-    elseif (state == "Main")              then self:setEnabled(false)
-    elseif (state == "UnitPropertyList")  then setStateHelp(self)
-    else                                  error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
+    if     (state == "stateAuxiliaryCommands") then setStateMain(self)
+    elseif (state == "stateDrawOrSurrender")   then setStateMain(self)
+    elseif (state == "stateHelp")              then setStateMain(self)
+    elseif (state == "stateMain")              then self:setEnabled(false)
+    elseif (state == "stateUnitPropertyList")  then setStateHelp(self)
+    else                                       error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
     end
 
     return self

@@ -722,7 +722,7 @@ local function executeAttack(action, modelSceneWar)
             end
             if (lostPlayerIndex) then
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
-                getModelMessageIndicator():showMessage(getLocalizedText(76, modelPlayerManager:getModelPlayer(lostPlayerIndex):getNickname()))
+                getModelMessageIndicator():showMessage(getLocalizedText(74, "Lose", modelPlayerManager:getModelPlayer(lostPlayerIndex):getNickname()))
             end
 
             updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
@@ -785,7 +785,7 @@ local function executeBeginTurn(action, modelSceneWar)
             end
 
             modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
-                getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(74, "Lose", lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
@@ -938,7 +938,7 @@ local function executeCaptureModelTile(action, modelSceneWar)
                     :showNormalAnimation()
                 modelTile:updateView()
 
-                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(76, lostModelPlayer:getNickname()))
+                getModelMessageIndicator(sceneWarFileName):showMessage(getLocalizedText(74, "Lose", lostModelPlayer:getNickname()))
                 Destroyers.destroyPlayerForce(sceneWarFileName, lostPlayerIndex)
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
 
@@ -1577,7 +1577,7 @@ local function executeSurrender(action, modelSceneWar)
         end
 
         updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
-        getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(77, modelPlayer:getNickname()))
+        getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(74, "Surrender", modelPlayer:getNickname()))
 
         if (not modelSceneWar:isEnded()) then
             modelTurnManager:endTurnPhaseMain()
@@ -1587,6 +1587,52 @@ local function executeSurrender(action, modelSceneWar)
             modelSceneWar:showEffectSurrender(callbackOnWarEndedForClient)
         else
             modelSceneWar:showEffectWin(callbackOnWarEndedForClient)
+        end
+
+        modelSceneWar:setExecutingAction(false)
+    end
+end
+
+local function executeVoteForDraw(action, modelSceneWar)
+    if (not modelSceneWar.isModelSceneWar) then
+        return
+    end
+    modelSceneWar:setExecutingAction(true)
+
+    local doesAgree          = action.doesAgree
+    local modelPlayerManager = modelSceneWar:getModelPlayerManager()
+    local modelPlayer        = modelPlayerManager:getModelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex())
+    if (not doesAgree) then
+        modelSceneWar:setRemainingVotesForDraw(nil)
+    else
+        local remainingVotes = (modelSceneWar:getRemainingVotesForDraw() or modelPlayerManager:getAlivePlayersCount()) - 1
+        modelSceneWar:setRemainingVotesForDraw(remainingVotes)
+        if (remainingVotes == 0) then
+            modelSceneWar:setEnded(true)
+        end
+    end
+    modelPlayer:setVotedForDraw(true)
+
+    if (IS_SERVER) then
+        modelSceneWar:setExecutingAction(false)
+    else
+        if (not modelSceneWar:isTotalReplay()) then
+            cleanupOnReceivingResponseFromServer(modelSceneWar)
+        end
+
+        if (not doesAgree) then
+            getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(74, "DisagreeDraw", modelPlayer:getNickname()))
+        else
+            local modelMessageIndicator = getModelMessageIndicator(modelSceneWar)
+            modelMessageIndicator:showMessage(getLocalizedText(74, "AgreeDraw", modelPlayer:getNickname()))
+            if (modelSceneWar:isEnded()) then
+                modelMessageIndicator:showMessage(getLocalizedText(74, "EndWithDraw"))
+            end
+        end
+
+        if     (not modelSceneWar:isEnded())   then -- do nothing.
+        elseif (modelSceneWar:isTotalReplay()) then modelSceneWar:showEffectReplayEnd(  callbackOnWarEndedForClient)
+        else                                        modelSceneWar:showEffectEndWithDraw(callbackOnWarEndedForClient)
         end
 
         modelSceneWar:setExecutingAction(false)
@@ -1668,9 +1714,10 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnTile)       then executeProduceModelUnitOnTile(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionProduceModelUnitOnUnit)       then executeProduceModelUnitOnUnit(      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSupplyModelUnit)              then executeSupplyModelUnit(             action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurface)                      then executeSurface(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionSurrender)                    then executeSurrender(                   action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionVoteForDraw)                  then executeVoteForDraw(                 action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionWait)                         then executeWait(                        action, modelScene)
     else                                                                        error("ActionExecutor.execute() invalid action: " .. SerializationFunctions.toString(action))
     end
 end

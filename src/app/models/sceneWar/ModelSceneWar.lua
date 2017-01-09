@@ -186,15 +186,16 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_ExecutedActions     = sceneData.executedActions
-    self.m_SceneWarFileName    = sceneData.sceneWarFileName
-    self.m_IsWarEnded          = sceneData.isWarEnded
-    self.m_IsFogOfWarByDefault = sceneData.isFogOfWarByDefault
-    self.m_IsRandomWarField    = sceneData.isRandomWarField
-    self.m_IsTotalReplay       = sceneData.isTotalReplay
-    self.m_MaxBaseSkillPoints  = sceneData.maxBaseSkillPoints
-    self.m_WarPassword         = sceneData.warPassword
-    self.m_CachedActions       = {}
+    self.m_ExecutedActions       = sceneData.executedActions
+    self.m_SceneWarFileName      = sceneData.sceneWarFileName
+    self.m_IsWarEnded            = sceneData.isWarEnded
+    self.m_IsFogOfWarByDefault   = sceneData.isFogOfWarByDefault
+    self.m_IsRandomWarField      = sceneData.isRandomWarField
+    self.m_IsTotalReplay         = sceneData.isTotalReplay
+    self.m_MaxBaseSkillPoints    = sceneData.maxBaseSkillPoints
+    self.m_RemainingVotesForDraw = sceneData.remainingVotesForDraw
+    self.m_WarPassword           = sceneData.warPassword
+    self.m_CachedActions         = {}
     setActionId(self, sceneData.actionID)
 
     initScriptEventDispatcher(self)
@@ -227,55 +228,58 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:toSerializableTable()
     return {
-        sceneWarFileName    = self.m_SceneWarFileName,
-        warPassword         = self.m_WarPassword,
-        isWarEnded          = self.m_IsWarEnded,
-        isRandomWarField    = self.m_IsRandomWarField,
-        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        isTotalReplay       = false,
-        executedActions     = self.m_ExecutedActions,
-        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
-        actionID            = self:getActionId(),
-        players             = self:getModelPlayerManager() :toSerializableTable(),
-        turn                = self:getModelTurnManager()   :toSerializableTable(),
-        warField            = self:getModelWarField()      :toSerializableTable(),
-        weather             = self:getModelWeatherManager():toSerializableTable(),
+        sceneWarFileName      = self.m_SceneWarFileName,
+        warPassword           = self.m_WarPassword,
+        isWarEnded            = self.m_IsWarEnded,
+        isRandomWarField      = self.m_IsRandomWarField,
+        isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
+        isTotalReplay         = false,
+        executedActions       = self.m_ExecutedActions,
+        maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
+        remainingVotesForDraw = self.m_RemainingVotesForDraw,
+        actionID              = self:getActionId(),
+        players               = self:getModelPlayerManager() :toSerializableTable(),
+        turn                  = self:getModelTurnManager()   :toSerializableTable(),
+        warField              = self:getModelWarField()      :toSerializableTable(),
+        weather               = self:getModelWeatherManager():toSerializableTable(),
     }
 end
 
 function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     return {
-        sceneWarFileName    = self.m_SceneWarFileName,
-        warPassword         = self.m_WarPassword,
-        isWarEnded          = self.m_IsWarEnded,
-        isRandomWarField    = self.m_IsRandomWarField,
-        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        isTotalReplay       = false,
-        executedActions     = nil,
-        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
-        actionID            = self:getActionId(),
-        players             = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
-        turn                = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
-        warField            = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
-        weather             = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
+        sceneWarFileName      = self.m_SceneWarFileName,
+        warPassword           = self.m_WarPassword,
+        isWarEnded            = self.m_IsWarEnded,
+        isRandomWarField      = self.m_IsRandomWarField,
+        isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
+        isTotalReplay         = false,
+        executedActions       = nil,
+        maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
+        remainingVotesForDraw = self.m_RemainingVotesForDraw,
+        actionID              = self:getActionId(),
+        players               = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
+        turn                  = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
+        warField              = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
+        weather               = self:getModelWeatherManager():toSerializableTableForPlayerIndex(playerIndex),
     }
 end
 
 function ModelSceneWar:toSerializableReplayData()
     return {
-        sceneWarFileName    = self.m_SceneWarFileName,
-        warPassword         = self.m_WarPassword,
-        isWarEnded          = false,
-        isRandomWarField    = self.m_IsRandomWarField,
-        isFogOfWarByDefault = self.m_IsFogOfWarByDefault,
-        isTotalReplay       = true,
-        executedActions     = self.m_ExecutedActions,
-        maxBaseSkillPoints  = self.m_MaxBaseSkillPoints,
-        actionID            = 0,
-        players             = self:getModelPlayerManager() :toSerializableReplayData(),
-        turn                = self:getModelTurnManager()   :toSerializableReplayData(),
-        warField            = self:getModelWarField()      :toSerializableReplayData(),
-        weather             = self:getModelWeatherManager():toSerializableReplayData(),
+        sceneWarFileName      = self.m_SceneWarFileName,
+        warPassword           = self.m_WarPassword,
+        isWarEnded            = false,
+        isRandomWarField      = self.m_IsRandomWarField,
+        isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
+        isTotalReplay         = true,
+        executedActions       = self.m_ExecutedActions,
+        maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
+        remainingVotesForDraw = nil,
+        actionID              = 0,
+        players               = self:getModelPlayerManager() :toSerializableReplayData(),
+        turn                  = self:getModelTurnManager()   :toSerializableReplayData(),
+        warField              = self:getModelWarField()      :toSerializableReplayData(),
+        weather               = self:getModelWeatherManager():toSerializableReplayData(),
     }
 end
 
@@ -454,6 +458,16 @@ function ModelSceneWar:isTotalReplay()
     return self.m_IsTotalReplay
 end
 
+function ModelSceneWar:getRemainingVotesForDraw()
+    return self.m_RemainingVotesForDraw
+end
+
+function ModelSceneWar:setRemainingVotesForDraw(votesCount)
+    self.m_RemainingVotesForDraw = votesCount
+
+    return self
+end
+
 function ModelSceneWar:getModelConfirmBox()
     return self.m_ActorConfirmBox:getModel()
 end
@@ -484,6 +498,13 @@ end
 
 function ModelSceneWar:getScriptEventDispatcher()
     return self.m_ScriptEventDispatcher
+end
+
+function ModelSceneWar:showEffectEndWithDraw(callback)
+    assert(not IS_SERVER, "ModelSceneWar:showEffectEndWithDraw() should not be invoked on the server.")
+    self.m_View:showEffectEndWithDraw(callback)
+
+    return self
 end
 
 function ModelSceneWar:showEffectSurrender(callback)

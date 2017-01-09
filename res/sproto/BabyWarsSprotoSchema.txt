@@ -40,6 +40,7 @@
     ActionSurface                     116 : ActionSurface
     ActionSurrender                   117 : ActionSurrender
     ActionWait                        118 : ActionWait
+    ActionVoteForDraw                 119 : ActionVoteForDraw
 }
 
 .ActionRedis {
@@ -471,6 +472,15 @@
     launchUnitID     10 :  integer
 }
 
+.ActionVoteForDraw {
+    actionCode        0 : integer
+    playerAccount     1 : string
+    playerPassword    2 : string
+    sceneWarFileName  3 : string
+    actionID          4 : integer
+    doesAgree         5 : boolean
+}
+
 ################################################################################
 # components
 ################################################################################
@@ -614,6 +624,7 @@
         damageCost          5 : integer
         skillActivatedCount 6 : integer
         skillConfiguration  7 : SingleSkillConfiguration
+        hasVotedForDraw     8 : boolean
     }
 
     .TurnData {
@@ -658,19 +669,20 @@
         expiringTurnIndexForWeather   3 : integer
     }
 
-    sceneWarFileName     0 :  string
-    actionID             1 :  integer
-    maxBaseSkillPoints   2 :  integer
-    isWarEnded           3 :  boolean
-    isRandomWarField     4 :  boolean
-    isFogOfWarByDefault  5 :  boolean
-    isTotalReplay        6 :  boolean
-    warPassword          7 :  string
-    executedActions      8 : *ActionGeneric
-    players              9 : *SinglePlayerData(playerIndex)
-    turn                10 :  TurnData
-    warField            11 :  WarFieldData
-    weather             12 :  WeatherData
+    sceneWarFileName       0 :  string
+    actionID               1 :  integer
+    maxBaseSkillPoints     2 :  integer
+    isWarEnded             3 :  boolean
+    isRandomWarField       4 :  boolean
+    isFogOfWarByDefault    5 :  boolean
+    isTotalReplay          6 :  boolean
+    warPassword            7 :  string
+    executedActions        8 : *ActionGeneric
+    players                9 : *SinglePlayerData(playerIndex)
+    turn                  10 :  TurnData
+    warField              11 :  WarFieldData
+    weather               12 :  WeatherData
+    remainingVotesForDraw 13 :  integer
 }
 
 .SceneWarFileNameForIndex {
