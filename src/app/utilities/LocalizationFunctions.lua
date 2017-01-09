@@ -299,67 +299,67 @@ local s_Texts = {
     },
     [4] = {
         [1] = function(skillID)
-            if     (skillID == 1)  then return "改变我方全体部队的攻击力，幅度为"
-            elseif (skillID == 2)  then return "改变我方全体部队的防御力，幅度为"
-            elseif (skillID == 3)  then return "改变我方全体部队的造价，幅度为"
-            elseif (skillID == 4)  then return "改变我方全体部队的当前HP，幅度为"
-            elseif (skillID == 5)  then return "改变对方全体部队的当前HP，幅度为"
-            elseif (skillID == 6)  then return "改变我方全体部队的移动力，幅度为"
-            elseif (skillID == 7)  then return "改变我方全体远程部队的射程上限，幅度为"
+            if     (skillID == 1)  then return "我方全体部队的攻击力"
+            elseif (skillID == 2)  then return "我方全体部队的防御力"
+            elseif (skillID == 3)  then return "我方全体部队的造价"
+            elseif (skillID == 4)  then return "我方全体部队的当前HP"
+            elseif (skillID == 5)  then return "对方全体部队的当前HP"
+            elseif (skillID == 6)  then return "我方全体部队的移动力"
+            elseif (skillID == 7)  then return "我方全体远程部队的射程上限"
             elseif (skillID == 8)  then return "使我方步兵系以外的全体部队变为未行动的状态。"
             elseif (skillID == 9)  then return "使对方全体部队的燃料值变为当前值的"
-            elseif (skillID == 10) then return "改变我方具有维修能力的据点及部队的维修量，幅度为额外"
+            elseif (skillID == 10) then return "我方具有维修能力的据点及部队的维修量"
             elseif (skillID == 11) then return "使我方维修费用变为基础的"
             elseif (skillID == 12) then return "使我方资金变为当前的"
-            elseif (skillID == 13) then return "根据我方资金来改变对方能量值，幅度为每10000资金"
-            elseif (skillID == 14) then return "额外改变我方全体部队的幸运伤害值上限，幅度为"
+            elseif (skillID == 13) then return "根据我方资金来改变其他所有玩家的能量值，幅度为每10000资金"
+            elseif (skillID == 14) then return "我方全体部队的幸运伤害值上限"
             elseif (skillID == 15) then return "改变我方步兵系的占领速度（四舍五入），幅度为"
             elseif (skillID == 16) then return "补满我方全体部队的燃料、弹药和建造材料。"
-            elseif (skillID == 17) then return "改变我方的金钱收入，幅度为"
+            elseif (skillID == 17) then return "我方所有建筑的金钱收入"
             elseif (skillID == 18) then return "锁定我方能量槽的实际长度，使能量增长不会随着主动技能的发动而变慢。"
-            elseif (skillID == 19) then return "改变我方能量增长速度，幅度为"
+            elseif (skillID == 19) then return "我方能量增长速度"
             elseif (skillID == 20) then return "根据我方资金来改变全军攻击力，比例为每10000资金"
             elseif (skillID == 21) then return "根据我方资金来改变全军防御力，比例为每10000资金"
             elseif (skillID == 22) then return "对对方造成攻击伤害时获得金钱，数量为该伤害的基础价值的"
             elseif (skillID == 23) then return "我方部队所在地形每有一颗防御星，则该部队的攻击力"
             elseif (skillID == 24) then return "我方部队所在地形每有一颗防御星，则该部队的防御力"
             elseif (skillID == 25) then return "额外改变我方全体部队的幸运伤害值下限（不高于上限），幅度为"
-            elseif (skillID == 26) then return "晋升我方全体部队，幅度为"
-            elseif (skillID == 27) then return "我方生产的部队自带晋升，等级为"
+            elseif (skillID == 26) then return "我方全体部队的当前晋升等级"
+            elseif (skillID == 27) then return "我方生产的所有部队自带晋升等级"
             elseif (skillID == 28) then return "使我方全军在全地形上的移动力消耗均变为1（不可移动的除外）"
-            elseif (skillID == 29) then return "改变我方所有近战部队（含步兵系）的攻击力，幅度为"
-            elseif (skillID == 30) then return "改变我方所有远程部队的攻击力，幅度为"
-            elseif (skillID == 31) then return "改变我方所有陆军的攻击力，幅度为"
-            elseif (skillID == 32) then return "改变我方所有空军的攻击力，幅度为"
-            elseif (skillID == 33) then return "改变我方所有海军的攻击力，幅度为"
-            elseif (skillID == 34) then return "改变我方步兵系的攻击力，幅度为"
-            elseif (skillID == 35) then return "改变我方车辆系的攻击力，幅度为"
-            elseif (skillID == 36) then return "改变我方近战机械部队的攻击力，幅度为"
-            elseif (skillID == 37) then return "改变我方所有近战部队（含步兵系）的防御力，幅度为"
-            elseif (skillID == 38) then return "改变我方所有远程部队的防御力，幅度为"
-            elseif (skillID == 39) then return "改变我方所有陆军的防御力，幅度为"
-            elseif (skillID == 40) then return "改变我方所有空军的防御力，幅度为"
-            elseif (skillID == 41) then return "改变我方所有海军的防御力，幅度为"
-            elseif (skillID == 42) then return "改变我方步兵系的防御力，幅度为"
-            elseif (skillID == 43) then return "改变我方车辆系的防御力，幅度为"
-            elseif (skillID == 44) then return "改变我方近战机械部队的防御力，幅度为"
-            elseif (skillID == 45) then return "改变我方运输系（不含炮舰）的防御力，幅度为"
-            elseif (skillID == 46) then return "改变我方所有近战部队的移动力，幅度为"
-            elseif (skillID == 47) then return "改变我方所有远程部队的移动力，幅度为"
-            elseif (skillID == 48) then return "改变我方所有陆军的移动力，幅度为"
-            elseif (skillID == 49) then return "改变我方所有空军的移动力，幅度为"
-            elseif (skillID == 50) then return "改变我方所有海军的移动力，幅度为"
-            elseif (skillID == 51) then return "改变我方所有步兵系的移动力，幅度为"
-            elseif (skillID == 52) then return "改变我方所有车辆系的移动力，幅度为"
-            elseif (skillID == 53) then return "改变我方所有近战机械部队的移动力，幅度为"
-            elseif (skillID == 54) then return "改变我方所有运输系（不含炮舰）的移动力，幅度为"
-            elseif (skillID == 55) then return "改变我方所有部队的视野，幅度为"
-            elseif (skillID == 56) then return "改变我方所有建筑的视野，幅度为"
-            elseif (skillID == 57) then return "改变我方所有部队和建筑的视野，幅度为"
+            elseif (skillID == 29) then return "我方所有近战部队（含步兵系）的攻击力"
+            elseif (skillID == 30) then return "我方所有远程部队的攻击力"
+            elseif (skillID == 31) then return "我方所有陆军的攻击力"
+            elseif (skillID == 32) then return "我方所有空军的攻击力"
+            elseif (skillID == 33) then return "我方所有海军的攻击力"
+            elseif (skillID == 34) then return "我方步兵系的攻击力"
+            elseif (skillID == 35) then return "我方车辆系的攻击力"
+            elseif (skillID == 36) then return "我方近战机械部队的攻击力"
+            elseif (skillID == 37) then return "我方所有近战部队（含步兵系）的防御力"
+            elseif (skillID == 38) then return "我方所有远程部队的防御力"
+            elseif (skillID == 39) then return "我方所有陆军的防御力"
+            elseif (skillID == 40) then return "我方所有空军的防御力"
+            elseif (skillID == 41) then return "我方所有海军的防御力"
+            elseif (skillID == 42) then return "我方步兵系的防御力"
+            elseif (skillID == 43) then return "我方车辆系的防御力"
+            elseif (skillID == 44) then return "我方近战机械部队的防御力"
+            elseif (skillID == 45) then return "我方运输系（不含炮舰）的防御力"
+            elseif (skillID == 46) then return "我方所有近战部队的移动力"
+            elseif (skillID == 47) then return "我方所有远程部队的移动力"
+            elseif (skillID == 48) then return "我方所有陆军的移动力"
+            elseif (skillID == 49) then return "我方所有空军的移动力"
+            elseif (skillID == 50) then return "我方所有海军的移动力"
+            elseif (skillID == 51) then return "我方所有步兵系的移动力"
+            elseif (skillID == 52) then return "我方所有车辆系的移动力"
+            elseif (skillID == 53) then return "我方所有近战机械部队的移动力"
+            elseif (skillID == 54) then return "我方所有运输系（不含炮舰）的移动力"
+            elseif (skillID == 55) then return "我方所有部队的视野"
+            elseif (skillID == 56) then return "我方所有建筑的视野"
+            elseif (skillID == 57) then return "我方所有部队和建筑的视野"
             elseif (skillID == 58) then return "使我方所有部队能够直接探明视野内的敌军隐蔽地点。"
             elseif (skillID == 59) then return "使我方所有建筑能够直接探明视野内的敌军隐蔽地点。"
             elseif (skillID == 60) then return "使我方所有部队和建筑能够直接探明视野内的敌军隐蔽地点。"
-            elseif (skillID == 61) then return "改变我方当前能量值，幅度为"
+            elseif (skillID == 61) then return "我方当前能量值"
             else                        return "未知4:" .. (skillID or "")
             end
         end,
@@ -629,6 +629,7 @@ local s_Texts = {
             elseif (actionName == "ActionSurface")                then return "上浮"
             elseif (actionName == "ActionSurrender")              then return "投降"
             elseif (actionName == "ActionTickActionId")           then return ""
+            elseif (actionName == "ActionVoteForDraw")            then return "表决和局"
             elseif (actionName == "ActionWait")                   then return "待机"
             else                                                 return "未知12:" .. (actionName or "")
             end
@@ -653,6 +654,7 @@ local s_Texts = {
             elseif (actionName == "ActionSurface")                then return "Surface"
             elseif (actionName == "ActionSurrender")              then return "Surrender"
             elseif (actionName == "ActionTickActionId")           then return ""
+            elseif (actionName == "ActionVoteForDraw")            then return "VoteForDraw"
             elseif (actionName == "ActionWait")                   then return "Wait"
             else                                                 return "Unknown12:" .. (actionName or "")
             end
@@ -958,7 +960,8 @@ local s_Texts = {
     },
     [65] = {
         [1] = function(textType)
-            if     (textType == "ActivateSkill")       then return "发 动 技 能"
+            if     (textType == "ActionID")            then return "行动数"
+            elseif (textType == "ActivateSkill")       then return "发 动 技 能"
             elseif (textType == "AgreeDraw")           then return "同 意 和 局"
             elseif (textType == "Author")              then return "作者"
             elseif (textType == "AuxiliaryCommands")   then return "辅 助 功 能"
@@ -974,6 +977,8 @@ local s_Texts = {
             elseif (textType == "Fund")                then return "资 金"
             elseif (textType == "Help")                then return "帮 助"
             elseif (textType == "HideUI")              then return "隐 藏 界 面"
+            elseif (textType == "IdleTiles")           then return "空闲工厂/机场/海港数量"
+            elseif (textType == "IdleUnits")           then return "空闲部队数量"
             elseif (textType == "Income")              then return "收 入"
             elseif (textType == "Lost")                then return "已战败"
             elseif (textType == "MainWeapon")          then return "主武器"
@@ -998,7 +1003,8 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "ActivateSkill")       then return "ActivateSkill"
+            if     (textType == "ActionID")            then return "Actions"
+            elseif (textType == "ActivateSkill")       then return "ActivateSkill"
             elseif (textType == "AgreeDraw")           then return "AgreeDraw"
             elseif (textType == "Author")              then return "Author"
             elseif (textType == "AuxiliaryCommands")   then return "AuxiliaryCmds"
@@ -1014,6 +1020,8 @@ local s_Texts = {
             elseif (textType == "Fund")                then return "Fund"
             elseif (textType == "Help")                then return "Help"
             elseif (textType == "HideUI")              then return "Hide UI"
+            elseif (textType == "IdleTiles")           then return "Idle factories/airports/seaports"
+            elseif (textType == "IdleUnits")           then return "Idle units"
             elseif (textType == "Income")              then return "Income"
             elseif (textType == "Lost")                then return "Lost"
             elseif (textType == "MainWeapon")          then return "Main"
@@ -1040,33 +1048,37 @@ local s_Texts = {
     },
     [66] = {
         [1] = function(textType)
-            if     (textType == "AgreeDraw")          then return "您确定要同意和局吗？"
-            elseif (textType == "DestroyOwnedUnit")   then return "摧毁部队将没有任何补偿！\n您确定要这样做吗？"
-            elseif (textType == "DisagreeDraw")       then return "您确定要拒绝和局吗？"
-            elseif (textType == "ExitGame")           then return "是否确定退出游戏？"
-            elseif (textType == "NoIdleTile")         then return "您的所有建筑均已被占用。"
-            elseif (textType == "NoIdleUnit")         then return "您的所有部队均已行动。"
-            elseif (textType == "ProposeDraw")        then return "求和需要战局内所有玩家一致同意才能生效。\n若中途有玩家战败，则需要重新求和。\n您确定要求和吗？"
-            elseif (textType == "RequireVoteForDraw") then return "已有玩家提出求和。您需要先表决是否同意和局，才能结束本回合。"
-            elseif (textType == "QuitWar")            then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
-            elseif (textType == "ReloadWar")          then return "是否确定要重新载入战局？"
-            elseif (textType == "Surrender")          then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
-            else                                           return "未知66:" .. (textType or "")
+            if     (textType == "AgreeDraw")           then return "您确定要同意和局吗？"
+            elseif (textType == "DestroyOwnedUnit")    then return "摧毁部队将没有任何补偿！\n您确定要这样做吗？"
+            elseif (textType == "DisagreeDraw")        then return "您确定要拒绝和局吗？"
+            elseif (textType == "EndTurnConfirmation") then return "您确定要结束回合吗？"
+            elseif (textType == "ExitGame")            then return "是否确定退出游戏？"
+            elseif (textType == "NoIdleTile")          then return "您的所有建筑均已被占用。"
+            elseif (textType == "NoIdleTilesOrUnits")  then return "您的所有建筑和部队均已生产或行动完毕。"
+            elseif (textType == "NoIdleUnit")          then return "您的所有部队均已行动。"
+            elseif (textType == "ProposeDraw")         then return "求和需要战局内所有玩家一致同意才能生效。\n若中途有玩家战败，则需要重新求和。\n您确定要求和吗？"
+            elseif (textType == "RequireVoteForDraw")  then return "已有玩家提出求和。您需要先表决是否同意和局，才能结束本回合。"
+            elseif (textType == "QuitWar")             then return "您将回到主界面（可以随时再回到本战局）。\n是否确定退出？"
+            elseif (textType == "ReloadWar")           then return "是否确定要重新载入战局？"
+            elseif (textType == "Surrender")           then return "您将输掉本战局，且无法反悔！\n是否确定投降？"
+            else                                            return "未知66:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "AgreeDraw")          then return "Are you sure to approve the draw?"
-            elseif (textType == "DestroyOwnedUnit")   then return "You won't get anything in return!\nAre you sure to destroy it?"
-            elseif (textType == "DisagreeDraw")       then return "Are you sure to decline the draw?"
-            elseif (textType == "ExitGame")           then return "Are you sure to exit the game?"
-            elseif (textType == "NoIdleTile")         then return "None of your tiles is idle."
-            elseif (textType == "NoIdleUnit")         then return "None of your units is idle."
-            elseif (textType == "ProposeDraw")        then return "Are you sure to propose a draw?"
-            elseif (textType == "RequireVoteForDraw") then return "A draw has been proposed. You must approve/decline it before ending your turn."
-            elseif (textType == "QuitWar")            then return "You are quitting the war (you may reenter it later).\nAre you sure?"
-            elseif (textType == "ReloadWar")          then return "Are you sure to reload the war?"
-            elseif (textType == "Surrender")          then return "You will lose the game by surrendering!\nAre you sure?"
-            else                                           return "Unrecognized:[66]" .. textType
+            if     (textType == "AgreeDraw")           then return "Are you sure to approve the draw?"
+            elseif (textType == "DestroyOwnedUnit")    then return "You won't get anything in return!\nAre you sure to destroy it?"
+            elseif (textType == "DisagreeDraw")        then return "Are you sure to decline the draw?"
+            elseif (textType == "EndTurnConfirmation") then return "Are you sure to end you turn?"
+            elseif (textType == "ExitGame")            then return "Are you sure to exit the game?"
+            elseif (textType == "NoIdleTile")          then return "None of your tiles is idle."
+            elseif (textType == "NoIdleTilesOrUnits")  then return "All your buildings and units have taken action already."
+            elseif (textType == "NoIdleUnit")          then return "None of your units is idle."
+            elseif (textType == "ProposeDraw")         then return "Are you sure to propose a draw?"
+            elseif (textType == "RequireVoteForDraw")  then return "A draw has been proposed. You must approve/decline it before ending your turn."
+            elseif (textType == "QuitWar")             then return "You are quitting the war (you may reenter it later).\nAre you sure?"
+            elseif (textType == "ReloadWar")           then return "Are you sure to reload the war?"
+            elseif (textType == "Surrender")           then return "You will lose the game by surrendering!\nAre you sure?"
+            else                                            return "Unrecognized:[66]" .. textType
             end
         end,
     },
@@ -1083,7 +1095,6 @@ local s_Texts = {
         [1] = function() return "结 束 回 合" end,
         [2] = function() return "End Turn" end,
     },
-    -]]
     [70] = {
         [1] = function(emptyProducersCount, idleUnitsCount)
             return string.format("空闲工厂机场海港数量：%d\n空闲部队数量：%d\n您是否确定结束回合？", emptyProducersCount, idleUnitsCount)
@@ -1092,7 +1103,6 @@ local s_Texts = {
             return string.format("Idle factories count: %d\n Idle units count: %d\nAre you sure to end turn?", emptyProducersCount, idleUnitsCount)
         end,
     },
-    --[[
     [71] = {
         [1] = function() return "当前是您对手的回合，请耐心等候。"           end,
         [2] = function() return "It's your opponent's turn. Please wait." end,

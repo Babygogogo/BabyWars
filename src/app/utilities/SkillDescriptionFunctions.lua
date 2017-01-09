@@ -35,8 +35,14 @@ end
 
 local function transformModifier3(modifier, unit)
     unit = unit or ""
-    if (modifier > 0) then return string.format("+%.2f%s", modifier, unit)
-    else                   return string.format("%.2f%s",  modifier, unit)
+    if (modifier == math.floor(modifier)) then
+        if (modifier > 0) then return string.format("+%d%s", modifier, unit)
+        else                   return string.format("%d%s",  modifier, unit)
+        end
+    else
+        if (modifier > 0) then return string.format("+%.2f%s", modifier, unit)
+        else                   return string.format("%.2f%s",  modifier, unit)
+        end
     end
 end
 

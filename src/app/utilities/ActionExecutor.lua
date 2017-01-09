@@ -662,6 +662,10 @@ local function executeAttack(action, modelSceneWar)
     local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
     local isInTurnPlayerLost = (lostPlayerIndex == attackerPlayerIndex)
+    if (lostPlayerIndex) then
+        modelSceneWar:setRemainingVotesForDraw(nil)
+    end
+
     if (IS_SERVER) then
         if (targetVision) then
             getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
@@ -751,6 +755,9 @@ local function executeBeginTurn(action, modelSceneWar)
     local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
     local modelPlayerManager = getModelPlayerManager(modelSceneWar)
+    if (lostPlayerIndex) then
+        modelSceneWar:setRemainingVotesForDraw(nil)
+    end
 
     if (IS_SERVER) then
         if (not lostPlayerIndex) then
@@ -898,6 +905,10 @@ local function executeCaptureModelTile(action, modelSceneWar)
     local sceneWarFileName   = action.sceneWarFileName
     local modelPlayerManager = getModelPlayerManager(modelSceneWar)
     local lostPlayerIndex    = action.lostPlayerIndex
+    if (lostPlayerIndex) then
+        modelSceneWar:setRemainingVotesForDraw(nil)
+    end
+
     if (IS_SERVER) then
         if (capturePoint <= 0) then
             modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
@@ -1556,8 +1567,9 @@ local function executeSurrender(action, modelSceneWar)
     local modelTurnManager   = getModelTurnManager(modelSceneWar)
     local playerIndex        = modelTurnManager:getPlayerIndex()
     local modelPlayer        = modelPlayerManager:getModelPlayer(playerIndex)
-
+    modelSceneWar:setRemainingVotesForDraw(nil)
     Destroyers.destroyPlayerForce(action.sceneWarFileName, playerIndex)
+
     if (IS_SERVER) then
         if (modelPlayerManager:getAlivePlayersCount() <= 1) then
             modelSceneWar:setEnded(true)

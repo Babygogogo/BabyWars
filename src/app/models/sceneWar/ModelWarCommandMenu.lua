@@ -43,6 +43,7 @@ local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local round                    = require("src.global.functions.round")
+local string, ipairs, pairs    = string, ipairs, pairs
 
 local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")
 local ACTION_CODE_DESTROY_OWNED_UNIT   = ActionCodeFunctions.getActionCode("ActionDestroyOwnedModelUnit")
@@ -150,7 +151,8 @@ local function getTilesInfo(tileTypeCounters, showIdleTilesCount)
 end
 
 local function getMapInfo()
-    local modelWarField = SingletonGetters.getModelWarField()
+    local modelSceneWar = SingletonGetters.getModelScene()
+    local modelWarField = SingletonGetters.getModelWarField(modelSceneWar)
     local modelTileMap  = modelWarField:getModelTileMap()
     local tileTypeCounters = {
         Headquarters = 0,
@@ -170,11 +172,12 @@ local function getMapInfo()
         end
     end)
 
-    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d\n%s",
+    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d      %s: %d\n%s",
         getLocalizedText(65, "MapName"),   modelWarField:getWarFieldDisplayName(),
         getLocalizedText(65, "Author"),    modelWarField:getWarFieldAuthorName(),
-        getLocalizedText(65, "WarID"),     getSceneWarFileName():sub(13),
-        getLocalizedText(65, "TurnIndex"), getModelTurnManager():getTurnIndex(),
+        getLocalizedText(65, "WarID"),     modelSceneWar:getFileName():sub(13),
+        getLocalizedText(65, "TurnIndex"), getModelTurnManager(modelSceneWar):getTurnIndex(),
+        getLocalizedText(65, "ActionID"),  modelSceneWar:getActionId(),
         getTilesInfo(tileTypeCounters)
     )
 end
@@ -272,34 +275,6 @@ local function dispatchEvtWarCommandMenuUpdated(self)
     })
 end
 
-local function getEmptyProducersCount(self)
-    local modelUnitMap = getModelUnitMap()
-    local count        = 0
-    local playerIndex  = getModelTurnManager():getPlayerIndex()
-
-    getModelTileMap():forEachModelTile(function(modelTile)
-        if ((modelTile.getProductionList)                                 and
-            (modelTile:getPlayerIndex() == playerIndex)                   and
-            (modelUnitMap:getModelUnit(modelTile:getGridIndex()) == nil)) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
-local function getIdleUnitsCount(self)
-    local count       = 0
-    local playerIndex = getModelTurnManager():getPlayerIndex()
-    getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
-        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:isStateIdle())) then
-            count = count + 1
-        end
-    end)
-
-    return count
-end
-
 local function createWeaponPropertyText(unitType)
     local template   = GameConstantFunctions.getTemplateModelUnitWithName(unitType)
     local attackDoer = template.AttackDoer
@@ -370,6 +345,53 @@ local function createUnitPropertyText(unitType)
         createCommonPropertyText(unitType),
         createDamageText(unitType)
     )
+end
+
+local function getIdleTilesCount(self)
+    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local modelUnitMap  = getModelUnitMap(modelSceneWar)
+    local playerIndex   = getModelTurnManager(modelSceneWar):getPlayerIndex()
+    local idleFactoriesCount, idleAirportsCount, idleSeaportsCount = 0, 0, 0
+
+    getModelTileMap(modelSceneWar):forEachModelTile(function(modelTile)
+        if ((modelTile:getPlayerIndex() == playerIndex) and (not modelUnitMap:getModelUnit(modelTile:getGridIndex()))) then
+            local tileType = modelTile:getTileType()
+            if     (tileType == "Airport") then idleAirportsCount  = idleAirportsCount  + 1
+            elseif (tileType == "Factory") then idleFactoriesCount = idleFactoriesCount + 1
+            elseif (tileType == "Seaport") then idleSeaportsCount  = idleSeaportsCount  + 1
+            end
+        end
+    end)
+
+    return idleFactoriesCount, idleAirportsCount, idleSeaportsCount
+end
+
+local function getIdleUnitsCount(self)
+    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local playerIndex   = getModelTurnManager(modelSceneWar):getPlayerIndex()
+    local count         = 0
+
+    getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(function(modelUnit)
+        if ((modelUnit:getPlayerIndex() == playerIndex) and (modelUnit:isStateIdle())) then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+local function createEndTurnText(self)
+    local idleFactoriesCount, idleAirportsCount, idleSeaportsCount = getIdleTilesCount(self)
+    local idleUnitsCount                                           = getIdleUnitsCount(self)
+    if (idleFactoriesCount + idleAirportsCount + idleSeaportsCount + idleUnitsCount == 0) then
+        return string.format("%s\n%s", getLocalizedText(66, "NoIdleTilesOrUnits"), getLocalizedText(66, "EndTurnConfirmation"))
+    else
+        return string.format("%s: %d   %d   %d\n%s: %d\n%s",
+            getLocalizedText(65, "IdleTiles"), idleFactoriesCount, idleAirportsCount, idleSeaportsCount,
+            getLocalizedText(65, "IdleUnits"), idleUnitsCount,
+            getLocalizedText(66, "EndTurnConfirmation")
+        )
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -644,7 +666,7 @@ local function initItemEndTurn(self)
                 getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(66, "RequireVoteForDraw"))
             else
                 local modelConfirmBox = getModelConfirmBox(modelSceneWar)
-                modelConfirmBox:setConfirmText(getLocalizedText(70, getEmptyProducersCount(self), getIdleUnitsCount(self)))
+                modelConfirmBox:setConfirmText(createEndTurnText(self))
                     :setOnConfirmYes(function()
                         modelConfirmBox:setEnabled(false)
                         self:setEnabled(false)
