@@ -13,10 +13,6 @@ local ModelMoneyEnergyInfo = class("ModelMoneyEnergyInfo")
 
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
-local getModelPlayerManager  = SingletonGetters.getModelPlayerManager
-local getModelTurnManager    = SingletonGetters.getModelTurnManager
-local getModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu
-
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -71,6 +67,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_SceneWarFileName = sceneWarFileName
     SingletonGetters.getScriptEventDispatcher()
         :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
@@ -79,10 +76,10 @@ function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
 
-    local playerIndex  = getModelTurnManager():getPlayerIndex()
+    local playerIndex  = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
     self.m_PlayerIndex = playerIndex
     if (self.m_View) then
-        self.m_View:updateWithModelPlayer(getModelPlayerManager():getModelPlayer(playerIndex), playerIndex)
+        self.m_View:updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
             :updateWithPlayerIndex(playerIndex)
     end
 
@@ -106,7 +103,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    getModelWarCommandMenu():setEnabled(true)
+    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    if ((modelSceneWar:isTotalReplay()) and (modelSceneWar:isAutoReplay())) then
+        modelSceneWar:setAutoReplay(false)
+        SingletonGetters.getModelReplayController(modelSceneWar):setButtonPlayVisible(true)
+    end
+    SingletonGetters.getModelWarCommandMenu(modelSceneWar):setEnabled(true)
 
     return self
 end

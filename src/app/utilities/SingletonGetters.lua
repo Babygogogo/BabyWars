@@ -102,6 +102,10 @@ function SingletonGetters.getModelMainMenu(param)
     return getModelScene(param):getModelMainMenu()
 end
 
+function SingletonGetters.getModelReplayController(param)
+    return getModelScene(param):getModelWarHud():getModelReplayController()
+end
+
 function SingletonGetters.getModelWarCommandMenu(param)
     return getModelScene(param):getModelWarHud():getModelWarCommandMenu()
 end

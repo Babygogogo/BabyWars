@@ -129,6 +129,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarHUD:getModelReplayController()
+    return self.m_ActorReplayController:getModel()
+end
+
 function ModelWarHUD:getModelWarCommandMenu()
     return self.m_ActorWarCommandMenu:getModel()
 end
