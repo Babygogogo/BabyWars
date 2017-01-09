@@ -113,19 +113,29 @@ local function getActorGameHelper(self)
     return self.m_ActorGameHelper
 end
 
+local function getActorGameRecordViewer(self)
+    if (not self.m_ActorGameRecordViewer) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelGameRecordViewer", nil, "sceneMain.ViewGameRecordViewer")
+        self.m_ActorGameRecordViewer = actor
+        self.m_View:setViewGameRecordViewer(actor:getView())
+    end
+
+    return self.m_ActorGameRecordViewer
+end
+
 --------------------------------------------------------------------------------
 -- The composition menu items.
 --------------------------------------------------------------------------------
-local function initItemNewWar(self)
+local function initItemConfigSkills(self)
     local item = {
-        name     = getLocalizedText(1, "NewGame"),
+        name     = getLocalizedText(1, "ConfigSkills"),
         callback = function()
             self:setMenuEnabled(false)
-                :getModelNewWarCreator():setEnabled(true)
+                :getModelSkillConfigurator():setEnabled(true)
         end,
     }
 
-    self.m_ItemNewWar = item
+    self.m_ItemConfigSkills = item
 end
 
 local function initItemContinue(self)
@@ -140,6 +150,18 @@ local function initItemContinue(self)
     self.m_ItemContinue = item
 end
 
+local function initItemHelp(self)
+    local item = {
+        name     = getLocalizedText(1, "Help"),
+        callback = function()
+            self:setMenuEnabled(false)
+            getActorGameHelper(self):getModel():setEnabled(true)
+        end,
+    }
+
+    self.m_ItemHelp = item
+end
+
 local function initItemJoinWar(self)
     local item = {
         name     = getLocalizedText(1, "JoinWar"),
@@ -152,16 +174,16 @@ local function initItemJoinWar(self)
     self.m_ItemJoinWar = item
 end
 
-local function initItemConfigSkills(self)
+local function initItemLogin(self)
     local item = {
-        name     = getLocalizedText(1, "ConfigSkills"),
+        name     = getLocalizedText(1, "Login"),
         callback = function()
             self:setMenuEnabled(false)
-                :getModelSkillConfigurator():setEnabled(true)
+                :getModelLoginPanel():setEnabled(true)
         end,
     }
 
-    self.m_ItemConfigSkills = item
+    self.m_ItemLogin = item
 end
 
 local function initItemManageReplay(self)
@@ -176,16 +198,16 @@ local function initItemManageReplay(self)
     self.m_ItemManageReplay = item
 end
 
-local function initItemLogin(self)
+local function initItemNewWar(self)
     local item = {
-        name     = getLocalizedText(1, "Login"),
+        name     = getLocalizedText(1, "NewGame"),
         callback = function()
             self:setMenuEnabled(false)
-                :getModelLoginPanel():setEnabled(true)
+                :getModelNewWarCreator():setEnabled(true)
         end,
     }
 
-    self.m_ItemLogin = item
+    self.m_ItemNewWar = item
 end
 
 local function initItemSetMessageIndicator(self)
@@ -215,35 +237,30 @@ local function initItemSetMusic(self)
     self.m_ItemSetMusic = item
 end
 
-local function initItemHelp(self)
-    local item = {
-        name     = getLocalizedText(1, "Help"),
+local function initItemViewGameRecord(self)
+    self.m_ItemViewGameRecord = {
+        name     = getLocalizedText(1, "ViewGameRecord"),
         callback = function()
             self:setMenuEnabled(false)
-            getActorGameHelper(self):getModel():setEnabled(true)
+                :getModelGameRecordViewer():setEnabled(true)
         end,
     }
-
-    self.m_ItemHelp = item
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
-    initItemNewWar(             self)
-    initItemContinue(           self)
-    initItemJoinWar(            self)
     initItemConfigSkills(       self)
-    initItemManageReplay(       self)
+    initItemContinue(           self)
+    initItemHelp(               self)
+    initItemJoinWar(            self)
     initItemLogin(              self)
+    initItemManageReplay(       self)
+    initItemNewWar(             self)
     initItemSetMessageIndicator(self)
     initItemSetMusic(           self)
-    initItemHelp(               self)
-
-    if (self.m_View) then
-        self:initView()
-    end
+    initItemViewGameRecord(     self)
 
     return self
 end
@@ -285,6 +302,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
                 self.m_ItemJoinWar,
                 self.m_ItemConfigSkills,
                 self.m_ItemManageReplay,
+                self.m_ItemViewGameRecord,
                 self.m_ItemLogin,
                 self.m_ItemSetMessageIndicator,
                 self.m_ItemSetMusic,
@@ -314,6 +332,10 @@ end
 
 function ModelMainMenu:getModelContinueWarSelector()
     return getActorContinueWarSelector(self):getModel()
+end
+
+function ModelMainMenu:getModelGameRecordViewer()
+    return getActorGameRecordViewer(self):getModel()
 end
 
 function ModelMainMenu:getModelJoinWarSelector()

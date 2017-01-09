@@ -10,6 +10,7 @@ local SKILL_CONFIGURATOR_Z_ORDER     = 3
 local REPLAY_MANAGER_Z_ORDER         = 3
 local LOGIN_PANEL_Z_ORDER            = 3
 local GAME_HELPER_Z_ORDER            = 3
+local GAME_RECORD_VIEWER_Z_ORDER     = 3
 local MENU_TITLE_Z_ORDER             = 2
 local MENU_LIST_VIEW_Z_ORDER         = 1
 local BUTTON_EXIT_Z_ORDER            = 1
@@ -213,6 +214,14 @@ function ViewMainMenu:setViewGameHelper(view)
     assert(self.m_ViewGameHelper == nil, "ViewMainMenu:setViewGameHelper() the view has been set.")
     self.m_ViewGameHelper = view
     self:addChild(view, GAME_HELPER_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewGameRecordViewer(view)
+    assert(self.m_ViewGameRecordViewer == nil, "ViewMainMenu:setViewGameRecordViewer() the view has been set already.")
+    self.m_ViewGameRecordViewer = view
+    self:addChild(view, GAME_RECORD_VIEWER_Z_ORDER)
 
     return self
 end

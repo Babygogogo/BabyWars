@@ -6,20 +6,21 @@
     ActionDownloadReplayData            1 : ActionDownloadReplayData
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
     ActionGetOngoingWarList             3 : ActionGetOngoingWarList
-    ActionGetReplayConfigurations       4 : ActionGetReplayConfigurations
-    ActionGetSkillConfiguration         5 : ActionGetSkillConfiguration
-    ActionJoinWar                       6 : ActionJoinWar
-    ActionLogin                         7 : ActionLogin
-    ActionLogout                        8 : ActionLogout
-    ActionMessage                       9 : ActionMessage
-    ActionNetworkHeartbeat             10 : ActionNetworkHeartbeat
-    ActionNewWar                       11 : ActionNewWar
-    ActionRegister                     12 : ActionRegister
-    ActionReloadSceneWar               13 : ActionReloadSceneWar
-    ActionRunSceneMain                 14 : ActionRunSceneMain
-    ActionRunSceneWar                  15 : ActionRunSceneWar
-    ActionSetSkillConfiguration        16 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 17 : ActionSyncSceneWar
+    ActionGetPlayerProfile              4 : ActionGetPlayerProfile
+    ActionGetReplayConfigurations       5 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         6 : ActionGetSkillConfiguration
+    ActionJoinWar                       7 : ActionJoinWar
+    ActionLogin                         8 : ActionLogin
+    ActionLogout                        9 : ActionLogout
+    ActionMessage                      10 : ActionMessage
+    ActionNetworkHeartbeat             11 : ActionNetworkHeartbeat
+    ActionNewWar                       12 : ActionNewWar
+    ActionRegister                     13 : ActionRegister
+    ActionReloadSceneWar               14 : ActionReloadSceneWar
+    ActionRunSceneMain                 15 : ActionRunSceneMain
+    ActionRunSceneWar                  16 : ActionRunSceneWar
+    ActionSetSkillConfiguration        17 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 18 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -72,6 +73,12 @@
     playerAccount  1 :  string
     playerPassword 2 :  string
     ongoingWarList 3 : *OngoingWarListItem
+}
+
+.ActionGetPlayerProfile {
+    actionCode    0 : integer
+    playerAccount 1 : string
+    playerProfile 2 : PlayerProfileForClient
 }
 
 .ActionGetReplayConfigurations {
@@ -589,7 +596,8 @@
 
     .WarLists {
         ongoing 0 : *SceneWarFileNameForIndex(sceneWarFileName)
-        created 1 : *SceneWarFileNameForIndex(sceneWarFileName)
+        created 1 : *SceneWarFileNameForIndex(sceneWarFileName) # deprecated
+        waiting 2 : *SceneWarFileNameForIndex(sceneWarFileName)
     }
 
     account             0 :  string
@@ -598,6 +606,17 @@
     gameRecords         3 : *SingleGameRecord
     skillConfigurations 4 : *SingleSkillConfiguration
     warLists            5 :  WarLists
+}
+
+.PlayerProfileForClient {
+    .WarLists {
+        waiting 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+    }
+
+    account     0 :  string
+    nickname    1 :  string
+    gameRecords 2 : *SingleGameRecordForPlayerProfile
+    warLists    3 :  WarLists
 }
 
 .ReplayConfiguration {
@@ -687,6 +706,13 @@
 
 .SceneWarFileNameForIndex {
     sceneWarFileName 0 : string
+}
+
+.SingleGameRecordForPlayerProfile {
+    rankScore 0 : integer
+    win       1 : integer
+    lose      2 : integer
+    draw      3 : integer
 }
 
 .SingleSkillConfiguration {
