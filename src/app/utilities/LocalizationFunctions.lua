@@ -666,11 +666,43 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [13] = {
-        [1] = function(...) return s_LongText2_1     end,
-        [2] = function(...) return "Untranslated..." end,
+        [1] = function(textType)
+            if     (textType == "Account")         then return "账号"
+            elseif (textType == "Draw")            then return "平"
+            elseif (textType == "FogOff")          then return "明战"
+            elseif (textType == "FogOn")           then return "雾战"
+            elseif (textType == "GameRecords")     then return "战绩"
+            elseif (textType == "Lose")            then return "负"
+            elseif (textType == "Nickname")        then return "昵称"
+            elseif (textType == "None")            then return "无"
+            elseif (textType == "Players")         then return "人局"
+            elseif (textType == "RankScore")       then return "积分"
+            elseif (textType == "TransferingData") then return "正在获取数据，请稍候。"
+            elseif (textType == "WaitingWars")     then return "已参加且未满员的战局"
+            elseif (textType == "Win")             then return "胜"
+            else                                        return "未知13:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Account")         then return "Account"
+            elseif (textType == "Draw")            then return "Draw"
+            elseif (textType == "FogOff")          then return "Fog Off"
+            elseif (textType == "FogOn")           then return "Fog On"
+            elseif (textType == "GameRecords")     then return "Game Records"
+            elseif (textType == "Lose")            then return "Lose"
+            elseif (textType == "Nickname")        then return "Nickname"
+            elseif (textType == "None")            then return "None"
+            elseif (textType == "Players")         then return "P"
+            elseif (textType == "RankScore")       then return "RankScore"
+            elseif (textType == "TransferingData") then return "Retrieving data from the server. Please wait."
+            elseif (textType == "WaitingWars")     then return "Waiting Wars"
+            elseif (textType == "Win")             then return "Win"
+            else                                        return "Unknown13:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [14] = {
         [1] = function(...) return s_LongText3_1     end,
         [2] = function(...) return "Untranslated..." end,
@@ -1707,7 +1739,7 @@ local s_Texts = {
             elseif (tileType == "EmptySilo")     then return "空发射塔：使用过的导弹发射塔，无法再次发射导弹。允许空军和陆军通过。"
             elseif (tileType == "Headquarters")  then return "总部：可以提供资金和维修陆军。若我方总部被占领，则我方战败。"
             elseif (tileType == "City")          then return "城市：可以提供资金和维修陆军。"
-            elseif (tileType == "CommandTower")  then return "指挥塔：可以提供资金，且为我方全体部队提供攻击加成。"
+            elseif (tileType == "CommandTower")  then return "指挥塔：可以提供资金，且为我方全体部队提供5%攻防加成。"
             elseif (tileType == "Radar")         then return "雷达：可以提供资金，且在雾战时照明5格范围内的区域。"
             elseif (tileType == "Factory")       then return "工厂：可以提供资金、生产和维修陆军。"
             elseif (tileType == "Airport")       then return "机场：可以提供资金、生产和维修空军。"
