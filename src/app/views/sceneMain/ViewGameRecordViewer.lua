@@ -231,4 +231,10 @@ function ViewGameRecordViewer:setText(text)
     return self
 end
 
+function ViewGameRecordViewer:setMenuTitleText(text)
+    self.m_MenuTitle:setString(text)
+
+    return self
+end
+
 return ViewGameRecordViewer

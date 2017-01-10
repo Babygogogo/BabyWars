@@ -7,20 +7,21 @@
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
     ActionGetOngoingWarList             3 : ActionGetOngoingWarList
     ActionGetPlayerProfile              4 : ActionGetPlayerProfile
-    ActionGetReplayConfigurations       5 : ActionGetReplayConfigurations
-    ActionGetSkillConfiguration         6 : ActionGetSkillConfiguration
-    ActionJoinWar                       7 : ActionJoinWar
-    ActionLogin                         8 : ActionLogin
-    ActionLogout                        9 : ActionLogout
-    ActionMessage                      10 : ActionMessage
-    ActionNetworkHeartbeat             11 : ActionNetworkHeartbeat
-    ActionNewWar                       12 : ActionNewWar
-    ActionRegister                     13 : ActionRegister
-    ActionReloadSceneWar               14 : ActionReloadSceneWar
-    ActionRunSceneMain                 15 : ActionRunSceneMain
-    ActionRunSceneWar                  16 : ActionRunSceneWar
-    ActionSetSkillConfiguration        17 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 18 : ActionSyncSceneWar
+    ActionGetRankingList                5 : ActionGetRankingList
+    ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         7 : ActionGetSkillConfiguration
+    ActionJoinWar                       8 : ActionJoinWar
+    ActionLogin                         9 : ActionLogin
+    ActionLogout                       10 : ActionLogout
+    ActionMessage                      11 : ActionMessage
+    ActionNetworkHeartbeat             12 : ActionNetworkHeartbeat
+    ActionNewWar                       13 : ActionNewWar
+    ActionRegister                     14 : ActionRegister
+    ActionReloadSceneWar               15 : ActionReloadSceneWar
+    ActionRunSceneMain                 16 : ActionRunSceneMain
+    ActionRunSceneWar                  17 : ActionRunSceneWar
+    ActionSetSkillConfiguration        18 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 19 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -79,6 +80,12 @@
     actionCode    0 : integer
     playerAccount 1 : string
     playerProfile 2 : PlayerProfileForClient
+}
+
+.ActionGetRankingList {
+    actionCode       0 :  integer
+    rankingListIndex 1 :  integer
+    rankingList      2 : *RankingListItem
 }
 
 .ActionGetReplayConfigurations {
@@ -617,6 +624,19 @@
     nickname    1 :  string
     gameRecords 2 : *SingleGameRecordForPlayerProfile
     warLists    3 :  WarLists
+}
+
+.RankingList {
+    list 0 : *RankingListItem
+}
+
+.RankingListItem {
+    rankScore 0 :  integer
+    accounts  1 : *string
+}
+
+.RankingListsForServer {
+    lists 0 : *RankingList
 }
 
 .ReplayConfiguration {

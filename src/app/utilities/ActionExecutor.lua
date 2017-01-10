@@ -391,6 +391,18 @@ local function executeGetPlayerProfile(action, modelScene)
     end
 end
 
+local function executeGetRankingList(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetRankingList() should not be invoked on the server.")
+    if (modelScene.isModelSceneWar) then
+        return
+    end
+
+    local modelGameRecordViewer = modelScene:getModelMainMenu():getModelGameRecordViewer()
+    if (modelGameRecordViewer:isRetrievingRankingList(action.rankingListIndex)) then
+        modelGameRecordViewer:updateWithRankingList(action.rankingList, action.rankingListIndex)
+    end
+end
+
 local function executeGetSkillConfiguration(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeGetSkillConfiguration() should not be invoked on the server.")
 
@@ -1710,6 +1722,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetOngoingWarList)            then executeGetOngoingWarList(           action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetPlayerProfile)             then executeGetPlayerProfile(            action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetRankingList)               then executeGetRankingList(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetReplayConfigurations)      then executeGetReplayConfigurations(     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinWar)                      then executeJoinWar(                     action, modelScene)
