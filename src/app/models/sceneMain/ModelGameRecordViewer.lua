@@ -70,17 +70,30 @@ local function generateTextForProfile(profile)
     )
 end
 
+local function generateNumTextWithLength(num, length)
+    local text = "" .. num
+    if   (num < 0) then return text
+    else                return string.rep("0", length - string.len(text)) .. text
+    end
+end
+
 local function generateTextForRankingList(rankingList, index)
     if (#rankingList == 0) then
         return string.format("%s\n%s", generateTextForGameType(index), getLocalizedText(13, "EmptyRankingList"))
     end
 
-    local textList = {generateTextForGameType(index)}
+    local textList = {
+        string.format("%s%s\n\n%s      %s        %s", generateTextForGameType(index), getLocalizedText(13, "RankingList"),
+            getLocalizedText(13, "RankIndex"), getLocalizedText(13, "RankScore"), getLocalizedText(13, "Account")),
+    }
+    local rankIndex = 1
     for i, item in ipairs(rankingList) do
-        local rankScore = item.rankScore
+        local indexText = generateNumTextWithLength(rankIndex,      3)
+        local scoreText = generateNumTextWithLength(item.rankScore, 4)
         for _, account in ipairs(item.accounts) do
-            textList[#textList + 1] = string.format("%3d   %5d   %s", i, rankScore, account)
+            textList[#textList + 1] = string.format("%s      %s      %s", indexText, scoreText, account)
         end
+        rankIndex = rankIndex + #(item.accounts)
     end
 
     return table.concat(textList, "\n")
