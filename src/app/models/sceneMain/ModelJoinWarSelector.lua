@@ -39,9 +39,16 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
     local warField = require("res.data.templateWarField." .. warConfiguration.warFieldFileName)
     for i = 1, warField.playersCount do
         if (not warConfiguration.players[i]) then
+            local colorText
+            if     (i == 1) then colorText = "Red"
+            elseif (i == 2) then colorText = "Blue"
+            elseif (i == 3) then colorText = "Yellow"
+            else                 colorText = "Black"
+            end
+
             availablePlayerIndexes[#availablePlayerIndexes + 1] = {
                 data = i,
-                text = "" .. i
+                text = string.format("%d (%s)", i, getLocalizedText(34, colorText)),
             }
         end
     end
@@ -129,17 +136,35 @@ local function resetSelectorSkill(self, modelWarConfigurator, warConfiguration)
     end
 end
 
+local function resetSelectorRankMatch(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("RankMatch"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = getLocalizedText(34, (warConfiguration.isRankMatch) and ("Yes") or ("No")),
+        }})
+end
+
+local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = (warConfiguration.maxDiffScore) and ("" .. warConfiguration.maxDiffScore) or (getLocalizedText(13, "NoLimit")),
+        }})
+end
+
 local getActorWarConfigurator
-local function resetModelWarConfigurator(self, sceneWarFileName, configuration)
+local function resetModelWarConfigurator(self, sceneWarFileName, warConfiguration)
     local model = getActorWarConfigurator(self):getModel()
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
 
-    resetSelectorPlayerIndex(   model, configuration)
-    resetSelectorFog(           model, configuration)
-    resetSelectorWeather(       model, configuration)
-    resetSelectorMaxSkillPoints(model, configuration)
-    resetSelectorSkill(self,    model, configuration)
+    resetSelectorPlayerIndex(   model, warConfiguration)
+    resetSelectorFog(           model, warConfiguration)
+    resetSelectorWeather(       model, warConfiguration)
+    resetSelectorMaxSkillPoints(model, warConfiguration)
+    resetSelectorSkill(self,    model, warConfiguration)
+    resetSelectorRankMatch(     model, warConfiguration)
+    resetSelectorMaxDiffScore(  model, warConfiguration)
 end
 
 --------------------------------------------------------------------------------
@@ -172,20 +197,26 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        local password = modelWarConfigurator:getPassword()
-        if ((#password ~= 0) and (#password ~= 4)) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
-        else
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
-            modelWarConfigurator:disableButtonConfirmForSecs(5)
-            WebSocketManager.sendAction({
-                actionCode           = ACTION_CODE_JOIN_WAR,
-                sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
-                playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
-                skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")      :getCurrentOption(),
-                warPassword          = password,
-            })
-        end
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        modelConfirmBox:setConfirmText(getLocalizedText(8, "JoinWarConfirmation"))
+            :setOnConfirmYes(function()
+                local password = modelWarConfigurator:getPassword()
+                if ((#password ~= 0) and (#password ~= 4)) then
+                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
+                else
+                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+                    modelWarConfigurator:disableButtonConfirmForSecs(5)
+                    WebSocketManager.sendAction({
+                        actionCode           = ACTION_CODE_JOIN_WAR,
+                        sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
+                        playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
+                        skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")      :getCurrentOption(),
+                        warPassword          = password,
+                    })
+                end
+                modelConfirmBox:setEnabled(false)
+            end)
+            :setEnabled(true)
     end)
 end
 

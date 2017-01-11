@@ -26,9 +26,16 @@ end
 local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
     local options = {}
     for i = 1, playersCount do
+        local colorText
+        if     (i == 1) then colorText = "Red"
+        elseif (i == 2) then colorText = "Blue"
+        elseif (i == 3) then colorText = "Yellow"
+        else                 colorText = "Black"
+        end
+
         options[#options + 1] = {
             data = i,
-            text = "" .. i,
+            text = string.format("%d (%s)", i, getLocalizedText(34, colorText)),
         }
     end
 
@@ -80,23 +87,31 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        local password = modelWarConfigurator:getPassword()
-        if ((#password ~= 0) and (#password ~= 4)) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
-        else
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
-            modelWarConfigurator:disableButtonConfirmForSecs(5)
-            WebSocketManager.sendAction({
-                    actionCode           = ACTION_CODE_NEW_WAR,
-                    warPassword          = password,
-                    warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
-                    playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
-                    skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                    maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                    isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
-                    defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
-                })
-        end
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        modelConfirmBox:setConfirmText(getLocalizedText(8, "NewWarConfirmation"))
+            :setOnConfirmYes(function()
+                local password = modelWarConfigurator:getPassword()
+                if ((#password ~= 0) and (#password ~= 4)) then
+                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
+                else
+                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+                    modelWarConfigurator:disableButtonConfirmForSecs(5)
+                    WebSocketManager.sendAction({
+                        actionCode           = ACTION_CODE_NEW_WAR,
+                        warPassword          = password,
+                        warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                        playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                        skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                        maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                        isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                        defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
+                        isRankMatch          = modelWarConfigurator:getModelOptionSelectorWithName("RankMatch")     :getCurrentOption(),
+                        maxDiffScore         = modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore")  :getCurrentOption(),
+                    })
+                end
+                modelConfirmBox:setEnabled(false)
+            end)
+            :setEnabled(true)
     end)
 end
 
@@ -167,7 +182,6 @@ local function initSelectorMaxSkillPoints(modelWarConfigurator)
 end
 
 local function initSelectorFog(modelWarConfigurator)
-    -- TODO: enable the selector.
     modelWarConfigurator:getModelOptionSelectorWithName("Fog"):setOptions({
             {data = false, text = getLocalizedText(9, false),},
             {data = true,  text = getLocalizedText(9, true),},
@@ -183,6 +197,26 @@ local function initSelectorWeather(modelWarConfigurator)
         })
 end
 
+local function initSelectorRankMatch(modelWarConfigurator)
+    modelWarConfigurator:getModelOptionSelectorWithName("RankMatch"):setOptions({
+            {data = false, text = getLocalizedText(34, "No"), },
+            {data = true,  text = getLocalizedText(34, "Yes"),},
+        })
+        :setButtonsEnabled(true)
+end
+
+local function initSelectorMaxDiffScore(modelWarConfigurator)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore"):setOptions({
+            {data = 50,  text = "50",                           },
+            {data = 100, text = "100",                          },
+            {data = 150, text = "150",                          },
+            {data = 200, text = "200",                          },
+            {data = nil, text = getLocalizedText(13, "NoLimit"),},
+        })
+        :setButtonsEnabled(true)
+        :setCurrentOptionIndex(2)
+end
+
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
         local model = Actor.createModel("sceneMain.ModelWarConfigurator")
@@ -195,6 +229,8 @@ local function getActorWarConfigurator(self)
         initSelectorMaxSkillPoints(model)
         initSelectorFog(           model)
         initSelectorWeather(       model)
+        initSelectorRankMatch(     model)
+        initSelectorMaxDiffScore(  model)
 
         self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
         if (self.m_View) then

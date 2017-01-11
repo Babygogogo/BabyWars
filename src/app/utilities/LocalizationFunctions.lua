@@ -520,15 +520,19 @@ local s_Texts = {
     },
     [8] = {
         [1] = function(textType)
-            if     (textType == "TransferingData")  then return "正在传输数据。若长时间没有反应，请返回重试。"
-            elseif (textType == "NoContinuableWar") then return "您没有可以继续进行的战局。"
-            else                                         return "未知8:" .. (textType or "")
+            if     (textType == "JoinWarConfirmation") then return "请仔细检查各项设定。\n一旦确认，您无法取消或退出。\n确定要参战吗？"
+            elseif (textType == "NewWarConfirmation")  then return "请仔细检查各项设定。\n一旦确认，您无法取消或退出。\n确定要创建战局吗？"
+            elseif (textType == "NoContinuableWar")    then return "您没有可以继续进行的战局。"
+            elseif (textType == "TransferingData")     then return "正在传输数据。若长时间没有反应，请返回重试。"
+            else                                            return "未知8:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "TransferingData")  then return "Transfering data. If it's not responding, please retry."
-            elseif (textType == "NoContinuableWar") then return "No war is continuable currently."
-            else                                         return "Unknown8:"
+            if     (textType == "JoinWarConfirmation") then return "Once you join the war, you won't be able to cancel it.\nAre you sure to join the war?"
+            elseif (textType == "NewWarConfirmation")  then return "Once you create the war, you won't be able to cancel it.\nAre you sure to create the war?"
+            elseif (textType == "NoContinuableWar")    then return "No war is continuable currently."
+            elseif (textType == "TransferingData")     then return "Transfering data. If it's not responding, please retry."
+            else                                            return "Unknown8:"
             end
         end,
     },
@@ -637,7 +641,7 @@ local s_Texts = {
             elseif (actionName == "ActionTickActionId")           then return ""
             elseif (actionName == "ActionVoteForDraw")            then return "表决和局"
             elseif (actionName == "ActionWait")                   then return "待机"
-            else                                                 return "未知12:" .. (actionName or "")
+            else                                                  return "未知12:" .. (actionName or "")
             end
         end,
         [2] = function(actionName)
@@ -662,7 +666,7 @@ local s_Texts = {
             elseif (actionName == "ActionTickActionId")           then return ""
             elseif (actionName == "ActionVoteForDraw")            then return "VoteForDraw"
             elseif (actionName == "ActionWait")                   then return "Wait"
-            else                                                 return "Unknown12:" .. (actionName or "")
+            else                                                  return "Unknown12:" .. (actionName or "")
             end
         end,
     },
@@ -676,6 +680,7 @@ local s_Texts = {
             elseif (textType == "GameRecords")      then return "战绩"
             elseif (textType == "Lose")             then return "负"
             elseif (textType == "Nickname")         then return "昵称"
+            elseif (textType == "NoLimit")          then return "不限"
             elseif (textType == "None")             then return "无"
             elseif (textType == "Overview")         then return "总 览"
             elseif (textType == "Players")          then return "人局"
@@ -697,6 +702,7 @@ local s_Texts = {
             elseif (textType == "GameRecords")      then return "Game Records"
             elseif (textType == "Lose")             then return "Lose"
             elseif (textType == "Nickname")         then return "Nickname"
+            elseif (textType == "NoLimit")          then return "No Limit"
             elseif (textType == "None")             then return "None"
             elseif (textType == "Overview")         then return "Overview"
             elseif (textType == "Players")          then return "P"
@@ -813,25 +819,37 @@ local s_Texts = {
     [34] = {
         [1] = function(textType)
             if     (textType == "BaseSkillPoints")    then return "全员技能基准点上限"
+            elseif (textType == "Black")              then return "黑方"
+            elseif (textType == "Blue")               then return "蓝方"
             elseif (textType == "FogOfWar")           then return "战 争 迷 雾"
             elseif (textType == "MaxDiffScore")       then return "最 大 分 差"
+            elseif (textType == "No")                 then return "否"
             elseif (textType == "Password")           then return "密 码 (可 选)"
             elseif (textType == "PlayerIndex")        then return "行 动 次 序"
             elseif (textType == "RankMatch")          then return "积 分 赛"
+            elseif (textType == "Red")                then return "红方"
             elseif (textType == "SkillConfiguration") then return "我方技能配置(可点击查看)"
             elseif (textType == "Weather")            then return "天 气"
+            elseif (textType == "Yellow")             then return "黄方"
+            elseif (textType == "Yes")                then return "是"
             else                                           return "未知34:" .. (textType or "")
             end
         end,
         [2] = function(textType)
             if     (textType == "BaseSkillPoints")    then return "Max Base Skill Points"
+            elseif (textType == "Black")              then return "Black"
+            elseif (textType == "Blue")               then return "Blue"
             elseif (textType == "FogOfWar")           then return "Fog of War"
             elseif (textType == "MaxDiffScore")       then return "Max Diff Score"
+            elseif (textType == "No")                 then return "No"
             elseif (textType == "Password")           then return "Password (optional)"
             elseif (textType == "PlayerIndex")        then return "Player Index"
             elseif (textType == "RankMatch")          then return "Ranking Match"
+            elseif (textType == "Red")                then return "Red"
             elseif (textType == "SkillConfiguration") then return "Skill Configuration"
             elseif (textType == "Weather")            then return "Weather"
+            elseif (textType == "Yellow")             then return "Yellow"
+            elseif (textType == "Yes")                then return "Yes"
             else                                           return "Unknown34:" .. (textType or "")
             end
         end,

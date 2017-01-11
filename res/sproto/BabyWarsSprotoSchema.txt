@@ -149,6 +149,8 @@
     maxBaseSkillPoints    8 : integer
     isFogOfWarByDefault   9 : boolean
     defaultWeatherCode   10 : integer
+    isRankMatch          11 : boolean
+    maxDiffScore         12 : integer
 }
 
 .ActionRegister {
@@ -722,6 +724,8 @@
     warField              11 :  WarFieldData
     weather               12 :  WeatherData
     remainingVotesForDraw 13 :  integer
+    isRankMatch           14 :  boolean
+    maxDiffScore          15 :  integer
 }
 
 .SceneWarFileNameForIndex {
@@ -791,4 +795,6 @@
     defaultWeatherCode  5 :  integer
     isRandomWarField    6 :  boolean
     players             7 : *PlayerInfo(playerIndex)
+    isRankMatch         8 :  boolean
+    maxDiffScore        9 :  integer
 }

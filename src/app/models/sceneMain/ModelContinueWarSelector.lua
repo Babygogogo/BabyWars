@@ -48,9 +48,16 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
     local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
     for playerIndex, data in pairs(warConfiguration.players) do
         if (data.account == loggedInAccount) then
+            local colorText
+            if     (playerIndex == 1) then colorText = "Red"
+            elseif (playerIndex == 2) then colorText = "Blue"
+            elseif (playerIndex == 3) then colorText = "Yellow"
+            else                           colorText = "Black"
+            end
+
             options[#options + 1] = {
                 data = playerIndex,
-                text = "" .. playerIndex,
+                text = string.format("%d (%s)", playerIndex, getLocalizedText(34, colorText)),
             }
         end
     end
@@ -91,6 +98,22 @@ local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguratio
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
 end
 
+local function resetSelectorRankMatch(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("RankMatch"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = getLocalizedText(34, (warConfiguration.isRankMatch) and ("Yes") or ("No")),
+        }})
+end
+
+local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = (warConfiguration.maxDiffScore) and ("" .. warConfiguration.maxDiffScore) or (getLocalizedText(13, "NoLimit")),
+        }})
+end
+
 local function resetModelWarConfigurator(model, sceneWarFileName, warConfiguration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
@@ -99,6 +122,8 @@ local function resetModelWarConfigurator(model, sceneWarFileName, warConfigurati
     resetSelectorFog(           model, warConfiguration)
     resetSelectorWeather(       model, warConfiguration)
     resetSelectorMaxSkillPoints(model, warConfiguration)
+    resetSelectorRankMatch(     model, warConfiguration)
+    resetSelectorMaxDiffScore(  model, warConfiguration)
 end
 
 --------------------------------------------------------------------------------
