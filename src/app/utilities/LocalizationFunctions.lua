@@ -812,22 +812,26 @@ local s_Texts = {
     },
     [34] = {
         [1] = function(textType)
-            if     (textType == "PlayerIndex")        then return "行 动 次 序"
+            if     (textType == "BaseSkillPoints")    then return "全员技能基准点上限"
             elseif (textType == "FogOfWar")           then return "战 争 迷 雾"
-            elseif (textType == "Weather")            then return "天 气"
-            elseif (textType == "SkillConfiguration") then return "我方技能配置(可点击查看)"
-            elseif (textType == "BaseSkillPoints")    then return "全员技能基准点上限"
+            elseif (textType == "MaxDiffScore")       then return "最 大 分 差"
             elseif (textType == "Password")           then return "密 码 (可 选)"
+            elseif (textType == "PlayerIndex")        then return "行 动 次 序"
+            elseif (textType == "RankMatch")          then return "积 分 赛"
+            elseif (textType == "SkillConfiguration") then return "我方技能配置(可点击查看)"
+            elseif (textType == "Weather")            then return "天 气"
             else                                           return "未知34:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "PlayerIndex")        then return "Player Index"
+            if     (textType == "BaseSkillPoints")    then return "Max Base Skill Points"
             elseif (textType == "FogOfWar")           then return "Fog of War"
-            elseif (textType == "Weather")            then return "Weather"
-            elseif (textType == "SkillConfiguration") then return "Skill Configuration"
-            elseif (textType == "BaseSkillPoints")    then return "Max Base Skill Points"
+            elseif (textType == "MaxDiffScore")       then return "Max Diff Score"
             elseif (textType == "Password")           then return "Password (optional)"
+            elseif (textType == "PlayerIndex")        then return "Player Index"
+            elseif (textType == "RankMatch")          then return "Ranking Match"
+            elseif (textType == "SkillConfiguration") then return "Skill Configuration"
+            elseif (textType == "Weather")            then return "Weather"
             else                                           return "Unknown34:" .. (textType or "")
             end
         end,

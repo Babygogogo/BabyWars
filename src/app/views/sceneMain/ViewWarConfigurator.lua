@@ -11,24 +11,28 @@ local POPUP_BACKGROUND_Z_ORDER = 2
 local POPUP_GREY_MASK_Z_ORDER  = 1
 
 local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
-local EDIT_BOX_PASSWORD_HEIGHT = 60  -- The same as the height of the indicator of ViewOptionSelector
+local EDIT_BOX_PASSWORD_HEIGHT = 50  -- The same as the height of the indicator of ViewOptionSelector
 local BUTTON_WIDTH             = 300
 local BUTTON_HEIGHT            = 80
 
-local SELECTOR_PLAYER_INDEX_POS_X     = 60
-local SELECTOR_PLAYER_INDEX_POS_Y     = 60 + (display.height - 60) / 4 * 3
-local SELECTOR_FOG_POS_X              = SELECTOR_PLAYER_INDEX_POS_X
-local SELECTOR_FOG_POS_Y              = 60 + (display.height - 60) / 4 * 2
+local SELECTOR_PLAYER_INDEX_POS_X     = 70
+local SELECTOR_PLAYER_INDEX_POS_Y     = 60 + (display.height - 60) / 5 * 4
+local SELECTOR_MAX_SKILL_POINTS_POS_X = SELECTOR_PLAYER_INDEX_POS_X
+local SELECTOR_MAX_SKILL_POINTS_POS_Y = 60 + (display.height - 60) / 5 * 3
+local SELECTOR_RANK_MATCH_POS_X       = SELECTOR_PLAYER_INDEX_POS_X
+local SELECTOR_RANK_MATCH_POS_Y       = 60 + (display.height - 60) / 5 * 2
 local SELECTOR_WEATHER_POS_X          = SELECTOR_PLAYER_INDEX_POS_X
-local SELECTOR_WEATHER_POS_Y          = 60 + (display.height - 60) / 4 * 1
-local SELECTOR_MAX_SKILL_POINTS_POS_X = display.width - 60 - (54 + 8 + 250 + 8 + 54)
-local SELECTOR_MAX_SKILL_POINTS_POS_Y = SELECTOR_PLAYER_INDEX_POS_Y
-local SELECTOR_SKILL_POS_X            = SELECTOR_MAX_SKILL_POINTS_POS_X
-local SELECTOR_SKILL_POS_Y            = SELECTOR_FOG_POS_Y
-local EDIT_BOX_PASSWORD_POS_X         = SELECTOR_MAX_SKILL_POINTS_POS_X + 54 + 8
+local SELECTOR_WEATHER_POS_Y          = 60 + (display.height - 60) / 5 * 1
+local SELECTOR_FOG_POS_X              = display.width - 70 - (42 + 8 + 250 + 8 + 42)
+local SELECTOR_FOG_POS_Y              = SELECTOR_PLAYER_INDEX_POS_Y
+local SELECTOR_SKILL_POS_X            = SELECTOR_FOG_POS_X
+local SELECTOR_SKILL_POS_Y            = SELECTOR_MAX_SKILL_POINTS_POS_Y
+local SELECTOR_MAX_DIFF_SCORE_POS_X   = SELECTOR_FOG_POS_X
+local SELECTOR_MAX_DIFF_SCORE_POS_Y   = SELECTOR_RANK_MATCH_POS_Y
+local EDIT_BOX_PASSWORD_POS_X         = SELECTOR_FOG_POS_X + 42 + 8
 local EDIT_BOX_PASSWORD_POS_Y         = SELECTOR_WEATHER_POS_Y
 local BUTTON_BACK_POS_X               = 120
-local BUTTON_BACK_POS_Y               = 45
+local BUTTON_BACK_POS_Y               = 35
 local BUTTON_CONFIRM_POS_X            = display.width - 120 - BUTTON_WIDTH
 local BUTTON_CONFIRM_POS_Y            = BUTTON_BACK_POS_Y
 
@@ -40,8 +44,8 @@ local FONT_OUTLINE_COLOR                = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH                = 2
 local POPUP_FONT_SIZE                   = 18
 local BUTTON_FONT_SIZE                  = 35
-local EDIT_BOX_PASSWORD_TITLE_FONT_SIZE = 20
-local EDIT_BOX_PASSWORD_FONT_SIZE       = 28
+local EDIT_BOX_PASSWORD_TITLE_FONT_SIZE = 16
+local EDIT_BOX_PASSWORD_FONT_SIZE       = 25
 
 local BUTTON_BACKGROUND_NAME      = "c03_t01_s01_f01.png"
 local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
@@ -91,7 +95,7 @@ local function initEditBoxPassword(self)
     titleLabel:ignoreAnchorPointForPosition(true)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
-        :setDimensions(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT + 30)
+        :setDimensions(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT + 25)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
 
@@ -255,6 +259,26 @@ function ViewWarConfigurator:setViewSelectorMaxSkillPoints(view)
 
     view:setPosition(SELECTOR_MAX_SKILL_POINTS_POS_X, SELECTOR_MAX_SKILL_POINTS_POS_Y)
     self.m_ViewSelectorMaxSkillPoints = view
+    self:addChild(view)
+
+    return self
+end
+
+function ViewWarConfigurator:setViewSelectorRankMatch(view)
+    assert(self.m_ViewSelectorRankMatch == nil, "ViewWarConfigurator:setViewSelectorRankMatch() the view has been set.")
+
+    view:setPosition(SELECTOR_RANK_MATCH_POS_X, SELECTOR_RANK_MATCH_POS_Y)
+    self.m_ViewSelectorRankMatch = view
+    self:addChild(view)
+
+    return self
+end
+
+function ViewWarConfigurator:setViewSelectorMaxDiffScore(view)
+    assert(self.m_ViewSelectorMaxDiffScore == nil, "ViewWarConfigurator:setViewSelectorMaxDiffScore() the view has been set.")
+
+    view:setPosition(SELECTOR_MAX_DIFF_SCORE_POS_X, SELECTOR_MAX_DIFF_SCORE_POS_Y)
+    self.m_ViewSelectorMaxDiffScore = view
     self:addChild(view)
 
     return self
