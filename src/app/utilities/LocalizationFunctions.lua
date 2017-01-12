@@ -247,6 +247,7 @@ local s_Texts = {
     [3] = {
         [1] = function(textType)
             if     (textType == "Configuration")          then return "配 置"
+            elseif (textType == "CurrentPosition")        then return "当前位置"
             elseif (textType == "SetSkillPoint")          then return "设定基准技能点数"
             elseif (textType == "PassiveSkill")           then return "日 常 技 能"
             elseif (textType == "ActiveSkill")            then return "主 动 技 能"
@@ -276,6 +277,7 @@ local s_Texts = {
         end,
         [2] = function(textType)
             if     (textType == "Configuration")          then return "Configuration"
+            elseif (textType == "CurrentPosition")        then return "Add"
             elseif (textType == "SetSkillPoint")          then return "SetSkillPoint"
             elseif (textType == "PassiveSkill")           then return "Passive"
             elseif (textType == "ActiveSkill")            then return "Active"

@@ -3,6 +3,7 @@ local ViewSkillConfigurator = class("ViewSkillConfigurator", cc.Node)
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
+local ADDRESS_BAR_Z_ORDER         = 1
 local MENU_TITLE_Z_ORDER          = 1
 local BUTTON_BACK_Z_ORDER         = 1
 local BUTTON_SAVE_Z_ORDER         = 1
@@ -48,9 +49,9 @@ local MENU_LIST_VIEW_POS_Y_WITH_SAVE     = MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE + B
 local MENU_LIST_VIEW_ITEMS_MARGIN        = 10
 
 local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
-local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT
+local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT - 90
 local OVERVIEW_BACKGROUND_POS_X  = display.width - 30 - OVERVIEW_BACKGROUND_WIDTH
-local OVERVIEW_BACKGROUND_POS_Y  = 30
+local OVERVIEW_BACKGROUND_POS_Y  = 30 + 90
 
 local OVERVIEW_SCROLLVIEW_WIDTH  = OVERVIEW_BACKGROUND_WIDTH  - 7
 local OVERVIEW_SCROLLVIEW_HEIGHT = OVERVIEW_BACKGROUND_HEIGHT - 11
@@ -58,6 +59,12 @@ local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
 local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
 
 local OVERVIEW_FONT_SIZE = 18
+
+local ADDRESS_BAR_WIDTH     = display.width - MENU_BACKGROUND_WIDTH - 90
+local ADDRESS_BAR_HEIGHT    = 60
+local ADDRESS_BAR_POS_X     = display.width - ADDRESS_BAR_WIDTH - 30
+local ADDRESS_BAR_POS_Y     = MENU_BACKGROUND_POS_Y
+local ADDRESS_BAR_FONT_SIZE = 18
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 50
@@ -122,6 +129,26 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function initAddressBar(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setPosition(ADDRESS_BAR_POS_X, ADDRESS_BAR_POS_Y)
+        :setContentSize(ADDRESS_BAR_WIDTH, ADDRESS_BAR_HEIGHT)
+        :setOpacity(BACKGROUND_OPACITY)
+
+    local label = cc.Label:createWithTTF("", ITEM_FONT_NAME, ADDRESS_BAR_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setPosition(5, 0)
+        :setDimensions(ADDRESS_BAR_WIDTH - 7, ADDRESS_BAR_HEIGHT)
+        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
+    background:addChild(label)
+
+    self.m_AddressBarBackground = background
+    self.m_AddressBarLabel      = label
+    self:addChild(background, ADDRESS_BAR_Z_ORDER)
+end
+
 local function initMenuBackground(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
@@ -247,6 +274,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewSkillConfigurator:ctor()
+    initAddressBar(    self)
     initMenuBackground(self)
     initMenuTitle(     self)
     initButtonBack(    self)
@@ -286,6 +314,12 @@ function ViewSkillConfigurator:setMenuItems(items)
     for _, item in ipairs(items) do
         listView:pushBackCustomItem(createViewItem(item))
     end
+
+    return self
+end
+
+function ViewSkillConfigurator:setAddressBarVisible(visible)
+    self.m_AddressBarBackground:setVisible(visible)
 
     return self
 end
@@ -330,6 +364,12 @@ function ViewSkillConfigurator:setButtonSaveVisible(visible)
     end
 
     self.m_ButtonSave:setVisible(visible)
+
+    return self
+end
+
+function ViewSkillConfigurator:setAddressBarText(text)
+    self.m_AddressBarLabel:setString(text)
 
     return self
 end
