@@ -97,16 +97,17 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
                     SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
                     modelWarConfigurator:disableButtonConfirmForSecs(5)
                     WebSocketManager.sendAction({
-                        actionCode           = ACTION_CODE_NEW_WAR,
-                        warPassword          = password,
-                        warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
-                        playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
-                        skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                        maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                        isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
-                        defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
-                        isRankMatch          = modelWarConfigurator:getModelOptionSelectorWithName("RankMatch")     :getCurrentOption(),
-                        maxDiffScore         = modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore")  :getCurrentOption(),
+                        actionCode               = ACTION_CODE_NEW_WAR,
+                        defaultIntervalUntilBoot = 3600 * 24 * 3,
+                        warPassword              = password,
+                        warFieldFileName         = modelWarConfigurator:getWarFieldFileName(),
+                        playerIndex              = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                        skillConfigurationID     = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                        maxBaseSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                        isFogOfWarByDefault      = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                        defaultWeatherCode       = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
+                        isRankMatch              = modelWarConfigurator:getModelOptionSelectorWithName("RankMatch")     :getCurrentOption(),
+                        maxDiffScore             = modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore")  :getCurrentOption(),
                     })
                 end
                 modelConfirmBox:setEnabled(false)

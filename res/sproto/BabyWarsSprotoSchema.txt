@@ -138,19 +138,20 @@
 }
 
 .ActionNewWar {
-    actionCode            0 : integer
-    playerAccount         1 : string
-    playerPassword        2 : string
-    sceneWarFileName      3 : string
-    warPassword           4 : string
-    warFieldFileName      5 : string
-    playerIndex           6 : integer
-    skillConfigurationID  7 : integer
-    maxBaseSkillPoints    8 : integer
-    isFogOfWarByDefault   9 : boolean
-    defaultWeatherCode   10 : integer
-    isRankMatch          11 : boolean
-    maxDiffScore         12 : integer
+    actionCode                0 : integer
+    playerAccount             1 : string
+    playerPassword            2 : string
+    sceneWarFileName          3 : string
+    warPassword               4 : string
+    warFieldFileName          5 : string
+    playerIndex               6 : integer
+    skillConfigurationID      7 : integer
+    maxBaseSkillPoints        8 : integer
+    isFogOfWarByDefault       9 : boolean
+    defaultWeatherCode       10 : integer
+    isRankMatch              11 : boolean
+    maxDiffScore             12 : integer
+    defaultIntervalUntilBoot 13 : integer
 }
 
 .ActionRegister {
@@ -710,22 +711,25 @@
         expiringTurnIndexForWeather   3 : integer
     }
 
-    sceneWarFileName       0 :  string
-    actionID               1 :  integer
-    maxBaseSkillPoints     2 :  integer
-    isWarEnded             3 :  boolean
-    isRandomWarField       4 :  boolean
-    isFogOfWarByDefault    5 :  boolean
-    isTotalReplay          6 :  boolean
-    warPassword            7 :  string
-    executedActions        8 : *ActionGeneric
-    players                9 : *SinglePlayerData(playerIndex)
-    turn                  10 :  TurnData
-    warField              11 :  WarFieldData
-    weather               12 :  WeatherData
-    remainingVotesForDraw 13 :  integer
-    isRankMatch           14 :  boolean
-    maxDiffScore          15 :  integer
+    sceneWarFileName            0 :  string
+    actionID                    1 :  integer
+    maxBaseSkillPoints          2 :  integer
+    isWarEnded                  3 :  boolean
+    isRandomWarField            4 :  boolean
+    isFogOfWarByDefault         5 :  boolean
+    isTotalReplay               6 :  boolean
+    warPassword                 7 :  string
+    executedActions             8 : *ActionGeneric
+    players                     9 : *SinglePlayerData(playerIndex)
+    turn                       10 :  TurnData
+    warField                   11 :  WarFieldData
+    weather                    12 :  WeatherData
+    remainingVotesForDraw      13 :  integer
+    isRankMatch                14 :  boolean
+    maxDiffScore               15 :  integer
+    createdTime                16 :  integer
+    defaultIntervalUntilBoot   17 :  integer
+    remainingIntervalUntilBoot 18 :  integer
 }
 
 .SceneWarFileNameForIndex {
@@ -787,14 +791,15 @@
 }
 
 .WarConfiguration {
-    sceneWarFileName    0 :  string
-    warFieldFileName    1 :  string
-    warPassword         2 :  string
-    maxBaseSkillPoints  3 :  integer
-    isFogOfWarByDefault 4 :  boolean
-    defaultWeatherCode  5 :  integer
-    isRandomWarField    6 :  boolean
-    players             7 : *PlayerInfo(playerIndex)
-    isRankMatch         8 :  boolean
-    maxDiffScore        9 :  integer
+    sceneWarFileName     0 :  string
+    warFieldFileName     1 :  string
+    warPassword          2 :  string
+    maxBaseSkillPoints   3 :  integer
+    isFogOfWarByDefault  4 :  boolean
+    defaultWeatherCode   5 :  integer
+    isRandomWarField     6 :  boolean
+    players              7 : *PlayerInfo(playerIndex)
+    isRankMatch          8 :  boolean
+    maxDiffScore         9 :  integer
+    createdTime         10 :  integer
 }

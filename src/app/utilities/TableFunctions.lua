@@ -1,6 +1,8 @@
 
 local TableFunctions = {}
 
+local pairs = pairs
+
 function TableFunctions.appendList(list1, list2, additionalItem)
     assert(type(list1) == "table", "TableFunctions.appendList() the param list1 is invalid.")
     assert((type(list2) == "table") or (list2 == nil), "TableFunctions.appendList() the param list2 is invalid.")
@@ -44,6 +46,15 @@ function TableFunctions.clone(t, ignoredKeys)
     end
 
     return clonedTable
+end
+
+function TableFunctions.getPairsCount(t)
+    local count = 0
+    for k, v in pairs(t) do
+        count = count + 1
+    end
+
+    return count
 end
 
 return TableFunctions

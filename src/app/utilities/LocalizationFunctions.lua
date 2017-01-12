@@ -1319,6 +1319,7 @@ local s_Texts = {
             elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
             elseif (errType == "OverloadedRankScore")            then return "您的积分超出了该战局的限制。请选择其它战局。"
             elseif (errType == "OverloadedSkillPoints")          then return "您选择的技能配置的点数超出了上限。请检查后重试。"
+            elseif (errType == "OverloadedWarsCount")            then return "您已参加的战局数量太多，暂无法创建房间或参战。请耐心等候已有的战局结束。"
             elseif (errType == "RegisteredAccount")              then return "该账号已被注册，请使用其他账号。"
             elseif (errType == "SucceedToSetSkillConfiguration") then return "技能配置已保存。" .. text
             else                                                      return "未知81:" .. (errType or "")
@@ -1346,6 +1347,7 @@ local s_Texts = {
             elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text
             elseif (errType == "OverloadedRankScore")            then return "Your rank score exceeds the limit of the war. Please choose another war to join."
             elseif (errType == "OverloadedSkillPoints")          then return "The skill points of the selected configuration is beyond the limitation."
+            elseif (errType == "OverloadedWarsCount")            then return "You have joined too many wars. Please wait until one of them ends."
             elseif (errType == "RegisteredAccount")              then return "The account is registered already. Please use another account."
             elseif (errType == "SucceedToSetSkillConfiguration") then return "Save skill configuration successfully." .. text
             else                                                      return "Unknown81:" .. (errType or "")
