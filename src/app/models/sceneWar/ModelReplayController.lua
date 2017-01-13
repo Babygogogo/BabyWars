@@ -3,9 +3,6 @@ local ModelReplayController = class("ModelReplayController")
 
 local SingletonGetters = require("src.app.utilities.SingletonGetters")
 
-local getModelScene            = SingletonGetters.getModelScene
-local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
-
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
@@ -44,7 +41,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelReplayController:onStartRunning(modelSceneWar, sceneWarFileName)
-    getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtWarCommandMenuUpdated", self)
         :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtGridSelected",          self)
@@ -78,14 +76,14 @@ function ModelReplayController:onButtonPreviousTurnTouched()
 end
 
 function ModelReplayController:onButtonPlayTouched()
-    getModelScene():setAutoReplay(true)
+    self.m_ModelSceneWar:setAutoReplay(true)
     self:setButtonPlayVisible(false)
 
     return self
 end
 
 function ModelReplayController:onButtonPauseTouched()
-    getModelScene():setAutoReplay(false)
+    self.m_ModelSceneWar:setAutoReplay(false)
     self:setButtonPlayVisible(true)
 
     return self

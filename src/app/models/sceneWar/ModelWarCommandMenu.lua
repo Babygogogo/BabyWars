@@ -150,8 +150,8 @@ local function getTilesInfo(tileTypeCounters, showIdleTilesCount)
     )
 end
 
-local function getMapInfo()
-    local modelSceneWar = SingletonGetters.getModelScene()
+local function getMapInfo(self)
+    local modelSceneWar = self.m_ModelSceneWar
     local modelWarField = SingletonGetters.getModelWarField(modelSceneWar)
     local modelTileMap  = modelWarField:getModelTileMap()
     local tileTypeCounters = {
@@ -187,7 +187,7 @@ local function updateStringWarInfo(self)
     updateUnitsData(dataForEachPlayer)
     updateTilesData(dataForEachPlayer)
 
-    local stringList        = {getMapInfo()}
+    local stringList        = {getMapInfo(self)}
     local playerIndexInTurn = getModelTurnManager():getPlayerIndex()
     for i = 1, getModelPlayerManager():getPlayersCount() do
         if (not dataForEachPlayer[i]) then
@@ -227,7 +227,7 @@ local function updateStringSkillInfo(self)
 end
 
 local function getAvailableMainItems(self)
-    local modelSceneWar     = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local modelSceneWar     = self.m_ModelSceneWar
     local playerIndexInTurn = getModelTurnManager(modelSceneWar):getPlayerIndex()
     if ((isTotalReplay(modelSceneWar))                               or
         (playerIndexInTurn ~= getPlayerIndexLoggedIn(modelSceneWar)) or
@@ -348,7 +348,7 @@ local function createUnitPropertyText(unitType)
 end
 
 local function getIdleTilesCount(self)
-    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local modelSceneWar = self.m_ModelSceneWar
     local modelUnitMap  = getModelUnitMap(modelSceneWar)
     local playerIndex   = getModelTurnManager(modelSceneWar):getPlayerIndex()
     local idleFactoriesCount, idleAirportsCount, idleSeaportsCount = 0, 0, 0
@@ -367,7 +367,7 @@ local function getIdleTilesCount(self)
 end
 
 local function getIdleUnitsCount(self)
-    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local modelSceneWar = self.m_ModelSceneWar
     local playerIndex   = getModelTurnManager(modelSceneWar):getPlayerIndex()
     local count         = 0
 
@@ -454,7 +454,7 @@ local function setStateAuxiliaryCommands(self)
     self.m_State = "stateAuxiliaryCommands"
 
     if (self.m_View) then
-        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelSceneWar = self.m_ModelSceneWar
         local items         = {}
         if (not modelSceneWar:isTotalReplay()) then
             items[#items + 1] = self.m_ItemReload
@@ -492,7 +492,7 @@ local function setStateDrawOrSurrender(self)
     self.m_State = "stateDrawOrSurrender"
 
     if (self.m_View) then
-        local modelSceneWar     = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelSceneWar     = self.m_ModelSceneWar
         local playerIndexInTurn = modelSceneWar:getModelTurnManager():getPlayerIndex()
         assert((not modelSceneWar:isTotalReplay()) and (getPlayerIndexLoggedIn(modelSceneWar) == playerIndexInTurn) and (not self.m_IsWaitingForServerResponse))
 
@@ -594,7 +594,7 @@ local function initItemAgreeDraw(self)
     self.m_ItemAgreeDraw = {
         name = getLocalizedText(65, "AgreeDraw"),
         callback = function()
-            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            local modelConfirmBox = getModelConfirmBox(self.m_ModelSceneWar)
             modelConfirmBox:setConfirmText(getLocalizedText(66, "AgreeDraw"))
                 :setOnConfirmYes(function()
                     sendActionVoteForDraw(self, true)
@@ -635,7 +635,7 @@ local function initItemDisagreeDraw(self)
     self.m_ItemDisagreeDraw = {
         name = getLocalizedText(65, "DisagreeDraw"),
         callback = function()
-            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            local modelConfirmBox = getModelConfirmBox(self.m_ModelSceneWar)
             modelConfirmBox:setConfirmText(getLocalizedText(66, "DisagreeDraw"))
                 :setOnConfirmYes(function()
                     sendActionVoteForDraw(self, false)
@@ -660,7 +660,7 @@ local function initItemEndTurn(self)
     self.m_ItemEndTurn = {
         name     = getLocalizedText(65, "EndTurn"),
         callback = function()
-            local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+            local modelSceneWar = self.m_ModelSceneWar
             if ((modelSceneWar:getRemainingVotesForDraw())                                                                                          and
                 (not modelSceneWar:getModelPlayerManager():getModelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex()):hasVotedForDraw())) then
                 getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(66, "RequireVoteForDraw"))
@@ -812,7 +812,7 @@ local function initItemProposeDraw(self)
     self.m_ItemProposeDraw = {
         name     = getLocalizedText(65, "ProposeDraw"),
         callback = function()
-            local modelConfirmBox = getModelConfirmBox(self.m_SceneWarFileName)
+            local modelConfirmBox = getModelConfirmBox(self.m_ModelSceneWar)
             modelConfirmBox:setConfirmText(getLocalizedText(66, "ProposeDraw"))
                 :setOnConfirmYes(function()
                     sendActionVoteForDraw(self, true)
@@ -1008,8 +1008,8 @@ end
 -- The public callback function on start running or script events.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
-    getScriptEventDispatcher()
+    self.m_ModelSceneWar    = modelSceneWar
+    getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)

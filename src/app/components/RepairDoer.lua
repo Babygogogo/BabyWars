@@ -53,7 +53,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function RepairDoer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -86,7 +86,7 @@ function RepairDoer:canRepairTarget(target)
 end
 
 function RepairDoer:getRepairAmountAndCost(target)
-    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
+    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
     local productionCost = math.floor(
         (costModifier >= 0)                                       and
@@ -109,7 +109,7 @@ function RepairDoer:getNormalizedRepairAmount()
     if (playerIndex < 1) then
         return self.m_Template.amount
     else
-        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
         return self.m_Template.amount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
     end
 end

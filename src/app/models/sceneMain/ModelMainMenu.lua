@@ -28,6 +28,7 @@ local function getActorNewWarCreator(self)
     if (not self.m_ActorNewWarCreator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
         actor:getModel():setModelMainMenu(self)
+            :onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorNewWarCreator = actor
@@ -41,6 +42,7 @@ local function getActorContinueWarSelector(self)
     if (not self.m_ActorContinueWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelContinueWarSelector", nil, "sceneMain.ViewContinueWarSelector")
         actor:getModel():setModelMainMenu(self)
+            :onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorContinueWarSelector = actor
@@ -54,6 +56,7 @@ local function getActorJoinWarSelector(self)
     if (not self.m_ActorJoinWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
         actor:getModel():setModelMainMenu(self)
+            :onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorJoinWarSelector = actor
@@ -67,6 +70,7 @@ local function getActorSkillConfigurator(self)
     if (not self.m_ActorSkillConfigurator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelSkillConfigurator", nil, "sceneMain.ViewSkillConfigurator")
         actor:getModel():setModelMainMenu(self)
+            :onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorSkillConfigurator = actor
@@ -79,7 +83,8 @@ end
 local function getActorReplayManager(self)
     if (not self.m_ActorReplayManager) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelReplayManager", nil, "sceneMain.ViewReplayManager")
-        actor:getModel():setEnabled(false)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
+            :setEnabled(false)
 
         self.m_ActorReplayManager = actor
         self.m_View:setViewReplayManager(actor:getView())
@@ -92,6 +97,7 @@ local function getActorLoginPanel(self)
     if (not self.m_ActorLoginPanel) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelLoginPanel", nil, "sceneMain.ViewLoginPanel")
         actor:getModel():setModelMainMenu(self)
+            :onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorLoginPanel = actor
@@ -104,7 +110,8 @@ end
 local function getActorGameHelper(self)
     if (not self.m_ActorGameHelper) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelGameHelper", nil, "sceneMain.ViewGameHelper")
-        actor:getModel():setModelMainMenu(self)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
+            :setModelMainMenu(self)
 
         self.m_ActorGameHelper = actor
         self.m_View:setViewGameHelper(actor:getView())
@@ -116,6 +123,8 @@ end
 local function getActorGameRecordViewer(self)
     if (not self.m_ActorGameRecordViewer) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelGameRecordViewer", nil, "sceneMain.ViewGameRecordViewer")
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
+
         self.m_ActorGameRecordViewer = actor
         self.m_View:setViewGameRecordViewer(actor:getView())
     end
@@ -270,6 +279,15 @@ function ModelMainMenu:initView()
     assert(view, "ModelMainMenu:initView() no view is attached to the actor of the model.")
 
     self:updateWithIsPlayerLoggedIn(false)
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelMainMenu:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
 
     return self
 end

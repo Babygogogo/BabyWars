@@ -169,7 +169,7 @@ function ModelWarField:onStartRunning(modelSceneWar, sceneWarFileName)
         self:getModelTileMap():updateOnModelFogMapStartedRunning()
     end
 
-    SingletonGetters.getScriptEventDispatcher(sceneWarFileName)
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtDragField",            self)
         :addEventListener("EvtZoomFieldWithScroll",  self)
         :addEventListener("EvtZoomFieldWithTouches", self)

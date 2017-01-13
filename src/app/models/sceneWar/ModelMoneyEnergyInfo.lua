@@ -67,8 +67,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
-    SingletonGetters.getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
@@ -79,7 +79,8 @@ function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar, sceneWarFileName)
     local playerIndex  = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
     self.m_PlayerIndex = playerIndex
     if (self.m_View) then
-        self.m_View:updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
+        self.m_View:setModelSceneWar(modelSceneWar)
+            :updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
             :updateWithPlayerIndex(playerIndex)
     end
 
@@ -103,7 +104,7 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+    local modelSceneWar = self.m_ModelSceneWar
     if ((modelSceneWar:isTotalReplay()) and (modelSceneWar:isAutoReplay())) then
         modelSceneWar:setAutoReplay(false)
         SingletonGetters.getModelReplayController(modelSceneWar):setButtonPlayVisible(true)

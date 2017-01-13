@@ -251,6 +251,15 @@ function ModelGameRecordViewer:ctor()
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelGameRecordViewer:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelGameRecordViewer:setEnabled(enabled)
@@ -259,7 +268,7 @@ function ModelGameRecordViewer:setEnabled(enabled)
         sendActionGetPlayerProfile(WebSocketManager.getLoggedInAccountAndPassword())
     else
         setStateDisabled(self)
-        SingletonGetters.getModelMainMenu():setMenuEnabled(true)
+        SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
     end
 
     self.m_View:setVisible(enabled)

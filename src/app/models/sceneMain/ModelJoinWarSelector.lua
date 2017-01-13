@@ -197,14 +197,14 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(8, "JoinWarConfirmation"))
             :setOnConfirmYes(function()
                 local password = modelWarConfigurator:getPassword()
                 if ((#password ~= 0) and (#password ~= 4)) then
-                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(61))
                 else
-                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
                     modelWarConfigurator:disableButtonConfirmForSecs(5)
                     WebSocketManager.sendAction({
                         actionCode           = ACTION_CODE_JOIN_WAR,
@@ -301,6 +301,15 @@ function ModelJoinWarSelector:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelJoinWarSelector:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:setEnabled(enabled)
@@ -344,7 +353,7 @@ end
 function ModelJoinWarSelector:updateWithJoinableWarConfigurations(warConfigurations)
     local warList = createJoinableWarList(self, warConfigurations)
     if (#warList == 0) then
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(60))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(60))
     elseif (self.m_View) then
         self.m_View:showWarList(warList)
     end
@@ -359,7 +368,7 @@ end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
     if (#editBoxText ~= 4) then
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(59))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(59))
     else
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
         if (self.m_View) then

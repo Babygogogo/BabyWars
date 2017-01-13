@@ -11,7 +11,6 @@ local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelMapCursor        = SingletonGetters.getModelMapCursor
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
-local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
@@ -36,16 +35,16 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
-    local isReplay            = isTotalReplay()
+    local modelSceneWar       = self.m_ModelSceneWar
+    local isReplay            = isTotalReplay(modelSceneWar)
     local playerIndex         = self.m_Model:getPlayerIndex()
     local playerIndexMod      = playerIndex % 2
-    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn()) or (nil)
-    local sceneWarFileName    = getSceneWarFileName()
+    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
     local unitType            = self.m_Model:getUnitType()
     local isAlwaysVisible     = (isReplay) or (playerIndex == playerIndexLoggedIn)
 
     local steps               = {cc.CallFunc:create(function()
-        getModelMapCursor():setMovableByPlayer(false)
+        getModelMapCursor(modelSceneWar):setMovableByPlayer(false)
         if (isAlwaysVisible) then
             self:setVisible(true)
         end
@@ -66,14 +65,14 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
         if (not isAlwaysVisible) then
             if (isDiving) then
                 if ((i == #path)                                                                                      and
-                    (isUnitVisible(sceneWarFileName, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
+                    (isUnitVisible(modelSceneWar, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()
                 end
             else
-                if ((isUnitVisible(sceneWarFileName, path[i - 1], unitType, isDiving, playerIndex, playerIndexLoggedIn))  or
-                    (isUnitVisible(sceneWarFileName, path[i],     unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
+                if ((isUnitVisible(modelSceneWar, path[i - 1], unitType, isDiving, playerIndex, playerIndexLoggedIn))  or
+                    (isUnitVisible(modelSceneWar, path[i],     unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()
@@ -90,7 +89,7 @@ end
 local function createActionMoveAlongPath(self, path, isDiving, callback)
     local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getModelMapCursor():setMovableByPlayer(true)
+        getModelMapCursor(self.m_ModelSceneWar):setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
         callback()
     end)
@@ -101,16 +100,16 @@ end
 local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
     local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getScriptEventDispatcher():dispatchEvent({
+        getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
             name      = "EvtMapCursorMoved",
             gridIndex = targetGridIndex,
         })
-        getModelMapCursor():setNormalCursorVisible(false)
+        getModelMapCursor(self.m_ModelSceneWar):setNormalCursorVisible(false)
             :setTargetCursorVisible(true)
     end)
     steps[#steps + 1] = cc.DelayTime:create(0.5)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getModelMapCursor():setMovableByPlayer(true)
+        getModelMapCursor(self.m_ModelSceneWar):setMovableByPlayer(true)
             :setNormalCursorVisible(true)
             :setTargetCursorVisible(false)
 
@@ -121,13 +120,13 @@ local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, t
     return cc.Sequence:create(unpack(steps))
 end
 
-local function getSkillIndicatorFrame(unit)
-    if (not unit:getSceneWarFileName()) then
+local function getSkillIndicatorFrame(self, unit)
+    if (not self.m_ModelSceneWar) then
         return nil
     end
 
     local playerIndex = unit:getPlayerIndex()
-    local modelPlayer = getModelPlayerManager():getModelPlayer(playerIndex)
+    local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex)
     local id          = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
     if (not id) then
         return nil
@@ -187,13 +186,14 @@ local function getBuildIndicatorFrame(unit)
     end
 end
 
-local function getLoadIndicatorFrame(unit)
+local function getLoadIndicatorFrame(self, unit)
     if (not unit.getCurrentLoadCount) then
         return nil
     else
+        local modelSceneWar = self.m_ModelSceneWar
         local loadCount = unit:getCurrentLoadCount()
-        if ((not isTotalReplay()) and (getModelFogMap():isFogOfWarCurrently())) then
-            if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn()) or (loadCount > 0)) then
+        if ((not isTotalReplay(modelSceneWar)) and (getModelFogMap(modelSceneWar):isFogOfWarCurrently())) then
+            if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn(modelSceneWar)) or (loadCount > 0)) then
                 return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
             else
                 return nil
@@ -306,15 +306,15 @@ end
 
 local function updateStateIndicator(self, unit)
     local frames = {}
-    frames[#frames + 1] = getSkillIndicatorFrame(    unit)
-    frames[#frames + 1] = getLevelIndicatorFrame(    unit)
-    frames[#frames + 1] = getFuelIndicatorFrame(     unit)
-    frames[#frames + 1] = getAmmoIndicatorFrame(     unit)
-    frames[#frames + 1] = getDiveIndicatorFrame(     unit)
-    frames[#frames + 1] = getCaptureIndicatorFrame(  unit)
-    frames[#frames + 1] = getBuildIndicatorFrame(    unit)
-    frames[#frames + 1] = getLoadIndicatorFrame(     unit)
-    frames[#frames + 1] = getMaterialIndicatorFrame( unit)
+    frames[#frames + 1] = getSkillIndicatorFrame(   self, unit)
+    frames[#frames + 1] = getLevelIndicatorFrame(         unit)
+    frames[#frames + 1] = getFuelIndicatorFrame(          unit)
+    frames[#frames + 1] = getAmmoIndicatorFrame(          unit)
+    frames[#frames + 1] = getDiveIndicatorFrame(          unit)
+    frames[#frames + 1] = getCaptureIndicatorFrame(       unit)
+    frames[#frames + 1] = getBuildIndicatorFrame(         unit)
+    frames[#frames + 1] = getLoadIndicatorFrame(    self, unit)
+    frames[#frames + 1] = getMaterialIndicatorFrame(      unit)
 
     local indicator = self.m_StateIndicator
     indicator:stopAllActions()
@@ -327,7 +327,7 @@ local function updateStateIndicator(self, unit)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewUnit:ctor()
     self:ignoreAnchorPointForPosition(true)
@@ -337,6 +337,12 @@ function ViewUnit:ctor()
     initWithUnitSprite(    self, createUnitSprite())
     initWithHpIndicator(   self, createHpIndicator())
     initWithStateIndicator(self, createStateIndicator())
+
+    return self
+end
+
+function ViewUnit:setModelSceneWar(modelSceneWar)
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end

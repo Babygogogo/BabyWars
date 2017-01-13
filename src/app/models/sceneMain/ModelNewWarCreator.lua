@@ -87,27 +87,27 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(8, "NewWarConfirmation"))
             :setOnConfirmYes(function()
                 local password = modelWarConfigurator:getPassword()
                 if ((#password ~= 0) and (#password ~= 4)) then
-                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(61))
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(61))
                 else
-                    SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
                     modelWarConfigurator:disableButtonConfirmForSecs(5)
                     WebSocketManager.sendAction({
-                        actionCode               = ACTION_CODE_NEW_WAR,
-                        defaultIntervalUntilBoot = 3600 * 24 * 3,
-                        warPassword              = password,
-                        warFieldFileName         = modelWarConfigurator:getWarFieldFileName(),
-                        playerIndex              = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
-                        skillConfigurationID     = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
-                        maxBaseSkillPoints       = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
-                        isFogOfWarByDefault      = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
-                        defaultWeatherCode       = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
-                        isRankMatch              = modelWarConfigurator:getModelOptionSelectorWithName("RankMatch")     :getCurrentOption(),
-                        maxDiffScore             = modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore")  :getCurrentOption(),
+                        actionCode           = ACTION_CODE_NEW_WAR,
+                        intervalUntilBoot    = 30, --3600 * 24 * 3, -- TODO: add a selector for this.
+                        warPassword          = password,
+                        warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
+                        playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
+                        skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")         :getCurrentOption(),
+                        maxBaseSkillPoints   = modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):getCurrentOption(),
+                        isFogOfWarByDefault  = modelWarConfigurator:getModelOptionSelectorWithName("Fog")           :getCurrentOption(),
+                        defaultWeatherCode   = modelWarConfigurator:getModelOptionSelectorWithName("Weather")       :getCurrentOption(),
+                        isRankMatch          = modelWarConfigurator:getModelOptionSelectorWithName("RankMatch")     :getCurrentOption(),
+                        maxDiffScore         = modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore")  :getCurrentOption(),
                     })
                 end
                 modelConfirmBox:setEnabled(false)
@@ -295,6 +295,15 @@ end
 function ModelNewWarCreator:setModelMainMenu(model)
     assert(self.m_ModelMainMenu == nil, "ModelNewWarCreator:setModelMainMenu() the model has been set.")
     self.m_ModelMainMenu = model
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelNewWarCreator:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
 
     return self
 end

@@ -168,11 +168,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, gridIndex, unitType, isDiving, unitPlayerIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
+function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(modelSceneWar, gridIndex, unitType, isDiving, unitPlayerIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
     assert(type(unitType)          == "string", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitType: " .. (unitType or ""))
     assert(type(unitPlayerIndex)   == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
     assert(type(targetPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid targetPlayerIndex: " .. (targetPlayerIndex or ""))
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
     if ((isTotalReplay(modelSceneWar)) or (unitPlayerIndex == targetPlayerIndex)) then
         return true
     elseif (isDiving) then
@@ -202,8 +201,7 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, g
     end
 end
 
-function VisibilityFunctions.isTileVisibleToPlayerIndex(sceneWarFileName, gridIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.isTileVisibleToPlayerIndex(modelSceneWar, gridIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
     local modelTile     = getModelTileMap(modelSceneWar):getModelTile(gridIndex)
     if (modelTile:getPlayerIndex() == targetPlayerIndex) then
         return true
@@ -231,8 +229,7 @@ end
 local isUnitVisible = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
 
-function VisibilityFunctions.getRevealedTilesAndUnitsData(sceneWarFileName, pathNodes, modelUnit, isModelUnitDestroyed)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.getRevealedTilesAndUnitsData(modelSceneWar, pathNodes, modelUnit, isModelUnitDestroyed)
     local modelTileMap  = getModelTileMap(modelSceneWar)
     local modelUnitMap  = getModelUnitMap(modelSceneWar)
     local mapSize       = modelUnitMap:getMapSize()
@@ -278,18 +275,15 @@ function VisibilityFunctions.getRevealedTilesAndUnitsData(sceneWarFileName, path
     return revealedTiles, revealedUnits
 end
 
-function VisibilityFunctions.getRevealedTilesAndUnitsDataForBuild(sceneWarFileName, origin, builder)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForBuild(modelSceneWar, origin, builder)
     return getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(modelSceneWar, origin, getVisionForBuiltTile(modelSceneWar, origin, builder), builder:getPlayerIndex())
 end
 
-function VisibilityFunctions.getRevealedTilesAndUnitsDataForCapture(sceneWarFileName, origin, playerIndex)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForCapture(modelSceneWar, origin, playerIndex)
     return getRevealedTilesAndUnitsForPlayerIndexOnGettingBuilding(modelSceneWar, origin, getVisionForCapturedTile(modelSceneWar, origin, playerIndex), playerIndex)
 end
 
-function VisibilityFunctions.getRevealedTilesAndUnitsDataForFlare(sceneWarFileName, origin, radius, playerIndex)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForFlare(modelSceneWar, origin, radius, playerIndex)
     local modelTileMap = getModelTileMap(modelSceneWar)
     local modelUnitMap = getModelUnitMap(modelSceneWar)
     local mapSize      = modelTileMap:getMapSize()
@@ -312,8 +306,7 @@ function VisibilityFunctions.getRevealedTilesAndUnitsDataForFlare(sceneWarFileNa
     return revealedTiles, revealedUnits
 end
 
-function VisibilityFunctions.getRevealedTilesAndUnitsDataForSkillActivation(sceneWarFileName, skillGroupID)
-    local modelSceneWar          = SingletonGetters.getModelScene(sceneWarFileName)
+function VisibilityFunctions.getRevealedTilesAndUnitsDataForSkillActivation(modelSceneWar, skillGroupID)
     local playerIndex            = getModelTurnManager(modelSceneWar):getPlayerIndex()
     local modelSkillGroup        = getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration():getModelSkillGroupWithId(skillGroupID)
     local canRevealWithTiles     = canRevealHidingPlacesWithTilesForSkillGroup(modelSkillGroup, true)

@@ -65,7 +65,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function MoveDoer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -76,7 +76,7 @@ end
 function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
     local owner       = self.m_Owner
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(owner:getPlayerIndex())
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(owner:getPlayerIndex())
     return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration(), owner))
 end
 

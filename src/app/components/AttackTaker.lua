@@ -17,7 +17,6 @@
 local AttackTaker = require("src.global.functions.class")("AttackTaker")
 
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = require("src.global.components.ComponentManager")
 
@@ -106,15 +105,6 @@ end
 
 function AttackTaker:toSerializableTableWithFog()
     return self:toSerializableTable()
-end
-
---------------------------------------------------------------------------------
--- The public callback function for start running.
---------------------------------------------------------------------------------
-function AttackTaker:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
-
-    return self
 end
 
 --------------------------------------------------------------------------------

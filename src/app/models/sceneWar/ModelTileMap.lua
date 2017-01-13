@@ -129,11 +129,10 @@ end
 function ModelTileMap:updateOnModelFogMapStartedRunning()
     assert(not IS_SERVER, "ModelTileMap:updateOnModelFogMapStartedRunning() this shouldn't be called on the server.")
 
-    if (not SingletonGetters.isTotalReplay()) then
-        local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn()
-        local sceneWarFileName = self.m_SceneWarFileName
+    if (not SingletonGetters.isTotalReplay(self.m_ModelSceneWar)) then
+        local playerIndex      = SingletonGetters.getPlayerIndexLoggedIn(self.m_ModelSceneWar)
         self:forEachModelTile(function(modelTile)
-            modelTile:initHasFogOnClient(not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex))
+            modelTile:initHasFogOnClient(not isTileVisible(self.m_ModelSceneWar, modelTile:getGridIndex(), playerIndex))
                 :updateView()
         end)
     end
@@ -166,7 +165,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelTileMap:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar    = modelSceneWar
     self:forEachModelTile(function(modelTile)
         modelTile:onStartRunning(modelSceneWar, sceneWarFileName)
     end)

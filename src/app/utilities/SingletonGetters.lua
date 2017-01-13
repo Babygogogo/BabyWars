@@ -1,117 +1,86 @@
 
 local SingletonGetters = {}
 
-local IS_SERVER       = require("src.app.utilities.GameConstantFunctions").isServer()
-local SceneWarManager = (    IS_SERVER) and (require("src.app.utilities.SceneWarManager")) or (nil)
-local ActorManager    = (not IS_SERVER) and (require("src.global.actors.ActorManager"))    or (nil)
-
-local getOngoingModelSceneWar = (SceneWarManager) and (SceneWarManager.getOngoingModelSceneWar) or (nil)
-local getRootActor            = (ActorManager) and (ActorManager.getRootActor) or (nil)
-local type                    = type
-
 --------------------------------------------------------------------------------
 -- The public getters.
 --------------------------------------------------------------------------------
-local function getModelScene(param)
-    local t = type(param)
-    if (IS_SERVER) then
-        if     (t == "table")  then return param
-        elseif (t == "string") then return getOngoingModelSceneWar(param)
-        else                        error("SingletonGetters-getModelScene() invalid param type on the server: " .. t)
-        end
-    else
-        if (t == "table") then
-            return param
-        else
-            local modelScene = getRootActor():getModel()
-            assert((not param) or (param == modelScene:getFileName()), "SingletonGetters-getModelScene() invalid param on the client.")
-            return modelScene
-        end
-    end
+function SingletonGetters.getActionId(modelSceneWar)
+    return modelSceneWar:getActionId()
 end
 
---------------------------------------------------------------------------------
--- The public getters.
---------------------------------------------------------------------------------
-SingletonGetters.getModelScene = getModelScene
-
-function SingletonGetters.getActionId(param)
-    return getModelScene(param):getActionId()
+function SingletonGetters.getModelFogMap(modelSceneWar)
+    return SingletonGetters.getModelWarField(modelSceneWar):getModelFogMap()
 end
 
-function SingletonGetters.getModelFogMap(param)
-    return SingletonGetters.getModelWarField(param):getModelFogMap()
+function SingletonGetters.getModelPlayerManager(modelSceneWar)
+    return modelSceneWar:getModelPlayerManager()
 end
 
-function SingletonGetters.getModelPlayerManager(param)
-    return getModelScene(param):getModelPlayerManager()
+function SingletonGetters.getModelTileMap(modelSceneWar)
+    return SingletonGetters.getModelWarField(modelSceneWar):getModelTileMap()
 end
 
-function SingletonGetters.getModelTileMap(param)
-    return SingletonGetters.getModelWarField(param):getModelTileMap()
+function SingletonGetters.getModelTurnManager(modelSceneWar)
+    return modelSceneWar:getModelTurnManager()
 end
 
-function SingletonGetters.getModelTurnManager(param)
-    return getModelScene(param):getModelTurnManager()
+function SingletonGetters.getModelUnitMap(modelSceneWar)
+    return SingletonGetters.getModelWarField(modelSceneWar):getModelUnitMap()
 end
 
-function SingletonGetters.getModelUnitMap(param)
-    return SingletonGetters.getModelWarField(param):getModelUnitMap()
+function SingletonGetters.getModelWarField(modelSceneWar)
+    return modelSceneWar:getModelWarField()
 end
 
-function SingletonGetters.getModelWarField(param)
-    return getModelScene(param):getModelWarField()
+function SingletonGetters.getModelWeatherManager(modelSceneWar)
+    return modelSceneWar:getModelWeatherManager()
 end
 
-function SingletonGetters.getModelWeatherManager(param)
-    return getModelScene(param):getModelWeatherManager()
+function SingletonGetters.getSceneWarFileName(modelSceneWar)
+    return modelSceneWar:getFileName()
 end
 
-function SingletonGetters.getSceneWarFileName(param)
-    return getModelScene(param):getFileName()
+function SingletonGetters.getScriptEventDispatcher(modelSceneWar)
+    return modelSceneWar:getScriptEventDispatcher()
 end
 
-function SingletonGetters.getScriptEventDispatcher(param)
-    return getModelScene(param):getScriptEventDispatcher()
-end
-
-function SingletonGetters.isTotalReplay(param)
-    return getModelScene(param):isTotalReplay()
+function SingletonGetters.isTotalReplay(modelSceneWar)
+    return modelSceneWar:isTotalReplay()
 end
 
 --------------------------------------------------------------------------------
 -- The public getters that can be used only on the client.
 --------------------------------------------------------------------------------
-function SingletonGetters.getModelConfirmBox(param)
-    return getModelScene(param):getModelConfirmBox()
+function SingletonGetters.getModelConfirmBox(modelScene)
+    return modelScene:getModelConfirmBox()
 end
 
-function SingletonGetters.getModelGridEffect(param)
-    return SingletonGetters.getModelWarField(param):getModelGridEffect()
+function SingletonGetters.getModelGridEffect(modelSceneWar)
+    return SingletonGetters.getModelWarField(modelSceneWar):getModelGridEffect()
 end
 
-function SingletonGetters.getModelMapCursor(param)
-    return SingletonGetters.getModelWarField(param):getModelMapCursor()
+function SingletonGetters.getModelMapCursor(modelSceneWar)
+    return SingletonGetters.getModelWarField(modelSceneWar):getModelMapCursor()
 end
 
-function SingletonGetters.getModelMessageIndicator(param)
-    return getModelScene(param):getModelMessageIndicator()
+function SingletonGetters.getModelMessageIndicator(modelScene)
+    return modelScene:getModelMessageIndicator()
 end
 
-function SingletonGetters.getModelMainMenu(param)
-    return getModelScene(param):getModelMainMenu()
+function SingletonGetters.getModelMainMenu(modelSceneMain)
+    return modelSceneMain:getModelMainMenu()
 end
 
-function SingletonGetters.getModelReplayController(param)
-    return getModelScene(param):getModelWarHud():getModelReplayController()
+function SingletonGetters.getModelReplayController(modelSceneWar)
+    return modelSceneWar:getModelWarHud():getModelReplayController()
 end
 
-function SingletonGetters.getModelWarCommandMenu(param)
-    return getModelScene(param):getModelWarHud():getModelWarCommandMenu()
+function SingletonGetters.getModelWarCommandMenu(modelSceneWar)
+    return modelSceneWar:getModelWarHud():getModelWarCommandMenu()
 end
 
-function SingletonGetters.getPlayerIndexLoggedIn(param)
-    return SingletonGetters.getModelPlayerManager(param):getPlayerIndexLoggedIn()
+function SingletonGetters.getPlayerIndexLoggedIn(modelSceneWar)
+    return SingletonGetters.getModelPlayerManager(modelSceneWar):getPlayerIndexLoggedIn()
 end
 
 return SingletonGetters

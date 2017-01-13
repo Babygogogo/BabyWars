@@ -496,6 +496,15 @@ function ModelSkillConfigurator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelSkillConfigurator:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:setEnabled(enabled)
@@ -535,7 +544,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
     elseif (state == "stateOverviewConfiguration") then
-        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
             :setOnConfirmYes(
                 function()
@@ -563,9 +572,9 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     assert(self.m_State == "stateOverviewConfiguration")
     local isConfigurationValid, err = self.m_ModelSkillConfiguration:isValid()
     if (not isConfigurationValid) then
-        SingletonGetters.getModelMessageIndicator():showMessage(err)
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(err)
     else
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
                 actionCode           = ACTION_CODE_SET_SKILL_CONFIGURATION,
                 skillConfigurationID = self.m_ConfigurationID,

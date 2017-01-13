@@ -156,7 +156,7 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
             actionCode       = ACTION_CODE_RUN_SCENE_WAR,
@@ -258,13 +258,22 @@ function ModelContinueWarSelector:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelContinueWarSelector:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_LIST})
     end
 
@@ -289,7 +298,7 @@ function ModelContinueWarSelector:updateWithOngoingWarList(list)
     if ((self.m_View) and (self.m_IsEnabled)) then
         local warList = createOngoingWarList(self, list)
         if (#warList == 0) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+            SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoContinuableWar"))
         else
             self.m_View:showWarList(warList)
         end

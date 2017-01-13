@@ -19,12 +19,12 @@ local SingletonGetters   = require("src.app.utilities.SingletonGetters")
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateWithModelTileMap(self)
-    local modelTileMap = SingletonGetters.getModelTileMap()
+    local modelTileMap = SingletonGetters.getModelTileMap(self.m_ModelSceneWar)
     local modelTile    = modelTileMap:getModelTile(self.m_CursorGridIndex)
 
     if (self.m_View) then
         self.m_View:updateWithModelTile(modelTile)
-            :setVisible(not SingletonGetters.getModelWarCommandMenu():isEnabled())
+            :setVisible(not SingletonGetters.getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())
     end
 end
 
@@ -83,7 +83,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelTileInfo:onStartRunning(modelSceneWar, sceneWarFileName)
-    SingletonGetters.getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtModelTileMapUpdated",   self)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtGridSelected",          self)
@@ -92,7 +93,7 @@ function ModelTileInfo:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
     if (self.m_View) then
-        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 
     updateWithModelTileMap(self)
@@ -118,7 +119,7 @@ end
 --------------------------------------------------------------------------------
 function ModelTileInfo:onPlayerTouch()
     if (self.m_ModelTileDetail) then
-        local modelTile = SingletonGetters.getModelTileMap():getModelTile(self.m_CursorGridIndex)
+        local modelTile = SingletonGetters.getModelTileMap(self.m_ModelSceneWar):getModelTile(self.m_CursorGridIndex)
         self.m_ModelTileDetail:updateWithModelTile(modelTile)
             :setEnabled(true)
     end

@@ -20,12 +20,10 @@ local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
 local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
 local isUnitOnMapVisibleToPlayerIndex = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."

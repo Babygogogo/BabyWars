@@ -39,6 +39,15 @@ function ModelLoginPanel:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelLoginPanel:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelLoginPanel:isEnabled()
@@ -69,7 +78,7 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
             self.m_View:disableButtonRegisterForSecs(5)
         end
 
-        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 WebSocketManager.sendAction({

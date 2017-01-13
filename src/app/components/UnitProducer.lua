@@ -42,7 +42,7 @@ end
 -- The public callback functions on start running.
 --------------------------------------------------------------------------------
 function UnitProducer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -67,9 +67,9 @@ end
 
 function UnitProducer:getProductionList()
     local playerIndex      = self.m_Owner:getPlayerIndex()
-    local fund             = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getFund()
-    local sceneWarFileName = self.m_SceneWarFileName
-    local modelSceneWar    = SingletonGetters.getModelScene(sceneWarFileName)
+    local modelSceneWar    = self.m_ModelSceneWar
+    local sceneWarFileName = modelSceneWar:getFileName()
+    local fund             = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getFund()
     local list             = {}
 
     for i, unitName in ipairs(self.m_Template.productionList) do

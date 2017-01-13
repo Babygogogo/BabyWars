@@ -71,7 +71,7 @@ local function getNormalizedRepairAmount(self)
     if ((not baseAmount) or (playerIndex < 1)) then
         return baseAmount
     else
-        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
         return baseAmount + SkillModifierFunctions.getRepairAmountModifier(modelPlayer:getModelSkillConfiguration())
     end
 end
@@ -117,7 +117,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function UnitLoader:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -175,7 +175,7 @@ function UnitLoader:getRepairAmountAndCostForLoadedModelUnit(modelUnit)
     assert(self:hasLoadUnitId(modelUnit:getUnitId()),
         "UnitLoader:getRepairAmountAndCostForLoadedModelUnit() the param modelUnit is not loaded by self.")
 
-    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
+    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
     local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
     local productionCost = math.floor(
         (costModifier >= 0)                                          and
