@@ -17,6 +17,7 @@ local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
@@ -76,7 +77,7 @@ function Destroyers.destroyActorUnitOnMap(modelSceneWar, gridIndex, shouldRemove
 
     if (not shouldRetainVisibility) then
         local playerIndex = modelUnit:getPlayerIndex()
-        if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
             getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, gridIndex, modelUnit:getVisionForPlayerIndex(playerIndex))
         end
     end
@@ -104,7 +105,7 @@ function Destroyers.destroyPlayerForce(modelSceneWar, playerIndex)
         end
     end)
 
-    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+    if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
         getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
             :resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)

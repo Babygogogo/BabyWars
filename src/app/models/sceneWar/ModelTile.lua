@@ -166,7 +166,7 @@ function ModelTile:toSerializableTable()
 end
 
 function ModelTile:toSerializableTableForPlayerIndex(playerIndex)
-    if (isTileVisibleToPlayerIndex(self.m_SceneWarFileName, self:getGridIndex(), playerIndex)) then
+    if (isTileVisibleToPlayerIndex(self.m_ModelSceneWar, self:getGridIndex(), playerIndex)) then
         return self:toSerializableTable()
     end
 

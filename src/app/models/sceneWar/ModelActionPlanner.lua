@@ -222,8 +222,8 @@ end
 --------------------------------------------------------------------------------
 local function createAndSendAction(self, rawAction)
     local modelSceneWar        = self.m_ModelSceneWar
+    rawAction.sceneWarFileName = self.m_SceneWarFileName
     rawAction.actionID         = getActionId(modelSceneWar) + 1
-    rawAction.sceneWarFileName = SingletonGetters.getSceneWarFileName(modelSceneWar)
     WebSocketManager.sendAction(rawAction)
 
     getModelMessageIndicator(modelSceneWar):showPersistentMessage(getLocalizedText(80, "TransferingData"))
@@ -1141,7 +1141,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelActionPlanner:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_ModelSceneWar = modelSceneWar
+    self.m_ModelSceneWar    = modelSceneWar
+    self.m_SceneWarFileName = sceneWarFileName
     getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)

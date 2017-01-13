@@ -202,6 +202,7 @@ function ViewWarCommandMenu:ctor(param)
     initOverview(      self)
 
     self:ignoreAnchorPointForPosition(true)
+        :setVisible(false)
 
     return self
 end

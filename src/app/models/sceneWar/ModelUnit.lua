@@ -100,7 +100,6 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
 
     if (self.m_View) then

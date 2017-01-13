@@ -98,7 +98,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
                     modelWarConfigurator:disableButtonConfirmForSecs(5)
                     WebSocketManager.sendAction({
                         actionCode           = ACTION_CODE_NEW_WAR,
-                        intervalUntilBoot    = 30, --3600 * 24 * 3, -- TODO: add a selector for this.
+                        intervalUntilBoot    = 3600 * 24 * 3, -- TODO: add a selector for this.
                         warPassword          = password,
                         warFieldFileName     = modelWarConfigurator:getWarFieldFileName(),
                         playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex")   :getCurrentOption(),
