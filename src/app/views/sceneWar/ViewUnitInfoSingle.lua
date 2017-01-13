@@ -255,6 +255,12 @@ function ViewUnitInfoSingle:ctor(param)
     return self
 end
 
+function ViewUnitInfoSingle:setModelSceneWar(modelSceneWar)
+    self.m_UnitIcon:setModelSceneWar(modelSceneWar)
+
+    return self
+end
+
 function ViewUnitInfoSingle:setCallbackOnTouch(callback)
     self.m_Background:addTouchEventListener(function(sender, eventType)
         if (eventType == ccui.TouchEventType.ended) then

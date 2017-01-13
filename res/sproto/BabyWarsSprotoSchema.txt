@@ -6,20 +6,22 @@
     ActionDownloadReplayData            1 : ActionDownloadReplayData
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
     ActionGetOngoingWarList             3 : ActionGetOngoingWarList
-    ActionGetReplayConfigurations       4 : ActionGetReplayConfigurations
-    ActionGetSkillConfiguration         5 : ActionGetSkillConfiguration
-    ActionJoinWar                       6 : ActionJoinWar
-    ActionLogin                         7 : ActionLogin
-    ActionLogout                        8 : ActionLogout
-    ActionMessage                       9 : ActionMessage
-    ActionNetworkHeartbeat             10 : ActionNetworkHeartbeat
-    ActionNewWar                       11 : ActionNewWar
-    ActionRegister                     12 : ActionRegister
-    ActionReloadSceneWar               13 : ActionReloadSceneWar
-    ActionRunSceneMain                 14 : ActionRunSceneMain
-    ActionRunSceneWar                  15 : ActionRunSceneWar
-    ActionSetSkillConfiguration        16 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 17 : ActionSyncSceneWar
+    ActionGetPlayerProfile              4 : ActionGetPlayerProfile
+    ActionGetRankingList                5 : ActionGetRankingList
+    ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         7 : ActionGetSkillConfiguration
+    ActionJoinWar                       8 : ActionJoinWar
+    ActionLogin                         9 : ActionLogin
+    ActionLogout                       10 : ActionLogout
+    ActionMessage                      11 : ActionMessage
+    ActionNetworkHeartbeat             12 : ActionNetworkHeartbeat
+    ActionNewWar                       13 : ActionNewWar
+    ActionRegister                     14 : ActionRegister
+    ActionReloadSceneWar               15 : ActionReloadSceneWar
+    ActionRunSceneMain                 16 : ActionRunSceneMain
+    ActionRunSceneWar                  17 : ActionRunSceneWar
+    ActionSetSkillConfiguration        18 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 19 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -40,6 +42,7 @@
     ActionSurface                     116 : ActionSurface
     ActionSurrender                   117 : ActionSurrender
     ActionWait                        118 : ActionWait
+    ActionVoteForDraw                 119 : ActionVoteForDraw
 }
 
 .ActionRedis {
@@ -71,6 +74,18 @@
     playerAccount  1 :  string
     playerPassword 2 :  string
     ongoingWarList 3 : *OngoingWarListItem
+}
+
+.ActionGetPlayerProfile {
+    actionCode    0 : integer
+    playerAccount 1 : string
+    playerProfile 2 : PlayerProfileForClient
+}
+
+.ActionGetRankingList {
+    actionCode       0 :  integer
+    rankingListIndex 1 :  integer
+    rankingList      2 : *RankingListItem
 }
 
 .ActionGetReplayConfigurations {
@@ -134,6 +149,9 @@
     maxBaseSkillPoints    8 : integer
     isFogOfWarByDefault   9 : boolean
     defaultWeatherCode   10 : integer
+    isRankMatch          11 : boolean
+    maxDiffScore         12 : integer
+    intervalUntilBoot    13 : integer
 }
 
 .ActionRegister {
@@ -471,6 +489,15 @@
     launchUnitID     10 :  integer
 }
 
+.ActionVoteForDraw {
+    actionCode        0 : integer
+    playerAccount     1 : string
+    playerPassword    2 : string
+    sceneWarFileName  3 : string
+    actionID          4 : integer
+    doesAgree         5 : boolean
+}
+
 ################################################################################
 # components
 ################################################################################
@@ -579,7 +606,8 @@
 
     .WarLists {
         ongoing 0 : *SceneWarFileNameForIndex(sceneWarFileName)
-        created 1 : *SceneWarFileNameForIndex(sceneWarFileName)
+        created 1 : *SceneWarFileNameForIndex(sceneWarFileName) # deprecated
+        waiting 2 : *SceneWarFileNameForIndex(sceneWarFileName)
     }
 
     account             0 :  string
@@ -588,6 +616,30 @@
     gameRecords         3 : *SingleGameRecord
     skillConfigurations 4 : *SingleSkillConfiguration
     warLists            5 :  WarLists
+}
+
+.PlayerProfileForClient {
+    .WarLists {
+        waiting 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+    }
+
+    account     0 :  string
+    nickname    1 :  string
+    gameRecords 2 : *SingleGameRecordForPlayerProfile
+    warLists    3 :  WarLists
+}
+
+.RankingList {
+    list 0 : *RankingListItem
+}
+
+.RankingListItem {
+    rankScore 0 :  integer
+    accounts  1 : *string
+}
+
+.RankingListsForServer {
+    lists 0 : *RankingList
 }
 
 .ReplayConfiguration {
@@ -614,6 +666,7 @@
         damageCost          5 : integer
         skillActivatedCount 6 : integer
         skillConfiguration  7 : SingleSkillConfiguration
+        hasVotedForDraw     8 : boolean
     }
 
     .TurnData {
@@ -658,23 +711,36 @@
         expiringTurnIndexForWeather   3 : integer
     }
 
-    sceneWarFileName     0 :  string
-    actionID             1 :  integer
-    maxBaseSkillPoints   2 :  integer
-    isWarEnded           3 :  boolean
-    isRandomWarField     4 :  boolean
-    isFogOfWarByDefault  5 :  boolean
-    isTotalReplay        6 :  boolean
-    warPassword          7 :  string
-    executedActions      8 : *ActionGeneric
-    players              9 : *SinglePlayerData(playerIndex)
-    turn                10 :  TurnData
-    warField            11 :  WarFieldData
-    weather             12 :  WeatherData
+    sceneWarFileName       0 :  string
+    actionID               1 :  integer
+    maxBaseSkillPoints     2 :  integer
+    isWarEnded             3 :  boolean
+    isRandomWarField       4 :  boolean
+    isFogOfWarByDefault    5 :  boolean
+    isTotalReplay          6 :  boolean
+    warPassword            7 :  string
+    executedActions        8 : *ActionGeneric
+    players                9 : *SinglePlayerData(playerIndex)
+    turn                  10 :  TurnData
+    warField              11 :  WarFieldData
+    weather               12 :  WeatherData
+    remainingVotesForDraw 13 :  integer
+    isRankMatch           14 :  boolean
+    maxDiffScore          15 :  integer
+    createdTime           16 :  integer
+    intervalUntilBoot     17 :  integer
+    enterTurnTime         18 :  integer
 }
 
 .SceneWarFileNameForIndex {
     sceneWarFileName 0 : string
+}
+
+.SingleGameRecordForPlayerProfile {
+    rankScore 0 : integer
+    win       1 : integer
+    lose      2 : integer
+    draw      3 : integer
 }
 
 .SingleSkillConfiguration {
@@ -725,12 +791,16 @@
 }
 
 .WarConfiguration {
-    sceneWarFileName    0 :  string
-    warFieldFileName    1 :  string
-    warPassword         2 :  string
-    maxBaseSkillPoints  3 :  integer
-    isFogOfWarByDefault 4 :  boolean
-    defaultWeatherCode  5 :  integer
-    isRandomWarField    6 :  boolean
-    players             7 : *PlayerInfo(playerIndex)
+    sceneWarFileName     0 :  string
+    warFieldFileName     1 :  string
+    warPassword          2 :  string
+    maxBaseSkillPoints   3 :  integer
+    isFogOfWarByDefault  4 :  boolean
+    defaultWeatherCode   5 :  integer
+    isRandomWarField     6 :  boolean
+    players              7 : *PlayerInfo(playerIndex)
+    isRankMatch          8 :  boolean
+    maxDiffScore         9 :  integer
+    createdTime         10 :  integer
+    intervalUntilBoot   11 :  integer
 }

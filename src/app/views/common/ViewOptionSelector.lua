@@ -1,12 +1,12 @@
 
 local ViewOptionSelector = class("ViewOptionSelector", cc.Node)
 
-local ARROW_LEFT_WIDTH        = 54
-local ARROW_LEFT_HEIGHT       = 54
+local ARROW_LEFT_WIDTH        = 42
+local ARROW_LEFT_HEIGHT       = 42
 local OPTION_INDICATOR_WIDTH  = 250
-local OPTION_INDICATOR_HEIGHT = 60
+local OPTION_INDICATOR_HEIGHT = 50
 local TITLE_LABEL_WIDTH       = OPTION_INDICATOR_WIDTH
-local TITLE_LABEL_HEIGHT      = 30
+local TITLE_LABEL_HEIGHT      = 25
 local ARROW_RIGHT_WIDTH       = ARROW_LEFT_WIDTH
 local ARROW_RIGHT_HEIGHT      = ARROW_LEFT_HEIGHT
 
@@ -23,8 +23,8 @@ local FONT_NAME           = "res/fonts/msyhbd.ttc"
 local FONT_COLOR          = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR  = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH  = 2
-local TITLE_FONT_SIZE     = 20
-local INDICATOR_FONT_SIZE = 32
+local TITLE_FONT_SIZE     = 16
+local INDICATOR_FONT_SIZE = 25
 
 local OPTION_INDICATOR_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
@@ -38,7 +38,7 @@ local function initArrowLeft(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(ARROW_LEFT_POS_X, ARROW_LEFT_POS_Y)
 
-        :setScale(0.75)
+        :setScale(0.6)
         :setZoomScale(-0.05)
 
         :addTouchEventListener(function(sender, eventType)
@@ -58,7 +58,7 @@ local function initArrowRight(self)
         :ignoreAnchorPointForPosition(true)
         :setPosition(ARROW_RIGHT_POS_X, ARROW_RIGHT_POS_Y)
 
-        :setScale(0.75)
+        :setScale(0.6)
         :setZoomScale(-0.05)
 
         :addTouchEventListener(function(sender, eventType)

@@ -29,7 +29,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function VisionOwner:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -44,9 +44,9 @@ function VisionOwner:getVisionForPlayerIndex(playerIndex, gridIndex)
     if ((not template.isEnabledForAllPlayers) and (ownerPlayerIndex ~= playerIndex)) then
         return nil
     else
-        local sceneWarFileName        = self.m_SceneWarFileName
+        local modelSceneWar           = self.m_ModelSceneWar
         local baseVision              = template.vision
-        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration()
+        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration()
         if (owner.getTileType) then
             if (ownerPlayerIndex == playerIndex) then
                 return baseVision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
@@ -54,7 +54,7 @@ function VisionOwner:getVisionForPlayerIndex(playerIndex, gridIndex)
                 return baseVision
             end
         else
-            local tileType = getModelTileMap(sceneWarFileName):getModelTile(gridIndex or owner:getGridIndex()):getTileType()
+            local tileType = getModelTileMap(modelSceneWar):getModelTile(gridIndex or owner:getGridIndex()):getTileType()
             local bonus    = (template.bonusOnTiles) and (template.bonusOnTiles[tileType] or 0) or (0)
             return baseVision + bonus + SkillModifierFunctions.getVisionModifierForUnits(modelSkillConfiguration)
         end

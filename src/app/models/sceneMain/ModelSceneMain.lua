@@ -124,15 +124,17 @@ function ModelSceneMain:initView()
     return self
 end
 
+--------------------------------------------------------------------------------
+-- The callback function on start running/script/web socket events.
+--------------------------------------------------------------------------------
 function ModelSceneMain:onStartRunning()
+    self:getModelMainMenu():onStartRunning(self)
+
     AudioManager.playMainMusic()
 
     return self
 end
 
---------------------------------------------------------------------------------
--- The callback function on script/web socket events.
---------------------------------------------------------------------------------
 function ModelSceneMain:onWebSocketEvent(eventName, param)
     if     (eventName == "open")    then onWebSocketOpen(   self, param)
     elseif (eventName == "message") then onWebSocketMessage(self, param)

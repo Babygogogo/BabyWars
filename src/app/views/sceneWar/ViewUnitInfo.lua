@@ -33,20 +33,19 @@ local function createLabel(posX, posY)
     return label
 end
 
---------------------------------------------------------------------------------
--- The composition elements.
---------------------------------------------------------------------------------
-local function initSubViewList(self)
+local function initSubView(self, index)
     local subView = Actor.createView("sceneWar.ViewUnitInfoSingle")
-    subView:setVisible(true)
+    subView:setModelSceneWar(self.m_ModelSceneWar)
+        :updateWithPlayerIndex(self.m_PlayerIndex)
+        :setVisible(true)
         :setCallbackOnTouch(function()
             if (self.m_Model) then
-                self.m_Model:onPlayerTouch(1)
+                self.m_Model:onPlayerTouch(index)
             end
         end)
 
     self:addChild(subView, SUB_VIEW_Z_ORDER)
-    self.m_SubViewList = {subView}
+    self.m_SubViewList[index] = subView
 end
 
 --------------------------------------------------------------------------------
@@ -79,15 +78,21 @@ local function adjustPosition(self, toLeftSide)
 end
 
 --------------------------------------------------------------------------------
--- The constructor.
+-- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewUnitInfo:ctor(param)
-    initSubViewList(self)
+    self.m_SubViewList = {}
 
     self:ignoreAnchorPointForPosition(true)
         :setVisible(false)
 
     adjustPosition(self, false)
+
+    return self
+end
+
+function ViewUnitInfo:setModelSceneWar(modelSceneWar)
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -109,6 +114,9 @@ end
 
 function ViewUnitInfo:updateWithModelUnit(modelUnit, loadedModelUnits)
     local subViewList = self.m_SubViewList
+    if (not subViewList[1]) then
+        initSubView(self, 1)
+    end
     subViewList[1]:updateWithModelUnit(modelUnit)
 
     for i = 2, #subViewList do
@@ -117,16 +125,7 @@ function ViewUnitInfo:updateWithModelUnit(modelUnit, loadedModelUnits)
 
     for i, loadedModelUnit in ipairs(loadedModelUnits or {}) do
         if (not subViewList[i + 1]) then
-            local subView = Actor.createView("sceneWar.ViewUnitInfoSingle")
-            subView:updateWithPlayerIndex(self.m_PlayerIndex)
-                :setCallbackOnTouch(function()
-                    if (self.m_Model) then
-                        self.m_Model:onPlayerTouch(i + 1)
-                    end
-                end)
-
-            self:addChild(subView, SUB_VIEW_Z_ORDER)
-            subViewList[i + 1] = subView
+            initSubView(self, i + 1)
         end
 
         subViewList[i + 1]:updateWithModelUnit(loadedModelUnit)

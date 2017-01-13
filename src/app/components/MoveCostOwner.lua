@@ -43,7 +43,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function MoveCostOwner:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -69,7 +69,7 @@ function MoveCostOwner:getMoveCostWithModelUnit(modelUnit)
         if (not baseCost) then
             return baseCost
         else
-            local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(modelUnit:getPlayerIndex())
+            local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(modelUnit:getPlayerIndex())
             return SkillModifierFunctions.isPerfectMovement(modelPlayer:getModelSkillConfiguration()) and (1) or (baseCost)
         end
     end

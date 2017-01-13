@@ -16,7 +16,6 @@ local Destroyers            = require("src.app.utilities.Destroyers")
 local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local ComponentManager      = require("src.global.components.ComponentManager")
 
 local UNIT_STATE_CODE = {
@@ -101,10 +100,12 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
 
-    self:updateView()
+    if (self.m_View) then
+        self.m_View:setModelSceneWar(modelSceneWar)
+        self:updateView()
+    end
 
     return self
 end
@@ -112,10 +113,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelUnit:getSceneWarFileName()
-    return self.m_SceneWarFileName
-end
-
 function ModelUnit:moveViewAlongPath(path, isDiving, callbackAfterMove)
     if (self.m_View) then
         self.m_View:moveAlongPath(path, isDiving, callbackAfterMove)

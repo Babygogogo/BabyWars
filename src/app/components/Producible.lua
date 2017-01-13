@@ -45,7 +45,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function Producible:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -54,7 +54,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function Producible:getProductionCost()
-    return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName))
+    return Producible.getProductionCostWithTiledId(self.m_Owner:getTiledId(), SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar))
 end
 
 function Producible:getBaseProductionCost()

@@ -107,7 +107,7 @@ end
 -- The public callback function for start running.
 --------------------------------------------------------------------------------
 function AttackDoer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -182,7 +182,7 @@ function AttackDoer:getAttackRangeMinMax()
     if (maxRange <= 1) then
         return minRange, maxRange
     else
-        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_Owner:getPlayerIndex())
+        local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
         return minRange,
             math.max(minRange, maxRange + SkillModifierFunctions.getAttackRangeModifier(modelPlayer:getModelSkillConfiguration()))
     end

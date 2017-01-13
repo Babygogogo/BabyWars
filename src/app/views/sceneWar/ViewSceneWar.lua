@@ -179,6 +179,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ViewSceneWar:showEffectEndWithDraw(callback)
+    local effect = createEndWarEffect(getLocalizedText(73, "Draw"), callback)
+    self:addChild(effect, END_WAR_EFFECT_Z_ORDER)
+    effect:runAction(createEndWarEffectMoveInAction(effect))
+
+    return self
+end
+
 function ViewSceneWar:showEffectSurrender(callback)
     local effect = createEndWarEffect(getLocalizedText(73, "Surrender"), callback)
     self:addChild(effect, END_WAR_EFFECT_Z_ORDER)

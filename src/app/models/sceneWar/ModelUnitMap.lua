@@ -20,12 +20,10 @@ local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
 
 local Destroyers             = require("src.app.utilities.Destroyers")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
-local getScriptEventDispatcher        = SingletonGetters.getScriptEventDispatcher
 local isUnitOnMapVisibleToPlayerIndex = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
@@ -165,10 +163,10 @@ function ModelUnitMap:toSerializableTable()
 end
 
 function ModelUnitMap:toSerializableTableForPlayerIndex(playerIndex)
-    local sceneWarFileName        = self.m_SceneWarFileName
+    local modelSceneWar           = self.m_ModelSceneWar
     local unitsOnMap, unitsLoaded = {}, {}
     self:forEachModelUnitOnMap(function(modelUnit)
-        if (isUnitOnMapVisibleToPlayerIndex(sceneWarFileName, modelUnit:getGridIndex(), modelUnit:getUnitType(), (modelUnit.isDiving) and (modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
+        if (isUnitOnMapVisibleToPlayerIndex(modelSceneWar, modelUnit:getGridIndex(), modelUnit:getUnitType(), (modelUnit.isDiving) and (modelUnit:isDiving()), modelUnit:getPlayerIndex(), playerIndex)) then
             unitsOnMap[modelUnit:getUnitId()] = modelUnit:toSerializableTable()
 
             for _, loadedModelUnit in pairs(self:getLoadedModelUnitsWithLoader(modelUnit, true) or {}) do
@@ -188,7 +186,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnitMap:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar    = modelSceneWar
     local func = function(modelUnit)
         modelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
     end

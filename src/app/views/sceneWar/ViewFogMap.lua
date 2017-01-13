@@ -5,7 +5,6 @@ local GridIndexFunctions  = require("src.app.utilities.GridIndexFunctions")
 local SingletonGetters    = require("src.app.utilities.SingletonGetters")
 local VisibilityFunctions = require("src.app.utilities.VisibilityFunctions")
 
-local getModelTurnManager = SingletonGetters.getModelTurnManager
 local isTileVisible       = VisibilityFunctions.isTileVisibleToPlayerIndex
 local toPositionWithXY    = GridIndexFunctions.toPositionWithXY
 
@@ -46,18 +45,25 @@ function ViewFogMap:setMapSize(mapSize)
     return self
 end
 
+function ViewFogMap:setModelSceneWar(modelSceneWar)
+    self.m_ModelSceneWar = modelSceneWar
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewFogMap:updateWithModelFogMap()
-    local playerIndex   = getModelTurnManager():getPlayerIndex()
+    local modelSceneWar = self.m_ModelSceneWar
+    local playerIndex   = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
     local width, height = self.m_MapSize.width, self.m_MapSize.height
     local map           = self.m_Map
 
     for x = 1, width do
         local column = map[x]
         for y = 1, height do
-            column[y]:setVisible(not isTileVisible(nil, {x = x, y = y}, playerIndex))
+            column[y]:setVisible(not isTileVisible(modelSceneWar, {x = x, y = y}, playerIndex))
         end
     end
 

@@ -10,6 +10,7 @@ local getSkillEnergyRequirement = SkillDataAccessors.getSkillEnergyRequirement
 local getSkillModifier          = SkillDataAccessors.getSkillModifier
 local getSkillModifierUnit      = SkillDataAccessors.getSkillModifierUnit
 local getLocalizedText          = LocalizationFunctions.getLocalizedText
+local string                    = string
 
 local PASSIVE_SLOTS_COUNT    = SkillDataAccessors.getPassiveSkillSlotsCount()
 local ACTIVE_SLOTS_COUNT     = SkillDataAccessors.getActiveSkillSlotsCount()
@@ -34,8 +35,14 @@ end
 
 local function transformModifier3(modifier, unit)
     unit = unit or ""
-    if (modifier > 0) then return "+" .. modifier .. unit
-    else                   return        modifier .. unit
+    if (modifier == math.floor(modifier)) then
+        if (modifier > 0) then return string.format("+%d%s", modifier, unit)
+        else                   return string.format("%d%s",  modifier, unit)
+        end
+    else
+        if (modifier > 0) then return string.format("+%.2f%s", modifier, unit)
+        else                   return string.format("%.2f%s",  modifier, unit)
+        end
     end
 end
 
@@ -46,9 +53,9 @@ local function getSkillModifierForDisplay(id, level, isActive)
     end
 
     local modifierUnit = getSkillModifierUnit(id)
-    if     (id == 1)  then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 2)  then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 3)  then return transformModifier2(-modifier, modifierUnit)
+    if     (id == 1)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 2)  then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 3)  then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 4)  then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 5)  then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 6)  then return transformModifier3(modifier,  modifierUnit)
@@ -70,23 +77,23 @@ local function getSkillModifierForDisplay(id, level, isActive)
     elseif (id == 25) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 26) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 27) then return transformModifier3(modifier,  modifierUnit)
-    elseif (id == 29) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 30) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 31) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 32) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 33) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 34) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 35) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 36) then return transformModifier1(modifier,  modifierUnit)
-    elseif (id == 37) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 38) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 39) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 40) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 41) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 42) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 43) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 44) then return transformModifier2(modifier,  modifierUnit)
-    elseif (id == 45) then return transformModifier2(modifier,  modifierUnit)
+    elseif (id == 29) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 30) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 31) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 32) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 33) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 34) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 35) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 36) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 37) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 38) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 39) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 40) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 41) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 42) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 43) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 44) then return transformModifier3(modifier,  modifierUnit)
+    elseif (id == 45) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 46) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 47) then return transformModifier3(modifier,  modifierUnit)
     elseif (id == 48) then return transformModifier3(modifier,  modifierUnit)

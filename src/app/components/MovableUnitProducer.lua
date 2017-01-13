@@ -30,7 +30,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function MovableUnitProducer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -39,7 +39,7 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function MovableUnitProducer:getMovableProductionCost()
-    return Producible.getProductionCostWithTiledId(self:getMovableProductionTiledId(), SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName))
+    return Producible.getProductionCostWithTiledId(self:getMovableProductionTiledId(), SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar))
 end
 
 function MovableUnitProducer:getMovableProductionTiledId()

@@ -7,15 +7,12 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
--- The util functions.
+-- The composition elements.
 --------------------------------------------------------------------------------
 local function createSelector(titleText)
     return Actor.createWithModelAndViewName("common.ModelOptionSelector", titleText, "common.ViewOptionSelector")
 end
 
---------------------------------------------------------------------------------
--- The composition elements.
---------------------------------------------------------------------------------
 local function initActorSelectorPlayerIndex(self)
     local actor = createSelector(getLocalizedText(34, "PlayerIndex"))
 
@@ -50,6 +47,14 @@ local function initActorSelectorMaxSkillPoints(self)
     self.m_ActorSelectorMaxSkillPoints = actor
 end
 
+local function initActorSelectorRankMatch(self)
+    self.m_ActorSelectorRankMatch = createSelector(getLocalizedText(34, "RankMatch"))
+end
+
+local function initActorSelectorMaxDiffScore(self)
+    self.m_ActorSelectorMaxDiffScore = createSelector(getLocalizedText(34, "MaxDiffScore"))
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -59,17 +64,21 @@ function ModelWarConfigurator:ctor()
     initActorSelectorWeather(       self)
     initActorSelectorSkill(         self)
     initActorSelectorMaxSkillPoints(self)
+    initActorSelectorRankMatch(     self)
+    initActorSelectorMaxDiffScore(  self)
 
     return self
 end
 
 function ModelWarConfigurator:initView()
     assert(self.m_View, "ModelWarConfigurator:initView() no view is attached to the owner actor of the model.")
-    self.m_View:setViewSelectorPlayerIndex(self.m_ActorSelectorPlayerIndex:getView())
-        :setViewSelectorFog(               self.m_ActorSelectorFog:getView())
-        :setViewSelectorWeather(           self.m_ActorSelectorWeather:getView())
-        :setViewSelectorSkill(             self.m_ActorSelectorSkill:getView())
+    self.m_View:setViewSelectorPlayerIndex(self.m_ActorSelectorPlayerIndex   :getView())
+        :setViewSelectorFog(               self.m_ActorSelectorFog           :getView())
+        :setViewSelectorWeather(           self.m_ActorSelectorWeather       :getView())
+        :setViewSelectorSkill(             self.m_ActorSelectorSkill         :getView())
         :setViewSelectorMaxSkillPoints(    self.m_ActorSelectorMaxSkillPoints:getView())
+        :setViewSelectorRankMatch(         self.m_ActorSelectorRankMatch     :getView())
+        :setViewSelectorMaxDiffScore(      self.m_ActorSelectorMaxDiffScore  :getView())
 
     return self
 end

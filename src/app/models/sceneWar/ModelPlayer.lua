@@ -41,6 +41,7 @@ function ModelPlayer:ctor(param)
     self.m_IsAlive                 = param.isAlive
     self.m_DamageCost              = param.damageCost
     self.m_SkillActivatedCount     = param.skillActivatedCount
+    self.m_HasVotedForDraw         = param.hasVotedForDraw
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
 
     return self
@@ -58,6 +59,7 @@ function ModelPlayer:toSerializableTable()
         isAlive             = self:isAlive(),
         damageCost          = self.m_DamageCost,
         skillActivatedCount = self.m_SkillActivatedCount,
+        hasVotedForDraw     = self:hasVotedForDraw(),
         skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
     }
 end
@@ -71,6 +73,7 @@ function ModelPlayer:toSerializableReplayData()
         isAlive             = true,
         damageCost          = 0,
         skillActivatedCount = 0,
+        hasVotedForDraw     = nil,
         skillConfiguration  = self:getModelSkillConfiguration():toSerializableReplayData(),
     }
 end
@@ -104,6 +107,16 @@ function ModelPlayer:setFund(fund)
     assert((fund >= 0) and (math.floor(fund) == fund),
         "ModelPlayer:setFund() the param is invalid. " .. SerializationFunctions.toErrorMessage(fund))
     self.m_Fund = fund
+
+    return self
+end
+
+function ModelPlayer:hasVotedForDraw()
+    return self.m_HasVotedForDraw
+end
+
+function ModelPlayer:setVotedForDraw(hasVoted)
+    self.m_HasVotedForDraw = hasVoted
 
     return self
 end

@@ -39,14 +39,14 @@ local DRAG_FIELD_TRIGGER_DISTANCE_SQUARED = 400
 -- The util functions.
 --------------------------------------------------------------------------------
 local function dispatchEvtMapCursorMoved(self, gridIndex)
-    getScriptEventDispatcher():dispatchEvent({
+    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
         name      = "EvtMapCursorMoved",
         gridIndex = gridIndex,
     })
 end
 
 local function dispatchEvtGridSelected(self, gridIndex)
-    getScriptEventDispatcher():dispatchEvent({
+    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
         name      = "EvtGridSelected",
         gridIndex = gridIndex,
     })
@@ -84,7 +84,7 @@ local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
     local function onTouchesBegan(touches, event)
-        if (getModelWarCommandMenu():isEnabled()) then
+        if (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled()) then
             return
         end
 
@@ -97,7 +97,7 @@ local function createTouchListener(self)
 
     local function onTouchesMoved(touches, event)
         if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (getModelWarCommandMenu():isEnabled())) then
+            (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())) then
             return
         end
 
@@ -107,7 +107,7 @@ local function createTouchListener(self)
             (cc.pDistanceSQ(touches[1]:getLocation(), initialTouchPosition) > DRAG_FIELD_TRIGGER_DISTANCE_SQUARED)
 
         if (touchesCount >= 2) then
-            getScriptEventDispatcher():dispatchEvent({
+            getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
                 name    = "EvtZoomFieldWithTouches",
                 touches = touches,
             })
@@ -122,7 +122,7 @@ local function createTouchListener(self)
                 end
             else
                 if (isTouchMoved) then
-                    getScriptEventDispatcher():dispatchEvent({
+                    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
                         name             = "EvtDragField",
                         previousPosition = touches[1]:getPreviousLocation(),
                         currentPosition  = touches[1]:getLocation()
@@ -137,7 +137,7 @@ local function createTouchListener(self)
 
     local function onTouchesEnded(touches, event)
         if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (getModelWarCommandMenu():isEnabled())) then
+            (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())) then
             return
         end
 
@@ -159,9 +159,9 @@ local function createTouchListener(self)
     return touchListener
 end
 
-local function createMouseListener()
+local function createMouseListener(self)
     local function onMouseScroll(event)
-        getScriptEventDispatcher():dispatchEvent({
+        getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
             name        = "EvtZoomFieldWithScroll",
             scrollEvent = event
         })
@@ -200,7 +200,7 @@ function ModelMapCursor:initView()
 
     self:setViewPositionWithGridIndex()
     view:setTouchListener(createTouchListener(self))
-        :setMouseListener(createMouseListener())
+        :setMouseListener(createMouseListener(self))
 
         :setNormalCursorVisible(true)
         :setTargetCursorVisible(false)
@@ -213,7 +213,8 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelMapCursor:onStartRunning(modelSceneWar, sceneWarFileName)
-    getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtGridSelected",                     self)
         :addEventListener("EvtMapCursorMoved",                   self)
         :addEventListener("EvtPreviewBattleDamage",              self)

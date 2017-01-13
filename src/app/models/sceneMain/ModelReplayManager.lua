@@ -10,8 +10,6 @@ local SerializationFunctions = require("src.app.utilities.SerializationFunctions
 local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
-local getModelConfirmBox       = SingletonGetters.getModelConfirmBox
-local getModelMainMenu         = SingletonGetters.getModelMainMenu
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
 local sendAction               = WebSocketManager.sendAction
 
@@ -137,7 +135,7 @@ local function createMenuItemsForDelete(self)
                 end
 
                 self.m_OnButtonConfirmTouched = function()
-                    local modelConfirmBox = getModelConfirmBox()
+                    local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
                     modelConfirmBox:setEnabled(true)
                         :setConfirmText(getLocalizedText(10, "DeleteConfirmation"))
                         :setOnConfirmYes(function()
@@ -184,7 +182,7 @@ local function createMenuItemsForDownload(self, list)
                             self.m_View:disableButtonConfirmForSecs(10)
                         end
 
-                        getModelMessageIndicator():showMessage(getLocalizedText(10, "DownloadStarted"))
+                        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "DownloadStarted"))
                     end
                 end,
             }
@@ -245,7 +243,7 @@ setStateDelete = function(self)
         local items = createMenuItemsForDelete(self)
         if (#items == 0) then
             view:removeAllMenuItems()
-            getModelMessageIndicator():showMessage(getLocalizedText(10, "NoReplayData"))
+            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoReplayData"))
         else
             view:setMenuItems(items)
         end
@@ -294,7 +292,7 @@ local function setStatePlayback(self)
         local items = createMenuItemsForPlayback(self)
         if (#items == 0) then
             view:removeAllMenuItems()
-            getModelMessageIndicator():showMessage(getLocalizedText(10, "NoReplayData"))
+            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoReplayData"))
         else
             view:setMenuItems(items)
         end
@@ -373,6 +371,15 @@ function ModelReplayManager:ctor()
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelReplayManager:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelReplayManager:setEnabled(enabled)
@@ -392,7 +399,7 @@ end
 function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations)
     local items = createMenuItemsForDownload(self, replayConfigurations)
     if (#items == 0) then
-        getModelMessageIndicator():showMessage(getLocalizedText(10, "NoDownloadableReplay"))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoDownloadableReplay"))
     elseif (self.m_View) then
         self.m_View:setMenuItems(items)
             :setButtonConfirmText(getLocalizedText(10, "DownloadReplay"))
@@ -414,7 +421,7 @@ function ModelReplayManager:updateWithEncodedReplayData(encodedReplayData)
         self.m_ReplayList[sceneWarFileName] = generateReplayConfiguration(replayData)
         serializeReplayList(self.m_ReplayList)
     end
-    getModelMessageIndicator():showMessage(getLocalizedText(10, "ReplayDataExists"))
+    getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "ReplayDataExists"))
 
     return self
 end
@@ -423,7 +430,7 @@ function ModelReplayManager:onButtonBackTouched()
     local state = self.m_State
     if (state == "stateMain") then
         setStateDisabled(self)
-        getModelMainMenu():setMenuEnabled(true)
+        SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
     elseif (state == "stateDownload") then
         setStateMain(self)
     elseif (state == "stateDelete") then

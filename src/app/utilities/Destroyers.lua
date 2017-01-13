@@ -17,6 +17,7 @@ local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
+local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 --------------------------------------------------------------------------------
@@ -44,8 +45,8 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function Destroyers.destroyActorUnitLoaded(sceneWarFileName, unitID, shouldRemoveView)
-    local modelUnitMap    = getModelUnitMap(sceneWarFileName)
+function Destroyers.destroyActorUnitLoaded(modelSceneWar, unitID, shouldRemoveView)
+    local modelUnitMap    = getModelUnitMap(modelSceneWar)
     local modelUnitLoaded = modelUnitMap:getLoadedModelUnitWithUnitId(unitID)
     local destroyedUnits  = {}
     shouldRemoveView      = (not IS_SERVER) and (shouldRemoveView)
@@ -58,8 +59,7 @@ function Destroyers.destroyActorUnitLoaded(sceneWarFileName, unitID, shouldRemov
     return destroyedUnits
 end
 
-function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRemoveView, shouldRetainVisibility)
-    local modelSceneWar = SingletonGetters.getModelScene(sceneWarFileName)
+function Destroyers.destroyActorUnitOnMap(modelSceneWar, gridIndex, shouldRemoveView, shouldRetainVisibility)
     resetModelTile(modelSceneWar, gridIndex)
 
     local modelUnitMap   = getModelUnitMap(modelSceneWar)
@@ -77,7 +77,7 @@ function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRem
 
     if (not shouldRetainVisibility) then
         local playerIndex = modelUnit:getPlayerIndex()
-        if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
             getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(playerIndex, gridIndex, modelUnit:getVisionForPlayerIndex(playerIndex))
         end
     end
@@ -85,13 +85,12 @@ function Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, shouldRem
     return destroyedUnits
 end
 
-function Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
-    local modelSceneWar   = SingletonGetters.getModelScene(sceneWarFileName)
+function Destroyers.destroyPlayerForce(modelSceneWar, playerIndex)
     local modelGridEffect = (not IS_SERVER) and (getModelGridEffect(modelSceneWar)) or (nil)
     getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             local gridIndex = modelUnit:getGridIndex()
-            Destroyers.destroyActorUnitOnMap(sceneWarFileName, gridIndex, true, true)
+            Destroyers.destroyActorUnitOnMap(modelSceneWar, gridIndex, true, true)
 
             if (not IS_SERVER) then
                 modelGridEffect:showAnimationExplosion(gridIndex)
@@ -106,7 +105,7 @@ function Destroyers.destroyPlayerForce(sceneWarFileName, playerIndex)
         end
     end)
 
-    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
+    if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
         getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
             :resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)

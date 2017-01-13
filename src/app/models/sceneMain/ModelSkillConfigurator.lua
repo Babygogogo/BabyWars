@@ -13,6 +13,7 @@ local Actor                     = require("src.global.actors.Actor")
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription
 local getSkillCategory   = SkillDataAccessors.getSkillCategory
+local string             = string
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 local SKILL_GROUP_ID_PASSIVE                  = ModelSkillConfiguration.getSkillGroupIdPassive()
@@ -91,6 +92,7 @@ local function setStateMain(self)
             :setMenuItems(self.m_ItemsAllConfigurations)
             :setOverviewVisible(false)
             :setButtonSaveVisible(false)
+            :setAddressBarVisible(false)
             :setEnabled(true)
     end
 end
@@ -113,6 +115,8 @@ local function setStateOverviewConfiguration(self, configurationID)
             :setMenuItems(self.m_ItemsOverview)
             :setOverviewVisible(true)
             :setButtonSaveVisible(true)
+            :setAddressBarVisible(true)
+            :setAddressBarText(string.format("%s: %s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID)))
             :setEnabled(true)
 
         local configuration = self.m_ModelSkillConfiguration
@@ -128,13 +132,14 @@ local function setStateOverviewConfiguration(self, configurationID)
     end
 end
 
-local function setStateSelectMaxPoint(self)
+local function setStateSelectBasePoint(self)
     self.m_State = "stateSelectBasePoint"
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(3, "BasePoints"))
             :setMenuItems(self.m_ItemsMaxPoints)
             :setButtonSaveVisible(false)
+            :setAddressBarText(string.format("%s: %s--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID), getLocalizedText(3, "BasePoints")))
     end
 end
 
@@ -146,6 +151,7 @@ local function setStateOverviewSkillGroupPassive(self)
         self.m_View:setMenuTitle(getLocalizedText(3, "PassiveSkill"))
             :setMenuItems(self.m_ItemsSkillGroupPassive)
             :setButtonSaveVisible(false)
+            :setAddressBarText(string.format("%s: %s--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID), getLocalizedText(3, "PassiveSkill")))
     end
 end
 
@@ -158,6 +164,7 @@ local function setStateOverviewSkillGroupActive(self, skillGroupID)
         self.m_View:setMenuTitle(string.format("%s %d", getLocalizedText(3, "ActiveSkill"), skillGroupID))
             :setMenuItems(self.m_ItemsSkillGroupActive)
             :setButtonSaveVisible(false)
+            :setAddressBarText(string.format("%s: %s--%s %d", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID), getLocalizedText(3, "ActiveSkill"), skillGroupID))
 
         setItemsSkillGroupActiveState(self, self.m_ModelSkillConfiguration:isModelSkillGroupEnabled(skillGroupID))
     end
@@ -170,6 +177,8 @@ local function setStateSelectEnergyRequirement(self)
         self.m_View:setMenuTitle(getLocalizedText(3, "EnergyRequirement"))
             :setMenuItems(self.m_ItemsEnergyRequirement)
             :setButtonSaveVisible(false)
+            :setAddressBarText(string.format("%s: %s--%s %d--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                getLocalizedText(3, "ActiveSkill"), self.m_SkillGroupID, getLocalizedText(3, "EnergyRequirement")))
     end
 end
 
@@ -182,8 +191,12 @@ local function setStateSelectSkillCategory(self, slotIndex)
         view:setMenuTitle(string.format("%s %d", getLocalizedText(3, "Skill"), slotIndex))
         if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
             view:setMenuItems(self.m_ItemsSkillCategoriesForPassive)
+                :setAddressBarText(string.format("%s: %s--%s--%s %d", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                    getLocalizedText(3, "PassiveSkill"), getLocalizedText(3, "Skill"), slotIndex))
         else
             view:setMenuItems(self.m_ItemsSkillCategoriesForActive)
+                :setAddressBarText(string.format("%s: %s--%s %d--%s %d", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                    getLocalizedText(3, "ActiveSkill"), self.m_SkillGroupID, getLocalizedText(3, "Skill"), slotIndex))
         end
     end
 end
@@ -194,6 +207,13 @@ local function setStateSelectSkill(self, categoryName)
 
     if (self.m_View) then
         self.m_View:setMenuItems(self.m_ItemsSkills[categoryName])
+        if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
+            self.m_View:setAddressBarText(string.format("%s: %s--%s--%s %d--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                getLocalizedText(3, "PassiveSkill"), getLocalizedText(3, "Skill"), self.m_SlotIndex, getLocalizedText(6, categoryName)))
+        else
+            self.m_View:setAddressBarText(string.format("%s: %s--%s %d--%s %d--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                getLocalizedText(3, "ActiveSkill"), self.m_SkillGroupID, getLocalizedText(3, "Skill"), self.m_SlotIndex, getLocalizedText(6, categoryName)))
+        end
     end
 end
 
@@ -203,8 +223,12 @@ setStateSelectSkillLevel = function(self, skillID)
 
     if (self.m_SkillGroupID == SKILL_GROUP_ID_PASSIVE) then
         self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID].passive)
+            :setAddressBarText(string.format("%s: %s--%s--%s %d--%s--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                getLocalizedText(3, "PassiveSkill"), getLocalizedText(3, "Skill"), self.m_SlotIndex, getLocalizedText(6, self.m_CategoryName), getLocalizedText(5, skillID)))
     else
         self.m_View:setMenuItems(self.m_ItemsSkillLevels[skillID].active)
+            :setAddressBarText(string.format("%s: %s--%s %d--%s %d--%s--%s", getLocalizedText(3, "CurrentPosition"), getConfigurationTitle(self.m_ConfigurationID),
+                getLocalizedText(3, "ActiveSkill"), self.m_SkillGroupID, getLocalizedText(3, "Skill"), self.m_SlotIndex, getLocalizedText(6, self.m_CategoryName), getLocalizedText(5, skillID)))
     end
 end
 
@@ -238,7 +262,7 @@ local function initItemsOverview(self)
         {
             name     = getLocalizedText(3, "SetSkillPoint"),
             callback = function()
-                setStateSelectMaxPoint(self)
+                setStateSelectBasePoint(self)
             end,
         },
         {
@@ -472,6 +496,15 @@ function ModelSkillConfigurator:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelSkillConfigurator:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelSkillConfigurator:setEnabled(enabled)
@@ -511,7 +544,7 @@ function ModelSkillConfigurator:onButtonBackTouched()
         setStateDisabled(self)
         self.m_ModelMainMenu:setMenuEnabled(true)
     elseif (state == "stateOverviewConfiguration") then
-        local modelConfirmBox = SingletonGetters.getModelConfirmBox()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(3, "ConfirmExitConfiguring"))
             :setOnConfirmYes(
                 function()
@@ -539,9 +572,9 @@ function ModelSkillConfigurator:onButtonSaveTouched()
     assert(self.m_State == "stateOverviewConfiguration")
     local isConfigurationValid, err = self.m_ModelSkillConfiguration:isValid()
     if (not isConfigurationValid) then
-        SingletonGetters.getModelMessageIndicator():showMessage(err)
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(err)
     else
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(3, "SettingConfiguration"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(3, "SettingConfiguration"))
         WebSocketManager.sendAction({
                 actionCode           = ACTION_CODE_SET_SKILL_CONFIGURATION,
                 skillConfigurationID = self.m_ConfigurationID,

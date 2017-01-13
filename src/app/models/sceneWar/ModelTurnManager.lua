@@ -38,7 +38,6 @@ local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelTileMap          = SingletonGetters.getModelTileMap
 local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
-local getSceneWarFileName      = SingletonGetters.getSceneWarFileName
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible            = VisibilityFunctions.isTileVisibleToPlayerIndex
@@ -59,6 +58,7 @@ local TURN_PHASE_CODES = {
     TickTurnAndPlayerIndex            = 10,
     ResetSkillState                   = 11,
     ResetVisionForBeginningTurnPlayer = 12,
+    ResetVotedForDraw                 = 13,
 }
 local DEFAULT_TURN_DATA = {
     turnIndex     = 1,
@@ -94,7 +94,7 @@ local function getNextTurnAndPlayerIndex(self, playerManager)
     end
 end
 
-local function repairModelUnit(modelUnit, repairAmount)
+local function repairModelUnit(self, modelUnit, repairAmount)
     modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
     local hasSupplied = supplyWithAmmoAndFuel(modelUnit, true)
 
@@ -102,30 +102,29 @@ local function repairModelUnit(modelUnit, repairAmount)
         modelUnit:updateView()
 
         if (repairAmount >= 10) then
-            SingletonGetters.getModelGridEffect():showAnimationRepair(modelUnit:getGridIndex())
+            SingletonGetters.getModelGridEffect(self.m_ModelSceneWar):showAnimationRepair(modelUnit:getGridIndex())
         elseif (hasSupplied) then
-            SingletonGetters.getModelGridEffect():showAnimationSupply(modelUnit:getGridIndex())
+            SingletonGetters.getModelGridEffect(self.m_ModelSceneWar):showAnimationSupply(modelUnit:getGridIndex())
         end
     end
 end
 
-local function resetVisionOnClient()
+local function resetVisionOnClient(self)
     assert(not IS_SERVER, "ModelTurnManager-resetVisionOnClient() this shouldn't be called on the server.")
-    if (isTotalReplay()) then
-        getModelFogMap():updateView()
+    local modelSceneWar = self.m_ModelSceneWar
+    if (isTotalReplay(modelSceneWar)) then
+        getModelFogMap(modelSceneWar):updateView()
     else
-        local sceneWarFileName = getSceneWarFileName()
-        local playerIndex      = getPlayerIndexLoggedIn()
-
-        getModelUnitMap():forEachModelUnitOnMap(function(modelUnit)
+        local playerIndex = getPlayerIndexLoggedIn(modelSceneWar)
+        getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(function(modelUnit)
             local gridIndex = modelUnit:getGridIndex()
-            if (not isUnitVisible(sceneWarFileName, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
-                destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+            if (not isUnitVisible(modelSceneWar, gridIndex, modelUnit:getUnitType(), isModelUnitDiving(modelUnit), modelUnit:getPlayerIndex(), playerIndex)) then
+                destroyActorUnitOnMap(modelSceneWar, gridIndex, true)
             end
         end)
 
-        getModelTileMap():forEachModelTile(function(modelTile)
-            if (not isTileVisible(sceneWarFileName, modelTile:getGridIndex(), playerIndex)) then
+        getModelTileMap(modelSceneWar):forEachModelTile(function(modelTile)
+            if (not isTileVisible(modelSceneWar, modelTile:getGridIndex(), playerIndex)) then
                 modelTile:updateAsFogEnabled()
                     :updateView()
             end
@@ -137,7 +136,7 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
-    local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
+    local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhaseCode = TURN_PHASE_CODES.GetFund
         self:runTurn()
@@ -152,7 +151,7 @@ end
 
 local function runTurnPhaseGetFund(self)
     if (self.m_IncomeForNextTurn) then
-        local modelPlayer = getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(self.m_PlayerIndex)
+        local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_PlayerIndex)
         modelPlayer:setFund(modelPlayer:getFund() + self.m_IncomeForNextTurn)
         self.m_IncomeForNextTurn = nil
     end
@@ -162,15 +161,14 @@ end
 
 local function runTurnPhaseConsumeUnitFuel(self)
     if (self.m_TurnIndex > 1) then
-        local sceneWarFileName    = self.m_SceneWarFileName
-        local modelSceneWar       = SingletonGetters.getModelScene(sceneWarFileName)
+        local modelSceneWar       = self.m_ModelSceneWar
         local playerIndexActing   = self.m_PlayerIndex
         local modelTileMap        = getModelTileMap(modelSceneWar)
         local modelUnitMap        = getModelUnitMap(modelSceneWar)
         local modelFogMap         = getModelFogMap( modelSceneWar)
         local mapSize             = modelTileMap:getMapSize()
         local dispatcher          = getScriptEventDispatcher(modelSceneWar)
-        local isReplay            = modelSceneWar:isTotalReplay()
+        local isReplay            = isTotalReplay(modelSceneWar)
         local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
         local shouldUpdateFogMap  = (IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)
 
@@ -189,7 +187,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
                         if (shouldUpdateFogMap) then
                             modelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, {gridIndex})
                         end
-                        destroyActorUnitOnMap(sceneWarFileName, gridIndex, true)
+                        destroyActorUnitOnMap(modelSceneWar, gridIndex, true)
                         dispatcher:dispatchEvent({
                             name      = "EvtDestroyViewUnit",
                             gridIndex = gridIndex,
@@ -199,8 +197,8 @@ local function runTurnPhaseConsumeUnitFuel(self)
                             for _, adjacentGridIndex in pairs(getAdjacentGrids(gridIndex, mapSize)) do
                                 local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
                                 if ((adjacentModelUnit)                                                                                                                                                                     and
-                                    (not isUnitVisible(sceneWarFileName, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexActing))) then
-                                    destroyActorUnitOnMap(sceneWarFileName, adjacentGridIndex, true)
+                                    (not isUnitVisible(modelSceneWar, adjacentGridIndex, adjacentModelUnit:getUnitType(), isModelUnitDiving(adjacentModelUnit), adjacentModelUnit:getPlayerIndex(), playerIndexActing))) then
+                                    destroyActorUnitOnMap(modelSceneWar, adjacentGridIndex, true)
                                 end
                             end
                         end
@@ -216,18 +214,18 @@ end
 local function runTurnPhaseRepairUnit(self)
     local repairData = self.m_RepairDataForNextTurn
     if (repairData) then
-        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelSceneWar = self.m_ModelSceneWar
         local modelUnitMap  = getModelUnitMap(modelSceneWar)
 
         if (repairData.onMapData) then
             for unitID, data in pairs(repairData.onMapData) do
-                repairModelUnit(modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
+                repairModelUnit(self, modelUnitMap:getModelUnit(data.gridIndex), data.repairAmount)
             end
         end
 
         if (repairData.loadedData) then
             for unitID, data in pairs(repairData.loadedData) do
-                repairModelUnit(modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
+                repairModelUnit(self, modelUnitMap:getLoadedModelUnitWithUnitId(unitID), data.repairAmount)
             end
         end
 
@@ -241,7 +239,7 @@ end
 local function runTurnPhaseSupplyUnit(self)
     local supplyData = self.m_SupplyDataForNextTurn
     if (supplyData) then
-        local modelSceneWar = SingletonGetters.getModelScene(self.m_SceneWarFileName)
+        local modelSceneWar = self.m_ModelSceneWar
         local modelUnitMap  = getModelUnitMap(modelSceneWar)
         local modelGridEffect = (not IS_SERVER) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
 
@@ -272,11 +270,11 @@ local function runTurnPhaseSupplyUnit(self)
 end
 
 local function runTurnPhaseMain(self)
-    local sceneWarFileName = self.m_SceneWarFileName
+    local modelSceneWar    = self.m_ModelSceneWar
     local playerIndex      = self.m_PlayerIndex
-    getScriptEventDispatcher(sceneWarFileName):dispatchEvent({
+    getScriptEventDispatcher(modelSceneWar):dispatchEvent({
             name        = "EvtModelPlayerUpdated",
-            modelPlayer = getModelPlayerManager(sceneWarFileName):getModelPlayer(playerIndex),
+            modelPlayer = getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex),
             playerIndex = playerIndex,
         })
         :dispatchEvent({name = "EvtModelUnitMapUpdated"})
@@ -285,7 +283,6 @@ end
 
 local function runTurnPhaseResetUnitState(self)
     local playerIndex      = self.m_PlayerIndex
-    local sceneWarFileName = self.m_SceneWarFileName
     local func             = function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             modelUnit:setStateIdle()
@@ -293,29 +290,30 @@ local function runTurnPhaseResetUnitState(self)
         end
     end
 
-    getModelUnitMap(sceneWarFileName):forEachModelUnitOnMap(func)
+    getModelUnitMap(self.m_ModelSceneWar):forEachModelUnitOnMap(func)
         :forEachModelUnitLoaded(func)
 
     self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetVisionForEndingTurnPlayer
 end
 
 local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
-    local playerIndex = self:getPlayerIndex()
+    local modelSceneWar = self.m_ModelSceneWar
+    local playerIndex   = self:getPlayerIndex()
     if (IS_SERVER) then
-        getModelFogMap(self.m_SceneWarFileName):resetMapForPathsForPlayerIndex(playerIndex)
-    elseif ((isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
-        getModelFogMap():resetMapForPathsForPlayerIndex(playerIndex)
-        resetVisionOnClient()
+        getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
+    elseif ((isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+        getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
+        resetVisionOnClient(self)
     end
 
     self.m_TurnPhaseCode = TURN_PHASE_CODES.TickTurnAndPlayerIndex
 end
 
 local function runTurnPhaseTickTurnAndPlayerIndex(self)
-    local modelPlayerManager = getModelPlayerManager(self.m_SceneWarFileName)
+    local modelPlayerManager = getModelPlayerManager(self.m_ModelSceneWar)
     self.m_TurnIndex, self.m_PlayerIndex = getNextTurnAndPlayerIndex(self, modelPlayerManager)
 
-    getScriptEventDispatcher(self.m_SceneWarFileName):dispatchEvent({
+    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
         name        = "EvtPlayerIndexUpdated",
         playerIndex = self.m_PlayerIndex,
         modelPlayer = modelPlayerManager:getModelPlayer(self.m_PlayerIndex),
@@ -327,7 +325,7 @@ end
 
 local function runTurnPhaseResetSkillState(self)
     local playerIndex = self.m_PlayerIndex
-    getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):deactivateSkillGroup()
+    getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex):deactivateSkillGroup()
 
     if (not IS_SERVER) then
         local func = function(modelUnit)
@@ -336,7 +334,7 @@ local function runTurnPhaseResetSkillState(self)
             end
         end
 
-        getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(func)
+        getModelUnitMap(self.m_ModelSceneWar):forEachModelUnitOnMap(func)
             :forEachModelUnitLoaded(func)
     end
 
@@ -344,24 +342,32 @@ local function runTurnPhaseResetSkillState(self)
 end
 
 local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
-    local playerIndex = self:getPlayerIndex()
+    local modelSceneWar = self.m_ModelSceneWar
+    local playerIndex   = self:getPlayerIndex()
     if (IS_SERVER) then
-        getModelFogMap(self.m_SceneWarFileName):resetMapForTilesForPlayerIndex(playerIndex)
+        getModelFogMap(modelSceneWar):resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
-    elseif ((isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn())) then
-        getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+    elseif ((isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+        getModelFogMap(modelSceneWar):resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
-        resetVisionOnClient()
+        resetVisionOnClient(self)
     end
+
+    self.m_TurnPhaseCode = TURN_PHASE_CODES.ResetVotedForDraw
+end
+
+local function runTurnPhaseResetVotedForDraw(self)
+    getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_PlayerIndex):setVotedForDraw(false)
 
     self.m_TurnPhaseCode = TURN_PHASE_CODES.RequestToBegin
 end
 
 local function runTurnPhaseRequestToBegin(self)
-    if ((not IS_SERVER) and (not isTotalReplay()) and (self.m_PlayerIndex == getPlayerIndexLoggedIn())) then
+    local modelSceneWar = self.m_ModelSceneWar
+    if ((not IS_SERVER) and (not isTotalReplay(modelSceneWar)) and (self.m_PlayerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
         WebSocketManager.sendAction({
             actionCode       = ACTION_CODE_BEGIN_TURN,
-            actionID         = SingletonGetters.getActionId(self.m_SceneWarFileName) + 1,
+            actionID         = SingletonGetters.getActionId(self.m_ModelSceneWar) + 1,
             sceneWarFileName = self.m_SceneWarFileName,
         })
     end
@@ -401,6 +407,7 @@ end
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
 function ModelTurnManager:onStartRunning(modelSceneWar, sceneWarFileName)
+    self.m_ModelSceneWar    = modelSceneWar
     self.m_SceneWarFileName = sceneWarFileName
 
     return self
@@ -437,6 +444,7 @@ function ModelTurnManager:runTurn()
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.TickTurnAndPlayerIndex)            then runTurnPhaseTickTurnAndPlayerIndex(           self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetSkillState)                   then runTurnPhaseResetSkillState(                  self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVisionForBeginningTurnPlayer) then runTurnPhaseResetVisionForBeginningTurnPlayer(self) end
+    if (self.m_TurnPhaseCode == TURN_PHASE_CODES.ResetVotedForDraw)                 then runTurnPhaseResetVotedForDraw(                self) end
     if (self.m_TurnPhaseCode == TURN_PHASE_CODES.RequestToBegin)                    then runTurnPhaseRequestToBegin(                   self) end
 
     if ((self.m_TurnPhaseCode == TURN_PHASE_CODES.Main) and (self.m_CallbackOnEnterTurnPhaseMainForNextTurn)) then
@@ -444,11 +452,12 @@ function ModelTurnManager:runTurn()
         self.m_CallbackOnEnterTurnPhaseMainForNextTurn = nil
     end
 
-    if ((not IS_SERVER) and (not isTotalReplay())) then
-        if (self:getPlayerIndex() == getPlayerIndexLoggedIn()) then
-            getModelMessageIndicator():hidePersistentMessage(getLocalizedText(80, "NotInTurn"))
+    local modelSceneWar = self.m_ModelSceneWar
+    if ((not IS_SERVER) and (not isTotalReplay(modelSceneWar))) then
+        if (self:getPlayerIndex() == getPlayerIndexLoggedIn(modelSceneWar)) then
+            getModelMessageIndicator(modelSceneWar):hidePersistentMessage(getLocalizedText(80, "NotInTurn"))
         else
-            getModelMessageIndicator():showPersistentMessage(getLocalizedText(80, "NotInTurn"))
+            getModelMessageIndicator(modelSceneWar):showPersistentMessage(getLocalizedText(80, "NotInTurn"))
         end
     end
 

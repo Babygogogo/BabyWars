@@ -26,7 +26,6 @@ local Actor = require("src.global.actors.Actor")
 --------------------------------------------------------------------------------
 local function initActorWarCommandMenu(self)
     local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarCommandMenu", nil, "sceneWar.ViewWarCommandMenu")
-    actor:getModel():setEnabled(false)
 
     self.m_ActorWarCommandMenu = actor
 end
@@ -129,6 +128,10 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function ModelWarHUD:getModelReplayController()
+    return self.m_ActorReplayController:getModel()
+end
+
 function ModelWarHUD:getModelWarCommandMenu()
     return self.m_ActorWarCommandMenu:getModel()
 end

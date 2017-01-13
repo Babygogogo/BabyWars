@@ -48,7 +48,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function Capturer:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -85,7 +85,7 @@ end
 
 function Capturer:getCaptureAmount()
     local capturer    = self.m_Owner
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(capturer:getPlayerIndex())
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(capturer:getPlayerIndex())
     local modifier    = SkillModifierFunctions.getCaptureAmountModifier(modelPlayer:getModelSkillConfiguration())
     return round(capturer:getNormalizedCurrentHP() * (100 + modifier) / 100)
 end

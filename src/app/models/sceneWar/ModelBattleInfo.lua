@@ -58,7 +58,7 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelBattleInfo:onStartRunning(modelSceneWar, sceneWarFileName)
-    SingletonGetters.getScriptEventDispatcher()
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPreviewBattleDamage",         self)
         :addEventListener("EvtPreviewNoBattleDamage",       self)
         :addEventListener("EvtActionPlannerIdle",           self)
@@ -67,7 +67,7 @@ function ModelBattleInfo:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtPlayerIndexUpdated",          self)
 
     if (self.m_View) then
-        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 
     return self

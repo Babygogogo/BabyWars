@@ -24,17 +24,18 @@ local isTotalReplay          = SingletonGetters.isTotalReplay
 -- The util functions.
 --------------------------------------------------------------------------------
 local function updateWithModelUnitMap(self)
-    local modelUnitMap = getModelUnitMap()
-    local modelUnit    = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelUnitMap  = getModelUnitMap(modelSceneWar)
+    local modelUnit     = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
     if (modelUnit) then
-        local loadedModelUnits = ((isTotalReplay()) or (not getModelFogMap():isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn())) and
+        local loadedModelUnits = ((isTotalReplay(modelSceneWar)) or (not getModelFogMap(modelSceneWar):isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn(modelSceneWar))) and
             (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                                              or
             (nil)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
         if (self.m_View) then
             self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
-                :setVisible(not SingletonGetters.getModelWarCommandMenu():isEnabled())
+                :setVisible(not SingletonGetters.getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())
         end
     elseif (self.m_View) then
         self.m_View:setVisible(false)
@@ -100,7 +101,8 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onStartRunning(modelSceneWar, sceneWarFileName)
-    SingletonGetters.getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtModelUnitMapUpdated",   self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
@@ -109,7 +111,8 @@ function ModelUnitInfo:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
     if (self.m_View) then
-        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+        self.m_View:setModelSceneWar(modelSceneWar)
+            :updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 
     updateWithModelUnitMap(self)

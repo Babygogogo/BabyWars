@@ -48,9 +48,16 @@ local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
     local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
     for playerIndex, data in pairs(warConfiguration.players) do
         if (data.account == loggedInAccount) then
+            local colorText
+            if     (playerIndex == 1) then colorText = "Red"
+            elseif (playerIndex == 2) then colorText = "Blue"
+            elseif (playerIndex == 3) then colorText = "Yellow"
+            else                           colorText = "Black"
+            end
+
             options[#options + 1] = {
                 data = playerIndex,
-                text = "" .. playerIndex,
+                text = string.format("%d (%s)", playerIndex, getLocalizedText(34, colorText)),
             }
         end
     end
@@ -91,6 +98,22 @@ local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguratio
     modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
 end
 
+local function resetSelectorRankMatch(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("RankMatch"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = getLocalizedText(34, (warConfiguration.isRankMatch) and ("Yes") or ("No")),
+        }})
+end
+
+local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
+    modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore"):setButtonsEnabled(false)
+        :setOptions({{
+            data = nil,
+            text = (warConfiguration.maxDiffScore) and ("" .. warConfiguration.maxDiffScore) or (getLocalizedText(13, "NoLimit")),
+        }})
+end
+
 local function resetModelWarConfigurator(model, sceneWarFileName, warConfiguration)
     model:setSceneWarFileName(sceneWarFileName)
         :setEnabled(true)
@@ -99,6 +122,8 @@ local function resetModelWarConfigurator(model, sceneWarFileName, warConfigurati
     resetSelectorFog(           model, warConfiguration)
     resetSelectorWeather(       model, warConfiguration)
     resetSelectorMaxSkillPoints(model, warConfiguration)
+    resetSelectorRankMatch(     model, warConfiguration)
+    resetSelectorMaxDiffScore(  model, warConfiguration)
 end
 
 --------------------------------------------------------------------------------
@@ -131,7 +156,7 @@ end
 
 local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
     modelWarConfigurator:setOnButtonConfirmTouched(function()
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
             actionCode       = ACTION_CODE_RUN_SCENE_WAR,
@@ -233,13 +258,22 @@ function ModelContinueWarSelector:setModelMainMenu(model)
 end
 
 --------------------------------------------------------------------------------
+-- The callback function on start running.
+--------------------------------------------------------------------------------
+function ModelContinueWarSelector:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
+
+    return self
+end
+
+--------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "TransferingData"))
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_LIST})
     end
 
@@ -264,7 +298,7 @@ function ModelContinueWarSelector:updateWithOngoingWarList(list)
     if ((self.m_View) and (self.m_IsEnabled)) then
         local warList = createOngoingWarList(self, list)
         if (#warList == 0) then
-            SingletonGetters.getModelMessageIndicator():showMessage(getLocalizedText(8, "NoContinuableWar"))
+            SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoContinuableWar"))
         else
             self.m_View:showWarList(warList)
         end

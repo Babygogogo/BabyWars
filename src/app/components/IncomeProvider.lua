@@ -45,7 +45,7 @@ end
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
 function IncomeProvider:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName = sceneWarFileName
+    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end
@@ -59,7 +59,7 @@ function IncomeProvider:getIncomeAmount()
     if (playerIndex < 1) then
         return baseAmount
     else
-        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration()
+        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration()
         local modifier                = SkillModifierFunctions.getIncomeModifier(modelSkillConfiguration)
         return round(baseAmount * (100 + modifier) / 100)
     end

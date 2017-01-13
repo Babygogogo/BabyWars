@@ -55,7 +55,8 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelActionMenu:onStartRunning(modelSceneWar, sceneWarFileName)
-    SingletonGetters.getScriptEventDispatcher()
+    self.m_ModelSceneWar = modelSceneWar
+    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",                    self)
         :addEventListener("EvtActionPlannerIdle",                     self)
         :addEventListener("EvtActionPlannerChoosingProductionTarget", self)
@@ -67,7 +68,7 @@ function ModelActionMenu:onStartRunning(modelSceneWar, sceneWarFileName)
         :addEventListener("EvtActionPlannerChoosingSiloTarget",       self)
 
     if (self.m_View) then
-        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager():getPlayerIndex())
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 
     return self

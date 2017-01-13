@@ -8,7 +8,6 @@ local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions
 local canRevealHidingPlacesWithUnits = SkillModifierFunctions.canRevealHidingPlacesWithUnits
 local getGridsWithinDistance         = GridIndexFunctions.getGridsWithinDistance
 local getModelPlayerManager          = SingletonGetters.getModelPlayerManager
-local getModelScene                  = SingletonGetters.getModelScene
 local getModelTileMap                = SingletonGetters.getModelTileMap
 local getModelUnitMap                = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn         = SingletonGetters.getPlayerIndexLoggedIn
@@ -202,11 +201,11 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelFogMap:onStartRunning(modelSceneWar, sceneWarFileName)
-    self.m_SceneWarFileName    = sceneWarFileName
-    self.m_IsFogOfWarByDefault = getModelScene(sceneWarFileName):isFogOfWarByDefault()
+    self.m_ModelSceneWar       = modelSceneWar
+    self.m_IsFogOfWarByDefault = modelSceneWar:isFogOfWarByDefault()
 
     if ((IS_SERVER) or (self.m_IsTotalReplay)) then
-        for playerIndex = 1, getModelPlayerManager(sceneWarFileName):getPlayersCount() do
+        for playerIndex = 1, getModelPlayerManager(modelSceneWar):getPlayersCount() do
             self:resetMapForTilesForPlayerIndex(playerIndex)
                 :resetMapForUnitsForPlayerIndex(playerIndex)
         end
@@ -216,7 +215,10 @@ function ModelFogMap:onStartRunning(modelSceneWar, sceneWarFileName)
             :resetMapForUnitsForPlayerIndex(playerIndex)
     end
 
-    self:updateView()
+    if (self.m_View) then
+        self.m_View:setModelSceneWar(modelSceneWar)
+        self:updateView()
+    end
 
     return self
 end
@@ -242,7 +244,7 @@ function ModelFogMap:isDisablingFogByForce()
 end
 
 function ModelFogMap:resetMapForPathsForPlayerIndex(playerIndex, data)
-    assert((IS_SERVER) or (not self.m_SceneWarFileName) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (not self.m_ModelSceneWar) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:resetMapForPathsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForPaths[playerIndex]
@@ -258,10 +260,10 @@ end
 
 function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
     local playerIndex = modelUnit:getPlayerIndex()
-    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:updateMapForPathsWithModelUnitAndPath() invalid playerIndex on the client: " .. (playerIndex or ""))
 
-    local canRevealHidingPlaces = canRevealHidingPlacesWithUnits(getModelPlayerManager(self.m_SceneWarFileName):getModelPlayer(playerIndex):getModelSkillConfiguration())
+    local canRevealHidingPlaces = canRevealHidingPlacesWithUnits(getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration())
     local visibilityMap         = self.m_MapsForPaths[playerIndex]
     local mapSize               = self:getMapSize()
     for _, pathNode in ipairs(path) do
@@ -272,7 +274,7 @@ function ModelFogMap:updateMapForPathsWithModelUnitAndPath(modelUnit, path)
 end
 
 function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origin, radius)
-    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:updateMapForPathsForPlayerIndexWithFlare() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForPaths[playerIndex]
@@ -284,14 +286,14 @@ function ModelFogMap:updateMapForPathsForPlayerIndexWithFlare(playerIndex, origi
 end
 
 function ModelFogMap:resetMapForTilesForPlayerIndex(playerIndex, visionModifier)
-    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:resetMapForTilesForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForTiles[playerIndex]
     local mapSize       = self:getMapSize()
     visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
-    getModelTileMap(self.m_SceneWarFileName):forEachModelTile(function(modelTile)
+    getModelTileMap(self.m_ModelSceneWar):forEachModelTile(function(modelTile)
         updateMapForTilesOrUnits(visibilityMap, mapSize, modelTile:getGridIndex(), getVisionForModelTileOrUnit(modelTile, playerIndex, visionModifier) , 1)
     end)
 
@@ -311,14 +313,14 @@ function ModelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(playerInde
 end
 
 function ModelFogMap:resetMapForUnitsForPlayerIndex(playerIndex, visionModifier)
-    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:resetMapForUnitsForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     local visibilityMap = self.m_MapsForUnits[playerIndex]
     local mapSize       = self:getMapSize()
     visionModifier      = visionModifier or 0
     fillSingleMapWithValue(visibilityMap, mapSize, 0)
-    getModelUnitMap(self.m_SceneWarFileName):forEachModelUnitOnMap(function(modelUnit)
+    getModelUnitMap(self.m_ModelSceneWar):forEachModelUnitOnMap(function(modelUnit)
         updateMapForTilesOrUnits(visibilityMap, mapSize, modelUnit:getGridIndex(), getVisionForModelTileOrUnit(modelUnit, playerIndex, visionModifier), 1)
     end)
 
@@ -348,7 +350,7 @@ function ModelFogMap:getVisibilityOnGridForPlayerIndex(gridIndex, playerIndex)
     -- The skills that enable the tiles/units to see through the hiding places are ignored for the maps for tiles/units, while they are considered for the maps for move paths.
     -- To check if a tile/unit is visible to a player, use functions in VisibilityFunctions.
 
-    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn()),
+    assert((IS_SERVER) or (self.m_IsTotalReplay) or (playerIndex == getPlayerIndexLoggedIn(self.m_ModelSceneWar)),
         "ModelFogMap:getVisibilityOnGridForPlayerIndex() invalid playerIndex on the client: " .. (playerIndex or ""))
 
     if (not self:isFogOfWarCurrently()) then
