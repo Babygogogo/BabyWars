@@ -2,7 +2,6 @@ return {
     "BaZhenTuEr",
     "BeiZhong",
     "BiFengGang",
-    "DiXiaShui",
     "DuoYanPingYuan",
     "FengBaoQianXian",
     "GaoLaMiJia",
@@ -11,9 +10,7 @@ return {
     "HaiAnTuJi",
     "HeiSenLin",
     "HuiShengDao",
-    "LianYuShengTan",
     "ManShouXueXing",
-    "QiuLongJuShu",
     "SanHeGu",
     "ShenSeYanCaoZhanZheng",
     "SiTongBaDa",
@@ -28,6 +25,7 @@ return {
     "XiaoGuoZhengBaSai",        -- 4p
 
     "Random2P",
+    "Random2P_HighQuality",
 
     "JiangQi",
     "QuanMianCeShi",

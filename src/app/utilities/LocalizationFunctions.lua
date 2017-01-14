@@ -309,7 +309,7 @@ local s_Texts = {
         [1] = function(skillID)
             if     (skillID == 1)  then return "我方全体部队的攻击力"
             elseif (skillID == 2)  then return "我方全体部队的防御力"
-            elseif (skillID == 3)  then return "我方全体部队的造价"
+            elseif (skillID == 3)  then return "我方全体部队的造价变为基础的"
             elseif (skillID == 4)  then return "我方全体部队的当前HP"
             elseif (skillID == 5)  then return "对方全体部队的当前HP"
             elseif (skillID == 6)  then return "我方全体部队的移动力"

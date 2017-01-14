@@ -110,8 +110,7 @@ end
 local function getActorGameHelper(self)
     if (not self.m_ActorGameHelper) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelGameHelper", nil, "sceneMain.ViewGameHelper")
-        actor:getModel():onStartRunning(self.m_ModelSceneMain)
-            :setModelMainMenu(self)
+        actor:getModel():setModelSceneMain(self.m_ModelSceneMain)
 
         self.m_ActorGameHelper = actor
         self.m_View:setViewGameHelper(actor:getView())
@@ -223,7 +222,7 @@ local function initItemSetMessageIndicator(self)
     local item = {
         name     = getLocalizedText(1, "SetMessageIndicator"),
         callback = function()
-            local indicator = SingletonGetters.getModelMessageIndicator()
+            local indicator = SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain)
             indicator:setEnabled(not indicator:isEnabled())
         end,
     }
@@ -341,7 +340,7 @@ function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
 end
 
 function ModelMainMenu:onButtonExitTouched()
-    SingletonGetters.getModelConfirmBox():setConfirmText(getLocalizedText(66, "ExitGame"))
+    SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain):setConfirmText(getLocalizedText(66, "ExitGame"))
         :setOnConfirmYes(function()
             cc.Director:getInstance():endToLua()
         end)

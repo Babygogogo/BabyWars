@@ -2,6 +2,7 @@
 local ModelGameHelper = class("ModelGameHelper")
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -94,9 +95,9 @@ function ModelGameHelper:initView()
     return self
 end
 
-function ModelGameHelper:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelGameHelper:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
+function ModelGameHelper:setModelSceneMain(model)
+    assert(self.m_ModelSceneMain == nil, "ModelGameHelper:setModelSceneMain() the model has been set.")
+    self.m_ModelSceneMain = model
 
     return self
 end
@@ -116,7 +117,7 @@ end
 
 function ModelGameHelper:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end
