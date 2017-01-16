@@ -52,7 +52,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function RepairDoer:onStartRunning(modelSceneWar, sceneWarFileName)
+function RepairDoer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

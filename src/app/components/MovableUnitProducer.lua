@@ -29,7 +29,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function MovableUnitProducer:onStartRunning(modelSceneWar, sceneWarFileName)
+function MovableUnitProducer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

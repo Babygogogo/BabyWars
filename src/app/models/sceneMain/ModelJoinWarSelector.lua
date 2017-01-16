@@ -361,9 +361,9 @@ function ModelJoinWarSelector:updateWithJoinableWarConfigurations(warConfigurati
     return self
 end
 
-function ModelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)
+function ModelJoinWarSelector:isRetrievingJoinWarResult(warID)
     local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getSceneWarFileName() == sceneWarFileName)
+    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getWarId() == warID)
 end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)

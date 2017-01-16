@@ -164,10 +164,10 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelTileMap:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelTileMap:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar    = modelSceneWar
     self:forEachModelTile(function(modelTile)
-        modelTile:onStartRunning(modelSceneWar, sceneWarFileName)
+        modelTile:onStartRunning(modelSceneWar)
     end)
 
     return self

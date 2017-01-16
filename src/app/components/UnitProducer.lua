@@ -41,7 +41,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback functions on start running.
 --------------------------------------------------------------------------------
-function UnitProducer:onStartRunning(modelSceneWar, sceneWarFileName)
+function UnitProducer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self
@@ -68,14 +68,13 @@ end
 function UnitProducer:getProductionList()
     local playerIndex      = self.m_Owner:getPlayerIndex()
     local modelSceneWar    = self.m_ModelSceneWar
-    local sceneWarFileName = modelSceneWar:getFileName()
     local fund             = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getFund()
     local list             = {}
 
     for i, unitName in ipairs(self.m_Template.productionList) do
         local tiledID   = GameConstantFunctions.getTiledIdWithTileOrUnitName(unitName, playerIndex)
         local modelUnit = Actor.createModel("sceneWar.ModelUnit", {tiledID = tiledID})
-        modelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
+        modelUnit:onStartRunning(modelSceneWar)
         local cost      = modelUnit:getProductionCost()
 
         list[i] = {

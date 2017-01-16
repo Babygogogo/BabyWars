@@ -185,10 +185,10 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelUnitMap:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelUnitMap:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar    = modelSceneWar
     local func = function(modelUnit)
-        modelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
+        modelUnit:onStartRunning(modelSceneWar)
     end
     self:forEachModelUnitOnMap( func)
         :forEachModelUnitLoaded(func)

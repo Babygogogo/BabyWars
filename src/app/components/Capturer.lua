@@ -47,7 +47,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function Capturer:onStartRunning(modelSceneWar, sceneWarFileName)
+function Capturer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

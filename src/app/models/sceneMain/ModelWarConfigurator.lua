@@ -174,14 +174,14 @@ function ModelWarConfigurator:getWarFieldFileName()
     return self.m_WarFieldFileName
 end
 
-function ModelWarConfigurator:setSceneWarFileName(name)
-    self.m_SceneWarFileName = name
+function ModelWarConfigurator:setWarId(warID)
+    self.m_WarID = warID
 
     return self
 end
 
-function ModelWarConfigurator:getSceneWarFileName()
-    return self.m_SceneWarFileName
+function ModelWarConfigurator:getWarId()
+    return self.m_WarID
 end
 
 function ModelWarConfigurator:onButtonBackTouched()

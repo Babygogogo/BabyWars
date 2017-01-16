@@ -366,9 +366,9 @@ local function runTurnPhaseRequestToBegin(self)
     local modelSceneWar = self.m_ModelSceneWar
     if ((not IS_SERVER) and (not isTotalReplay(modelSceneWar)) and (self.m_PlayerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
         WebSocketManager.sendAction({
-            actionCode       = ACTION_CODE_BEGIN_TURN,
-            actionID         = SingletonGetters.getActionId(self.m_ModelSceneWar) + 1,
-            sceneWarFileName = self.m_SceneWarFileName,
+            actionCode = ACTION_CODE_BEGIN_TURN,
+            actionID   = SingletonGetters.getActionId(self.m_ModelSceneWar) + 1,
+            warID      = self.m_ModelSceneWar:getWarId(),
         })
     end
 end
@@ -406,9 +406,8 @@ end
 --------------------------------------------------------------------------------
 -- The public functions for doing actions.
 --------------------------------------------------------------------------------
-function ModelTurnManager:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelTurnManager:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar    = modelSceneWar
-    self.m_SceneWarFileName = sceneWarFileName
 
     return self
 end

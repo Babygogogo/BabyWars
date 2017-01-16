@@ -156,15 +156,15 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelWarField:onStartRunning(modelSceneWar, sceneWarFileName)
-    self:getModelTileMap():onStartRunning(modelSceneWar, sceneWarFileName)
-    self:getModelUnitMap():onStartRunning(modelSceneWar, sceneWarFileName)
-    self:getModelFogMap() :onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelWarField:onStartRunning(modelSceneWar)
+    self:getModelTileMap():onStartRunning(modelSceneWar)
+    self:getModelUnitMap():onStartRunning(modelSceneWar)
+    self:getModelFogMap() :onStartRunning(modelSceneWar)
 
     if (not IS_SERVER) then
-        self.m_ActorActionPlanner:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
-        self.m_ActorGridEffect   :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
-        self.m_ActorMapCursor    :getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+        self.m_ActorActionPlanner:getModel():onStartRunning(modelSceneWar)
+        self.m_ActorGridEffect   :getModel():onStartRunning(modelSceneWar)
+        self.m_ActorMapCursor    :getModel():onStartRunning(modelSceneWar)
 
         self:getModelTileMap():updateOnModelFogMapStartedRunning()
     end

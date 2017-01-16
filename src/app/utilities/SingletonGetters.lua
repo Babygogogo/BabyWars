@@ -36,8 +36,8 @@ function SingletonGetters.getModelWeatherManager(modelSceneWar)
     return modelSceneWar:getModelWeatherManager()
 end
 
-function SingletonGetters.getSceneWarFileName(modelSceneWar)
-    return modelSceneWar:getFileName()
+function SingletonGetters.getWarId(modelSceneWar)
+    return modelSceneWar:getWarId()
 end
 
 function SingletonGetters.getScriptEventDispatcher(modelSceneWar)

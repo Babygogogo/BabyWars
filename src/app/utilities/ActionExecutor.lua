@@ -59,6 +59,18 @@ end
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getWarNameWithWarId(warID)
+    local charList = {}
+    local bytea    = string.byte("a")
+    for i = 6, 1, -1 do
+        local mod   = warID % 36
+        charList[i] = (mod < 10) and ("" .. mod) or (string.char(bytea + mod - 10))
+        warID       = math.floor(warID / 36)
+    end
+
+    return table.concat(charList)
+end
+
 local function runSceneMain(isPlayerLoggedIn, confirmText)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -99,7 +111,7 @@ local function produceActorUnit(modelSceneWar, tiledID, unitID, gridIndex)
     local modelUnit = actorUnit:getModel()
     promoteModelUnitOnProduce(modelUnit, modelSceneWar)
     modelUnit:setStateActioned()
-        :onStartRunning(modelSceneWar, modelSceneWar:getFileName())
+        :onStartRunning(modelSceneWar)
 
     return actorUnit
 end
@@ -124,11 +136,10 @@ local function addActorUnitsWithUnitsData(modelSceneWar, unitsData, isViewVisibl
     assert(not isTotalReplay(modelSceneWar), "ActionExecutor-addActorUnitsWithUnitsData() this shouldn't be called in the replay mode.")
 
     if (unitsData) then
-        local sceneWarFileName = modelSceneWar:getFileName()
-        local modelUnitMap     = getModelUnitMap(modelSceneWar)
+        local modelUnitMap = getModelUnitMap(modelSceneWar)
         for unitID, unitData in pairs(unitsData) do
             local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
-            actorUnit:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+            actorUnit:getModel():onStartRunning(modelSceneWar)
                 :updateView()
                 :setViewVisible(isViewVisible)
 
@@ -423,13 +434,13 @@ local function executeJoinWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.joinWar(action)
     else
-        local sceneWarFileName = action.sceneWarFileName
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", sceneWarFileName:sub(13)))
+        local warID = action.warID
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", getWarNameWithWarId(warID)))
             :showMessage(getLocalizedText(56, (action.isWarStarted) and ("JoinWarStarted") or ("JoinWarNotStarted")))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu        = modelScene:getModelMainMenu()
             local modelJoinWarSelector = modelMainMenu:getModelJoinWarSelector()
-            if (modelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)) then
+            if (modelJoinWarSelector:isRetrievingJoinWarResult(warID)) then
                 modelJoinWarSelector:setEnabled(false)
                 modelMainMenu:setMenuEnabled(true)
             end
@@ -478,7 +489,7 @@ local function executeNewWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.createNewWar(action)
     else
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", action.sceneWarFileName:sub(13)))
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", getWarNameWithWarId(action.warID)))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu      = modelScene:getModelMainMenu()
             local modelNewWarCreator = modelMainMenu:getModelNewWarCreator()
@@ -530,9 +541,9 @@ local function executeReloadSceneWar(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeReloadSceneWar() should not be invoked on the server.")
 
     local warData = action.warData
-    if ((modelScene.isModelSceneWar)                           and
-        (modelScene:getFileName() == warData.sceneWarFileName) and
-        (modelScene:getActionId() <= warData.actionID))        then
+    if ((modelScene.isModelSceneWar)                    and
+        (modelScene:getWarId() == warData.warID)        and
+        (modelScene:getActionId() <= warData.actionID)) then
         if (action.messageCode) then
             getModelMessageIndicator(modelScene):showPersistentMessage(getLocalizedText(action.messageCode, action.messageParams))
         end
