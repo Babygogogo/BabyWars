@@ -243,11 +243,7 @@ local function createJoinableWarList(self, list)
     local warList = {}
     for warID, warConfiguration in pairs(list or {}) do
         local warFieldFileName = warConfiguration.warFieldFileName
-        if (warConfiguration.isRandomWarField) then
-            warFieldFileName   = "Random" .. require("res.data.templateWarField." .. warFieldFileName).playersCount .. "P"
-        end
-
-        warList[#warList + 1] = {
+        warList[#warList + 1]  = {
             warFieldName = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
             warID        = warID,
 
@@ -282,22 +278,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:ctor(param)
-    return self
-end
-
-function ModelJoinWarSelector:initView()
-    local view = self.m_View
-    assert(view, "ModelJoinWarSelector:initView() no view is attached to the actor of the model.")
-
-    view:removeAllItems()
-
-    return self
-end
-
-function ModelJoinWarSelector:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelJoinWarSelector:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
-
     return self
 end
 
@@ -388,7 +368,7 @@ end
 
 function ModelJoinWarSelector:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end

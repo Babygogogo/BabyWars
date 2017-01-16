@@ -54,8 +54,7 @@ end
 local function getActorJoinWarSelector(self)
     if (not self.m_ActorJoinWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
-        actor:getModel():setModelMainMenu(self)
-            :onStartRunning(self.m_ModelSceneMain)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorJoinWarSelector = actor
