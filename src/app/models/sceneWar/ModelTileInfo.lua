@@ -82,7 +82,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelTileInfo:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelTileInfo:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtModelTileMapUpdated",   self)

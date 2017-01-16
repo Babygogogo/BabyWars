@@ -64,7 +64,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelGridEffect:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelGridEffect:onStartRunning(modelSceneWar)
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtDestroyViewUnit", self)
         :addEventListener("EvtDestroyViewTile", self)

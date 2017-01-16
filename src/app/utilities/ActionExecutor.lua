@@ -2,6 +2,7 @@
 local ActionExecutor = {}
 
 local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions     = require("src.app.utilities.AuxiliaryFunctions")
 local Destroyers             = require("src.app.utilities.Destroyers")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
@@ -59,18 +60,6 @@ end
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getWarNameWithWarId(warID)
-    local charList = {}
-    local bytea    = string.byte("a")
-    for i = 6, 1, -1 do
-        local mod   = warID % 36
-        charList[i] = (mod < 10) and ("" .. mod) or (string.char(bytea + mod - 10))
-        warID       = math.floor(warID / 36)
-    end
-
-    return table.concat(charList)
-end
-
 local function runSceneMain(isPlayerLoggedIn, confirmText)
     assert(not IS_SERVER, "ActionExecutor-runSceneMain() the main scene can't be run on the server.")
 
@@ -435,7 +424,7 @@ local function executeJoinWar(action, modelScene)
         SceneWarManager.joinWar(action)
     else
         local warID = action.warID
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", getWarNameWithWarId(warID)))
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", AuxiliaryFunctions.getWarNameWithWarId(warID)))
             :showMessage(getLocalizedText(56, (action.isWarStarted) and ("JoinWarStarted") or ("JoinWarNotStarted")))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu        = modelScene:getModelMainMenu()
@@ -489,7 +478,7 @@ local function executeNewWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.createNewWar(action)
     else
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", getWarNameWithWarId(action.warID)))
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", AuxiliaryFunctions.getWarNameWithWarId(action.warID)))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu      = modelScene:getModelMainMenu()
             local modelNewWarCreator = modelMainMenu:getModelNewWarCreator()

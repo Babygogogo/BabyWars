@@ -40,7 +40,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelReplayController:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelReplayController:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtWarCommandMenuUpdated", self)

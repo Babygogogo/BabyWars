@@ -114,8 +114,8 @@ local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
         }})
 end
 
-local function resetModelWarConfigurator(model, sceneWarFileName, warConfiguration)
-    model:setSceneWarFileName(sceneWarFileName)
+local function resetModelWarConfigurator(model, warID, warConfiguration)
+    model:setWarId(warID)
         :setEnabled(true)
 
     resetSelectorPlayerIndex(   model, warConfiguration)
@@ -159,8 +159,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
-            actionCode       = ACTION_CODE_RUN_SCENE_WAR,
-            sceneWarFileName = modelWarConfigurator:getSceneWarFileName(),
+            actionCode = ACTION_CODE_RUN_SCENE_WAR,
+            warID      = modelWarConfigurator:getWarId(),
         })
     end)
 end
@@ -197,13 +197,13 @@ local function createOngoingWarList(self, list)
     local warList = {}
     for _, item in pairs(list) do
         local warConfiguration = item.warConfiguration
-        local sceneWarFileName = warConfiguration.sceneWarFileName
+        local warID            = warConfiguration.warID
         local warFieldFileName = warConfiguration.warFieldFileName
         warList[#warList + 1] = {
-            sceneWarFileName = sceneWarFileName,
-            warFieldName     = getWarFieldName(warFieldFileName),
-            isInTurn         = item.isInTurn,
-            callback         = function()
+            warID        = warID,
+            warFieldName = getWarFieldName(warFieldFileName),
+            isInTurn     = item.isInTurn,
+            callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setPlayerNicknames(getPlayerNicknames(warConfiguration))
                     :setEnabled(true)
@@ -213,7 +213,7 @@ local function createOngoingWarList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, warConfiguration)
+                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warID, warConfiguration)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)
@@ -224,7 +224,7 @@ local function createOngoingWarList(self, list)
     end
 
     table.sort(warList, function(item1, item2)
-        return item1.sceneWarFileName < item2.sceneWarFileName
+        return item1.warID < item2.warID
     end)
 
     return warList
@@ -234,26 +234,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:ctor(param)
-    if (self.m_View) then
-        self:initView()
-    end
-
-    return self
-end
-
-function ModelContinueWarSelector:initView()
-    local view = self.m_View
-    assert(view, "ModelContinueWarSelector:initView() no view is attached to the actor of the model.")
-
-    view:removeAllItems()
-
-    return self
-end
-
-function ModelContinueWarSelector:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelContinueWarSelector:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
-
     return self
 end
 
@@ -318,7 +298,7 @@ end
 
 function ModelContinueWarSelector:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end

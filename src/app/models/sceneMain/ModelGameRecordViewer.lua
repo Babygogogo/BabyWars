@@ -2,6 +2,7 @@
 local ModelGameRecordViewer = class("ModelGameRecordViewer")
 
 local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
@@ -44,8 +45,8 @@ end
 
 local function generateTextForWarList(warList)
     local textList = {}
-    for sceneWarFileName, _ in pairs(warList) do
-        textList[#textList + 1] = string.sub(sceneWarFileName, 13)
+    for warID, _ in pairs(warList) do
+        textList[#textList + 1] = AuxiliaryFunctions.getWarNameWithWarId(warID)
     end
 
     table.sort(textList, function(name1, name2)
