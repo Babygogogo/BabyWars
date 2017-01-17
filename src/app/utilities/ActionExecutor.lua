@@ -2,6 +2,7 @@
 local ActionExecutor = {}
 
 local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions     = require("src.app.utilities.AuxiliaryFunctions")
 local Destroyers             = require("src.app.utilities.Destroyers")
 local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
@@ -99,7 +100,7 @@ local function produceActorUnit(modelSceneWar, tiledID, unitID, gridIndex)
     local modelUnit = actorUnit:getModel()
     promoteModelUnitOnProduce(modelUnit, modelSceneWar)
     modelUnit:setStateActioned()
-        :onStartRunning(modelSceneWar, modelSceneWar:getFileName())
+        :onStartRunning(modelSceneWar)
 
     return actorUnit
 end
@@ -124,11 +125,10 @@ local function addActorUnitsWithUnitsData(modelSceneWar, unitsData, isViewVisibl
     assert(not isTotalReplay(modelSceneWar), "ActionExecutor-addActorUnitsWithUnitsData() this shouldn't be called in the replay mode.")
 
     if (unitsData) then
-        local sceneWarFileName = modelSceneWar:getFileName()
-        local modelUnitMap     = getModelUnitMap(modelSceneWar)
+        local modelUnitMap = getModelUnitMap(modelSceneWar)
         for unitID, unitData in pairs(unitsData) do
             local actorUnit = Actor.createWithModelAndViewName("sceneWar.ModelUnit", unitData, "sceneWar.ViewUnit")
-            actorUnit:getModel():onStartRunning(modelSceneWar, sceneWarFileName)
+            actorUnit:getModel():onStartRunning(modelSceneWar)
                 :updateView()
                 :setViewVisible(isViewVisible)
 
@@ -364,15 +364,15 @@ local function executeGetJoinableWarConfigurations(action, modelScene)
     end
 end
 
-local function executeGetOngoingWarList(action, modelScene)
-    assert(not IS_SERVER, "ActionExecutor-executeGetOngoingWarList() should not be invoked on the server.")
+local function executeGetOngoingWarConfigurations(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetOngoingWarConfigurations() should not be invoked on the server.")
     if (modelScene.isModelSceneWar) then
         return
     end
 
     local modelContinueWarSelector = modelScene:getModelMainMenu():getModelContinueWarSelector()
-    if (modelContinueWarSelector:isRetrievingOngoingWarList()) then
-        modelContinueWarSelector:updateWithOngoingWarList(action.ongoingWarList)
+    if (modelContinueWarSelector:isRetrievingOngoingWarConfigurations()) then
+        modelContinueWarSelector:updateWithOngoingWarConfigurations(action.warConfigurations)
     end
 end
 
@@ -423,13 +423,13 @@ local function executeJoinWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.joinWar(action)
     else
-        local sceneWarFileName = action.sceneWarFileName
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", sceneWarFileName:sub(13)))
+        local warID = action.warID
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "JoinWarSuccessfully", AuxiliaryFunctions.getWarNameWithWarId(warID)))
             :showMessage(getLocalizedText(56, (action.isWarStarted) and ("JoinWarStarted") or ("JoinWarNotStarted")))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu        = modelScene:getModelMainMenu()
             local modelJoinWarSelector = modelMainMenu:getModelJoinWarSelector()
-            if (modelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)) then
+            if (modelJoinWarSelector:isRetrievingJoinWarResult(warID)) then
                 modelJoinWarSelector:setEnabled(false)
                 modelMainMenu:setMenuEnabled(true)
             end
@@ -478,7 +478,7 @@ local function executeNewWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.createNewWar(action)
     else
-        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", action.sceneWarFileName:sub(13)))
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(51, "NewWarCreated", AuxiliaryFunctions.getWarNameWithWarId(action.warID)))
         if (not modelScene.isModelSceneWar) then
             local modelMainMenu      = modelScene:getModelMainMenu()
             local modelNewWarCreator = modelMainMenu:getModelNewWarCreator()
@@ -530,9 +530,9 @@ local function executeReloadSceneWar(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeReloadSceneWar() should not be invoked on the server.")
 
     local warData = action.warData
-    if ((modelScene.isModelSceneWar)                           and
-        (modelScene:getFileName() == warData.sceneWarFileName) and
-        (modelScene:getActionId() <= warData.actionID))        then
+    if ((modelScene.isModelSceneWar)                    and
+        (modelScene:getWarId() == warData.warID)        and
+        (modelScene:getActionId() <= warData.actionID)) then
         if (action.messageCode) then
             getModelMessageIndicator(modelScene):showPersistentMessage(getLocalizedText(action.messageCode, action.messageParams))
         end
@@ -1710,7 +1710,7 @@ function ActionExecutor.execute(action, modelScene)
 
     if     (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionGetOngoingWarList)            then executeGetOngoingWarList(           action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetOngoingWarConfigurations)  then executeGetOngoingWarConfigurations( action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetPlayerProfile)             then executeGetPlayerProfile(            action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetRankingList)               then executeGetRankingList(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetReplayConfigurations)      then executeGetReplayConfigurations(     action, modelScene)

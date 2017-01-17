@@ -41,8 +41,7 @@ end
 local function getActorContinueWarSelector(self)
     if (not self.m_ActorContinueWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelContinueWarSelector", nil, "sceneMain.ViewContinueWarSelector")
-        actor:getModel():setModelMainMenu(self)
-            :onStartRunning(self.m_ModelSceneMain)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorContinueWarSelector = actor
@@ -55,8 +54,7 @@ end
 local function getActorJoinWarSelector(self)
     if (not self.m_ActorJoinWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
-        actor:getModel():setModelMainMenu(self)
-            :onStartRunning(self.m_ModelSceneMain)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorJoinWarSelector = actor

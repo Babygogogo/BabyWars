@@ -106,7 +106,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function for start running.
 --------------------------------------------------------------------------------
-function AttackDoer:onStartRunning(modelSceneWar, sceneWarFileName)
+function AttackDoer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

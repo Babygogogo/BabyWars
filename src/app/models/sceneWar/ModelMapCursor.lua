@@ -212,7 +212,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-function ModelMapCursor:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelMapCursor:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtGridSelected",                     self)

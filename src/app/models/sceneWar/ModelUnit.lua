@@ -99,8 +99,8 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelUnit:onStartRunning(modelSceneWar, sceneWarFileName)
-    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar, sceneWarFileName)
+function ModelUnit:onStartRunning(modelSceneWar)
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar)
 
     if (self.m_View) then
         self.m_View:setModelSceneWar(modelSceneWar)

@@ -2,6 +2,7 @@
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
 local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
@@ -153,9 +154,9 @@ local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
 end
 
 local getActorWarConfigurator
-local function resetModelWarConfigurator(self, sceneWarFileName, warConfiguration)
+local function resetModelWarConfigurator(self, warID, warConfiguration)
     local model = getActorWarConfigurator(self):getModel()
-    model:setSceneWarFileName(sceneWarFileName)
+    model:setWarId(warID)
         :setEnabled(true)
 
     resetSelectorPlayerIndex(   model, warConfiguration)
@@ -208,7 +209,7 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
                     modelWarConfigurator:disableButtonConfirmForSecs(5)
                     WebSocketManager.sendAction({
                         actionCode           = ACTION_CODE_JOIN_WAR,
-                        sceneWarFileName     = modelWarConfigurator:getSceneWarFileName(),
+                        warID                = modelWarConfigurator:getWarId(),
                         playerIndex          = modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):getCurrentOption(),
                         skillConfigurationID = modelWarConfigurator:getModelOptionSelectorWithName("Skill")      :getCurrentOption(),
                         warPassword          = password,
@@ -240,19 +241,15 @@ end
 
 local function createJoinableWarList(self, list)
     local warList = {}
-    for sceneWarFileName, configuration in pairs(list or {}) do
-        local warFieldFileName = configuration.warFieldFileName
-        if (configuration.isRandomWarField) then
-            warFieldFileName   = "Random" .. require("res.data.templateWarField." .. warFieldFileName).playersCount .. "P"
-        end
+    for warID, warConfiguration in pairs(list or {}) do
+        local warFieldFileName = warConfiguration.warFieldFileName
+        warList[#warList + 1]  = {
+            warFieldName = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            warID        = warID,
 
-        warList[#warList + 1] = {
-            warFieldName     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
-            sceneWarFileName = sceneWarFileName,
-
-            callback         = function()
+            callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(configuration))
+                    :setPlayerNicknames(getPlayerNicknames(warConfiguration))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)
@@ -260,7 +257,7 @@ local function createJoinableWarList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    resetModelWarConfigurator(self, sceneWarFileName, configuration)
+                    resetModelWarConfigurator(self, warID, warConfiguration)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)
@@ -271,7 +268,7 @@ local function createJoinableWarList(self, list)
     end
 
     table.sort(warList, function(item1, item2)
-        return item1.sceneWarFileName < item2.sceneWarFileName
+        return item1.warID < item2.warID
     end)
 
     return warList
@@ -281,22 +278,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelJoinWarSelector:ctor(param)
-    return self
-end
-
-function ModelJoinWarSelector:initView()
-    local view = self.m_View
-    assert(view, "ModelJoinWarSelector:initView() no view is attached to the actor of the model.")
-
-    view:removeAllItems()
-
-    return self
-end
-
-function ModelJoinWarSelector:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelJoinWarSelector:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
-
     return self
 end
 
@@ -361,13 +342,13 @@ function ModelJoinWarSelector:updateWithJoinableWarConfigurations(warConfigurati
     return self
 end
 
-function ModelJoinWarSelector:isRetrievingJoinWarResult(sceneWarFileName)
+function ModelJoinWarSelector:isRetrievingJoinWarResult(warID)
     local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getSceneWarFileName() == sceneWarFileName)
+    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getWarId() == warID)
 end
 
 function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
-    if (#editBoxText ~= 4) then
+    if (#editBoxText ~= 6) then
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(59))
     else
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
@@ -377,8 +358,8 @@ function ModelJoinWarSelector:onButtonFindTouched(editBoxText)
         end
 
         WebSocketManager.sendAction({
-            actionCode        = ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS,
-            sceneWarShortName = editBoxText:lower(),
+            actionCode = ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS,
+            warID      = AuxiliaryFunctions.getWarIdWithWarName(editBoxText:lower()),
         })
     end
 
@@ -387,7 +368,7 @@ end
 
 function ModelJoinWarSelector:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end

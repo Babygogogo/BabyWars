@@ -54,7 +54,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
-function ModelActionMenu:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelActionMenu:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",                    self)

@@ -42,7 +42,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function MoveCostOwner:onStartRunning(modelSceneWar, sceneWarFileName)
+function MoveCostOwner:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

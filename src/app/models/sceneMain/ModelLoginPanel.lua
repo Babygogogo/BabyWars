@@ -70,9 +70,9 @@ end
 
 function ModelLoginPanel:onButtonRegisterTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        getModelMessageIndicator():showMessage(getLocalizedText(19))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(19))
     elseif (account == getLoggedInAccountAndPassword()) then
-        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonRegisterForSecs(5)
@@ -82,11 +82,11 @@ function ModelLoginPanel:onButtonRegisterTouched(account, password)
         modelConfirmBox:setConfirmText(getLocalizedText(24, account, password))
             :setOnConfirmYes(function()
                 WebSocketManager.sendAction({
-                        actionCode       = ACTION_CODE_REGISTER,
-                        clientVersion    = GAME_VERSION,
-                        registerAccount  = account,
-                        registerPassword = password,
-                    }, true)
+                    actionCode       = ACTION_CODE_REGISTER,
+                    clientVersion    = GAME_VERSION,
+                    registerAccount  = account,
+                    registerPassword = password,
+                }, true)
                 modelConfirmBox:setEnabled(false)
             end)
             :setEnabled(true)
@@ -97,19 +97,19 @@ end
 
 function ModelLoginPanel:onButtonLoginTouched(account, password)
     if ((not validateAccountOrPassword(account)) or (not validateAccountOrPassword(password))) then
-        getModelMessageIndicator():showMessage(getLocalizedText(19))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(19))
     elseif (account == getLoggedInAccountAndPassword()) then
-        getModelMessageIndicator():showMessage(getLocalizedText(21, account))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(21, account))
     else
         if (self.m_View) then
             self.m_View:disableButtonLoginForSecs(5)
         end
         WebSocketManager.sendAction({
-                actionCode    = ACTION_CODE_LOGIN,
-                clientVersion = GAME_VERSION,
-                loginAccount  = account,
-                loginPassword = password,
-            }, true)
+            actionCode    = ACTION_CODE_LOGIN,
+            clientVersion = GAME_VERSION,
+            loginAccount  = account,
+            loginPassword = password,
+        }, true)
     end
 
     return self

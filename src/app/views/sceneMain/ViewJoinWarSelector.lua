@@ -1,6 +1,7 @@
 
 local ViewJoinWarSelector = class("ViewJoinWarSelector", cc.Node)
 
+local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local WAR_CONFIGURATOR_Z_ORDER    = 1
@@ -71,8 +72,8 @@ local WAR_NAME_INDICATOR_OUTLINE_WIDTH = 1
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createSceneWarFileNameIndicator(sceneWarFileName)
-    local indicator = cc.Label:createWithTTF(string.sub(sceneWarFileName, 13), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
+local function createWarNameIndicator(warID)
+    local indicator = cc.Label:createWithTTF(AuxiliaryFunctions.getWarNameWithWarId(warID), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
     indicator:ignoreAnchorPointForPosition(true)
 
         :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
@@ -116,7 +117,7 @@ local function createViewMenuItem(item)
         end)
 
     view:getRendererNormal():addChild(createWarFieldNameIndicator(item.warFieldName))
-        :addChild(createSceneWarFileNameIndicator(item.sceneWarFileName))
+        :addChild(createWarNameIndicator(item.warID))
 
     return view
 end
@@ -230,7 +231,7 @@ local function initEditBoxWarName(self)
         :setPlaceholderFontColor({r = 0, g = 0, b = 0})
         :setPlaceHolder(LocalizationFunctions.getLocalizedText(58))
 
-        :setMaxLength(4)
+        :setMaxLength(6)
         :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
         :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
 

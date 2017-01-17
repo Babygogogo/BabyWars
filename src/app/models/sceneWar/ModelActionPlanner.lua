@@ -28,7 +28,6 @@ local WebSocketManager            = require("src.app.utilities.WebSocketManager"
 local Actor                       = require("src.global.actors.Actor")
 
 local createPathForDispatch    = MovePathFunctions.createPathForDispatch
-local getActionId              = SingletonGetters.getActionId
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
@@ -221,9 +220,9 @@ end
 -- The functions for sending actions to the server.
 --------------------------------------------------------------------------------
 local function createAndSendAction(self, rawAction)
-    local modelSceneWar        = self.m_ModelSceneWar
-    rawAction.sceneWarFileName = self.m_SceneWarFileName
-    rawAction.actionID         = getActionId(modelSceneWar) + 1
+    local modelSceneWar = self.m_ModelSceneWar
+    rawAction.warID     = SingletonGetters.getWarId(modelSceneWar)
+    rawAction.actionID  = SingletonGetters.getActionId(modelSceneWar) + 1
     WebSocketManager.sendAction(rawAction)
 
     getModelMessageIndicator(modelSceneWar):showPersistentMessage(getLocalizedText(80, "TransferingData"))
@@ -1140,9 +1139,8 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelActionPlanner:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelActionPlanner:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar    = modelSceneWar
-    self.m_SceneWarFileName = sceneWarFileName
     getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtGridSelected",               self)
         :addEventListener("EvtMapCursorMoved",             self)

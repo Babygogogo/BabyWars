@@ -20,6 +20,7 @@ local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
 local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local AudioManager              = require("src.app.utilities.AudioManager")
+local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
@@ -176,7 +177,7 @@ local function getMapInfo(self)
     return string.format("%s: %s      %s: %s\n%s: %s      %s: %d      %s: %d\n%s",
         getLocalizedText(65, "MapName"),   modelWarField:getWarFieldDisplayName(),
         getLocalizedText(65, "Author"),    modelWarField:getWarFieldAuthorName(),
-        getLocalizedText(65, "WarID"),     modelSceneWar:getFileName():sub(13),
+        getLocalizedText(65, "WarID"),     AuxiliaryFunctions.getWarNameWithWarId(SingletonGetters.getWarId(modelSceneWar)),
         getLocalizedText(65, "TurnIndex"), getModelTurnManager(modelSceneWar):getTurnIndex(),
         getLocalizedText(65, "ActionID"),  getActionId(modelSceneWar),
         getTilesInfo(tileTypeCounters)
@@ -188,17 +189,19 @@ local function updateStringWarInfo(self)
     updateUnitsData(self, dataForEachPlayer)
     updateTilesData(self, dataForEachPlayer)
 
+    local modelSceneWar     = self.m_ModelSceneWar
     local stringList        = {getMapInfo(self)}
-    local playerIndexInTurn = getModelTurnManager(self.m_ModelSceneWar):getPlayerIndex()
-    for i = 1, getModelPlayerManager(self.m_ModelSceneWar):getPlayersCount() do
+    local playerIndexInTurn = getModelTurnManager(modelSceneWar):getPlayerIndex()
+    for i = 1, getModelPlayerManager(modelSceneWar):getPlayersCount() do
         if (not dataForEachPlayer[i]) then
             stringList[#stringList + 1] = string.format("%s %d: %s", getLocalizedText(65, "Player"), i, getLocalizedText(65, "Lost"))
         else
-            local d              = dataForEachPlayer[i]
-            local isPlayerInTurn = i == playerIndexInTurn
+            local d                  = dataForEachPlayer[i]
+            local isPlayerInTurn     = i == playerIndexInTurn
+            local formattedCountdown = AuxiliaryFunctions.formatTimeInterval(modelSceneWar:getIntervalUntilBoot() - os.time() + modelSceneWar:getEnterTurnTime())
             stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %s      %s: %d\n%s: %d%s      %s: %d\n%s: %d\n%s",
                 getLocalizedText(65, "Player"),              i,           d.nickname,
-                ((isPlayerInTurn) and (string.format(" (%s)", getLocalizedText(49))) or ("")),
+                ((isPlayerInTurn) and (string.format(" (%s, %s: %s)", getLocalizedText(49), getLocalizedText(34, "BootCountdown"), formattedCountdown)) or ("")),
                 getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,
                 getLocalizedText(65, "Fund"),                 "" .. d.fund,
@@ -401,8 +404,8 @@ end
 local function createAndSendAction(self, rawAction, needActionID)
     local modelSceneWar = self.m_ModelSceneWar
     if (needActionID) then
-        rawAction.actionID         = getActionId(modelSceneWar) + 1
-        rawAction.sceneWarFileName = self.m_SceneWarFileName
+        rawAction.actionID = getActionId(modelSceneWar) + 1
+        rawAction.warID    = SingletonGetters.getWarId(self.m_ModelSceneWar)
     end
 
     WebSocketManager.sendAction(rawAction)
@@ -440,8 +443,8 @@ end
 
 local function sendActionReloadSceneWar(self)
     createAndSendAction(self, {
-        actionCode       = ACTION_CODE_RELOAD_SCENE_WAR,
-        sceneWarFileName = self.m_SceneWarFileName,
+        actionCode = ACTION_CODE_RELOAD_SCENE_WAR,
+        warID      = SingletonGetters.getWarId(self.m_ModelSceneWar),
     }, false)
 end
 
@@ -1011,9 +1014,8 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running or script events.
 --------------------------------------------------------------------------------
-function ModelWarCommandMenu:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelWarCommandMenu:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar    = modelSceneWar
-    self.m_SceneWarFileName = sceneWarFileName
     getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtIsWaitingForServerResponse", self)
         :addEventListener("EvtGridSelected",               self)

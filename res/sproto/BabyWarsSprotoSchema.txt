@@ -5,7 +5,7 @@
 .ActionGeneric {
     ActionDownloadReplayData            1 : ActionDownloadReplayData
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
-    ActionGetOngoingWarList             3 : ActionGetOngoingWarList
+    ActionGetOngoingWarConfigurations   3 : ActionGetOngoingWarConfigurations
     ActionGetPlayerProfile              4 : ActionGetPlayerProfile
     ActionGetRankingList                5 : ActionGetRankingList
     ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
@@ -41,8 +41,8 @@
     ActionSupplyModelUnit             115 : ActionSupplyModelUnit
     ActionSurface                     116 : ActionSurface
     ActionSurrender                   117 : ActionSurrender
-    ActionWait                        118 : ActionWait
-    ActionVoteForDraw                 119 : ActionVoteForDraw
+    ActionVoteForDraw                 118 : ActionVoteForDraw
+    ActionWait                        119 : ActionWait
 }
 
 .ActionRedis {
@@ -52,28 +52,23 @@
 
 .ActionDownloadReplayData {
     actionCode        0 : integer
-    sceneWarFileName  1 : string
+    warID             1 : integer
     encodedReplayData 2 : string
 }
 
 .ActionGetJoinableWarConfigurations {
-    actionCode        0 : integer
-    playerAccount     1 : string
-    playerPassword    2 : string
-    sceneWarShortName 3 : string
-    warConfigurations 4 : *WarConfiguration(sceneWarFileName)
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    warID             3 :  integer
+    warConfigurations 4 : *WarConfiguration(warID)
 }
 
-.ActionGetOngoingWarList {
-    .OngoingWarListItem {
-        warConfiguration 0 : WarConfiguration
-        isInTurn         1 : boolean
-    }
-
-    actionCode     0 :  integer
-    playerAccount  1 :  string
-    playerPassword 2 :  string
-    ongoingWarList 3 : *OngoingWarListItem
+.ActionGetOngoingWarConfigurations {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    warConfigurations 3 : *WarConfiguration(warID)
 }
 
 .ActionGetPlayerProfile {
@@ -106,7 +101,7 @@
     actionCode           0 : integer
     playerAccount        1 : string
     playerPassword       2 : string
-    sceneWarFileName     3 : string
+    warID                3 : integer
     playerIndex          4 : integer
     skillConfigurationID 5 : integer
     warPassword          6 : string
@@ -141,7 +136,7 @@
     actionCode            0 : integer
     playerAccount         1 : string
     playerPassword        2 : string
-    sceneWarFileName      3 : string
+    warID                 3 : integer
     warPassword           4 : string
     warFieldFileName      5 : string
     playerIndex           6 : integer
@@ -165,7 +160,7 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     warData          4 : SceneWar
 }
 
@@ -179,7 +174,7 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     warData          4 : SceneWar
 }
 
@@ -195,7 +190,7 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     actionID         4 : integer
 }
 
@@ -203,7 +198,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -216,7 +211,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -265,7 +260,7 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     actionID         4 : integer
     income           5 : integer
     lostPlayerIndex  6 : integer
@@ -277,7 +272,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -291,7 +286,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -306,7 +301,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -319,7 +314,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -333,7 +328,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -349,7 +344,7 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     actionID         4 : integer
 }
 
@@ -357,7 +352,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -371,7 +366,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -386,7 +381,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -401,7 +396,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -415,7 +410,7 @@
     actionCode       0 :  integer
     playerAccount    1 :  string
     playerPassword   2 :  string
-    sceneWarFileName 3 :  string
+    warID            3 :  integer
     actionID         4 :  integer
     revealedUnits    5 : *UnitData(unitID)
     revealedTiles    6 : *TileData(positionIndex)
@@ -428,7 +423,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -443,7 +438,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -457,7 +452,7 @@
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -471,15 +466,24 @@
     actionCode       0 : integer
     playerAccount    1 : string
     playerPassword   2 : string
-    sceneWarFileName 3 : string
+    warID            3 : integer
     actionID         4 : integer
+}
+
+.ActionVoteForDraw {
+    actionCode        0 : integer
+    playerAccount     1 : string
+    playerPassword    2 : string
+    warID             3 : integer
+    actionID          4 : integer
+    doesAgree         5 : boolean
 }
 
 .ActionWait {
     actionCode        0 :  integer
     playerAccount     1 :  string
     playerPassword    2 :  string
-    sceneWarFileName  3 :  string
+    warID             3 :  integer
     actionID          4 :  integer
     revealedUnits     5 : *UnitData(unitID)
     revealedTiles     6 : *TileData(positionIndex)
@@ -487,15 +491,6 @@
     actingTilesData   8 : *TileData(positionIndex)
     path              9 :  MovePath
     launchUnitID     10 :  integer
-}
-
-.ActionVoteForDraw {
-    actionCode        0 : integer
-    playerAccount     1 : string
-    playerPassword    2 : string
-    sceneWarFileName  3 : string
-    actionID          4 : integer
-    doesAgree         5 : boolean
 }
 
 ################################################################################
@@ -577,7 +572,7 @@
 }
 
 .JoinableWarList {
-    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+    list 0 : *WarIdForIndexing(warID)
 }
 
 .MovePath {
@@ -587,7 +582,7 @@
 }
 
 .OngoingWarListForServer {
-    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+    list 0 : *WarIdForIndexing(warID)
 }
 
 .PlayerInfo {
@@ -605,9 +600,8 @@
     }
 
     .WarLists {
-        ongoing 0 : *SceneWarFileNameForIndex(sceneWarFileName)
-        created 1 : *SceneWarFileNameForIndex(sceneWarFileName) # deprecated
-        waiting 2 : *SceneWarFileNameForIndex(sceneWarFileName)
+        ongoing 0 : *WarIdForIndexing(warID)
+        waiting 1 : *WarIdForIndexing(warID)
     }
 
     account             0 :  string
@@ -620,7 +614,7 @@
 
 .PlayerProfileForClient {
     .WarLists {
-        waiting 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+        waiting 0 : *WarIdForIndexing(warID)
     }
 
     account     0 :  string
@@ -643,17 +637,17 @@
 }
 
 .ReplayConfiguration {
-    sceneWarFileName    0 :  string
+    warID               0 :  integer
     warFieldFileName    1 :  string
     players             2 : *PlayerInfo
 }
 
 .ReplayListForClient {
-    list 0 : *ReplayConfiguration(sceneWarFileName)
+    list 0 : *ReplayConfiguration(warID)
 }
 
 .ReplayListForServer {
-    list 0 : *SceneWarFileNameForIndex(sceneWarFileName)
+    list 0 : *WarIdForIndexing(warID)
 }
 
 .SceneWar {
@@ -711,7 +705,7 @@
         expiringTurnIndexForWeather   3 : integer
     }
 
-    sceneWarFileName       0 :  string
+    warID                  0 :  integer
     actionID               1 :  integer
     maxBaseSkillPoints     2 :  integer
     isWarEnded             3 :  boolean
@@ -732,8 +726,8 @@
     enterTurnTime         18 :  integer
 }
 
-.SceneWarFileNameForIndex {
-    sceneWarFileName 0 : string
+.WarIdForIndexing {
+    warID 0 : integer
 }
 
 .SingleGameRecordForPlayerProfile {
@@ -791,7 +785,7 @@
 }
 
 .WarConfiguration {
-    sceneWarFileName     0 :  string
+    warID                0 :  integer
     warFieldFileName     1 :  string
     warPassword          2 :  string
     maxBaseSkillPoints   3 :  integer
@@ -803,4 +797,6 @@
     maxDiffScore         9 :  integer
     createdTime         10 :  integer
     intervalUntilBoot   11 :  integer
+    enterTurnTime       12 :  integer
+    playerIndexInTurn   13 :  integer
 }

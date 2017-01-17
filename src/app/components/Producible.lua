@@ -44,7 +44,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function Producible:onStartRunning(modelSceneWar, sceneWarFileName)
+function Producible:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

@@ -58,7 +58,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function ModelPlayerManager:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelPlayerManager:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     if ((not IS_SERVER) and (not SingletonGetters.isTotalReplay(modelSceneWar))) then
         self.m_ModelPlayerLoggedIn, self.m_PlayerIndexLoggedIn = self:getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())

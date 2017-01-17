@@ -200,7 +200,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelFogMap:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelFogMap:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar       = modelSceneWar
     self.m_IsFogOfWarByDefault = modelSceneWar:isFogOfWarByDefault()
 

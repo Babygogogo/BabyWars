@@ -64,7 +64,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function MoveDoer:onStartRunning(modelSceneWar, sceneWarFileName)
+function MoveDoer:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self

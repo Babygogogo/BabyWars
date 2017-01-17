@@ -1,6 +1,7 @@
 
 local ViewReplayManager = class("ViewReplayManager", cc.Node)
 
+local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
@@ -82,8 +83,8 @@ local function setButtonEnabled(button, enabled)
     end
 end
 
-local function createSceneWarFileNameIndicator(sceneWarFileName)
-    local indicator = cc.Label:createWithTTF(string.sub(sceneWarFileName, 13), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
+local function createWarNameIndicator(warID)
+    local indicator = cc.Label:createWithTTF(AuxiliaryFunctions.getWarNameWithWarId(warID), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
     indicator:ignoreAnchorPointForPosition(true)
 
         :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
@@ -125,8 +126,8 @@ local function createViewMenuItem(item)
     view:setCascadeColorEnabled(true)
         :getRendererNormal():addChild(label)
 
-    if (item.sceneWarFileName) then
-        view:getRendererNormal():addChild(createSceneWarFileNameIndicator(item.sceneWarFileName))
+    if (item.warID) then
+        view:getRendererNormal():addChild(createWarNameIndicator(item.warID))
     end
 
     return view

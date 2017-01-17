@@ -10,6 +10,7 @@
 local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
 local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
@@ -17,10 +18,11 @@ local ModelWeatherManager   = require("src.app.models.sceneWar.ModelWeatherManag
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
+local os, string       = os, string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local ACTION_CODE_GET_ONGOING_WAR_LIST = ActionCodeFunctions.getActionCode("ActionGetOngoingWarList")
-local ACTION_CODE_RUN_SCENE_WAR        = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
+local ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetOngoingWarConfigurations")
+local ACTION_CODE_RUN_SCENE_WAR                  = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -29,14 +31,18 @@ local function getWarFieldName(fileName)
     return require("res.data.templateWarField." .. fileName).warFieldName
 end
 
-local function getPlayerNicknames(warConfiguration)
+local function getPlayerNicknames(warConfiguration, currentTime)
     local playersCount = require("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
-    local names = {}
-    local players = warConfiguration.players
+    local players      = warConfiguration.players
+    local names        = {}
 
     for i = 1, playersCount do
         if (players[i]) then
             names[i] = players[i].account
+            if (i == warConfiguration.playerIndexInTurn) then
+                names[i] = names[i] .. string.format("(%s: %s)", getLocalizedText(34, "BootCountdown"),
+                    AuxiliaryFunctions.formatTimeInterval(warConfiguration.intervalUntilBoot - currentTime + warConfiguration.enterTurnTime))
+            end
         end
     end
 
@@ -114,8 +120,8 @@ local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
         }})
 end
 
-local function resetModelWarConfigurator(model, sceneWarFileName, warConfiguration)
-    model:setSceneWarFileName(sceneWarFileName)
+local function resetModelWarConfigurator(model, warID, warConfiguration)
+    model:setWarId(warID)
         :setEnabled(true)
 
     resetSelectorPlayerIndex(   model, warConfiguration)
@@ -159,8 +165,8 @@ local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
         modelWarConfigurator:disableButtonConfirmForSecs(5)
         WebSocketManager.sendAction({
-            actionCode       = ACTION_CODE_RUN_SCENE_WAR,
-            sceneWarFileName = modelWarConfigurator:getSceneWarFileName(),
+            actionCode = ACTION_CODE_RUN_SCENE_WAR,
+            warID      = modelWarConfigurator:getWarId(),
         })
     end)
 end
@@ -193,19 +199,21 @@ local function getActorWarConfigurator(self)
     return self.m_ActorWarConfigurator
 end
 
-local function createOngoingWarList(self, list)
-    local warList = {}
-    for _, item in pairs(list) do
-        local warConfiguration = item.warConfiguration
-        local sceneWarFileName = warConfiguration.sceneWarFileName
-        local warFieldFileName = warConfiguration.warFieldFileName
+local function createOngoingWarList(self, warConfigurations)
+    local warList               = {}
+    local playerAccountLoggedIn = WebSocketManager.getLoggedInAccountAndPassword()
+
+    for warID, warConfiguration in pairs(warConfigurations) do
+        local warFieldFileName  = warConfiguration.warFieldFileName
+        local playerIndexInTurn = warConfiguration.playerIndexInTurn
+
         warList[#warList + 1] = {
-            sceneWarFileName = sceneWarFileName,
-            warFieldName     = getWarFieldName(warFieldFileName),
-            isInTurn         = item.isInTurn,
-            callback         = function()
+            warID        = warID,
+            warFieldName = getWarFieldName(warFieldFileName),
+            isInTurn     = (warConfiguration.players[playerIndexInTurn].account == playerAccountLoggedIn),
+            callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
-                    :setPlayerNicknames(getPlayerNicknames(warConfiguration))
+                    :setPlayerNicknames(getPlayerNicknames(warConfiguration, os.time()))
                     :setEnabled(true)
                 if (self.m_View) then
                     self.m_View:setButtonNextVisible(true)
@@ -213,7 +221,7 @@ local function createOngoingWarList(self, list)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), sceneWarFileName, warConfiguration)
+                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warID, warConfiguration)
                     if (self.m_View) then
                         self.m_View:setMenuVisible(false)
                             :setButtonNextVisible(false)
@@ -224,7 +232,7 @@ local function createOngoingWarList(self, list)
     end
 
     table.sort(warList, function(item1, item2)
-        return item1.sceneWarFileName < item2.sceneWarFileName
+        return item1.warID < item2.warID
     end)
 
     return warList
@@ -234,26 +242,6 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:ctor(param)
-    if (self.m_View) then
-        self:initView()
-    end
-
-    return self
-end
-
-function ModelContinueWarSelector:initView()
-    local view = self.m_View
-    assert(view, "ModelContinueWarSelector:initView() no view is attached to the actor of the model.")
-
-    view:removeAllItems()
-
-    return self
-end
-
-function ModelContinueWarSelector:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelContinueWarSelector:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
-
     return self
 end
 
@@ -274,7 +262,7 @@ function ModelContinueWarSelector:setEnabled(enabled)
 
     if (enabled) then
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
-        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_LIST})
+        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS})
     end
 
     if (self.m_View) then
@@ -290,13 +278,13 @@ function ModelContinueWarSelector:setEnabled(enabled)
     return self
 end
 
-function ModelContinueWarSelector:isRetrievingOngoingWarList()
+function ModelContinueWarSelector:isRetrievingOngoingWarConfigurations()
     return self.m_IsEnabled
 end
 
-function ModelContinueWarSelector:updateWithOngoingWarList(list)
+function ModelContinueWarSelector:updateWithOngoingWarConfigurations(warConfigurations)
     if ((self.m_View) and (self.m_IsEnabled)) then
-        local warList = createOngoingWarList(self, list)
+        local warList = createOngoingWarList(self, warConfigurations)
         if (#warList == 0) then
             SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoContinuableWar"))
         else
@@ -318,7 +306,7 @@ end
 
 function ModelContinueWarSelector:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end

@@ -48,6 +48,18 @@ function TableFunctions.clone(t, ignoredKeys)
     return clonedTable
 end
 
+function TableFunctions.deepClone(t)
+    if (type(t) ~= "table") then
+        return t
+    else
+        local clonedTable = {}
+        for k, v in pairs(t) do
+            clonedTable[TableFunctions.deepClone(k)] = TableFunctions.deepClone(v)
+        end
+        return clonedTable
+    end
+end
+
 function TableFunctions.getPairsCount(t)
     local count = 0
     for k, v in pairs(t) do

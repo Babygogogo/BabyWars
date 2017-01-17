@@ -1,6 +1,7 @@
 
 local ViewContinueWarSelector = class("ViewContinueWarSelector", cc.Node)
 
+local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local WAR_CONFIGURATOR_Z_ORDER    = 1
@@ -60,8 +61,8 @@ local IN_TURN_INDICATOR_OUTLINE_WIDTH = 1
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createSceneWarFileNameIndicator(sceneWarFileName)
-    local indicator = cc.Label:createWithTTF(string.sub(sceneWarFileName, 13), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
+local function createWarNameIndicator(warID)
+    local indicator = cc.Label:createWithTTF(AuxiliaryFunctions.getWarNameWithWarId(warID), ITEM_FONT_NAME, WAR_NAME_INDICATOR_FONT_SIZE)
     indicator:ignoreAnchorPointForPosition(true)
 
         :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
@@ -120,7 +121,7 @@ local function createViewMenuItem(item)
 
     local backgroundRenderer = view:getRendererNormal()
     backgroundRenderer:addChild(createWarFieldNameIndicator(item.warFieldName))
-        :addChild(createSceneWarFileNameIndicator(item.sceneWarFileName))
+        :addChild(createWarNameIndicator(item.warID))
     if (item.isInTurn) then
         backgroundRenderer:addChild(createIsInTurnIndicator())
     end

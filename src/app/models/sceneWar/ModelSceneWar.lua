@@ -36,7 +36,7 @@ local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSock
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"sceneWarFileName", "actionID"}
+local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"warID", "actionID"}
 local TIME_INTERVAL_FOR_ACTIONS         = 1.5
 local DEFAULT_INTERVAL_UNTIL_BOOT       = 3600 * 24 * 3
 
@@ -56,7 +56,7 @@ local function onWebSocketOpen(self, param)
             WebSocketManager.sendAction({
                 actionCode       = ActionCodeFunctions.getActionCode("ActionSyncSceneWar"),
                 actionID         = self:getActionId(),
-                sceneWarFileName = self:getFileName(),
+                warID            = self:getWarId(),
             })
         end
     end
@@ -188,10 +188,9 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     self.m_CachedActions              = {}
-    self.m_EnterTurnTime              = sceneData.enterTurnTime     or DEFAULT_INTERVAL_UNTIL_BOOT
+    self.m_EnterTurnTime              = sceneData.enterTurnTime
     self.m_ExecutedActions            = sceneData.executedActions
-    self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot or DEFAULT_INTERVAL_UNTIL_BOOT
-    self.m_SceneWarFileName           = sceneData.sceneWarFileName
+    self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot
     self.m_IsWarEnded                 = sceneData.isWarEnded
     self.m_IsFogOfWarByDefault        = sceneData.isFogOfWarByDefault
     self.m_IsRandomWarField           = sceneData.isRandomWarField
@@ -200,6 +199,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_MaxBaseSkillPoints         = sceneData.maxBaseSkillPoints
     self.m_MaxDiffScore               = sceneData.maxDiffScore
     self.m_RemainingVotesForDraw      = sceneData.remainingVotesForDraw
+    self.m_WarID                      = sceneData.warID
     self.m_WarPassword                = sceneData.warPassword
     setActionId(self, sceneData.actionID)
 
@@ -245,7 +245,7 @@ function ModelSceneWar:toSerializableTable()
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
-        sceneWarFileName      = self.m_SceneWarFileName,
+        warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableTable(),
         turn                  = self:getModelTurnManager()   :toSerializableTable(),
@@ -268,7 +268,7 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
-        sceneWarFileName      = self.m_SceneWarFileName,
+        warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
         turn                  = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
@@ -291,7 +291,7 @@ function ModelSceneWar:toSerializableReplayData()
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = nil,
-        sceneWarFileName      = self.m_SceneWarFileName,
+        warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableReplayData(),
         turn                  = self:getModelTurnManager()   :toSerializableReplayData(),
@@ -304,13 +304,12 @@ end
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
 function ModelSceneWar:onStartRunning()
-    local sceneWarFileName = self:getFileName()
     local modelTurnManager = self:getModelTurnManager()
-    modelTurnManager            :onStartRunning(self, sceneWarFileName)
-    self:getModelPlayerManager():onStartRunning(self, sceneWarFileName)
-    self:getModelWarField()     :onStartRunning(self, sceneWarFileName)
+    modelTurnManager            :onStartRunning(self)
+    self:getModelPlayerManager():onStartRunning(self)
+    self:getModelWarField()     :onStartRunning(self)
     if (not IS_SERVER) then
-        self:getModelWarHud():onStartRunning(self, sceneWarFileName)
+        self:getModelWarHud():onStartRunning(self)
     end
 
     self:getScriptEventDispatcher():dispatchEvent({name = "EvtSceneWarStarted"})
@@ -345,13 +344,13 @@ end
 ModelSceneWar.isModelSceneWar = true
 
 function ModelSceneWar:executeAction(action)
-    local sceneWarFileName = action.sceneWarFileName
-    local actionID         = action.actionID
-    local selfActionID     = self:getActionId()
+    local warID        = action.warID
+    local actionID     = action.actionID
+    local selfActionID = self:getActionId()
     if (IS_SERVER) then
-        assert(sceneWarFileName == self:getFileName(), "ModelSceneWar:executeAction() invalid action.sceneWarFileName:" .. (sceneWarFileName or ""))
-        assert(actionID == selfActionID + 1,           "ModelSceneWar:executeAction() invalid action.actionID:" .. (actionID or ""))
-        assert(not self:isExecutingAction(),           "ModelSceneWar:executeAction() another action is being executed. This should not happen.")
+        assert(warID == self:getWarId(),  "ModelSceneWar:executeAction() invalid action.warID:" .. (warID or ""))
+        assert(actionID == selfActionID + 1, "ModelSceneWar:executeAction() invalid action.actionID:" .. (actionID or ""))
+        assert(not self:isExecutingAction(), "ModelSceneWar:executeAction() another action is being executed. This should not happen.")
 
         setActionId(self, actionID)
         ActionExecutor.execute(action, self)
@@ -362,10 +361,10 @@ function ModelSceneWar:executeAction(action)
             }
         end
 
-    elseif (not sceneWarFileName) then
+    elseif (not warID) then
         ActionExecutor.execute(action, self)
 
-    elseif (sceneWarFileName ~= self:getFileName()) then
+    elseif (warID ~= self:getWarId()) then
         -- The action is not for this war. Do nothing.
 
     elseif (not actionID) then
@@ -449,8 +448,8 @@ function ModelSceneWar:getActionId()
     return self.m_ActionID
 end
 
-function ModelSceneWar:getFileName()
-    return self.m_SceneWarFileName
+function ModelSceneWar:getWarId()
+    return self.m_WarID
 end
 
 function ModelSceneWar:getIntervalUntilBoot()

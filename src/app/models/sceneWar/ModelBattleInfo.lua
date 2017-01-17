@@ -57,7 +57,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelBattleInfo:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelBattleInfo:onStartRunning(modelSceneWar)
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPreviewBattleDamage",         self)
         :addEventListener("EvtPreviewNoBattleDamage",       self)

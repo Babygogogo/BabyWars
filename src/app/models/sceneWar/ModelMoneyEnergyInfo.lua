@@ -66,7 +66,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar, sceneWarFileName)
+function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",    self)

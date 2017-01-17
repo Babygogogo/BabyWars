@@ -116,7 +116,7 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function UnitLoader:onStartRunning(modelSceneWar, sceneWarFileName)
+function UnitLoader:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
 
     return self
