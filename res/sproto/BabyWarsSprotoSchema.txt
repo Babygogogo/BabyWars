@@ -5,7 +5,7 @@
 .ActionGeneric {
     ActionDownloadReplayData            1 : ActionDownloadReplayData
     ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
-    ActionGetOngoingWarList             3 : ActionGetOngoingWarList
+    ActionGetOngoingWarConfigurations   3 : ActionGetOngoingWarConfigurations
     ActionGetPlayerProfile              4 : ActionGetPlayerProfile
     ActionGetRankingList                5 : ActionGetRankingList
     ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
@@ -64,16 +64,11 @@
     warConfigurations 4 : *WarConfiguration(warID)
 }
 
-.ActionGetOngoingWarList {
-    .OngoingWarListItem {
-        warConfiguration 0 : WarConfiguration
-        isInTurn         1 : boolean
-    }
-
-    actionCode     0 :  integer
-    playerAccount  1 :  string
-    playerPassword 2 :  string
-    ongoingWarList 3 : *OngoingWarListItem
+.ActionGetOngoingWarConfigurations {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    warConfigurations 3 : *WarConfiguration(warID)
 }
 
 .ActionGetPlayerProfile {
@@ -802,4 +797,6 @@
     maxDiffScore         9 :  integer
     createdTime         10 :  integer
     intervalUntilBoot   11 :  integer
+    enterTurnTime       12 :  integer
+    playerIndexInTurn   13 :  integer
 }

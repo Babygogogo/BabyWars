@@ -1,9 +1,13 @@
 
 local AuxiliaryFunctions = {}
 
-local math, string, table = math, string, table
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local BYTE_A, BYTE_Z, BYTE_0 = string.byte("az0", 1, 3)
+local math, string, table = math, string, table
+local getLocalizedText    = LocalizationFunctions.getLocalizedText
+
+local BYTE_A, BYTE_Z, BYTE_0                    = string.byte("az0", 1, 3)
+local SECS_FOR_DAY, SECS_FOR_HOUR, SECS_FOR_MIN = 3600 * 24, 3600, 60
 
 function AuxiliaryFunctions.getWarIdWithWarName(warName)
     local bytes      = {string.byte(warName, 1, 6)}
@@ -26,6 +30,23 @@ function AuxiliaryFunctions.getWarNameWithWarId(warID)
     end
 
     return table.concat(charList)
+end
+
+function AuxiliaryFunctions.formatTimeInterval(interval)
+    local days  = math.floor(interval / SECS_FOR_DAY)
+    interval    =            interval % SECS_FOR_DAY
+    local hours = math.floor(interval / SECS_FOR_HOUR)
+    interval    =            interval % SECS_FOR_HOUR
+    local mins  = math.floor(interval / SECS_FOR_MIN)
+    interval    =            interval % SECS_FOR_MIN
+
+    local strList = {}
+    if (days     > 0) then strList[#strList + 1] = string.format("%d%s", days,     getLocalizedText(34, "Day"))    end
+    if (hours    > 0) then strList[#strList + 1] = string.format("%d%s", hours,    getLocalizedText(34, "Hour"))   end
+    if (mins     > 0) then strList[#strList + 1] = string.format("%d%s", mins,     getLocalizedText(34, "Minute")) end
+    if (interval > 0) then strList[#strList + 1] = string.format("%d%s", interval, getLocalizedText(34, "Second")) end
+
+    return table.concat(strList, " ")
 end
 
 function AuxiliaryFunctions.round(num)

@@ -364,15 +364,15 @@ local function executeGetJoinableWarConfigurations(action, modelScene)
     end
 end
 
-local function executeGetOngoingWarList(action, modelScene)
-    assert(not IS_SERVER, "ActionExecutor-executeGetOngoingWarList() should not be invoked on the server.")
+local function executeGetOngoingWarConfigurations(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetOngoingWarConfigurations() should not be invoked on the server.")
     if (modelScene.isModelSceneWar) then
         return
     end
 
     local modelContinueWarSelector = modelScene:getModelMainMenu():getModelContinueWarSelector()
-    if (modelContinueWarSelector:isRetrievingOngoingWarList()) then
-        modelContinueWarSelector:updateWithOngoingWarList(action.ongoingWarList)
+    if (modelContinueWarSelector:isRetrievingOngoingWarConfigurations()) then
+        modelContinueWarSelector:updateWithOngoingWarConfigurations(action.warConfigurations)
     end
 end
 
@@ -1710,7 +1710,7 @@ function ActionExecutor.execute(action, modelScene)
 
     if     (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
-    elseif (actionCode == ACTION_CODES.ActionGetOngoingWarList)            then executeGetOngoingWarList(           action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetOngoingWarConfigurations)  then executeGetOngoingWarConfigurations( action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetPlayerProfile)             then executeGetPlayerProfile(            action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetRankingList)               then executeGetRankingList(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetReplayConfigurations)      then executeGetReplayConfigurations(     action, modelScene)
