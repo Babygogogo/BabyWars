@@ -136,13 +136,14 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
-    local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_PlayerIndex)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelPlayer   = getModelPlayerManager(modelSceneWar):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhaseCode = TURN_PHASE_CODES.GetFund
         self:runTurn()
     end
 
-    if (self.m_View) then
+    if ((self.m_View) and (not modelSceneWar:isFastExecutingActions())) then
         self.m_View:showBeginTurnEffect(self.m_TurnIndex, modelPlayer:getNickname(), callbackOnBeginTurnEffectDisappear)
     else
         callbackOnBeginTurnEffectDisappear()

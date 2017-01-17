@@ -34,6 +34,7 @@ local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isSe
 local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
 local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
 
+local ipairs, next     = ipairs, next
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"warID", "actionID"}
@@ -228,6 +229,36 @@ function ModelSceneWar:initView()
     return self
 end
 
+function ModelSceneWar:initWarDataForEachTurn()
+    assert((self:isTotalReplay()) and (not self.m_WarDataForEachTurn) and (self:getActionId() == 0))
+
+    self.m_IsFastExecutingActions = true
+    self:onStartRunning()
+
+    local modelTurnManager    = self:getModelTurnManager()
+    local turnCounter         = 0
+    local actionIdForEachTurn = {}
+    local warDataForEachTurn  = {}
+
+    for actionID, wrappedAction in ipairs(self.m_ExecutedActions) do
+        if (modelTurnManager:isTurnPhaseRequestToBegin()) then
+            turnCounter = turnCounter + 1
+            warDataForEachTurn[turnCounter] = self:toSerializableTable()
+        end
+        actionIdForEachTurn[actionID] = turnCounter
+
+        local _, action = next(wrappedAction)
+        ActionExecutor.execute(action, self)
+    end
+
+    self.m_IsFastExecutingActions = false
+    self.m_ActionIdForEachTurn    = actionIdForEachTurn
+    self.m_WarDataForEachTurn     = warDataForEachTurn
+    self:ctor(warDataForEachTurn[1])
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The functions for serialization.
 --------------------------------------------------------------------------------
@@ -240,7 +271,7 @@ function ModelSceneWar:toSerializableTable()
         isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
         isRandomWarField      = self.m_IsRandomWarField,
         isRankMatch           = self.m_IsRankMatch,
-        isTotalReplay         = false,
+        isTotalReplay         = self.m_IsTotalReplay,
         isWarEnded            = self.m_IsWarEnded,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
@@ -402,6 +433,10 @@ end
 
 function ModelSceneWar:isExecutingAction()
     return self.m_IsExecutingAction
+end
+
+function ModelSceneWar:isFastExecutingActions()
+    return self.m_IsFastExecutingActions
 end
 
 function ModelSceneWar:setExecutingAction(executing)

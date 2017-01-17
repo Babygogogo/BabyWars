@@ -86,13 +86,13 @@ function Destroyers.destroyActorUnitOnMap(modelSceneWar, gridIndex, shouldRemove
 end
 
 function Destroyers.destroyPlayerForce(modelSceneWar, playerIndex)
-    local modelGridEffect = (not IS_SERVER) and (getModelGridEffect(modelSceneWar)) or (nil)
+    local modelGridEffect = ((not IS_SERVER) and (not modelSceneWar:isFastExecutingActions())) and (getModelGridEffect(modelSceneWar)) or (nil)
     getModelUnitMap(modelSceneWar):forEachModelUnitOnMap(function(modelUnit)
         if (modelUnit:getPlayerIndex() == playerIndex) then
             local gridIndex = modelUnit:getGridIndex()
             Destroyers.destroyActorUnitOnMap(modelSceneWar, gridIndex, true, true)
 
-            if (not IS_SERVER) then
+            if (modelGridEffect) then
                 modelGridEffect:showAnimationExplosion(gridIndex)
             end
         end
