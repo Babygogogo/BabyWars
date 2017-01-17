@@ -33,6 +33,11 @@ function AuxiliaryFunctions.getWarNameWithWarId(warID)
 end
 
 function AuxiliaryFunctions.formatTimeInterval(interval)
+    interval = math.max(interval, 0)
+    if (interval == 0) then
+        return string.format("%d%s", interval, getLocalizedText(34, "Second"))
+    end
+
     local days  = math.floor(interval / SECS_FOR_DAY)
     interval    =            interval % SECS_FOR_DAY
     local hours = math.floor(interval / SECS_FOR_HOUR)
