@@ -14,7 +14,6 @@ return {
         "GeBiTan",
         "HaiAnTuJi",
         "HeiSenLin",
-        "HuiShengDao",
         "ManShouXueXing",
         "SanHeGu",
         "ShenSeYanCaoZhanZheng",
