@@ -48,48 +48,54 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initActorFogMap(self, fogMapData, isTotalReplay)
-    local modelFogMap = Actor.createModel("sceneWar.ModelFogMap", fogMapData, self.m_WarFieldFileName, isTotalReplay)
-    local actor       = ((IS_SERVER) or (not isTotalReplay))                                         and
-        (Actor.createWithModelAndViewInstance(modelFogMap))                                          or
-        (Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap")))
-
-    self.m_ActorFogMap = actor
+    if (not self.m_ActorFogMap) then
+        local modelFogMap  = Actor.createModel("sceneWar.ModelFogMap", fogMapData, self.m_WarFieldFileName, isTotalReplay)
+        self.m_ActorFogMap = ((IS_SERVER) or (not isTotalReplay))                                        and
+            (Actor.createWithModelAndViewInstance(modelFogMap))                                          or
+            (Actor.createWithModelAndViewInstance(modelFogMap, Actor.createView("sceneWar.ViewFogMap")))
+    else
+        self.m_ActorFogMap:getModel():ctor(fogMapData, self.m_WarFieldFileName, isTotalReplay)
+    end
 end
 
 local function initActorTileMap(self, tileMapData)
-    local modelTileMap = Actor.createModel("sceneWar.ModelTileMap", tileMapData, self.m_WarFieldFileName)
-    local actor = (IS_SERVER)                                                                          and
-        (Actor.createWithModelAndViewInstance(modelTileMap))                                           or
-        (Actor.createWithModelAndViewInstance(modelTileMap, Actor.createView("sceneWar.ViewTileMap")))
-
-    self.m_ActorTileMap = actor
+    if (not self.m_ActorTileMap) then
+        local modelTileMap  = Actor.createModel("sceneWar.ModelTileMap", tileMapData, self.m_WarFieldFileName)
+        self.m_ActorTileMap = (IS_SERVER)                                                                  and
+            (Actor.createWithModelAndViewInstance(modelTileMap))                                           or
+            (Actor.createWithModelAndViewInstance(modelTileMap, Actor.createView("sceneWar.ViewTileMap")))
+    else
+        self.m_ActorTileMap:getModel():ctor(tileMapData, self.m_WarFieldFileName)
+    end
 end
 
 local function initActorUnitMap(self, unitMapData)
-    local modelUnitMap = Actor.createModel("sceneWar.ModelUnitMap", unitMapData, self.m_WarFieldFileName)
-    local actor        = (IS_SERVER)                                                                   and
-        (Actor.createWithModelAndViewInstance(modelUnitMap))                                           or
-        (Actor.createWithModelAndViewInstance(modelUnitMap, Actor.createView("sceneWar.ViewUnitMap")))
-
-    self.m_ActorUnitMap = actor
+    if (not self.m_ActorUnitMap) then
+        local modelUnitMap  = Actor.createModel("sceneWar.ModelUnitMap", unitMapData, self.m_WarFieldFileName)
+        self.m_ActorUnitMap = (IS_SERVER)                                                                  and
+            (Actor.createWithModelAndViewInstance(modelUnitMap))                                           or
+            (Actor.createWithModelAndViewInstance(modelUnitMap, Actor.createView("sceneWar.ViewUnitMap")))
+    else
+        self.m_ActorUnitMap:getModel():ctor(unitMapData, self.m_WarFieldFileName)
+    end
 end
 
 local function initActorActionPlanner(self)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
-
-    self.m_ActorActionPlanner = actor
+    if (not self.m_ActorActionPlanner) then
+        self.m_ActorActionPlanner = Actor.createWithModelAndViewName("sceneWar.ModelActionPlanner", nil, "sceneWar.ViewActionPlanner")
+    end
 end
 
 local function initActorMapCursor(self, param)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelMapCursor", param, "sceneWar.ViewMapCursor")
-
-    self.m_ActorMapCursor = actor
+    if (not self.m_ActorMapCursor) then
+        self.m_ActorMapCursor = Actor.createWithModelAndViewName("sceneWar.ModelMapCursor", param, "sceneWar.ViewMapCursor")
+    end
 end
 
 local function initActorGridEffect(self)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelGridEffect", nil, "sceneWar.ViewGridEffect")
-
-    self.m_ActorGridEffect = actor
+    if (not self.m_ActorGridEffect) then
+        self.m_ActorGridEffect = Actor.createWithModelAndViewName("sceneWar.ModelGridEffect", nil, "sceneWar.ViewGridEffect")
+    end
 end
 
 --------------------------------------------------------------------------------

@@ -98,7 +98,10 @@ local function loadInstantialData(self, param, isPreview)
     else
         for name, data in pairs(param) do
             if (string.byte(name) > string.byte("z")) or (string.byte(name) < string.byte("a")) then
-                ComponentManager.getComponent(self, name):loadInstantialData(data)
+                local component = ComponentManager.getComponent(self, name)
+                if (component.loadInstantialData) then
+                    component:loadInstantialData(data)
+                end
             end
         end
     end
@@ -113,6 +116,10 @@ function ModelTile:ctor(param, isPreview)
         initWithTiledID(self, param.objectID, param.baseID, isPreview)
     end
     loadInstantialData(self, param, isPreview)
+
+    if (self.m_View) then
+        self:initView()
+    end
 
     return self
 end

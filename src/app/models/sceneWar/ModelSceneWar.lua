@@ -134,54 +134,64 @@ end
 -- The composition elements.
 --------------------------------------------------------------------------------
 local function initScriptEventDispatcher(self)
-    local dispatcher = EventDispatcher:create()
-
-    self.m_ScriptEventDispatcher = dispatcher
+    self.m_ScriptEventDispatcher = EventDispatcher:create()
 end
 
 local function initActorConfirmBox(self)
-    local actor = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
-    actor:getModel():setEnabled(false)
+    if (not self.m_ActorConfirmBox) then
+        local actor = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
+        actor:getModel():setEnabled(false)
 
-    self.m_ActorConfirmBox = actor
+        self.m_ActorConfirmBox = actor
+    end
 end
 
 local function initActorMessageIndicator(self)
-    local actor = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
-
-    self.m_ActorMessageIndicator = actor
+    if (not self.m_ActorMessageIndicator) then
+        self.m_ActorMessageIndicator = Actor.createWithModelAndViewName("common.ModelMessageIndicator", nil, "common.ViewMessageIndicator")
+    end
 end
 
 local function initActorPlayerManager(self, playersData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
-
-    self.m_ActorPlayerManager = actor
+    if (not self.m_ActorPlayerManager) then
+        self.m_ActorPlayerManager = Actor.createWithModelAndViewName("sceneWar.ModelPlayerManager", playersData)
+    else
+        self.m_ActorPlayerManager:getModel():ctor(playersData)
+    end
 end
 
 local function initActorWeatherManager(self, weatherData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
-
-    self.m_ActorWeatherManager = actor
+    if (not self.m_ActorWeatherManager) then
+        self.m_ActorWeatherManager = Actor.createWithModelAndViewName("sceneWar.ModelWeatherManager", weatherData)
+    else
+        self.m_ActorWeatherManager:getModel():ctor(weatherData)
+    end
 end
 
 local function initActorWarField(self, warFieldData, isTotalReplay)
-    local modelWarField = Actor.createModel("sceneWar.ModelWarField", warFieldData, isTotalReplay)
-    local viewWarField  = (not IS_SERVER) and (Actor.createView("sceneWar.ViewWarField")) or (nil)
-    local actor         = Actor.createWithModelAndViewInstance(modelWarField, viewWarField)
-
-    self.m_ActorWarField = actor
+    if (not self.m_ActorWarField) then
+        local modelWarField  = Actor.createModel("sceneWar.ModelWarField", warFieldData, isTotalReplay)
+        local viewWarField   = (not IS_SERVER) and (Actor.createView("sceneWar.ViewWarField")) or (nil)
+        self.m_ActorWarField = Actor.createWithModelAndViewInstance(modelWarField, viewWarField)
+    else
+        self.m_ActorWarField:getModel():ctor(warFieldData, isTotalReplay)
+    end
 end
 
 local function initActorWarHud(self, isReplay)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", isReplay, "sceneWar.ViewWarHUD")
-
-    self.m_ActorWarHud = actor
+    if (not self.m_ActorWarHud) then
+        self.m_ActorWarHud = Actor.createWithModelAndViewName("sceneWar.ModelWarHUD", isReplay, "sceneWar.ViewWarHUD")
+    else
+        self.m_ActorWarHud:getModel():ctor(isReplay)
+    end
 end
 
 local function initActorTurnManager(self, turnData)
-    local actor = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
-
-    self.m_ActorTurnManager = actor
+    if (not self.m_ActorTurnManager) then
+        self.m_ActorTurnManager = Actor.createWithModelAndViewName("sceneWar.ModelTurnManager", turnData, "sceneWar.ViewTurnManager")
+    else
+        self.m_ActorTurnManager:getModel():ctor(turnData)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -235,25 +245,28 @@ function ModelSceneWar:initWarDataForEachTurn()
     self.m_IsFastExecutingActions = true
     self:onStartRunning()
 
-    local modelTurnManager    = self:getModelTurnManager()
-    local turnCounter         = 0
-    local actionIdForEachTurn = {}
-    local warDataForEachTurn  = {}
+    local modelTurnManager           = self:getModelTurnManager()
+    local turnCounter                = 0
+    local turnCounterForEachActionID = {[0] = 0}
+    local warDataForEachTurn         = {}
 
     for actionID, wrappedAction in ipairs(self.m_ExecutedActions) do
         if (modelTurnManager:isTurnPhaseRequestToBegin()) then
             turnCounter = turnCounter + 1
-            warDataForEachTurn[turnCounter] = self:toSerializableTable()
+            warDataForEachTurn[turnCounter]          = self:toSerializableTable()
+            turnCounterForEachActionID[actionID - 1] = turnCounterForEachActionID[actionID - 1] + 1
         end
-        actionIdForEachTurn[actionID] = turnCounter
+        turnCounterForEachActionID[actionID] = turnCounter
 
         local _, action = next(wrappedAction)
+        setActionId(self, actionID)
         ActionExecutor.execute(action, self)
     end
 
-    self.m_IsFastExecutingActions = false
-    self.m_ActionIdForEachTurn    = actionIdForEachTurn
-    self.m_WarDataForEachTurn     = warDataForEachTurn
+    self.m_IsFastExecutingActions     = false
+    self.m_TurnCounterForEachActionID = turnCounterForEachActionID
+    self.m_WarDataForEachTurn         = warDataForEachTurn
+    self.m_WarDataCount               = #warDataForEachTurn
     self:ctor(warDataForEachTurn[1])
 
     return self
@@ -334,7 +347,7 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start/stop running and script events.
 --------------------------------------------------------------------------------
-function ModelSceneWar:onStartRunning()
+function ModelSceneWar:onStartRunning(ignoreWarMusic)
     local modelTurnManager = self:getModelTurnManager()
     modelTurnManager            :onStartRunning(self)
     self:getModelPlayerManager():onStartRunning(self)
@@ -348,7 +361,7 @@ function ModelSceneWar:onStartRunning()
     if (not self:isTotalReplay()) then
         modelTurnManager:runTurn()
     end
-    if (not IS_SERVER) then
+    if ((not IS_SERVER) and (not ignoreWarMusic)) then
         AudioManager.playRandomWarMusic()
     end
 
@@ -437,6 +450,41 @@ end
 
 function ModelSceneWar:isFastExecutingActions()
     return self.m_IsFastExecutingActions
+end
+
+function ModelSceneWar:canFastForwardForReplay()
+    assert(self:isTotalReplay(), "ModelSceneWar:canFastForwardForReplay() this may be invoked in replay only.")
+    return self.m_TurnCounterForEachActionID[self:getActionId()] < #self.m_WarDataForEachTurn
+end
+
+function ModelSceneWar:canFastRewindForReplay()
+    assert(self:isTotalReplay(), "ModelSceneWar:canFastRewindForReplay() this may be invoked in replay only.")
+    return self:getActionId() > 0
+end
+
+function ModelSceneWar:fastForwardForReplay()
+    local warDataIndex = self.m_TurnCounterForEachActionID[self:getActionId()] + 1
+    self:ctor(self.m_WarDataForEachTurn[warDataIndex])
+        :onStartRunning(true)
+
+    self:getModelMessageIndicator():showMessage(string.format("%s: %d/ %d", getLocalizedText(11, "SwitchTurn"), warDataIndex, self.m_WarDataCount))
+
+    return self
+end
+
+function ModelSceneWar:fastRewindForReplay()
+    local actionID     = self:getActionId()
+    local warDataIndex = self.m_TurnCounterForEachActionID[actionID]
+    if (warDataIndex > self.m_TurnCounterForEachActionID[actionID - 1]) then
+        warDataIndex = warDataIndex - 1
+    end
+
+    self:ctor(self.m_WarDataForEachTurn[warDataIndex])
+        :onStartRunning(true)
+
+    self:getModelMessageIndicator():showMessage(string.format("%s: %d/ %d", getLocalizedText(11, "SwitchTurn"), warDataIndex, self.m_WarDataCount))
+
+    return self
 end
 
 function ModelSceneWar:setExecutingAction(executing)

@@ -184,6 +184,15 @@ local function getMapInfo(self)
     )
 end
 
+local function getInTurnDescription(modelSceneWar)
+    if (isTotalReplay(modelSceneWar)) then
+        return string.format("(%s)", getLocalizedText(49))
+    else
+        local formattedCountdown = AuxiliaryFunctions.formatTimeInterval(modelSceneWar:getIntervalUntilBoot() - os.time() + modelSceneWar:getEnterTurnTime())
+        return string.format("(%s, %s: %s)", getLocalizedText(49), getLocalizedText(34, "BootCountdown"), formattedCountdown)
+    end
+end
+
 local function updateStringWarInfo(self)
     local dataForEachPlayer = generateEmptyDataForEachPlayer(self)
     updateUnitsData(self, dataForEachPlayer)
@@ -198,10 +207,9 @@ local function updateStringWarInfo(self)
         else
             local d                  = dataForEachPlayer[i]
             local isPlayerInTurn     = i == playerIndexInTurn
-            local formattedCountdown = AuxiliaryFunctions.formatTimeInterval(modelSceneWar:getIntervalUntilBoot() - os.time() + modelSceneWar:getEnterTurnTime())
             stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %s      %s: %d\n%s: %d%s      %s: %d\n%s: %d\n%s",
                 getLocalizedText(65, "Player"),              i,           d.nickname,
-                ((isPlayerInTurn) and (string.format(" (%s, %s: %s)", getLocalizedText(49), getLocalizedText(34, "BootCountdown"), formattedCountdown)) or ("")),
+                ((isPlayerInTurn) and (getInTurnDescription(modelSceneWar)) or ("")),
                 getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,
                 getLocalizedText(65, "Fund"),                 "" .. d.fund,

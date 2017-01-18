@@ -77,7 +77,6 @@ function ViewUnitMap:ctor(param)
 end
 
 function ViewUnitMap:setMapSize(size)
-    assert(self.m_MapHeight == nil, "ViewUnitMap:setMapSize() the size has been set already.")
     self.m_MapHeight = size.height
 
     return self
@@ -95,6 +94,15 @@ function ViewUnitMap:addViewUnit(viewUnit, modelUnit)
     if (self.m_Model:getLoadedModelUnitWithUnitId(unitID)) then
         viewUnit:setVisible(false)
     end
+
+    return self
+end
+
+function ViewUnitMap:removeAllViewUnits()
+    for _, layer in pairs(self.m_Layers) do
+        layer:removeAllChildren()
+    end
+    self.m_PreviewLaunchUnit:setVisible(false)
 
     return self
 end

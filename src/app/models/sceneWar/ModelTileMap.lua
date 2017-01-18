@@ -30,9 +30,11 @@
 
 local ModelTileMap = require("src.global.functions.class")("ModelTileMap")
 
+local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
 local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
 local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local TableFunctions         = require("src.app.utilities.TableFunctions")
 local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
 local Actor                  = require("src.global.actors.Actor")
 
@@ -40,7 +42,7 @@ local ceil          = math.ceil
 local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
 local toErrMsg      = SerializationFunctions.toErrorMessage
 
-local IS_SERVER               = require("src.app.utilities.GameConstantFunctions").isServer()
+local IS_SERVER               = GameConstantFunctions.isServer()
 local TEMPLATE_WAR_FIELD_PATH = "res.data.templateWarField."
 
 --------------------------------------------------------------------------------
@@ -98,15 +100,42 @@ local function updateActorTilesMapWithTilesData(map, height, tiles)
     end
 end
 
+local function resetActorTilesMap(map, mapSize, warFieldFileName)
+    local width, height    = mapSize.width, mapSize.height
+    local templateWarField = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName)
+    local baseLayerData    = templateWarField.layers[1].data
+    local objectLayerData  = templateWarField.layers[2].data
+
+    for x = 1, width do
+        for y = 1, height do
+            local idIndex  = x + (height - y) * width
+            local objectID = objectLayerData[idIndex]
+            local baseID   = baseLayerData[idIndex]
+            local tileData = TableFunctions.clone(GameConstantFunctions.getTemplateModelTileWithObjectAndBaseId(objectID, baseID))
+            tileData.positionIndex = (x - 1) * height + y
+            tileData.objectID      = objectID
+            tileData.baseID        = baseID
+            tileData.GridIndexable = {x = x, y = y}
+
+            map[x][y]:getModel():ctor(tileData)
+        end
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelTileMap:ctor(param, warFieldFileName, isPreview)
-    local map, mapSize = createActorTilesMapWithWarFieldFileName(warFieldFileName, isPreview)
-    updateActorTilesMapWithTilesData(map, mapSize.height, (param) and (param.tiles) or (nil))
+    if (self.m_ActorTilesMap) then
+        resetActorTilesMap(self.m_ActorTilesMap, self.m_MapSize, warFieldFileName)
+        updateActorTilesMapWithTilesData(self.m_ActorTilesMap, self.m_MapSize.height, param.tiles)
+    else
+        local map, mapSize = createActorTilesMapWithWarFieldFileName(warFieldFileName, isPreview)
+        updateActorTilesMapWithTilesData(map, mapSize.height, (param) and (param.tiles) or (nil))
 
-    self.m_ActorTilesMap = map
-    self.m_MapSize       = mapSize
+        self.m_ActorTilesMap = map
+        self.m_MapSize       = mapSize
+    end
 
     return self
 end
