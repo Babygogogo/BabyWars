@@ -266,12 +266,13 @@ function ViewActionPlanner:ctor(param)
 end
 
 function ViewActionPlanner:setMapSize(size)
-    assert(self.m_MapSize == nil, "ViewActionPlanner:setMapSize() the size has been set already.")
-    self.m_MapSize = size
-    initViewReachableArea(        self)
-    initViewPreviewAttackableArea(self)
-    initViewPreviewReachableArea( self)
-    initViewFlareArea(            self)
+    if (not self.m_MapSize) then
+        self.m_MapSize = size
+        initViewReachableArea(        self)
+        initViewPreviewAttackableArea(self)
+        initViewPreviewReachableArea( self)
+        initViewFlareArea(            self)
+    end
 
     return self
 end

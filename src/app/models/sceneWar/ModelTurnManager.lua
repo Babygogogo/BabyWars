@@ -98,7 +98,7 @@ local function repairModelUnit(self, modelUnit, repairAmount)
     modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
     local hasSupplied = supplyWithAmmoAndFuel(modelUnit, true)
 
-    if (not IS_SERVER) then
+    if ((not IS_SERVER) and (not self.m_ModelSceneWar:isFastExecutingActions())) then
         modelUnit:updateView()
 
         if (repairAmount >= 10) then
@@ -136,13 +136,14 @@ end
 -- The functions that runs each turn phase.
 --------------------------------------------------------------------------------
 local function runTurnPhaseBeginning(self)
-    local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_PlayerIndex)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelPlayer   = getModelPlayerManager(modelSceneWar):getModelPlayer(self.m_PlayerIndex)
     local callbackOnBeginTurnEffectDisappear = function()
         self.m_TurnPhaseCode = TURN_PHASE_CODES.GetFund
         self:runTurn()
     end
 
-    if (self.m_View) then
+    if ((self.m_View) and (not modelSceneWar:isFastExecutingActions())) then
         self.m_View:showBeginTurnEffect(self.m_TurnIndex, modelPlayer:getNickname(), callbackOnBeginTurnEffectDisappear)
     else
         callbackOnBeginTurnEffectDisappear()
@@ -241,7 +242,7 @@ local function runTurnPhaseSupplyUnit(self)
     if (supplyData) then
         local modelSceneWar = self.m_ModelSceneWar
         local modelUnitMap  = getModelUnitMap(modelSceneWar)
-        local modelGridEffect = (not IS_SERVER) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
+        local modelGridEffect = ((not IS_SERVER) and (not modelSceneWar:isFastExecutingActions())) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
 
         if (supplyData.onMapData) then
             for unitID, data in pairs(supplyData.onMapData) do

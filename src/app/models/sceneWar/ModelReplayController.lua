@@ -1,7 +1,10 @@
 
 local ModelReplayController = class("ModelReplayController")
 
-local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
@@ -66,12 +69,28 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelReplayController:onButtonNextTurnTouched()
-    print("ModelReplayController:onButtonNextTurnTouched() not implemented.")
+    local modelSceneWar = self.m_ModelSceneWar
+    if (not modelSceneWar:canFastForwardForReplay()) then
+        SingletonGetters.getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(11, "NoMoreNextTurn"))
+    else
+        modelSceneWar:setAutoReplay(false)
+            :fastForwardForReplay()
+        self:setButtonPlayVisible(true)
+    end
+
     return self
 end
 
 function ModelReplayController:onButtonPreviousTurnTouched()
-    print("ModelReplayController:onButtonPreviousTurnTouched() not implemented.")
+    local modelSceneWar = self.m_ModelSceneWar
+    if (not modelSceneWar:canFastRewindForReplay()) then
+        SingletonGetters.getModelMessageIndicator(modelSceneWar):showMessage(getLocalizedText(11, "NoMorePreviousTurn"))
+    else
+        modelSceneWar:setAutoReplay(false)
+            :fastRewindForReplay()
+        self:setButtonPlayVisible(true)
+    end
+
     return self
 end
 

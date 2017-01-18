@@ -213,8 +213,10 @@ local function createMenuItemsForPlayback(self)
                 end
 
                 self.m_OnButtonConfirmTouched = function()
-                    local actorWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", loadDecodedReplayData(warID), "sceneWar.ViewSceneWar")
-                    ActorManager.setAndRunRootActor(actorWar, "FADE", 1)
+                    local modelSceneWar = Actor.createModel("sceneWar.ModelSceneWar", loadDecodedReplayData(warID))
+                    modelSceneWar:initWarDataForEachTurn()
+
+                    ActorManager.setAndRunRootActor(Actor.createWithModelAndViewInstance(modelSceneWar, Actor.createView("sceneWar.ViewSceneWar")), "FADE", 1)
                 end
             end,
         }

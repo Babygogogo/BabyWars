@@ -63,6 +63,10 @@ function ModelUnit:ctor(param)
     initWithTiledID(   self, param.tiledID)
     loadInstantialData(self, param)
 
+    if (self.m_View) then
+        self:initView()
+    end
+
     return self
 end
 

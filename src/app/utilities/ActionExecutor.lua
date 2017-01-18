@@ -579,7 +579,7 @@ local function executeActivateSkillGroup(action, modelSceneWar)
         :setSkillActivatedCount(modelPlayer:getSkillActivatedCount() + 1)
     InstantSkillExecutor.activateSkillGroup(modelSceneWar, skillGroupID)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -686,7 +686,7 @@ local function executeAttack(action, modelSceneWar)
         modelSceneWar:setRemainingVotesForDraw(nil)
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         if (targetVision) then
             getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
         end
@@ -778,7 +778,7 @@ local function executeBeginTurn(action, modelSceneWar)
         modelSceneWar:setRemainingVotesForDraw(nil)
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         if (not lostPlayerIndex) then
             modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
                 modelSceneWar:setExecutingAction(false)
@@ -863,7 +863,7 @@ local function executeBuildModelTile(action, modelSceneWar)
         end
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -927,7 +927,7 @@ local function executeCaptureModelTile(action, modelSceneWar)
         modelSceneWar:setRemainingVotesForDraw(nil)
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         if (capturePoint <= 0) then
             modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
         end
@@ -1005,7 +1005,7 @@ local function executeDestroyOwnedModelUnit(action, modelSceneWar)
         assert((not IS_SERVER) and (not isReplay), "ActionExecutor-executeDestroyOwnedModelUnit() the gridIndex must exist on server or in replay.")
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isReplay) then
@@ -1044,7 +1044,7 @@ local function executeDive(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(true)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         local isReplay = isTotalReplay(modelSceneWar)
@@ -1118,7 +1118,7 @@ local function executeDropModelUnit(action, modelSceneWar)
         end
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isReplay) then
@@ -1245,7 +1245,7 @@ local function executeJoinModelUnit(action, modelSceneWar)
         focusModelUnit:setCapturingModelTile(targetModelUnit:isCapturingModelTile())
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -1287,7 +1287,7 @@ local function executeLaunchFlare(action, modelSceneWar)
         getModelFogMap(modelSceneWar):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isReplay) then
@@ -1342,7 +1342,7 @@ local function executeLaunchSilo(action, modelSceneWar)
         end
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isReplay) then
@@ -1390,7 +1390,7 @@ local function executeLoadModelUnit(action, modelSceneWar)
         assert((not IS_SERVER) and (not isReplay), "ActionExecutor-executeLoadModelUnit() failed to get the target loader on the server or in replay.")
     end
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isReplay) then
@@ -1436,7 +1436,7 @@ local function executeProduceModelUnitOnTile(action, modelSceneWar)
     modelUnitMap:setAvailableUnitId(producedUnitID + 1)
     updateFundWithCost(modelSceneWar, playerIndex, action.cost)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -1472,7 +1472,7 @@ local function executeProduceModelUnitOnUnit(action, modelSceneWar)
     end
     updateFundWithCost(modelSceneWar, producer:getPlayerIndex(), action.cost)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -1504,7 +1504,7 @@ local function executeSupplyModelUnit(action, modelSceneWar)
     focusModelUnit:setStateActioned()
     local targetModelUnits = getAndSupplyAdjacentModelUnits(modelSceneWar, pathNodes[#pathNodes], focusModelUnit:getPlayerIndex())
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -1542,7 +1542,7 @@ local function executeSurface(action, modelSceneWar)
     focusModelUnit:setStateActioned()
         :setDiving(false)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         local isReplay = isTotalReplay(modelSceneWar)
@@ -1585,7 +1585,7 @@ local function executeSurrender(action, modelSceneWar)
     modelSceneWar:setRemainingVotesForDraw(nil)
     Destroyers.destroyPlayerForce(modelSceneWar, playerIndex)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         if (modelPlayerManager:getAlivePlayersCount() <= 1) then
             modelSceneWar:setEnded(true)
         else
@@ -1640,7 +1640,7 @@ local function executeVoteForDraw(action, modelSceneWar)
     end
     modelPlayer:setVotedForDraw(true)
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then
@@ -1679,7 +1679,7 @@ local function executeWait(action, modelSceneWar)
     moveModelUnitWithAction(action, modelSceneWar)
     focusModelUnit:setStateActioned()
 
-    if (IS_SERVER) then
+    if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
         modelSceneWar:setExecutingAction(false)
     else
         if (not isTotalReplay(modelSceneWar)) then

@@ -608,14 +608,20 @@ local s_Texts = {
     },
     [11] = {
         [1] = function(textType)
-            if     (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
+            if     (textType == "NoMoreNextTurn")      then return "已经是最后一回合，无法继续快进。"
+            elseif (textType == "NoMorePreviousTurn")  then return "已经是战局最初状态，无法继续快退。"
+            elseif (textType == "NoMoreReplayActions") then return "所有步骤已全部回放完毕。"
             elseif (textType == "Progress")            then return "进度"
+            elseif (textType == "SwitchTurn")          then return "已切换回合"
             else                                            return "未知11:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "NoMoreReplayActions") then return "The replay is finished."
+            if     (textType == "NoMoreNextTurn")      then return "There're no more turns."
+            elseif (textType == "NoMorePreviousTurn")  then return "It's the beginning of the replay."
+            elseif (textType == "NoMoreReplayActions") then return "The replay is finished."
             elseif (textType == "Progress")            then return "Progress"
+            elseif (textType == "SwitchTurn")          then return "Turn switched"
             else                                            return "Unknown11:" .. (textType or "")
             end
         end,

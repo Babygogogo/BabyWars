@@ -114,6 +114,10 @@ function ModelUnitMap:ctor(unitMapData, warFieldFileName)
         self.m_ActorUnitsMap, self.m_MapSize, self.m_AvailableUnitID, self.m_LoadedActorUnits = createActorUnitsMapWithWarFieldFileName(warFieldFileName)
     end
 
+    if (self.m_View) then
+        self:initView()
+    end
+
     return self
 end
 
@@ -123,6 +127,7 @@ function ModelUnitMap:initView()
 
     local mapSize = self:getMapSize()
     view:setMapSize(mapSize)
+        :removeAllViewUnits()
 
     local actorUnitsMap = self.m_ActorUnitsMap
     for y = mapSize.height, 1, -1 do
