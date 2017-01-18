@@ -98,7 +98,7 @@ local function repairModelUnit(self, modelUnit, repairAmount)
     modelUnit:setCurrentHP(modelUnit:getCurrentHP() + repairAmount)
     local hasSupplied = supplyWithAmmoAndFuel(modelUnit, true)
 
-    if (not IS_SERVER) then
+    if ((not IS_SERVER) and (not self.m_ModelSceneWar:isFastExecutingActions())) then
         modelUnit:updateView()
 
         if (repairAmount >= 10) then
@@ -242,7 +242,7 @@ local function runTurnPhaseSupplyUnit(self)
     if (supplyData) then
         local modelSceneWar = self.m_ModelSceneWar
         local modelUnitMap  = getModelUnitMap(modelSceneWar)
-        local modelGridEffect = (not IS_SERVER) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
+        local modelGridEffect = ((not IS_SERVER) and (not modelSceneWar:isFastExecutingActions())) and (SingletonGetters.getModelGridEffect(modelSceneWar)) or (nil)
 
         if (supplyData.onMapData) then
             for unitID, data in pairs(supplyData.onMapData) do

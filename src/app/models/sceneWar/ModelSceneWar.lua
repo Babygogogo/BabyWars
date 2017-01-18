@@ -467,6 +467,7 @@ function ModelSceneWar:fastForwardForReplay()
     self:ctor(self.m_WarDataForEachTurn[warDataIndex])
         :onStartRunning(true)
 
+    self.m_IsExecutingAction = false
     self:getModelMessageIndicator():showMessage(string.format("%s: %d/ %d", getLocalizedText(11, "SwitchTurn"), warDataIndex, self.m_WarDataCount))
 
     return self
@@ -479,6 +480,7 @@ function ModelSceneWar:fastRewindForReplay()
         warDataIndex = warDataIndex - 1
     end
 
+    self.m_IsExecutingAction = false
     self:ctor(self.m_WarDataForEachTurn[warDataIndex])
         :onStartRunning(true)
 
