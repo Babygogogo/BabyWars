@@ -204,6 +204,10 @@ function ModelWarField:getWarFieldAuthorName()
     return require(TEMPLATE_WAR_FIELD_PATH .. self.m_WarFieldFileName).authorName
 end
 
+function ModelWarField:getModelActionPlanner()
+    return self.m_ActorActionPlanner:getModel()
+end
+
 function ModelWarField:getModelFogMap()
     return self.m_ActorFogMap:getModel()
 end

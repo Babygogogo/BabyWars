@@ -111,8 +111,7 @@ function ModelUnitInfo:onStartRunning(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
     if (self.m_View) then
-        self.m_View:setModelSceneWar(modelSceneWar)
-            :updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
+        self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 
     updateWithModelUnitMap(self)

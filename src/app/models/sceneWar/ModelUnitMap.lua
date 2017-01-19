@@ -198,10 +198,6 @@ function ModelUnitMap:onStartRunning(modelSceneWar)
     self:forEachModelUnitOnMap( func)
         :forEachModelUnitLoaded(func)
 
-    if (self.m_View) then
-        self.m_View:setModelSceneWar(modelSceneWar)
-    end
-
     return self
 end
 

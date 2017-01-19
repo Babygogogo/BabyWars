@@ -277,13 +277,6 @@ function ViewActionPlanner:setMapSize(size)
     return self
 end
 
-function ViewActionPlanner:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
-    self.m_ViewPreviewDropDestination:setModelSceneWar(modelSceneWar)
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -369,8 +362,7 @@ function ViewActionPlanner:setDropDestinations(destinations)
 
     for _, destination in pairs(destinations) do
         local viewUnit = Actor.createView("sceneWar.ViewUnit")
-        viewUnit:setModelSceneWar(self.m_ModelSceneWar)
-            :updateWithModelUnit(destination.modelUnit)
+        viewUnit:updateWithModelUnit(destination.modelUnit)
             :setPosition(GridIndexFunctions.toPosition(destination.gridIndex))
             :setCascadeOpacityEnabled(true)
         viewDropDestinations:addChild(viewUnit, DROP_DESTIONATIONS_UNIT_Z_ORDER)

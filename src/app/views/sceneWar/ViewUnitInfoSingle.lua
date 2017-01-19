@@ -255,13 +255,6 @@ function ViewUnitInfoSingle:ctor(param)
     return self
 end
 
-function ViewUnitInfoSingle:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
-    self.m_UnitIcon:setModelSceneWar(modelSceneWar)
-
-    return self
-end
-
 function ViewUnitInfoSingle:setCallbackOnTouch(callback)
     self.m_Background:addTouchEventListener(function(sender, eventType)
         if (eventType == ccui.TouchEventType.ended) then
@@ -276,14 +269,12 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ViewUnitInfoSingle:updateWithModelUnit(modelUnit)
-    if (self.m_ModelSceneWar) then
-        updateUnitIconWithModelUnit(    self, modelUnit)
-        updateUnitLabelWithModelUnit(   self, modelUnit)
-        updateHPInfoWithModelUnit(      self, modelUnit)
-        updateFuelInfoWithModelUnit(    self, modelUnit)
-        updateAmmoInfoWithModelUnit(    self, modelUnit)
-        updateMaterialInfoWithModelUnit(self, modelUnit)
-    end
+    updateUnitIconWithModelUnit(    self, modelUnit)
+    updateUnitLabelWithModelUnit(   self, modelUnit)
+    updateHPInfoWithModelUnit(      self, modelUnit)
+    updateFuelInfoWithModelUnit(    self, modelUnit)
+    updateAmmoInfoWithModelUnit(    self, modelUnit)
+    updateMaterialInfoWithModelUnit(self, modelUnit)
 
     return self
 end
