@@ -1152,7 +1152,8 @@ function ModelActionPlanner:onStartRunning(modelSceneWar)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
     if (self.m_View) then
-        self.m_View:setMapSize(getModelTileMap(modelSceneWar):getMapSize())
+        self.m_View:setModelSceneWar(modelSceneWar)
+            :setMapSize(getModelTileMap(modelSceneWar):getMapSize())
     end
     setStateIdle(self, true)
 
