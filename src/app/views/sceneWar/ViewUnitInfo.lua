@@ -93,6 +93,9 @@ end
 
 function ViewUnitInfo:setModelSceneWar(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
+    for _, subView in ipairs(self.m_SubViewList) do
+        subView:setModelSceneWar(modelSceneWar)
+    end
 
     return self
 end

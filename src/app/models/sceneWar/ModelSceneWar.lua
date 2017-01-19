@@ -463,6 +463,8 @@ function ModelSceneWar:canFastRewindForReplay()
 end
 
 function ModelSceneWar:fastForwardForReplay()
+    self:getScriptEventDispatcher():dispatchEvent({name = "EvtSwitchingTurnInReplay"})
+
     local warDataIndex = self.m_TurnCounterForEachActionID[self:getActionId()] + 1
     self:ctor(self.m_WarDataForEachTurn[warDataIndex])
         :onStartRunning(true)
@@ -474,6 +476,8 @@ function ModelSceneWar:fastForwardForReplay()
 end
 
 function ModelSceneWar:fastRewindForReplay()
+    self:getScriptEventDispatcher():dispatchEvent({name = "EvtSwitchingTurnInReplay"})
+
     local actionID     = self:getActionId()
     local warDataIndex = self.m_TurnCounterForEachActionID[actionID]
     if (warDataIndex > self.m_TurnCounterForEachActionID[actionID - 1]) then

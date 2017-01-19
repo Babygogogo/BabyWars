@@ -82,6 +82,12 @@ function ViewUnitMap:setMapSize(size)
     return self
 end
 
+function ViewUnitMap:setModelSceneWar(modelSceneWar)
+    self.m_PreviewLaunchUnit:setModelSceneWar(modelSceneWar)
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------

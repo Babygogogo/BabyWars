@@ -996,6 +996,10 @@ local function onEvtIsWaitingForServerResponse(self, event)
     self.m_IsWaitingForServerResponse = event.waiting
 end
 
+local function onEvtSwitchingTurnInReplay(self, event)
+    setStateIdle(self, true)
+end
+
 local function onEvtWarCommandMenuUpdated(self, event)
     if (event.modelWarCommandMenu:isEnabled()) then
         setStateIdle(self, not self.m_IsWaitingForServerResponse)
@@ -1149,6 +1153,7 @@ function ModelActionPlanner:onStartRunning(modelSceneWar)
         :addEventListener("EvtMapCursorMoved",             self)
         :addEventListener("EvtPlayerIndexUpdated",         self)
         :addEventListener("EvtIsWaitingForServerResponse", self)
+        :addEventListener("EvtSwitchingTurnInReplay",      self)
         :addEventListener("EvtWarCommandMenuUpdated",      self)
 
     if (self.m_View) then
@@ -1166,6 +1171,7 @@ function ModelActionPlanner:onEvent(event)
     elseif (name == "EvtPlayerIndexUpdated")         then onEvtPlayerIndexUpdated(        self, event)
     elseif (name == "EvtMapCursorMoved")             then onEvtMapCursorMoved(            self, event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
+    elseif (name == "EvtSwitchingTurnInReplay")      then onEvtSwitchingTurnInReplay(     self, event)
     elseif (name == "EvtWarCommandMenuUpdated")      then onEvtWarCommandMenuUpdated(     self, event)
     end
 
