@@ -11,7 +11,6 @@ local WebSocketManager       = require("src.app.utilities.WebSocketManager")
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
-local sendAction               = WebSocketManager.sendAction
 
 local ACTION_CODE_DOWNLOAD_REPLAY_DATA      = ActionCodeFunctions.getActionCode("ActionDownloadReplayData")
 local ACTION_CODE_GET_REPLAY_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetReplayConfigurations")
@@ -157,7 +156,7 @@ end
 
 local function createMenuItemsForDownload(self, list)
     local items = {}
-    for _, replayConfiguration in pairs(list) do
+    for _, replayConfiguration in pairs(list or {}) do
         local warID            = replayConfiguration.warID
         local warFieldFileName = replayConfiguration.warFieldFileName
         if (not self.m_ReplayList[warID]) then
@@ -239,6 +238,7 @@ setStateDelete = function(self)
         view:setMenuTitle(getLocalizedText(10, "DeleteReplay"))
             :setButtonConfirmText(getLocalizedText(10, "DeleteReplay"))
             :setButtonConfirmVisible(false)
+            :setButtonMoreVisible(false)
             :enableButtonConfirm()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
 
@@ -261,10 +261,17 @@ local function setStateDisabled(self)
 end
 
 local function setStateDownload(self)
-    self.m_State = "stateDownload"
+    self.m_State             = "stateDownload"
+    self.m_DownloadPageIndex = 0
+    WebSocketManager.sendAction({
+        actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
+        pageIndex  = 1,
+    })
+
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(10, "DownloadReplay"))
             :setButtonConfirmVisible(false)
+            :setButtonMoreVisible(true)
             :removeAllMenuItems()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     end
@@ -276,6 +283,7 @@ local function setStateMain(self)
         self.m_View:setMenuTitle(getLocalizedText(1, "ManageReplay"))
             :setMenuItems(self.m_ItemsForStateMain)
             :setButtonConfirmVisible(false)
+            :setButtonMoreVisible(false)
             :setVisible(true)
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     end
@@ -288,6 +296,7 @@ local function setStatePlayback(self)
         view:setMenuTitle(getLocalizedText(10, "Playback"))
             :setButtonConfirmText(getLocalizedText(10, "Playback"))
             :setButtonConfirmVisible(false)
+            :setButtonMoreVisible(false)
             :enableButtonConfirm()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
 
@@ -328,10 +337,6 @@ local function initItemDownload(self)
         name     = getLocalizedText(10, "Download"),
         callback = function()
             setStateDownload(self)
-            WebSocketManager.sendAction({
-                actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
-                pageIndex  = 1,
-            })
         end,
     }
 
@@ -398,13 +403,23 @@ function ModelReplayManager:isRetrievingReplayConfigurations()
     return self.m_State == "stateDownload"
 end
 
-function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations)
+function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations, pageIndex)
+    self.m_DownloadPageIndex = pageIndex
+
     local items = createMenuItemsForDownload(self, replayConfigurations)
     if (#items == 0) then
-        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoDownloadableReplay"))
+        if (pageIndex == 1) then
+            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoDownloadableReplay"))
+        else
+            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoMoreReplay"))
+        end
     elseif (self.m_View) then
-        self.m_View:setMenuItems(items)
-            :setButtonConfirmText(getLocalizedText(10, "DownloadReplay"))
+        if (pageIndex == 1) then
+            self.m_View:setMenuItems(items)
+        else
+            self.m_View:appendMenuItems(items)
+        end
+        self.m_View:setButtonConfirmText(getLocalizedText(10, "DownloadReplay"))
     end
 
     return self
@@ -448,6 +463,15 @@ end
 
 function ModelReplayManager:onButtonConfirmTouched()
     self.m_OnButtonConfirmTouched()
+
+    return self
+end
+
+function ModelReplayManager:onButtonMoreTouched()
+    WebSocketManager.sendAction({
+        actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
+        pageIndex  = self.m_DownloadPageIndex + 1,
+    })
 
     return self
 end

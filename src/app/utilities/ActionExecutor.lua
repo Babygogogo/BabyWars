@@ -347,7 +347,7 @@ local function executeGetReplayConfigurations(action, modelScene)
 
     local modelReplayManager = modelScene:getModelMainMenu():getModelReplayManager()
     if (modelReplayManager:isRetrievingReplayConfigurations()) then
-        modelReplayManager:updateWithReplayConfigurations(action.replayConfigurations)
+        modelReplayManager:updateWithReplayConfigurations(action.replayConfigurations, action.pageIndex)
     end
 end
 
