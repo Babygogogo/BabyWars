@@ -36,10 +36,16 @@ local BUTTON_BACK_POS_X      = MENU_BACKGROUND_POS_X
 local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y
 local BUTTON_BACK_FONT_COLOR = {r = 240, g = 80, b = 56}
 
-local BUTTON_NEXT_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
-local BUTTON_NEXT_HEIGHT = 60
-local BUTTON_NEXT_POS_X  = display.width - BUTTON_NEXT_WIDTH - 30
-local BUTTON_NEXT_POS_Y  = MENU_BACKGROUND_POS_Y
+local BUTTON_MORE_WIDTH      = BUTTON_BACK_WIDTH
+local BUTTON_MORE_HEIGHT     = BUTTON_BACK_HEIGHT
+local BUTTON_MORE_POS_X      = BUTTON_BACK_POS_X
+local BUTTON_MORE_POS_Y      = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local BUTTON_MORE_FONT_COLOR = MENU_TITLE_FONT_COLOR
+
+local BUTTON_CONFIRM_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_CONFIRM_HEIGHT = 60
+local BUTTON_CONFIRM_POS_X  = display.width - BUTTON_CONFIRM_WIDTH - 30
+local BUTTON_CONFIRM_POS_Y  = MENU_BACKGROUND_POS_Y
 
 local BUTTON_NEXT_PAGE_WIDTH      = BUTTON_BACK_WIDTH
 local BUTTON_NEXT_PAGE_HEIGHT     = BUTTON_BACK_HEIGHT
@@ -48,11 +54,11 @@ local BUTTON_NEXT_PAGE_POS_Y      = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
 local BUTTON_NEXT_PAGE_FONT_COLOR = MENU_TITLE_FONT_COLOR
 
 local MENU_LIST_VIEW_WIDTH               = MENU_BACKGROUND_WIDTH
-local MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_HEIGHT_WITH_SAVE    = MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE - BUTTON_NEXT_PAGE_HEIGHT
+local MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_HEIGHT_WITH_MORE    = MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE - BUTTON_NEXT_PAGE_HEIGHT
 local MENU_LIST_VIEW_POS_X               = MENU_BACKGROUND_POS_X
-local MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_POS_Y_WITH_SAVE     = MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE + BUTTON_NEXT_PAGE_HEIGHT
+local MENU_LIST_VIEW_POS_Y_WITHOUT_MORE  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_POS_Y_WITH_MORE     = MENU_LIST_VIEW_POS_Y_WITHOUT_MORE + BUTTON_NEXT_PAGE_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN        = 10
 
 local ITEM_WIDTH              = 230
@@ -196,13 +202,13 @@ local function initButtonConfirm(self)
 
         :setScale9Enabled(true)
         :setCapInsets(BACKGROUND_CAPINSETS)
-        :setContentSize(BUTTON_NEXT_WIDTH, BUTTON_NEXT_HEIGHT)
+        :setContentSize(BUTTON_CONFIRM_WIDTH, BUTTON_CONFIRM_HEIGHT)
 
         :setZoomScale(-0.05)
         :setOpacity(180)
 
         :ignoreAnchorPointForPosition(true)
-        :setPosition(BUTTON_NEXT_POS_X, BUTTON_NEXT_POS_Y)
+        :setPosition(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y)
 
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
@@ -220,7 +226,7 @@ local function initButtonConfirm(self)
     self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
 end
 
-local function initButtonNextPage(self)
+local function initButtonMore(self)
     local button = ccui.Button:create()
     button:ignoreAnchorPointForPosition(true)
         :setPosition(BUTTON_NEXT_PAGE_POS_X, BUTTON_NEXT_PAGE_POS_Y)
@@ -233,28 +239,28 @@ local function initButtonNextPage(self)
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
         :setTitleColor(BUTTON_NEXT_PAGE_FONT_COLOR)
-        :setTitleText(getLocalizedText(10, "NextPage"))
+        :setTitleText(getLocalizedText(10, "GetMore"))
 
         :setVisible(false)
         :setCascadeColorEnabled(true)
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-                self.m_Model:onButtonSaveTouched()
+                self.m_Model:onButtonMoreTouched()
             end
         end)
 
     button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
-    self.m_ButtonNextPage = button
+    self.m_ButtonMore = button
     self:addChild(button, BUTTON_NEXT_PAGE_Z_ORDER)
 end
 
 local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE)
-        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_MORE)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE)
         :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
@@ -270,7 +276,7 @@ function ViewReplayManager:ctor()
     initMenuTitle(     self)
     initButtonBack(    self)
     initButtonConfirm( self)
-    initButtonNextPage(self)
+    initButtonMore(    self)
     initMenuListView(  self)
 
     return self
@@ -305,22 +311,32 @@ function ViewReplayManager:setMenuItems(items)
     return self
 end
 
+function ViewReplayManager:appendMenuItems(items)
+    assert(#items > 0, "ViewReplayManager:appendMenuItems() the items are empty.")
+    local listView = self.m_MenuListView
+    for _, item in ipairs(items) do
+        listView:pushBackCustomItem(createViewMenuItem(item))
+    end
+
+    return self
+end
+
 function ViewReplayManager:removeAllMenuItems()
     self.m_MenuListView:removeAllChildren()
 
     return self
 end
 
-function ViewReplayManager:setButtonNextPageVisible(visible)
+function ViewReplayManager:setButtonMoreVisible(visible)
     if (visible) then
-        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_SAVE)
-            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITH_SAVE)
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_MORE)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITH_MORE)
     else
-        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITHOUT_SAVE)
-            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_SAVE)
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITHOUT_MORE)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE)
     end
 
-    self.m_ButtonNextPage:setVisible(visible)
+    self.m_ButtonMore:setVisible(visible)
 
     return self
 end

@@ -104,12 +104,11 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnit:onStartRunning(modelSceneWar)
-    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar)
+    assert(modelSceneWar.isModelSceneWar, "ModelUnit:onStartRunning() invalid modelSceneWar.")
+    self.m_ModelSceneWar = modelSceneWar
 
-    if (self.m_View) then
-        self.m_View:setModelSceneWar(modelSceneWar)
-        self:updateView()
-    end
+    ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar)
+    self:updateView()
 
     return self
 end
@@ -176,6 +175,11 @@ function ModelUnit:showMovingAnimation()
     end
 
     return self
+end
+
+function ModelUnit:getModelSceneWar()
+    assert(self.m_ModelSceneWar, "ModelUnit:getModelSceneWar() onStartRunning() hasn't been called yet.")
+    return self.m_ModelSceneWar
 end
 
 function ModelUnit:getTiledId()

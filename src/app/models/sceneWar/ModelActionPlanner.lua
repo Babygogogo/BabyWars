@@ -358,7 +358,6 @@ end
 --------------------------------------------------------------------------------
 -- The functions for available action list.
 --------------------------------------------------------------------------------
-local setStateIdle
 local setStatePreviewingAttackableArea
 local setStatePreviewingReachableArea
 local setStateChoosingProductionTarget
@@ -542,8 +541,9 @@ local function getActionsLaunchModelUnit(self)
 end
 
 local function getSingleActionDropModelUnit(self, unitID)
-    local icon = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(getModelUnitMap(self.m_ModelSceneWar):getLoadedModelUnitWithUnitId(unitID))
-    icon:ignoreAnchorPointForPosition(true)
+    local icon = Actor.createView("sceneWar.ViewUnit")
+    icon:updateWithModelUnit(getModelUnitMap(self.m_ModelSceneWar):getLoadedModelUnitWithUnitId(unitID))
+        :ignoreAnchorPointForPosition(true)
         :setScale(0.5)
 
     return {
@@ -714,42 +714,6 @@ end
 --------------------------------------------------------------------------------
 -- The set state functions.
 --------------------------------------------------------------------------------
-setStateIdle = function(self, resetUnitAnimation)
-    if (self.m_View) then
-        self.m_View:setReachableAreaVisible(  false)
-            :setAttackableGridsVisible(       false)
-            :setMovePathVisible(              false)
-            :setMovePathDestinationVisible(   false)
-            :setDroppableGridsVisible(        false)
-            :setPreviewDropDestinationVisible(false)
-            :setDropDestinationsVisible(      false)
-            :setPreviewAttackableAreaVisible( false)
-            :setPreviewReachableAreaVisible(  false)
-            :setFlareGridsVisible(            false)
-
-        getModelUnitMap(self.m_ModelSceneWar):setPreviewLaunchUnitVisible(false)
-        if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
-            self.m_FocusModelUnit:showNormalAnimation()
-        end
-        for _, modelUnit in pairs(self.m_PreviewAttackModelUnits) do
-            modelUnit:showNormalAnimation()
-        end
-        if (self.m_PreviewReachModelUnit) then
-            self.m_PreviewReachModelUnit:showNormalAnimation()
-        end
-    end
-
-    self.m_State                    = "idle"
-    self.m_FocusModelUnit           = nil
-    self.m_PreviewAttackModelUnits  = {}
-    self.m_PreviewAttackableArea    = {}
-    self.m_PreviewReachModelUnit    = nil
-    self.m_LaunchUnitID             = nil
-    self.m_SelectedDropDestinations = {}
-
-    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({name = "EvtActionPlannerIdle"})
-end
-
 local function canSetStatePreviewingAttackableArea(self, gridIndex)
     local modelUnit = getModelUnitMap(self.m_ModelSceneWar):getModelUnit(gridIndex)
     return (modelUnit)                                                                  and
@@ -985,17 +949,17 @@ end
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtPlayerIndexUpdated(self, event)
-    setStateIdle(self, true)
+    self:setStateIdle(true)
 end
 
 local function onEvtIsWaitingForServerResponse(self, event)
-    setStateIdle(self, false)
+    self:setStateIdle(false)
     self.m_IsWaitingForServerResponse = event.waiting
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     if (event.modelWarCommandMenu:isEnabled()) then
-        setStateIdle(self, not self.m_IsWaitingForServerResponse)
+        self:setStateIdle(not self.m_IsWaitingForServerResponse)
     end
 end
 
@@ -1010,7 +974,7 @@ local function onEvtMapCursorMoved(self, event)
     local gridIndex = event.gridIndex
 
     if (state == "choosingProductionTarget") then
-        setStateIdle(self, true)
+        self:setStateIdle(true)
     elseif (state == "makingMovePath") then
         if (ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             updateMovePathWithDestinationGrid(self, gridIndex)
@@ -1051,13 +1015,13 @@ local function onEvtGridSelected(self, event)
         elseif (canSetStatePreviewingReachableArea( self, gridIndex)) then setStatePreviewingReachableArea( self, gridIndex)
         end
     elseif (state == "choosingProductionTarget") then
-        setStateIdle(self, true)
+        self:setStateIdle(true)
     elseif (state == "makingMovePath") then
         if (not ReachableAreaFunctions.getAreaNode(self.m_ReachableArea, gridIndex)) then
             if (self.m_LaunchUnitID) then
                 setStateChoosingAction(self, self.m_PathNodes[1])
             else
-                setStateIdle(self, true)
+                self:setStateIdle(true)
             end
         elseif (canUnitStayInGrid(self.m_FocusModelUnit, gridIndex, getModelUnitMap(self.m_ModelSceneWar), getModelTileMap(self.m_ModelSceneWar))) then
             if ((self.m_LaunchUnitID) and (GridIndexFunctions.isEqual(self.m_FocusModelUnit:getGridIndex(), gridIndex))) then
@@ -1113,10 +1077,10 @@ local function onEvtGridSelected(self, event)
         if (canSetStatePreviewingAttackableArea(self, gridIndex)) then
             setStatePreviewingAttackableArea(self, gridIndex)
         else
-            setStateIdle(self, true)
+            self:setStateIdle(true)
         end
     elseif (state == "previewingReachableArea") then
-        setStateIdle(self, true)
+        self:setStateIdle(true)
     else
         error("ModelActionPlanner-onEvtGridSelected() the state of the planner is invalid.")
     end
@@ -1151,7 +1115,7 @@ function ModelActionPlanner:onStartRunning(modelSceneWar)
     if (self.m_View) then
         self.m_View:setMapSize(getModelTileMap(modelSceneWar):getMapSize())
     end
-    setStateIdle(self, true)
+    self:setStateIdle(true)
 
     return self
 end
@@ -1164,6 +1128,47 @@ function ModelActionPlanner:onEvent(event)
     elseif (name == "EvtIsWaitingForServerResponse") then onEvtIsWaitingForServerResponse(self, event)
     elseif (name == "EvtWarCommandMenuUpdated")      then onEvtWarCommandMenuUpdated(     self, event)
     end
+
+    return self
+end
+
+--------------------------------------------------------------------------------
+-- The public functions.
+--------------------------------------------------------------------------------
+function ModelActionPlanner:setStateIdle(resetUnitAnimation)
+    if (self.m_View) then
+        self.m_View:setReachableAreaVisible(  false)
+            :setAttackableGridsVisible(       false)
+            :setMovePathVisible(              false)
+            :setMovePathDestinationVisible(   false)
+            :setDroppableGridsVisible(        false)
+            :setPreviewDropDestinationVisible(false)
+            :setDropDestinationsVisible(      false)
+            :setPreviewAttackableAreaVisible( false)
+            :setPreviewReachableAreaVisible(  false)
+            :setFlareGridsVisible(            false)
+
+        getModelUnitMap(self.m_ModelSceneWar):setPreviewLaunchUnitVisible(false)
+        if ((resetUnitAnimation) and (self.m_FocusModelUnit)) then
+            self.m_FocusModelUnit:showNormalAnimation()
+        end
+        for _, modelUnit in pairs(self.m_PreviewAttackModelUnits) do
+            modelUnit:showNormalAnimation()
+        end
+        if (self.m_PreviewReachModelUnit) then
+            self.m_PreviewReachModelUnit:showNormalAnimation()
+        end
+    end
+
+    self.m_State                    = "idle"
+    self.m_FocusModelUnit           = nil
+    self.m_PreviewAttackModelUnits  = {}
+    self.m_PreviewAttackableArea    = {}
+    self.m_PreviewReachModelUnit    = nil
+    self.m_LaunchUnitID             = nil
+    self.m_SelectedDropDestinations = {}
+
+    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({name = "EvtActionPlannerIdle"})
 
     return self
 end

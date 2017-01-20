@@ -35,8 +35,7 @@ end
 
 local function initSubView(self, index)
     local subView = Actor.createView("sceneWar.ViewUnitInfoSingle")
-    subView:setModelSceneWar(self.m_ModelSceneWar)
-        :updateWithPlayerIndex(self.m_PlayerIndex)
+    subView:updateWithPlayerIndex(self.m_PlayerIndex)
         :setVisible(true)
         :setCallbackOnTouch(function()
             if (self.m_Model) then
@@ -87,12 +86,6 @@ function ViewUnitInfo:ctor(param)
         :setVisible(false)
 
     adjustPosition(self, false)
-
-    return self
-end
-
-function ViewUnitInfo:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end

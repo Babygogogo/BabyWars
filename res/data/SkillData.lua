@@ -437,16 +437,16 @@ SkillData.skills = {
         maxLevelPassive     = 10,
         modifierUnit = "%",
         levels       = {
-            [1] = {modifierPassive = -25, pointsPassive = 25, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [2] = {modifierPassive = -50, pointsPassive = 50, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [3] = {modifierPassive = -75, pointsPassive = 75, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [4] = {modifierPassive = -100, pointsPassive = 100, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [5] = {modifierPassive = -125, pointsPassive = 125, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [6] = {modifierPassive = -150, pointsPassive = 150, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [7] = {modifierPassive = -175, pointsPassive = 175, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [8] = {modifierPassive = -200, pointsPassive = 200, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [9] = {modifierPassive = -225, pointsPassive = 225, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [10] = {modifierPassive = -250, pointsPassive = 250, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [1] = {modifierPassive = -10, pointsPassive = 25, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [2] = {modifierPassive = -20, pointsPassive = 50, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [3] = {modifierPassive = -30, pointsPassive = 75, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [4] = {modifierPassive = -40, pointsPassive = 100, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [5] = {modifierPassive = -50, pointsPassive = 125, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [6] = {modifierPassive = -60, pointsPassive = 150, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [7] = {modifierPassive = -70, pointsPassive = 175, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [8] = {modifierPassive = -80, pointsPassive = 200, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [9] = {modifierPassive = -90, pointsPassive = 225, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [10] = {modifierPassive = -100, pointsPassive = 250, modifierActive = nil, pointsActive = nil, minEnergy = nil},
         },
     },
 
@@ -1845,7 +1845,7 @@ SkillData.skillPresets = {
             },
         },
         active1 = {
-            energyRequirement = 3,
+            energyRequirement = 4,
             skills            = {
                 {
                     id    = 5,
@@ -2097,7 +2097,7 @@ SkillData.skillPresets = {
         passive = {
             {
                 id    = 23,
-                level = 6,
+                level = 3,
             },
         },
         active1 = {
@@ -2107,22 +2107,30 @@ SkillData.skillPresets = {
                     id    = 28,
                     level = 1,
                 },
+                {
+                    id    = 23,
+                    level = 1,
+                },
+                {
+                    id    = 24,
+                    level = 1,
+                },
             },
         },
         active2 = {
             energyRequirement = 7,
             skills            = {
                 {
+                    id    = 28,
+                    level = 1,
+                },
+                {
                     id    = 23,
-                    level = 3,
+                    level = 2,
                 },
                 {
                     id    = 24,
-                    level = 3,
-                },
-                {
-                    id    = 28,
-                    level = 1,
+                    level = 2,
                 },
             },
         },

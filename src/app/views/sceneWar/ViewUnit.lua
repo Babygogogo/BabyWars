@@ -35,7 +35,7 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
-    local modelSceneWar       = self.m_ModelSceneWar
+    local modelSceneWar       = self.m_Model:getModelSceneWar()
     local isReplay            = isTotalReplay(modelSceneWar)
     local playerIndex         = self.m_Model:getPlayerIndex()
     local playerIndexMod      = playerIndex % 2
@@ -89,7 +89,7 @@ end
 local function createActionMoveAlongPath(self, path, isDiving, callback)
     local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getModelMapCursor(self.m_ModelSceneWar):setMovableByPlayer(true)
+        getModelMapCursor(self.m_Model:getModelSceneWar()):setMovableByPlayer(true)
         self.m_UnitSprite:setFlippedX(false)
         callback()
     end)
@@ -98,18 +98,19 @@ local function createActionMoveAlongPath(self, path, isDiving, callback)
 end
 
 local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
-    local steps = createStepsForActionMoveAlongPath(self, path, isDiving)
+    local modelSceneWar = self.m_Model:getModelSceneWar()
+    local steps         = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
+        getScriptEventDispatcher(modelSceneWar):dispatchEvent({
             name      = "EvtMapCursorMoved",
             gridIndex = targetGridIndex,
         })
-        getModelMapCursor(self.m_ModelSceneWar):setNormalCursorVisible(false)
+        getModelMapCursor(modelSceneWar):setNormalCursorVisible(false)
             :setTargetCursorVisible(true)
     end)
     steps[#steps + 1] = cc.DelayTime:create(0.5)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getModelMapCursor(self.m_ModelSceneWar):setMovableByPlayer(true)
+        getModelMapCursor(modelSceneWar):setMovableByPlayer(true)
             :setNormalCursorVisible(true)
             :setTargetCursorVisible(false)
 
@@ -121,12 +122,8 @@ local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, t
 end
 
 local function getSkillIndicatorFrame(self, unit)
-    if (not self.m_ModelSceneWar) then
-        return nil
-    end
-
     local playerIndex = unit:getPlayerIndex()
-    local modelPlayer = getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex)
+    local modelPlayer = getModelPlayerManager(unit:getModelSceneWar()):getModelPlayer(playerIndex)
     local id          = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
     if (not id) then
         return nil
@@ -190,7 +187,7 @@ local function getLoadIndicatorFrame(self, unit)
     if (not unit.getCurrentLoadCount) then
         return nil
     else
-        local modelSceneWar = self.m_ModelSceneWar
+        local modelSceneWar = unit:getModelSceneWar()
         local loadCount = unit:getCurrentLoadCount()
         if ((not isTotalReplay(modelSceneWar)) and (getModelFogMap(modelSceneWar):isFogOfWarCurrently())) then
             if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn(modelSceneWar)) or (loadCount > 0)) then
@@ -337,12 +334,6 @@ function ViewUnit:ctor()
     initWithUnitSprite(    self, createUnitSprite())
     initWithHpIndicator(   self, createHpIndicator())
     initWithStateIndicator(self, createStateIndicator())
-
-    return self
-end
-
-function ViewUnit:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
 
     return self
 end

@@ -361,8 +361,9 @@ function ViewActionPlanner:setDropDestinations(destinations)
     viewDropDestinations:removeAllChildren()
 
     for _, destination in pairs(destinations) do
-        local viewUnit = Actor.createView("sceneWar.ViewUnit"):updateWithModelUnit(destination.modelUnit)
-        viewUnit:setPosition(GridIndexFunctions.toPosition(destination.gridIndex))
+        local viewUnit = Actor.createView("sceneWar.ViewUnit")
+        viewUnit:updateWithModelUnit(destination.modelUnit)
+            :setPosition(GridIndexFunctions.toPosition(destination.gridIndex))
             :setCascadeOpacityEnabled(true)
         viewDropDestinations:addChild(viewUnit, DROP_DESTIONATIONS_UNIT_Z_ORDER)
     end

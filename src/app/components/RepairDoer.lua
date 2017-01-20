@@ -27,7 +27,6 @@ RepairDoer.EXPORTED_METHODS = {
     "getRepairTargetCategoryFullName",
     "getRepairTargetCategory",
     "canRepairTarget",
-    "getRepairAmountAndCost",
     "getNormalizedRepairAmount",
 }
 
@@ -83,25 +82,6 @@ function RepairDoer:canRepairTarget(target)
     end
 
     return false
-end
-
-function RepairDoer:getRepairAmountAndCost(target)
-    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
-    local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
-    local productionCost = math.floor(
-        (costModifier >= 0)                                       and
-        (target:getProductionCost() * (100 + costModifier) / 100) or
-        (target:getProductionCost() * 100 / (100 - costModifier))
-    )
-    local normalizedCurrentHP    = target:getNormalizedCurrentHP()
-    local normalizedRepairAmount = math.min(
-        10 - normalizedCurrentHP,
-        self:getNormalizedRepairAmount(),
-        math.floor(modelPlayer:getFund() * 10 / productionCost)
-    )
-
-    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - target:getCurrentHP(),
-        math.floor(normalizedRepairAmount * productionCost / 10)
 end
 
 function RepairDoer:getNormalizedRepairAmount()

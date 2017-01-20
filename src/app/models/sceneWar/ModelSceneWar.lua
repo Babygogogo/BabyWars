@@ -38,8 +38,7 @@ local ipairs, next     = ipairs, next
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local IGNORED_KEYS_FOR_EXECUTED_ACTIONS = {"warID", "actionID"}
-local TIME_INTERVAL_FOR_ACTIONS         = 1.5
-local DEFAULT_INTERVAL_UNTIL_BOOT       = 3600 * 24 * 3
+local TIME_INTERVAL_FOR_ACTIONS         = 1
 
 --------------------------------------------------------------------------------
 -- The private callback function on web socket events.
@@ -114,6 +113,7 @@ local function executeReplayAction(self)
     if (not action) then
         self:getModelMessageIndicator():showMessage(getLocalizedText(11, "NoMoreReplayActions"))
     else
+        self:getModelWarField():getModelActionPlanner():setStateIdle(true)
         self:getModelMessageIndicator():showMessage(string.format("%s: %d / %d (%s)",
             getLocalizedText(11, "Progress"),
             actionID,
@@ -463,6 +463,8 @@ function ModelSceneWar:canFastRewindForReplay()
 end
 
 function ModelSceneWar:fastForwardForReplay()
+    self:getModelWarField():getModelActionPlanner():setStateIdle(true)
+
     local warDataIndex = self.m_TurnCounterForEachActionID[self:getActionId()] + 1
     self:ctor(self.m_WarDataForEachTurn[warDataIndex])
         :onStartRunning(true)
@@ -474,6 +476,8 @@ function ModelSceneWar:fastForwardForReplay()
 end
 
 function ModelSceneWar:fastRewindForReplay()
+    self:getModelWarField():getModelActionPlanner():setStateIdle(true)
+
     local actionID     = self:getActionId()
     local warDataIndex = self.m_TurnCounterForEachActionID[actionID]
     if (warDataIndex > self.m_TurnCounterForEachActionID[actionID - 1]) then
