@@ -17,7 +17,6 @@ UnitLoader.EXPORTED_METHODS = {
     "canLaunchModelUnit",
     "canRepairLoadedModelUnit",
     "canSupplyLoadedModelUnit",
-    "getRepairAmountAndCostForLoadedModelUnit",
 
     "addLoadUnitId",
     "removeLoadUnitId",
@@ -169,28 +168,6 @@ end
 
 function UnitLoader:canSupplyLoadedModelUnit()
     return self.m_Template.canSupply
-end
-
-function UnitLoader:getRepairAmountAndCostForLoadedModelUnit(modelUnit)
-    assert(self:hasLoadUnitId(modelUnit:getUnitId()),
-        "UnitLoader:getRepairAmountAndCostForLoadedModelUnit() the param modelUnit is not loaded by self.")
-
-    local modelPlayer    = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(self.m_Owner:getPlayerIndex())
-    local costModifier   = SkillModifierFunctions.getRepairCostModifier(modelPlayer:getModelSkillConfiguration())
-    local productionCost = math.floor(
-        (costModifier >= 0)                                          and
-        (modelUnit:getProductionCost() * (100 + costModifier) / 100) or
-        (modelUnit:getProductionCost() * 100 / (100 - costModifier))
-    )
-    local normalizedCurrentHP    = modelUnit:getNormalizedCurrentHP()
-    local normalizedRepairAmount = math.min(
-        10 - normalizedCurrentHP,
-        getNormalizedRepairAmount(self),
-        math.floor(modelPlayer:getFund() * 10 / productionCost)
-    )
-
-    return (normalizedRepairAmount + normalizedCurrentHP) * 10 - modelUnit:getCurrentHP(),
-        round(normalizedRepairAmount * productionCost / 10)
 end
 
 function UnitLoader:addLoadUnitId(unitID)
