@@ -2248,7 +2248,7 @@ SkillData.skillPresets = {
             skills            = {
                 {
                     id    = 15,
-                    level = 6,
+                    level = 5,
                 },
                 {
                     id    = 34,
