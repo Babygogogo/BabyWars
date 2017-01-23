@@ -1,9 +1,11 @@
 return {
     "BaZhenTuEr",
+    "BaoFengYan",
     "BeiZhong",
     "BiFengGang",
-    "DuoYanPingYuan",
+    "DuoYanPingYuan_2",
     "FengBaoQianXian",
+    "FuWuTai",
     "GaoLaMiJia",
     "GanHeZhiJing",
     "GeBiTan",
@@ -11,17 +13,21 @@ return {
     "HeiSenLin",
     "ManShouXueXing",
     "SanHeGu",
-    "ShenSeYanCaoZhanZheng",
+    "ShenSeYanCaoZhanZheng_2",
     "SiTongBaDa",
     "TanXinWan",
     "WangPaiKongJun",
-    "YanMo",
+    "WeiJiSiFu",
+    "YangFanYuanHang",
     "YunShiQun",
     "ZhengZhengFangFang",
+
+    "JuWaiRen",                 -- 3p
 
     "BeiPan",                   -- 4p
     "DuiKangZhaoTianTong",      -- 4p
     "XiaoGuoZhengBaSai",        -- 4p
+    "XuanZe",
 
     "Random2P",
     "Random2P_HighQuality",
