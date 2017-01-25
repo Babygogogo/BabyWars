@@ -26,7 +26,7 @@ return {
         "WangPaiKongJun",
         "WeiJiSiFu",
         "WuShangZhiAi",
-        "YangFanYuanHang",
+        "YangFanYuanHang_2",
         "YunShiQun",
         "ZhengZhengFangFang",
     },

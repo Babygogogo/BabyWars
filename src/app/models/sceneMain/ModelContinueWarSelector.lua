@@ -140,9 +140,7 @@ local function getActorWarFieldPreviewer(self)
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarFieldPreviewer", nil, "sceneMain.ViewWarFieldPreviewer")
 
         self.m_ActorWarFieldPreviewer = actor
-        if (self.m_View) then
-            self.m_View:setViewWarFieldPreviewer(actor:getView())
-        end
+        self.m_View:setViewWarFieldPreviewer(actor:getView())
     end
 
     return self.m_ActorWarFieldPreviewer
@@ -153,10 +151,8 @@ local function initCallbackOnButtonBackTouched(self, modelWarConfigurator)
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
         self:setEnabled(true)
 
-        if (self.m_View) then
-            self.m_View:setMenuVisible(true)
-                :setButtonNextVisible(false)
-        end
+        self.m_View:setMenuVisible(true)
+            :setButtonNextVisible(false)
     end)
 end
 
@@ -191,9 +187,7 @@ local function getActorWarConfigurator(self)
         initSelectorSkill(model)
 
         self.m_ActorWarConfigurator = actor
-        if (self.m_View) then
-            self.m_View:setViewWarConfigurator(actor:getView())
-        end
+        self.m_View:setViewWarConfigurator(actor:getView())
     end
 
     return self.m_ActorWarConfigurator
@@ -215,17 +209,14 @@ local function createOngoingWarList(self, warConfigurations)
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setPlayerNicknames(getPlayerNicknames(warConfiguration, os.time()))
                     :setEnabled(true)
-                if (self.m_View) then
-                    self.m_View:setButtonNextVisible(true)
-                end
+                self.m_View:setButtonNextVisible(true)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                    self.m_View:setMenuVisible(false)
+                        :setButtonNextVisible(false)
+
                     resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warID, warConfiguration)
-                    if (self.m_View) then
-                        self.m_View:setMenuVisible(false)
-                            :setButtonNextVisible(false)
-                    end
                 end
             end,
         }
@@ -283,7 +274,7 @@ function ModelContinueWarSelector:isRetrievingOngoingWarConfigurations()
 end
 
 function ModelContinueWarSelector:updateWithOngoingWarConfigurations(warConfigurations)
-    if ((self.m_View) and (self.m_IsEnabled)) then
+    if (self.m_IsEnabled) then
         local warList = createOngoingWarList(self, warConfigurations)
         if (#warList == 0) then
             SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoContinuableWar"))
