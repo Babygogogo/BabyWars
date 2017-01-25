@@ -12585,7 +12585,7 @@
             <key>size</key>
             <string>{4096,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:7c49f59239216c5cc650e1a4f40236fe:ed36c5d514ccd36dbe830ad6f3543f6f:9a5bac27175cc3dae0c83d0015ed06ee$</string>
+            <string>$TexturePacker:SmartUpdate:d0e8c70f54225fa9406a036955a95037:ed36c5d514ccd36dbe830ad6f3543f6f:9a5bac27175cc3dae0c83d0015ed06ee$</string>
             <key>textureFileName</key>
             <string>BabyWarsTextureTile.pvr.ccz</string>
         </dict>
