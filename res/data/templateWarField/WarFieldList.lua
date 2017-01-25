@@ -3,6 +3,7 @@ return {
     "BaoFengYan",
     "BeiZhong",
     "BiFengGang",
+    "CuiMian",
     "DuoYanPingYuan_2",
     "FangBaoPingZhang",
     "FengBaoQianXian",
