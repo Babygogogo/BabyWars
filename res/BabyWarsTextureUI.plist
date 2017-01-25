@@ -1076,13 +1076,13 @@
             <key>format</key>
             <integer>2</integer>
             <key>realTextureFileName</key>
-            <string>BabyWarsTextureUI.png</string>
+            <string>BabyWarsTextureUI.pvr.ccz</string>
             <key>size</key>
             <string>{1024,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:80bee02cae13145e41d2472d3c341bce:3990dbf31fa37fc4ae22f2400e63f1ff:215d1941b12516cc0f89fcfb847e1dd5$</string>
+            <string>$TexturePacker:SmartUpdate:eb064aa87dfabd2fb90608d648ba4d9f:3990dbf31fa37fc4ae22f2400e63f1ff:4eccb6f479e9e6e077477e71e7dafcc4$</string>
             <key>textureFileName</key>
-            <string>BabyWarsTextureUI.png</string>
+            <string>BabyWarsTextureUI.pvr.ccz</string>
         </dict>
     </dict>
 </plist>
