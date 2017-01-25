@@ -1719,7 +1719,7 @@ local s_Texts = {
             elseif (tileType == "Mist")          then return "迷雾"
             elseif (tileType == "Reef")          then return "礁石"
             elseif (tileType == "Plasma")        then return "等离子体"
-            elseif (tileType == "GreenPlasma")   then return "红色等离子"
+            elseif (tileType == "GreenPlasma")   then return "绿色等离子"
             elseif (tileType == "Meteor")        then return "陨石"
             elseif (tileType == "Silo")          then return "导弹发射塔"
             elseif (tileType == "EmptySilo")     then return "空发射塔"

@@ -487,6 +487,7 @@ local function setStateAuxiliaryCommands(self)
             end
         end
         items[#items + 1] = self.m_ItemHideUI
+        items[#items + 1] = self.m_ItemSetMessageIndicator
         items[#items + 1] = self.m_ItemSetMusic
 
         self.m_View:setItems(items)
@@ -925,6 +926,16 @@ local function initItemReload(self)
     self.m_ItemReload = item
 end
 
+local function initItemSetMessageIndicator(self)
+    self.m_ItemSetMessageIndicator = {
+        name     = getLocalizedText(1, "SetMessageIndicator"),
+        callback = function()
+            local indicator = SingletonGetters.getModelMessageIndicator(self.m_ModelSceneWar)
+            indicator:setEnabled(not indicator:isEnabled())
+        end,
+    }
+end
+
 local function initItemSetMusic(self)
     local item = {
         name     = getLocalizedText(1, "SetMusic"),
@@ -989,32 +1000,33 @@ function ModelWarCommandMenu:ctor(param)
     self.m_IsWaitingForServerResponse = false
     self.m_State                      = "stateDisabled"
 
-    initItemAbout(            self)
-    initItemActivateSkill1(   self)
-    initItemActivateSkill2(   self)
-    initItemAgreeDraw(        self)
-    initItemAuxiliaryCommands(self)
-    initItemDestroyOwnedUnit( self)
-    initItemDisagreeDraw(     self)
-    initItemDrawOrSurrender(  self)
-    initItemEndTurn(          self)
-    initItemEssentialConcept( self)
-    initItemFindIdleTile(     self)
-    initItemFindIdleUnit(     self)
-    initItemGameFlow(         self)
-    initItemHelp(             self)
-    initItemHideUI(           self)
-    initItemProposeDraw(      self)
-    initItemQuit(             self)
-    initItemReload(           self)
-    initItemSkillInfo(        self)
-    initItemSkillSystem(      self)
-    initItemSetMusic(         self)
-    initItemSurrender(        self)
-    initItemsUnitProperties(  self)
-    initItemUnitPropertyList( self)
-    initItemWarControl(       self)
-    initItemWarInfo(          self)
+    initItemAbout(              self)
+    initItemActivateSkill1(     self)
+    initItemActivateSkill2(     self)
+    initItemAgreeDraw(          self)
+    initItemAuxiliaryCommands(  self)
+    initItemDestroyOwnedUnit(   self)
+    initItemDisagreeDraw(       self)
+    initItemDrawOrSurrender(    self)
+    initItemEndTurn(            self)
+    initItemEssentialConcept(   self)
+    initItemFindIdleTile(       self)
+    initItemFindIdleUnit(       self)
+    initItemGameFlow(           self)
+    initItemHelp(               self)
+    initItemHideUI(             self)
+    initItemProposeDraw(        self)
+    initItemQuit(               self)
+    initItemReload(             self)
+    initItemSkillInfo(          self)
+    initItemSkillSystem(        self)
+    initItemSetMessageIndicator(self)
+    initItemSetMusic(           self)
+    initItemSurrender(          self)
+    initItemsUnitProperties(    self)
+    initItemUnitPropertyList(   self)
+    initItemWarControl(         self)
+    initItemWarInfo(            self)
 
     return self
 end

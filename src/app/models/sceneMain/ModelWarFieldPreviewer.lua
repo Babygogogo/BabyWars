@@ -1,7 +1,10 @@
 
 local ModelWarFieldPreviewer = class("ModelWarFieldPreviewer")
 
-local Actor = require("src.global.actors.Actor")
+local AnimationLoader       = require("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local Actor                 = require("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -18,6 +21,30 @@ local function initActorTileMap(self, warFieldFileName)
     local actor        = Actor.createWithModelAndViewInstance(modelTileMap, Actor.createView("sceneWar.ViewTileMap"))
 
     self.m_ActorTileMap = actor
+end
+
+local function initViewUnitMap(self, warFieldFileName)
+    local layer               = require("res.data.templateWarField." .. warFieldFileName).layers[3]
+    local data, width, height = layer.data, layer.width, layer.height
+    local viewUnitMap         = cc.Node:create()
+
+    for x = 1, width do
+        for y = 1, height do
+            local tiledID = data[x + (height - y) * width]
+            if (tiledID > 0) then
+                local viewUnit    = cc.Sprite:create()
+                local unitType    = GameConstantFunctions.getUnitTypeWithTiledId(tiledID)
+                local playerIndex = GameConstantFunctions.getPlayerIndexWithTiledId(tiledID)
+                viewUnit:ignoreAnchorPointForPosition(true)
+                    :setPosition(GridIndexFunctions.toPositionWithXY(x, y))
+                    :playAnimationForever(AnimationLoader.getUnitAnimation(unitType, playerIndex, "normal"))
+
+                viewUnitMap:addChild(viewUnit)
+            end
+        end
+    end
+
+    self.m_ViewUnitMap = viewUnitMap
 end
 
 --------------------------------------------------------------------------------
@@ -39,7 +66,8 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
             self.m_RandomPlayersCount = nil
 
             initActorTileMap(self, warFieldFileName)
-            self.m_View:setViewTileMap(self.m_ActorTileMap:getView(), self.m_ActorTileMap:getModel():getMapSize())
+            initViewUnitMap(self, warFieldFileName)
+            self.m_View:setViewTileAndUnitMap(self.m_ActorTileMap:getView(), self.m_ViewUnitMap, self.m_ActorTileMap:getModel():getMapSize())
         end
         self.m_View:setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)
     end

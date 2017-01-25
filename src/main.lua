@@ -22,10 +22,10 @@ require "config"
 require "cocos.init"
 
 local function main()
-    display.loadSpriteFrames("BabyWarsTextureTile.plist",    "BabyWarsTextureTile.png")
-    display.loadSpriteFrames("BabyWarsTextureUnit.plist",    "BabyWarsTextureUnit.png")
-    display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.png")
-    display.loadSpriteFrames("BabyWarsTextureGallery.plist", "BabyWarsTextureGallery.png")
+    display.loadSpriteFrames("BabyWarsTextureTile.plist",    "BabyWarsTextureTile.pvr.ccz")
+    display.loadSpriteFrames("BabyWarsTextureUnit.plist",    "BabyWarsTextureUnit.pvr.ccz")
+    display.loadSpriteFrames("BabyWarsTextureUI.plist",      "BabyWarsTextureUI.pvr.ccz")
+    display.loadSpriteFrames("BabyWarsTextureGallery.plist", "BabyWarsTextureGallery.pvr.ccz")
 
     require("src.app.utilities.AnimationLoader")       .load()
     require("src.app.utilities.GameConstantFunctions") .init()
