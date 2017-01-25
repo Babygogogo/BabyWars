@@ -18,6 +18,7 @@ return {
         "GeBiTan",
         "HaiAnTuJi",
         "HeiSenLin",
+        "Ling",
         "ManShouXueXing",
         "SanHeGu",
         "ShenSeYanCaoZhanZheng_2",
