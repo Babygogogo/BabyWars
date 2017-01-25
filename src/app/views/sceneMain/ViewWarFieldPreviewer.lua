@@ -154,14 +154,15 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarFieldPreviewer:setViewTileMap(view, mapSize)
+function ViewWarFieldPreviewer:setViewTileAndUnitMap(viewTileMap, viewUnitMap, mapSize)
     if (self.m_ViewTileMap) then
         self.m_ZoomableNode:removeChild(self.m_ViewTileMap)
         self.m_ViewTileMap = nil
     end
 
-    self.m_ViewTileMap = view
-    self.m_ZoomableNode:setContentAndSize(view, {
+    viewTileMap:addChild(viewUnitMap)
+    self.m_ViewTileMap = viewTileMap
+    self.m_ZoomableNode:setContentAndSize(viewTileMap, {
         width  = mapSize.width  * GRID_SIZE.width,
         height = mapSize.height * GRID_SIZE.height,
     })
