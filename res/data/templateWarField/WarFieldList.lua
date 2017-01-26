@@ -1,11 +1,14 @@
 return {
     "BaZhenTuEr",               -- 2p
+    "BaoChiWeiXiao",
     "BaoFengYan",
     "BeiZhong",
     "BiFengGang",
     "CuiMian",
+    "DiBiao",
     "DuoYanPingYuan_2",
     "FangBaoPingZhang",
+    "FeiXu",
     "FengBaoQianXian",
     "FuWuTai",
     "GaoLaMiJia",
