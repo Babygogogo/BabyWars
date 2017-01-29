@@ -43,7 +43,7 @@ local getScriptEventDispatcher      = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay                 = SingletonGetters.isTotalReplay
 local isTileVisible                 = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible                 = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
-local next, pairs, ipairs           = next, pairs, ipairs
+local next, pairs, ipairs, unpack   = next, pairs, ipairs, unpack
 local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
 
 --------------------------------------------------------------------------------
@@ -516,6 +516,12 @@ local function executeRegister(action, modelScene)
     end
 end
 
+local function executeRunSceneMain(action)
+    assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
+    local message = (action.messageCode) and (getLocalizedText(action.messageCode, unpack(action.messageParams or {}))) or (nil)
+    runSceneMain(getLoggedInAccountAndPassword() ~= nil, message)
+end
+
 local function executeRunSceneWar(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeRunSceneWar() this shouldn't be invoked on the server.")
     if (not modelScene.isModelSceneWar) then
@@ -534,18 +540,12 @@ local function executeReloadSceneWar(action, modelScene)
         (modelScene:getWarId() == warData.warID)        and
         (modelScene:getActionId() <= warData.actionID)) then
         if (action.messageCode) then
-            getModelMessageIndicator(modelScene):showPersistentMessage(getLocalizedText(action.messageCode, action.messageParams))
+            getModelMessageIndicator(modelScene):showPersistentMessage(getLocalizedText(action.messageCode, unpack(action.messageParams or {})))
         end
 
         local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", warData, "sceneWar.ViewSceneWar")
         ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
     end
-end
-
-local function executeRunSceneMain(action)
-    assert(not IS_SERVER, "ActionExecutor-executeRunSceneMain() should not be invoked on the server.")
-    local message = (action.messageCode) and (getLocalizedText(action.messageCode, action.messageParams)) or (nil)
-    runSceneMain(getLoggedInAccountAndPassword() ~= nil, message)
 end
 
 local function executeSetSkillConfiguration(action, modelScene)

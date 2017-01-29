@@ -12,8 +12,9 @@
 
 local ModelUnitInfo = class("ModelUnitInfo")
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters   = require("src.app.utilities.SingletonGetters")
+local GridIndexFunctions  = require("src.app.utilities.GridIndexFunctions")
+local VisibilityFunctions = require("src.app.utilities.VisibilityFunctions")
+local SingletonGetters    = require("src.app.utilities.SingletonGetters")
 
 local getModelFogMap         = SingletonGetters.getModelFogMap
 local getModelUnitMap        = SingletonGetters.getModelUnitMap
@@ -23,22 +24,35 @@ local isTotalReplay          = SingletonGetters.isTotalReplay
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function isModelUnitVisible(modelSceneWar, modelUnit)
+    if (isTotalReplay(modelSceneWar)) then
+        return true
+    else
+        return VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(
+            modelSceneWar,
+            modelUnit:getGridIndex(),
+            modelUnit:getUnitType(),
+            (modelUnit.isDiving) and (modelUnit:isDiving()),
+            modelUnit:getPlayerIndex(),
+            getPlayerIndexLoggedIn(modelSceneWar)
+        )
+    end
+end
+
 local function updateWithModelUnitMap(self)
     local modelSceneWar = self.m_ModelSceneWar
     local modelUnitMap  = getModelUnitMap(modelSceneWar)
     local modelUnit     = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
-    if (modelUnit) then
+    if ((not modelUnit) or (not isModelUnitVisible(modelSceneWar, modelUnit))) then
+        self.m_View:setVisible(false)
+    else
         local loadedModelUnits = ((isTotalReplay(modelSceneWar)) or (not getModelFogMap(modelSceneWar):isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn(modelSceneWar))) and
-            (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                                              or
+            (modelUnitMap:getLoadedModelUnitsWithLoader(modelUnit))                                                                                                                                     or
             (nil)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
-        if (self.m_View) then
-            self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
-                :setVisible(not SingletonGetters.getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())
-        end
-    elseif (self.m_View) then
-        self.m_View:setVisible(false)
+        self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
+            :setVisible(not SingletonGetters.getModelWarCommandMenu(modelSceneWar):isEnabled())
     end
 end
 
