@@ -690,10 +690,10 @@ local function getAvailableActionList(self)
     list[#list + 1] = getActionLaunchFlare(           self)
     list[#list + 1] = getActionLaunchSilo(            self)
     list[#list + 1] = getActionProduceModelUnitOnUnit(self)
-    list[#list + 1] = getActionWait(                  self)
 
-    assert(#list > 0, "ModelActionPlanner-getAvailableActionList() the generated list has no valid action item.")
-    return list
+    local itemWait = getActionWait(self)
+    assert((#list > 0) or (itemWait), "ModelActionPlanner-getAvailableActionList() the generated list has no valid action item.")
+    return list, itemWait
 end
 
 local function getAdditionalDropActionList(self)
@@ -877,9 +877,11 @@ setStateChoosingAction = function(self, destination, launchUnitID)
         end
     end
 
+    local list, itemWait = getAvailableActionList(self)
     getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
-        name = "EvtActionPlannerChoosingAction",
-        list = getAvailableActionList(self)
+        name     = "EvtActionPlannerChoosingAction",
+        list     = list,
+        itemWait = itemWait,
     })
 end
 

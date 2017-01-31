@@ -27,7 +27,7 @@ local function onEvtActionPlannerChoosingAction(self, event)
 
     if (self.m_View) then
         self.m_View:removeAllItems()
-            :showActionList(event.list)
+            :showActionList(event.list, event.itemWait)
     end
 end
 

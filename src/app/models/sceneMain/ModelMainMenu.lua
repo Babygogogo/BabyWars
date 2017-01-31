@@ -130,8 +130,57 @@ local function getActorGameRecordViewer(self)
 end
 
 --------------------------------------------------------------------------------
+-- The state setters.
+--------------------------------------------------------------------------------
+local function setStateAuxiliaryCommands(self)
+    self.m_State = "stateAuxiliaryCommands"
+
+    self.m_View:setButtonExitText(getLocalizedText(1, "Back"))
+        :setItems({
+            self.m_ItemSetMessageIndicator,
+            self.m_ItemSetMusic,
+        })
+end
+
+local function setStateMain(self, isPlayerLoggedIn)
+    self.m_State            = "stateMain"
+    self.m_IsPlayerLoggedIn = isPlayerLoggedIn
+
+    self.m_View:setButtonExitText(getLocalizedText(1, "Exit"))
+    if (isPlayerLoggedIn) then
+        self.m_View:setItems({
+            self.m_ItemNewWar,
+            self.m_ItemContinue,
+            self.m_ItemJoinWar,
+            self.m_ItemConfigSkills,
+            self.m_ItemManageReplay,
+            self.m_ItemViewGameRecord,
+            self.m_ItemLogin,
+            self.m_ItemAuxiliaryCommands,
+            self.m_ItemHelp,
+        })
+    else
+        self.m_View:setItems({
+            self.m_ItemLogin,
+            self.m_ItemManageReplay,
+            self.m_ItemAuxiliaryCommands,
+            self.m_ItemHelp,
+        })
+    end
+end
+
+--------------------------------------------------------------------------------
 -- The composition menu items.
 --------------------------------------------------------------------------------
+local function initItemAuxiliaryCommands(self)
+    self.m_ItemAuxiliaryCommands = {
+        name     = getLocalizedText(1, "AuxiliaryCommands"),
+        callback = function()
+            setStateAuxiliaryCommands(self)
+        end,
+    }
+end
+
 local function initItemConfigSkills(self)
     local item = {
         name     = getLocalizedText(1, "ConfigSkills"),
@@ -257,6 +306,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
+    initItemAuxiliaryCommands(  self)
     initItemConfigSkills(       self)
     initItemContinue(           self)
     initItemHelp(               self)
@@ -308,41 +358,27 @@ function ModelMainMenu:setMenuEnabled(enabled)
     return self
 end
 
-function ModelMainMenu:updateWithIsPlayerLoggedIn(isLogged)
-    if (self.m_View) then
-        if (isLogged) then
-            showMenuItems(self,
-                self.m_ItemNewWar,
-                self.m_ItemContinue,
-                self.m_ItemJoinWar,
-                self.m_ItemConfigSkills,
-                self.m_ItemManageReplay,
-                self.m_ItemViewGameRecord,
-                self.m_ItemLogin,
-                self.m_ItemSetMessageIndicator,
-                self.m_ItemSetMusic,
-                self.m_ItemHelp
-            )
-        else
-            showMenuItems(self,
-                self.m_ItemLogin,
-                self.m_ItemManageReplay,
-                self.m_ItemSetMessageIndicator,
-                self.m_ItemSetMusic,
-                self.m_ItemHelp
-            )
-        end
-    end
+function ModelMainMenu:updateWithIsPlayerLoggedIn(isPlayerLoggedIn)
+    setStateMain(self, isPlayerLoggedIn)
 
     return self
 end
 
 function ModelMainMenu:onButtonExitTouched()
-    SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain):setConfirmText(getLocalizedText(66, "ExitGame"))
-        :setOnConfirmYes(function()
-            cc.Director:getInstance():endToLua()
-        end)
-        :setEnabled(true)
+    local state = self.m_State
+    if (state == "stateAuxiliaryCommands") then
+        setStateMain(self, self.m_IsPlayerLoggedIn)
+    elseif (state == "stateMain") then
+        SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain):setConfirmText(getLocalizedText(66, "ExitGame"))
+            :setOnConfirmYes(function()
+                cc.Director:getInstance():endToLua()
+            end)
+            :setEnabled(true)
+    else
+        assert("ModelMainMenu:onButtonExitTouched() invalid state: " .. (state or ""))
+    end
+
+    return self
 end
 
 function ModelMainMenu:getModelContinueWarSelector()

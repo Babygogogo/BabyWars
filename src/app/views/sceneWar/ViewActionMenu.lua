@@ -4,7 +4,7 @@ local ViewActionMenu = class("ViewActionMenu", cc.Node)
 local AnimationLoader       = require("src.app.utilities.AnimationLoader")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
-local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 150
+local MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM      = 210
 local MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM     = display.height - 10 - 93 - 130 - 10 -- These are the height of boundary/MoneyEnergyInfo/UnitInfo/boundary.
 local MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM  = 210
 local MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM = MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM
@@ -20,10 +20,6 @@ local RIGHT_POS_Y_FOR_ACTION_ITEM     = LEFT_POS_Y_FOR_ACTION_ITEM
 local RIGHT_POS_X_FOR_PRODUCTION_ITEM = display.width - MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 10
 local RIGHT_POS_Y_FOR_PRODUCTION_ITEM = RIGHT_POS_Y_FOR_ACTION_ITEM
 
-local LIST_VIEW_POS_X        = 0
-local LIST_VIEW_POS_Y        = 6
-local LIST_VIEW_ITEMS_MARGIN = 10
-
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local ITEM_FONT_SIZE_SMALL    = 16
 local ITEM_FONT_SIZE_LARGE    = 25
@@ -32,15 +28,23 @@ local ITEM_FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local ITEM_FONT_OUTLINE_WIDTH = 2
 local ITEM_DISABLED_COLOR     = {r = 180, g = 180, b = 180}
 
-local ITEM_ACTION_WIDTH     = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 20
-local ITEM_ACTION_HEIGHT    = 60
-local ITEM_ACTION_CAPINSETS = {x = 1, y = ITEM_ACTION_HEIGHT, width = 1, height = 1}
+local ITEM_WIDTH_FOR_ACTION  = MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - 20
+local ITEM_HEIGHT_FOR_ACTION = 60
+local ITEM_ACTION_CAPINSETS  = {x = 1, y = ITEM_HEIGHT_FOR_ACTION, width = 1, height = 1}
 
 local ITEM_PRODUCTION_WIDTH     = MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM - 20
 local ITEM_PRODUCTION_HEIGHT    = 60
 local ITEM_PRODUCTION_CAPINSETS = {x = 1, y = ITEM_PRODUCTION_HEIGHT, width = 1, height = 1}
 
+local LIST_VIEW_ITEMS_MARGIN         = 20
+local LIST_VIEW_POS_X_FOR_ACTION     = 0
+local LIST_VIEW_POS_Y_FOR_ACTION     = 6 + ITEM_HEIGHT_FOR_ACTION + LIST_VIEW_ITEMS_MARGIN
+local LIST_VIEW_POS_X_FOR_PRODUCTION = 0
+local LIST_VIEW_POS_Y_FOR_PRODUCTION = 6
+
 local BUTTON_CONFIRM_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local BUTTON_WAIT_POS_X         = (MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM - ITEM_WIDTH_FOR_ACTION) / 2
+local BUTTON_WAIT_POS_Y         = 15
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -57,7 +61,7 @@ local function createViewAction(itemModel)
     local label    = cc.Label:createWithTTF(text, ITEM_FONT_NAME, fontSize)
     label:ignoreAnchorPointForPosition(true)
 
-        :setDimensions(ITEM_ACTION_WIDTH, ITEM_ACTION_HEIGHT)
+        :setDimensions(ITEM_WIDTH_FOR_ACTION, ITEM_HEIGHT_FOR_ACTION)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
 
@@ -69,7 +73,7 @@ local function createViewAction(itemModel)
 
         :setScale9Enabled(true)
         :setCapInsets(ITEM_ACTION_CAPINSETS)
-        :setContentSize(ITEM_ACTION_WIDTH, ITEM_ACTION_HEIGHT)
+        :setContentSize(ITEM_WIDTH_FOR_ACTION, ITEM_HEIGHT_FOR_ACTION)
 
         :setZoomScale(-0.05)
 
@@ -185,9 +189,30 @@ local function createViewProduction(self, modelItem)
     return view
 end
 
-local function setContentSize(self, width, height)
-    self.m_MenuBackground:setContentSize(width, height)
-    self.m_ListView:setContentSize(width, height - 14)
+local function clearButtonWait(self)
+    if (self.m_ButtonWait) then
+        self.m_ButtonWait:removeFromParent()
+        self.m_ButtonWait = nil
+    end
+end
+
+local function resetForViewingActions(self, hasItemWait)
+    self.m_MenuBackground:setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
+    if (hasItemWait) then
+        self.m_ListView:setContentSize(MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM - ITEM_HEIGHT_FOR_ACTION - LIST_VIEW_ITEMS_MARGIN - 10)
+            :setPosition(LIST_VIEW_POS_X_FOR_ACTION, LIST_VIEW_POS_Y_FOR_ACTION)
+    else
+        self.m_ListView:setContentSize(MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM - 14)
+            :setPosition(LIST_VIEW_POS_X_FOR_PRODUCTION, LIST_VIEW_POS_Y_FOR_PRODUCTION)
+    end
+    clearButtonWait(self)
+end
+
+local function resetForViewingProductions(self)
+    self.m_MenuBackground:setContentSize(MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM)
+    self.m_ListView      :setContentSize(MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM - 14)
+                         :setPosition(LIST_VIEW_POS_X_FOR_PRODUCTION, LIST_VIEW_POS_Y_FOR_PRODUCTION)
+    clearButtonWait(self)
 end
 
 local function moveToLeftSide(self)
@@ -240,7 +265,7 @@ end
 local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(LIST_VIEW_POS_X, LIST_VIEW_POS_Y)
+        :setPosition(LIST_VIEW_POS_X_FOR_PRODUCTION, LIST_VIEW_POS_Y_FOR_PRODUCTION)
 
         :setItemsMargin(LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
@@ -267,17 +292,26 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewActionMenu:showActionList(list)
-    setContentSize(self, MENU_BACKGROUND_WIDTH_FOR_ACTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_ACTION_ITEM)
+function ViewActionMenu:showActionList(list, itemWait)
+    resetForViewingActions(self, itemWait)
     adjustPositionOnShowingList(self, true)
 
+    local listView = self.m_ListView
     for _, listItem in ipairs(list) do
-        self.m_ListView:pushBackCustomItem(createViewAction(listItem))
+        listView:pushBackCustomItem(createViewAction(listItem))
+    end
+    if (itemWait) then
+        local buttonWait = createViewAction(itemWait)
+        buttonWait:ignoreAnchorPointForPosition(true)
+            :setPosition(BUTTON_WAIT_POS_X, BUTTON_WAIT_POS_Y)
+
+        self.m_ButtonWait = buttonWait
+        self:addChild(buttonWait)
     end
 end
 
 function ViewActionMenu:showProductionList(list)
-    setContentSize(self, MENU_BACKGROUND_WIDTH_FOR_PRODUCTION_ITEM, MENU_BACKGROUND_HEIGHT_FOR_PRODUCTION_ITEM)
+    resetForViewingProductions(self)
     adjustPositionOnShowingList(self, false)
 
     for _, listItem in ipairs(list) do

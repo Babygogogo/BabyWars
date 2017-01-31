@@ -1,7 +1,7 @@
 return {
     "BaZhenTuEr",               -- 2p
     "BaoChiWeiXiao",
-    "BaoFengYan",
+    "BaoFengYan_2",
     "BeiZhong",
     "BiFengGang",
     "CuiMian",
@@ -10,7 +10,7 @@ return {
     "FangBaoPingZhang",
     "FeiXu",
     "FengBaoQianXian",
-    "FuWuTai",
+    "FuWuTai_2",
     "GaoLaMiJia",
     "GanHeZhiJing",
     "GeBiTan",
@@ -20,12 +20,13 @@ return {
     "ManShouXueXing",
     "SanHeGu",
     "ShenSeYanCaoZhanZheng_2",
+    "SiPanDao",
     "SiTongBaDa",
     "TanXinWan",
     "WangPaiKongJun",
-    "WeiJiSiFu",
+    "WeiJiSiFu_2",
     "WuShangZhiAi",
-    "YangFanYuanHang_2",
+    "YangFanYuanHang_3",
     "YunShiQun",
     "ZhengZhengFangFang",
 

@@ -241,11 +241,28 @@ function ViewMainMenu:createAndPushBackItem(item)
     return self
 end
 
+function ViewMainMenu:setItems(items)
+    local listView = self.m_MenuListView
+    listView:removeAllItems()
+
+    for _, item in ipairs(items) do
+        listView:pushBackCustomItem(createViewItem(item))
+    end
+
+    return self
+end
+
 function ViewMainMenu:setMenuVisible(visible)
     self.m_MenuBackground:setVisible(visible)
     self.m_MenuListView  :setVisible(visible)
     self.m_MenuTitle     :setVisible(visible)
     self.m_ButtonExit    :setVisible(visible)
+
+    return self
+end
+
+function ViewMainMenu:setButtonExitText(text)
+    self.m_ButtonExit:setTitleText(text)
 
     return self
 end

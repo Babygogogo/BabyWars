@@ -173,6 +173,7 @@ local s_Texts = {
     [1] = {
         [1] = function(textType)
             if     (textType == "About")               then return "关 于 本 作"
+            elseif (textType == "AuxiliaryCommands")   then return "辅 助 功 能"
             elseif (textType == "Back")                then return "返 回"
             elseif (textType == "Close")               then return "关 闭"
             elseif (textType == "ConfigSkills")        then return "配 置 技 能"
@@ -199,6 +200,7 @@ local s_Texts = {
         end,
         [2] = function(textType)
             if     (textType == "About")               then return "About"
+            elseif (textType == "AuxiliaryCommands")   then return "AuxiliaryCmds"
             elseif (textType == "Back")                then return "Back"
             elseif (textType == "Close")               then return "Close"
             elseif (textType == "ConfigSkills")        then return "Config Skills"
