@@ -27,8 +27,7 @@ end
 local function getActorNewWarCreator(self)
     if (not self.m_ActorNewWarCreator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
-        actor:getModel():setModelMainMenu(self)
-            :onStartRunning(self.m_ModelSceneMain)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorNewWarCreator = actor

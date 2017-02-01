@@ -7,10 +7,12 @@ local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctio
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WarFieldManager           = require("src.app.utilities.WarFieldManager")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
+local ipairs           = ipairs
 
 local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
@@ -292,13 +294,6 @@ function ModelNewWarCreator:initView()
     return self
 end
 
-function ModelNewWarCreator:setModelMainMenu(model)
-    assert(self.m_ModelMainMenu == nil, "ModelNewWarCreator:setModelMainMenu() the model has been set.")
-    self.m_ModelMainMenu = model
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The callback function on start running.
 --------------------------------------------------------------------------------
@@ -345,7 +340,7 @@ end
 
 function ModelNewWarCreator:onButtonBackTouched()
     self:setEnabled(false)
-    self.m_ModelMainMenu:setMenuEnabled(true)
+    SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end
