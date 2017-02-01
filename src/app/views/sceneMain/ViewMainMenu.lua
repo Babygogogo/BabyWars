@@ -261,6 +261,12 @@ function ViewMainMenu:setMenuVisible(visible)
     return self
 end
 
+function ViewMainMenu:setMenuTitleText(text)
+    self.m_MenuTitle:setString(text)
+
+    return self
+end
+
 function ViewMainMenu:setButtonExitText(text)
     self.m_ButtonExit:setTitleText(text)
 
