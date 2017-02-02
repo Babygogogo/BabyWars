@@ -12,7 +12,9 @@ local POPUP_GREY_MASK_Z_ORDER     = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local BUTTON_BACK_Z_ORDER         = 1
+local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
 local BUTTON_CONFIRM_Z_ORDER      = 1
+local OVERVIEW_BACKGROUND_Z_ORDER = 0
 local MENU_BACKGROUND_Z_ORDER     = 0
 
 local MENU_BACKGROUND_WIDTH     = 250
@@ -62,9 +64,21 @@ local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH = 2
 local ITEM_FONT_SIZE     = 25
 local POPUP_FONT_SIZE    = 18
+local OVERVIEW_FONT_SIZE = 18
 
-local BUTTON_BACKGROUND_NAME      = "c03_t01_s01_f01.png"
-local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+local BACKGROUND_NAME      = "c03_t01_s01_f01.png"
+local BACKGROUND_OPACITY   = 180
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+
+local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT - 90
+local OVERVIEW_BACKGROUND_POS_X  = display.width - 30 - OVERVIEW_BACKGROUND_WIDTH
+local OVERVIEW_BACKGROUND_POS_Y  = 30 + 90
+
+local OVERVIEW_SCROLLVIEW_WIDTH  = OVERVIEW_BACKGROUND_WIDTH  - 7
+local OVERVIEW_SCROLLVIEW_HEIGHT = OVERVIEW_BACKGROUND_HEIGHT - 11
+local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
+local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
 
 local POPUP_BACKGROUND_WIDTH  = display.width  * 0.7
 local POPUP_BACKGROUND_HEIGHT = display.height * 0.8
@@ -117,7 +131,7 @@ local function initMenuBackground(self)
     background:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
         :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
-        :setOpacity(180)
+        :setOpacity(BACKGROUND_OPACITY)
 
     self.m_MenuBackground = background
     self:addChild(background, MENU_BACKGROUND_Z_ORDER)
@@ -159,8 +173,8 @@ local function initEditBoxPassword(self)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
 
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
-    background:setOpacity(180)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
+    background:setOpacity(BACKGROUND_OPACITY)
 
     local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT), background, background, background)
     editBox:ignoreAnchorPointForPosition(true)
@@ -218,7 +232,7 @@ local function initButtonConfirm(self)
         :setContentSize(BUTTON_CONFIRM_WIDTH, BUTTON_CONFIRM_HEIGHT)
 
         :setZoomScale(-0.05)
-        :setOpacity(180)
+        :setOpacity(BACKGROUND_OPACITY)
 
         :ignoreAnchorPointForPosition(true)
         :setPosition(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y)
@@ -240,12 +254,37 @@ local function initButtonConfirm(self)
     self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
 end
 
+local function initOverview(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setPosition(OVERVIEW_BACKGROUND_POS_X, OVERVIEW_BACKGROUND_POS_Y)
+        :setContentSize(OVERVIEW_BACKGROUND_WIDTH, OVERVIEW_BACKGROUND_HEIGHT)
+        :setOpacity(BACKGROUND_OPACITY)
+
+    local scrollView = ccui.ScrollView:create()
+    scrollView:setContentSize(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(OVERVIEW_SCROLLVIEW_POS_X, OVERVIEW_SCROLLVIEW_POS_Y)
+
+    local label = cc.Label:createWithTTF("", FONT_NAME, OVERVIEW_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+        :setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+    scrollView:addChild(label)
+
+    self.m_OverviewBackground = background
+    self.m_OverviewScrollView = scrollView
+    self.m_OverviewLabel      = label
+    self:addChild(background, OVERVIEW_BACKGROUND_Z_ORDER)
+        :addChild(scrollView, OVERVIEW_SCROLLVIEW_Z_ORDER)
+end
+
 local function initPopUpPanel(self)
     local mask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
     mask:setContentSize(display.width, display.height)
         :ignoreAnchorPointForPosition(true)
 
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
         :setPosition(POPUP_BACKGROUND_POS_X, POPUP_BACKGROUND_POS_Y)
         :setContentSize(POPUP_BACKGROUND_WIDTH, POPUP_BACKGROUND_HEIGHT)
@@ -301,8 +340,10 @@ function ViewWarConfiguratorRenewal:ctor()
     initMenuTitle(         self)
     initButtonBack(        self)
     initButtonConfirm(     self)
+    initOverview(          self)
     initPopUpPanel(        self)
     initPopUpTouchListener(self)
+
     self:setPopUpPanelEnabled(false)
 
     return self
@@ -365,6 +406,23 @@ function ViewWarConfiguratorRenewal:setPopUpPanelText(text)
     local height = math.max(label:getLineHeight() * label:getStringNumLines(), POPUP_SCROLLVIEW_HEIGHT)
     label:setDimensions(POPUP_SCROLLVIEW_WIDTH, height)
     self.m_PopUpScrollView:setInnerContainerSize({width = POPUP_SCROLLVIEW_WIDTH, height = height})
+
+    return self
+end
+
+function ViewWarConfiguratorRenewal:setMenuTitleText(text)
+    self.m_MenuTitle:setString(text)
+
+    return self
+end
+
+function ViewWarConfiguratorRenewal:setOverviewText(text)
+    local label = self.m_OverviewLabel
+    label:setString(text)
+
+    local height = math.max(label:getLineHeight() * label:getStringNumLines(), OVERVIEW_SCROLLVIEW_HEIGHT)
+    label:setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, height)
+    self.m_OverviewScrollView:setInnerContainerSize({width = OVERVIEW_SCROLLVIEW_WIDTH, height = height})
 
     return self
 end

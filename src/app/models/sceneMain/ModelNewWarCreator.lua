@@ -81,7 +81,8 @@ local function getActorWarConfigurator(self)
         local model = Actor.createModel("sceneMain.ModelWarConfiguratorRenewal")
         local view  = Actor.createView( "sceneMain.ViewWarConfiguratorRenewal")
 
-        model:setEnabled(false)
+        model:setModeAsCreatingWar()
+            :setEnabled(false)
         initCallbackOnButtonConfirmTouched(self, model)
         initCallbackOnButtonBackTouched(   self, model)
 

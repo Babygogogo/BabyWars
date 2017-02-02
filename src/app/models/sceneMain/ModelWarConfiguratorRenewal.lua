@@ -3,7 +3,6 @@ local ModelWarConfiguratorRenewal = class("ModelWarConfiguratorRenewal")
 
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
-local TableFunctions        = require("src.app.utilities.TableFunctions")
 local WarFieldManager       = require("src.app.utilities.WarFieldManager")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
@@ -22,19 +21,39 @@ end
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function generateOverviewText(self)
+    return "asdf"
+end
+
 local function createItemsForStateMain(self)
-    return {
-        self.m_ItemPlayerIndex,
-        self.m_ItemFogOfWar,
-        self.m_ItemMaxBaseSkillPoints,
-        self.m_ItemSkillConfiguration,
-        self.m_ItemRankMatch,
-        self.m_ItemMaxDiffScore,
-    }
+    local mode = self.m_Mode
+    if (mode == "modeCreate") then
+        local items = {
+            self.m_ItemPlayerIndex,
+            self.m_ItemFogOfWar,
+            self.m_ItemMaxBaseSkillPoints,
+        }
+        if (self.m_MaxBaseSkillPoints) then
+            items[#items + 1] = self.m_ItemSkillConfiguration
+        end
+        items[#items + 1] = self.m_ItemRankMatch
+        items[#items + 1] = self.m_ItemMaxDiffScore
+
+        return items
+
+    elseif (mode == "modeJoin") then
+        return {
+
+        }
+    elseif (mode == "modeContinue") then
+        return {
+
+        }
+    end
 end
 
 local function createItemsForStatePlayerIndex(self)
-    local warConfiguration = self.m_WarConfigurationOrigin
+    local warConfiguration = self.m_WarConfiguration
     local players          = warConfiguration.players
     local items            = {}
 
@@ -65,37 +84,44 @@ end
 --------------------------------------------------------------------------------
 local function setStateFogOfWar(self)
     self.m_State = "stateFogOfWar"
-    self.m_View:setItems(self.m_ItemsForStateFogOfWar)
+    self.m_View:setMenuTitleText(getLocalizedText(34, "FogOfWar"))
+        :setItems(self.m_ItemsForStateFogOfWar)
 end
 
 local function setStateMain(self)
     self.m_State = "stateMain"
-    self.m_View:setItems(createItemsForStateMain(self))
+    self.m_View:setMenuTitleText(getLocalizedText(1, "NewGame"))
+        :setItems(createItemsForStateMain(self))
 end
 
 local function setStateMaxBaseSkillPoints(self)
     self.m_State = "stateMaxBaseSkillPoints"
-    self.m_View:setItems(self.m_ItemsForStateMaxBaseSkillPoints)
+    self.m_View:setMenuTitleText(getLocalizedText(34, "BaseSkillPointsShort"))
+        :setItems(self.m_ItemsForStateMaxBaseSkillPoints)
 end
 
 local function setStateMaxDiffScore(self)
     self.m_State = "stateMaxDiffScore"
-    self.m_View:setItems(self.m_ItemsForStateMaxDiffScore)
+    self.m_View:setMenuTitleText(getLocalizedText(34, "MaxDiffScore"))
+        :setItems(self.m_ItemsForStateMaxDiffScore)
 end
 
 local function setStatePlayerIndex(self)
     self.m_State = "statePlayerIndex"
-    self.m_View:setItems(createItemsForStatePlayerIndex(self))
+    self.m_View:setMenuTitleText(getLocalizedText(34, "PlayerIndex"))
+        :setItems(createItemsForStatePlayerIndex(self))
 end
 
 local function setStateRankMatch(self)
     self.m_State = "stateRankMatch"
-    self.m_View:setItems(self.m_ItemsForStateRankMatch)
+    self.m_View:setMenuTitleText(getLocalizedText(34, "RankMatch"))
+        :setItems(self.m_ItemsForStateRankMatch)
 end
 
 local function setStateSkillConfiguration(self)
     self.m_State = "stateSkillConfiguration"
-    self.m_View:setItems(self.m_ItemsForStateSkillConfiguration)
+    self.m_View:setMenuTitleText(getLocalizedText(34, "SkillConfiguration"))
+        :setItems(self.m_ItemsForStateSkillConfiguration)
 end
 
 --------------------------------------------------------------------------------
@@ -173,24 +199,22 @@ end
 local function initItemsForStateMaxBaseSkillPoints(self)
     local items = {{
         name     = getLocalizedText(3, "Disable"),
-        data     = nil,
         callback = function()
-            --[[
-            self:getModelOptionSelectorWithName("Skill"):setCurrentOptionIndex(1)
-                :setButtonsEnabled(false)
-                :setOptionIndicatorTouchEnabled(false)
-            ]]
+            self.m_MaxBaseSkillPoints   = nil
+            self.m_SkillConfigurationID = nil
+
+            self.m_View:setOverviewText(generateOverviewText(self))
+            setStateMain(self)
         end,
     }}
     for points = MIN_POINTS, MAX_POINTS, POINTS_PER_STEP do
         items[#items + 1] = {
-            name     = "" .. points,
-            data     = points,
+            name     = (points == 100) and ("100" .. "(" .. getLocalizedText(3, "Default") .. ")") or ("" .. points),
             callback = function()
-                --[[
-                self:getModelOptionSelectorWithName("Skill"):setButtonsEnabled(true)
-                    :setOptionIndicatorTouchEnabled(true)
-                ]]
+                self.m_MaxBaseSkillPoints = points
+
+                self.m_View:setOverviewText(generateOverviewText(self))
+                setStateMain(self)
             end,
         }
     end
@@ -308,12 +332,34 @@ function ModelWarConfiguratorRenewal:setCallbackOnButtonConfirmTouched(callback)
     return self
 end
 
+function ModelWarConfiguratorRenewal:setModeAsCreatingWar()
+    self.m_Mode = "modeCreate"
+
+    return self
+end
+
+function ModelWarConfiguratorRenewal:setModeAsJoiningWar()
+    self.m_Mode = "modeJoin"
+
+    return self
+end
+
+function ModelWarConfiguratorRenewal:setModeAsContinuingWar()
+    self.m_Mode = "modeContinue"
+
+    return self
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarConfiguratorRenewal:resetWithWarConfiguration(warConfiguration)
-    self.m_WarConfigurationOrigin   = warConfiguration
-    self.m_WarConfigurationModified = TableFunctions.deepClone(warConfiguration)
+    self.m_WarConfiguration = warConfiguration
+    if (self.m_Mode == "modeCreate") then
+        self.m_MaxBaseSkillPoints = 100
+    end
+
+    self.m_View:setOverviewText(generateOverviewText(self))
     setStateMain(self)
 
     return self
@@ -383,7 +429,7 @@ function ModelWarConfiguratorRenewal:setPasswordEnabled(enabled)
 end
 
 function ModelWarConfiguratorRenewal:getWarFieldFileName()
-    return self.m_WarConfigurationModified.warFieldFileName
+    return self.m_WarConfiguration.warFieldFileName
 end
 
 function ModelWarConfiguratorRenewal:setWarId(warID)
