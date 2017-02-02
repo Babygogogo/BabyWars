@@ -6,20 +6,25 @@ local WAR_FIELD_PATH = "res.data.templateWarField."
 local string, pairs, ipairs, require = string, pairs, ipairs, require
 
 local s_IsInitialized          = false
+local s_WarFieldFileNameList
 local s_WarFieldList
 local s_WarFieldListDeprecated = {}
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createWarFieldList()
+local function loadWarFieldFileNameList()
+    return require(WAR_FIELD_PATH .. "WarFieldList")
+end
+
+local function createWarFieldList(warFieldFileNameList)
     local list = {}
-    for _, warFieldFileName in ipairs(require(WAR_FIELD_PATH .. "WarFieldList")) do
+    for _, warFieldFileName in ipairs(warFieldFileNameList) do
         list[warFieldFileName] = require(WAR_FIELD_PATH .. warFieldFileName)
     end
 
     for warFieldFileName, warFieldData in pairs(list) do
-        if (string.find(warFieldFileName, "Random", 1, true) == 1) then
+        if (WarFieldManager.isRandomWarField(warFieldFileName)) then
             local candidateList = warFieldData.list
             assert(#candidateList > 0, "WarFieldManager-createWarFieldList() the candidateList of the random map is invalid: " .. warFieldFileName)
 
@@ -39,10 +44,15 @@ function WarFieldManager.init()
     if (not s_IsInitialized) then
         s_IsInitialized = true
 
-        s_WarFieldList = createWarFieldList()
+        s_WarFieldFileNameList = loadWarFieldFileNameList()
+        s_WarFieldList         = createWarFieldList(s_WarFieldFileNameList)
     end
 
     return WarFieldManager
+end
+
+function WarFieldManager.isRandomWarField(warFieldFileName)
+    return (string.find(warFieldFileName, "Random", 1, true) == 1)
 end
 
 function WarFieldManager.getWarFieldData(warFieldFileName)
@@ -57,8 +67,13 @@ function WarFieldManager.getWarFieldData(warFieldFileName)
     end
 end
 
+function WarFieldManager.getWarFieldFileNameList()
+    assert(s_IsInitialized, "WarFieldManager.getWarFieldFileNameList() the manager has not been initialized yet.")
+    return s_WarFieldFileNameList
+end
+
 function WarFieldManager.getWarFieldName(warFieldFileName)
-    return s_WarFieldList[warFieldFileName].warFieldName
+    return WarFieldManager.getWarFieldData(warFieldFileName).warFieldName
 end
 
 return WarFieldManager

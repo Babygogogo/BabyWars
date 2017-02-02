@@ -1,7 +1,6 @@
 
 local ModelNewWarCreator = class("ModelNewWarCreator")
 
-local WarFieldList              = require("res.data.templateWarField.WarFieldList")
 local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
@@ -21,10 +20,6 @@ local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePoints
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getWarFieldName(fileName)
-    return require("res.data.templateWarField." .. fileName).warFieldName
-end
-
 local function resetSelectorPlayerIndex(modelWarConfigurator, playersCount)
     local options = {}
     for i = 1, playersCount do
@@ -246,23 +241,20 @@ end
 
 local function initWarFieldList(self, list)
     local list = {}
-    for _, warFieldFileName in ipairs(WarFieldList) do
+    for _, warFieldFileName in ipairs(WarFieldManager.getWarFieldFileNameList()) do
         list[#list + 1] = {
-            name     = getWarFieldName(warFieldFileName),
+            name     = WarFieldManager.getWarFieldName(warFieldFileName),
             callback = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
-                if (self.m_View) then
-                    self.m_View:setButtonNextVisible(true)
-                end
+                self.m_View:setButtonNextVisible(true)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
                     resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warFieldFileName)
-                    if (self.m_View) then
-                        self.m_View:setMenuVisible(false)
-                            :setButtonNextVisible(false)
-                    end
+
+                    self.m_View:setMenuVisible(false)
+                        :setButtonNextVisible(false)
                 end
             end,
         }
@@ -276,10 +268,6 @@ end
 --------------------------------------------------------------------------------
 function ModelNewWarCreator:ctor(param)
     initWarFieldList(self)
-
-    if (self.m_View) then
-        self:initView()
-    end
 
     return self
 end
