@@ -1,10 +1,13 @@
 
 local ModelWarConfiguratorRenewal = class("ModelWarConfiguratorRenewal")
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
-local WarFieldManager       = require("src.app.utilities.WarFieldManager")
+local Actor                     = require("src.global.actors.Actor")
+local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
+local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
+local WarFieldManager           = require("src.app.utilities.WarFieldManager")
 
+local string           = string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
@@ -21,8 +24,34 @@ end
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function generatePlayerColorText(playerIndex)
+    if     (playerIndex == 1) then return string.format("1 (%s)", getLocalizedText(34, "Red"))
+    elseif (playerIndex == 2) then return string.format("2 (%s)", getLocalizedText(34, "Blue"))
+    elseif (playerIndex == 3) then return string.format("3 (%s)", getLocalizedText(34, "Yellow"))
+    elseif (playerIndex == 4) then return string.format("4 (%s)", getLocalizedText(34, "Black"))
+    else                           error("ModelWarConfiguratorRenewal-generatePlayerColorText() invalid playerIndex: " .. (playerIndex or ""))
+    end
+end
+
+local function generateSkillDescription(self)
+    if (not self.m_SkillConfigurationID) then
+        return getLocalizedText(14, "None")
+    elseif (not self.m_ModelSkillConfiguration) then
+        return getLocalizedText(14, "RetrievingSkillConfiguration")
+    else
+        return SkillDescriptionFunctions.getBriefDescription(self.m_ModelSkillConfiguration)
+    end
+end
+
 local function generateOverviewText(self)
-    return "asdf"
+    return string.format("%s:\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n",
+        getLocalizedText(14, "Overview"),
+        getLocalizedText(14, "WarFieldName"),       WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
+        getLocalizedText(14, "PlayerIndex"),        generatePlayerColorText(self.m_PlayerIndex),
+        getLocalizedText(14, "FogOfWar"),           getLocalizedText(14, (self.m_IsFogOfWar) and ("Yes") or ("No")),
+        getLocalizedText(14, "MaxBaseSkillPoints"), (self.m_MaxBaseSkillPoints) and ("" .. self.m_MaxBaseSkillPoints) or (getLocalizedText(14, "DisableSkills")),
+        getLocalizedText(14, "SkillConfiguration"), generateSkillDescription(self)
+    )
 end
 
 local function createItemsForStateMain(self)
@@ -52,6 +81,8 @@ local function createItemsForStateMain(self)
     end
 end
 
+local setStateMain
+
 local function createItemsForStatePlayerIndex(self)
     local warConfiguration = self.m_WarConfiguration
     local players          = warConfiguration.players
@@ -59,17 +90,14 @@ local function createItemsForStatePlayerIndex(self)
 
     for playerIndex = 1, WarFieldManager.getPlayersCount(warConfiguration.warFieldFileName) do
         if ((not players) or (not players[playerIndex])) then
-            local colorText
-            if     (playerIndex == 1) then colorText = "Red"
-            elseif (playerIndex == 2) then colorText = "Blue"
-            elseif (playerIndex == 3) then colorText = "Yellow"
-            else                           colorText = "Black"
-            end
-
             items[#items + 1] = {
-                name     = string.format("%d (%s)", playerIndex, getLocalizedText(34, colorText)),
+                name     = generatePlayerColorText(playerIndex),
                 data     = playerIndex,
                 callback = function()
+                    self.m_PlayerIndex = playerIndex
+
+                    self.m_View:setOverviewText(generateOverviewText(self))
+                    setStateMain(self)
                 end,
             }
         end
@@ -88,7 +116,7 @@ local function setStateFogOfWar(self)
         :setItems(self.m_ItemsForStateFogOfWar)
 end
 
-local function setStateMain(self)
+setStateMain = function(self)
     self.m_State = "stateMain"
     self.m_View:setMenuTitleText(getLocalizedText(1, "NewGame"))
         :setItems(createItemsForStateMain(self))
@@ -186,11 +214,19 @@ local function initItemsForStateFogOfWar(self)
         {
             name     = getLocalizedText(9, false),
             callback = function()
+                self.m_IsFogOfWar = false
+
+                self.m_View:setOverviewText(generateOverviewText(self))
+                setStateMain(self)
             end,
         },
         {
             name     = getLocalizedText(9, true),
             callback = function()
+                self.m_IsFogOfWar = true
+
+                self.m_View:setOverviewText(generateOverviewText(self))
+                setStateMain(self)
             end,
         },
     }
@@ -198,7 +234,7 @@ end
 
 local function initItemsForStateMaxBaseSkillPoints(self)
     local items = {{
-        name     = getLocalizedText(3, "Disable"),
+        name     = getLocalizedText(14, "DisableSkills"),
         callback = function()
             self.m_MaxBaseSkillPoints   = nil
             self.m_SkillConfigurationID = nil
@@ -258,8 +294,12 @@ end
 local function initItemsForStateSkillConfiguration(self)
     local items = {{
         name     = getLocalizedText(3, "None"),
-        data     = nil,
         callback = function()
+            self.m_SkillConfigurationID    = nil
+            self.m_ModelSkillConfiguration = nil
+
+            self.m_View:setOverviewText(generateOverviewText(self))
+            setStateMain(self)
         end,
     }}
 
@@ -283,16 +323,12 @@ local function initItemsForStateSkillConfiguration(self)
         local presetName = presetData.name
         items[#items + 1] = {
             name     = presetName,
-            data     = -i,
             callback = function()
-                --[[
-                local modelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
-                self:setPopUpPanelEnabled(true)
-                    :setPopUpPanelText(string.format("%s %s:\n%s",
-                        getLocalizedText(3, "Configuration"), presetName,
-                        SkillDescriptionFunctions.getBriefDescription(modelSkillConfiguration)
-                    ))
-                ]]
+                self.m_SkillConfigurationID    = -i
+                self.m_ModelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
+
+                self.m_View:setOverviewText(generateOverviewText(self))
+                setStateMain(self)
             end,
         }
     end
@@ -356,7 +392,12 @@ end
 function ModelWarConfiguratorRenewal:resetWithWarConfiguration(warConfiguration)
     self.m_WarConfiguration = warConfiguration
     if (self.m_Mode == "modeCreate") then
-        self.m_MaxBaseSkillPoints = 100
+        self.m_PlayerIndex          = 1
+        self.m_MaxBaseSkillPoints   = 100
+        self.m_SkillConfigurationID = 1
+        self.m_IsFogOfWar           = false
+
+        self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
     end
 
     self.m_View:setOverviewText(generateOverviewText(self))

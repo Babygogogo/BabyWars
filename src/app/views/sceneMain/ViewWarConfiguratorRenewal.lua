@@ -427,4 +427,10 @@ function ViewWarConfiguratorRenewal:setOverviewText(text)
     return self
 end
 
+function ViewWarConfiguratorRenewal:setButtonConfirmText(text)
+    self.m_ButtonConfirm:setTitleText(text)
+
+    return self
+end
+
 return ViewWarConfiguratorRenewal

@@ -732,12 +732,42 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [14] = {
-        [1] = function(...) return s_LongText3_1     end,
-        [2] = function(...) return "Untranslated..." end,
+        [1] = function(textType)
+            if     (textType == "ConfirmCreateWar")             then return "确 认 新 建 战 局"
+            elseif (textType == "DisableSkills")                then return "禁用技能"
+            elseif (textType == "FogOfWar")                     then return "战争迷雾"
+            elseif (textType == "IntervalUntilBoot")            then return "回合限时"
+            elseif (textType == "MaxBaseSkillPoints")           then return "全员技能基准点上限"
+            elseif (textType == "No")                           then return "否"
+            elseif (textType == "None")                         then return "无"
+            elseif (textType == "Overview")                     then return "战局设定总览"
+            elseif (textType == "PlayerIndex")                  then return "行动次序"
+            elseif (textType == "RetrievingSkillConfiguration") then return "正在获取技能数据，请稍候。"
+            elseif (textType == "SkillConfiguration")           then return "我方技能配置"
+            elseif (textType == "WarFieldName")                 then return "地图名称"
+            elseif (textType == "Yes")                          then return "是"
+            else                                                     return "未知14:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "ConfirmCreateWar")             then return "Confirm"
+            elseif (textType == "DisableSkills")                then return "Disable Skills"
+            elseif (textType == "FogOfWar")                     then return "Fog of War"
+            elseif (textType == "IntervalUntilBoot")            then return "Interval until Boot"
+            elseif (textType == "MaxBaseSkillPoints")           then return "Max Skill Points"
+            elseif (textType == "No")                           then return "No"
+            elseif (textType == "None")                         then return "None"
+            elseif (textType == "Overview")                     then return "Overview"
+            elseif (textType == "PlayerIndex")                  then return "Player Index"
+            elseif (textType == "RetrievingSkillConfiguration") then return "Retrieving data..."
+            elseif (textType == "SkillConfiguration")           then return "Skill Configuration"
+            elseif (textType == "WarFieldName")                 then return "Map"
+            elseif (textType == "Yes")                          then return "Yes"
+            else                                                     return "Unknown14:" .. (textType or "")
+            end
+        end,
     },
-    --]]
     [15] = {
         [1] = function(...) return "账 号："  end,
         [2] = function(...) return "Account:" end,

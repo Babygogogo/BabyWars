@@ -99,18 +99,11 @@ local function initWarFieldList(self, list)
         list[#list + 1] = {
             name     = WarFieldManager.getWarFieldName(warFieldFileName),
             callback = function()
+                self.m_WarFieldFileName = warFieldFileName
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setEnabled(true)
+
                 self.m_View:setButtonNextVisible(true)
-
-                self.m_OnButtonNextTouched = function()
-                    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-                    getActorWarConfigurator(self):getModel():resetWithWarConfiguration({warFieldFileName = warFieldFileName})
-                        :setEnabled(true)
-
-                    self.m_View:setMenuVisible(false)
-                        :setButtonNextVisible(false)
-                end
             end,
         }
     end
@@ -189,7 +182,12 @@ function ModelNewWarCreator:onButtonBackTouched()
 end
 
 function ModelNewWarCreator:onButtonNextTouched()
-    self.m_OnButtonNextTouched()
+    getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+    getActorWarConfigurator(self):getModel():resetWithWarConfiguration({warFieldFileName = self.m_WarFieldFileName})
+        :setEnabled(true)
+
+    self.m_View:setMenuVisible(false)
+        :setButtonNextVisible(false)
 
     return self
 end
