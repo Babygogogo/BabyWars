@@ -13,8 +13,9 @@ local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local string           = string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
+local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
+local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 local function initSelectorWeather(modelWarConfigurator)
     -- TODO: enable the selector.
@@ -54,7 +55,7 @@ local function generateSkillDescription(self)
 end
 
 local function generateOverviewText(self)
-    return string.format("%s:\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n",
+    return string.format("%s:\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s",
         getLocalizedText(14, "Overview"),
         getLocalizedText(14, "WarFieldName"),       WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
         getLocalizedText(14, "PlayerIndex"),        generatePlayerColorText(self.m_PlayerIndex),
@@ -106,12 +107,10 @@ local function createItemsForStatePlayerIndex(self)
         if ((not players) or (not players[playerIndex])) then
             items[#items + 1] = {
                 name     = generatePlayerColorText(playerIndex),
-                data     = playerIndex,
                 callback = function()
                     self.m_PlayerIndex = playerIndex
 
-                    self.m_View:setOverviewText(generateOverviewText(self))
-                    setStateMain(self)
+                    setStateMain(self, true)
                 end,
             }
         end
@@ -119,6 +118,16 @@ local function createItemsForStatePlayerIndex(self)
 
     assert(#items > 1)
     return items
+end
+
+--------------------------------------------------------------------------------
+-- The functions for sending actions.
+--------------------------------------------------------------------------------
+local function sendActionGetSkillConfiguration(skillConfigurationID)
+    WebSocketManager.sendAction({
+        actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
+        skillConfigurationID = skillConfigurationID,
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -136,10 +145,14 @@ local function setStateIntervalUntilBoot(self)
         :setItems(self.m_ItemsForStateIntervalUntilBoot)
 end
 
-setStateMain = function(self)
+setStateMain = function(self, shouldUpdateOverview)
     self.m_State = "stateMain"
     self.m_View:setMenuTitleText(getLocalizedText(1, "NewGame"))
         :setItems(createItemsForStateMain(self))
+
+    if (shouldUpdateOverview) then
+        self.m_View:setOverviewText(generateOverviewText(self))
+    end
 end
 
 local function setStateMaxBaseSkillPoints(self)
@@ -245,8 +258,7 @@ local function initItemsForStateFogOfWar(self)
             callback = function()
                 self.m_IsFogOfWar = false
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         },
         {
@@ -254,8 +266,7 @@ local function initItemsForStateFogOfWar(self)
             callback = function()
                 self.m_IsFogOfWar = true
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         },
     }
@@ -269,8 +280,7 @@ local function initItemsForStateIntervalUntilBoot(self)
             callback = function()
                 self.m_IntervalUntilBoot = interval
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end
         }
     end
@@ -285,8 +295,7 @@ local function initItemsForStateMaxBaseSkillPoints(self)
             self.m_MaxBaseSkillPoints   = nil
             self.m_SkillConfigurationID = nil
 
-            self.m_View:setOverviewText(generateOverviewText(self))
-            setStateMain(self)
+            setStateMain(self, true)
         end,
     }}
     for points = MIN_POINTS, MAX_POINTS, POINTS_PER_STEP do
@@ -295,8 +304,7 @@ local function initItemsForStateMaxBaseSkillPoints(self)
             callback = function()
                 self.m_MaxBaseSkillPoints = points
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         }
     end
@@ -312,8 +320,7 @@ local function initItemsForStateMaxDiffScore(self)
             callback = function()
                 self.m_MaxDiffScore = maxDiffScore
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         }
     end
@@ -322,8 +329,7 @@ local function initItemsForStateMaxDiffScore(self)
         callback = function()
             self.m_MaxDiffScore = nil
 
-            self.m_View:setOverviewText(generateOverviewText(self))
-            setStateMain(self)
+            setStateMain(self, true)
         end,
     }
 
@@ -337,8 +343,7 @@ local function initItemsForStateRankMatch(self)
             callback = function()
                 self.m_IsRankMatch = false
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         },
         {
@@ -346,8 +351,7 @@ local function initItemsForStateRankMatch(self)
             callback = function()
                 self.m_IsRankMatch = true
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         },
     }
@@ -360,8 +364,7 @@ local function initItemsForStateSkillConfiguration(self)
             self.m_SkillConfigurationID    = nil
             self.m_ModelSkillConfiguration = nil
 
-            self.m_View:setOverviewText(generateOverviewText(self))
-            setStateMain(self)
+            setStateMain(self, true)
         end,
     }}
 
@@ -369,14 +372,12 @@ local function initItemsForStateSkillConfiguration(self)
     for i = 1, SkillDataAccessors.getSkillConfigurationsCount() do
         items[#items + 1] = {
             name     = prefix .. i,
-            data     = i,
             callback = function()
-                --[[
-                WebSocketManager.sendAction({
-                    actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
-                    skillConfigurationID = i
-                })
-                ]]
+                self.m_SkillConfigurationID    = i
+                self.m_ModelSkillConfiguration = nil
+                sendActionGetSkillConfiguration(i)
+
+                setStateMain(self, true)
             end,
         }
     end
@@ -389,8 +390,7 @@ local function initItemsForStateSkillConfiguration(self)
                 self.m_SkillConfigurationID    = -i
                 self.m_ModelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", presetData)
 
-                self.m_View:setOverviewText(generateOverviewText(self))
-                setStateMain(self)
+                setStateMain(self, true)
             end,
         }
     end
@@ -465,11 +465,11 @@ function ModelWarConfiguratorRenewal:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex             = 1
         self.m_SkillConfigurationID    = 1
 
+        sendActionGetSkillConfiguration(1)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
     end
 
-    self.m_View:setOverviewText(generateOverviewText(self))
-    setStateMain(self)
+    setStateMain(self, true)
 
     return self
 end
@@ -483,31 +483,19 @@ function ModelWarConfiguratorRenewal:setEnabled(enabled)
 
     if (self.m_View) then
         self.m_View:setVisible(enabled)
-            :setPopUpPanelEnabled(false)
     end
 
     return self
 end
 
-function ModelWarConfiguratorRenewal:isPopUpPanelEnabled()
-    if (self.m_View) then
-        return self.m_View:isPopUpPanelEnabled()
-    else
-        return false
-    end
+function ModelWarConfiguratorRenewal:isRetrievingSkillConfiguration(skillConfigurationID)
+    return (self.m_SkillConfigurationID == skillConfigurationID) and (not self.m_ModelSkillConfiguration)
 end
 
-function ModelWarConfiguratorRenewal:setPopUpPanelEnabled(enabled)
-    if (self.m_View) then
-        self.m_View:setPopUpPanelEnabled(enabled)
-    end
-
-    return self
-end
-
-function ModelWarConfiguratorRenewal:setPopUpPanelText(text)
-    if (self.m_View) then
-        self.m_View:setPopUpPanelText(text)
+function ModelWarConfiguratorRenewal:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    if (self:isRetrievingSkillConfiguration(skillConfigurationID)) then
+        self.m_ModelSkillConfiguration = Actor.createModel("common.ModelSkillConfiguration", skillConfiguration)
+        self.m_View:setOverviewText(generateOverviewText(self))
     end
 
     return self

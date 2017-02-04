@@ -6,9 +6,6 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local POPUP_SCROLLVIEW_Z_ORDER    = 3
-local POPUP_BACKGROUND_Z_ORDER    = 2
-local POPUP_GREY_MASK_Z_ORDER     = 1
 local MENU_TITLE_Z_ORDER          = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local BUTTON_BACK_Z_ORDER         = 1
@@ -63,7 +60,6 @@ local FONT_COLOR         = {r = 255, g = 255, b = 255}
 local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
 local FONT_OUTLINE_WIDTH = 2
 local ITEM_FONT_SIZE     = 25
-local POPUP_FONT_SIZE    = 18
 local OVERVIEW_FONT_SIZE = 18
 
 local BACKGROUND_NAME      = "c03_t01_s01_f01.png"
@@ -79,16 +75,6 @@ local OVERVIEW_SCROLLVIEW_WIDTH  = OVERVIEW_BACKGROUND_WIDTH  - 7
 local OVERVIEW_SCROLLVIEW_HEIGHT = OVERVIEW_BACKGROUND_HEIGHT - 11
 local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
 local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
-
-local POPUP_BACKGROUND_WIDTH  = display.width  * 0.7
-local POPUP_BACKGROUND_HEIGHT = display.height * 0.8
-local POPUP_BACKGROUND_POS_X  = (display.width  - POPUP_BACKGROUND_WIDTH)  / 2
-local POPUP_BACKGROUND_POS_Y  = (display.height - POPUP_BACKGROUND_HEIGHT) / 2
-
-local POPUP_SCROLLVIEW_WIDTH  = POPUP_BACKGROUND_WIDTH  - 7
-local POPUP_SCROLLVIEW_HEIGHT = POPUP_BACKGROUND_HEIGHT - 11
-local POPUP_SCROLLVIEW_POS_X  = POPUP_BACKGROUND_POS_X + 5
-local POPUP_SCROLLVIEW_POS_Y  = POPUP_BACKGROUND_POS_Y + 5
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -279,56 +265,6 @@ local function initOverview(self)
         :addChild(scrollView, OVERVIEW_SCROLLVIEW_Z_ORDER)
 end
 
-local function initPopUpPanel(self)
-    local mask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
-    mask:setContentSize(display.width, display.height)
-        :ignoreAnchorPointForPosition(true)
-
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
-    background:ignoreAnchorPointForPosition(true)
-        :setPosition(POPUP_BACKGROUND_POS_X, POPUP_BACKGROUND_POS_Y)
-        :setContentSize(POPUP_BACKGROUND_WIDTH, POPUP_BACKGROUND_HEIGHT)
-
-    local scrollView = ccui.ScrollView:create()
-    scrollView:setContentSize(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(POPUP_SCROLLVIEW_POS_X, POPUP_SCROLLVIEW_POS_Y)
-
-    local label = cc.Label:createWithTTF("", FONT_NAME, POPUP_FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setDimensions(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
-        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
-    scrollView:addChild(label)
-
-    self.m_PopUpGreyMask   = mask
-    self.m_PopUpBackground = background
-    self.m_PopUpScrollView = scrollView
-    self.m_PopUpLabel      = label
-    self:addChild(mask,       POPUP_GREY_MASK_Z_ORDER)
-        :addChild(background, POPUP_BACKGROUND_Z_ORDER)
-        :addChild(scrollView, POPUP_SCROLLVIEW_Z_ORDER)
-end
-
-local function initPopUpTouchListener(self)
-    local listener = cc.EventListenerTouchOneByOne:create()
-    listener:setSwallowTouches(true)
-    local isTouchWithinBackground = false
-
-    listener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = DisplayNodeFunctions.isTouchWithinNode(touch, self.m_PopUpBackground)
-        return true
-    end, cc.Handler.EVENT_TOUCH_BEGAN)
-
-    listener:registerScriptHandler(function(touch, event)
-        if (not isTouchWithinBackground) then
-            self:setPopUpPanelEnabled(false)
-        end
-    end, cc.Handler.EVENT_TOUCH_ENDED)
-
-    self.m_PopUpTouchListener = listener
-    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self.m_PopUpBackground)
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -341,10 +277,6 @@ function ViewWarConfiguratorRenewal:ctor()
     initButtonBack(        self)
     initButtonConfirm(     self)
     initOverview(          self)
-    initPopUpPanel(        self)
-    initPopUpTouchListener(self)
-
-    self:setPopUpPanelEnabled(false)
 
     return self
 end
@@ -382,30 +314,6 @@ function ViewWarConfiguratorRenewal:disableButtonConfirmForSecs(secs)
                 self.m_ButtonConfirm:setEnabled(true)
             end)
         ))
-
-    return self
-end
-
-function ViewWarConfiguratorRenewal:isPopUpPanelEnabled(enabled)
-    return self.m_PopUpGreyMask:isVisible()
-end
-
-function ViewWarConfiguratorRenewal:setPopUpPanelEnabled(enabled)
-    self.m_PopUpGreyMask     :setVisible(enabled)
-    self.m_PopUpBackground   :setVisible(enabled)
-    self.m_PopUpScrollView   :setVisible(enabled)
-    self.m_PopUpTouchListener:setEnabled(enabled)
-
-    return self
-end
-
-function ViewWarConfiguratorRenewal:setPopUpPanelText(text)
-    local label = self.m_PopUpLabel
-    label:setString(text)
-
-    local height = math.max(label:getLineHeight() * label:getStringNumLines(), POPUP_SCROLLVIEW_HEIGHT)
-    label:setDimensions(POPUP_SCROLLVIEW_WIDTH, height)
-    self.m_PopUpScrollView:setInnerContainerSize({width = POPUP_SCROLLVIEW_WIDTH, height = height})
 
     return self
 end

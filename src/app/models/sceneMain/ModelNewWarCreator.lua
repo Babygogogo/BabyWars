@@ -161,17 +161,13 @@ function ModelNewWarCreator:setEnabled(enabled)
 end
 
 function ModelNewWarCreator:isRetrievingSkillConfiguration(skillConfigurationID)
-    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
-    return (modelWarConfigurator:isPopUpPanelEnabled())                                                           and
-        (modelWarConfigurator:getModelOptionSelectorWithName("Skill"):getCurrentOption() == skillConfigurationID)
+    return getActorWarConfigurator(self):getModel():isRetrievingSkillConfiguration(skillConfigurationID)
 end
 
 function ModelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
-    getActorWarConfigurator(self):getModel():setPopUpPanelText(string.format("%s %d:\n%s",
-        getLocalizedText(3, "Configuration"),
-        skillConfigurationID,
-        SkillDescriptionFunctions.getFullDescription(Actor.createModel("common.ModelSkillConfiguration", skillConfiguration))
-    ))
+    getActorWarConfigurator(self):getModel():updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+
+    return self
 end
 
 function ModelNewWarCreator:onButtonBackTouched()
