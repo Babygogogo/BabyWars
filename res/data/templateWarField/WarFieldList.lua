@@ -26,6 +26,7 @@ return {
     "TanXinWan",
     "WangPaiKongJun",
     "WeiJiSiFu_2",
+    "WuGuangDeWuTai",
     "WuShangZhiAi",
     "YangFanYuanHang_3",
     "YunShiQun",
