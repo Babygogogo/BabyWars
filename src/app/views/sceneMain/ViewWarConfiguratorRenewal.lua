@@ -230,7 +230,7 @@ local function initButtonConfirm(self)
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-                self.m_Model:onButtonNextTouched()
+                self.m_Model:onButtonConfirmTouched()
             end
         end)
 

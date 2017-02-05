@@ -5,6 +5,7 @@ local Actor                     = require("src.global.actors.Actor")
 local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
+local SingletonGetters          = require("src.app.utilities.SingletonGetters")
 local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
 local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WarFieldManager           = require("src.app.utilities.WarFieldManager")
@@ -14,6 +15,7 @@ local string           = string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
+local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
@@ -59,9 +61,9 @@ local function generateOverviewText(self)
         getLocalizedText(14, "Overview"),
         getLocalizedText(14, "WarFieldName"),       WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
         getLocalizedText(14, "PlayerIndex"),        generatePlayerColorText(self.m_PlayerIndex),
-        getLocalizedText(14, "FogOfWar"),           getLocalizedText(14, (self.m_IsFogOfWar)  and ("Yes") or ("No")),
-        getLocalizedText(14, "RankMatch"),          getLocalizedText(14, (self.m_IsRankMatch) and ("Yes") or ("No")),
-        getLocalizedText(14, "MaxDiffScore"),       (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "None"),
+        getLocalizedText(14, "FogOfWar"),           getLocalizedText(14, (self.m_IsFogOfWarByDefault) and ("Yes") or ("No")),
+        getLocalizedText(14, "RankMatch"),          getLocalizedText(14, (self.m_IsRankMatch)         and ("Yes") or ("No")),
+        getLocalizedText(14, "MaxDiffScore"),       (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "NoLimit"),
         getLocalizedText(14, "IntervalUntilBoot"),  AuxiliaryFunctions.formatTimeInterval(self.m_IntervalUntilBoot),
         getLocalizedText(14, "MaxBaseSkillPoints"), (self.m_MaxBaseSkillPoints) and ("" .. self.m_MaxBaseSkillPoints) or (getLocalizedText(14, "DisableSkills")),
         getLocalizedText(14, "SkillConfiguration"), generateSkillDescription(self)
@@ -254,17 +256,17 @@ end
 local function initItemsForStateFogOfWar(self)
     self.m_ItemsForStateFogOfWar = {
         {
-            name     = getLocalizedText(9, false),
+            name     = getLocalizedText(14, "No"),
             callback = function()
-                self.m_IsFogOfWar = false
+                self.m_IsFogOfWarByDefault = false
 
                 setStateMain(self, true)
             end,
         },
         {
-            name     = getLocalizedText(9, true),
+            name     = getLocalizedText(14, "Yes"),
             callback = function()
-                self.m_IsFogOfWar = true
+                self.m_IsFogOfWarByDefault = true
 
                 setStateMain(self, true)
             end,
@@ -325,7 +327,7 @@ local function initItemsForStateMaxDiffScore(self)
         }
     end
     items[#items + 1] = {
-        name     = getLocalizedText(13, "NoLimit"),
+        name     = getLocalizedText(14, "NoLimit"),
         callback = function()
             self.m_MaxDiffScore = nil
 
@@ -339,7 +341,7 @@ end
 local function initItemsForStateRankMatch(self)
     self.m_ItemsForStateRankMatch = {
         {
-            name     = getLocalizedText(34, "No"),
+            name     = getLocalizedText(14, "No"),
             callback = function()
                 self.m_IsRankMatch = false
 
@@ -347,7 +349,7 @@ local function initItemsForStateRankMatch(self)
             end,
         },
         {
-            name     = getLocalizedText(34, "Yes"),
+            name     = getLocalizedText(14, "Yes"),
             callback = function()
                 self.m_IsRankMatch = true
 
@@ -359,7 +361,7 @@ end
 
 local function initItemsForStateSkillConfiguration(self)
     local items = {{
-        name     = getLocalizedText(3, "None"),
+        name     = getLocalizedText(14, "None"),
         callback = function()
             self.m_SkillConfigurationID    = nil
             self.m_ModelSkillConfiguration = nil
@@ -426,26 +428,55 @@ function ModelWarConfiguratorRenewal:setCallbackOnButtonBackTouched(callback)
     return self
 end
 
-function ModelWarConfiguratorRenewal:setCallbackOnButtonConfirmTouched(callback)
-    self.m_OnButtonConfirmTouched = callback
+function ModelWarConfiguratorRenewal:setModeCreateWar()
+    self.m_Mode                           = "modeCreate"
+    self.m_CallbackOnButtonConfirmTouched = function()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
+        modelConfirmBox:setConfirmText(getLocalizedText(8, "NewWarConfirmation"))
+            :setOnConfirmYes(function()
+                local password = "" -- self.m_WarPassword
+                if ((#password ~= 0) and (#password ~= 4)) then
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "InvalidWarPassword"))
+                else
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
+                    self.m_View:disableButtonConfirmForSecs(5)
+
+                    WebSocketManager.sendAction({
+                        actionCode           = ACTION_CODE_NEW_WAR,
+                        defaultWeatherCode   = 1, --TODO: add an option for the weather.
+                        intervalUntilBoot    = self.m_IntervalUntilBoot,
+                        isFogOfWarByDefault  = self.m_IsFogOfWarByDefault,
+                        isRankMatch          = self.m_IsRankMatch,
+                        maxBaseSkillPoints   = self.m_MaxBaseSkillPoints,
+                        maxDiffScore         = self.m_MaxDiffScore,
+                        playerIndex          = self.m_PlayerIndex,
+                        skillConfigurationID = self.m_SkillConfigurationID,
+                        warPassword          = password,
+                        warFieldFileName     = self.m_WarConfiguration.warFieldFileName,
+                    })
+                end
+                modelConfirmBox:setEnabled(false)
+            end)
+            :setEnabled(true)
+    end
 
     return self
 end
 
-function ModelWarConfiguratorRenewal:setModeAsCreatingWar()
-    self.m_Mode = "modeCreate"
-
-    return self
-end
-
-function ModelWarConfiguratorRenewal:setModeAsJoiningWar()
+function ModelWarConfiguratorRenewal:setModeJoinWar()
     self.m_Mode = "modeJoin"
 
     return self
 end
 
-function ModelWarConfiguratorRenewal:setModeAsContinuingWar()
+function ModelWarConfiguratorRenewal:setModeContinueWar()
     self.m_Mode = "modeContinue"
+
+    return self
+end
+
+function ModelWarConfiguratorRenewal:onStartRunning(modelSceneMain)
+    self.m_ModelSceneMain = modelSceneMain
 
     return self
 end
@@ -457,7 +488,7 @@ function ModelWarConfiguratorRenewal:resetWithWarConfiguration(warConfiguration)
     self.m_WarConfiguration = warConfiguration
     if (self.m_Mode == "modeCreate") then
         self.m_IntervalUntilBoot       = 3600 * 24 * 3
-        self.m_IsFogOfWar              = false
+        self.m_IsFogOfWarByDefault     = false
         self.m_IsRankMatch             = false
         self.m_MaxBaseSkillPoints      = 100
         self.m_MaxDiffScore            = 100
@@ -502,11 +533,7 @@ function ModelWarConfiguratorRenewal:updateWithSkillConfiguration(skillConfigura
 end
 
 function ModelWarConfiguratorRenewal:getPassword()
-    if (not self.m_View) then
-        return nil
-    else
-        return self.m_View:getEditBoxPassword():getText()
-    end
+    --return self.m_View:getEditBoxPassword():getText()
 end
 
 function ModelWarConfiguratorRenewal:setPassword(password)
@@ -523,10 +550,6 @@ function ModelWarConfiguratorRenewal:setPasswordEnabled(enabled)
     end
 
     return self
-end
-
-function ModelWarConfiguratorRenewal:getWarFieldFileName()
-    return self.m_WarConfiguration.warFieldFileName
 end
 
 function ModelWarConfiguratorRenewal:setWarId(warID)
@@ -558,8 +581,8 @@ function ModelWarConfiguratorRenewal:disableButtonConfirmForSecs(secs)
 end
 
 function ModelWarConfiguratorRenewal:onButtonConfirmTouched()
-    if (self.m_OnButtonConfirmTouched) then
-        self.m_OnButtonConfirmTouched()
+    if (self.m_CallbackOnButtonConfirmTouched) then
+        self.m_CallbackOnButtonConfirmTouched()
     end
 
     return self
