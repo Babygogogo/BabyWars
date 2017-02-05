@@ -36,6 +36,7 @@ return {
 
     "BeiPan",                   -- 4p
     "DuiKangZhaoTianTong",
+    "ShiJieDaZhan",
     "XiaoGuoZhengBaSai",
     "XuanZe_2",
 
