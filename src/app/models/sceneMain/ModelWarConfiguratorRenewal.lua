@@ -16,6 +16,7 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
+local ACTION_CODE_JOIN_WAR                    = ActionCodeFunctions.getActionCode("ActionJoinWar")
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
@@ -88,9 +89,19 @@ local function createItemsForStateMain(self)
         return items
 
     elseif (mode == "modeJoin") then
-        return {
+        local items = {}
+        if (#self.m_ItemsForStatePlayerIndex > 1) then
+            items[#items + 1] = self.m_ItemPlayerIndex
+        end
+        if (self.m_MaxBaseSkillPoints) then
+            items[#items + 1] = self.m_ItemSkillConfiguration
+        end
+        if (#items == 0) then
+            items[#items + 1] = self.m_ItemPlaceHolder
+        end
 
-        }
+        return items
+
     elseif (mode == "modeContinue") then
         return {
 
@@ -108,8 +119,9 @@ local function createItemsForStatePlayerIndex(self)
     for playerIndex = 1, WarFieldManager.getPlayersCount(warConfiguration.warFieldFileName) do
         if ((not players) or (not players[playerIndex])) then
             items[#items + 1] = {
-                name     = generatePlayerColorText(playerIndex),
-                callback = function()
+                playerIndex = playerIndex,
+                name        = generatePlayerColorText(playerIndex),
+                callback    = function()
                     self.m_PlayerIndex = playerIndex
 
                     setStateMain(self, true)
@@ -118,7 +130,7 @@ local function createItemsForStatePlayerIndex(self)
         end
     end
 
-    assert(#items > 1)
+    assert(#items > 0)
     return items
 end
 
@@ -129,6 +141,32 @@ local function sendActionGetSkillConfiguration(skillConfigurationID)
     WebSocketManager.sendAction({
         actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
         skillConfigurationID = skillConfigurationID,
+    })
+end
+
+local function sendActionJoinWar(self)
+    WebSocketManager.sendAction({
+        actionCode           = ACTION_CODE_JOIN_WAR,
+        playerIndex          = self.m_PlayerIndex,
+        skillConfigurationID = self.m_SkillConfigurationID,
+        warID                = self.m_WarConfiguration.warID,
+        warPassword          = "", -- TODO: self.m_WarPassword,
+    })
+end
+
+local function sendActionNewWar(self)
+    WebSocketManager.sendAction({
+        actionCode           = ACTION_CODE_NEW_WAR,
+        defaultWeatherCode   = 1, --TODO: add an option for the weather.
+        intervalUntilBoot    = self.m_IntervalUntilBoot,
+        isFogOfWarByDefault  = self.m_IsFogOfWarByDefault,
+        isRankMatch          = self.m_IsRankMatch,
+        maxBaseSkillPoints   = self.m_MaxBaseSkillPoints,
+        maxDiffScore         = self.m_MaxDiffScore,
+        playerIndex          = self.m_PlayerIndex,
+        skillConfigurationID = self.m_SkillConfigurationID,
+        warPassword          = "", -- TODO: self.m_WarPassword,
+        warFieldFileName     = self.m_WarConfiguration.warFieldFileName,
     })
 end
 
@@ -149,7 +187,7 @@ end
 
 setStateMain = function(self, shouldUpdateOverview)
     self.m_State = "stateMain"
-    self.m_View:setMenuTitleText(getLocalizedText(1, "NewGame"))
+    self.m_View:setMenuTitleText(self.m_MenuTitleTextForMode)
         :setItems(createItemsForStateMain(self))
 
     if (shouldUpdateOverview) then
@@ -172,7 +210,7 @@ end
 local function setStatePlayerIndex(self)
     self.m_State = "statePlayerIndex"
     self.m_View:setMenuTitleText(getLocalizedText(34, "PlayerIndex"))
-        :setItems(createItemsForStatePlayerIndex(self))
+        :setItems(self.m_ItemsForStatePlayerIndex)
 end
 
 local function setStateRankMatch(self)
@@ -231,6 +269,14 @@ local function initItemPlayerIndex(self)
         name     = getLocalizedText(34, "PlayerIndex"),
         callback = function()
             setStatePlayerIndex(self)
+        end,
+    }
+end
+
+local function initItemPlaceHolder(self)
+    self.m_ItemPlaceHolder = {
+        name     = "(" .. getLocalizedText(14, "NoAvailableOption") .. ")",
+        callback = function()
         end,
     }
 end
@@ -409,6 +455,7 @@ function ModelWarConfiguratorRenewal:ctor()
     initItemMaxBaseSkillPoints(self)
     initItemMaxDiffScore(      self)
     initItemPlayerIndex(       self)
+    initItemPlaceHolder(       self)
     initItemRankMatch(         self)
     initItemSkillConfiguration(self)
 
@@ -434,26 +481,13 @@ function ModelWarConfiguratorRenewal:setModeCreateWar()
         local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(8, "NewWarConfirmation"))
             :setOnConfirmYes(function()
-                local password = "" -- self.m_WarPassword
+                local password = "" -- TODO: self.m_WarPassword
                 if ((#password ~= 0) and (#password ~= 4)) then
                     SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "InvalidWarPassword"))
                 else
                     SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
+                    sendActionNewWar(self)
                     self.m_View:disableButtonConfirmForSecs(5)
-
-                    WebSocketManager.sendAction({
-                        actionCode           = ACTION_CODE_NEW_WAR,
-                        defaultWeatherCode   = 1, --TODO: add an option for the weather.
-                        intervalUntilBoot    = self.m_IntervalUntilBoot,
-                        isFogOfWarByDefault  = self.m_IsFogOfWarByDefault,
-                        isRankMatch          = self.m_IsRankMatch,
-                        maxBaseSkillPoints   = self.m_MaxBaseSkillPoints,
-                        maxDiffScore         = self.m_MaxDiffScore,
-                        playerIndex          = self.m_PlayerIndex,
-                        skillConfigurationID = self.m_SkillConfigurationID,
-                        warPassword          = password,
-                        warFieldFileName     = self.m_WarConfiguration.warFieldFileName,
-                    })
                 end
                 modelConfirmBox:setEnabled(false)
             end)
@@ -464,7 +498,23 @@ function ModelWarConfiguratorRenewal:setModeCreateWar()
 end
 
 function ModelWarConfiguratorRenewal:setModeJoinWar()
-    self.m_Mode = "modeJoin"
+    self.m_Mode                           = "modeJoin"
+    self.m_CallbackOnButtonConfirmTouched = function()
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
+        modelConfirmBox:setConfirmText(getLocalizedText(8, "JoinWarConfirmation"))
+            :setOnConfirmYes(function()
+                local password = "" -- TODO: self.m_WarPassword
+                if ((#password ~= 0) and (#password ~= 4)) then
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "InvalidWarPassword"))
+                else
+                    SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
+                    sendActionJoinWar(self)
+                    self.m_View:disableButtonConfirmForSecs(5)
+                end
+                modelConfirmBox:setEnabled(false)
+            end)
+            :setEnabled(true)
+    end
 
     return self
 end
@@ -486,18 +536,38 @@ end
 --------------------------------------------------------------------------------
 function ModelWarConfiguratorRenewal:resetWithWarConfiguration(warConfiguration)
     self.m_WarConfiguration = warConfiguration
-    if (self.m_Mode == "modeCreate") then
-        self.m_IntervalUntilBoot       = 3600 * 24 * 3
-        self.m_IsFogOfWarByDefault     = false
-        self.m_IsRankMatch             = false
-        self.m_MaxBaseSkillPoints      = 100
-        self.m_MaxDiffScore            = 100
-        self.m_ModelSkillConfiguration = nil
-        self.m_PlayerIndex             = 1
-        self.m_SkillConfigurationID    = 1
+    local mode = self.m_Mode
+    if (mode == "modeCreate") then
+        self.m_IntervalUntilBoot        = 3600 * 24 * 3
+        self.m_IsFogOfWarByDefault      = false
+        self.m_IsRankMatch              = false
+        self.m_ItemsForStatePlayerIndex = createItemsForStatePlayerIndex(self)
+        self.m_MaxBaseSkillPoints       = 100
+        self.m_MaxDiffScore             = 100
+        self.m_MenuTitleTextForMode     = getLocalizedText(14, "CreateWar")
+        self.m_ModelSkillConfiguration  = nil
+        self.m_PlayerIndex              = 1
+        self.m_SkillConfigurationID     = 1
 
         sendActionGetSkillConfiguration(1)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
+
+    elseif (mode == "modeJoin") then
+        self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
+        self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
+        self.m_IsRankMatch              = warConfiguration.isRankMatch
+        self.m_ItemsForStatePlayerIndex = createItemsForStatePlayerIndex(self)
+        self.m_MaxBaseSkillPoints       = warConfiguration.maxBaseSkillPoints
+        self.m_MaxDiffScore             = warConfiguration.maxDiffScore
+        self.m_MenuTitleTextForMode     = getLocalizedText(14, "JoinWar")
+        self.m_ModelSkillConfiguration  = nil
+        self.m_PlayerIndex              = self.m_ItemsForStatePlayerIndex[1].playerIndex
+        self.m_SkillConfigurationID     = (warConfiguration.maxBaseSkillPoints) and (1) or (nil)
+
+        if (self.m_SkillConfigurationID) then
+            sendActionGetSkillConfiguration(1)
+        end
+        self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmJoinWar"))
     end
 
     setStateMain(self, true)
@@ -552,14 +622,8 @@ function ModelWarConfiguratorRenewal:setPasswordEnabled(enabled)
     return self
 end
 
-function ModelWarConfiguratorRenewal:setWarId(warID)
-    self.m_WarID = warID
-
-    return self
-end
-
 function ModelWarConfiguratorRenewal:getWarId()
-    return self.m_WarID
+    return self.m_WarConfiguration.warID
 end
 
 function ModelWarConfiguratorRenewal:onButtonBackTouched()
@@ -567,14 +631,6 @@ function ModelWarConfiguratorRenewal:onButtonBackTouched()
         setStateMain(self)
     elseif (self.m_OnButtonBackTouched) then
         self.m_OnButtonBackTouched()
-    end
-
-    return self
-end
-
-function ModelWarConfiguratorRenewal:disableButtonConfirmForSecs(secs)
-    if (self.m_View) then
-        self.m_View:disableButtonConfirmForSecs(secs)
     end
 
     return self
