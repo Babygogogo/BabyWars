@@ -36,5 +36,6 @@ return {
         "YangFanYuanHang_3",
         "YunShiQun",
         "ZhengZhengFangFang",
+        "ZuJiZhaoTianTong",
     },
 }
