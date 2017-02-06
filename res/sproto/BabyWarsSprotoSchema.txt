@@ -10,18 +10,19 @@
     ActionGetRankingList                5 : ActionGetRankingList
     ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
     ActionGetSkillConfiguration         7 : ActionGetSkillConfiguration
-    ActionJoinWar                       8 : ActionJoinWar
-    ActionLogin                         9 : ActionLogin
-    ActionLogout                       10 : ActionLogout
-    ActionMessage                      11 : ActionMessage
-    ActionNetworkHeartbeat             12 : ActionNetworkHeartbeat
-    ActionNewWar                       13 : ActionNewWar
-    ActionRegister                     14 : ActionRegister
-    ActionReloadSceneWar               15 : ActionReloadSceneWar
-    ActionRunSceneMain                 16 : ActionRunSceneMain
-    ActionRunSceneWar                  17 : ActionRunSceneWar
-    ActionSetSkillConfiguration        18 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 19 : ActionSyncSceneWar
+    ActionGetWaitingWarConfigurations   8 : ActionGetWaitingWarConfigurations
+    ActionJoinWar                       9 : ActionJoinWar
+    ActionLogin                        10 : ActionLogin
+    ActionLogout                       11 : ActionLogout
+    ActionMessage                      12 : ActionMessage
+    ActionNetworkHeartbeat             13 : ActionNetworkHeartbeat
+    ActionNewWar                       14 : ActionNewWar
+    ActionRegister                     15 : ActionRegister
+    ActionReloadSceneWar               16 : ActionReloadSceneWar
+    ActionRunSceneMain                 17 : ActionRunSceneMain
+    ActionRunSceneWar                  18 : ActionRunSceneWar
+    ActionSetSkillConfiguration        19 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 20 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -95,6 +96,13 @@
     playerPassword       2 : string
     skillConfigurationID 3 : integer
     skillConfiguration   4 : SingleSkillConfiguration
+}
+
+.ActionGetWaitingWarConfigurations {
+    actionCode        0 :  integer
+    playerAccount     1 :  string
+    playerPassword    2 :  string
+    warConfigurations 3 : *WarConfiguration(warID)
 }
 
 .ActionJoinWar {

@@ -120,7 +120,7 @@ local function createItemsForStateMain(self)
     elseif (mode == "modeContinue") then
         return {self.m_ItemPlaceHolder}
 
-    elseif (model == "modeExit") then
+    elseif (mode == "modeExit") then
         return {self.m_ItemPlaceHolder}
 
     else

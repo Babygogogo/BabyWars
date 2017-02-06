@@ -352,7 +352,7 @@ local function executeGetReplayConfigurations(action, modelScene)
 end
 
 local function executeGetJoinableWarConfigurations(action, modelScene)
-    assert(not IS_SERVER, "ActionExecutor-executeGetSkillConfiguration() should not be invoked on the server.")
+    assert(not IS_SERVER, "ActionExecutor-executeGetJoinableWarConfigurations() should not be invoked on the server.")
 
     if (modelScene.isModelSceneWar) then
         return
@@ -416,6 +416,18 @@ local function executeGetSkillConfiguration(action, modelScene)
         modelNewWarCreator:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
     elseif (modelJoinWarSelector:isRetrievingSkillConfiguration(skillConfigurationID)) then
         modelJoinWarSelector:updateWithSkillConfiguration(skillConfiguration, skillConfigurationID)
+    end
+end
+
+local function executeGetWaitingWarConfigurations(action, modelScene)
+    assert(not IS_SERVER, "ActionExecutor-executeGetWaitingWarConfigurations() should not be invoked on the server.")
+    if (modelScene.isModelSceneWar) then
+        return
+    end
+
+    local modelExitWarSelector = modelScene:getModelMainMenu():getModelExitWarSelector()
+    if (modelExitWarSelector:isRetrievingWaitingWarConfigurations()) then
+        modelExitWarSelector:updateWithWaitingWarConfigurations(action.warConfigurations)
     end
 end
 
@@ -1715,6 +1727,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetRankingList)               then executeGetRankingList(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetReplayConfigurations)      then executeGetReplayConfigurations(     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetSkillConfiguration)        then executeGetSkillConfiguration(       action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionGetWaitingWarConfigurations)  then executeGetWaitingWarConfigurations( action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionJoinWar)                      then executeJoinWar(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogin)                        then executeLogin(                       action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogout)                       then executeLogout(                      action, modelScene)

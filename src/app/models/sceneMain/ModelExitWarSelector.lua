@@ -3,18 +3,17 @@ local ModelExitWarSelector = class("ModelExitWarSelector")
 
 local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
 local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WarFieldManager       = require("src.app.utilities.WarFieldManager")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
 local os, string       = os, string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetOngoingWarConfigurations")
-local ACTION_CODE_RUN_SCENE_WAR                  = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
+local ACTION_CODE_GET_WAITING_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetWaitingWarConfigurations")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -88,7 +87,6 @@ local function createWaitingWarList(self, warConfigurations)
         warList[#warList + 1] = {
             warID        = warID,
             warFieldName = WarFieldManager.getWarFieldName(warFieldFileName),
-            isInTurn     = (warConfiguration.players[playerIndexInTurn].account == playerAccountLoggedIn),
             callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setPlayerNicknames(getPlayerNicknames(warConfiguration, os.time()))
@@ -139,7 +137,9 @@ function ModelExitWarSelector:setEnabled(enabled)
 
     if (enabled) then
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingExitableWar"))
-        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS})
+        WebSocketManager.sendAction({
+            actionCode = ACTION_CODE_GET_WAITING_WAR_CONFIGURATIONS,
+        })
     end
 
     if (self.m_View) then
@@ -155,11 +155,11 @@ function ModelExitWarSelector:setEnabled(enabled)
     return self
 end
 
-function ModelExitWarSelector:isRetrievingOngoingWarConfigurations()
+function ModelExitWarSelector:isRetrievingWaitingWarConfigurations()
     return self.m_IsEnabled
 end
 
-function ModelExitWarSelector:updateWithOngoingWarConfigurations(warConfigurations)
+function ModelExitWarSelector:updateWithWaitingWarConfigurations(warConfigurations)
     if (self.m_IsEnabled) then
         local warList = createWaitingWarList(self, warConfigurations)
         if (#warList == 0) then
@@ -170,15 +170,6 @@ function ModelExitWarSelector:updateWithOngoingWarConfigurations(warConfiguratio
     end
 
     return self
-end
-
-function ModelExitWarSelector:isRetrievingOngoingWarData()
-    return self.m_IsEnabled
-end
-
-function ModelExitWarSelector:updateWithOngoingWarData(warData)
-    local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", warData, "sceneWar.ViewSceneWar")
-    ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
 end
 
 function ModelExitWarSelector:onButtonBackTouched()
