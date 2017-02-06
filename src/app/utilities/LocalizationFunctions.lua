@@ -734,7 +734,8 @@ local s_Texts = {
     },
     [14] = {
         [1] = function(textType)
-            if     (textType == "ConfirmCreateWar")             then return "确 认 新 建 战 局"
+            if     (textType == "ConfirmContinueWar")           then return "进 入 战 局"
+            elseif (textType == "ConfirmCreateWar")             then return "确 认 新 建 战 局"
             elseif (textType == "ConfirmJoinWar")               then return "确 认 参 战"
             elseif (textType == "ContinueWar")                  then return "继 续"
             elseif (textType == "CreateWar")                    then return "新 建 战 局"
@@ -753,7 +754,11 @@ local s_Texts = {
             elseif (textType == "Overview")                     then return "战局设定总览"
             elseif (textType == "PlayerIndex")                  then return "行动次序"
             elseif (textType == "RankMatch")                    then return "积分赛"
+            elseif (textType == "RetrievingCreateWarResult")    then return "正在创建战局，请稍候，若长时间没有反应，请返回重试。"
+            elseif (textType == "RetrievingJoinWarResult")      then return "正在参战，请稍候。若长时间没有反应，请返回重试。"
             elseif (textType == "RetrievingSkillConfiguration") then return "正在获取技能数据，请稍候。"
+            elseif (textType == "RetrievingWarData")            then return "正在进入战局，请稍候。若长时间没有反应，请返回重试。"
+            elseif (textType == "Selected")                     then return "已选定"
             elseif (textType == "SkillConfiguration")           then return "我方技能配置"
             elseif (textType == "WarFieldName")                 then return "地图名称"
             elseif (textType == "Yes")                          then return "是"
@@ -761,7 +766,8 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "ConfirmCreateWar")             then return "Confirm"
+            if     (textType == "ConfirmContinueWar")           then return "Confirm"
+            elseif (textType == "ConfirmCreateWar")             then return "Confirm"
             elseif (textType == "ConfirmJoinWar")               then return "Confirm"
             elseif (textType == "ContinueWar")                  then return "Continue"
             elseif (textType == "CreateWar")                    then return "New War"
@@ -780,7 +786,11 @@ local s_Texts = {
             elseif (textType == "Overview")                     then return "Overview"
             elseif (textType == "PlayerIndex")                  then return "Player Index"
             elseif (textType == "RankMatch")                    then return "Ranking Match"
+            elseif (textType == "RetrievingCreateWarResult")    then return "Creating the war, please wait."
+            elseif (textType == "RetrievingJoinWarResult")      then return "Joining the war, please wait."
             elseif (textType == "RetrievingSkillConfiguration") then return "Retrieving data..."
+            elseif (textType == "RetrievingWarData")            then return "Retrieving war data, please wait."
+            elseif (textType == "Selected")                     then return "Selected"
             elseif (textType == "SkillConfiguration")           then return "Skill Configuration"
             elseif (textType == "WarFieldName")                 then return "Map"
             elseif (textType == "Yes")                          then return "Yes"

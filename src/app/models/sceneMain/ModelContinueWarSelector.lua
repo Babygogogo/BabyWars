@@ -14,7 +14,7 @@ local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
 local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local ModelWeatherManager   = require("src.app.models.sceneWar.ModelWeatherManager")
+local WarFieldManager       = require("src.app.utilities.WarFieldManager")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
@@ -49,89 +49,6 @@ local function getPlayerNicknames(warConfiguration, currentTime)
     return names, playersCount
 end
 
-local function resetSelectorPlayerIndex(modelWarConfigurator, warConfiguration)
-    local options         = {}
-    local loggedInAccount = WebSocketManager.getLoggedInAccountAndPassword()
-    for playerIndex, data in pairs(warConfiguration.players) do
-        if (data.account == loggedInAccount) then
-            local colorText
-            if     (playerIndex == 1) then colorText = "Red"
-            elseif (playerIndex == 2) then colorText = "Blue"
-            elseif (playerIndex == 3) then colorText = "Yellow"
-            else                           colorText = "Black"
-            end
-
-            options[#options + 1] = {
-                data = playerIndex,
-                text = string.format("%d (%s)", playerIndex, getLocalizedText(34, colorText)),
-            }
-        end
-    end
-
-    assert(#options == 1)
-    modelWarConfigurator:getModelOptionSelectorWithName("PlayerIndex"):setOptions(options)
-end
-
-local function resetSelectorFog(modelWarConfigurator, warConfiguration)
-    local isFogOfWarByDefault = warConfiguration.isFogOfWarByDefault
-    local options = {{
-        data = isFogOfWarByDefault,
-        text = getLocalizedText(9, isFogOfWarByDefault),
-    }}
-
-    modelWarConfigurator:getModelOptionSelectorWithName("Fog"):setOptions(options)
-end
-
-local function resetSelectorWeather(modelWarConfigurator, warConfiguration)
-    local weatherCode = warConfiguration.defaultWeatherCode
-    local options = {{
-        data = weatherCode,
-        text = getLocalizedText(40, ModelWeatherManager.getWeatherName(weatherCode)),
-    }}
-
-    modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setOptions(options)
-end
-
-local function resetSelectorMaxSkillPoints(modelWarConfigurator, warConfiguration)
-    local maxBaseSkillPoints = warConfiguration.maxBaseSkillPoints
-    local options = {{
-        data = maxBaseSkillPoints,
-        text = (maxBaseSkillPoints)              and
-            ("" .. maxBaseSkillPoints)           or
-            (getLocalizedText(3, "Disable")),
-    }}
-
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxSkillPoints"):setOptions(options)
-end
-
-local function resetSelectorRankMatch(modelWarConfigurator, warConfiguration)
-    modelWarConfigurator:getModelOptionSelectorWithName("RankMatch"):setButtonsEnabled(false)
-        :setOptions({{
-            data = nil,
-            text = getLocalizedText(34, (warConfiguration.isRankMatch) and ("Yes") or ("No")),
-        }})
-end
-
-local function resetSelectorMaxDiffScore(modelWarConfigurator, warConfiguration)
-    modelWarConfigurator:getModelOptionSelectorWithName("MaxDiffScore"):setButtonsEnabled(false)
-        :setOptions({{
-            data = nil,
-            text = (warConfiguration.maxDiffScore) and ("" .. warConfiguration.maxDiffScore) or (getLocalizedText(13, "NoLimit")),
-        }})
-end
-
-local function resetModelWarConfigurator(model, warID, warConfiguration)
-    model:setWarId(warID)
-        :setEnabled(true)
-
-    resetSelectorPlayerIndex(   model, warConfiguration)
-    resetSelectorFog(           model, warConfiguration)
-    resetSelectorWeather(       model, warConfiguration)
-    resetSelectorMaxSkillPoints(model, warConfiguration)
-    resetSelectorRankMatch(     model, warConfiguration)
-    resetSelectorMaxDiffScore(  model, warConfiguration)
-end
-
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
@@ -146,48 +63,23 @@ local function getActorWarFieldPreviewer(self)
     return self.m_ActorWarFieldPreviewer
 end
 
-local function initCallbackOnButtonBackTouched(self, modelWarConfigurator)
-    modelWarConfigurator:setOnButtonBackTouched(function()
-        getActorWarFieldPreviewer(self):getModel():setEnabled(false)
-        self:setEnabled(true)
-
-        self.m_View:setMenuVisible(true)
-            :setButtonNextVisible(false)
-    end)
-end
-
-local function initCallbackOnButtonConfirmTouched(self, modelWarConfigurator)
-    modelWarConfigurator:setOnButtonConfirmTouched(function()
-        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
-        modelWarConfigurator:disableButtonConfirmForSecs(5)
-        WebSocketManager.sendAction({
-            actionCode = ACTION_CODE_RUN_SCENE_WAR,
-            warID      = modelWarConfigurator:getWarId(),
-        })
-    end)
-end
-
-local function initSelectorSkill(modelWarConfigurator)
-    modelWarConfigurator:getModelOptionSelectorWithName("Skill"):setOptions({{
-        data = "Unavailable",
-        text = getLocalizedText(3, "Selected"),
-    }})
-end
-
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
-        local actor = Actor.createWithModelAndViewName("sceneMain.ModelWarConfigurator", nil, "sceneMain.ViewWarConfigurator")
-        local model = actor:getModel()
+        local model = Actor.createModel("sceneMain.ModelWarConfigurator")
+        local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
 
-        model:setEnabled(false)
-            :setPasswordEnabled(false)
-            :getModelOptionSelectorWithName("PlayerIndex"):setButtonsEnabled(false)
-        initCallbackOnButtonBackTouched(   self, model)
-        initCallbackOnButtonConfirmTouched(self, model)
-        initSelectorSkill(model)
+        model:setModeContinueWar()
+            :setEnabled(false)
+            :setCallbackOnButtonBackTouched(function()
+                model:setEnabled(false)
+                getActorWarFieldPreviewer(self):getModel():setEnabled(false)
 
-        self.m_ActorWarConfigurator = actor
-        self.m_View:setViewWarConfigurator(actor:getView())
+                self.m_View:setMenuVisible(true)
+                    :setButtonNextVisible(false)
+            end)
+
+        self.m_ActorWarConfigurator = Actor.createWithModelAndViewInstance(model, view)
+        self.m_View:setViewWarConfigurator(view)
     end
 
     return self.m_ActorWarConfigurator
@@ -203,7 +95,7 @@ local function createOngoingWarList(self, warConfigurations)
 
         warList[#warList + 1] = {
             warID        = warID,
-            warFieldName = getWarFieldName(warFieldFileName),
+            warFieldName = WarFieldManager.getWarFieldName(warFieldFileName),
             isInTurn     = (warConfiguration.players[playerIndexInTurn].account == playerAccountLoggedIn),
             callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
@@ -213,10 +105,11 @@ local function createOngoingWarList(self, warConfigurations)
 
                 self.m_OnButtonNextTouched = function()
                     getActorWarFieldPreviewer(self):getModel():setEnabled(false)
+                    getActorWarConfigurator(self):getModel():resetWithWarConfiguration(warConfiguration)
+                        :setEnabled(true)
+
                     self.m_View:setMenuVisible(false)
                         :setButtonNextVisible(false)
-
-                    resetModelWarConfigurator(getActorWarConfigurator(self):getModel(), warID, warConfiguration)
                 end
             end,
         }
@@ -241,6 +134,7 @@ end
 --------------------------------------------------------------------------------
 function ModelContinueWarSelector:onStartRunning(modelSceneMain)
     self.m_ModelSceneMain = modelSceneMain
+    getActorWarConfigurator(self):getModel():onStartRunning(modelSceneMain)
 
     return self
 end

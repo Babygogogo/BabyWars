@@ -25,8 +25,8 @@ end
 
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
-        local model = Actor.createModel("sceneMain.ModelWarConfiguratorRenewal")
-        local view  = Actor.createView( "sceneMain.ViewWarConfiguratorRenewal")
+        local model = Actor.createModel("sceneMain.ModelWarConfigurator")
+        local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
 
         model:setModeCreateWar()
             :setEnabled(false)

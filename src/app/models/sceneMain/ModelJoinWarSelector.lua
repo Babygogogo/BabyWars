@@ -3,20 +3,14 @@ local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
 local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
 local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
 local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters          = require("src.app.utilities.SingletonGetters")
-local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
-local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
 local WebSocketManager          = require("src.app.utilities.WebSocketManager")
-local ModelWeatherManager       = require("src.app.models.sceneWar.ModelWeatherManager")
 local Actor                     = require("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local ACTION_CODE_GET_SKILL_CONFIGURATION         = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetJoinableWarConfigurations")
-local ACTION_CODE_JOIN_WAR                        = ActionCodeFunctions.getActionCode("ActionJoinWar")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -53,8 +47,8 @@ end
 
 local function getActorWarConfigurator(self)
     if (not self.m_ActorWarConfigurator) then
-        local model = Actor.createModel("sceneMain.ModelWarConfiguratorRenewal")
-        local view  = Actor.createView( "sceneMain.ViewWarConfiguratorRenewal")
+        local model = Actor.createModel("sceneMain.ModelWarConfigurator")
+        local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
 
         model:setModeJoinWar()
             :setEnabled(false)
