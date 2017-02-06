@@ -6,6 +6,7 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
+local EXIT_WAR_SELECTOR_Z_ORDER      = 3
 local SKILL_CONFIGURATOR_Z_ORDER     = 3
 local REPLAY_MANAGER_Z_ORDER         = 3
 local LOGIN_PANEL_Z_ORDER            = 3
@@ -178,6 +179,14 @@ function ViewMainMenu:setViewContinueWarSelector(view)
     return self
 end
 
+function ViewMainMenu:setViewExitWarSelector(view)
+    assert(self.m_ViewExitWarSelector == nil, "ViewMainMenu:setViewExitWarSelector() the view has been set already.")
+    self.m_ViewExitWarSelector = view
+    self:addChild(view, EXIT_WAR_SELECTOR_Z_ORDER)
+
+    return self
+end
+
 function ViewMainMenu:setViewJoinWarSelector(view)
     assert(self.m_ViewJoinWarSelector == nil, "ViewMainMenu:setViewJoinWarSelector() the view has been set.")
     self.m_ViewJoinWarSelector = view
@@ -257,6 +266,12 @@ function ViewMainMenu:setMenuVisible(visible)
     self.m_MenuListView  :setVisible(visible)
     self.m_MenuTitle     :setVisible(visible)
     self.m_ButtonExit    :setVisible(visible)
+
+    return self
+end
+
+function ViewMainMenu:setMenuTitleText(text)
+    self.m_MenuTitle:setString(text)
 
     return self
 end

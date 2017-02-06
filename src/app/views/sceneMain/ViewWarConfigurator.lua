@@ -6,90 +6,150 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local POPUP_SCROLLVIEW_Z_ORDER = 3
-local POPUP_BACKGROUND_Z_ORDER = 2
-local POPUP_GREY_MASK_Z_ORDER  = 1
+local MENU_TITLE_Z_ORDER          = 1
+local MENU_LIST_VIEW_Z_ORDER      = 1
+local BUTTON_BACK_Z_ORDER         = 1
+local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
+local BUTTON_CONFIRM_Z_ORDER      = 1
+local OVERVIEW_BACKGROUND_Z_ORDER = 0
+local MENU_BACKGROUND_Z_ORDER     = 0
+
+local MENU_BACKGROUND_WIDTH     = 250
+local MENU_BACKGROUND_HEIGHT    = display.height - 60
+local MENU_BACKGROUND_POS_X     = 30
+local MENU_BACKGROUND_POS_Y     = 30
+local MENU_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+
+local MENU_TITLE_WIDTH      = MENU_BACKGROUND_WIDTH
+local MENU_TITLE_HEIGHT     = 60
+local MENU_TITLE_POS_X      = MENU_BACKGROUND_POS_X
+local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - MENU_TITLE_HEIGHT
+local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
+local MENU_TITLE_FONT_SIZE  = 35
+
+local ITEM_WIDTH     = 230
+local ITEM_HEIGHT    = 50
+local ITEM_CAPINSETS = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
 
 local EDIT_BOX_PASSWORD_WIDTH  = 250 -- The same as the width of the indicator of ViewOptionSelector
 local EDIT_BOX_PASSWORD_HEIGHT = 50  -- The same as the height of the indicator of ViewOptionSelector
-local BUTTON_WIDTH             = 300
-local BUTTON_HEIGHT            = 80
 
-local SELECTOR_PLAYER_INDEX_POS_X     = 70
-local SELECTOR_PLAYER_INDEX_POS_Y     = 60 + (display.height - 60) / 5 * 4
-local SELECTOR_MAX_SKILL_POINTS_POS_X = SELECTOR_PLAYER_INDEX_POS_X
-local SELECTOR_MAX_SKILL_POINTS_POS_Y = 60 + (display.height - 60) / 5 * 3
-local SELECTOR_RANK_MATCH_POS_X       = SELECTOR_PLAYER_INDEX_POS_X
-local SELECTOR_RANK_MATCH_POS_Y       = 60 + (display.height - 60) / 5 * 2
-local SELECTOR_WEATHER_POS_X          = SELECTOR_PLAYER_INDEX_POS_X
-local SELECTOR_WEATHER_POS_Y          = 60 + (display.height - 60) / 5 * 1
-local SELECTOR_FOG_POS_X              = display.width - 70 - (42 + 8 + 250 + 8 + 42)
-local SELECTOR_FOG_POS_Y              = SELECTOR_PLAYER_INDEX_POS_Y
-local SELECTOR_SKILL_POS_X            = SELECTOR_FOG_POS_X
-local SELECTOR_SKILL_POS_Y            = SELECTOR_MAX_SKILL_POINTS_POS_Y
-local SELECTOR_MAX_DIFF_SCORE_POS_X   = SELECTOR_FOG_POS_X
-local SELECTOR_MAX_DIFF_SCORE_POS_Y   = SELECTOR_RANK_MATCH_POS_Y
-local EDIT_BOX_PASSWORD_POS_X         = SELECTOR_FOG_POS_X + 42 + 8
-local EDIT_BOX_PASSWORD_POS_Y         = SELECTOR_WEATHER_POS_Y
-local BUTTON_BACK_POS_X               = 120
-local BUTTON_BACK_POS_Y               = 35
-local BUTTON_CONFIRM_POS_X            = display.width - 120 - BUTTON_WIDTH
-local BUTTON_CONFIRM_POS_Y            = BUTTON_BACK_POS_Y
+local BUTTON_BACK_WIDTH  = MENU_BACKGROUND_WIDTH
+local BUTTON_BACK_HEIGHT = 50
+local BUTTON_BACK_POS_X  = MENU_BACKGROUND_POS_X
+local BUTTON_BACK_POS_Y  = MENU_BACKGROUND_POS_Y
 
-local EDIT_BOX_PASSWORD_CAPINSETS = {x = 1, y = EDIT_BOX_PASSWORD_HEIGHT - 7, width = 1, height = 1}
+local BUTTON_CONFIRM_WIDTH     = display.width - MENU_BACKGROUND_WIDTH - 90
+local BUTTON_CONFIRM_HEIGHT    = 60
+local BUTTON_CONFIRM_POS_X     = MENU_BACKGROUND_POS_X + MENU_BACKGROUND_WIDTH + 30
+local BUTTON_CONFIRM_POS_Y     = MENU_BACKGROUND_POS_Y
+local BUTTON_CONFIRM_FONT_SIZE = 30
 
-local FONT_NAME                         = "res/fonts/msyhbd.ttc"
-local FONT_COLOR                        = {r = 255, g = 255, b = 255}
-local FONT_OUTLINE_COLOR                = {r = 0,   g = 0,   b = 0}
-local FONT_OUTLINE_WIDTH                = 2
-local POPUP_FONT_SIZE                   = 18
-local BUTTON_FONT_SIZE                  = 35
+local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH
+local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
+local MENU_LIST_VIEW_POS_Y        = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_ITEMS_MARGIN = 10
+
+local EDIT_BOX_PASSWORD_CAPINSETS       = {x = 1, y = EDIT_BOX_PASSWORD_HEIGHT - 7, width = 1, height = 1}
 local EDIT_BOX_PASSWORD_TITLE_FONT_SIZE = 16
 local EDIT_BOX_PASSWORD_FONT_SIZE       = 25
 
-local BUTTON_BACKGROUND_NAME      = "c03_t01_s01_f01.png"
-local BUTTON_BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
+local FONT_NAME          = "res/fonts/msyhbd.ttc"
+local FONT_COLOR         = {r = 255, g = 255, b = 255}
+local FONT_OUTLINE_COLOR = {r = 0,   g = 0,   b = 0}
+local FONT_OUTLINE_WIDTH = 2
+local ITEM_FONT_SIZE     = 25
+local OVERVIEW_FONT_SIZE = 18
 
-local POPUP_BACKGROUND_WIDTH  = display.width  * 0.7
-local POPUP_BACKGROUND_HEIGHT = display.height * 0.8
-local POPUP_BACKGROUND_POS_X  = (display.width  - POPUP_BACKGROUND_WIDTH)  / 2
-local POPUP_BACKGROUND_POS_Y  = (display.height - POPUP_BACKGROUND_HEIGHT) / 2
+local BACKGROUND_NAME      = "c03_t01_s01_f01.png"
+local BACKGROUND_OPACITY   = 180
+local BACKGROUND_CAPINSETS = {x = 4, y = 6, width = 1, height = 1}
 
-local POPUP_SCROLLVIEW_WIDTH  = POPUP_BACKGROUND_WIDTH  - 7
-local POPUP_SCROLLVIEW_HEIGHT = POPUP_BACKGROUND_HEIGHT - 11
-local POPUP_SCROLLVIEW_POS_X  = POPUP_BACKGROUND_POS_X + 5
-local POPUP_SCROLLVIEW_POS_Y  = POPUP_BACKGROUND_POS_Y + 5
+local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
+local OVERVIEW_BACKGROUND_HEIGHT = MENU_BACKGROUND_HEIGHT - 90
+local OVERVIEW_BACKGROUND_POS_X  = display.width - 30 - OVERVIEW_BACKGROUND_WIDTH
+local OVERVIEW_BACKGROUND_POS_Y  = 30 + 90
+
+local OVERVIEW_SCROLLVIEW_WIDTH  = OVERVIEW_BACKGROUND_WIDTH  - 7
+local OVERVIEW_SCROLLVIEW_HEIGHT = OVERVIEW_BACKGROUND_HEIGHT - 11
+local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
+local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function createButton(posX, posY, text)
-    local button = ccui.Button:create()
-    button:loadTextureNormal(BUTTON_BACKGROUND_NAME, ccui.TextureResType.plistType)
+local function createViewItem(item)
+    local label = cc.Label:createWithTTF(item.name, FONT_NAME, ITEM_FONT_SIZE)
+    label:ignoreAnchorPointForPosition(true)
+
+        :setDimensions(ITEM_WIDTH, ITEM_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM)
+
+        :setTextColor(FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+
+    local view = ccui.Button:create()
+    view:loadTextureNormal("c03_t06_s01_f01.png", ccui.TextureResType.plistType)
+
         :setScale9Enabled(true)
-        :setCapInsets(BUTTON_BACKGROUND_CAPINSETS)
-        :setContentSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-
-        :setOpacity(180)
-
-        :ignoreAnchorPointForPosition(true)
-        :setPosition(posX, posY)
+        :setCapInsets(ITEM_CAPINSETS)
+        :setContentSize(ITEM_WIDTH, ITEM_HEIGHT)
 
         :setZoomScale(-0.05)
 
-        :setTitleFontName(FONT_NAME)
-        :setTitleFontSize(BUTTON_FONT_SIZE)
-        :setTitleColor(FONT_COLOR)
-        :setTitleText(text)
+        :addTouchEventListener(function(sender, eventType)
+            if (eventType == ccui.TouchEventType.ended) then
+                item.callback()
+            end
+        end)
+    view:getRendererNormal():addChild(label)
 
-    button:getTitleRenderer():enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
-
-    return button
+    return view
 end
 
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function initMenuBackground(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName("c03_t01_s01_f01.png", MENU_BACKGROUND_CAPINSETS)
+    background:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_BACKGROUND_POS_X, MENU_BACKGROUND_POS_Y)
+        :setContentSize(MENU_BACKGROUND_WIDTH, MENU_BACKGROUND_HEIGHT)
+        :setOpacity(BACKGROUND_OPACITY)
+
+    self.m_MenuBackground = background
+    self:addChild(background, MENU_BACKGROUND_Z_ORDER)
+end
+
+local function initMenuListView(self)
+    local listView = ccui.ListView:create()
+    listView:setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
+        :setGravity(ccui.ListViewGravity.centerHorizontal)
+
+    self.m_MenuListView = listView
+    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
+end
+
+local function initMenuTitle(self)
+    local title = cc.Label:createWithTTF(getLocalizedText(1, "NewGame"), FONT_NAME, MENU_TITLE_FONT_SIZE)
+    title:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
+
+        :setDimensions(MENU_TITLE_WIDTH, MENU_TITLE_HEIGHT)
+        :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+        :setVerticalAlignment(cc.TEXT_ALIGNMENT_CENTER)
+
+        :setTextColor(MENU_TITLE_FONT_COLOR)
+        :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
+
+    self.m_MenuTitle = title
+    self:addChild(title, MENU_TITLE_Z_ORDER)
+end
+
 local function initEditBoxPassword(self)
     local titleLabel = cc.Label:createWithTTF(getLocalizedText(34, "Password"), FONT_NAME, EDIT_BOX_PASSWORD_TITLE_FONT_SIZE)
     titleLabel:ignoreAnchorPointForPosition(true)
@@ -99,8 +159,8 @@ local function initEditBoxPassword(self)
         :setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER)
         :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_TOP)
 
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
-    background:setOpacity(180)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
+    background:setOpacity(BACKGROUND_OPACITY)
 
     local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_PASSWORD_WIDTH, EDIT_BOX_PASSWORD_HEIGHT), background, background, background)
     editBox:ignoreAnchorPointForPosition(true)
@@ -123,163 +183,100 @@ local function initEditBoxPassword(self)
 end
 
 local function initButtonBack(self)
-    local button = createButton(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y, getLocalizedText(1, "Back"))
-    button:addTouchEventListener(function(sender, eventType)
-        if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-            self.m_Model:onButtonBackTouched()
-        end
-    end)
+    local button = ccui.Button:create()
+    button:ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_BACK_POS_X, BUTTON_BACK_POS_Y)
+
+        :setScale9Enabled(true)
+        :setContentSize(BUTTON_BACK_WIDTH, BUTTON_BACK_HEIGHT)
+
+        :setZoomScale(-0.05)
+
+        :setTitleFontName(FONT_NAME)
+        :setTitleFontSize(ITEM_FONT_SIZE)
+        :setTitleColor({r = 240, g = 80, b = 56})
+        :setTitleText(getLocalizedText(1, "Back"))
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonBackTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
     self.m_ButtonBack = button
-    self:addChild(button)
+    self:addChild(button, BUTTON_BACK_Z_ORDER)
 end
 
 local function initButtonConfirm(self)
-    local button = createButton(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y, getLocalizedText(46))
-    button:addTouchEventListener(function(sender, eventType)
-        if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-            self.m_Model:onButtonConfirmTouched()
-        end
-    end)
+    local button = ccui.Button:create()
+    button:loadTextureNormal("c03_t01_s01_f01.png", ccui.TextureResType.plistType)
+
+        :setScale9Enabled(true)
+        :setCapInsets(MENU_BACKGROUND_CAPINSETS)
+        :setContentSize(BUTTON_CONFIRM_WIDTH, BUTTON_CONFIRM_HEIGHT)
+
+        :setZoomScale(-0.05)
+        :setOpacity(BACKGROUND_OPACITY)
+
+        :ignoreAnchorPointForPosition(true)
+        :setPosition(BUTTON_CONFIRM_POS_X, BUTTON_CONFIRM_POS_Y)
+
+        :setTitleFontName(FONT_NAME)
+        :setTitleFontSize(BUTTON_CONFIRM_FONT_SIZE)
+        :setTitleColor(FONT_COLOR)
+        :setTitleText(getLocalizedText(1, "Confirm"))
+
+        :addTouchEventListener(function(sender, eventType)
+            if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
+                self.m_Model:onButtonConfirmTouched()
+            end
+        end)
+
+    button:getTitleRenderer():enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
 
     self.m_ButtonConfirm = button
-    self:addChild(button)
+    self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
 end
 
-local function initPopUpPanel(self)
-    local mask = cc.LayerColor:create({r = 0, g = 0, b = 0, a = 140})
-    mask:setContentSize(display.width, display.height)
-        :ignoreAnchorPointForPosition(true)
-
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(BUTTON_BACKGROUND_NAME, BUTTON_BACKGROUND_CAPINSETS)
+local function initOverview(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
     background:ignoreAnchorPointForPosition(true)
-        :setPosition(POPUP_BACKGROUND_POS_X, POPUP_BACKGROUND_POS_Y)
-        :setContentSize(POPUP_BACKGROUND_WIDTH, POPUP_BACKGROUND_HEIGHT)
+        :setPosition(OVERVIEW_BACKGROUND_POS_X, OVERVIEW_BACKGROUND_POS_Y)
+        :setContentSize(OVERVIEW_BACKGROUND_WIDTH, OVERVIEW_BACKGROUND_HEIGHT)
+        :setOpacity(BACKGROUND_OPACITY)
 
     local scrollView = ccui.ScrollView:create()
-    scrollView:setContentSize(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
+    scrollView:setContentSize(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
         :ignoreAnchorPointForPosition(true)
-        :setPosition(POPUP_SCROLLVIEW_POS_X, POPUP_SCROLLVIEW_POS_Y)
+        :setPosition(OVERVIEW_SCROLLVIEW_POS_X, OVERVIEW_SCROLLVIEW_POS_Y)
 
-    local label = cc.Label:createWithTTF("", FONT_NAME, POPUP_FONT_SIZE)
+    local label = cc.Label:createWithTTF("", FONT_NAME, OVERVIEW_FONT_SIZE)
     label:ignoreAnchorPointForPosition(true)
-        :setDimensions(POPUP_SCROLLVIEW_WIDTH, POPUP_SCROLLVIEW_HEIGHT)
+        :setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, OVERVIEW_SCROLLVIEW_HEIGHT)
         :enableOutline(FONT_OUTLINE_COLOR, FONT_OUTLINE_WIDTH)
     scrollView:addChild(label)
 
-    self.m_PopUpGreyMask   = mask
-    self.m_PopUpBackground = background
-    self.m_PopUpScrollView = scrollView
-    self.m_PopUpLabel      = label
-    self:addChild(mask,       POPUP_GREY_MASK_Z_ORDER)
-        :addChild(background, POPUP_BACKGROUND_Z_ORDER)
-        :addChild(scrollView, POPUP_SCROLLVIEW_Z_ORDER)
-end
-
-local function initPopUpTouchListener(self)
-    local listener = cc.EventListenerTouchOneByOne:create()
-    listener:setSwallowTouches(true)
-    local isTouchWithinBackground = false
-
-    listener:registerScriptHandler(function(touch, event)
-        isTouchWithinBackground = DisplayNodeFunctions.isTouchWithinNode(touch, self.m_PopUpBackground)
-        return true
-    end, cc.Handler.EVENT_TOUCH_BEGAN)
-
-    listener:registerScriptHandler(function(touch, event)
-        if (not isTouchWithinBackground) then
-            self:setPopUpPanelEnabled(false)
-        end
-    end, cc.Handler.EVENT_TOUCH_ENDED)
-
-    self.m_PopUpTouchListener = listener
-    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self.m_PopUpBackground)
+    self.m_OverviewBackground = background
+    self.m_OverviewScrollView = scrollView
+    self.m_OverviewLabel      = label
+    self:addChild(background, OVERVIEW_BACKGROUND_Z_ORDER)
+        :addChild(scrollView, OVERVIEW_SCROLLVIEW_Z_ORDER)
 end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewWarConfigurator:ctor()
-    self:setAnchorPoint(0, 0)
-        :ignoreAnchorPointForPosition(true)
+    -- initEditBoxPassword(   self)
 
-    initEditBoxPassword(   self)
+    initMenuBackground(    self)
+    initMenuListView(      self)
+    initMenuTitle(         self)
     initButtonBack(        self)
     initButtonConfirm(     self)
-    initPopUpPanel(        self)
-    initPopUpTouchListener(self)
-
-    self:setPopUpPanelEnabled(false)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorPlayerIndex(view)
-    assert(self.m_ViewSelectorPlayerIndex == nil, "ViewWarConfigurator:setViewSelectorPlayerIndex() the view has been set.")
-
-    view:setPosition(SELECTOR_PLAYER_INDEX_POS_X, SELECTOR_PLAYER_INDEX_POS_Y)
-    self.m_ViewSelectorPlayerIndex = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorFog(view)
-    assert(self.m_ViewSelectorFog == nil, "ViewWarConfigurator:setViewSelectorFog() the view has been set.")
-
-    view:setPosition(SELECTOR_FOG_POS_X, SELECTOR_FOG_POS_Y)
-    self.m_ViewSelectorFog = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorWeather(view)
-    assert(self.m_ViewSelectorWeather == nil, "ViewWarConfigurator:setViewSelectorWeather() the view has been set.")
-
-    view:setPosition(SELECTOR_WEATHER_POS_X, SELECTOR_WEATHER_POS_Y)
-    self.m_ViewSelectorWeather = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorSkill(view)
-    assert(self.m_ViewSelectorSkill == nil, "ViewWarConfigurator:setViewSelectorSkill() the view has been set.")
-
-    view:setPosition(SELECTOR_SKILL_POS_X, SELECTOR_SKILL_POS_Y)
-    self.m_ViewSelectorSkill = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorMaxSkillPoints(view)
-    assert(self.m_ViewSelectorMaxSkillPoints == nil, "ViewWarConfigurator:setViewSelectorMaxSkillPoints() the view has been set.")
-
-    view:setPosition(SELECTOR_MAX_SKILL_POINTS_POS_X, SELECTOR_MAX_SKILL_POINTS_POS_Y)
-    self.m_ViewSelectorMaxSkillPoints = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorRankMatch(view)
-    assert(self.m_ViewSelectorRankMatch == nil, "ViewWarConfigurator:setViewSelectorRankMatch() the view has been set.")
-
-    view:setPosition(SELECTOR_RANK_MATCH_POS_X, SELECTOR_RANK_MATCH_POS_Y)
-    self.m_ViewSelectorRankMatch = view
-    self:addChild(view)
-
-    return self
-end
-
-function ViewWarConfigurator:setViewSelectorMaxDiffScore(view)
-    assert(self.m_ViewSelectorMaxDiffScore == nil, "ViewWarConfigurator:setViewSelectorMaxDiffScore() the view has been set.")
-
-    view:setPosition(SELECTOR_MAX_DIFF_SCORE_POS_X, SELECTOR_MAX_DIFF_SCORE_POS_Y)
-    self.m_ViewSelectorMaxDiffScore = view
-    self:addChild(view)
+    initOverview(          self)
 
     return self
 end
@@ -287,24 +284,21 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarConfigurator:getSelectorPlayerIndex()
-    return self.m_SelectorPlayerIndex
+function ViewWarConfigurator:removeAllItems()
+    self.m_MenuListView:removeAllItems()
+
+    return self
 end
 
-function ViewWarConfigurator:getSelectorFog()
-    return self.m_SelectorFog
-end
+function ViewWarConfigurator:setItems(items)
+    local listView = self.m_MenuListView
+    listView:removeAllItems()
 
-function ViewWarConfigurator:getSelectorWeather()
-    return self.m_SelectorWeather
-end
+    for _, item in ipairs(items) do
+        listView:pushBackCustomItem(createViewItem(item))
+    end
 
-function ViewWarConfigurator:getSelectorSkill()
-    return self.m_SelectorSkill
-end
-
-function ViewWarConfigurator:getSelectorMaxSkillPoints()
-    return self.m_SelectorMaxSkillPoints
+    return self
 end
 
 function ViewWarConfigurator:getEditBoxPassword()
@@ -324,26 +318,25 @@ function ViewWarConfigurator:disableButtonConfirmForSecs(secs)
     return self
 end
 
-function ViewWarConfigurator:isPopUpPanelEnabled(enabled)
-    return self.m_PopUpGreyMask:isVisible()
-end
-
-function ViewWarConfigurator:setPopUpPanelEnabled(enabled)
-    self.m_PopUpGreyMask  :setVisible(enabled)
-    self.m_PopUpBackground:setVisible(enabled)
-    self.m_PopUpScrollView:setVisible(enabled)
-    self.m_PopUpTouchListener:setEnabled(enabled)
+function ViewWarConfigurator:setMenuTitleText(text)
+    self.m_MenuTitle:setString(text)
 
     return self
 end
 
-function ViewWarConfigurator:setPopUpPanelText(text)
-    local label = self.m_PopUpLabel
+function ViewWarConfigurator:setOverviewText(text)
+    local label = self.m_OverviewLabel
     label:setString(text)
 
-    local height = math.max(label:getLineHeight() * label:getStringNumLines(), POPUP_SCROLLVIEW_HEIGHT)
-    label:setDimensions(POPUP_SCROLLVIEW_WIDTH, height)
-    self.m_PopUpScrollView:setInnerContainerSize({width = POPUP_SCROLLVIEW_WIDTH, height = height})
+    local height = math.max(label:getLineHeight() * label:getStringNumLines(), OVERVIEW_SCROLLVIEW_HEIGHT)
+    label:setDimensions(OVERVIEW_SCROLLVIEW_WIDTH, height)
+    self.m_OverviewScrollView:setInnerContainerSize({width = OVERVIEW_SCROLLVIEW_WIDTH, height = height})
+
+    return self
+end
+
+function ViewWarConfigurator:setButtonConfirmText(text)
+    self.m_ButtonConfirm:setTitleText(text)
 
     return self
 end

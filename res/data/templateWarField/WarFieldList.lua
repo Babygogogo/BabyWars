@@ -20,20 +20,25 @@ return {
     "ManShouXueXing",
     "SanHeGu",
     "ShenSeYanCaoZhanZheng_2",
-    "SiPanDao",
+    "ShuiXingYaoSai",
+    "SiPanDao_2",
     "SiTongBaDa",
     "TanXinWan",
     "WangPaiKongJun",
     "WeiJiSiFu_2",
+    "WuGuangDeWuTai",
     "WuShangZhiAi",
     "YangFanYuanHang_3",
     "YunShiQun",
     "ZhengZhengFangFang",
 
+    "ZuJiZhaoTianTong",         -- Fun 2p maps
+
     "JuWaiRen_2",               -- 3p
 
     "BeiPan",                   -- 4p
     "DuiKangZhaoTianTong",
+    "ShiJieDaZhan",
     "XiaoGuoZhengBaSai",
     "XuanZe_2",
 

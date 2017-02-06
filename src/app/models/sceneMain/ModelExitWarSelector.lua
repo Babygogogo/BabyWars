@@ -1,28 +1,19 @@
 
---[[--------------------------------------------------------------------------------
--- ModelContinueWarSelector是主场景中的“已参战、未结束的战局”的列表。
---
--- 主要职责和使用场景举例：
---   构造并显示上述战局列表
---
---]]--------------------------------------------------------------------------------
-
-local ModelContinueWarSelector = class("ModelContinueWarSelector")
+local ModelExitWarSelector = class("ModelExitWarSelector")
 
 local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
 local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local SingletonGetters      = require("src.app.utilities.SingletonGetters")
 local WarFieldManager       = require("src.app.utilities.WarFieldManager")
+local WebSocketManager      = require("src.app.utilities.WebSocketManager")
 local Actor                 = require("src.global.actors.Actor")
 local ActorManager          = require("src.global.actors.ActorManager")
 
 local os, string       = os, string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetOngoingWarConfigurations")
-local ACTION_CODE_RUN_SCENE_WAR                  = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
+local ACTION_CODE_GET_WAITING_WAR_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetWaitingWarConfigurations")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -68,7 +59,7 @@ local function getActorWarConfigurator(self)
         local model = Actor.createModel("sceneMain.ModelWarConfigurator")
         local view  = Actor.createView( "sceneMain.ViewWarConfigurator")
 
-        model:setModeContinueWar()
+        model:setModeExitWar()
             :setEnabled(false)
             :setCallbackOnButtonBackTouched(function()
                 model:setEnabled(false)
@@ -85,7 +76,7 @@ local function getActorWarConfigurator(self)
     return self.m_ActorWarConfigurator
 end
 
-local function createOngoingWarList(self, warConfigurations)
+local function createWaitingWarList(self, warConfigurations)
     local warList               = {}
     local playerAccountLoggedIn = WebSocketManager.getLoggedInAccountAndPassword()
 
@@ -96,7 +87,6 @@ local function createOngoingWarList(self, warConfigurations)
         warList[#warList + 1] = {
             warID        = warID,
             warFieldName = WarFieldManager.getWarFieldName(warFieldFileName),
-            isInTurn     = (warConfiguration.players[playerIndexInTurn].account == playerAccountLoggedIn),
             callback     = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
                     :setPlayerNicknames(getPlayerNicknames(warConfiguration, os.time()))
@@ -125,14 +115,14 @@ end
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
-function ModelContinueWarSelector:ctor(param)
+function ModelExitWarSelector:ctor(param)
     return self
 end
 
 --------------------------------------------------------------------------------
 -- The callback function on start running.
 --------------------------------------------------------------------------------
-function ModelContinueWarSelector:onStartRunning(modelSceneMain)
+function ModelExitWarSelector:onStartRunning(modelSceneMain)
     self.m_ModelSceneMain = modelSceneMain
     getActorWarConfigurator(self):getModel():onStartRunning(modelSceneMain)
 
@@ -142,12 +132,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ModelContinueWarSelector:setEnabled(enabled)
+function ModelExitWarSelector:setEnabled(enabled)
     self.m_IsEnabled = enabled
 
     if (enabled) then
-        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "TransferingData"))
-        WebSocketManager.sendAction({actionCode = ACTION_CODE_GET_ONGOING_WAR_CONFIGURATIONS})
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingExitableWar"))
+        WebSocketManager.sendAction({
+            actionCode = ACTION_CODE_GET_WAITING_WAR_CONFIGURATIONS,
+        })
     end
 
     if (self.m_View) then
@@ -163,15 +155,15 @@ function ModelContinueWarSelector:setEnabled(enabled)
     return self
 end
 
-function ModelContinueWarSelector:isRetrievingOngoingWarConfigurations()
+function ModelExitWarSelector:isRetrievingWaitingWarConfigurations()
     return self.m_IsEnabled
 end
 
-function ModelContinueWarSelector:updateWithOngoingWarConfigurations(warConfigurations)
+function ModelExitWarSelector:updateWithWaitingWarConfigurations(warConfigurations)
     if (self.m_IsEnabled) then
-        local warList = createOngoingWarList(self, warConfigurations)
+        local warList = createWaitingWarList(self, warConfigurations)
         if (#warList == 0) then
-            SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoContinuableWar"))
+            SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(8, "NoWaitingWar"))
         else
             self.m_View:showWarList(warList)
         end
@@ -180,26 +172,22 @@ function ModelContinueWarSelector:updateWithOngoingWarConfigurations(warConfigur
     return self
 end
 
-function ModelContinueWarSelector:isRetrievingOngoingWarData()
-    return self.m_IsEnabled
+function ModelExitWarSelector:isRetrievingExitWarResult(warID)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getWarId() == warID)
 end
 
-function ModelContinueWarSelector:updateWithOngoingWarData(warData)
-    local actorSceneWar = Actor.createWithModelAndViewName("sceneWar.ModelSceneWar", warData, "sceneWar.ViewSceneWar")
-    ActorManager.setAndRunRootActor(actorSceneWar, "FADE", 1)
-end
-
-function ModelContinueWarSelector:onButtonBackTouched()
+function ModelExitWarSelector:onButtonBackTouched()
     self:setEnabled(false)
     SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
 
     return self
 end
 
-function ModelContinueWarSelector:onButtonNextTouched()
+function ModelExitWarSelector:onButtonNextTouched()
     self.m_OnButtonNextTouched()
 
     return self
 end
 
-return ModelContinueWarSelector
+return ModelExitWarSelector

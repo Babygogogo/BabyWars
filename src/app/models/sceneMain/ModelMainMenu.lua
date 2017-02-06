@@ -27,8 +27,7 @@ end
 local function getActorNewWarCreator(self)
     if (not self.m_ActorNewWarCreator) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelNewWarCreator", nil, "sceneMain.ViewNewWarCreator")
-        actor:getModel():setModelMainMenu(self)
-            :onStartRunning(self.m_ModelSceneMain)
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
             :setEnabled(false)
 
         self.m_ActorNewWarCreator = actor
@@ -49,6 +48,19 @@ local function getActorContinueWarSelector(self)
     end
 
     return self.m_ActorContinueWarSelector
+end
+
+local function getActorExitWarSelector(self)
+    if (not self.m_ActorExitWarSelector) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelExitWarSelector", nil, "sceneMain.ViewExitWarSelector")
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
+            :setEnabled(false)
+
+        self.m_ActorExitWarSelector = actor
+        self.m_View:setViewExitWarSelector(actor:getView())
+    end
+
+    return self.m_ActorExitWarSelector
 end
 
 local function getActorJoinWarSelector(self)
@@ -135,7 +147,8 @@ end
 local function setStateAuxiliaryCommands(self)
     self.m_State = "stateAuxiliaryCommands"
 
-    self.m_View:setButtonExitText(getLocalizedText(1, "Back"))
+    self.m_View:setMenuTitleText(getLocalizedText(1, "AuxiliaryCommands"))
+        :setButtonExitText(getLocalizedText(1, "Back"))
         :setItems({
             self.m_ItemSetMessageIndicator,
             self.m_ItemSetMusic,
@@ -146,12 +159,11 @@ local function setStateMain(self, isPlayerLoggedIn)
     self.m_State            = "stateMain"
     self.m_IsPlayerLoggedIn = isPlayerLoggedIn
 
-    self.m_View:setButtonExitText(getLocalizedText(1, "Exit"))
+    self.m_View:setMenuTitleText(getLocalizedText(1, "MainMenu"))
+        :setButtonExitText(getLocalizedText(1, "Exit"))
     if (isPlayerLoggedIn) then
         self.m_View:setItems({
-            self.m_ItemNewWar,
-            self.m_ItemContinue,
-            self.m_ItemJoinWar,
+            self.m_ItemManageWar,
             self.m_ItemConfigSkills,
             self.m_ItemManageReplay,
             self.m_ItemViewGameRecord,
@@ -167,6 +179,19 @@ local function setStateMain(self, isPlayerLoggedIn)
             self.m_ItemHelp,
         })
     end
+end
+
+local function setStateManageWar(self)
+    self.m_State = "stateManageWar"
+
+    self.m_View:setMenuTitleText(getLocalizedText(1, "ManageWar"))
+        :setButtonExitText(getLocalizedText(1, "Back"))
+        :setItems({
+            self.m_ItemNewWar,
+            self.m_ItemContinue,
+            self.m_ItemJoinWar,
+            self.m_ItemExitWar,
+        })
 end
 
 --------------------------------------------------------------------------------
@@ -203,6 +228,16 @@ local function initItemContinue(self)
     }
 
     self.m_ItemContinue = item
+end
+
+local function initItemExitWar(self)
+    self.m_ItemExitWar = {
+        name     = getLocalizedText(1, "ExitWar"),
+        callback = function()
+            self:setMenuEnabled(false)
+                :getModelExitWarSelector():setEnabled(true)
+        end,
+    }
 end
 
 local function initItemHelp(self)
@@ -251,6 +286,15 @@ local function initItemManageReplay(self)
     }
 
     self.m_ItemManageReplay = item
+end
+
+local function initItemManageWar(self)
+    self.m_ItemManageWar = {
+        name     = getLocalizedText(1, "ManageWar"),
+        callback = function()
+            setStateManageWar(self)
+        end,
+    }
 end
 
 local function initItemNewWar(self)
@@ -309,10 +353,12 @@ function ModelMainMenu:ctor(param)
     initItemAuxiliaryCommands(  self)
     initItemConfigSkills(       self)
     initItemContinue(           self)
+    initItemExitWar(            self)
     initItemHelp(               self)
     initItemJoinWar(            self)
     initItemLogin(              self)
     initItemManageReplay(       self)
+    initItemManageWar(          self)
     initItemNewWar(             self)
     initItemSetMessageIndicator(self)
     initItemSetMusic(           self)
@@ -368,6 +414,8 @@ function ModelMainMenu:onButtonExitTouched()
     local state = self.m_State
     if (state == "stateAuxiliaryCommands") then
         setStateMain(self, self.m_IsPlayerLoggedIn)
+    elseif (state == "stateManageWar") then
+        setStateMain(self, self.m_IsPlayerLoggedIn)
     elseif (state == "stateMain") then
         SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain):setConfirmText(getLocalizedText(66, "ExitGame"))
             :setOnConfirmYes(function()
@@ -383,6 +431,10 @@ end
 
 function ModelMainMenu:getModelContinueWarSelector()
     return getActorContinueWarSelector(self):getModel()
+end
+
+function ModelMainMenu:getModelExitWarSelector()
+    return getActorExitWarSelector(self):getModel()
 end
 
 function ModelMainMenu:getModelGameRecordViewer()
