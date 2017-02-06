@@ -50,6 +50,19 @@ local function getActorContinueWarSelector(self)
     return self.m_ActorContinueWarSelector
 end
 
+local function getActorExitWarSelector(self)
+    if (not self.m_ActorExitWarSelector) then
+        local actor = Actor.createWithModelAndViewName("sceneMain.ModelExitWarSelector", nil, "sceneMain.ViewExitWarSelector")
+        actor:getModel():onStartRunning(self.m_ModelSceneMain)
+            :setEnabled(false)
+
+        self.m_ActorExitWarSelector = actor
+        self.m_View:setViewExitWarSelector(actor:getView())
+    end
+
+    return self.m_ActorExitWarSelector
+end
+
 local function getActorJoinWarSelector(self)
     if (not self.m_ActorJoinWarSelector) then
         local actor = Actor.createWithModelAndViewName("sceneMain.ModelJoinWarSelector", nil, "sceneMain.ViewJoinWarSelector")
@@ -177,6 +190,7 @@ local function setStateManageWar(self)
             self.m_ItemNewWar,
             self.m_ItemContinue,
             self.m_ItemJoinWar,
+            self.m_ItemExitWar,
         })
 end
 
@@ -214,6 +228,16 @@ local function initItemContinue(self)
     }
 
     self.m_ItemContinue = item
+end
+
+local function initItemExitWar(self)
+    self.m_ItemExitWar = {
+        name     = getLocalizedText(1, "ExitWar"),
+        callback = function()
+            self:setMenuEnabled(false)
+                :getModelExitWarSelector():setEnabled(true)
+        end,
+    }
 end
 
 local function initItemHelp(self)
@@ -329,6 +353,7 @@ function ModelMainMenu:ctor(param)
     initItemAuxiliaryCommands(  self)
     initItemConfigSkills(       self)
     initItemContinue(           self)
+    initItemExitWar(            self)
     initItemHelp(               self)
     initItemJoinWar(            self)
     initItemLogin(              self)
@@ -406,6 +431,10 @@ end
 
 function ModelMainMenu:getModelContinueWarSelector()
     return getActorContinueWarSelector(self):getModel()
+end
+
+function ModelMainMenu:getModelExitWarSelector()
+    return getActorExitWarSelector(self):getModel()
 end
 
 function ModelMainMenu:getModelGameRecordViewer()

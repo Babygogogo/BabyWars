@@ -6,6 +6,7 @@ local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3
 local JOIN_WAR_SELECTOR_Z_ORDER      = 3
+local EXIT_WAR_SELECTOR_Z_ORDER      = 3
 local SKILL_CONFIGURATOR_Z_ORDER     = 3
 local REPLAY_MANAGER_Z_ORDER         = 3
 local LOGIN_PANEL_Z_ORDER            = 3
@@ -174,6 +175,14 @@ function ViewMainMenu:setViewContinueWarSelector(view)
     assert(self.m_ViewContinueWarSelector == nil, "ViewMainMenu:setViewContinueWarSelector() the view has been set.")
     self.m_ViewContinueWarSelector = view
     self:addChild(view, CONTINUE_GAME_SELECTOR_Z_ORDER)
+
+    return self
+end
+
+function ViewMainMenu:setViewExitWarSelector(view)
+    assert(self.m_ViewExitWarSelector == nil, "ViewMainMenu:setViewExitWarSelector() the view has been set already.")
+    self.m_ViewExitWarSelector = view
+    self:addChild(view, EXIT_WAR_SELECTOR_Z_ORDER)
 
     return self
 end

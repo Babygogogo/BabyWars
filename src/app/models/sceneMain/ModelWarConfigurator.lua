@@ -43,7 +43,7 @@ end
 
 local function generateSkillDescription(self)
     local skillConfigurationID = self.m_SkillConfigurationID
-    if (self.m_Mode == "modeContinue") then
+    if ((self.m_Mode == "modeContinue") or (self.m_Mode == "modeExit")) then
         return getLocalizedText(14, "Selected")
     elseif (not skillConfigurationID) then
         return getLocalizedText(14, "None")
@@ -120,6 +120,9 @@ local function createItemsForStateMain(self)
     elseif (mode == "modeContinue") then
         return {self.m_ItemPlaceHolder}
 
+    elseif (model == "modeExit") then
+        return {self.m_ItemPlaceHolder}
+
     else
         error("ModelWarConfigurator-createItemsForStateMain() the mode of the configurator is invalid: " .. (mode or ""))
     end
@@ -153,6 +156,9 @@ end
 --------------------------------------------------------------------------------
 -- The functions for sending actions.
 --------------------------------------------------------------------------------
+local function sendActionExitWar(self)
+end
+
 local function sendActionGetSkillConfiguration(skillConfigurationID)
     WebSocketManager.sendAction({
         actionCode           = ACTION_CODE_GET_SKILL_CONFIGURATION,
@@ -500,6 +506,7 @@ end
 
 function ModelWarConfigurator:setModeCreateWar()
     self.m_Mode                           = "modeCreate"
+    self.m_MenuTitleTextForMode           = getLocalizedText(14, "CreateWar")
     self.m_CallbackOnButtonConfirmTouched = function()
         local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(8, "NewWarConfirmation"))
@@ -522,6 +529,7 @@ end
 
 function ModelWarConfigurator:setModeJoinWar()
     self.m_Mode                           = "modeJoin"
+    self.m_MenuTitleTextForMode           = getLocalizedText(14, "JoinWar")
     self.m_CallbackOnButtonConfirmTouched = function()
         local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
         modelConfirmBox:setConfirmText(getLocalizedText(8, "JoinWarConfirmation"))
@@ -544,9 +552,22 @@ end
 
 function ModelWarConfigurator:setModeContinueWar()
     self.m_Mode                           = "modeContinue"
+    self.m_MenuTitleTextForMode           = getLocalizedText(14, "ContinueWar")
     self.m_CallbackOnButtonConfirmTouched = function()
         SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingWarData"))
         sendActionRunSceneWar(self.m_WarConfiguration.warID)
+        self.m_View:disableButtonConfirmForSecs(5)
+    end
+
+    return self
+end
+
+function ModelWarConfigurator:setModeExitWar()
+    self.m_Mode                           = "modeExit"
+    self.m_MenuTitleTextForMode           = getLocalizedText(14, "ExitWar")
+    self.m_CallbackOnButtonConfirmTouched = function()
+        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingExitWarResult"))
+        sendActionExitWar(self)
         self.m_View:disableButtonConfirmForSecs(5)
     end
 
@@ -572,7 +593,6 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ItemsForStatePlayerIndex = createItemsForStatePlayerIndex(self)
         self.m_MaxBaseSkillPoints       = 100
         self.m_MaxDiffScore             = 100
-        self.m_MenuTitleTextForMode     = getLocalizedText(14, "CreateWar")
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = 1
         self.m_SkillConfigurationID     = 1
@@ -587,7 +607,6 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ItemsForStatePlayerIndex = createItemsForStatePlayerIndex(self)
         self.m_MaxBaseSkillPoints       = warConfiguration.maxBaseSkillPoints
         self.m_MaxDiffScore             = warConfiguration.maxDiffScore
-        self.m_MenuTitleTextForMode     = getLocalizedText(14, "JoinWar")
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = self.m_ItemsForStatePlayerIndex[1].playerIndex
         self.m_SkillConfigurationID     = (warConfiguration.maxBaseSkillPoints) and (1) or (nil)
@@ -604,12 +623,24 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ItemsForStatePlayerIndex = nil
         self.m_MaxBaseSkillPoints       = warConfiguration.maxBaseSkillPoints
         self.m_MaxDiffScore             = warConfiguration.maxDiffScore
-        self.m_MenuTitleTextForMode     = getLocalizedText(14, "ContinueWar")
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
+
+    elseif (mode == "modeExit") then
+        self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
+        self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
+        self.m_IsRankMatch              = warConfiguration.isRankMatch
+        self.m_ItemsForStatePlayerIndex = nil
+        self.m_MaxBaseSkillPoints       = warConfiguration.maxBaseSkillPoints
+        self.m_MaxDiffScore             = warConfiguration.maxDiffScore
+        self.m_ModelSkillConfiguration  = nil
+        self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
+        self.m_SkillConfigurationID     = nil
+
+        self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmExitWar"))
 
     else
         error("ModelWarConfigurator:resetWithWarConfiguration() the mode of the configurator is invalid: " .. (mode or ""))
