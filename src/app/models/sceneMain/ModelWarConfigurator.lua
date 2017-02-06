@@ -14,6 +14,7 @@ local WebSocketManager          = require("src.app.utilities.WebSocketManager")
 local string           = string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
+local ACTION_CODE_EXIT_WAR                    = ActionCodeFunctions.getActionCode("ActionExitWar")
 local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCode("ActionGetSkillConfiguration")
 local ACTION_CODE_JOIN_WAR                    = ActionCodeFunctions.getActionCode("ActionJoinWar")
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
@@ -75,10 +76,9 @@ local function generateOverviewText(self)
 end
 
 local function getPlayerIndexForWarConfiguration(warConfiguration)
-    local players = warConfiguration.players
     local account = WebSocketManager.getLoggedInAccountAndPassword()
-    for playerIndex = 1, WarFieldManager.getPlayersCount(warConfiguration.warFieldFileName) do
-        if (players[playerIndex].account == account) then
+    for playerIndex, player in pairs(warConfiguration.players) do
+        if (player.account == account) then
             return playerIndex
         end
     end
@@ -156,7 +156,11 @@ end
 --------------------------------------------------------------------------------
 -- The functions for sending actions.
 --------------------------------------------------------------------------------
-local function sendActionExitWar(self)
+local function sendActionExitWar(warID)
+    WebSocketManager.sendAction({
+        actionCode = ACTION_CODE_EXIT_WAR,
+        warID      = warID,
+    })
 end
 
 local function sendActionGetSkillConfiguration(skillConfigurationID)
@@ -566,9 +570,15 @@ function ModelWarConfigurator:setModeExitWar()
     self.m_Mode                           = "modeExit"
     self.m_MenuTitleTextForMode           = getLocalizedText(14, "ExitWar")
     self.m_CallbackOnButtonConfirmTouched = function()
-        SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingExitWarResult"))
-        sendActionExitWar(self)
-        self.m_View:disableButtonConfirmForSecs(5)
+        local modelConfirmBox = SingletonGetters.getModelConfirmBox(self.m_ModelSceneMain)
+        modelConfirmBox:setConfirmText(getLocalizedText(8, "ExitWarConfirmation"))
+            :setOnConfirmYes(function()
+                SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(14, "RetrievingExitWarResult"))
+                sendActionExitWar(self.m_WarConfiguration.warID)
+                self.m_View:disableButtonConfirmForSecs(5)
+                modelConfirmBox:setEnabled(false)
+            end)
+            :setEnabled(true)
     end
 
     return self

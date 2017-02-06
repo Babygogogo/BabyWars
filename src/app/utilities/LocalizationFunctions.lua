@@ -530,8 +530,9 @@ local s_Texts = {
     },
     [8] = {
         [1] = function(textType)
-            if     (textType == "JoinWarConfirmation") then return "请仔细检查各项设定。\n一旦确认，您无法取消或退出。\n确定要参战吗？"
-            elseif (textType == "NewWarConfirmation")  then return "请仔细检查各项设定。\n一旦确认，您无法取消或退出。\n确定要创建战局吗？"
+            if     (textType == "ExitWarConfirmation") then return "确定要退出该战局吗？"
+            elseif (textType == "JoinWarConfirmation") then return "请仔细检查各项设定。\n确定要参战吗？"
+            elseif (textType == "NewWarConfirmation")  then return "请仔细检查各项设定。\n确定要创建战局吗？"
             elseif (textType == "NoContinuableWar")    then return "您没有可以继续进行的战局。"
             elseif (textType == "NoWaitingWar")        then return "您没有可以退出的战局。"
             elseif (textType == "TransferingData")     then return "正在传输数据。若长时间没有反应，请返回重试。"
@@ -539,8 +540,9 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "JoinWarConfirmation") then return "Once you join the war, you won't be able to cancel it.\nAre you sure to join the war?"
-            elseif (textType == "NewWarConfirmation")  then return "Once you create the war, you won't be able to cancel it.\nAre you sure to create the war?"
+            if     (textType == "ExitWarConfirmation") then return "Are you sure to exit the war?"
+            elseif (textType == "JoinWarConfirmation") then return "Are you sure to join the war?"
+            elseif (textType == "NewWarConfirmation")  then return "Are you sure to create the war?"
             elseif (textType == "NoContinuableWar")    then return "No war is continuable currently."
             elseif (textType == "NoWaitingWar")        then return "There's no war that you can exit currently."
             elseif (textType == "TransferingData")     then return "Transfering data. If it's not responding, please retry."
@@ -1080,14 +1082,16 @@ local s_Texts = {
     },
     [56] = {
         [1] = function(textType, additionalText)
-            if     (textType == "JoinWarNotStarted")   then return "该战局尚未开始，请耐心等待更多玩家加入。"
+            if     (textType == "ExitWarSuccessfully") then return "您已退出战局 [" .. additionalText .. "]。"
+            elseif (textType == "JoinWarNotStarted")   then return "该战局尚未开始，请耐心等待更多玩家加入。"
             elseif (textType == "JoinWarStarted")      then return "该战局已开始，您可以通过[继续]选项进入战局。"
             elseif (textType == "JoinWarSuccessfully") then return "您已成功参战 [" .. additionalText .. "]。"
             else                                            return "未知56:" .. (textType or "")
             end
         end,
         [2] = function(textType, additionalText)
-            if     (textType == "JoinWarNotStarted")   then return "The war is not started. Please wait for more players to join."
+            if     (textType == "ExitWarSuccessfully") then return "Exit war [" .. additionalText .. "] successfully."
+            elseif (textType == "JoinWarNotStarted")   then return "The war is not started. Please wait for more players to join."
             elseif (textType == "JoinWarStarted")      then return "The war is started."
             elseif (textType == "JoinWarSuccessfully") then return "Join war [" .. additionalText .. "] successfully."
             else                                            return "Unknown56:" .. (textType or "")
@@ -1414,6 +1418,7 @@ local s_Texts = {
             elseif (errType == "MultiJoinWar")                   then return "您已参战。"
             elseif (errType == "MultiLogin")                     then return "您的账号[" .. text .. "]在另一台设备上被登陆，您已被迫下线！"
             elseif (errType == "NoReplayData")                   then return "该回放数据不存在，无法下载。若一直遇到此问题，请与作者联系。"
+            elseif (errType == "NotExitableWar")                 then return "该战局可能已经开始，无法退出。"
             elseif (errType == "NotJoinableWar")                 then return "战局可能已经开始，无法参战。请选择其他战局。"
             elseif (errType == "OccupiedPlayerIndex")            then return "您指定的行动顺序已被其他玩家占用。请使用其他顺序。"
             elseif (errType == "OutOfSync")                      then return "战局数据不同步。将自动刷新。" .. text .. "\n若无限刷新，请联系作者，谢谢！"
@@ -1442,6 +1447,7 @@ local s_Texts = {
             elseif (errType == "MultiJoinWar")                   then return "You have already joined the war."
             elseif (errType == "MultiLogin")                     then return "Another device is logging in with your account [" .. account .. "], and you're kicked offline!"
             elseif (errType == "NoReplayData")                   then return "The replay data doesn't exist."
+            elseif (errType == "NotExitableWar")                 then return "The war has begun already. You can no longer exit."
             elseif (errType == "NotJoinableWar")                 then return "The war has begun already. Please join another war."
             elseif (errType == "OccupiedPlayerIndex")            then return "The player index has been used by another player."
             elseif (errType == "OutOfSync")                      then return "The war data is out of sync." .. text

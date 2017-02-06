@@ -339,6 +339,23 @@ local function executeDownloadReplayData(action, modelScene)
     end
 end
 
+local function executeExitWar(action, modelScene)
+    local warID = action.warID
+    if (IS_SERVER) then
+        SceneWarManager.exitWar(action.playerAccount, warID)
+    else
+        getModelMessageIndicator(modelScene):showMessage(getLocalizedText(56, "ExitWarSuccessfully", AuxiliaryFunctions.getWarNameWithWarId(warID)))
+        if (not modelScene.isModelSceneWar) then
+            local modelMainMenu        = modelScene:getModelMainMenu()
+            local modelExitWarSelector = modelMainMenu:getModelExitWarSelector()
+            if (modelExitWarSelector:isRetrievingExitWarResult(warID)) then
+                modelExitWarSelector:setEnabled(false)
+                modelMainMenu:setMenuEnabled(true)
+            end
+        end
+    end
+end
+
 local function executeGetReplayConfigurations(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeGetReplayConfigurations() should not be invoked on the server.")
     if (modelScene.isModelSceneWar) then
@@ -1721,6 +1738,7 @@ function ActionExecutor.execute(action, modelScene)
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
     if     (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionExitWar)                      then executeExitWar(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetOngoingWarConfigurations)  then executeGetOngoingWarConfigurations( action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetPlayerProfile)             then executeGetPlayerProfile(            action, modelScene)

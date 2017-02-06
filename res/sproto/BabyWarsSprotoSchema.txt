@@ -4,25 +4,26 @@
 ################################################################################
 .ActionGeneric {
     ActionDownloadReplayData            1 : ActionDownloadReplayData
-    ActionGetJoinableWarConfigurations  2 : ActionGetJoinableWarConfigurations
-    ActionGetOngoingWarConfigurations   3 : ActionGetOngoingWarConfigurations
-    ActionGetPlayerProfile              4 : ActionGetPlayerProfile
-    ActionGetRankingList                5 : ActionGetRankingList
-    ActionGetReplayConfigurations       6 : ActionGetReplayConfigurations
-    ActionGetSkillConfiguration         7 : ActionGetSkillConfiguration
-    ActionGetWaitingWarConfigurations   8 : ActionGetWaitingWarConfigurations
-    ActionJoinWar                       9 : ActionJoinWar
-    ActionLogin                        10 : ActionLogin
-    ActionLogout                       11 : ActionLogout
-    ActionMessage                      12 : ActionMessage
-    ActionNetworkHeartbeat             13 : ActionNetworkHeartbeat
-    ActionNewWar                       14 : ActionNewWar
-    ActionRegister                     15 : ActionRegister
-    ActionReloadSceneWar               16 : ActionReloadSceneWar
-    ActionRunSceneMain                 17 : ActionRunSceneMain
-    ActionRunSceneWar                  18 : ActionRunSceneWar
-    ActionSetSkillConfiguration        19 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 20 : ActionSyncSceneWar
+    ActionExitWar                       2 : ActionExitWar
+    ActionGetJoinableWarConfigurations  3 : ActionGetJoinableWarConfigurations
+    ActionGetOngoingWarConfigurations   4 : ActionGetOngoingWarConfigurations
+    ActionGetPlayerProfile              5 : ActionGetPlayerProfile
+    ActionGetRankingList                6 : ActionGetRankingList
+    ActionGetReplayConfigurations       7 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         8 : ActionGetSkillConfiguration
+    ActionGetWaitingWarConfigurations   9 : ActionGetWaitingWarConfigurations
+    ActionJoinWar                      10 : ActionJoinWar
+    ActionLogin                        11 : ActionLogin
+    ActionLogout                       12 : ActionLogout
+    ActionMessage                      13 : ActionMessage
+    ActionNetworkHeartbeat             14 : ActionNetworkHeartbeat
+    ActionNewWar                       15 : ActionNewWar
+    ActionRegister                     16 : ActionRegister
+    ActionReloadSceneWar               17 : ActionReloadSceneWar
+    ActionRunSceneMain                 18 : ActionRunSceneMain
+    ActionRunSceneWar                  19 : ActionRunSceneWar
+    ActionSetSkillConfiguration        20 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 21 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -55,6 +56,13 @@
     actionCode        0 : integer
     warID             1 : integer
     encodedReplayData 2 : string
+}
+
+.ActionExitWar {
+    actionCode     0 : integer
+    playerAccount  1 : string
+    playerPassword 2 : string
+    warID          3 : integer
 }
 
 .ActionGetJoinableWarConfigurations {

@@ -172,6 +172,11 @@ function ModelExitWarSelector:updateWithWaitingWarConfigurations(warConfiguratio
     return self
 end
 
+function ModelExitWarSelector:isRetrievingExitWarResult(warID)
+    local modelWarConfigurator = getActorWarConfigurator(self):getModel()
+    return (modelWarConfigurator:isEnabled()) and (modelWarConfigurator:getWarId() == warID)
+end
+
 function ModelExitWarSelector:onButtonBackTouched()
     self:setEnabled(false)
     SingletonGetters.getModelMainMenu(self.m_ModelSceneMain):setMenuEnabled(true)
