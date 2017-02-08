@@ -32,7 +32,7 @@ local COMPONENT_PATH = "src.app.components."
 -- The util functions.
 --------------------------------------------------------------------------------
 local function loadComponentClass(componentName)
-    local cls = require(COMPONENT_PATH .. componentName)
+    local cls = requireBW(COMPONENT_PATH .. componentName)
     assert(cls, string.format("ComponentManager--loadComponentClass() component \"%s\" load failed", componentName))
 
     return cls

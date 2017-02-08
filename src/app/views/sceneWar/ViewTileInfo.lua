@@ -1,8 +1,8 @@
 
 local ViewTileInfo = class("ViewTileInfo", cc.Node)
 
-local AnimationLoader       = require("src.app.utilities.AnimationLoader")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local AnimationLoader       = requireBW("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
 
 local TILE_LABEL_Z_ORDER = 3
 local INFO_LABEL_Z_ORDER = 2

@@ -14,7 +14,7 @@
 
 local ModelBattleInfo = class("ModelBattleInfo")
 
-local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.

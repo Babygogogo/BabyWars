@@ -1,11 +1,11 @@
 
 local ModelGameRecordViewer = class("ModelGameRecordViewer")
 
-local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
-local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local ActionCodeFunctions   = requireBW("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions    = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local WebSocketManager      = requireBW("src.app.utilities.WebSocketManager")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
 
 local string, ipairs, pairs = string, ipairs, pairs
 local getLocalizedText      = LocalizationFunctions.getLocalizedText

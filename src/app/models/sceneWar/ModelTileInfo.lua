@@ -12,8 +12,8 @@
 
 local ModelTileInfo = class("ModelTileInfo")
 
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters   = require("src.app.utilities.SingletonGetters")
+local GridIndexFunctions = requireBW("src.app.utilities.GridIndexFunctions")
+local SingletonGetters   = requireBW("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The util functions.

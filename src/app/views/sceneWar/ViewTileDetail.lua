@@ -1,8 +1,8 @@
 
 local ViewTileDetail = class("ViewTileDetail", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local DisplayNodeFunctions  = requireBW("src.app.utilities.DisplayNodeFunctions")
 
 local LABEL_Z_ORDER       = 1
 local BOTTOM_LINE_Z_ORDER = 0

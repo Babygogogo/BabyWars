@@ -11,7 +11,7 @@
 
 local ModelGridEffect = class("ModelGridEffect")
 
-local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
 
 --------------------------------------------------------------------------------
 -- The util functions.

@@ -1,13 +1,13 @@
 
 local ModelReplayManager = class("ModelReplayManager")
 
-local Actor                  = require("src.global.actors.Actor")
-local ActorManager           = require("src.global.actors.ActorManager")
-local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
+local Actor                  = requireBW("src.global.actors.Actor")
+local ActorManager           = requireBW("src.global.actors.ActorManager")
+local ActionCodeFunctions    = requireBW("src.app.utilities.ActionCodeFunctions")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
+local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local WebSocketManager       = requireBW("src.app.utilities.WebSocketManager")
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
@@ -91,7 +91,7 @@ local function generateReplayConfiguration(warData)
 end
 
 local function getPlayerNicknames(replayConfiguration)
-    local playersCount = require("res.data.templateWarField." .. replayConfiguration.warFieldFileName).playersCount
+    local playersCount = requireBW("res.data.templateWarField." .. replayConfiguration.warFieldFileName).playersCount
     local names        = {}
     local players      = replayConfiguration.players
 
@@ -123,7 +123,7 @@ local function createMenuItemsForDelete(self)
     for warID, replayConfiguration in pairs(self.m_ReplayList) do
         local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
-            name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
             warID    = warID,
             callback = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
@@ -161,7 +161,7 @@ local function createMenuItemsForDownload(self, list)
         local warFieldFileName = replayConfiguration.warFieldFileName
         if (not self.m_ReplayList[warID]) then
             items[#items + 1] = {
-                name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+                name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
                 warID    = warID,
 
                 callback = function()
@@ -200,7 +200,7 @@ local function createMenuItemsForPlayback(self)
     for warID, replayConfiguration in pairs(self.m_ReplayList) do
         local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
-            name     = require("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
             warID    = warID,
 
             callback = function()

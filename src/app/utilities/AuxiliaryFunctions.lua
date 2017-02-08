@@ -1,7 +1,7 @@
 
 local AuxiliaryFunctions = {}
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local math, string, table = math, string, table
 local getLocalizedText    = LocalizationFunctions.getLocalizedText

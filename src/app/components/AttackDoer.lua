@@ -13,12 +13,12 @@
 --    伤害值受防御类型、hp、地形、等级、co技能、天气等影响
 --]]--------------------------------------------------------------------------------
 
-local AttackDoer = require("src.global.functions.class")("AttackDoer")
+local AttackDoer = requireBW("src.global.functions.class")("AttackDoer")
 
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
-local ComponentManager       = require("src.global.components.ComponentManager")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = requireBW("src.global.components.ComponentManager")
+local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 
 AttackDoer.EXPORTED_METHODS = {
     "hasPrimaryWeapon",

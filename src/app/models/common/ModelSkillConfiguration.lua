@@ -1,13 +1,13 @@
 
-local ModelSkillConfiguration = require("src.global.functions.class")("ModelSkillConfiguration")
+local ModelSkillConfiguration = requireBW("src.global.functions.class")("ModelSkillConfiguration")
 
-local ModelSkillGroupPassive = require("src.app.models.common.ModelSkillGroupPassive")
-local ModelSkillGroupActive  = require("src.app.models.common.ModelSkillGroupActive")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SkillDataAccessors     = require("src.app.utilities.SkillDataAccessors")
+local ModelSkillGroupPassive = requireBW("src.app.models.common.ModelSkillGroupPassive")
+local ModelSkillGroupActive  = requireBW("src.app.models.common.ModelSkillGroupActive")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors     = requireBW("src.app.utilities.SkillDataAccessors")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
-local round            = require("src.global.functions.round")
+local round            = requireBW("src.global.functions.round")
 
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 local SKILL_POINTS_PER_ENERGY_REQUIREMENT     = SkillDataAccessors.getSkillPointsPerEnergyRequirement()

@@ -13,7 +13,7 @@
 --   目前还没有正式开始实现天气功能。
 --]]--------------------------------------------------------------------------------
 
-local ModelWeatherManager = require("src.global.functions.class")("ModelWeatherManager")
+local ModelWeatherManager = requireBW("src.global.functions.class")("ModelWeatherManager")
 
 local WEATHER_CODES = {
     Clear = 1,

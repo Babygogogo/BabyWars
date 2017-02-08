@@ -1,8 +1,8 @@
 
 local ViewExitWarSelector = class("ViewExitWarSelector", cc.Node)
 
-local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local AuxiliaryFunctions    = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local WAR_CONFIGURATOR_Z_ORDER    = 1
 local MENU_TITLE_Z_ORDER          = 1

@@ -1,7 +1,7 @@
 
 local ViewBattleInfo = class("ViewBattleInfo", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local LABEL_Z_ORDER      = 1
 local BACKGROUND_Z_ORDER = 0

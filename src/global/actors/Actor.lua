@@ -29,7 +29,7 @@
 --     理想状态下，如果需要更换引擎，那么我们只需要改写view就可以，其他都可以不用更改。
 --]]--------------------------------------------------------------------------------
 
-local Actor = require("src.global.functions.class")("Actor")
+local Actor = requireBW("src.global.functions.class")("Actor")
 
 local MODEL_PATH = "src.app.models."
 local VIEW_PATH  = "src.app.views."
@@ -49,7 +49,7 @@ function Actor.createModel(name, ...)
     if (not name) then
         return nil
     else
-        return require(MODEL_PATH .. name):create(...)
+        return requireBW(MODEL_PATH .. name):create(...)
     end
 end
 
@@ -57,7 +57,7 @@ function Actor.createView(name, ...)
     if (not name) then
         return nil
     else
-        return require(VIEW_PATH .. name):create(...)
+        return requireBW(VIEW_PATH .. name):create(...)
     end
 end
 

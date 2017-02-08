@@ -1,9 +1,9 @@
 
 local ViewFogMap = class("ViewFogMap", cc.Node)
 
-local GridIndexFunctions  = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters    = require("src.app.utilities.SingletonGetters")
-local VisibilityFunctions = require("src.app.utilities.VisibilityFunctions")
+local GridIndexFunctions  = requireBW("src.app.utilities.GridIndexFunctions")
+local SingletonGetters    = requireBW("src.app.utilities.SingletonGetters")
+local VisibilityFunctions = requireBW("src.app.utilities.VisibilityFunctions")
 
 local isTileVisible       = VisibilityFunctions.isTileVisibleToPlayerIndex
 local toPositionWithXY    = GridIndexFunctions.toPositionWithXY

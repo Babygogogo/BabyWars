@@ -11,7 +11,7 @@
 
 local GridIndexFunctions = {}
 
-local GRID_SIZE               = require("src.app.utilities.GameConstantFunctions").getGridSize()
+local GRID_SIZE               = requireBW("src.app.utilities.GameConstantFunctions").getGridSize()
 local GRID_WIDTH, GRID_HEIGHT = GRID_SIZE.width, GRID_SIZE.height
 local ADJACENT_GRIDS_OFFSET   = {
     {x = -1, y =  0, direction = "left",  clockwiseOffset = {x =  1, y =  1},},

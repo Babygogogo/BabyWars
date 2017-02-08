@@ -1,8 +1,8 @@
 
 local ViewReplayManager = class("ViewReplayManager", cc.Node)
 
-local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local AuxiliaryFunctions    = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 

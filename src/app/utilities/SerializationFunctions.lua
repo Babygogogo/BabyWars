@@ -2,9 +2,9 @@
 local SerializationFunctions = {}
 
 local io     = io
-local sproto = require("src.global.functions.sproto")
+local sproto = requireBW("src.global.functions.sproto")
 
-local IS_SERVER         = require("src.app.utilities.GameConstantFunctions").isServer()
+local IS_SERVER         = requireBW("src.app.utilities.GameConstantFunctions").isServer()
 local WRITABLE_PATH     = (not IS_SERVER) and (cc.FileUtils:getInstance():getWritablePath() .. "writablePath/") or (nil)
 local ACCOUNT_FILE_PATH = (not IS_SERVER) and (WRITABLE_PATH  .. "LoggedInAccount.lua")                         or (nil)
 

@@ -1,11 +1,11 @@
 
 local ViewWarFieldPreviewer = class("ViewWarFieldPreviewer", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local GRID_SIZE = require("src.app.utilities.GameConstantFunctions").getGridSize()
+local GRID_SIZE = requireBW("src.app.utilities.GameConstantFunctions").getGridSize()
 
 local AUTHOR_NAME_LABEL_Z_ORDER = 1
 local LABEL_NICKNAMES_Z_ORDER   = 1
@@ -83,7 +83,7 @@ end
 local function initClippingNode(self)
     local clippingNode = cc.ClippingRectangleNode:create(CLIPPING_RECT)
     clippingNode:setPosition(CLIPPING_NODE_POS_X, CLIPPING_NODE_POS_Y)
-    local zoomableNode = require("src.app.views.common.ViewZoomableNode"):create(BOUNDARY_RECT)
+    local zoomableNode = requireBW("src.app.views.common.ViewZoomableNode"):create(BOUNDARY_RECT)
 
     self.m_ClippingNode = clippingNode
     self.m_ZoomableNode = zoomableNode

@@ -1,8 +1,8 @@
 
 local ViewLoginPanel = class("ViewLoginPanel", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local DisplayNodeFunctions  = requireBW("src.app.utilities.DisplayNodeFunctions")
 
 local LABEL_TITLE_Z_ORDER       = 1
 local LABEL_ACCOUNT_Z_ORDER     = 1

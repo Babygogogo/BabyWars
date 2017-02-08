@@ -1,8 +1,8 @@
 
-local ModelSkillGroupPassive = require("src.global.functions.class")("ModelSkillGroupPassive")
+local ModelSkillGroupPassive = requireBW("src.global.functions.class")("ModelSkillGroupPassive")
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SkillDataAccessors    = requireBW("src.app.utilities.SkillDataAccessors")
 
 local getSkillModifierUnit = SkillDataAccessors.getSkillModifierUnit
 local getSkillPoints       = SkillDataAccessors.getSkillPoints

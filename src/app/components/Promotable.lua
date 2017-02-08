@@ -11,9 +11,9 @@
 --   不能进行攻击的单位无法升级，因此无需绑定本组件
 --]]--------------------------------------------------------------------------------
 
-local Promotable = require("src.global.functions.class")("Promotable")
+local Promotable = requireBW("src.global.functions.class")("Promotable")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
 
 local MAX_PROMOTION   = GameConstantFunctions.getMaxPromotion()
 local PROMOTION_BONUS = GameConstantFunctions.getPromotionBonus()

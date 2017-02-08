@@ -15,16 +15,16 @@
 
 local ModelSceneMain = class("ModelSceneMain")
 
-local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
-local ActionExecutor         = require("src.app.utilities.ActionExecutor")
-local AudioManager           = require("src.app.utilities.AudioManager")
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
-local Actor                  = require("src.global.actors.Actor")
-local ActorManager           = require("src.global.actors.ActorManager")
-local EventDispatcher        = require("src.global.events.EventDispatcher")
+local ActionCodeFunctions    = requireBW("src.app.utilities.ActionCodeFunctions")
+local ActionExecutor         = requireBW("src.app.utilities.ActionExecutor")
+local AudioManager           = requireBW("src.app.utilities.AudioManager")
+local GameConstantFunctions  = requireBW("src.app.utilities.GameConstantFunctions")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local WebSocketManager       = requireBW("src.app.utilities.WebSocketManager")
+local Actor                  = requireBW("src.global.actors.Actor")
+local ActorManager           = requireBW("src.global.actors.ActorManager")
+local EventDispatcher        = requireBW("src.global.events.EventDispatcher")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 local string           = string

@@ -1,8 +1,8 @@
 
 local ModelReplayController = class("ModelReplayController")
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 

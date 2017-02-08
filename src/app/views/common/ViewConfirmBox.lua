@@ -1,8 +1,8 @@
 
 local ViewConfirmBox = class("ViewConfirmBox", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local DisplayNodeFunctions  = requireBW("src.app.utilities.DisplayNodeFunctions")
 
 local BACKGROUND_WIDTH  = 600
 local BACKGROUND_HEIGHT = display.height * 0.5

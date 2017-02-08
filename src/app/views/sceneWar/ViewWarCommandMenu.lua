@@ -1,7 +1,7 @@
 
 local ViewWarCommandMenu = class("ViewWarCommandMenu", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 

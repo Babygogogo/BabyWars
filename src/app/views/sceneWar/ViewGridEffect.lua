@@ -1,8 +1,8 @@
 
 local ViewGridEffect = class("ViewGridEffect", cc.Node)
 
-local GRID_SIZE          = require("src.app.utilities.GameConstantFunctions").getGridSize()
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local GRID_SIZE          = requireBW("src.app.utilities.GameConstantFunctions").getGridSize()
+local GridIndexFunctions = requireBW("src.app.utilities.GridIndexFunctions")
 
 local SKILL_ACTIVATION_Z_ORDER = 3
 local DAMAGE_Z_ORDER           = 2

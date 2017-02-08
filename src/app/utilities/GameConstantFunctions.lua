@@ -40,9 +40,9 @@
 
 local GameConstantFunctions = {}
 
-local Actor = require("src.global.actors.Actor")
+local Actor = requireBW("src.global.actors.Actor")
 
-local GAME_CONSTANT        = require("res.data.GameConstant")
+local GAME_CONSTANT        = requireBW("res.data.GameConstant")
 local GRID_SIZE            = GAME_CONSTANT.gridSize
 local UNIT_NAMES           = GAME_CONSTANT.categories.AllUnits
 local TEMPLATE_MODEL_TILES = GAME_CONSTANT.templateModelTiles

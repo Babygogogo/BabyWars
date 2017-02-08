@@ -12,10 +12,10 @@
 --     此外，客户端发送给服务器的操作消息也都用GridIndex来指代特定的unit或tile
 --]]--------------------------------------------------------------------------------
 
-local GridIndexable = require("src.global.functions.class")("GridIndexable")
+local GridIndexable = requireBW("src.global.functions.class")("GridIndexable")
 
-local ComponentManager   = require("src.global.components.ComponentManager")
-local GridIndexFunctions = require("src.app.utilities.GridIndexFunctions")
+local ComponentManager   = requireBW("src.global.components.ComponentManager")
+local GridIndexFunctions = requireBW("src.app.utilities.GridIndexFunctions")
 
 GridIndexable.EXPORTED_METHODS = {
     "getGridIndex",

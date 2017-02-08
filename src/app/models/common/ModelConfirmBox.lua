@@ -13,8 +13,8 @@
 
 local ModelConfirmBox = class("ModelConfirmBox")
 
-local Actor           = require("src.global.actors.Actor")
-local TypeChecker     = require("src.app.utilities.TypeChecker")
+local Actor           = requireBW("src.global.actors.Actor")
+local TypeChecker     = requireBW("src.app.utilities.TypeChecker")
 
 local function createDefaultCallbackOnConfirm(self)
     return function()

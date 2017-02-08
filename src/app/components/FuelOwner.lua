@@ -10,7 +10,7 @@
 --   当前燃料量会影响单位的可移动距离，具体计算目前由ModelActionPlanner进行
 --]]--------------------------------------------------------------------------------
 
-local FuelOwner = require("src.global.functions.class")("FuelOwner")
+local FuelOwner = requireBW("src.global.functions.class")("FuelOwner")
 
 FuelOwner.EXPORTED_METHODS = {
     "getCurrentFuel",

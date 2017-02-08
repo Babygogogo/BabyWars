@@ -1,15 +1,15 @@
 
 local ModelWarConfigurator = class("ModelWarConfigurator")
 
-local Actor                     = require("src.global.actors.Actor")
-local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
-local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters          = require("src.app.utilities.SingletonGetters")
-local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
-local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
-local WarFieldManager           = require("src.app.utilities.WarFieldManager")
-local WebSocketManager          = require("src.app.utilities.WebSocketManager")
+local Actor                     = requireBW("src.global.actors.Actor")
+local ActionCodeFunctions       = requireBW("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions        = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions     = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters          = requireBW("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = requireBW("src.app.utilities.SkillDataAccessors")
+local SkillDescriptionFunctions = requireBW("src.app.utilities.SkillDescriptionFunctions")
+local WarFieldManager           = requireBW("src.app.utilities.WarFieldManager")
+local WebSocketManager          = requireBW("src.app.utilities.WebSocketManager")
 
 local string           = string
 local getLocalizedText = LocalizationFunctions.getLocalizedText

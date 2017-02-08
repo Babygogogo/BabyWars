@@ -1,8 +1,8 @@
 
-local Buildable = require("src.global.functions.class")("Buildable")
+local Buildable = requireBW("src.global.functions.class")("Buildable")
 
-local ComponentManager      = require("src.global.components.ComponentManager")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
+local ComponentManager      = requireBW("src.global.components.ComponentManager")
+local GridIndexFunctions    = requireBW("src.app.utilities.GridIndexFunctions")
 
 Buildable.EXPORTED_METHODS = {
     "getCurrentBuildPoint",

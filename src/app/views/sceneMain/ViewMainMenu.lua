@@ -1,7 +1,7 @@
 
 local ViewMainMenu = class("ViewMainMenu", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local NEW_GAME_CREATOR_Z_ORDER       = 3
 local CONTINUE_GAME_SELECTOR_Z_ORDER = 3

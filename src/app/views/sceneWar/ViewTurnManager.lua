@@ -1,7 +1,7 @@
 
 local ViewTurnManager = class("ViewTurnManager", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
 
 local BEGIN_TURN_EFFECT_Z_ORDER = 1
 

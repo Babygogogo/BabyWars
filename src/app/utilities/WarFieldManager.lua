@@ -14,13 +14,13 @@ local s_WarFieldListDeprecated = {}
 -- The util functions.
 --------------------------------------------------------------------------------
 local function loadWarFieldFileNameList()
-    return require(WAR_FIELD_PATH .. "WarFieldList")
+    return requireBW(WAR_FIELD_PATH .. "WarFieldList")
 end
 
 local function createWarFieldList(warFieldFileNameList)
     local list = {}
     for _, warFieldFileName in ipairs(warFieldFileNameList) do
-        list[warFieldFileName] = require(WAR_FIELD_PATH .. warFieldFileName)
+        list[warFieldFileName] = requireBW(WAR_FIELD_PATH .. warFieldFileName)
     end
 
     for warFieldFileName, warFieldData in pairs(list) do
@@ -61,7 +61,7 @@ function WarFieldManager.getWarFieldData(warFieldFileName)
         return s_WarFieldList[warFieldFileName]
     else
         if (not s_WarFieldListDeprecated[warFieldFileName]) then
-            s_WarFieldListDeprecated[warFieldFileName] = require(WAR_FIELD_PATH .. warFieldFileName)
+            s_WarFieldListDeprecated[warFieldFileName] = requireBW(WAR_FIELD_PATH .. warFieldFileName)
         end
         return s_WarFieldListDeprecated[warFieldFileName]
     end

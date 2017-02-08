@@ -18,7 +18,7 @@
 --     另外，如果分发事件引起了侦听器的注册/反注册，那么这些注册/反注册操作将被缓存，等到整个事件（包括连锁事件）处理完毕后再自动进行。
 --]]--------------------------------------------------------------------------------
 
-local EventDispatcher = require("src.global.functions.class")("EventDispatcher")
+local EventDispatcher = requireBW("src.global.functions.class")("EventDispatcher")
 
 local DISPATCH_NEST_INFORMING_LEVEL = 3
 

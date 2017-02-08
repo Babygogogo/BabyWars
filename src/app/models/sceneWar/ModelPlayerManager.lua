@@ -9,13 +9,13 @@
 --  - 本类目前没有对应的view，因为暂时还不用显示。
 --]]--------------------------------------------------------------------------------
 
-local ModelPlayerManager = require("src.global.functions.class")("ModelPlayerManager")
+local ModelPlayerManager = requireBW("src.global.functions.class")("ModelPlayerManager")
 
-local ModelPlayer      = require("src.app.models.sceneWar.ModelPlayer")
-local SingletonGetters = require("src.app.utilities.SingletonGetters")
+local ModelPlayer      = requireBW("src.app.models.sceneWar.ModelPlayer")
+local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
 
-local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
-local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+local IS_SERVER        = requireBW("src.app.utilities.GameConstantFunctions").isServer()
+local WebSocketManager = (not IS_SERVER) and (requireBW("src.app.utilities.WebSocketManager")) or (nil)
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.

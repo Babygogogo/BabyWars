@@ -10,10 +10,10 @@
 --   占领能力受hp、co技能影响
 --]]--------------------------------------------------------------------------------
 
-local Capturer = require("src.global.functions.class")("Capturer")
+local Capturer = requireBW("src.global.functions.class")("Capturer")
 
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
-local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
+local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 
 Capturer.EXPORTED_METHODS = {
     "isCapturingModelTile",

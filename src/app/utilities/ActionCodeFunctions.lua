@@ -1,7 +1,7 @@
 
 local ActionCodeFunctions = {}
 
-local TableFunctions = require("src.app.utilities.TableFunctions")
+local TableFunctions = requireBW("src.app.utilities.TableFunctions")
 
 local s_ActionCodes = {
     ActionDownloadReplayData           = 1,

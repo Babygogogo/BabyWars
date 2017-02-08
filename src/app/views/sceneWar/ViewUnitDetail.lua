@@ -1,9 +1,9 @@
 
 local ViewUnitDetail = class("ViewUnitDetail", cc.Node)
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local AnimationLoader       = require("src.app.utilities.AnimationLoader")
-local DisplayNodeFunctions  = require("src.app.utilities.DisplayNodeFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local AnimationLoader       = requireBW("src.app.utilities.AnimationLoader")
+local DisplayNodeFunctions  = requireBW("src.app.utilities.DisplayNodeFunctions")
 
 local PRIMARY_WEAPON_ICONS_Z_ORDER   = 2
 local SECONDARY_WEAPON_ICONS_Z_ORDER = 2
@@ -71,7 +71,7 @@ local DEFENSE_INFO_POS_X  = BACKGROUND_POS_X + 5
 local DEFENSE_INFO_POS_Y  = SECONDARY_WEAPON_INFO_POS_Y - DEFENSE_INFO_HEIGHT
 
 local ICON_SCALE = FONT_SIZE * 0.016
-local GRID_WIDTH = require("src.app.utilities.GameConstantFunctions").getGridSize().width
+local GRID_WIDTH = requireBW("src.app.utilities.GameConstantFunctions").getGridSize().width
 
 --------------------------------------------------------------------------------
 -- Util functions.

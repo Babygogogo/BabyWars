@@ -1,12 +1,12 @@
 
 local ModelLoginPanel = class("ModelLoginPanel")
 
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
-local WebSocketManager       = require("src.app.utilities.WebSocketManager")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
+local WebSocketManager       = requireBW("src.app.utilities.WebSocketManager")
 
-local getActionCode                 = require("src.app.utilities.ActionCodeFunctions").getActionCode
+local getActionCode                 = requireBW("src.app.utilities.ActionCodeFunctions").getActionCode
 local getModelMessageIndicator      = SingletonGetters.getModelMessageIndicator
 local getLocalizedText              = LocalizationFunctions.getLocalizedText
 local getLoggedInAccountAndPassword = WebSocketManager.getLoggedInAccountAndPassword
@@ -15,7 +15,7 @@ local serializeAccountAndPassword   = SerializationFunctions.serializeAccountAnd
 
 local ACTION_CODE_LOGIN    = getActionCode("ActionLogin")
 local ACTION_CODE_REGISTER = getActionCode("ActionRegister")
-local GAME_VERSION         = require("src.app.utilities.GameConstantFunctions").getGameVersion()
+local GAME_VERSION         = requireBW("src.app.utilities.GameConstantFunctions").getGameVersion()
 
 --------------------------------------------------------------------------------
 -- The util functions.

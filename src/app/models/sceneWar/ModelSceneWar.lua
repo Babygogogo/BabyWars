@@ -20,19 +20,19 @@
 --    采取model先行结算的方式可以避免很多问题，所以后续开发应该遵守同样的规范。
 --]]--------------------------------------------------------------------------------
 
-local ModelSceneWar = require("src.global.functions.class")("ModelSceneWar")
+local ModelSceneWar = requireBW("src.global.functions.class")("ModelSceneWar")
 
-local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
-local ActionExecutor         = require("src.app.utilities.ActionExecutor")
-local LocalizationFunctions  = require("src.app.utilities.LocalizationFunctions")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local TableFunctions         = require("src.app.utilities.TableFunctions")
-local Actor                  = require("src.global.actors.Actor")
-local EventDispatcher        = require("src.global.events.EventDispatcher")
+local ActionCodeFunctions    = requireBW("src.app.utilities.ActionCodeFunctions")
+local ActionExecutor         = requireBW("src.app.utilities.ActionExecutor")
+local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
+local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local TableFunctions         = requireBW("src.app.utilities.TableFunctions")
+local Actor                  = requireBW("src.global.actors.Actor")
+local EventDispatcher        = requireBW("src.global.events.EventDispatcher")
 
-local IS_SERVER        = require("src.app.utilities.GameConstantFunctions").isServer()
-local AudioManager     = (not IS_SERVER) and (require("src.app.utilities.AudioManager"))     or (nil)
-local WebSocketManager = (not IS_SERVER) and (require("src.app.utilities.WebSocketManager")) or (nil)
+local IS_SERVER        = requireBW("src.app.utilities.GameConstantFunctions").isServer()
+local AudioManager     = (not IS_SERVER) and (requireBW("src.app.utilities.AudioManager"))     or (nil)
+local WebSocketManager = (not IS_SERVER) and (requireBW("src.app.utilities.WebSocketManager")) or (nil)
 
 local ipairs, next     = ipairs, next
 local getLocalizedText = LocalizationFunctions.getLocalizedText

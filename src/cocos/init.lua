@@ -26,18 +26,6 @@ require "cocos.cocos2d.Cocos2d"
 require "cocos.cocos2d.Cocos2dConstants"
 require "cocos.cocos2d.functions"
 
-__G__TRACKBACK__ = function(msg)
-    local msg = debug.traceback(msg, 3)
-    print(msg)
-
-    local scene = display.getRunningScene()
-    if (scene ~= nil) then
-        scene:addChild(require("app.views.common.ViewErrorIndicator"):create(msg), 999)
-    end
-
-    return msg
-end
-
 -- opengl
 require "cocos.cocos2d.Opengl"
 require "cocos.cocos2d.OpenglConstants"

@@ -1,10 +1,10 @@
 
 local ModelWarFieldPreviewer = class("ModelWarFieldPreviewer")
 
-local AnimationLoader       = require("src.app.utilities.AnimationLoader")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local Actor                 = require("src.global.actors.Actor")
+local AnimationLoader       = requireBW("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions    = requireBW("src.app.utilities.GridIndexFunctions")
+local Actor                 = requireBW("src.global.actors.Actor")
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -24,7 +24,7 @@ local function initActorTileMap(self, warFieldFileName)
 end
 
 local function initViewUnitMap(self, warFieldFileName)
-    local layer               = require("res.data.templateWarField." .. warFieldFileName).layers[3]
+    local layer               = requireBW("res.data.templateWarField." .. warFieldFileName).layers[3]
     local data, width, height = layer.data, layer.width, layer.height
     local viewUnitMap         = cc.Node:create()
 
@@ -61,7 +61,7 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
     if (self.m_WarFieldFileName ~= warFieldFileName) then
         self.m_WarFieldFileName = warFieldFileName
         if (isRandomWarField(warFieldFileName)) then
-            self.m_RandomPlayersCount = require("res.data.templateWarField." .. warFieldFileName).playersCount
+            self.m_RandomPlayersCount = requireBW("res.data.templateWarField." .. warFieldFileName).playersCount
         else
             self.m_RandomPlayersCount = nil
 
@@ -69,7 +69,7 @@ function ModelWarFieldPreviewer:setWarField(warFieldFileName)
             initViewUnitMap(self, warFieldFileName)
             self.m_View:setViewTileAndUnitMap(self.m_ActorTileMap:getView(), self.m_ViewUnitMap, self.m_ActorTileMap:getModel():getMapSize())
         end
-        self.m_View:setAuthorName(require("res.data.templateWarField." .. warFieldFileName).authorName)
+        self.m_View:setAuthorName(requireBW("res.data.templateWarField." .. warFieldFileName).authorName)
     end
 
     return self

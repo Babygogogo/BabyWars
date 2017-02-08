@@ -1,9 +1,9 @@
 
 local WebSocketManager = {}
 
-local ActionCodeFunctions    = require("src.app.utilities.ActionCodeFunctions")
-local SerializationFunctions = require("src.app.utilities.SerializationFunctions")
-local ActorManager           = require("src.global.actors.ActorManager")
+local ActionCodeFunctions    = requireBW("src.app.utilities.ActionCodeFunctions")
+local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local ActorManager           = requireBW("src.global.actors.ActorManager")
 
 local decode = SerializationFunctions.decode
 local encode = SerializationFunctions.encode

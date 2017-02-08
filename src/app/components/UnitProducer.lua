@@ -10,12 +10,12 @@
 --   生产价格受co技能影响（但目前未完成）
 --]]--------------------------------------------------------------------------------
 
-local UnitProducer = require("src.global.functions.class")("UnitProducer")
+local UnitProducer = requireBW("src.global.functions.class")("UnitProducer")
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local Actor                 = require("src.global.actors.Actor")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+local Actor                 = requireBW("src.global.actors.Actor")
+local ComponentManager      = requireBW("src.global.components.ComponentManager")
 
 UnitProducer.EXPORTED_METHODS = {
     "canProduceUnitWithTiledId",

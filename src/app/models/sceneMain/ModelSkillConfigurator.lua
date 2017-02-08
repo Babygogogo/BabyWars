@@ -1,14 +1,14 @@
 
 local ModelSkillConfigurator = class("ModelSkillConfigurator")
 
-local ModelSkillConfiguration   = require("src.app.models.common.ModelSkillConfiguration")
-local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
-local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters          = require("src.app.utilities.SingletonGetters")
-local SkillDataAccessors        = require("src.app.utilities.SkillDataAccessors")
-local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
-local WebSocketManager          = require("src.app.utilities.WebSocketManager")
-local Actor                     = require("src.global.actors.Actor")
+local ModelSkillConfiguration   = requireBW("src.app.models.common.ModelSkillConfiguration")
+local ActionCodeFunctions       = requireBW("src.app.utilities.ActionCodeFunctions")
+local LocalizationFunctions     = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters          = requireBW("src.app.utilities.SingletonGetters")
+local SkillDataAccessors        = requireBW("src.app.utilities.SkillDataAccessors")
+local SkillDescriptionFunctions = requireBW("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = requireBW("src.app.utilities.WebSocketManager")
+local Actor                     = requireBW("src.global.actors.Actor")
 
 local getLocalizedText   = LocalizationFunctions.getLocalizedText
 local getFullDescription = SkillDescriptionFunctions.getFullDescription

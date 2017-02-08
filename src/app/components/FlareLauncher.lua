@@ -1,5 +1,5 @@
 
-local FlareLauncher = require("src.global.functions.class")("FlareLauncher")
+local FlareLauncher = requireBW("src.global.functions.class")("FlareLauncher")
 
 FlareLauncher.EXPORTED_METHODS = {
     "getFlareAreaRadius",

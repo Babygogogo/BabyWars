@@ -9,14 +9,14 @@
 
 local ModelContinueWarSelector = class("ModelContinueWarSelector")
 
-local ActionCodeFunctions   = require("src.app.utilities.ActionCodeFunctions")
-local AuxiliaryFunctions    = require("src.app.utilities.AuxiliaryFunctions")
-local WebSocketManager      = require("src.app.utilities.WebSocketManager")
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local WarFieldManager       = require("src.app.utilities.WarFieldManager")
-local Actor                 = require("src.global.actors.Actor")
-local ActorManager          = require("src.global.actors.ActorManager")
+local ActionCodeFunctions   = requireBW("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions    = requireBW("src.app.utilities.AuxiliaryFunctions")
+local WebSocketManager      = requireBW("src.app.utilities.WebSocketManager")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+local WarFieldManager       = requireBW("src.app.utilities.WarFieldManager")
+local Actor                 = requireBW("src.global.actors.Actor")
+local ActorManager          = requireBW("src.global.actors.ActorManager")
 
 local os, string       = os, string
 local getLocalizedText = LocalizationFunctions.getLocalizedText
@@ -28,11 +28,11 @@ local ACTION_CODE_RUN_SCENE_WAR                  = ActionCodeFunctions.getAction
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getWarFieldName(fileName)
-    return require("res.data.templateWarField." .. fileName).warFieldName
+    return requireBW("res.data.templateWarField." .. fileName).warFieldName
 end
 
 local function getPlayerNicknames(warConfiguration, currentTime)
-    local playersCount = require("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
+    local playersCount = requireBW("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
     local players      = warConfiguration.players
     local names        = {}
 

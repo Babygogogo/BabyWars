@@ -1,10 +1,10 @@
 
 local SkillModifierFunctions = {}
 
-local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
+local SkillDataAccessors    = requireBW("src.app.utilities.SkillDataAccessors")
 
 local getSkillModifier = SkillDataAccessors.getSkillModifier
-local isTypeInCategory = require("src.app.utilities.GameConstantFunctions").isTypeInCategory
+local isTypeInCategory = requireBW("src.app.utilities.GameConstantFunctions").isTypeInCategory
 
 local PASSIVE_SLOTS_COUNT = SkillDataAccessors.getPassiveSkillSlotsCount()
 local ACTIVE_SLOTS_COUNT  = SkillDataAccessors.getActiveSkillSlotsCount()

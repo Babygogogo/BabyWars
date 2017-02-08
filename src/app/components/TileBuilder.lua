@@ -1,9 +1,9 @@
 
-local TileBuilder = require("src.global.functions.class")("TileBuilder")
+local TileBuilder = requireBW("src.global.functions.class")("TileBuilder")
 
-local ComponentManager      = require("src.global.components.ComponentManager")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
+local ComponentManager      = requireBW("src.global.components.ComponentManager")
+local GridIndexFunctions    = requireBW("src.app.utilities.GridIndexFunctions")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
 
 TileBuilder.EXPORTED_METHODS = {
     "isBuildingModelTile",

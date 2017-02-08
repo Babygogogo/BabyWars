@@ -1,5 +1,5 @@
 
-local Diver = require("src.global.functions.class")("Diver")
+local Diver = requireBW("src.global.functions.class")("Diver")
 
 Diver.EXPORTED_METHODS = {
     "isDiving",

@@ -1,10 +1,10 @@
 
 local InstantSkillExecutor = {}
 
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local SkillDataAccessors    = require("src.app.utilities.SkillDataAccessors")
-local SupplyFunctions       = require("src.app.utilities.SupplyFunctions")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+local SkillDataAccessors    = requireBW("src.app.utilities.SkillDataAccessors")
+local SupplyFunctions       = requireBW("src.app.utilities.SupplyFunctions")
 
 local IS_SERVER = GameConstantFunctions.isServer()
 

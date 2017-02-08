@@ -18,17 +18,17 @@
 
 local ModelWarCommandMenu = class("ModelWarCommandMenu")
 
-local ActionCodeFunctions       = require("src.app.utilities.ActionCodeFunctions")
-local AudioManager              = require("src.app.utilities.AudioManager")
-local AuxiliaryFunctions        = require("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions     = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions     = require("src.app.utilities.GameConstantFunctions")
-local GridIndexFunctions        = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters          = require("src.app.utilities.SingletonGetters")
-local SkillDescriptionFunctions = require("src.app.utilities.SkillDescriptionFunctions")
-local WebSocketManager          = require("src.app.utilities.WebSocketManager")
-local Actor                     = require("src.global.actors.Actor")
-local ActorManager              = require("src.global.actors.ActorManager")
+local ActionCodeFunctions       = requireBW("src.app.utilities.ActionCodeFunctions")
+local AudioManager              = requireBW("src.app.utilities.AudioManager")
+local AuxiliaryFunctions        = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions     = requireBW("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions     = requireBW("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions        = requireBW("src.app.utilities.GridIndexFunctions")
+local SingletonGetters          = requireBW("src.app.utilities.SingletonGetters")
+local SkillDescriptionFunctions = requireBW("src.app.utilities.SkillDescriptionFunctions")
+local WebSocketManager          = requireBW("src.app.utilities.WebSocketManager")
+local Actor                     = requireBW("src.global.actors.Actor")
+local ActorManager              = requireBW("src.global.actors.ActorManager")
 
 local getActionId              = SingletonGetters.getActionId
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
@@ -42,7 +42,7 @@ local getModelUnitMap          = SingletonGetters.getModelUnitMap
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay            = SingletonGetters.isTotalReplay
-local round                    = require("src.global.functions.round")
+local round                    = requireBW("src.global.functions.round")
 local string, ipairs, pairs    = string, ipairs, pairs
 
 local ACTION_CODE_ACTIVATE_SKILL_GROUP = ActionCodeFunctions.getActionCode("ActionActivateSkillGroup")

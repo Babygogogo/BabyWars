@@ -16,13 +16,13 @@
 --   - ModelUnitMap中，其他的许多概念都和ModelTileMap很相似，直接参照ModelTileMap即可。
 --]]--------------------------------------------------------------------------------
 
-local ModelUnitMap = require("src.global.functions.class")("ModelUnitMap")
+local ModelUnitMap = requireBW("src.global.functions.class")("ModelUnitMap")
 
-local Destroyers             = require("src.app.utilities.Destroyers")
-local GridIndexFunctions     = require("src.app.utilities.GridIndexFunctions")
-local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
-local VisibilityFunctions    = require("src.app.utilities.VisibilityFunctions")
-local Actor                  = require("src.global.actors.Actor")
+local Destroyers             = requireBW("src.app.utilities.Destroyers")
+local GridIndexFunctions     = requireBW("src.app.utilities.GridIndexFunctions")
+local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
+local VisibilityFunctions    = requireBW("src.app.utilities.VisibilityFunctions")
+local Actor                  = requireBW("src.global.actors.Actor")
 
 local isUnitOnMapVisibleToPlayerIndex = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
@@ -65,7 +65,7 @@ end
 -- The unit actors map.
 --------------------------------------------------------------------------------
 local function createActorUnitsMapWithWarFieldFileName(warFieldFileName)
-    local layer               = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
+    local layer               = requireBW(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
     local data, width, height = layer.data, layer.width, layer.height
     local actorUnitsMap       = createEmptyMap(width)
     local availableUnitID     = 1
@@ -84,7 +84,7 @@ local function createActorUnitsMapWithWarFieldFileName(warFieldFileName)
 end
 
 local function createActorUnitsMapWithUnitMapData(unitMapData, warFieldFileName)
-    local layer         = require(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
+    local layer         = requireBW(TEMPLATE_WAR_FIELD_PATH .. warFieldFileName).layers[3]
     local width, height = layer.width, layer.height
     local mapSize       = {width = width, height = height}
 

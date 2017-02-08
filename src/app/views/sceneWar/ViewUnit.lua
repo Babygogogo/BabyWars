@@ -1,11 +1,11 @@
 
 local ViewUnit = class("ViewUnit", cc.Node)
 
-local AnimationLoader       = require("src.app.utilities.AnimationLoader")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local GridIndexFunctions    = require("src.app.utilities.GridIndexFunctions")
-local SingletonGetters      = require("src.app.utilities.SingletonGetters")
-local VisibilityFunctions   = require("src.app.utilities.VisibilityFunctions")
+local AnimationLoader       = requireBW("src.app.utilities.AnimationLoader")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
+local GridIndexFunctions    = requireBW("src.app.utilities.GridIndexFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+local VisibilityFunctions   = requireBW("src.app.utilities.VisibilityFunctions")
 
 local getModelFogMap           = SingletonGetters.getModelFogMap
 local getModelMapCursor        = SingletonGetters.getModelMapCursor

@@ -10,11 +10,11 @@
 --   虽然不是所有ModelTile都提供防御加成，但目前设计是所有ModelTile都要绑定本组件
 --]]--------------------------------------------------------------------------------
 
-local DefenseBonusProvider = require("src.global.functions.class")("DefenseBonusProvider")
+local DefenseBonusProvider = requireBW("src.global.functions.class")("DefenseBonusProvider")
 
-local LocalizationFunctions = require("src.app.utilities.LocalizationFunctions")
-local GameConstantFunctions = require("src.app.utilities.GameConstantFunctions")
-local ComponentManager      = require("src.global.components.ComponentManager")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
+local ComponentManager      = requireBW("src.global.components.ComponentManager")
 
 DefenseBonusProvider.EXPORTED_METHODS = {
     "getDefenseBonusAmount",

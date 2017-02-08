@@ -1,7 +1,7 @@
 
-local UnitHider = require("src.global.functions.class")("UnitHider")
+local UnitHider = requireBW("src.global.functions.class")("UnitHider")
 
-local isTypeInCategory = require("src.app.utilities.GameConstantFunctions").isTypeInCategory
+local isTypeInCategory = requireBW("src.app.utilities.GameConstantFunctions").isTypeInCategory
 
 UnitHider.EXPORTED_METHODS = {
     "canHideUnitType",

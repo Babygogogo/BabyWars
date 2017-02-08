@@ -11,12 +11,12 @@
 --   需要传入移动类型，本组件才能返回相应的移动力消耗值
 --]]--------------------------------------------------------------------------------
 
-local MoveCostOwner = require("src.global.functions.class")("MoveCostOwner")
+local MoveCostOwner = requireBW("src.global.functions.class")("MoveCostOwner")
 
-local GameConstantFunctions  = require("src.app.utilities.GameConstantFunctions")
-local SingletonGetters       = require("src.app.utilities.SingletonGetters")
-local SkillModifierFunctions = require("src.app.utilities.SkillModifierFunctions")
-local ComponentManager       = require("src.global.components.ComponentManager")
+local GameConstantFunctions  = requireBW("src.app.utilities.GameConstantFunctions")
+local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
+local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
+local ComponentManager       = requireBW("src.global.components.ComponentManager")
 
 MoveCostOwner.EXPORTED_METHODS = {
     "getMoveCostWithMoveType",
