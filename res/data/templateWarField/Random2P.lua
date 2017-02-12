@@ -13,7 +13,7 @@ return {
         "DiBiao",
         "DuoYanPingYuan_2",
         "FangBaoPingZhang",
-        "FeiXu",
+        "FeiXu_2",
         "FengBaoQianXian",
         "FuWuTai_2",
         "GaoLaMiJia",

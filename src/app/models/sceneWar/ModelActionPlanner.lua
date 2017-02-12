@@ -701,14 +701,13 @@ local function getAdditionalDropActionList(self)
     for _, action in ipairs(getActionsDropModelUnit(self)) do
         list[#list + 1] = action
     end
-    list[#list + 1] = {
+
+    return list, {
         name     = getLocalizedText(78, "Wait"),
         callback = function()
             sendActionDropModelUnit(self)
         end,
     }
-
-    return list
 end
 
 --------------------------------------------------------------------------------
@@ -941,9 +940,11 @@ setStateChoosingAdditionalDropAction = function(self)
             :setDropDestinationsVisible(true)
     end
 
+    local list, itemWait = getAdditionalDropActionList(self)
     getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
-        name = "EvtActionPlannerChoosingAction",
-        list = getAdditionalDropActionList(self),
+        name     = "EvtActionPlannerChoosingAction",
+        list     = list,
+        itemWait = itemWait,
     })
 end
 
