@@ -4,9 +4,11 @@ local ModelReplayManager = class("ModelReplayManager")
 local Actor                  = requireBW("src.global.actors.Actor")
 local ActorManager           = requireBW("src.global.actors.ActorManager")
 local ActionCodeFunctions    = requireBW("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions     = requireBW("src.app.utilities.AuxiliaryFunctions")
 local LocalizationFunctions  = requireBW("src.app.utilities.LocalizationFunctions")
 local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SerializationFunctions = requireBW("src.app.utilities.SerializationFunctions")
+local WarFieldManager        = requireBW("src.app.utilities.WarFieldManager")
 local WebSocketManager       = requireBW("src.app.utilities.WebSocketManager")
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
@@ -91,7 +93,7 @@ local function generateReplayConfiguration(warData)
 end
 
 local function getPlayerNicknames(replayConfiguration)
-    local playersCount = requireBW("res.data.templateWarField." .. replayConfiguration.warFieldFileName).playersCount
+    local playersCount = WarFieldManager.getPlayersCount(replayConfiguration.warFieldFileName)
     local names        = {}
     local players      = replayConfiguration.players
 
@@ -123,7 +125,7 @@ local function createMenuItemsForDelete(self)
     for warID, replayConfiguration in pairs(self.m_ReplayList) do
         local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
-            name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            name     = WarFieldManager.getWarFieldName(warFieldFileName),
             warID    = warID,
             callback = function()
                 getActorWarFieldPreviewer(self):getModel():setWarField(warFieldFileName)
@@ -161,7 +163,7 @@ local function createMenuItemsForDownload(self, list)
         local warFieldFileName = replayConfiguration.warFieldFileName
         if (not self.m_ReplayList[warID]) then
             items[#items + 1] = {
-                name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
+                name     = WarFieldManager.getWarFieldName(warFieldFileName),
                 warID    = warID,
 
                 callback = function()
@@ -200,7 +202,7 @@ local function createMenuItemsForPlayback(self)
     for warID, replayConfiguration in pairs(self.m_ReplayList) do
         local warFieldFileName = replayConfiguration.warFieldFileName
         items[#items + 1] = {
-            name     = requireBW("res.data.templateWarField." .. warFieldFileName).warFieldName,
+            name     = WarFieldManager.getWarFieldName(warFieldFileName),
             warID    = warID,
 
             callback = function()
@@ -238,7 +240,7 @@ setStateDelete = function(self)
         view:setMenuTitle(getLocalizedText(10, "DeleteReplay"))
             :setButtonConfirmText(getLocalizedText(10, "DeleteReplay"))
             :setButtonConfirmVisible(false)
-            :setButtonMoreVisible(false)
+            :setButtonFindVisible(false)
             :enableButtonConfirm()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
 
@@ -261,17 +263,15 @@ local function setStateDisabled(self)
 end
 
 local function setStateDownload(self)
-    self.m_State             = "stateDownload"
-    self.m_DownloadPageIndex = 0
+    self.m_State = "stateDownload"
     WebSocketManager.sendAction({
         actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
-        pageIndex  = 1,
     })
 
     if (self.m_View) then
         self.m_View:setMenuTitle(getLocalizedText(10, "DownloadReplay"))
             :setButtonConfirmVisible(false)
-            :setButtonMoreVisible(true)
+            :setButtonFindVisible(true)
             :removeAllMenuItems()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     end
@@ -283,7 +283,7 @@ local function setStateMain(self)
         self.m_View:setMenuTitle(getLocalizedText(1, "ManageReplay"))
             :setMenuItems(self.m_ItemsForStateMain)
             :setButtonConfirmVisible(false)
-            :setButtonMoreVisible(false)
+            :setButtonFindVisible(false)
             :setVisible(true)
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
     end
@@ -296,7 +296,7 @@ local function setStatePlayback(self)
         view:setMenuTitle(getLocalizedText(10, "Playback"))
             :setButtonConfirmText(getLocalizedText(10, "Playback"))
             :setButtonConfirmVisible(false)
-            :setButtonMoreVisible(false)
+            :setButtonFindVisible(false)
             :enableButtonConfirm()
         getActorWarFieldPreviewer(self):getModel():setEnabled(false)
 
@@ -403,23 +403,13 @@ function ModelReplayManager:isRetrievingReplayConfigurations()
     return self.m_State == "stateDownload"
 end
 
-function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations, pageIndex)
-    self.m_DownloadPageIndex = pageIndex
-
+function ModelReplayManager:updateWithReplayConfigurations(replayConfigurations)
     local items = createMenuItemsForDownload(self, replayConfigurations)
     if (#items == 0) then
-        if (pageIndex == 1) then
-            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoDownloadableReplay"))
-        else
-            getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoMoreReplay"))
-        end
-    elseif (self.m_View) then
-        if (pageIndex == 1) then
-            self.m_View:setMenuItems(items)
-        else
-            self.m_View:appendMenuItems(items)
-        end
-        self.m_View:setButtonConfirmText(getLocalizedText(10, "DownloadReplay"))
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "NoDownloadableReplay"))
+    else
+        self.m_View:setMenuItems(items)
+            :setButtonConfirmText(getLocalizedText(10, "DownloadReplay"))
     end
 
     return self
@@ -467,11 +457,16 @@ function ModelReplayManager:onButtonConfirmTouched()
     return self
 end
 
-function ModelReplayManager:onButtonMoreTouched()
-    WebSocketManager.sendAction({
-        actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
-        pageIndex  = self.m_DownloadPageIndex + 1,
-    })
+function ModelReplayManager:onButtonFindTouched(warName)
+    if (string.len(warName) ~= 6) then
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "InvalidWarName"))
+    else
+        getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(10, "RetrievingReplayConfiguration"))
+        WebSocketManager.sendAction({
+            actionCode = ACTION_CODE_GET_REPLAY_CONFIGURATIONS,
+            warID      = AuxiliaryFunctions.getWarIdWithWarName(warName),
+        })
+    end
 
     return self
 end

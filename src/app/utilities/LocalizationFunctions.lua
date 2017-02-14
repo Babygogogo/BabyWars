@@ -586,37 +586,41 @@ local s_Texts = {
     },
     [10] = {
         [1] = function(textType)
-            if     (textType == "Delete")               then return "删 除"
-            elseif (textType == "DeleteConfirmation")   then return "您是否确认要删除此回放数据？"
-            elseif (textType == "DeleteReplay")         then return "删 除 回 放"
-            elseif (textType == "Download")             then return "下 载"
-            elseif (textType == "DownloadReplay")       then return "下 载 回 放"
-            elseif (textType == "DownloadStarted")      then return "正在下载回放数据，请稍候。若长时间没有反应，请重试。"
-            elseif (textType == "GetMore")              then return "获取更多数据"
-            elseif (textType == "NoDownloadableReplay") then return "当前没有可下载的回放数据。请返回。"
-            elseif (textType == "NoMoreReplay")         then return "已没有更多的可下载的回放数据。"
-            elseif (textType == "NoReplayData")         then return "本机没有可供播放或删除的回放数据。请返回。"
-            elseif (textType == "Playback")             then return "播 放"
-            elseif (textType == "ReplayDataExists")     then return "该回放数据已下载完成。"
-            elseif (textType == "ReplayDataNotExists")  then return "该回放数据不存在，无法下载。若一直遇到此问题，请与作者联系。"
-            else                                             return "未知10:" .. (textType or "")
+            if     (textType == "Delete")                        then return "删 除"
+            elseif (textType == "DeleteConfirmation")            then return "您是否确认要删除此回放数据？"
+            elseif (textType == "DeleteReplay")                  then return "删 除 回 放"
+            elseif (textType == "Download")                      then return "下 载"
+            elseif (textType == "DownloadReplay")                then return "下 载 回 放"
+            elseif (textType == "DownloadStarted")               then return "正在下载回放数据，请稍候。若长时间没有反应，请重试。"
+            elseif (textType == "GetMore")                       then return "获取更多数据"
+            elseif (textType == "InvalidWarName")                then return "您输入的房间号无效，请检查后重试。"
+            elseif (textType == "NoDownloadableReplay")          then return "当前没有可下载的回放数据。请返回。"
+            elseif (textType == "NoMoreReplay")                  then return "已没有更多的可下载的回放数据。"
+            elseif (textType == "NoReplayData")                  then return "本机没有可供播放或删除的回放数据。请返回。"
+            elseif (textType == "Playback")                      then return "播 放"
+            elseif (textType == "ReplayDataExists")              then return "该回放数据已下载完成。"
+            elseif (textType == "ReplayDataNotExists")           then return "该回放数据不存在，无法下载。若一直遇到此问题，请与作者联系。"
+            elseif (textType == "RetrievingReplayConfiguration") then return "正在获取回放数据，请稍候。若长时间没有反应，请重试。"
+            else                                                      return "未知10:" .. (textType or "")
             end
         end,
         [2] = function(textType)
-            if     (textType == "Delete")               then return "Delete"
-            elseif (textType == "DeleteConfirmation")   then return "Are you sure to delete this replay data?"
-            elseif (textType == "DeleteReplay")         then return "Delete"
-            elseif (textType == "Download")             then return "Download"
-            elseif (textType == "DownloadReplay")       then return "Download"
-            elseif (textType == "DownloadStarted")      then return "The download has been started. Please wait."
-            elseif (textType == "GetMore")              then return "Get More"
-            elseif (textType == "NoDownloadableReplay") then return "There's no downloadable replay currently."
-            elseif (textType == "NoMoreReplay")         then return "There's no more downloadable replay data."
-            elseif (textType == "NoReplayData")         then return "There's no replay data on the device."
-            elseif (textType == "Playback")             then return "Playback"
-            elseif (textType == "ReplayDataExists")     then return "The replay data has been downloaded already."
-            elseif (textType == "ReplayDataNotExists")  then return "The replay data doesn't exist and can't be downloaded."
-            else                                             return "Unknown10:" .. (textType or "")
+            if     (textType == "Delete")                        then return "Delete"
+            elseif (textType == "DeleteConfirmation")            then return "Are you sure to delete this replay data?"
+            elseif (textType == "DeleteReplay")                  then return "Delete"
+            elseif (textType == "Download")                      then return "Download"
+            elseif (textType == "DownloadReplay")                then return "Download"
+            elseif (textType == "DownloadStarted")               then return "The download has been started. Please wait."
+            elseif (textType == "GetMore")                       then return "Get More"
+            elseif (textType == "InvalidWarName")                then return "The war name is invalid. Please check and retry."
+            elseif (textType == "NoDownloadableReplay")          then return "There's no downloadable replay currently."
+            elseif (textType == "NoMoreReplay")                  then return "There's no more downloadable replay data."
+            elseif (textType == "NoReplayData")                  then return "There's no replay data on the device."
+            elseif (textType == "Playback")                      then return "Playback"
+            elseif (textType == "ReplayDataExists")              then return "The replay data has been downloaded already."
+            elseif (textType == "ReplayDataNotExists")           then return "The replay data doesn't exist and can't be downloaded."
+            elseif (textType == "RetrievingReplayConfiguration") then return "Retrieving replay data. Please wait."
+            else                                                      return "Unknown10:" .. (textType or "")
             end
         end,
     },
