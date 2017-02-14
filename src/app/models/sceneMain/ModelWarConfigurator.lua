@@ -20,6 +20,7 @@ local ACTION_CODE_JOIN_WAR                    = ActionCodeFunctions.getActionCod
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
 local ACTION_CODE_RUN_SCENE_WAR               = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
+local INCOME_MODIFIERS                        = {50, 100, 150, 200, 300, 500}
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 
 local function initSelectorWeather(modelWarConfigurator)
@@ -62,16 +63,17 @@ local function generateSkillDescription(self)
 end
 
 local function generateOverviewText(self)
-    return string.format("%s:\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s\n\n%s: %s",
+    return string.format("%s:\n\n%s:%s%s\n%s:%s%s\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n\n%s:%s%s\n%s:%s%s",
         getLocalizedText(14, "Overview"),
-        getLocalizedText(14, "WarFieldName"),       WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
-        getLocalizedText(14, "PlayerIndex"),        generatePlayerColorText(self.m_PlayerIndex),
-        getLocalizedText(14, "FogOfWar"),           getLocalizedText(14, (self.m_IsFogOfWarByDefault) and ("Yes") or ("No")),
-        getLocalizedText(14, "RankMatch"),          getLocalizedText(14, (self.m_IsRankMatch)         and ("Yes") or ("No")),
-        getLocalizedText(14, "MaxDiffScore"),       (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "NoLimit"),
-        getLocalizedText(14, "IntervalUntilBoot"),  AuxiliaryFunctions.formatTimeInterval(self.m_IntervalUntilBoot),
-        getLocalizedText(14, "MaxBaseSkillPoints"), (self.m_MaxBaseSkillPoints) and ("" .. self.m_MaxBaseSkillPoints) or (getLocalizedText(14, "DisableSkills")),
-        getLocalizedText(14, "SkillConfiguration"), generateSkillDescription(self)
+        getLocalizedText(14, "WarFieldName"),       "         ",      WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
+        getLocalizedText(14, "PlayerIndex"),        "         ",      generatePlayerColorText(self.m_PlayerIndex),
+        getLocalizedText(14, "FogOfWar"),           "         ",      getLocalizedText(14, (self.m_IsFogOfWarByDefault) and ("Yes") or ("No")),
+        getLocalizedText(14, "IncomeModifier"),     "         ",      "" .. self.m_IncomeModifier .. "%",
+        getLocalizedText(14, "RankMatch"),          "             ",  getLocalizedText(14, (self.m_IsRankMatch)         and ("Yes") or ("No")),
+        getLocalizedText(14, "MaxDiffScore"),       "         ",      (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "NoLimit"),
+        getLocalizedText(14, "IntervalUntilBoot"),  "         ",      AuxiliaryFunctions.formatTimeInterval(self.m_IntervalUntilBoot),
+        getLocalizedText(14, "MaxBaseSkillPoints"), "   ",            (self.m_MaxBaseSkillPoints) and ("" .. self.m_MaxBaseSkillPoints) or (getLocalizedText(14, "DisableSkills")),
+        getLocalizedText(14, "SkillConfiguration"), "              ", generateSkillDescription(self)
     )
 end
 
@@ -92,6 +94,7 @@ local function createItemsForStateMain(self)
         local items = {
             self.m_ItemPlayerIndex,
             self.m_ItemFogOfWar,
+            self.m_ItemIncomeModifier,
             self.m_ItemRankMatch,
             self.m_ItemMaxDiffScore,
             self.m_ItemIntervalUntilBoot,
@@ -184,6 +187,7 @@ local function sendActionNewWar(self)
     WebSocketManager.sendAction({
         actionCode           = ACTION_CODE_NEW_WAR,
         defaultWeatherCode   = 1, --TODO: add an option for the weather.
+        incomeModifier       = self.m_IncomeModifier,
         intervalUntilBoot    = self.m_IntervalUntilBoot,
         isFogOfWarByDefault  = self.m_IsFogOfWarByDefault,
         isRankMatch          = self.m_IsRankMatch,
@@ -210,6 +214,12 @@ local function setStateFogOfWar(self)
     self.m_State = "stateFogOfWar"
     self.m_View:setMenuTitleText(getLocalizedText(34, "FogOfWar"))
         :setItems(self.m_ItemsForStateFogOfWar)
+end
+
+local function setStateIncomeModifier(self)
+    self.m_State = "stateIncomeModifier"
+    self.m_View:setMenuTitleText(getLocalizedText(14, "Income Modifier"))
+        :setItems(self.m_ItemsForStateIncomeModifier)
 end
 
 local function setStateIntervalUntilBoot(self)
@@ -266,6 +276,15 @@ local function initItemFogOfWar(self)
         name     = getLocalizedText(34, "FogOfWar"),
         callback = function()
             setStateFogOfWar(self)
+        end,
+    }
+end
+
+local function initItemIncomeModifier(self)
+    self.m_ItemIncomeModifier = {
+        name     = getLocalizedText(14, "Income Modifier"),
+        callback = function()
+            setStateIncomeModifier(self)
         end,
     }
 end
@@ -351,6 +370,21 @@ local function initItemsForStateFogOfWar(self)
             end,
         },
     }
+end
+
+local function initItemsForStateIncomeModifier(self)
+    local items = {}
+    for _, modifier in ipairs(INCOME_MODIFIERS) do
+        items[#items + 1] = {
+            name     = (modifier == 100) and (string.format("%d%%(%s)", modifier, getLocalizedText(14, "Default"))) or ("" .. modifier .. "%"),
+            callback = function()
+                self.m_IncomeModifier = modifier
+                setStateMain(self, true)
+            end,
+        }
+    end
+
+    self.m_ItemsForStateIncomeModifier = items
 end
 
 local function initItemsForStateIntervalUntilBoot(self)
@@ -484,6 +518,7 @@ end
 --------------------------------------------------------------------------------
 function ModelWarConfigurator:ctor()
     initItemFogOfWar(          self)
+    initItemIncomeModifier(    self)
     initItemIntervalUntilBoot( self)
     initItemMaxBaseSkillPoints(self)
     initItemMaxDiffScore(      self)
@@ -493,6 +528,7 @@ function ModelWarConfigurator:ctor()
     initItemSkillConfiguration(self)
 
     initItemsForStateFogOfWar(          self)
+    initItemsForStateIncomeModifier(    self)
     initItemsForStateIntervalUntilBoot( self)
     initItemsForStateMaxBaseSkillPoints(self)
     initItemsForStateMaxDiffScore(      self)
@@ -597,6 +633,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
     self.m_WarConfiguration = warConfiguration
     local mode = self.m_Mode
     if (mode == "modeCreate") then
+        self.m_IncomeModifier           = 100
         self.m_IntervalUntilBoot        = 3600 * 24 * 3
         self.m_IsFogOfWarByDefault      = false
         self.m_IsRankMatch              = false
@@ -611,6 +648,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
 
     elseif (mode == "modeJoin") then
+        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch
@@ -627,6 +665,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmJoinWar"))
 
     elseif (mode == "modeContinue") then
+        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch
@@ -640,6 +679,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
 
     elseif (mode == "modeExit") then
+        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch

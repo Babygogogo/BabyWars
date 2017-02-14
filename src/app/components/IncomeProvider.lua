@@ -14,16 +14,11 @@ local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = requireBW("src.global.components.ComponentManager")
 
+local math = math
+
 IncomeProvider.EXPORTED_METHODS = {
     "getIncomeAmount",
 }
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function round(num)
-    return math.floor(num + 0.5)
-end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -54,14 +49,15 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function IncomeProvider:getIncomeAmount()
-    local playerIndex = self.m_Owner:getPlayerIndex()
-    local baseAmount  = self.m_Template.amount
-    if (playerIndex < 1) then
-        return baseAmount
+    local modelSceneWar = self.m_ModelSceneWar
+    local playerIndex   = self.m_Owner:getPlayerIndex()
+    local baseAmount    = self.m_Template.amount * modelSceneWar:getIncomeModifier() / 100
+    if (playerIndex == 0) then
+        return math.floor(baseAmount)
     else
-        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration()
+        local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration()
         local modifier                = SkillModifierFunctions.getIncomeModifier(modelSkillConfiguration)
-        return round(baseAmount * (100 + modifier) / 100)
+        return math.floor(baseAmount * (100 + modifier) / 100)
     end
 end
 

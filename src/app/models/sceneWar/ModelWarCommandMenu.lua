@@ -174,13 +174,14 @@ local function getMapInfo(self)
         end
     end)
 
-    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d      %s: %d\n%s",
-        getLocalizedText(65, "MapName"),   modelWarField:getWarFieldDisplayName(),
-        getLocalizedText(65, "Author"),    modelWarField:getWarFieldAuthorName(),
-        getLocalizedText(65, "WarID"),     AuxiliaryFunctions.getWarNameWithWarId(SingletonGetters.getWarId(modelSceneWar)),
-        getLocalizedText(65, "TurnIndex"), getModelTurnManager(modelSceneWar):getTurnIndex(),
-        getLocalizedText(65, "ActionID"),  getActionId(modelSceneWar),
-        getTilesInfo(tileTypeCounters)
+    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d      %s: %d\n%s\n%s: %d%%",
+        getLocalizedText(65, "MapName"),        modelWarField:getWarFieldDisplayName(),
+        getLocalizedText(65, "Author"),         modelWarField:getWarFieldAuthorName(),
+        getLocalizedText(65, "WarID"),          AuxiliaryFunctions.getWarNameWithWarId(SingletonGetters.getWarId(modelSceneWar)),
+        getLocalizedText(65, "TurnIndex"),      getModelTurnManager(modelSceneWar):getTurnIndex(),
+        getLocalizedText(65, "ActionID"),       getActionId(modelSceneWar),
+        getTilesInfo(tileTypeCounters),
+        getLocalizedText(14, "IncomeModifier"), modelSceneWar:getIncomeModifier()
     )
 end
 

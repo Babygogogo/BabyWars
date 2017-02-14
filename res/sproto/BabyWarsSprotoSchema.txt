@@ -163,6 +163,7 @@
     isRankMatch          11 : boolean
     maxDiffScore         12 : integer
     intervalUntilBoot    13 : integer
+    incomeModifier       14 : integer
 }
 
 .ActionRegister {
@@ -740,6 +741,7 @@
     createdTime           16 :  integer
     intervalUntilBoot     17 :  integer
     enterTurnTime         18 :  integer
+    incomeModifier        19 :  integer
 }
 
 .WarIdForIndexing {
@@ -815,4 +817,5 @@
     intervalUntilBoot   11 :  integer
     enterTurnTime       12 :  integer
     playerIndexInTurn   13 :  integer
+    incomeModifier      14 :  integer
 }

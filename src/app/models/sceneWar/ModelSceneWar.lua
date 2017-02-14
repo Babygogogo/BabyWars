@@ -201,6 +201,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_CachedActions              = {}
     self.m_EnterTurnTime              = sceneData.enterTurnTime
     self.m_ExecutedActions            = sceneData.executedActions
+    self.m_IncomeModifier             = sceneData.incomeModifier      or 100
     self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot
     self.m_IsWarEnded                 = sceneData.isWarEnded
     self.m_IsFogOfWarByDefault        = sceneData.isFogOfWarByDefault
@@ -280,6 +281,7 @@ function ModelSceneWar:toSerializableTable()
         actionID              = self:getActionId(),
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = self.m_ExecutedActions,
+        incomeModifier        = self.m_IncomeModifier,
         intervalUntilBoot     = self.m_IntervalUntilBoot,
         isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
         isRandomWarField      = self.m_IsRandomWarField,
@@ -303,6 +305,7 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         actionID              = self:getActionId(),
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = nil,
+        incomeModifier        = self.m_IncomeModifier,
         intervalUntilBoot     = self.m_IntervalUntilBoot,
         isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
         isRandomWarField      = self.m_IsRandomWarField,
@@ -326,6 +329,7 @@ function ModelSceneWar:toSerializableReplayData()
         actionID              = 0,
         enterTurnTime         = nil,
         executedActions       = self.m_ExecutedActions,
+        incomeModifier        = self.m_IncomeModifier,
         intervalUntilBoot     = self.m_IntervalUntilBoot,
         isFogOfWarByDefault   = self.m_IsFogOfWarByDefault,
         isRandomWarField      = self.m_IsRandomWarField,
@@ -539,6 +543,10 @@ end
 
 function ModelSceneWar:getWarId()
     return self.m_WarID
+end
+
+function ModelSceneWar:getIncomeModifier()
+    return self.m_IncomeModifier
 end
 
 function ModelSceneWar:getIntervalUntilBoot()
