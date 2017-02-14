@@ -9,7 +9,8 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 local MENU_TITLE_Z_ORDER          = 1
 local BUTTON_BACK_Z_ORDER         = 1
 local BUTTON_CONFIRM_Z_ORDER      = 1
-local BUTTON_NEXT_PAGE_Z_ORDER    = 1
+local BUTTON_FIND_Z_ORDER         = 1
+local EDIT_BOX_WAR_NAME_Z_ORDER   = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local WAR_FIELD_PREVIEWER_Z_ORDER = 1
 local MENU_BACKGROUND_Z_ORDER     = 0
@@ -36,29 +37,30 @@ local BUTTON_BACK_POS_X      = MENU_BACKGROUND_POS_X
 local BUTTON_BACK_POS_Y      = MENU_BACKGROUND_POS_Y
 local BUTTON_BACK_FONT_COLOR = {r = 240, g = 80, b = 56}
 
-local BUTTON_MORE_WIDTH      = BUTTON_BACK_WIDTH
-local BUTTON_MORE_HEIGHT     = BUTTON_BACK_HEIGHT
-local BUTTON_MORE_POS_X      = BUTTON_BACK_POS_X
-local BUTTON_MORE_POS_Y      = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local BUTTON_MORE_FONT_COLOR = MENU_TITLE_FONT_COLOR
+local BUTTON_FIND_WIDTH  = 110
+local BUTTON_FIND_HEIGHT = BUTTON_BACK_HEIGHT
+local BUTTON_FIND_POS_X  = BUTTON_BACK_POS_X
+local BUTTON_FIND_POS_Y  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+
+local EDIT_BOX_WAR_NAME_WIDTH  = 110
+local EDIT_BOX_WAR_NAME_HEIGHT = BUTTON_FIND_HEIGHT
+local EDIT_BOX_WAR_NAME_POS_X  = BUTTON_FIND_POS_X + BUTTON_FIND_WIDTH - MENU_BACKGROUND_POS_X
+local EDIT_BOX_WAR_NAME_POS_Y  = BUTTON_FIND_POS_Y - MENU_BACKGROUND_POS_Y
+local EDIT_BOX_TEXTURE_NAME    = "c03_t06_s01_f01.png"
+local EDIT_BOX_CAPINSETS       = {x = 1, y = EDIT_BOX_WAR_NAME_HEIGHT - 5, width = 1, height = 1}
+local EDIT_BOX_FONT_SIZE       = 25
 
 local BUTTON_CONFIRM_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
 local BUTTON_CONFIRM_HEIGHT = 60
 local BUTTON_CONFIRM_POS_X  = display.width - BUTTON_CONFIRM_WIDTH - 30
 local BUTTON_CONFIRM_POS_Y  = MENU_BACKGROUND_POS_Y
 
-local BUTTON_NEXT_PAGE_WIDTH      = BUTTON_BACK_WIDTH
-local BUTTON_NEXT_PAGE_HEIGHT     = BUTTON_BACK_HEIGHT
-local BUTTON_NEXT_PAGE_POS_X      = BUTTON_BACK_POS_X
-local BUTTON_NEXT_PAGE_POS_Y      = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local BUTTON_NEXT_PAGE_FONT_COLOR = MENU_TITLE_FONT_COLOR
-
 local MENU_LIST_VIEW_WIDTH               = MENU_BACKGROUND_WIDTH
-local MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_HEIGHT_WITH_MORE    = MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE - BUTTON_NEXT_PAGE_HEIGHT
+local MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND = MENU_TITLE_POS_Y - BUTTON_BACK_POS_Y - BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_HEIGHT_WITH_FIND    = MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND - BUTTON_FIND_HEIGHT
 local MENU_LIST_VIEW_POS_X               = MENU_BACKGROUND_POS_X
-local MENU_LIST_VIEW_POS_Y_WITHOUT_MORE  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
-local MENU_LIST_VIEW_POS_Y_WITH_MORE     = MENU_LIST_VIEW_POS_Y_WITHOUT_MORE + BUTTON_NEXT_PAGE_HEIGHT
+local MENU_LIST_VIEW_POS_Y_WITHOUT_FIND  = BUTTON_BACK_POS_Y + BUTTON_BACK_HEIGHT
+local MENU_LIST_VIEW_POS_Y_WITH_FIND     = MENU_LIST_VIEW_POS_Y_WITHOUT_FIND + BUTTON_FIND_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN        = 10
 
 local ITEM_WIDTH              = 230
@@ -226,41 +228,58 @@ local function initButtonConfirm(self)
     self:addChild(button, BUTTON_CONFIRM_Z_ORDER)
 end
 
-local function initButtonMore(self)
+local function initButtonFind(self)
     local button = ccui.Button:create()
     button:ignoreAnchorPointForPosition(true)
-        :setPosition(BUTTON_NEXT_PAGE_POS_X, BUTTON_NEXT_PAGE_POS_Y)
+        :setPosition(BUTTON_FIND_POS_X, BUTTON_FIND_POS_Y)
 
         :setScale9Enabled(true)
-        :setContentSize(BUTTON_NEXT_PAGE_WIDTH, BUTTON_NEXT_PAGE_HEIGHT)
+        :setContentSize(BUTTON_FIND_WIDTH, BUTTON_FIND_HEIGHT)
 
         :setZoomScale(-0.05)
 
         :setTitleFontName(ITEM_FONT_NAME)
         :setTitleFontSize(ITEM_FONT_SIZE)
-        :setTitleColor(BUTTON_NEXT_PAGE_FONT_COLOR)
-        :setTitleText(getLocalizedText(10, "GetMore"))
-
-        :setVisible(false)
-        :setCascadeColorEnabled(true)
+        :setTitleColor(MENU_TITLE_FONT_COLOR)
+        :setTitleText(getLocalizedText(57))
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-                self.m_Model:onButtonMoreTouched()
+                self.m_Model:onButtonFindTouched(self.m_EditBoxWarName:getText())
             end
         end)
 
     button:getTitleRenderer():enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
 
-    self.m_ButtonMore = button
-    self:addChild(button, BUTTON_NEXT_PAGE_Z_ORDER)
+    self.m_ButtonFind = button
+    self:addChild(button, BUTTON_FIND_Z_ORDER)
+end
+
+local function initEditBoxWarName(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(EDIT_BOX_TEXTURE_NAME, EDIT_BOX_CAPINSETS)
+    local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_WAR_NAME_WIDTH, EDIT_BOX_WAR_NAME_HEIGHT), background, background, background)
+    editBox:ignoreAnchorPointForPosition(true)
+        :setPosition(EDIT_BOX_WAR_NAME_POS_X, EDIT_BOX_WAR_NAME_POS_Y)
+        :setFontSize(EDIT_BOX_FONT_SIZE)
+        :setFontColor({r = 0, g = 0, b = 0})
+
+        :setPlaceholderFontSize(EDIT_BOX_FONT_SIZE)
+        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(LocalizationFunctions.getLocalizedText(58))
+
+        :setMaxLength(6)
+        :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+
+    self.m_EditBoxWarName = editBox
+    self.m_MenuBackground:addChild(editBox, EDIT_BOX_WAR_NAME_Z_ORDER)
 end
 
 local function initMenuListView(self)
     local listView = ccui.ListView:create()
     listView:ignoreAnchorPointForPosition(true)
-        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_MORE)
-        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_FIND)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND)
         :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
         :setGravity(ccui.ListViewGravity.centerHorizontal)
 
@@ -276,7 +295,8 @@ function ViewReplayManager:ctor()
     initMenuTitle(     self)
     initButtonBack(    self)
     initButtonConfirm( self)
-    initButtonMore(    self)
+    initButtonFind(    self)
+    initEditBoxWarName(self)
     initMenuListView(  self)
 
     return self
@@ -327,16 +347,17 @@ function ViewReplayManager:removeAllMenuItems()
     return self
 end
 
-function ViewReplayManager:setButtonMoreVisible(visible)
+function ViewReplayManager:setButtonFindVisible(visible)
     if (visible) then
-        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_MORE)
-            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITH_MORE)
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITH_FIND)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITH_FIND)
     else
-        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITHOUT_MORE)
-            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_MORE)
+        self.m_MenuListView:setPositionY(MENU_LIST_VIEW_POS_Y_WITHOUT_FIND)
+            :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND)
     end
 
-    self.m_ButtonMore:setVisible(visible)
+    self.m_ButtonFind    :setVisible(visible)
+    self.m_EditBoxWarName:setVisible(visible)
 
     return self
 end
