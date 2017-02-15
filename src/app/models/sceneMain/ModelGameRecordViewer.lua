@@ -43,7 +43,7 @@ local function generateTextForGameRecords(gameRecords)
     return table.concat(textList, "\n")
 end
 
-local function generateTextForWarList(warList)
+local function generateTextForWaitingWarList(warList)
     local textList = {}
     for warID, _ in pairs(warList) do
         textList[#textList + 1] = AuxiliaryFunctions.getWarNameWithWarId(warID)
@@ -60,15 +60,27 @@ local function generateTextForWarList(warList)
     end
 end
 
+local function generateTextForRecentWarList(warList)
+    local textList = {}
+    for _, warID in ipairs(warList or {}) do
+        textList[#textList + 1] = AuxiliaryFunctions.getWarNameWithWarId(warID)
+    end
+
+    if (#textList == 0) then
+        return getLocalizedText(13, "None")
+    else
+        return table.concat(textList, "  ")
+    end
+end
+
 local function generateTextForProfile(profile)
-    return string.format("%s: %s      %s: %s\n%s: %s\n\n%s:\n%s\n\n%s:\n%s",
+    return string.format("%s: %s      %s: %s\n%s: %s\n\n%s:\n%s\n\n%s:\n%s\n\n%s:\n%s",
         getLocalizedText(13, "Account"),                 profile.account,
         getLocalizedText(13, "Nickname"),                profile.nickname,
         getLocalizedText(13, "TotalOnlineDuration"),     AuxiliaryFunctions.formatTimeInterval(profile.totalOnlineDuration),
-        getLocalizedText(13, "GameRecords"),
-        generateTextForGameRecords(profile.gameRecords),
-        getLocalizedText(13, "WaitingWars"),
-        generateTextForWarList(profile.warLists.waiting)
+        getLocalizedText(13, "GameRecords"),             generateTextForGameRecords(profile.gameRecords),
+        getLocalizedText(13, "WaitingWars"),             generateTextForWaitingWarList(profile.warLists.waiting),
+        getLocalizedText(13, "RecentWars"),              generateTextForRecentWarList(profile.warLists.recent)
     )
 end
 
