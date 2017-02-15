@@ -61,9 +61,10 @@ local function generateTextForWarList(warList)
 end
 
 local function generateTextForProfile(profile)
-    return string.format("%s : %s      %s : %s\n\n%s:\n%s\n\n%s:\n%s",
-        getLocalizedText(13, "Account"),     profile.account,
-        getLocalizedText(13, "Nickname"),    profile.nickname,
+    return string.format("%s: %s      %s: %s\n%s: %s\n\n%s:\n%s\n\n%s:\n%s",
+        getLocalizedText(13, "Account"),                 profile.account,
+        getLocalizedText(13, "Nickname"),                profile.nickname,
+        getLocalizedText(13, "TotalOnlineDuration"),     AuxiliaryFunctions.formatTimeInterval(profile.totalOnlineDuration),
         getLocalizedText(13, "GameRecords"),
         generateTextForGameRecords(profile.gameRecords),
         getLocalizedText(13, "WaitingWars"),

@@ -503,6 +503,11 @@ local function executeMessage(action, modelScene)
     getModelMessageIndicator(modelScene):showMessage(message)
 end
 
+local function executeNetworkHeartbeat(action)
+    assert(IS_SERVER, "ActionExecutor-executeNetworkHeartbeat() should not be invoked on the client.")
+    PlayerProfileManager.updateProfileWithNetworkHeartbeat(action.playerAccount)
+end
+
 local function executeNewWar(action, modelScene)
     if (IS_SERVER) then
         SceneWarManager.createNewWar(action)
@@ -1751,6 +1756,7 @@ function ActionExecutor.execute(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionLogout)                       then executeLogout(                      action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionMessage)                      then executeMessage(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionNewWar)                       then executeNewWar(                      action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionNetworkHeartbeat)             then executeNetworkHeartbeat(            action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRegister)                     then executeRegister(                    action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionReloadSceneWar)               then executeReloadSceneWar(              action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionRunSceneMain)                 then executeRunSceneMain(                action, modelScene)
