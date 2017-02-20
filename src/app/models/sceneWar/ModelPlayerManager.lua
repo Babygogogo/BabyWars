@@ -60,6 +60,10 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayerManager:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar = modelSceneWar
+    self:forEachModelPlayer(function(modelPlayer)
+        modelPlayer:onStartRunning(modelSceneWar)
+    end)
+
     if ((not IS_SERVER) and (not SingletonGetters.isTotalReplay(modelSceneWar))) then
         self.m_ModelPlayerLoggedIn, self.m_PlayerIndexLoggedIn = self:getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
     end
