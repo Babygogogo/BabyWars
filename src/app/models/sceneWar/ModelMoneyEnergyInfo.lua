@@ -33,27 +33,8 @@ local function onEvtModelPlayerUpdated(self, event)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(not event.modelWarCommandMenu:isEnabled())
-    end
-end
-
-local function onEvtHideUI(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(false)
-    end
-end
-
-local function onEvtGridSelected(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(true)
-    end
-end
-
-local function onEvtMapCursorMoved(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(true)
-    end
+    local menu = self.m_ModelWarCommandMenu
+    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()))
 end
 
 --------------------------------------------------------------------------------
@@ -67,14 +48,12 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+    self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
-        :addEventListener("EvtHideUI",                self)
-        :addEventListener("EvtGridSelected",          self)
-        :addEventListener("EvtMapCursorMoved",        self)
 
     local playerIndex  = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
     self.m_PlayerIndex = playerIndex
@@ -92,9 +71,6 @@ function ModelMoneyEnergyInfo:onEvent(event)
     if     (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     elseif (eventName == "EvtModelPlayerUpdated")    then onEvtModelPlayerUpdated(   self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
-    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
-    elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
-    elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
     end
 
     return self

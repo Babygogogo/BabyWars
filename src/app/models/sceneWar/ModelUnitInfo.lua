@@ -40,10 +40,14 @@ local function isModelUnitVisible(modelSceneWar, modelUnit)
 end
 
 local function updateWithModelUnitMap(self)
-    local modelSceneWar = self.m_ModelSceneWar
-    local modelUnitMap  = getModelUnitMap(modelSceneWar)
-    local modelUnit     = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
-    if ((not modelUnit) or (not isModelUnitVisible(modelSceneWar, modelUnit))) then
+    local modelSceneWar       = self.m_ModelSceneWar
+    local modelUnitMap        = getModelUnitMap(modelSceneWar)
+    local modelUnit           = modelUnitMap:getModelUnit(self.m_CursorGridIndex)
+    local modelWarCommandMenu = self.m_ModelWarCommandMenu
+    if ((modelWarCommandMenu:isEnabled())                   or
+        (modelWarCommandMenu:isHiddenWithHideUI())          or
+        (not modelUnit)                                     or
+        (not isModelUnitVisible(modelSceneWar, modelUnit))) then
         self.m_View:setVisible(false)
     else
         local loadedModelUnits = ((isTotalReplay(modelSceneWar)) or (not getModelFogMap(modelSceneWar):isFogOfWarCurrently()) or (modelUnit:getPlayerIndex() == getPlayerIndexLoggedIn(modelSceneWar))) and
@@ -52,7 +56,7 @@ local function updateWithModelUnitMap(self)
         self.m_ModelUnitList = {modelUnit, unpack(loadedModelUnits or {})}
 
         self.m_View:updateWithModelUnit(modelUnit, loadedModelUnits)
-            :setVisible(not SingletonGetters.getModelWarCommandMenu(modelSceneWar):isEnabled())
+            :setVisible(true)
     end
 end
 
@@ -74,25 +78,11 @@ local function onEvtMapCursorMoved(self, event)
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (event.modelWarCommandMenu:isEnabled()) then
-        if (self.m_View) then
-            self.m_View:setVisible(false)
-        end
-    else
-        updateWithModelUnitMap(self)
-    end
-end
-
-local function onEvtHideUI(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(false)
-    end
+    updateWithModelUnitMap(self)
 end
 
 local function onEvtPlayerIndexUpdated(self, event)
-    if (self.m_View) then
-        self.m_View:updateWithPlayerIndex(event.playerIndex)
-    end
+    self.m_View:updateWithPlayerIndex(event.playerIndex)
 end
 
 --------------------------------------------------------------------------------
@@ -115,13 +105,13 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+    self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtModelUnitMapUpdated",   self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
-        :addEventListener("EvtHideUI",                self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
 
     if (self.m_View) then
@@ -139,7 +129,6 @@ function ModelUnitInfo:onEvent(event)
     elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
     elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
-    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
     elseif (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     end
 

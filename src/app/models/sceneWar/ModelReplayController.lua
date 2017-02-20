@@ -10,27 +10,8 @@ local getLocalizedText = LocalizationFunctions.getLocalizedText
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtWarCommandMenuUpdated(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(not event.modelWarCommandMenu:isEnabled())
-    end
-end
-
-local function onEvtHideUI(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(false)
-    end
-end
-
-local function onEvtGridSelected(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(true)
-    end
-end
-
-local function onEvtMapCursorMoved(self, event)
-    if (self.m_View) then
-        self.m_View:setVisible(true)
-    end
+    local menu = self.m_ModelWarCommandMenu
+    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()))
 end
 
 --------------------------------------------------------------------------------
@@ -44,22 +25,18 @@ end
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
 function ModelReplayController:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+    self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtWarCommandMenuUpdated", self)
-        :addEventListener("EvtHideUI",                self)
-        :addEventListener("EvtGridSelected",          self)
-        :addEventListener("EvtMapCursorMoved",        self)
 
     return self
 end
 
 function ModelReplayController:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
-    elseif (eventName == "EvtHideUI")                then onEvtHideUI(               self, event)
-    elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
-    elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
+    if (eventName == "EvtWarCommandMenuUpdated") then
+        onEvtWarCommandMenuUpdated(self, event)
     end
 
     return self

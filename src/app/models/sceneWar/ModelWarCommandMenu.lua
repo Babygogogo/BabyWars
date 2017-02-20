@@ -270,10 +270,6 @@ local function getAvailableMainItems(self)
     end
 end
 
-local function dispatchEvtHideUI(self)
-    getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({name = "EvtHideUI"})
-end
-
 local function dispatchEvtMapCursorMoved(self, gridIndex)
     getScriptEventDispatcher(self.m_ModelSceneWar):dispatchEvent({
         name      = "EvtMapCursorMoved",
@@ -503,10 +499,9 @@ end
 
 local function setStateDisabled(self)
     self.m_State = "stateDisabled"
+    self.m_View:setVisible(false)
 
-    if (self.m_View) then
-        self.m_View:setEnabled(false)
-    end
+    dispatchEvtWarCommandMenuUpdated(self)
 end
 
 local function setStateDrawOrSurrender(self)
@@ -546,16 +541,23 @@ local function setStateHelp(self)
     end
 end
 
+local function setStateHiddenWithHideUI(self)
+    self.m_State = "stateHiddenWithHideUI"
+    self.m_View:setVisible(false)
+
+    dispatchEvtWarCommandMenuUpdated(self)
+end
+
 local function setStateMain(self)
     self.m_State = "stateMain"
     updateStringWarInfo(  self)
     updateStringSkillInfo(self)
 
-    if (self.m_View) then
-        self.m_View:setItems(getAvailableMainItems(self))
-            :setOverviewString(self.m_StringWarInfo)
-            :setEnabled(true)
-    end
+    self.m_View:setItems(getAvailableMainItems(self))
+        :setOverviewString(self.m_StringWarInfo)
+        :setVisible(true)
+
+    dispatchEvtWarCommandMenuUpdated(self)
 end
 
 local function setStateUnitPropertyList(self)
@@ -571,10 +573,16 @@ end
 --------------------------------------------------------------------------------
 local function onEvtGridSelected(self, event)
     self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    if (self.m_State == "stateHiddenWithHideUI") then
+        setStateDisabled(self)
+    end
 end
 
 local function onEvtMapCursorMoved(self, event)
     self.m_MapCursorGridIndex = GridIndexFunctions.clone(event.gridIndex)
+    if (self.m_State == "stateHiddenWithHideUI") then
+        setStateDisabled(self)
+    end
 end
 
 local function onEvtIsWaitingForServerResponse(self, event)
@@ -820,10 +828,7 @@ local function initItemHideUI(self)
     local item = {
         name     = getLocalizedText(65, "HideUI"),
         callback = function()
-            setStateDisabled(self)
-
-            dispatchEvtWarCommandMenuUpdated(self)
-            dispatchEvtHideUI(self)
+            setStateHiddenWithHideUI(self)
         end,
     }
 
@@ -1065,7 +1070,11 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelWarCommandMenu:isEnabled()
-    return self.m_State ~= "stateDisabled"
+    return (self.m_State ~= "stateDisabled") and (self.m_State ~= "stateHiddenWithHideUI")
+end
+
+function ModelWarCommandMenu:isHiddenWithHideUI()
+    return self.m_State == "stateHiddenWithHideUI"
 end
 
 function ModelWarCommandMenu:setEnabled(enabled)
@@ -1074,7 +1083,6 @@ function ModelWarCommandMenu:setEnabled(enabled)
     else
         setStateDisabled(self)
     end
-    dispatchEvtWarCommandMenuUpdated(self)
 
     return self
 end
