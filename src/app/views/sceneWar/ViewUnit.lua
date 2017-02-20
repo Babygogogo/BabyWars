@@ -225,54 +225,43 @@ local function playSpriteAnimation(sprite, tiledID, state)
 end
 
 --------------------------------------------------------------------------------
--- The unit sprite.
+-- The composition elements.
 --------------------------------------------------------------------------------
-local function createUnitSprite()
+local function initUnitSprite(self)
     local sprite = cc.Sprite:create()
     sprite:ignoreAnchorPointForPosition(true)
 
-    return sprite
-end
-
-local function initWithUnitSprite(self, sprite)
     self.m_UnitSprite = sprite
     self:addChild(sprite, UNIT_SPRITE_Z_ORDER)
 end
 
-local function updateUnitSprite(self, tiledID)
-    if (self.m_TiledID ~= tiledID) then
-        playSpriteAnimation(self.m_UnitSprite, tiledID, "normal")
-    end
-end
-
---------------------------------------------------------------------------------
--- The unit state.
---------------------------------------------------------------------------------
-local function updateUnitState(self, isStateIdle)
-    if (self.m_IsStateIdle ~= isStateIdle) then
-        if (isStateIdle) then
-            self:setColor(COLOR_IDLE)
-        else
-            self:setColor(COLOR_ACTIONED)
-        end
-    end
-end
-
---------------------------------------------------------------------------------
--- The hp indicator.
---------------------------------------------------------------------------------
-local function createHpIndicator()
+local function initHpIndicator(self)
     local indicator = cc.Sprite:createWithSpriteFrameName("c02_t99_s01_f00.png")
     indicator:ignoreAnchorPointForPosition(true)
         :setPosition(HP_INDICATOR_POSITION_X, HP_INDICATOR_POSITION_Y)
         :setVisible(false)
 
-    return indicator
-end
-
-local function initWithHpIndicator(self, indicator)
     self.m_HpIndicator = indicator
     self:addChild(indicator, HP_INDICATOR_Z_ORDER)
+end
+
+local function initStateIndicator(self)
+    local indicator = cc.Sprite:createWithSpriteFrameName("c02_t99_s02_f01.png")
+    indicator:ignoreAnchorPointForPosition(true)
+        :setPosition(STATE_INDICATOR_POSITION_X, STATE_INDICATOR_POSITION_Y)
+        :setVisible(true)
+
+    self.m_StateIndicator = indicator
+    self:addChild(indicator, STATE_INDICATOR_Z_ORDER)
+end
+
+--------------------------------------------------------------------------------
+-- The functions for updating the composition elements.
+--------------------------------------------------------------------------------
+local function updateUnitSprite(self, tiledID)
+    if (self.m_TiledID ~= tiledID) then
+        playSpriteAnimation(self.m_UnitSprite, tiledID, "normal")
+    end
 end
 
 local function updateHpIndicator(indicator, hp)
@@ -284,21 +273,14 @@ local function updateHpIndicator(indicator, hp)
     end
 end
 
---------------------------------------------------------------------------------
--- The state indicator.
---------------------------------------------------------------------------------
-local function createStateIndicator()
-    local indicator = cc.Sprite:createWithSpriteFrameName("c02_t99_s02_f01.png")
-    indicator:ignoreAnchorPointForPosition(true)
-        :setPosition(STATE_INDICATOR_POSITION_X, STATE_INDICATOR_POSITION_Y)
-        :setVisible(true)
-
-    return indicator
-end
-
-local function initWithStateIndicator(self, indicator)
-    self.m_StateIndicator = indicator
-    self:addChild(indicator, STATE_INDICATOR_Z_ORDER)
+local function updateUnitState(self, isStateIdle)
+    if (self.m_IsStateIdle ~= isStateIdle) then
+        if (isStateIdle) then
+            self:setColor(COLOR_IDLE)
+        else
+            self:setColor(COLOR_ACTIONED)
+        end
+    end
 end
 
 local function updateStateIndicator(self, unit)
@@ -323,6 +305,13 @@ local function updateStateIndicator(self, unit)
     end
 end
 
+local function updateZOrder(self, modelUnit)
+    if (modelUnit.getGridIndex) then
+        local mapSize = SingletonGetters.getModelTileMap(modelUnit:getModelSceneWar()):getMapSize()
+        self:setLocalZOrder(mapSize.height - modelUnit:getGridIndex().y)
+    end
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -331,9 +320,9 @@ function ViewUnit:ctor()
         :setCascadeColorEnabled(true)
     self.m_IsShowingNormalAnimation = true
 
-    initWithUnitSprite(    self, createUnitSprite())
-    initWithHpIndicator(   self, createHpIndicator())
-    initWithStateIndicator(self, createStateIndicator())
+    initUnitSprite(    self)
+    initHpIndicator(   self)
+    initStateIndicator(self)
 
     return self
 end
@@ -341,13 +330,14 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewUnit:updateWithModelUnit(unit)
-    local tiledID     = unit:getTiledId()
-    local isStateIdle = unit:isStateIdle()
+function ViewUnit:updateWithModelUnit(modelUnit)
+    local tiledID     = modelUnit:getTiledId()
+    local isStateIdle = modelUnit:isStateIdle()
     updateUnitSprite(    self,               tiledID)
     updateUnitState(     self,               isStateIdle)
-    updateHpIndicator(   self.m_HpIndicator, unit:getNormalizedCurrentHP())
-    updateStateIndicator(self,               unit)
+    updateHpIndicator(   self.m_HpIndicator, modelUnit:getNormalizedCurrentHP())
+    updateStateIndicator(self,               modelUnit)
+    updateZOrder(        self,               modelUnit)
 
     self.m_TiledID     = tiledID
     self.m_IsStateIdle = isStateIdle

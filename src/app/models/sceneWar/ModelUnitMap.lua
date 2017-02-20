@@ -261,20 +261,14 @@ function ModelUnitMap:getLoadedModelUnitsWithLoader(loaderModelUnit, isRecursive
 end
 
 function ModelUnitMap:swapActorUnit(gridIndex1, gridIndex2)
-    if (GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
-        return
+    if (not GridIndexFunctions.isEqual(gridIndex1, gridIndex2)) then
+        local x1, y1 = gridIndex1.x, gridIndex1.y
+        local x2, y2 = gridIndex2.x, gridIndex2.y
+        local map    = self.m_ActorUnitsMap
+        map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
     end
 
-    local x1, y1 = gridIndex1.x, gridIndex1.y
-    local x2, y2 = gridIndex2.x, gridIndex2.y
-    local map    = self.m_ActorUnitsMap
-    map[x1][y1], map[x2][y2] = map[x2][y2], map[x1][y1]
-
-    local view = self.m_View
-    if (view) then
-        if (map[x1][y1]) then view:adjustViewUnitZOrder(map[x1][y1]:getView(), gridIndex1) end
-        if (map[x2][y2]) then view:adjustViewUnitZOrder(map[x2][y2]:getView(), gridIndex2) end
-    end
+    return self
 end
 
 function ModelUnitMap:setActorUnitLoaded(gridIndex)
@@ -297,10 +291,6 @@ function ModelUnitMap:setActorUnitUnloaded(unitID, gridIndex)
     assert(map[x][y] == nil, "ModelUnitMap-setActorUnitUnloaded() another unit is occupying the destination.")
 
     loaded[unitID], map[x][y] = map[x][y], loaded[unitID]
-
-    if (self.m_View) then
-        self.m_View:adjustViewUnitZOrder(map[x][y]:getView(), gridIndex)
-    end
 
     return self
 end

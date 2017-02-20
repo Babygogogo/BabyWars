@@ -107,12 +107,6 @@ function ViewUnitMap:removeAllViewUnits()
     return self
 end
 
-function ViewUnitMap:adjustViewUnitZOrder(viewUnit, gridIndex)
-    viewUnit:setLocalZOrder(self.m_MapHeight - gridIndex.y)
-
-    return self
-end
-
 function ViewUnitMap:setPreviewLaunchUnit(modelUnit, gridIndex)
     self.m_PreviewLaunchUnit:updateWithModelUnit(modelUnit)
         :showMovingAnimation()
