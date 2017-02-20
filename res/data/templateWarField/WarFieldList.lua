@@ -32,7 +32,7 @@ return {
     "YunShiQun",
     "ZhengZhengFangFang",
 
-    "ZuJiZhaoTianTong",         -- Fun 2p maps
+    "ZuJiZhaoTianTong_2",         -- Fun 2p maps
 
     "JuWaiRen_2",               -- 3p
 

@@ -201,7 +201,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_CachedActions              = {}
     self.m_EnterTurnTime              = sceneData.enterTurnTime
     self.m_ExecutedActions            = sceneData.executedActions
-    self.m_IncomeModifier             = sceneData.incomeModifier      or 100
+    self.m_IncomeModifier             = sceneData.incomeModifier        or 100
     self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot
     self.m_IsWarEnded                 = sceneData.isWarEnded
     self.m_IsFogOfWarByDefault        = sceneData.isFogOfWarByDefault
@@ -211,6 +211,7 @@ function ModelSceneWar:ctor(sceneData)
     self.m_MaxBaseSkillPoints         = sceneData.maxBaseSkillPoints
     self.m_MaxDiffScore               = sceneData.maxDiffScore
     self.m_RemainingVotesForDraw      = sceneData.remainingVotesForDraw
+    self.m_StartingFund               = sceneData.startingFund          or 0
     self.m_WarID                      = sceneData.warID
     self.m_WarPassword                = sceneData.warPassword
     setActionId(self, sceneData.actionID)
@@ -291,6 +292,7 @@ function ModelSceneWar:toSerializableTable()
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
+        startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableTable(),
@@ -315,6 +317,7 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
+        startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
@@ -339,6 +342,7 @@ function ModelSceneWar:toSerializableReplayData()
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
         remainingVotesForDraw = nil,
+        startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         players               = self:getModelPlayerManager() :toSerializableReplayData(),
@@ -547,6 +551,10 @@ end
 
 function ModelSceneWar:getIncomeModifier()
     return self.m_IncomeModifier
+end
+
+function ModelSceneWar:getStartingFund()
+    return self.m_StartingFund
 end
 
 function ModelSceneWar:getIntervalUntilBoot()

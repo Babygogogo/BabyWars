@@ -155,6 +155,18 @@ local function initMenuBackground(self)
     self:addChild(background, MENU_BACKGROUND_Z_ORDER)
 end
 
+local function initMenuListView(self)
+    local listView = ccui.ListView:create()
+    listView:ignoreAnchorPointForPosition(true)
+        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_FIND)
+        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND)
+        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
+        :setGravity(ccui.ListViewGravity.centerHorizontal)
+
+    self.m_MenuListView = listView
+    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
+end
+
 local function initMenuTitle(self)
     local title = cc.Label:createWithTTF("", ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
@@ -169,6 +181,32 @@ local function initMenuTitle(self)
 
     self.m_MenuTitle = title
     self:addChild(title, MENU_TITLE_Z_ORDER)
+end
+
+local function initEditBoxWarName(self)
+    local background = cc.Scale9Sprite:createWithSpriteFrameName(EDIT_BOX_TEXTURE_NAME, EDIT_BOX_CAPINSETS)
+    local editBox    = ccui.EditBox:create(cc.size(EDIT_BOX_WAR_NAME_WIDTH, EDIT_BOX_WAR_NAME_HEIGHT), background, background, background)
+    editBox:ignoreAnchorPointForPosition(true)
+        :setFontSize(EDIT_BOX_FONT_SIZE)
+        :setFontColor({r = 0, g = 0, b = 0})
+
+        :setPlaceholderFontSize(EDIT_BOX_FONT_SIZE)
+        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(LocalizationFunctions.getLocalizedText(58))
+
+        :setMaxLength(6)
+        :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+
+    -- The EditBox automatically opens up the soft keyboard when it is set visible (WTF?). To elinimate that, use an empty node to contain it.
+    local container = cc.Node:create()
+    container:ignoreAnchorPointForPosition(true)
+        :setPosition(EDIT_BOX_WAR_NAME_POS_X, EDIT_BOX_WAR_NAME_POS_Y)
+        :addChild(editBox)
+
+    self.m_ContainerForEditBoxWarName = container
+    self.m_EditBoxWarName             = editBox
+    self.m_MenuBackground:addChild(container, EDIT_BOX_WAR_NAME_Z_ORDER)
 end
 
 local function initButtonBack(self)
@@ -255,49 +293,17 @@ local function initButtonFind(self)
     self:addChild(button, BUTTON_FIND_Z_ORDER)
 end
 
-local function initEditBoxWarName(self)
-    local background = cc.Scale9Sprite:createWithSpriteFrameName(EDIT_BOX_TEXTURE_NAME, EDIT_BOX_CAPINSETS)
-    local editBox = ccui.EditBox:create(cc.size(EDIT_BOX_WAR_NAME_WIDTH, EDIT_BOX_WAR_NAME_HEIGHT), background, background, background)
-    editBox:ignoreAnchorPointForPosition(true)
-        :setPosition(EDIT_BOX_WAR_NAME_POS_X, EDIT_BOX_WAR_NAME_POS_Y)
-        :setFontSize(EDIT_BOX_FONT_SIZE)
-        :setFontColor({r = 0, g = 0, b = 0})
-
-        :setPlaceholderFontSize(EDIT_BOX_FONT_SIZE)
-        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
-        :setPlaceHolder(LocalizationFunctions.getLocalizedText(58))
-
-        :setMaxLength(6)
-        :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
-        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
-
-    self.m_EditBoxWarName = editBox
-    self.m_MenuBackground:addChild(editBox, EDIT_BOX_WAR_NAME_Z_ORDER)
-end
-
-local function initMenuListView(self)
-    local listView = ccui.ListView:create()
-    listView:ignoreAnchorPointForPosition(true)
-        :setPosition(MENU_LIST_VIEW_POS_X, MENU_LIST_VIEW_POS_Y_WITHOUT_FIND)
-        :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND)
-        :setItemsMargin(MENU_LIST_VIEW_ITEMS_MARGIN)
-        :setGravity(ccui.ListViewGravity.centerHorizontal)
-
-    self.m_MenuListView = listView
-    self:addChild(listView, MENU_LIST_VIEW_Z_ORDER)
-end
-
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewReplayManager:ctor()
     initMenuBackground(self)
+    initMenuListView(  self)
     initMenuTitle(     self)
+    initEditBoxWarName(self)
     initButtonBack(    self)
     initButtonConfirm( self)
     initButtonFind(    self)
-    initEditBoxWarName(self)
-    initMenuListView(  self)
 
     return self
 end
@@ -356,8 +362,8 @@ function ViewReplayManager:setButtonFindVisible(visible)
             :setContentSize(MENU_LIST_VIEW_WIDTH, MENU_LIST_VIEW_HEIGHT_WITHOUT_FIND)
     end
 
-    self.m_ButtonFind    :setVisible(visible)
-    self.m_EditBoxWarName:setVisible(visible)
+    self.m_ButtonFind                :setVisible(visible)
+    self.m_ContainerForEditBoxWarName:setVisible(visible)
 
     return self
 end

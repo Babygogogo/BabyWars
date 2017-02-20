@@ -10,23 +10,23 @@ local BACKGROUND_POSITION_X = (display.width  - BACKGROUND_WIDTH)  / 2
 local BACKGROUND_POSITION_Y = (display.height - BACKGROUND_HEIGHT) / 2
 local BACKGROUND_CAPINSETS  = {x = 4, y = 6, width = 1, height = 1}
 
-local TEXT_WIDTH  = 580
-local TEXT_HEIGHT = display.height * 0.3
-local TEXT_POSITION_X = (display.width - TEXT_WIDTH) / 2
-local TEXT_POSITION_Y = (display.height - TEXT_HEIGHT) / 2 * 1.2
-
 local BUTTON_WIDTH        = 200
 local BUTTON_HEIGHT       = display.height * 0.1
 local BUTTON_TEXTURE_NAME = "c03_t06_s01_f01.png"
 local BUTTON_CAPINSETS    = {x = 1, y = BUTTON_HEIGHT - 7, width = 1, height = 1}
 
 local BUTTON_YES_POS_X      = (display.width  - BUTTON_WIDTH)  / 2 - BUTTON_WIDTH  * 0.66
-local BUTTON_YES_POS_Y      = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_YES_POS_Y      = BACKGROUND_POSITION_Y + 10
 local BUTTON_YES_FONT_COLOR = {r = 96,  g = 224, b = 88}
 
 local BUTTON_NO_POS_X      = (display.width  - BUTTON_WIDTH)  / 2 + BUTTON_WIDTH  * 0.66
-local BUTTON_NO_POS_Y      = (display.height - BUTTON_HEIGHT) / 2 - BUTTON_HEIGHT * 1.5
+local BUTTON_NO_POS_Y      = BUTTON_YES_POS_Y
 local BUTTON_NO_FONT_COLOR = {r = 240, g = 80, b = 56}
+
+local TEXT_WIDTH      = BACKGROUND_WIDTH - 20
+local TEXT_HEIGHT     = BACKGROUND_HEIGHT - BUTTON_HEIGHT - 30
+local TEXT_POSITION_X = (display.width - TEXT_WIDTH) / 2
+local TEXT_POSITION_Y = BUTTON_YES_POS_Y + BUTTON_HEIGHT + 10
 
 local TEXT_OUTLINE_COLOR = {r = 0, g = 0, b = 0}
 local TEXT_OUTLINE_WIDTH = 2
@@ -78,7 +78,7 @@ local function initBackground(self)
 end
 
 local function initConfirmTextLabel(self)
-    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 25)
+    local label = cc.Label:createWithTTF("", "res/fonts/msyhbd.ttc", 22)
     label:ignoreAnchorPointForPosition(true)
         :setPosition(TEXT_POSITION_X, TEXT_POSITION_Y)
 

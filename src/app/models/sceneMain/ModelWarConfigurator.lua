@@ -22,6 +22,7 @@ local ACTION_CODE_RUN_SCENE_WAR               = ActionCodeFunctions.getActionCod
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
 local INCOME_MODIFIERS                        = {50, 100, 150, 200, 300, 500}
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
+local STARTING_FUNDS                          = {0, 5000, 10000, 20000, 30000, 40000, 50000, 100000, 150000, 200000, 300000, 400000, 500000}
 
 local function initSelectorWeather(modelWarConfigurator)
     -- TODO: enable the selector.
@@ -63,11 +64,12 @@ local function generateSkillDescription(self)
 end
 
 local function generateOverviewText(self)
-    return string.format("%s:\n\n%s:%s%s\n%s:%s%s\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n\n%s:%s%s\n%s:%s%s",
+    return string.format("%s:\n\n%s:%s%s\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n\n%s:%s%s\n%s:%s%s",
         getLocalizedText(14, "Overview"),
         getLocalizedText(14, "WarFieldName"),       "         ",      WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
         getLocalizedText(14, "PlayerIndex"),        "         ",      generatePlayerColorText(self.m_PlayerIndex),
         getLocalizedText(14, "FogOfWar"),           "         ",      getLocalizedText(14, (self.m_IsFogOfWarByDefault) and ("Yes") or ("No")),
+        getLocalizedText(14, "StartingFund"),       "         ",      "" .. self.m_StartingFund,
         getLocalizedText(14, "IncomeModifier"),     "         ",      "" .. self.m_IncomeModifier .. "%",
         getLocalizedText(14, "RankMatch"),          "             ",  getLocalizedText(14, (self.m_IsRankMatch)         and ("Yes") or ("No")),
         getLocalizedText(14, "MaxDiffScore"),       "         ",      (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "NoLimit"),
@@ -94,6 +96,7 @@ local function createItemsForStateMain(self)
         local items = {
             self.m_ItemPlayerIndex,
             self.m_ItemFogOfWar,
+            self.m_ItemStartingFund,
             self.m_ItemIncomeModifier,
             self.m_ItemRankMatch,
             self.m_ItemMaxDiffScore,
@@ -195,6 +198,7 @@ local function sendActionNewWar(self)
         maxDiffScore         = self.m_MaxDiffScore,
         playerIndex          = self.m_PlayerIndex,
         skillConfigurationID = self.m_SkillConfigurationID,
+        startingFund         = self.m_StartingFund,
         warPassword          = "", -- TODO: self.m_WarPassword,
         warFieldFileName     = self.m_WarConfiguration.warFieldFileName,
     })
@@ -266,6 +270,12 @@ local function setStateSkillConfiguration(self)
     self.m_State = "stateSkillConfiguration"
     self.m_View:setMenuTitleText(getLocalizedText(34, "SkillConfiguration"))
         :setItems(self.m_ItemsForStateSkillConfiguration)
+end
+
+local function setStateStartingFund(self)
+    self.m_State = "stateStartingFund"
+    self.m_View:setMenuTitleText(getLocalizedText(14, "Starting Fund"))
+        :setItems(self.m_ItemsForStateStartingFund)
 end
 
 --------------------------------------------------------------------------------
@@ -347,6 +357,15 @@ local function initItemSkillConfiguration(self)
         name     = getLocalizedText(34, "SkillConfiguration"),
         callback = function()
             setStateSkillConfiguration(self)
+        end,
+    }
+end
+
+local function initItemStartingFund(self)
+    self.m_ItemStartingFund = {
+        name     = getLocalizedText(14, "Starting Fund"),
+        callback = function()
+            setStateStartingFund(self)
         end,
     }
 end
@@ -513,6 +532,21 @@ local function initItemsForStateSkillConfiguration(self)
     self.m_ItemsForStateSkillConfiguration = items
 end
 
+local function initItemsForStateStartingFund(self)
+    local items = {}
+    for _, fund in ipairs(STARTING_FUNDS) do
+        items[#items + 1] = {
+            name     = (fund ~= 0) and ("" .. fund) or (string.format("%d(%s)", fund, getLocalizedText(14, "Default"))),
+            callback = function()
+                self.m_StartingFund = fund
+                setStateMain(self, true)
+            end
+        }
+    end
+
+    self.m_ItemsForStateStartingFund = items
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -526,6 +560,7 @@ function ModelWarConfigurator:ctor()
     initItemPlaceHolder(       self)
     initItemRankMatch(         self)
     initItemSkillConfiguration(self)
+    initItemStartingFund(      self)
 
     initItemsForStateFogOfWar(          self)
     initItemsForStateIncomeModifier(    self)
@@ -534,6 +569,7 @@ function ModelWarConfigurator:ctor()
     initItemsForStateMaxDiffScore(      self)
     initItemsForStateRankMatch(         self)
     initItemsForStateSkillConfiguration(self)
+    initItemsForStateStartingFund(      self)
 
     return self
 end
@@ -643,6 +679,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = 1
         self.m_SkillConfigurationID     = 1
+        self.m_StartingFund             = 0
 
         sendActionGetSkillConfiguration(1)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
@@ -658,6 +695,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = self.m_ItemsForStatePlayerIndex[1].playerIndex
         self.m_SkillConfigurationID     = (warConfiguration.maxBaseSkillPoints) and (1) or (nil)
+        self.m_StartingFund             = warConfiguration.startingFund
 
         if (self.m_SkillConfigurationID) then
             sendActionGetSkillConfiguration(1)
@@ -675,6 +713,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
+        self.m_StartingFund             = warConfiguration.startingFund
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
 
@@ -689,6 +728,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_ModelSkillConfiguration  = nil
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
+        self.m_StartingFund             = warConfiguration.startingFund
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmExitWar"))
 

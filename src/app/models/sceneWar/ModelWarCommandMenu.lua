@@ -394,16 +394,22 @@ local function getIdleUnitsCount(self)
 end
 
 local function createEndTurnText(self)
+    local textList       = {}
+    local idleUnitsCount = getIdleUnitsCount(self)
+    if (idleUnitsCount > 0) then
+        textList[#textList + 1] = string.format("%s:  %d", getLocalizedText(65, "IdleUnits"), idleUnitsCount)
+    end
+
     local idleFactoriesCount, idleAirportsCount, idleSeaportsCount = getIdleTilesCount(self)
-    local idleUnitsCount                                           = getIdleUnitsCount(self)
-    if (idleFactoriesCount + idleAirportsCount + idleSeaportsCount + idleUnitsCount == 0) then
-        return string.format("%s\n%s", getLocalizedText(66, "NoIdleTilesOrUnits"), getLocalizedText(66, "EndTurnConfirmation"))
+    if (idleFactoriesCount + idleAirportsCount + idleSeaportsCount > 0) then
+        textList[#textList + 1] = string.format("%s:  %d    %d    %d", getLocalizedText(65, "IdleTiles"), idleFactoriesCount, idleAirportsCount, idleSeaportsCount)
+    end
+
+    if (#textList == 0) then
+        return getLocalizedText(66, "EndTurnConfirmation")
     else
-        return string.format("%s: %d   %d   %d\n%s: %d\n%s",
-            getLocalizedText(65, "IdleTiles"), idleFactoriesCount, idleAirportsCount, idleSeaportsCount,
-            getLocalizedText(65, "IdleUnits"), idleUnitsCount,
-            getLocalizedText(66, "EndTurnConfirmation")
-        )
+        textList[#textList + 1] = "\n" .. getLocalizedText(66, "EndTurnConfirmation")
+        return table.concat(textList, "\n")
     end
 end
 

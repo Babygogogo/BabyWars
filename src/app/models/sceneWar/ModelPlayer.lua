@@ -47,6 +47,10 @@ function ModelPlayer:ctor(param)
     return self
 end
 
+function ModelPlayer:onStartRunning(modelSceneWar)
+    self.m_ModelSceneWar = modelSceneWar
+end
+
 --------------------------------------------------------------------------------
 -- The function for serialization.
 --------------------------------------------------------------------------------
@@ -69,7 +73,7 @@ function ModelPlayer:toSerializableReplayData()
         playerIndex         = self.m_PlayerIndex,
         account             = self:getAccount(),
         nickname            = self:getNickname(),
-        fund                = 0,
+        fund                = self.m_ModelSceneWar:getStartingFund(),
         isAlive             = true,
         damageCost          = 0,
         skillActivatedCount = 0,

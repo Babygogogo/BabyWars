@@ -1,6 +1,6 @@
 return {
     warFieldName = "随机2人图",
-    authorName   = "???\n图库：\n所有2人地图",
+    authorName   = "???\n图库：\n所有2人地图\n（娱乐或测试图除外）",
     playersCount = 2,
 
     list = {
@@ -36,6 +36,5 @@ return {
         "YangFanYuanHang_3",
         "YunShiQun",
         "ZhengZhengFangFang",
-        "ZuJiZhaoTianTong",
     },
 }
