@@ -20,7 +20,7 @@ local ACTION_CODE_JOIN_WAR                    = ActionCodeFunctions.getActionCod
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
 local ACTION_CODE_RUN_SCENE_WAR               = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
-local INCOME_MODIFIERS                        = {50, 100, 150, 200, 300, 500}
+local INCOME_MODIFIERS                        = {0, 50, 100, 150, 200, 300, 500}
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 local STARTING_FUNDS                          = {0, 5000, 10000, 20000, 30000, 40000, 50000, 100000, 150000, 200000, 300000, 400000, 500000}
 
