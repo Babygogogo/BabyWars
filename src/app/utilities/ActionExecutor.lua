@@ -43,8 +43,10 @@ local getScriptEventDispatcher      = SingletonGetters.getScriptEventDispatcher
 local isTotalReplay                 = SingletonGetters.isTotalReplay
 local isTileVisible                 = VisibilityFunctions.isTileVisibleToPlayerIndex
 local isUnitVisible                 = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
-local next, pairs, ipairs, unpack   = next, pairs, ipairs, unpack
 local supplyWithAmmoAndFuel         = SupplyFunctions.supplyWithAmmoAndFuel
+
+local math, string                  = math, string
+local next, pairs, ipairs, unpack   = next, pairs, ipairs, unpack
 
 --------------------------------------------------------------------------------
 -- The functions for dispatching events.
@@ -327,6 +329,27 @@ end
 --------------------------------------------------------------------------------
 -- The executors for non-war actions.
 --------------------------------------------------------------------------------
+local function executeChat(action, modelScene)
+    -- The ActionChat is special, because it is made in wars but has no actionID.
+    local warID             = action.warID
+    local channelID         = action.channelID
+    local chatText          = action.chatText
+    local senderPlayerIndex = action.senderPlayerIndex
+
+    if (IS_SERVER) then
+        SingletonGetters.getModelChatManager(SceneWarManager.getOngoingModelSceneWar(warID)):updateWithChatMessage(channelID, senderPlayerIndex, chatText)
+    elseif (modelScene.isModelSceneWar) then
+        SingletonGetters.getModelChatManager(modelScene):updateWithChatMessage(channelID, senderPlayerIndex, chatText)
+    else
+        SingletonGetters.getModelMessageIndicator(modelScene):showMessage(string.format("%s[%s]%s: %s",
+            getLocalizedText(65, "War"),
+            AuxiliaryFunctions.getWarNameWithWarId(warID),
+            getLocalizedText(65, "ReceiveChatText"),
+            chatText
+        ))
+    end
+end
+
 local function executeDownloadReplayData(action, modelScene)
     assert(not IS_SERVER, "ActionExecutor-executeDownloadReplayData() should not be invoked on the server.")
     if (modelScene.isModelSceneWar) then
@@ -1742,7 +1765,8 @@ function ActionExecutor.execute(action, modelScene)
     local actionCode = action.actionCode
     assert(ActionCodeFunctions.getActionName(actionCode), "ActionExecutor.execute() invalid actionCode: " .. (actionCode or ""))
 
-    if     (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
+    if     (actionCode == ACTION_CODES.ActionChat)                         then executeChat(                        action, modelScene)
+    elseif (actionCode == ACTION_CODES.ActionDownloadReplayData)           then executeDownloadReplayData(          action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionExitWar)                      then executeExitWar(                     action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetJoinableWarConfigurations) then executeGetJoinableWarConfigurations(action, modelScene)
     elseif (actionCode == ACTION_CODES.ActionGetOngoingWarConfigurations)  then executeGetOngoingWarConfigurations( action, modelScene)

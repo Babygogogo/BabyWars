@@ -8,16 +8,33 @@ local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
 local IS_SERVER           = requireBW("src.app.utilities.GameConstantFunctions").isServer()
 local WebSocketManager    = (not IS_SERVER) and (requireBW("src.app.utilities.WebSocketManager")) or (nil)
 
-local getLocalizedText = LocalizationFunctions.getLocalizedText
-local math, string     = math, string
+local getLocalizedText    = LocalizationFunctions.getLocalizedText
+local math, string, table = math, string, table
 
-local ACTION_CODE_CHAT  = ActionCodeFunctions.getActionCode("ActionChat")
+local MESSAGE_CAPACITY_PER_CHANNEL = 20
+local ACTION_CODE_CHAT             = ActionCodeFunctions.getActionCode("ActionChat")
 
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getPrivateChannelsCount(playersCount)
     return playersCount * (playersCount - 1) / 2
+end
+
+local function generateChannelText(self, channelID)
+    local textList = {(channelID) and (getLocalizedText(65, "Channel Private") .. "\n") or (getLocalizedText(65, "Channel Public") .. "\n")}
+    local channel  = (channelID) and (self.m_PrivateChannels[channelID]) or (self.m_PublicChannel)
+    local messages = channel.messages
+    if ((not messages) or (#messages == 0)) then
+        textList[#textList + 1] = getLocalizedText(65, "NoHistoricalChat")
+    else
+        local modelPlayerManager = self.m_ModelPlayerManager
+        for _, message in ipairs(messages) do
+            textList[#textList + 1] = string.format("[%s]: %s", modelPlayerManager:getModelPlayer(message.senderPlayerIndex):getAccount(), message.text)
+        end
+    end
+
+    return table.concat(textList, "\n")
 end
 
 --------------------------------------------------------------------------------
@@ -29,6 +46,7 @@ local function setStatePrivateChannel(self, channelID)
 
     if (self.m_View) then
         self.m_View:setVisible(true)
+            :setOverviewText(generateChannelText(self, channelID))
     end
     if (self.m_ScriptEventDispatcher) then
         self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtChatManagerUpdated"})
@@ -41,6 +59,7 @@ local function setStatePublicChannel(self)
 
     if (self.m_View) then
         self.m_View:setVisible(true)
+            :setOverviewText(generateChannelText(self, nil))
     end
     if (self.m_ScriptEventDispatcher) then
         self.m_ScriptEventDispatcher:dispatchEvent({name = "EvtChatManagerUpdated"})
@@ -197,8 +216,33 @@ function ModelChatManager:setEnabled(enabled)
     return self
 end
 
-function ModelChatManager:updateWithChatMessage(warID, channelID, chatMessage)
-    self.m_ModelMessageIndicator:showMessage(chatMessage.text)
+function ModelChatManager:getChannelIdWithPlayerIndices(playerIndex1, playerIndex2)
+    return self.m_ChannelIdMap[playerIndex1][playerIndex2]
+end
+
+function ModelChatManager:updateWithChatMessage(channelID, senderPlayerIndex, chatText)
+    local channel = (channelID) and (self.m_PrivateChannels[channelID]) or (self.m_PublicChannel)
+    channel.messages = channel.messages or {}
+    local messages = channel.messages
+    messages[#messages + 1] = {
+        text              = chatText,
+        senderPlayerIndex = senderPlayerIndex,
+    }
+    if (#messages > MESSAGE_CAPACITY_PER_CHANNEL) then
+        table.remove(messages, 1)
+    end
+
+    if (not IS_SERVER) then
+        if ((not self:isEnabled()) or (self.m_PrivateChannelID ~= channelID)) then
+            self.m_ModelMessageIndicator:showMessage(string.format("%s[%s]: %s",
+                getLocalizedText(65, "Player"),
+                self.m_ModelPlayerManager:getModelPlayer(senderPlayerIndex):getAccount(),
+                chatText
+            ))
+        else
+            self.m_View:setOverviewText(generateChannelText(self, channelID))
+        end
+    end
 
     return self
 end
@@ -214,11 +258,10 @@ function ModelChatManager:onButtonSendTouched(chatText)
         self.m_View:setInputBarText("")
 
         WebSocketManager.sendAction({
-            actionCode        = ACTION_CODE_CHAT,
-            warID             = self.m_WarID,
-            channelID         = self.m_PrivateChannelID,
-            senderPlayerIndex = self.m_PlayerIndexLoggedIn,
-            chatText          = chatText,
+            actionCode = ACTION_CODE_CHAT,
+            warID      = self.m_WarID,
+            channelID  = self.m_PrivateChannelID,
+            chatText   = chatText,
         })
     end
 
