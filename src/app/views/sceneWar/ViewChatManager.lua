@@ -5,9 +5,9 @@ local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
-local ADDRESS_BAR_Z_ORDER         = 1
+local INPUT_BAR_Z_ORDER           = 1
 local MENU_TITLE_Z_ORDER          = 1
-local BUTTON_CLOSE_Z_ORDER         = 1
+local BUTTON_CLOSE_Z_ORDER        = 1
 local BUTTON_SEND_Z_ORDER         = 1
 local MENU_LIST_VIEW_Z_ORDER      = 1
 local OVERVIEW_SCROLLVIEW_Z_ORDER = 1
@@ -30,22 +30,28 @@ local MENU_TITLE_POS_Y      = MENU_BACKGROUND_POS_Y + MENU_BACKGROUND_HEIGHT - M
 local MENU_TITLE_FONT_COLOR = {r = 96,  g = 224, b = 88}
 local MENU_TITLE_FONT_SIZE  = 35
 
+local INPUT_BAR_WIDTH     = display.width - MENU_BACKGROUND_WIDTH - 90
+local INPUT_BAR_HEIGHT    = 60
+local INPUT_BAR_POS_X     = display.width - INPUT_BAR_WIDTH - 30
+local INPUT_BAR_POS_Y     = MENU_BACKGROUND_POS_Y
+local INPUT_BAR_FONT_SIZE = 18
+
 local BUTTON_CLOSE_WIDTH      = MENU_BACKGROUND_WIDTH
 local BUTTON_CLOSE_HEIGHT     = 50
 local BUTTON_CLOSE_POS_X      = MENU_BACKGROUND_POS_X
 local BUTTON_CLOSE_POS_Y      = MENU_BACKGROUND_POS_Y
 local BUTTON_CLOSE_FONT_COLOR = {r = 240, g = 80, b = 56}
 
-local BUTTON_SEND_WIDTH      = BUTTON_CLOSE_WIDTH
-local BUTTON_SEND_HEIGHT     = BUTTON_CLOSE_HEIGHT
-local BUTTON_SEND_POS_X      = BUTTON_CLOSE_POS_X
-local BUTTON_SEND_POS_Y      = BUTTON_CLOSE_POS_Y + BUTTON_CLOSE_HEIGHT
+local BUTTON_SEND_WIDTH      = 70
+local BUTTON_SEND_HEIGHT     = INPUT_BAR_HEIGHT
+local BUTTON_SEND_POS_X      = INPUT_BAR_POS_X + INPUT_BAR_WIDTH - BUTTON_SEND_WIDTH
+local BUTTON_SEND_POS_Y      = INPUT_BAR_POS_Y
 local BUTTON_SEND_FONT_COLOR = MENU_TITLE_FONT_COLOR
 
 local MENU_LIST_VIEW_WIDTH        = MENU_BACKGROUND_WIDTH
-local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_CLOSE_POS_Y - BUTTON_CLOSE_HEIGHT - BUTTON_SEND_HEIGHT
+local MENU_LIST_VIEW_HEIGHT       = MENU_TITLE_POS_Y - BUTTON_CLOSE_POS_Y - BUTTON_CLOSE_HEIGHT
 local MENU_LIST_VIEW_POS_X        = MENU_BACKGROUND_POS_X
-local MENU_LIST_VIEW_POS_Y        = BUTTON_CLOSE_POS_Y + BUTTON_CLOSE_HEIGHT + BUTTON_SEND_HEIGHT
+local MENU_LIST_VIEW_POS_Y        = BUTTON_CLOSE_POS_Y + BUTTON_CLOSE_HEIGHT
 local MENU_LIST_VIEW_ITEMS_MARGIN = 10
 
 local OVERVIEW_BACKGROUND_WIDTH  = display.width - MENU_BACKGROUND_WIDTH - 90
@@ -59,12 +65,6 @@ local OVERVIEW_SCROLLVIEW_POS_X  = OVERVIEW_BACKGROUND_POS_X + 5
 local OVERVIEW_SCROLLVIEW_POS_Y  = OVERVIEW_BACKGROUND_POS_Y + 5
 
 local OVERVIEW_FONT_SIZE = 18
-
-local ADDRESS_BAR_WIDTH     = display.width - MENU_BACKGROUND_WIDTH - 90
-local ADDRESS_BAR_HEIGHT    = 60
-local ADDRESS_BAR_POS_X     = display.width - ADDRESS_BAR_WIDTH - 30
-local ADDRESS_BAR_POS_Y     = MENU_BACKGROUND_POS_Y
-local ADDRESS_BAR_FONT_SIZE = 18
 
 local ITEM_WIDTH              = 230
 local ITEM_HEIGHT             = 50
@@ -129,24 +129,27 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
-local function initAddressBar(self)
+local function initInputBar(self)
     local background = cc.Scale9Sprite:createWithSpriteFrameName(BACKGROUND_NAME, BACKGROUND_CAPINSETS)
-    background:ignoreAnchorPointForPosition(true)
-        :setPosition(ADDRESS_BAR_POS_X, ADDRESS_BAR_POS_Y)
-        :setContentSize(ADDRESS_BAR_WIDTH, ADDRESS_BAR_HEIGHT)
-        :setOpacity(BACKGROUND_OPACITY)
+    local editBox    = ccui.EditBox:create(cc.size(INPUT_BAR_WIDTH, INPUT_BAR_HEIGHT), background, background, background)
+    editBox:ignoreAnchorPointForPosition(true)
+        :setPosition(INPUT_BAR_POS_X, INPUT_BAR_POS_Y)
+        :setFontSize(INPUT_BAR_FONT_SIZE)
+        :setFontColor({r = 0, g = 0, b = 0})
 
-    local label = cc.Label:createWithTTF("", ITEM_FONT_NAME, ADDRESS_BAR_FONT_SIZE)
-    label:ignoreAnchorPointForPosition(true)
-        :setPosition(5, 0)
-        :setDimensions(ADDRESS_BAR_WIDTH - 7, ADDRESS_BAR_HEIGHT)
-        :enableOutline(ITEM_FONT_OUTLINE_COLOR, ITEM_FONT_OUTLINE_WIDTH)
-        :setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER)
-    background:addChild(label)
+        :setCascadeOpacityEnabled(true)
+        :setOpacity(180)
 
-    self.m_AddressBarBackground = background
-    self.m_AddressBarLabel      = label
-    self:addChild(background, ADDRESS_BAR_Z_ORDER)
+        :setPlaceholderFontSize(INPUT_BAR_FONT_SIZE)
+        :setPlaceholderFontColor({r = 0, g = 0, b = 0})
+        :setPlaceHolder(getLocalizedText(65, "TouchMeToInput"))
+
+        :setMaxLength(60)
+        :setInputMode(cc.EDITBOX_INPUT_MODE_SINGLELINE)
+        :setInputFlag(cc.EDITBOX_INPUT_FLAG_SENSITIVE)
+
+    self.m_InputBar = editBox
+    self:addChild(editBox, INPUT_BAR_Z_ORDER)
 end
 
 local function initMenuBackground(self)
@@ -161,7 +164,7 @@ local function initMenuBackground(self)
 end
 
 local function initMenuTitle(self)
-    local title = cc.Label:createWithTTF(getLocalizedText(65, "Channel Public"), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
+    local title = cc.Label:createWithTTF(getLocalizedText(65, "Chat"), ITEM_FONT_NAME, MENU_TITLE_FONT_SIZE)
     title:ignoreAnchorPointForPosition(true)
         :setPosition(MENU_TITLE_POS_X, MENU_TITLE_POS_Y)
 
@@ -222,7 +225,7 @@ local function initButtonSend(self)
 
         :addTouchEventListener(function(sender, eventType)
             if ((eventType == ccui.TouchEventType.ended) and (self.m_Model)) then
-                self.m_Model:onButtonSendTouched()
+                self.m_Model:onButtonSendTouched(self.m_InputBar:getText())
             end
         end)
 
@@ -273,7 +276,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ViewChatManager:ctor()
-    initAddressBar(    self)
+    initInputBar(      self)
     initMenuBackground(self)
     initMenuTitle(     self)
     initButtonBack(    self)
@@ -287,24 +290,6 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewChatManager:setEnabled(enabled)
-    self:setVisible(enabled)
-
-    return self
-end
-
-function ViewChatManager:setItemEnabled(itemIndex, enabled)
-    setButtonEnabled(self.m_MenuListView:getItem(itemIndex - 1), enabled)
-
-    return self
-end
-
-function ViewChatManager:setMenuTitle(text)
-    self.m_MenuTitle:setString(text)
-
-    return self
-end
-
 function ViewChatManager:setMenuItems(items)
     assert(#items > 0, "ViewChatManager:setMenuItems() the items are empty.")
     local listView = self.m_MenuListView
@@ -313,19 +298,6 @@ function ViewChatManager:setMenuItems(items)
     for _, item in ipairs(items) do
         listView:pushBackCustomItem(createViewItem(item))
     end
-
-    return self
-end
-
-function ViewChatManager:setAddressBarVisible(visible)
-    self.m_AddressBarBackground:setVisible(visible)
-
-    return self
-end
-
-function ViewChatManager:setOverviewVisible(visible)
-    self.m_OverviewBackground:setVisible(visible)
-    self.m_OverviewScrollView:setVisible(visible)
 
     return self
 end
@@ -353,8 +325,8 @@ function ViewChatManager:setButtonSendEnabled(enabled)
     return self
 end
 
-function ViewChatManager:setAddressBarText(text)
-    self.m_AddressBarLabel:setString(text)
+function ViewChatManager:setInputBarText(text)
+    self.m_InputBar:setText(text)
 
     return self
 end

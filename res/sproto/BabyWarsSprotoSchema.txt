@@ -3,27 +3,28 @@
 # actions
 ################################################################################
 .ActionGeneric {
-    ActionDownloadReplayData            1 : ActionDownloadReplayData
-    ActionExitWar                       2 : ActionExitWar
-    ActionGetJoinableWarConfigurations  3 : ActionGetJoinableWarConfigurations
-    ActionGetOngoingWarConfigurations   4 : ActionGetOngoingWarConfigurations
-    ActionGetPlayerProfile              5 : ActionGetPlayerProfile
-    ActionGetRankingList                6 : ActionGetRankingList
-    ActionGetReplayConfigurations       7 : ActionGetReplayConfigurations
-    ActionGetSkillConfiguration         8 : ActionGetSkillConfiguration
-    ActionGetWaitingWarConfigurations   9 : ActionGetWaitingWarConfigurations
-    ActionJoinWar                      10 : ActionJoinWar
-    ActionLogin                        11 : ActionLogin
-    ActionLogout                       12 : ActionLogout
-    ActionMessage                      13 : ActionMessage
-    ActionNetworkHeartbeat             14 : ActionNetworkHeartbeat
-    ActionNewWar                       15 : ActionNewWar
-    ActionRegister                     16 : ActionRegister
-    ActionReloadSceneWar               17 : ActionReloadSceneWar
-    ActionRunSceneMain                 18 : ActionRunSceneMain
-    ActionRunSceneWar                  19 : ActionRunSceneWar
-    ActionSetSkillConfiguration        20 : ActionSetSkillConfiguration
-    ActionSyncSceneWar                 21 : ActionSyncSceneWar
+    ActionChat                          1 : ActionChat
+    ActionDownloadReplayData            2 : ActionDownloadReplayData
+    ActionExitWar                       3 : ActionExitWar
+    ActionGetJoinableWarConfigurations  4 : ActionGetJoinableWarConfigurations
+    ActionGetOngoingWarConfigurations   5 : ActionGetOngoingWarConfigurations
+    ActionGetPlayerProfile              6 : ActionGetPlayerProfile
+    ActionGetRankingList                7 : ActionGetRankingList
+    ActionGetReplayConfigurations       8 : ActionGetReplayConfigurations
+    ActionGetSkillConfiguration         9 : ActionGetSkillConfiguration
+    ActionGetWaitingWarConfigurations  10 : ActionGetWaitingWarConfigurations
+    ActionJoinWar                      11 : ActionJoinWar
+    ActionLogin                        12 : ActionLogin
+    ActionLogout                       13 : ActionLogout
+    ActionMessage                      14 : ActionMessage
+    ActionNetworkHeartbeat             15 : ActionNetworkHeartbeat
+    ActionNewWar                       16 : ActionNewWar
+    ActionRegister                     17 : ActionRegister
+    ActionReloadSceneWar               18 : ActionReloadSceneWar
+    ActionRunSceneMain                 19 : ActionRunSceneMain
+    ActionRunSceneWar                  20 : ActionRunSceneWar
+    ActionSetSkillConfiguration        21 : ActionSetSkillConfiguration
+    ActionSyncSceneWar                 22 : ActionSyncSceneWar
 
     ActionActivateSkillGroup          100 : ActionActivateSkillGroup
     ActionAttack                      101 : ActionAttack
@@ -50,6 +51,16 @@
 .ActionRedis {
     actionCode           0 : integer
     encodedActionGeneric 1 : string
+}
+
+.ActionChat {
+    actionCode        0 : integer
+    playerAccount     1 : string
+    playerPassword    2 : string
+    warID             3 : integer
+    channelID         4 : integer
+    senderPlayerIndex 5 : integer
+    chatText          6 : string
 }
 
 .ActionDownloadReplayData {
@@ -581,6 +592,15 @@
     password 2 : string
 }
 
+.ChatChannel {
+    .ChatMessage {
+        text              0 : string
+        senderPlayerIndex 1 : integer
+    }
+
+    messages 0 : *ChatMessage
+}
+
 .DropDestination {
     unitID    0 : integer
     gridIndex 1 : GridIndex
@@ -676,6 +696,11 @@
 }
 
 .SceneWar {
+    .ChatData {
+        publicChannel   0 :  ChatChannel
+        privateChannels 1 : *ChatChannel
+    }
+
     .SinglePlayerData {
         playerIndex         0 : integer
         account             1 : string
@@ -751,6 +776,7 @@
     enterTurnTime         18 :  integer
     incomeModifier        19 :  integer
     startingFund          20 :  integer
+    chatData              21 :  ChatData
 }
 
 .WarIdForIndexing {
