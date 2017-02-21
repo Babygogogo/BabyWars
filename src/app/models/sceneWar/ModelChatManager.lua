@@ -21,8 +21,29 @@ local function getPrivateChannelsCount(playersCount)
     return playersCount * (playersCount - 1) / 2
 end
 
+local function getChatTargetAccount(self, channelID)
+    local map          = self.m_ChannelIdMap
+    local playersCount = self.m_PlayersCount
+    for index1 = 1, playersCount - 1 do
+        for index2 = index1 + 1, playersCount do
+            if (map[index1][index2] == channelID) then
+                local index = (index1 == self.m_PlayerIndexLoggedIn) and (index2) or (index1)
+                return self.m_ModelPlayerManager:getModelPlayer(index):getAccount()
+            end
+        end
+    end
+
+    error("ModelChatManager-getChatTargetAccount() failed to find the account with channelID: " .. (channelID or ""))
+end
+
 local function generateChannelText(self, channelID)
-    local textList = {(channelID) and (getLocalizedText(65, "Channel Private") .. "\n") or (getLocalizedText(65, "Channel Public") .. "\n")}
+    local textList = {}
+    if (not channelID) then
+        textList[#textList + 1] = getLocalizedText(65, "Channel Public") .. "\n"
+    else
+        textList[#textList + 1] = string.format("%s %s\n", getLocalizedText(65, "Channel Private"), getChatTargetAccount(self, channelID))
+    end
+
     local channel  = (channelID) and (self.m_PrivateChannels[channelID]) or (self.m_PublicChannel)
     local messages = channel.messages
     if ((not messages) or (#messages == 0)) then

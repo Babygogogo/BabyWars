@@ -338,6 +338,7 @@ local function executeChat(action, modelScene)
 
     if (IS_SERVER) then
         SingletonGetters.getModelChatManager(SceneWarManager.getOngoingModelSceneWar(warID)):updateWithChatMessage(channelID, senderPlayerIndex, chatText)
+        SceneWarManager.serializeOngoingModelSceneWar(warID)
     elseif (modelScene.isModelSceneWar) then
         SingletonGetters.getModelChatManager(modelScene):updateWithChatMessage(channelID, senderPlayerIndex, chatText)
     else
