@@ -46,6 +46,7 @@ local function updateWithModelUnitMap(self)
     local modelWarCommandMenu = self.m_ModelWarCommandMenu
     if ((modelWarCommandMenu:isEnabled())                   or
         (modelWarCommandMenu:isHiddenWithHideUI())          or
+        (self.m_ModelChatManager:isEnabled())               or
         (not modelUnit)                                     or
         (not isModelUnitVisible(modelSceneWar, modelUnit))) then
         self.m_View:setVisible(false)
@@ -63,6 +64,10 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtChatManagerUpdated(self, event)
+    updateWithModelUnitMap(self)
+end
+
 local function onEvtModelUnitMapUpdated(self, event)
     updateWithModelUnitMap(self)
 end
@@ -106,13 +111,16 @@ end
 --------------------------------------------------------------------------------
 function ModelUnitInfo:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelChatManager    = SingletonGetters.getModelChatManager(   modelSceneWar)
     self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
+
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
-        :addEventListener("EvtModelUnitMapUpdated",   self)
+        :addEventListener("EvtChatManagerUpdated",    self)
         :addEventListener("EvtGridSelected",          self)
         :addEventListener("EvtMapCursorMoved",        self)
-        :addEventListener("EvtWarCommandMenuUpdated", self)
+        :addEventListener("EvtModelUnitMapUpdated",   self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
+        :addEventListener("EvtWarCommandMenuUpdated", self)
 
     if (self.m_View) then
         self.m_View:updateWithPlayerIndex(SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex())
@@ -125,11 +133,12 @@ end
 
 function ModelUnitInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtModelUnitMapUpdated")   then onEvtModelUnitMapUpdated(  self, event)
+    if     (eventName == "EvtChatManagerUpdated")    then onEvtChatManagerUpdated(   self, event)
     elseif (eventName == "EvtGridSelected")          then onEvtGridSelected(         self, event)
     elseif (eventName == "EvtMapCursorMoved")        then onEvtMapCursorMoved(       self, event)
-    elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
+    elseif (eventName == "EvtModelUnitMapUpdated")   then onEvtModelUnitMapUpdated(  self, event)
     elseif (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
+    elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
     end
 
     return self

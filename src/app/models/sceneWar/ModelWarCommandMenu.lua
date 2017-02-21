@@ -473,6 +473,7 @@ local function setStateAuxiliaryCommands(self)
         local modelSceneWar = self.m_ModelSceneWar
         local items         = {}
         if (not isTotalReplay(modelSceneWar)) then
+            items[#items + 1] = self.m_ItemChat
             items[#items + 1] = self.m_ItemReload
 
             local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
@@ -640,6 +641,16 @@ local function initItemAuxiliaryCommands(self)
         name     = getLocalizedText(65, "AuxiliaryCommands"),
         callback = function()
             setStateAuxiliaryCommands(self)
+        end,
+    }
+end
+
+local function initItemChat(self)
+    self.m_ItemChat = {
+        name     = getLocalizedText(65, "Chat"),
+        callback = function()
+            SingletonGetters.getModelChatManager(self.m_ModelSceneWar):setEnabled(true)
+            setStateDisabled(self)
         end,
     }
 end
@@ -1017,6 +1028,7 @@ function ModelWarCommandMenu:ctor(param)
     initItemActivateSkill2(     self)
     initItemAgreeDraw(          self)
     initItemAuxiliaryCommands(  self)
+    initItemChat(               self)
     initItemDestroyOwnedUnit(   self)
     initItemDisagreeDraw(       self)
     initItemDrawOrSurrender(    self)

@@ -84,7 +84,7 @@ local function createTouchListener(self)
     local touchListener = cc.EventListenerTouchAllAtOnce:create()
 
     local function onTouchesBegan(touches, event)
-        if (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled()) then
+        if ((self.m_ModelChatManager:isEnabled()) or (self.m_ModelWarCommandMenu:isEnabled())) then
             return
         end
 
@@ -96,8 +96,9 @@ local function createTouchListener(self)
     end
 
     local function onTouchesMoved(touches, event)
-        if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())) then
+        if ((not isTouchBegan)                        or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (self.m_ModelChatManager:isEnabled())     or
+            (self.m_ModelWarCommandMenu:isEnabled())) then
             return
         end
 
@@ -136,8 +137,9 @@ local function createTouchListener(self)
     end
 
     local function onTouchesEnded(touches, event)
-        if ((not isTouchBegan)                      or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
-            (getModelWarCommandMenu(self.m_ModelSceneWar):isEnabled())) then
+        if ((not isTouchBegan)                        or --Sometimes this function is invoked without the onTouchesBegan() being invoked first, so we must do the manual check here.
+            (self.m_ModelChatManager:isEnabled())     or
+            (self.m_ModelWarCommandMenu:isEnabled())) then
             return
         end
 
@@ -213,7 +215,10 @@ end
 -- The callback functions on script events.
 --------------------------------------------------------------------------------
 function ModelMapCursor:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+    self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelChatManager    = SingletonGetters.getModelChatManager(   modelSceneWar)
+    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
+
     getScriptEventDispatcher(modelSceneWar)
         :addEventListener("EvtGridSelected",                     self)
         :addEventListener("EvtMapCursorMoved",                   self)

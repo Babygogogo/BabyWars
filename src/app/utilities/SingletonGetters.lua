@@ -8,6 +8,10 @@ function SingletonGetters.getActionId(modelSceneWar)
     return modelSceneWar:getActionId()
 end
 
+function SingletonGetters.getModelChatManager(modelSceneWar)
+    return modelSceneWar:getModelChatManager()
+end
+
 function SingletonGetters.getModelFogMap(modelSceneWar)
     return SingletonGetters.getModelWarField(modelSceneWar):getModelFogMap()
 end

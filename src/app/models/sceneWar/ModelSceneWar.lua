@@ -137,6 +137,13 @@ local function initScriptEventDispatcher(self)
     self.m_ScriptEventDispatcher = EventDispatcher:create()
 end
 
+local function initActorChatManager(self, chatData)
+    if (not self.m_ActorChatManager) then
+        self.m_ActorChatManager = Actor.createWithModelAndViewName("sceneWar.ModelChatManager", chatData, "sceneWar.ViewChatManager")
+        self.m_ActorChatManager:getModel():setEnabled(false)
+    end
+end
+
 local function initActorConfirmBox(self)
     if (not self.m_ActorConfirmBox) then
         local actor = Actor.createWithModelAndViewName("common.ModelConfirmBox", nil, "common.ViewConfirmBox")
@@ -217,10 +224,12 @@ function ModelSceneWar:ctor(sceneData)
     setActionId(self, sceneData.actionID)
 
     initScriptEventDispatcher(self)
+    initActorChatManager(     self, sceneData.chatData)
     initActorPlayerManager(   self, sceneData.players)
     initActorWeatherManager(  self, sceneData.weather)
     initActorWarField(        self, sceneData.warField, sceneData.isTotalReplay)
     initActorTurnManager(     self, sceneData.turn)
+
     if (not IS_SERVER) then
         initActorConfirmBox(      self)
         initActorMessageIndicator(self)
@@ -232,11 +241,12 @@ end
 
 function ModelSceneWar:initView()
     assert(self.m_View, "ModelSceneWar:initView() no view is attached to the owner actor of the model.")
-    self.m_View:setViewConfirmBox(self.m_ActorConfirmBox      :getView())
-        :setViewWarField(         self.m_ActorWarField        :getView())
-        :setViewWarHud(           self.m_ActorWarHud          :getView())
-        :setViewTurnManager(      self.m_ActorTurnManager     :getView())
-        :setViewMessageIndicator( self.m_ActorMessageIndicator:getView())
+    self.m_View:setViewChatManager(self.m_ActorChatManager     :getView())
+        :setViewConfirmBox(        self.m_ActorConfirmBox      :getView())
+        :setViewWarField(          self.m_ActorWarField        :getView())
+        :setViewWarHud(            self.m_ActorWarHud          :getView())
+        :setViewTurnManager(       self.m_ActorTurnManager     :getView())
+        :setViewMessageIndicator(  self.m_ActorMessageIndicator:getView())
 
     return self
 end
@@ -295,6 +305,7 @@ function ModelSceneWar:toSerializableTable()
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
+        chatData              = self:getModelChatManager()   :toSerializableTable(),
         players               = self:getModelPlayerManager() :toSerializableTable(),
         turn                  = self:getModelTurnManager()   :toSerializableTable(),
         warField              = self:getModelWarField()      :toSerializableTable(),
@@ -320,6 +331,7 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
+        chatData              = self:getModelChatManager()   :toSerializableTableForPlayerIndex(playerIndex),
         players               = self:getModelPlayerManager() :toSerializableTableForPlayerIndex(playerIndex),
         turn                  = self:getModelTurnManager()   :toSerializableTableForPlayerIndex(playerIndex),
         warField              = self:getModelWarField()      :toSerializableTableForPlayerIndex(playerIndex),
@@ -345,6 +357,7 @@ function ModelSceneWar:toSerializableReplayData()
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
+        chatData              = nil,
         players               = self:getModelPlayerManager() :toSerializableReplayData(),
         turn                  = self:getModelTurnManager()   :toSerializableReplayData(),
         warField              = self:getModelWarField()      :toSerializableReplayData(),
@@ -358,6 +371,7 @@ end
 function ModelSceneWar:onStartRunning(ignoreWarMusic)
     local modelTurnManager = self:getModelTurnManager()
     modelTurnManager            :onStartRunning(self)
+    self:getModelChatManager()  :onStartRunning(self)
     self:getModelPlayerManager():onStartRunning(self)
     self:getModelWarField()     :onStartRunning(self)
     if (not IS_SERVER) then
@@ -605,6 +619,10 @@ function ModelSceneWar:setRemainingVotesForDraw(votesCount)
     self.m_RemainingVotesForDraw = votesCount
 
     return self
+end
+
+function ModelSceneWar:getModelChatManager()
+    return self.m_ActorChatManager:getModel()
 end
 
 function ModelSceneWar:getModelConfirmBox()

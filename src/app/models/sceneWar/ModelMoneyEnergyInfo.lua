@@ -16,14 +16,17 @@ local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
+local function onEvtChatManagerUpdated(self, event)
+    local menu = self.m_ModelWarCommandMenu
+    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()) and (not self.m_ModelChatManager:isEnabled()))
+end
+
 local function onEvtPlayerIndexUpdated(self, event)
     local playerIndex = event.playerIndex
     self.m_PlayerIndex = playerIndex
 
-    if (self.m_View) then
-        self.m_View:updateWithModelPlayer(event.modelPlayer, playerIndex)
-            :updateWithPlayerIndex(playerIndex)
-    end
+    self.m_View:updateWithModelPlayer(event.modelPlayer, playerIndex)
+        :updateWithPlayerIndex(playerIndex)
 end
 
 local function onEvtModelPlayerUpdated(self, event)
@@ -34,7 +37,7 @@ end
 
 local function onEvtWarCommandMenuUpdated(self, event)
     local menu = self.m_ModelWarCommandMenu
-    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()))
+    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()) and (not self.m_ModelChatManager:isEnabled()))
 end
 
 --------------------------------------------------------------------------------
@@ -49,27 +52,30 @@ end
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar)
     self.m_ModelSceneWar       = modelSceneWar
+    self.m_ModelChatManager    = SingletonGetters.getModelChatManager(   modelSceneWar)
     self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
+
     SingletonGetters.getScriptEventDispatcher(modelSceneWar)
-        :addEventListener("EvtPlayerIndexUpdated",    self)
+        :addEventListener("EvtChatManagerUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
+        :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
 
     local playerIndex  = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
     self.m_PlayerIndex = playerIndex
-    if (self.m_View) then
-        self.m_View:setModelSceneWar(modelSceneWar)
-            :updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
-            :updateWithPlayerIndex(playerIndex)
-    end
+
+    self.m_View:setModelSceneWar(modelSceneWar)
+        :updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
+        :updateWithPlayerIndex(playerIndex)
 
     return self
 end
 
 function ModelMoneyEnergyInfo:onEvent(event)
     local eventName = event.name
-    if     (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
+    if     (eventName == "EvtChatManagerUpdated")    then onEvtChatManagerUpdated(   self, event)
     elseif (eventName == "EvtModelPlayerUpdated")    then onEvtModelPlayerUpdated(   self, event)
+    elseif (eventName == "EvtPlayerIndexUpdated")    then onEvtPlayerIndexUpdated(   self, event)
     elseif (eventName == "EvtWarCommandMenuUpdated") then onEvtWarCommandMenuUpdated(self, event)
     end
 
