@@ -714,13 +714,15 @@ end
 -- The set state functions.
 --------------------------------------------------------------------------------
 local function canSetStatePreviewingAttackableArea(self, gridIndex)
-    local modelUnit = getModelUnitMap(self.m_ModelSceneWar):getModelUnit(gridIndex)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelUnit     = getModelUnitMap(modelSceneWar):getModelUnit(gridIndex)
     if ((not modelUnit) or (not modelUnit.getAttackRangeMinMax)) then
         return false
-    elseif (isTotalReplay(self.m_ModelSceneWar)) then
+    elseif ((isTotalReplay(modelSceneWar)) or (not modelUnit:isStateIdle())) then
         return true
     else
-        return (not modelUnit:isStateIdle()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar))
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+        return (playerIndexLoggedIn ~= modelUnit:getPlayerIndex()) or (playerIndexLoggedIn ~= getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 end
 
@@ -744,13 +746,15 @@ setStatePreviewingAttackableArea = function(self, gridIndex)
 end
 
 local function canSetStatePreviewingReachableArea(self, gridIndex)
-    local modelUnit = getModelUnitMap(self.m_ModelSceneWar):getModelUnit(gridIndex)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelUnit     = getModelUnitMap(modelSceneWar):getModelUnit(gridIndex)
     if ((not modelUnit) or (modelUnit.getAttackRangeMinMax)) then
         return false
-    elseif (isTotalReplay(self.m_ModelSceneWar)) then
+    elseif ((isTotalReplay(modelSceneWar)) or (not modelUnit:isStateIdle())) then
         return true
     else
-        return (not modelUnit:isStateIdle()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar))
+        local playerIndexLoggedIn = getPlayerIndexLoggedIn(modelSceneWar)
+        return (playerIndexLoggedIn ~= modelUnit:getPlayerIndex()) or (playerIndexLoggedIn ~= getModelTurnManager(modelSceneWar):getPlayerIndex())
     end
 end
 
