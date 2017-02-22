@@ -715,9 +715,13 @@ end
 --------------------------------------------------------------------------------
 local function canSetStatePreviewingAttackableArea(self, gridIndex)
     local modelUnit = getModelUnitMap(self.m_ModelSceneWar):getModelUnit(gridIndex)
-    return (modelUnit)                                                                  and
-        (modelUnit.getAttackRangeMinMax)                                                and
-        ((isTotalReplay(self.m_ModelSceneWar)) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar)))
+    if ((not modelUnit) or (not modelUnit.getAttackRangeMinMax)) then
+        return false
+    elseif (isTotalReplay(self.m_ModelSceneWar)) then
+        return true
+    else
+        return (not modelUnit:isStateIdle()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar))
+    end
 end
 
 setStatePreviewingAttackableArea = function(self, gridIndex)
@@ -741,9 +745,13 @@ end
 
 local function canSetStatePreviewingReachableArea(self, gridIndex)
     local modelUnit = getModelUnitMap(self.m_ModelSceneWar):getModelUnit(gridIndex)
-    return (modelUnit)                                                                  and
-        (not modelUnit.getAttackRangeMinMax)                                            and
-        ((isTotalReplay(self.m_ModelSceneWar)) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar)))
+    if ((not modelUnit) or (modelUnit.getAttackRangeMinMax)) then
+        return false
+    elseif (isTotalReplay(self.m_ModelSceneWar)) then
+        return true
+    else
+        return (not modelUnit:isStateIdle()) or (modelUnit:getPlayerIndex() ~= getPlayerIndexLoggedIn(self.m_ModelSceneWar))
+    end
 end
 
 setStatePreviewingReachableArea = function(self, gridIndex)
