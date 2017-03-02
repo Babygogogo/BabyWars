@@ -167,11 +167,11 @@ function ModelChatManager:ctor(chatData)
     return self
 end
 
-function ModelChatManager:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar         = modelSceneWar
-    self.m_ModelPlayerManager    = SingletonGetters.getModelPlayerManager(   modelSceneWar)
-    self.m_ScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher(modelSceneWar)
-    self.m_WarID                 = SingletonGetters.getWarId(                modelSceneWar)
+function ModelChatManager:onStartRunning(modelWar)
+    self.m_ModelWar              = modelWar
+    self.m_ModelPlayerManager    = SingletonGetters.getModelPlayerManager(   modelWar)
+    self.m_ScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher(modelWar)
+    self.m_WarID                 = SingletonGetters.getWarId(                modelWar)
 
     local playersCount = self.m_ModelPlayerManager:getPlayersCount()
     for channelID = 1, getPrivateChannelsCount(playersCount) do
@@ -180,8 +180,8 @@ function ModelChatManager:onStartRunning(modelSceneWar)
     self.m_PlayersCount = playersCount
     initChannelIdMap(self, playersCount)
 
-    if ((not IS_SERVER) and (not SingletonGetters.isTotalReplay(modelSceneWar))) then
-        self.m_ModelMessageIndicator = SingletonGetters.getModelMessageIndicator(modelSceneWar)
+    if ((not IS_SERVER) and (not SingletonGetters.isTotalReplay(modelWar))) then
+        self.m_ModelMessageIndicator = SingletonGetters.getModelMessageIndicator(modelWar)
         self.m_PlayerIndexLoggedIn   = self.m_ModelPlayerManager:getPlayerIndexLoggedIn()
     end
 
@@ -254,14 +254,14 @@ function ModelChatManager:updateWithChatMessage(channelID, senderPlayerIndex, ch
     end
 
     if (not IS_SERVER) then
-        if ((not self:isEnabled()) or (self.m_PrivateChannelID ~= channelID)) then
+        if ((self:isEnabled()) and (self.m_PrivateChannelID == channelID)) then
+            self.m_View:setOverviewText(generateChannelText(self, channelID))
+        elseif (senderPlayerIndex ~= self.m_PlayerIndexLoggedIn) then
             self.m_ModelMessageIndicator:showMessage(string.format("%s[%s]: %s",
                 getLocalizedText(65, "Player"),
                 self.m_ModelPlayerManager:getModelPlayer(senderPlayerIndex):getAccount(),
                 chatText
             ))
-        else
-            self.m_View:setOverviewText(generateChannelText(self, channelID))
         end
     end
 
