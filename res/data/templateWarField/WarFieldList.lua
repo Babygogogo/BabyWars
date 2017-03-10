@@ -1,6 +1,6 @@
 return {
     "BaZhenTuEr",               -- 2p
-    "BaoChiWeiXiao",
+    "BaoChiWeiXiao_2",
     "BaoFengYan_2",
     "BeiZhong",
     "BiFengGang",
