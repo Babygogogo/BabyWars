@@ -6,6 +6,8 @@ local GridIndexFunctions     = requireBW("src.app.utilities.GridIndexFunctions")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = requireBW("src.global.components.ComponentManager")
 
+local math = math
+
 local COMMAND_TOWER_ATTACK_BONUS  = GameConstantFunctions.getCommandTowerAttackBonus()
 local COMMAND_TOWER_DEFENSE_BONUS = GameConstantFunctions.getCommandTowerDefenseBonus()
 
@@ -38,7 +40,7 @@ end
 local function getAttackBonusMultiplier(attacker, attackerGridIndex, target, targetGridIndex, modelSceneWar)
     local modelTileMap = modelSceneWar:getModelWarField():getModelTileMap()
     local playerIndex  = attacker:getPlayerIndex()
-    local bonus        = 0
+    local bonus        = modelSceneWar:getAttackModifier()
 
     bonus = bonus + ((attacker.getPromotionAttackBonus) and (attacker:getPromotionAttackBonus()) or 0)
     modelTileMap:forEachModelTile(function(modelTile)

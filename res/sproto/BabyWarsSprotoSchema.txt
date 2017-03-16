@@ -178,6 +178,10 @@
     intervalUntilBoot    13 : integer
     incomeModifier       14 : integer
     startingFund         15 : integer
+    energyGainModifier   16 : integer
+    moveRangeModifier    17 : integer
+    attackModifier       18 : integer
+    visionModifier       19 : integer
 }
 
 .ActionRegister {
@@ -777,6 +781,10 @@
     incomeModifier        19 :  integer
     startingFund          20 :  integer
     chatData              21 :  ChatData
+    energyGainModifier    22 :  integer
+    moveRangeModifier     23 :  integer
+    attackModifier        24 :  integer
+    visionModifier        25 :  integer
 }
 
 .WarIdForIndexing {
@@ -854,4 +862,8 @@
     playerIndexInTurn   13 :  integer
     incomeModifier      14 :  integer
     startingFund        15 :  integer
+    energyGainModifier  16 :  integer
+    moveRangeModifier   17 :  integer
+    attackModifier      18 :  integer
+    visionModifier      19 :  integer
 }

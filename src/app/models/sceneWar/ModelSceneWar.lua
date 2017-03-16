@@ -205,22 +205,26 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_CachedActions              = {}
-    self.m_EnterTurnTime              = sceneData.enterTurnTime
-    self.m_ExecutedActions            = sceneData.executedActions
-    self.m_IncomeModifier             = sceneData.incomeModifier        or 100
-    self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot
-    self.m_IsWarEnded                 = sceneData.isWarEnded
-    self.m_IsFogOfWarByDefault        = sceneData.isFogOfWarByDefault
-    self.m_IsRandomWarField           = sceneData.isRandomWarField
-    self.m_IsRankMatch                = sceneData.isRankMatch
-    self.m_IsTotalReplay              = sceneData.isTotalReplay
-    self.m_MaxBaseSkillPoints         = sceneData.maxBaseSkillPoints
-    self.m_MaxDiffScore               = sceneData.maxDiffScore
-    self.m_RemainingVotesForDraw      = sceneData.remainingVotesForDraw
-    self.m_StartingFund               = sceneData.startingFund          or 0
-    self.m_WarID                      = sceneData.warID
-    self.m_WarPassword                = sceneData.warPassword
+    self.m_CachedActions         = {}
+    self.m_AttackModifier        = sceneData.attackModifier        or 0
+    self.m_EnergyGainModifier    = sceneData.energyGainModifier    or 100
+    self.m_EnterTurnTime         = sceneData.enterTurnTime
+    self.m_ExecutedActions       = sceneData.executedActions
+    self.m_IncomeModifier        = sceneData.incomeModifier        or 100
+    self.m_IntervalUntilBoot     = sceneData.intervalUntilBoot
+    self.m_IsWarEnded            = sceneData.isWarEnded
+    self.m_IsFogOfWarByDefault   = sceneData.isFogOfWarByDefault
+    self.m_IsRandomWarField      = sceneData.isRandomWarField
+    self.m_IsRankMatch           = sceneData.isRankMatch
+    self.m_IsTotalReplay         = sceneData.isTotalReplay
+    self.m_MaxBaseSkillPoints    = sceneData.maxBaseSkillPoints
+    self.m_MaxDiffScore          = sceneData.maxDiffScore
+    self.m_MoveRangeModifier     = sceneData.moveRangeModifier     or 0
+    self.m_RemainingVotesForDraw = sceneData.remainingVotesForDraw
+    self.m_StartingFund          = sceneData.startingFund          or 0
+    self.m_VisionModifier        = sceneData.visionModifier        or 0
+    self.m_WarID                 = sceneData.warID
+    self.m_WarPassword           = sceneData.warPassword
     setActionId(self, sceneData.actionID)
 
     initScriptEventDispatcher(self)
@@ -290,6 +294,8 @@ end
 function ModelSceneWar:toSerializableTable()
     return {
         actionID              = self:getActionId(),
+        attackModifier        = self.m_AttackModifier,
+        energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = self.m_ExecutedActions,
         incomeModifier        = self.m_IncomeModifier,
@@ -301,8 +307,10 @@ function ModelSceneWar:toSerializableTable()
         isWarEnded            = self.m_IsWarEnded,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
         startingFund          = self.m_StartingFund,
+        visionModifier        = self.m_VisionModifier,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         chatData              = self:getModelChatManager()   :toSerializableTable(),
@@ -316,6 +324,8 @@ end
 function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     return {
         actionID              = self:getActionId(),
+        attackModifier        = self.m_AttackModifier,
+        energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = nil,
         incomeModifier        = self.m_IncomeModifier,
@@ -327,8 +337,10 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         isWarEnded            = self.m_IsWarEnded,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
         startingFund          = self.m_StartingFund,
+        visionModifier        = self.m_VisionModifier,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         chatData              = self:getModelChatManager()   :toSerializableTableForPlayerIndex(playerIndex),
@@ -342,6 +354,8 @@ end
 function ModelSceneWar:toSerializableReplayData()
     return {
         actionID              = 0,
+        attackModifier        = self.m_AttackModifier,
+        energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = nil,
         executedActions       = self.m_ExecutedActions,
         incomeModifier        = self.m_IncomeModifier,
@@ -353,8 +367,10 @@ function ModelSceneWar:toSerializableReplayData()
         isWarEnded            = false,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = nil,
         startingFund          = self.m_StartingFund,
+        visionModifier        = self.m_VisionModifier,
         warID                 = self.m_WarID,
         warPassword           = self.m_WarPassword,
         chatData              = nil,
@@ -563,12 +579,28 @@ function ModelSceneWar:getWarId()
     return self.m_WarID
 end
 
+function ModelSceneWar:getAttackModifier()
+    return self.m_AttackModifier
+end
+
+function ModelSceneWar:getEnergyGainModifier()
+    return self.m_EnergyGainModifier
+end
+
 function ModelSceneWar:getIncomeModifier()
     return self.m_IncomeModifier
 end
 
+function ModelSceneWar:getMoveRangeModifier()
+    return self.m_MoveRangeModifier
+end
+
 function ModelSceneWar:getStartingFund()
     return self.m_StartingFund
+end
+
+function ModelSceneWar:getVisionModifier()
+    return self.m_VisionModifier
 end
 
 function ModelSceneWar:getIntervalUntilBoot()

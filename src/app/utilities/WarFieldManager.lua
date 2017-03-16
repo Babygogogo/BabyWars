@@ -76,6 +76,10 @@ function WarFieldManager.getWarFieldName(warFieldFileName)
     return WarFieldManager.getWarFieldData(warFieldFileName).warFieldName
 end
 
+function WarFieldManager.getWarFieldAuthorName(warFieldFileName)
+    return WarFieldManager.getWarFieldData(warFieldFileName).authorName
+end
+
 function WarFieldManager.getPlayersCount(warFieldFileName)
     return WarFieldManager.getWarFieldData(warFieldFileName).playersCount
 end

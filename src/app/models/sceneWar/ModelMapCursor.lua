@@ -134,6 +134,7 @@ local function createTouchListener(self)
     end
 
     local function onTouchesCancelled(touch, event)
+        isTouchBegan = false
     end
 
     local function onTouchesEnded(touches, event)
@@ -142,6 +143,7 @@ local function createTouchListener(self)
             (self.m_ModelWarCommandMenu:isEnabled())) then
             return
         end
+        isTouchBegan = false
 
         local gridIndex = GridIndexFunctions.worldPosToGridIndexInNode(touches[1]:getLocation(), self.m_View)
         if ((self:isMovableByPlayer()) and (GridIndexFunctions.isWithinMap(gridIndex, self.m_MapSize))) then
