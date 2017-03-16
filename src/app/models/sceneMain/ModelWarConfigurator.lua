@@ -24,17 +24,50 @@ local INCOME_MODIFIERS                        = {0, 50, 100, 150, 200, 300, 500}
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
 local STARTING_FUNDS                          = {0, 5000, 10000, 20000, 30000, 40000, 50000, 100000, 150000, 200000, 300000, 400000, 500000}
 
-local function initSelectorWeather(modelWarConfigurator)
-    -- TODO: enable the selector.
-    modelWarConfigurator:getModelOptionSelectorWithName("Weather"):setButtonsEnabled(false)
-        :setOptions({
-            {data = 1, text = getLocalizedText(40, "Clear"),},
-        })
-end
-
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
+local function getPlayerIndexForWarConfiguration(warConfiguration)
+    local account = WebSocketManager.getLoggedInAccountAndPassword()
+    for playerIndex, player in pairs(warConfiguration.players) do
+        if (player.account == account) then
+            return playerIndex
+        end
+    end
+
+    error("ModelWarConfigurator-getPlayerIndexForWarConfiguration() failed to find the playerIndex.")
+end
+
+--------------------------------------------------------------------------------
+-- The overview text generators.
+--------------------------------------------------------------------------------
+local function generateTextForStartingFund(startingFund)
+    if (startingFund == 0) then
+        return nil
+    else
+        return string.format("%s:         %d", getLocalizedText(14, "StartingFund"), startingFund)
+    end
+end
+
+local function generateTextForIncomeModifier(incomeModifier)
+    if (incomeModifier == 100) then
+        return nil
+    else
+        return string.format("%s:         %d%%", getLocalizedText(14, "IncomeModifier"), incomeModifier)
+    end
+end
+
+local function generateTextForAdvancedSettings(self)
+    local textList = {getLocalizedText(14, "Advanced Settings") .. ":"}
+    textList[#textList + 1] = generateTextForStartingFund(          self.m_StartingFund)
+    textList[#textList + 1] = generateTextForIncomeModifier(        self.m_IncomeModifier)
+
+    if (#textList == 1) then
+        textList[#textList + 1] = getLocalizedText(14, "None")
+    end
+    return table.concat(textList, "\n")
+end
+
 local function generatePlayerColorText(playerIndex)
     if     (playerIndex == 1) then return string.format("1 (%s)", getLocalizedText(34, "Red"))
     elseif (playerIndex == 2) then return string.format("2 (%s)", getLocalizedText(34, "Blue"))
@@ -64,48 +97,35 @@ local function generateSkillDescription(self)
 end
 
 local function generateOverviewText(self)
-    return string.format("%s:\n\n%s:%s%s\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n\n%s:%s%s\n%s:%s%s",
+    return string.format("%s:\n\n%s:%s%s\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n%s:%s%s\n\n%s:%s%s\n----------\n%s:%s%s\n%s:%s%s\n----------\n%s",
         getLocalizedText(14, "Overview"),
         getLocalizedText(14, "WarFieldName"),       "         ",      WarFieldManager.getWarFieldName(self.m_WarConfiguration.warFieldFileName),
         getLocalizedText(14, "PlayerIndex"),        "         ",      generatePlayerColorText(self.m_PlayerIndex),
         getLocalizedText(14, "FogOfWar"),           "         ",      getLocalizedText(14, (self.m_IsFogOfWarByDefault) and ("Yes") or ("No")),
-        getLocalizedText(14, "StartingFund"),       "         ",      "" .. self.m_StartingFund,
-        getLocalizedText(14, "IncomeModifier"),     "         ",      "" .. self.m_IncomeModifier .. "%",
         getLocalizedText(14, "RankMatch"),          "             ",  getLocalizedText(14, (self.m_IsRankMatch)         and ("Yes") or ("No")),
         getLocalizedText(14, "MaxDiffScore"),       "         ",      (self.m_MaxDiffScore) and ("" .. self.m_MaxDiffScore) or getLocalizedText(14, "NoLimit"),
         getLocalizedText(14, "IntervalUntilBoot"),  "         ",      AuxiliaryFunctions.formatTimeInterval(self.m_IntervalUntilBoot),
         getLocalizedText(14, "MaxBaseSkillPoints"), "   ",            (self.m_MaxBaseSkillPoints) and ("" .. self.m_MaxBaseSkillPoints) or (getLocalizedText(14, "DisableSkills")),
-        getLocalizedText(14, "SkillConfiguration"), "              ", generateSkillDescription(self)
+        getLocalizedText(14, "SkillConfiguration"), "              ", generateSkillDescription(self),
+        generateTextForAdvancedSettings(self)
     )
 end
 
-local function getPlayerIndexForWarConfiguration(warConfiguration)
-    local account = WebSocketManager.getLoggedInAccountAndPassword()
-    for playerIndex, player in pairs(warConfiguration.players) do
-        if (player.account == account) then
-            return playerIndex
-        end
-    end
-
-    error("ModelWarConfigurator-getPlayerIndexForWarConfiguration() failed to find the playerIndex.")
-end
-
+--------------------------------------------------------------------------------
+-- The dynamic item generators.
+--------------------------------------------------------------------------------
 local function createItemsForStateMain(self)
     local mode = self.m_Mode
     if (mode == "modeCreate") then
         local items = {
             self.m_ItemPlayerIndex,
             self.m_ItemFogOfWar,
-            self.m_ItemStartingFund,
-            self.m_ItemIncomeModifier,
-            self.m_ItemRankMatch,
-            self.m_ItemMaxDiffScore,
             self.m_ItemIntervalUntilBoot,
-            self.m_ItemMaxBaseSkillPoints,
         }
         if (self.m_MaxBaseSkillPoints) then
             items[#items + 1] = self.m_ItemSkillConfiguration
         end
+        items[#items + 1] = self.m_ItemAdvancedSettings
 
         return items
 
@@ -214,6 +234,13 @@ end
 --------------------------------------------------------------------------------
 -- The state setters.
 --------------------------------------------------------------------------------
+local function setStateAdvancedSettings(self)
+    self.m_State = "stateAdvancedSettings"
+    self.m_View:setMenuTitleText(getLocalizedText(14, "Advanced Settings"))
+        :setItems(self.m_ItemsForStateAdvancedSettings)
+        :setOverviewText(generateOverviewText(self))
+end
+
 local function setStateFogOfWar(self)
     self.m_State = "stateFogOfWar"
     self.m_View:setMenuTitleText(getLocalizedText(34, "FogOfWar"))
@@ -281,6 +308,15 @@ end
 --------------------------------------------------------------------------------
 -- The composition elements.
 --------------------------------------------------------------------------------
+local function initItemAdvancedSettings(self)
+    self.m_ItemAdvancedSettings = {
+        name     = getLocalizedText(14, "Advanced Settings"),
+        callback = function()
+            setStateAdvancedSettings(self)
+        end,
+    }
+end
+
 local function initItemFogOfWar(self)
     self.m_ItemFogOfWar = {
         name     = getLocalizedText(34, "FogOfWar"),
@@ -367,6 +403,16 @@ local function initItemStartingFund(self)
         callback = function()
             setStateStartingFund(self)
         end,
+    }
+end
+
+local function initItemsForStateAdvancedSettings(self)
+    self.m_ItemsForStateAdvancedSettings = {
+        self.m_ItemMaxBaseSkillPoints,
+        self.m_ItemRankMatch,
+        self.m_ItemMaxDiffScore,
+        self.m_ItemStartingFund,
+        self.m_ItemIncomeModifier,
     }
 end
 
@@ -551,6 +597,7 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelWarConfigurator:ctor()
+    initItemAdvancedSettings(  self)
     initItemFogOfWar(          self)
     initItemIncomeModifier(    self)
     initItemIntervalUntilBoot( self)
@@ -562,6 +609,7 @@ function ModelWarConfigurator:ctor()
     initItemSkillConfiguration(self)
     initItemStartingFund(      self)
 
+    initItemsForStateAdvancedSettings(  self)
     initItemsForStateFogOfWar(          self)
     initItemsForStateIncomeModifier(    self)
     initItemsForStateIntervalUntilBoot( self)
@@ -793,10 +841,18 @@ function ModelWarConfigurator:getWarId()
 end
 
 function ModelWarConfigurator:onButtonBackTouched()
-    if (self.m_State ~= "stateMain") then
-        setStateMain(self)
-    elseif (self.m_OnButtonBackTouched) then
-        self.m_OnButtonBackTouched()
+    local state = self.m_State
+    if     (state == "stateAdvancedSettings")       then setStateMain(self)
+    elseif (state == "stateFogOfWar")               then setStateMain(self)
+    elseif (state == "stateIncomeModifier")         then setStateAdvancedSettings(self)
+    elseif (state == "stateIntervalUntilBoot")      then setStateMain(self)
+    elseif (state == "stateMaxBaseSkillPoints")     then setStateAdvancedSettings(self)
+    elseif (state == "stateMaxDiffScore")           then setStateAdvancedSettings(self)
+    elseif (state == "statePlayerIndex")            then setStateMain(self)
+    elseif (state == "stateRankMatch")              then setStateAdvancedSettings(self)
+    elseif (state == "stateSkillConfiguration")     then setStateMain(self)
+    elseif (state == "stateStartingFund")           then setStateAdvancedSettings(self)
+    elseif (self.m_OnButtonBackTouched)             then self.m_OnButtonBackTouched()
     end
 
     return self

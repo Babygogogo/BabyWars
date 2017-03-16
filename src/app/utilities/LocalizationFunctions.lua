@@ -748,7 +748,8 @@ local s_Texts = {
     },
     [14] = {
         [1] = function(textType)
-            if     (textType == "ConfirmContinueWar")           then return "进 入 战 局"
+            if     (textType == "Advanced Settings")            then return "高 级 设 置"
+            elseif (textType == "ConfirmContinueWar")           then return "进 入 战 局"
             elseif (textType == "ConfirmCreateWar")             then return "确 认 新 建 战 局"
             elseif (textType == "ConfirmExitWar")               then return "确 认 退 出 战 局"
             elseif (textType == "ConfirmJoinWar")               then return "确 认 参 战"
@@ -789,7 +790,8 @@ local s_Texts = {
             end
         end,
         [2] = function(textType)
-            if     (textType == "ConfirmContinueWar")           then return "Confirm"
+            if     (textType == "Advanced Settings")            then return "Advanced"
+            elseif (textType == "ConfirmContinueWar")           then return "Confirm"
             elseif (textType == "ConfirmCreateWar")             then return "Confirm"
             elseif (textType == "ConfirmExitWar")               then return "Confirm"
             elseif (textType == "ConfirmJoinWar")               then return "Confirm"
