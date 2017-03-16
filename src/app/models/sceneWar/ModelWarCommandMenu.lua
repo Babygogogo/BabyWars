@@ -410,29 +410,20 @@ end
 -- The dynamic items generators.
 --------------------------------------------------------------------------------
 local function createItemsForStateMain(self)
-    local modelWar     = self.m_ModelWar
-    local playerIndexInTurn = getModelTurnManager(modelWar):getPlayerIndex()
-    if ((isTotalReplay(modelWar))                               or
-        (playerIndexInTurn ~= getPlayerIndexLoggedIn(modelWar)) or
-        (self.m_IsWaitingForServerResponse))                         then
-        return {
-            self.m_ItemBackToMainScene,
-            self.m_ItemSkillInfo,
-            self.m_ItemAuxiliaryCommands,
-        }
-    else
-        local modelPlayer = getModelPlayerManager(modelWar):getModelPlayer(playerIndexInTurn)
-        local items = {
-            self.m_ItemBackToMainScene,
-            self.m_ItemSkillInfo,
-        }
-        items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
-        items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
-        items[#items + 1] = self.m_ItemAuxiliaryCommands
-        items[#items + 1] = self.m_ItemEndTurn
+    local items = {
+        self.m_ItemBackToMainScene,
+        self.m_ItemSkillInfo,
+        self.m_ItemAuxiliaryCommands,
+    }
 
-        return items
+    local modelWar = self.m_ModelWar
+    if ((not isTotalReplay(modelWar))                                                        and
+        (getModelTurnManager(modelWar):getPlayerIndex() == getPlayerIndexLoggedIn(modelWar)) and
+        (not self.m_IsWaitingForServerResponse))                                             then
+        items[#items + 1] = self.m_ItemEndTurn
     end
+
+    return items
 end
 
 local function createItemsForStateAuxiliaryCommands(self)
@@ -462,6 +453,25 @@ local function createItemsForStateAuxiliaryCommands(self)
     items[#items + 1] = self.m_ItemHideUI
     items[#items + 1] = self.m_ItemSetMessageIndicator
     items[#items + 1] = self.m_ItemSetMusic
+
+    return items
+end
+
+local function createItemsForStateSkillInfo(self)
+    local modelWar          = self.m_ModelWar
+    local playerIndexInTurn = getModelTurnManager(modelWar):getPlayerIndex()
+    local items             = {}
+
+    if ((not isTotalReplay(modelWar))                           and
+        (playerIndexInTurn == getPlayerIndexLoggedIn(modelWar)) and
+        (not self.m_IsWaitingForServerResponse))                then
+        local modelPlayer = getModelPlayerManager(modelWar):getModelPlayer(playerIndexInTurn)
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(1)) and (self.m_ItemActiveSkill1) or (nil)
+        items[#items + 1] = (modelPlayer:canActivateSkillGroup(2)) and (self.m_ItemActiveSkill2) or (nil)
+    end
+    if (#items == 0) then
+        items[#items + 1] = self.m_ItemPlaceHolder
+    end
 
     return items
 end
@@ -576,12 +586,17 @@ end
 
 local function setStateMain(self)
     self.m_State = "stateMain"
-
     self.m_View:setItems(createItemsForStateMain(self))
         :setOverviewString(createTextForWarInfo(self))
         :setVisible(true)
 
     dispatchEvtWarCommandMenuUpdated(self)
+end
+
+local function setStateSkillInfo(self)
+    self.m_State = "stateSkillInfo"
+    self.m_View:setItems(createItemsForStateSkillInfo(self))
+        :setOverviewString(createTextSkillInfo(self))
 end
 
 local function setStateUnitPropertyList(self)
@@ -855,14 +870,20 @@ local function initItemHelp(self)
 end
 
 local function initItemHideUI(self)
-    local item = {
+    self.m_ItemHideUI = {
         name     = getLocalizedText(65, "HideUI"),
         callback = function()
             setStateHiddenWithHideUI(self)
         end,
     }
+end
 
-    self.m_ItemHideUI = item
+local function initItemPlaceHolder(self)
+    self.m_ItemPlaceHolder = {
+        name     = "(" .. getLocalizedText(14, "NoAvailableOption") .. ")",
+        callback = function()
+        end,
+    }
 end
 
 local function initItemProposeDraw(self)
@@ -885,7 +906,7 @@ local function initItemSkillInfo(self)
     self.m_ItemSkillInfo = {
         name     = getLocalizedText(65, "SkillInfo"),
         callback = function()
-            self.m_View:setOverviewString(createTextSkillInfo(self))
+            setStateSkillInfo(self)
         end,
     }
 end
@@ -1041,6 +1062,7 @@ function ModelWarCommandMenu:ctor(param)
     initItemGameFlow(           self)
     initItemHelp(               self)
     initItemHideUI(             self)
+    initItemPlaceHolder(        self)
     initItemProposeDraw(        self)
     initItemReload(             self)
     initItemSkillInfo(          self)
@@ -1107,6 +1129,7 @@ function ModelWarCommandMenu:onButtonBackTouched()
     elseif (state == "stateDrawOrSurrender")   then setStateAuxiliaryCommands(self)
     elseif (state == "stateHelp")              then setStateAuxiliaryCommands(self)
     elseif (state == "stateMain")              then setStateDisabled(         self)
+    elseif (state == "stateSkillInfo")         then setStateMain(             self)
     elseif (state == "stateUnitPropertyList")  then setStateAuxiliaryCommands(self)
     else                                       error("ModelWarCommandMenu:onButtonBackTouched() the state is invalid: " .. (state or ""))
     end
