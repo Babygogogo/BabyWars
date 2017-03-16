@@ -180,6 +180,7 @@
     startingFund         15 : integer
     energyGainModifier   16 : integer
     moveRangeModifier    17 : integer
+    attackModifier       18 : integer
 }
 
 .ActionRegister {
@@ -781,6 +782,7 @@
     chatData              21 :  ChatData
     energyGainModifier    22 :  integer
     moveRangeModifier     23 :  integer
+    attackModifier        24 :  integer
 }
 
 .WarIdForIndexing {
@@ -860,4 +862,5 @@
     startingFund        15 :  integer
     energyGainModifier  16 :  integer
     moveRangeModifier   17 :  integer
+    attackModifier      18 :  integer
 }

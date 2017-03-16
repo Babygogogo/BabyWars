@@ -206,6 +206,7 @@ end
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
     self.m_CachedActions         = {}
+    self.m_AttackModifier        = sceneData.attackModifier        or 0
     self.m_EnergyGainModifier    = sceneData.energyGainModifier    or 100
     self.m_EnterTurnTime         = sceneData.enterTurnTime
     self.m_ExecutedActions       = sceneData.executedActions
@@ -292,6 +293,7 @@ end
 function ModelSceneWar:toSerializableTable()
     return {
         actionID              = self:getActionId(),
+        attackModifier        = self.m_AttackModifier,
         energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = self.m_ExecutedActions,
@@ -320,6 +322,7 @@ end
 function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
     return {
         actionID              = self:getActionId(),
+        attackModifier        = self.m_AttackModifier,
         energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = self.m_EnterTurnTime,
         executedActions       = nil,
@@ -348,6 +351,7 @@ end
 function ModelSceneWar:toSerializableReplayData()
     return {
         actionID              = 0,
+        attackModifier        = self.m_AttackModifier,
         energyGainModifier    = self.m_EnergyGainModifier,
         enterTurnTime         = nil,
         executedActions       = self.m_ExecutedActions,
@@ -569,6 +573,10 @@ end
 
 function ModelSceneWar:getWarId()
     return self.m_WarID
+end
+
+function ModelSceneWar:getAttackModifier()
+    return self.m_AttackModifier
 end
 
 function ModelSceneWar:getEnergyGainModifier()

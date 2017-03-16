@@ -147,10 +147,11 @@ local function getMapInfo(self)
             getLocalizedText(65, "TurnIndex"),         getModelTurnManager(modelWar):getTurnIndex(),
             getLocalizedText(65, "ActionID"),          getActionId(modelWar)
         ),
-        string.format("%s: %d%%      %s: %d%%\n%s: %d",
+        string.format("%s: %d%%      %s: %d%%\n%s: %d      %s: %d%%",
             getLocalizedText(14, "IncomeModifier"),     modelWar:getIncomeModifier(),
             getLocalizedText(14, "EnergyGainModifier"), modelWar:getEnergyGainModifier(),
-            getLocalizedText(14, "MoveRangeModifier"),  modelWar:getMoveRangeModifier()
+            getLocalizedText(14, "MoveRangeModifier"),  modelWar:getMoveRangeModifier(),
+            getLocalizedText(14, "AttackModifier"),     modelWar:getAttackModifier()
         ),
     }
 
