@@ -166,6 +166,199 @@ local s_LongText5_1 = [[
 ]]
 local s_LongText5_2 = "Untranslated"
 
+local s_LongText6_1 = [[
+本选项规定本战局所有玩家所有部队的攻击力加成。
+
+如果选正数，则部队的攻击力相应增加，反之亦然。
+本加成与其他加成（如技能、部队等级、指挥塔等）是线性叠加的。也就是说，如果其他加成合计为+20%，而本加成为-30%攻，则合计为-10%攻。
+
+默认为“0%”。
+]]
+
+local s_LongText6_2 = [[
+Untranslated...
+]]
+
+local s_LongText7_1 = [[
+本选项影响战局内所有玩家获取能量的速度。
+
+能量值实际上是部队战斗时造成的HP损伤（不论敌我）的金钱价值。我方部队受伤时获得能量的数量是对敌军造成损伤时的两倍。
+举例而言，在默认情况（100%）下，如果每单位能量价值为18000，那么当您一击摧毁敌方的武装直升机（售价9000），自己没有受伤时：
+- 您将获得 9000/18000=0.5能量值
+- 对手将获得 9000*2/18000=1能量值
+
+如选择“0%”，则全体玩家都不能通过战斗获取能量。
+
+默认为“100%”。
+]]
+
+local s_LongText7_2 = [[
+Untranslated...
+]]
+
+local s_LongText8_1 = [[
+本选项影响战局是明战或雾战。
+
+明战下，您可以观察到整个战场的情况。雾战下，您只能看到自己军队的视野内的战场情况。
+雾战难度相对较大。如果您是新手，建议先通过明战熟悉游戏系统，再尝试雾战模式。
+
+默认为“否”（即明战）。
+]]
+
+local s_LongText8_2 = [[
+Untranslated...
+]]
+
+local s_LongText9_1 = [[
+本选项影响所有玩家的回合收入。
+
+默认（100%）情况下，您的每个建筑在每个回合初为您提供1000金钱（少数特殊建筑除外）。其他玩家亦然。
+如选择0%，则全体玩家都没有金钱收入。
+
+默认为“100%”。
+]]
+
+local s_LongText9_2 = [[
+Untranslated...
+]]
+
+local s_LongText10_1 = [[
+本选项影响所有玩家的每回合的时限。
+
+如果某个玩家的回合时间超出了本限制，则服务器将自动为该玩家执行投降操作。
+当战局满员，或某个玩家结束回合后，则服务器自动开始下个玩家回合的倒计时（无论该玩家是否在线）。
+因此，请仅在已约好对手的情况下才选择“15分”，以免造成不必要的败绩。
+
+默认为“3天”。
+]]
+
+local s_LongText10_2 = [[
+Untranslated...
+]]
+
+local s_LongText11_1 = [[
+本选项影响参战玩家之间的最大积分差距。
+
+积分代表着一个玩家的实力。通过本选项，您可以限制参战玩家之间的积分差距，以避免实力差距过大而影响游戏体验。
+请注意，此选项不限制正负差距。也就是说，参战玩家的积分既可能比您的少，也可能比您的多。
+
+默认为“100”。
+]]
+
+local s_LongText11_2 = [[
+Untranslated...
+]]
+
+local s_LongText12_1 = [[
+本选项规定本战局所有玩家所有部队的移动力加成。
+
+如果选正数，则部队的移动力相应增加，反之亦然。
+部队的最终移动力最低为1。
+
+默认为“0”。
+]]
+
+local s_LongText12_2 = [[
+Untranslated...
+]]
+
+local s_LongText13_1 = [[
+本选项影响您在回合中的行动顺序。
+
+本游戏固定了每回合中的行动顺序为：
+1 红方
+2 蓝方
+3 黄方
+4 黑方
+其中，2人局不存在黄方和黑方，3人局不存在黑方。
+每个玩家只能选择其中一项，不能重复。
+
+默认为当前可用选项中最靠前的一项。
+]]
+
+local s_LongText13_2 = [[
+Untranslated...
+]]
+
+local s_LongText14_1 = [[
+本选项规定本战局的结果是否影响玩家的积分。
+
+积分代表着一个玩家的实力。
+积分赛中，如果您获胜，则您的积分将增加，败者的积分将减少。您原本的积分越是比对方少，则获得的积分越多，反之亦然。
+如果和局，且您的分数较对手少，则您也可以获得少量积分，反之亦然。
+非积分赛中，无论战果如何，您的积分都不会受到影响。
+
+很显然，积分赛中，您的对手不会轻易认输。如果要玩积分赛，请全力以赴吧。
+
+默认为“否”（即非积分赛）。
+]]
+
+local s_LongText14_2 = [[
+Untranslated...
+]]
+
+local s_LongText15_1 = [[
+本选项规定本战局所有玩家的初始资金。
+
+资金可以用来购买新的单位，是游戏中重要的资源。
+
+默认为“0”。
+]]
+
+local s_LongText15_2 = [[
+Untranslated...
+]]
+
+local s_LongText16_1 = [[
+本选项规定您所属的队伍。
+
+战局中，属于同一队伍的玩家共享视野，部队能够相互穿越，不能相互攻击/装载/用后勤车补给。
+此外，可以使用队友的建筑来维修/补给自己的部队（消耗自己的金钱），但不能占领队友的建筑。
+
+默认为当前未被其他玩家选用的队伍中最靠前的一项。
+]]
+
+local s_LongText16_2 = [[
+Untranslated...
+]]
+
+local s_LongText17_1 = [[
+本选项规定本战局所有玩家所有部队/建筑的视野加成。
+
+如果选正数，则部队/建筑的视野相应增加，反之亦然。
+部队/建筑的最终视野最低为1。
+
+默认为“0”。
+]]
+
+local s_LongText17_2 = [[
+Untranslated...
+]]
+
+local s_LongText18_1 = [[
+本选项规定本战局所有玩家的基准技能点上限。
+
+基准技能点直接限制了技能配置的强度，点数越高则强度也越高（合理配置的情况下），由此会造成很不一样的游戏体验。
+
+默认为“100”。
+]]
+
+local s_LongText18_2 = [[
+Untranslated...
+]]
+
+local s_LongText19_1 = [[
+本选项影响您自己在战局中使用的技能配置。
+
+游戏内置了一些技能配置（以英文命名），它们是按照原版游戏中的CO来设定的。这些配置的强度经过了调整，使得不同配置的强度相互接近。您可以直接使用这些配置进行游戏。
+此外，选项中的“配置1”~“配置10”是您的自定义配置。通过它们，您可以创造您想要的CO效果并在战局中使用。这也是本游戏的重点之一。
+
+默认为“配置1”，该配置默认没有任何技能，您需要事先另行设定。
+]]
+
+local s_LongText19_2 = [[
+Untranslated...
+]]
 --------------------------------------------------------------------------------
 -- The private functions.
 --------------------------------------------------------------------------------
@@ -976,11 +1169,45 @@ local s_Texts = {
             end
         end,
     },
-    --[[
     [35] = {
-        [1] = function() return "战 争 迷 雾" end,
-        [2] = function() return "Fog of War" end,
+        [1] = function(textType)
+            if     (textType == "HelpForAttackModifier")         then return s_LongText6_1
+            elseif (textType == "HelpForEnergyGainModifier")     then return s_LongText7_1
+            elseif (textType == "HelpForFogOfWar")               then return s_LongText8_1
+            elseif (textType == "HelpForIncomeModifier")         then return s_LongText9_1
+            elseif (textType == "HelpForIntervalUntilBoot")      then return s_LongText10_1
+            elseif (textType == "HelpForMaxBaseSkillPoints")     then return s_LongText18_1
+            elseif (textType == "HelpForMaxDiffScore")           then return s_LongText11_1
+            elseif (textType == "HelpForMoveRangeModifier")      then return s_LongText12_1
+            elseif (textType == "HelpForPlayerIndex")            then return s_LongText13_1
+            elseif (textType == "HelpForRankMatch")              then return s_LongText14_1
+            elseif (textType == "HelpForSkillConfiguration")     then return s_LongText19_1
+            elseif (textType == "HelpForStartingFund")           then return s_LongText15_1
+            elseif (textType == "HelpForTeamIndex")              then return s_LongText16_1
+            elseif (textType == "HelpForVisionModifier")         then return s_LongText17_1
+            else                                                      return "未知35:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "HelpForAttackModifier")         then return s_LongText6_2
+            elseif (textType == "HelpForEnergyGainModifier")     then return s_LongText7_2
+            elseif (textType == "HelpForFogOfWar")               then return s_LongText8_2
+            elseif (textType == "HelpForIncomeModifier")         then return s_LongText9_2
+            elseif (textType == "HelpForIntervalUntilBoot")      then return s_LongText10_2
+            elseif (textType == "HelpForMaxBaseSkillPoints")     then return s_LongText18_2
+            elseif (textType == "HelpForMaxDiffScore")           then return s_LongText11_2
+            elseif (textType == "HelpForMoveRangeModifier")      then return s_LongText12_2
+            elseif (textType == "HelpForPlayerIndex")            then return s_LongText13_2
+            elseif (textType == "HelpForRankMatch")              then return s_LongText14_2
+            elseif (textType == "HelpForSkillConfiguration")     then return s_LongText19_2
+            elseif (textType == "HelpForStartingFund")           then return s_LongText15_2
+            elseif (textType == "HelpForTeamIndex")              then return s_LongText16_2
+            elseif (textType == "HelpForVisionModifier")         then return s_LongText17_2
+            else                                                      return "Unknown35:" .. (textType or "")
+            end
+        end,
     },
+    --[[
     [36] = {
         [1] = function() return "天 气"   end,
         [2] = function() return "Weather" end,
