@@ -19,6 +19,7 @@ local ACTION_CODE_GET_SKILL_CONFIGURATION     = ActionCodeFunctions.getActionCod
 local ACTION_CODE_JOIN_WAR                    = ActionCodeFunctions.getActionCode("ActionJoinWar")
 local ACTION_CODE_NEW_WAR                     = ActionCodeFunctions.getActionCode("ActionNewWar")
 local ACTION_CODE_RUN_SCENE_WAR               = ActionCodeFunctions.getActionCode("ActionRunSceneWar")
+local ENERGY_GAIN_MODIFIERS                   = {0, 50, 100, 150, 200, 300, 500}
 local INTERVALS_UNTIL_BOOT                    = {60 * 15, 3600 * 24, 3600 * 24 * 3, 3600 * 24 * 7} -- 15 minutes, 1 day, 3 days, 7 days
 local INCOME_MODIFIERS                        = {0, 50, 100, 150, 200, 300, 500}
 local MIN_POINTS, MAX_POINTS, POINTS_PER_STEP = SkillDataAccessors.getBasePointsMinMaxStep()
@@ -57,10 +58,19 @@ local function generateTextForIncomeModifier(incomeModifier)
     end
 end
 
+local function generateTextForEnergyGainModifier(energyGainModifier)
+    if (energyGainModifier == 100) then
+        return nil
+    else
+        return string.format("%s:         %d%%", getLocalizedText(14, "EnergyGainModifier"), energyGainModifier)
+    end
+end
+
 local function generateTextForAdvancedSettings(self)
     local textList = {getLocalizedText(14, "Advanced Settings") .. ":"}
-    textList[#textList + 1] = generateTextForStartingFund(          self.m_StartingFund)
-    textList[#textList + 1] = generateTextForIncomeModifier(        self.m_IncomeModifier)
+    textList[#textList + 1] = generateTextForStartingFund(      self.m_StartingFund)
+    textList[#textList + 1] = generateTextForIncomeModifier(    self.m_IncomeModifier)
+    textList[#textList + 1] = generateTextForEnergyGainModifier(self.m_EnergyGainModifier)
 
     if (#textList == 1) then
         textList[#textList + 1] = getLocalizedText(14, "None")
@@ -210,6 +220,7 @@ local function sendActionNewWar(self)
     WebSocketManager.sendAction({
         actionCode           = ACTION_CODE_NEW_WAR,
         defaultWeatherCode   = 1, --TODO: add an option for the weather.
+        energyGainModifier   = self.m_EnergyGainModifier,
         incomeModifier       = self.m_IncomeModifier,
         intervalUntilBoot    = self.m_IntervalUntilBoot,
         isFogOfWarByDefault  = self.m_IsFogOfWarByDefault,
@@ -239,6 +250,13 @@ local function setStateAdvancedSettings(self)
     self.m_View:setMenuTitleText(getLocalizedText(14, "Advanced Settings"))
         :setItems(self.m_ItemsForStateAdvancedSettings)
         :setOverviewText(generateOverviewText(self))
+end
+
+local function setStateEnergyGainModifier(self)
+    self.m_State = "stateEnergyGainModifier"
+    self.m_View:setMenuTitleText(getLocalizedText(14, "Energy Gain Modifier"))
+        :setItems(self.m_ItemsForStateEnergyGainModifier)
+        :setOverviewText(getLocalizedText(35, "HelpForEnergyGainModifier"))
 end
 
 local function setStateFogOfWar(self)
@@ -319,6 +337,15 @@ local function initItemAdvancedSettings(self)
         name     = getLocalizedText(14, "Advanced Settings"),
         callback = function()
             setStateAdvancedSettings(self)
+        end,
+    }
+end
+
+local function initItemEnergyGainModifier(self)
+    self.m_ItemEnergyGainModifier = {
+        name     = getLocalizedText(14, "Energy Gain Modifier"),
+        callback = function()
+            setStateEnergyGainModifier(self)
         end,
     }
 end
@@ -419,7 +446,23 @@ local function initItemsForStateAdvancedSettings(self)
         self.m_ItemMaxDiffScore,
         self.m_ItemStartingFund,
         self.m_ItemIncomeModifier,
+        self.m_ItemEnergyGainModifier,
     }
+end
+
+local function initItemsForStateEnergyGainModifier(self)
+    local items = {}
+    for _, modifier in ipairs(ENERGY_GAIN_MODIFIERS) do
+        items[#items + 1] = {
+            name     = (modifier ~= 100) and (string.format("%d%%", modifier)) or (string.format("%d%%(%s)", modifier, getLocalizedText(14, "Default"))),
+            callback = function()
+                self.m_EnergyGainModifier = modifier
+                setStateMain(self)
+            end,
+        }
+    end
+
+    self.m_ItemsForStateEnergyGainModifier = items
 end
 
 local function initItemsForStateFogOfWar(self)
@@ -604,6 +647,7 @@ end
 --------------------------------------------------------------------------------
 function ModelWarConfigurator:ctor()
     initItemAdvancedSettings(  self)
+    initItemEnergyGainModifier(self)
     initItemFogOfWar(          self)
     initItemIncomeModifier(    self)
     initItemIntervalUntilBoot( self)
@@ -616,6 +660,7 @@ function ModelWarConfigurator:ctor()
     initItemStartingFund(      self)
 
     initItemsForStateAdvancedSettings(  self)
+    initItemsForStateEnergyGainModifier(self)
     initItemsForStateFogOfWar(          self)
     initItemsForStateIncomeModifier(    self)
     initItemsForStateIntervalUntilBoot( self)
@@ -723,6 +768,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
     self.m_WarConfiguration = warConfiguration
     local mode = self.m_Mode
     if (mode == "modeCreate") then
+        self.m_EnergyGainModifier       = 100
         self.m_IncomeModifier           = 100
         self.m_IntervalUntilBoot        = 3600 * 24 * 3
         self.m_IsFogOfWarByDefault      = false
@@ -739,7 +785,8 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
 
     elseif (mode == "modeJoin") then
-        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
+        self.m_EnergyGainModifier       = warConfiguration.energyGainModifier
+        self.m_IncomeModifier           = warConfiguration.incomeModifier
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch
@@ -757,7 +804,8 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmJoinWar"))
 
     elseif (mode == "modeContinue") then
-        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
+        self.m_EnergyGainModifier       = warConfiguration.energyGainModifier
+        self.m_IncomeModifier           = warConfiguration.incomeModifier
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch
@@ -772,7 +820,8 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
 
     elseif (mode == "modeExit") then
-        self.m_IncomeModifier           = warConfiguration.incomeModifier      or 100
+        self.m_EnergyGainModifier       = warConfiguration.energyGainModifier
+        self.m_IncomeModifier           = warConfiguration.incomeModifier
         self.m_IntervalUntilBoot        = warConfiguration.intervalUntilBoot
         self.m_IsFogOfWarByDefault      = warConfiguration.isFogOfWarByDefault
         self.m_IsRankMatch              = warConfiguration.isRankMatch
@@ -848,17 +897,18 @@ end
 
 function ModelWarConfigurator:onButtonBackTouched()
     local state = self.m_State
-    if     (state == "stateAdvancedSettings")       then setStateMain(self)
-    elseif (state == "stateFogOfWar")               then setStateMain(self)
-    elseif (state == "stateIncomeModifier")         then setStateAdvancedSettings(self)
-    elseif (state == "stateIntervalUntilBoot")      then setStateMain(self)
-    elseif (state == "stateMaxBaseSkillPoints")     then setStateAdvancedSettings(self)
-    elseif (state == "stateMaxDiffScore")           then setStateAdvancedSettings(self)
-    elseif (state == "statePlayerIndex")            then setStateMain(self)
-    elseif (state == "stateRankMatch")              then setStateAdvancedSettings(self)
-    elseif (state == "stateSkillConfiguration")     then setStateMain(self)
-    elseif (state == "stateStartingFund")           then setStateAdvancedSettings(self)
-    elseif (self.m_OnButtonBackTouched)             then self.m_OnButtonBackTouched()
+    if     (state == "stateAdvancedSettings")   then setStateMain(            self)
+    elseif (state == "stateEnergyGainModifier") then setStateAdvancedSettings(self)
+    elseif (state == "stateFogOfWar")           then setStateMain(            self)
+    elseif (state == "stateIncomeModifier")     then setStateAdvancedSettings(self)
+    elseif (state == "stateIntervalUntilBoot")  then setStateMain(            self)
+    elseif (state == "stateMaxBaseSkillPoints") then setStateAdvancedSettings(self)
+    elseif (state == "stateMaxDiffScore")       then setStateAdvancedSettings(self)
+    elseif (state == "statePlayerIndex")        then setStateMain(            self)
+    elseif (state == "stateRankMatch")          then setStateAdvancedSettings(self)
+    elseif (state == "stateSkillConfiguration") then setStateMain(            self)
+    elseif (state == "stateStartingFund")       then setStateAdvancedSettings(self)
+    elseif (self.m_OnButtonBackTouched)         then self.m_OnButtonBackTouched()
     end
 
     return self

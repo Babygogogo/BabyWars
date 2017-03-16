@@ -183,7 +183,7 @@ local s_LongText7_1 = [[
 本选项影响战局内所有玩家获取能量的速度。
 
 能量值实际上是部队战斗时造成的HP损伤（不论敌我）的金钱价值。我方部队受伤时获得能量的数量是对敌军造成损伤时的两倍。
-举例而言，在默认情况（100%）下，如果每单位能量价值为18000，那么当您一击摧毁敌方的武装直升机（售价9000），自己没有受伤时：
+举例而言，在默认情况（100%）下，如果每单位能量价值为18000，那么当您一击摧毁敌方的满HP武装直升机（售价9000），且自己没有受伤时：
 - 您将获得 9000/18000=0.5能量值
 - 对手将获得 9000*2/18000=1能量值
 
@@ -951,6 +951,8 @@ local s_Texts = {
             elseif (textType == "CustomConfiguration")          then return "自定义配置"
             elseif (textType == "Default")                      then return "默认"
             elseif (textType == "DisableSkills")                then return "禁用技能"
+            elseif (textType == "Energy Gain Modifier")         then return "能 量 增 速"
+            elseif (textType == "EnergyGainModifier")           then return "能量增速"
             elseif (textType == "ExitWar")                      then return "退 出 战 局"
             elseif (textType == "FogOfWar")                     then return "战争迷雾"
             elseif (textType == "Income Modifier")              then return "收 入 倍 率"
@@ -993,6 +995,8 @@ local s_Texts = {
             elseif (textType == "CustomConfiguration")          then return "Custom"
             elseif (textType == "Default")                      then return "Default"
             elseif (textType == "DisableSkills")                then return "Disable Skills"
+            elseif (textType == "Energy Gain Modifier")         then return "EnergyGain"
+            elseif (textType == "EnergyGainModifier")           then return "EnergyGain"
             elseif (textType == "ExitWar")                      then return "Exit War"
             elseif (textType == "FogOfWar")                     then return "Fog of War"
             elseif (textType == "Income Modifier")              then return "IncomeModifier"

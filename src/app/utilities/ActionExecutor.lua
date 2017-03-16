@@ -277,9 +277,9 @@ local function getBaseDamageCostWithTargetAndDamage(target, damage)
     end
 end
 
-local function getSkillModifiedDamageCost(cost, modelPlayer)
+local function getSkillModifiedDamageCost(cost, modelPlayer, globalModifier)
     local modifier = SkillModifierFunctions.getEnergyGrowthRateModifier(modelPlayer:getModelSkillConfiguration())
-    return math.floor(cost * (100 + modifier) / 100)
+    return math.floor(cost * (100 + modifier) * globalModifier / 10000)
 end
 
 local function getIncomeWithDamageCost(targetDamageCost, modelPlayer)
@@ -695,9 +695,10 @@ local function executeAttack(action, modelSceneWar)
         local targetDamageCost    = getBaseDamageCostWithTargetAndDamage(attackTarget, attackDamage)
         local attackerModelPlayer = modelPlayerManager:getModelPlayer(attackerPlayerIndex)
         local targetModelPlayer   = modelPlayerManager:getModelPlayer(targetPlayerIndex)
+        local energyGainModifier  = modelSceneWar:getEnergyGainModifier()
 
-        attackerModelPlayer:addDamageCost(getSkillModifiedDamageCost(attackerDamageCost * 2 + targetDamageCost,     attackerModelPlayer))
-        targetModelPlayer  :addDamageCost(getSkillModifiedDamageCost(attackerDamageCost     + targetDamageCost * 2, targetModelPlayer))
+        attackerModelPlayer:addDamageCost(getSkillModifiedDamageCost(attackerDamageCost * 2 + targetDamageCost,     attackerModelPlayer, energyGainModifier))
+        targetModelPlayer  :addDamageCost(getSkillModifiedDamageCost(attackerDamageCost     + targetDamageCost * 2, targetModelPlayer,   energyGainModifier))
         attackerModelPlayer:setFund(attackerModelPlayer:getFund() + getIncomeWithDamageCost(targetDamageCost,   attackerModelPlayer))
         targetModelPlayer  :setFund(targetModelPlayer  :getFund() + getIncomeWithDamageCost(attackerDamageCost, targetModelPlayer))
 
