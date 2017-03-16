@@ -179,6 +179,7 @@
     incomeModifier       14 : integer
     startingFund         15 : integer
     energyGainModifier   16 : integer
+    moveRangeModifier    17 : integer
 }
 
 .ActionRegister {
@@ -779,6 +780,7 @@
     startingFund          20 :  integer
     chatData              21 :  ChatData
     energyGainModifier    22 :  integer
+    moveRangeModifier     23 :  integer
 }
 
 .WarIdForIndexing {
@@ -857,4 +859,5 @@
     incomeModifier      14 :  integer
     startingFund        15 :  integer
     energyGainModifier  16 :  integer
+    moveRangeModifier   17 :  integer
 }

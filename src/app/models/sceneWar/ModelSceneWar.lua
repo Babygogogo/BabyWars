@@ -205,23 +205,24 @@ end
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
 function ModelSceneWar:ctor(sceneData)
-    self.m_CachedActions              = {}
-    self.m_EnergyGainModifier         = sceneData.energyGainModifier    or 100
-    self.m_EnterTurnTime              = sceneData.enterTurnTime
-    self.m_ExecutedActions            = sceneData.executedActions
-    self.m_IncomeModifier             = sceneData.incomeModifier        or 100
-    self.m_IntervalUntilBoot          = sceneData.intervalUntilBoot
-    self.m_IsWarEnded                 = sceneData.isWarEnded
-    self.m_IsFogOfWarByDefault        = sceneData.isFogOfWarByDefault
-    self.m_IsRandomWarField           = sceneData.isRandomWarField
-    self.m_IsRankMatch                = sceneData.isRankMatch
-    self.m_IsTotalReplay              = sceneData.isTotalReplay
-    self.m_MaxBaseSkillPoints         = sceneData.maxBaseSkillPoints
-    self.m_MaxDiffScore               = sceneData.maxDiffScore
-    self.m_RemainingVotesForDraw      = sceneData.remainingVotesForDraw
-    self.m_StartingFund               = sceneData.startingFund          or 0
-    self.m_WarID                      = sceneData.warID
-    self.m_WarPassword                = sceneData.warPassword
+    self.m_CachedActions         = {}
+    self.m_EnergyGainModifier    = sceneData.energyGainModifier    or 100
+    self.m_EnterTurnTime         = sceneData.enterTurnTime
+    self.m_ExecutedActions       = sceneData.executedActions
+    self.m_IncomeModifier        = sceneData.incomeModifier        or 100
+    self.m_IntervalUntilBoot     = sceneData.intervalUntilBoot
+    self.m_IsWarEnded            = sceneData.isWarEnded
+    self.m_IsFogOfWarByDefault   = sceneData.isFogOfWarByDefault
+    self.m_IsRandomWarField      = sceneData.isRandomWarField
+    self.m_IsRankMatch           = sceneData.isRankMatch
+    self.m_IsTotalReplay         = sceneData.isTotalReplay
+    self.m_MaxBaseSkillPoints    = sceneData.maxBaseSkillPoints
+    self.m_MaxDiffScore          = sceneData.maxDiffScore
+    self.m_MoveRangeModifier     = sceneData.moveRangeModifier     or 0
+    self.m_RemainingVotesForDraw = sceneData.remainingVotesForDraw
+    self.m_StartingFund          = sceneData.startingFund          or 0
+    self.m_WarID                 = sceneData.warID
+    self.m_WarPassword           = sceneData.warPassword
     setActionId(self, sceneData.actionID)
 
     initScriptEventDispatcher(self)
@@ -303,6 +304,7 @@ function ModelSceneWar:toSerializableTable()
         isWarEnded            = self.m_IsWarEnded,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
@@ -330,6 +332,7 @@ function ModelSceneWar:toSerializableTableForPlayerIndex(playerIndex)
         isWarEnded            = self.m_IsWarEnded,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = self.m_RemainingVotesForDraw,
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
@@ -357,6 +360,7 @@ function ModelSceneWar:toSerializableReplayData()
         isWarEnded            = false,
         maxBaseSkillPoints    = self.m_MaxBaseSkillPoints,
         maxDiffScore          = self.m_MaxDiffScore,
+        moveRangeModifier     = self.m_MoveRangeModifier,
         remainingVotesForDraw = nil,
         startingFund          = self.m_StartingFund,
         warID                 = self.m_WarID,
@@ -573,6 +577,10 @@ end
 
 function ModelSceneWar:getIncomeModifier()
     return self.m_IncomeModifier
+end
+
+function ModelSceneWar:getMoveRangeModifier()
+    return self.m_MoveRangeModifier
 end
 
 function ModelSceneWar:getStartingFund()

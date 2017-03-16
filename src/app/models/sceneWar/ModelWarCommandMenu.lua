@@ -147,8 +147,10 @@ local function getMapInfo(self)
             getLocalizedText(65, "TurnIndex"),         getModelTurnManager(modelWar):getTurnIndex(),
             getLocalizedText(65, "ActionID"),          getActionId(modelWar)
         ),
-        string.format("%s: %d%%",
-            getLocalizedText(14, "IncomeModifier"), modelWar:getIncomeModifier()
+        string.format("%s: %d%%      %s: %d%%\n%s: %d",
+            getLocalizedText(14, "IncomeModifier"),     modelWar:getIncomeModifier(),
+            getLocalizedText(14, "EnergyGainModifier"), modelWar:getEnergyGainModifier(),
+            getLocalizedText(14, "MoveRangeModifier"),  modelWar:getMoveRangeModifier()
         ),
     }
 
@@ -178,7 +180,7 @@ local function createTextForWarInfo(self)
         else
             local d                  = dataForEachPlayer[i]
             local isPlayerInTurn     = i == playerIndexInTurn
-            stringList[#stringList + 1] = string.format("%s %d:    %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %s      %s: %d\n%s: %d%s      %s: %d",
+            stringList[#stringList + 1] = string.format("%s %d: %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %s      %s: %d\n%s: %d%s      %s: %d",
                 getLocalizedText(65, "Player"),               i, d.nickname, ((isPlayerInTurn) and (getInTurnDescription(modelWar)) or ("")),
                 getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,

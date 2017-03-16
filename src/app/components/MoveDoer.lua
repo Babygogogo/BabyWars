@@ -19,6 +19,8 @@ local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = requireBW("src.global.components.ComponentManager")
 
+local math = math
+
 local MOVE_TYPES = requireBW("res.data.GameConstant").moveTypes
 
 MoveDoer.EXPORTED_METHODS = {
@@ -77,7 +79,7 @@ function MoveDoer:getMoveRange()
     -- TODO: Take modelPlayer and modelWeather into account.
     local owner       = self.m_Owner
     local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(owner:getPlayerIndex())
-    return math.max(1, self.m_Template.range + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration(), owner))
+    return math.max(1, self.m_Template.range + self.m_ModelSceneWar:getMoveRangeModifier() + SkillModifierFunctions.getMoveRangeModifier(modelPlayer:getModelSkillConfiguration(), owner))
 end
 
 function MoveDoer:getMoveType()
