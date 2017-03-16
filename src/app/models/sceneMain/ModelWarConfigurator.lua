@@ -82,6 +82,14 @@ local function generateTextForAttackModifier(attackModifier)
     end
 end
 
+local function generateTextForVisionModifier(visionModifier)
+    if (visionModifier == 0) then
+        return nil
+    else
+        return string.format("%s:         %d", getLocalizedText(14, "VisionModifier"), visionModifier)
+    end
+end
+
 local function generateTextForAdvancedSettings(self)
     local textList = {getLocalizedText(14, "Advanced Settings") .. ":"}
     textList[#textList + 1] = generateTextForStartingFund(      self.m_StartingFund)
@@ -89,6 +97,7 @@ local function generateTextForAdvancedSettings(self)
     textList[#textList + 1] = generateTextForEnergyGainModifier(self.m_EnergyGainModifier)
     textList[#textList + 1] = generateTextForMoveRangeModifier( self.m_MoveRangeModifier)
     textList[#textList + 1] = generateTextForAttackModifier(    self.m_AttackModifier)
+    textList[#textList + 1] = generateTextForVisionModifier(    self.m_VisionModifier)
 
     if (#textList == 1) then
         textList[#textList + 1] = getLocalizedText(14, "None")
@@ -250,6 +259,7 @@ local function sendActionNewWar(self)
         playerIndex          = self.m_PlayerIndex,
         skillConfigurationID = self.m_SkillConfigurationID,
         startingFund         = self.m_StartingFund,
+        visionModifier       = self.m_VisionModifier,
         warPassword          = "", -- TODO: self.m_WarPassword,
         warFieldFileName     = self.m_WarConfiguration.warFieldFileName,
     })
@@ -361,6 +371,13 @@ local function setStateStartingFund(self)
     self.m_View:setMenuTitleText(getLocalizedText(14, "Starting Fund"))
         :setItems(self.m_ItemsForStateStartingFund)
         :setOverviewText(getLocalizedText(35, "HelpForStartingFund"))
+end
+
+local function setStateVisionModifier(self)
+    self.m_State = "stateVisionModifier"
+    self.m_View:setMenuTitleText(getLocalizedText(14, "VisionModifier"))
+        :setItems(self.m_ItemsForStateVisionModifier)
+        :setOverviewText(getLocalizedText(35, "HelpForVisionModifier"))
 end
 
 --------------------------------------------------------------------------------
@@ -491,6 +508,15 @@ local function initItemStartingFund(self)
     }
 end
 
+local function initItemVisionModifier(self)
+    self.m_ItemVisionModifier = {
+        name     = getLocalizedText(14, "VisionModifier"),
+        callback = function()
+            setStateVisionModifier(self)
+        end,
+    }
+end
+
 local function initItemsForStateAdvancedSettings(self)
     self.m_ItemsForStateAdvancedSettings = {
         self.m_ItemMaxBaseSkillPoints,
@@ -501,6 +527,7 @@ local function initItemsForStateAdvancedSettings(self)
         self.m_ItemEnergyGainModifier,
         self.m_ItemMoveRangeModifier,
         self.m_ItemAttackModifier,
+        self.m_ItemVisionModifier,
     }
 end
 
@@ -726,6 +753,21 @@ local function initItemsForStateStartingFund(self)
     self.m_ItemsForStateStartingFund = items
 end
 
+local function initItemsForStateVisionModifier(self)
+    local items = {}
+    for modifier = 1, -1, -1 do
+        items[#items + 1] = {
+            name     = "" .. modifier,
+            callback = function()
+                self.m_VisionModifier = modifier
+                setStateMain(self)
+            end
+        }
+    end
+
+    self.m_ItemsForStateVisionModifier = items
+end
+
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
 --------------------------------------------------------------------------------
@@ -744,6 +786,7 @@ function ModelWarConfigurator:ctor()
     initItemRankMatch(         self)
     initItemSkillConfiguration(self)
     initItemStartingFund(      self)
+    initItemVisionModifier(    self)
 
     initItemsForStateAdvancedSettings(  self)
     initItemsForStateAttackModifier(    self)
@@ -757,6 +800,7 @@ function ModelWarConfigurator:ctor()
     initItemsForStateRankMatch(         self)
     initItemsForStateSkillConfiguration(self)
     initItemsForStateStartingFund(      self)
+    initItemsForStateVisionModifier(    self)
 
     return self
 end
@@ -870,6 +914,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = 1
         self.m_SkillConfigurationID     = 1
         self.m_StartingFund             = 0
+        self.m_VisionModifier           = 0
 
         sendActionGetSkillConfiguration(1)
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmCreateWar"))
@@ -889,6 +934,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = self.m_ItemsForStatePlayerIndex[1].playerIndex
         self.m_SkillConfigurationID     = (warConfiguration.maxBaseSkillPoints) and (1) or (nil)
         self.m_StartingFund             = warConfiguration.startingFund
+        self.m_VisionModifier           = warConfiguration.visionModifier
 
         if (self.m_SkillConfigurationID) then
             sendActionGetSkillConfiguration(1)
@@ -910,6 +956,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
         self.m_StartingFund             = warConfiguration.startingFund
+        self.m_VisionModifier           = warConfiguration.visionModifier
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
 
@@ -928,6 +975,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
         self.m_StartingFund             = warConfiguration.startingFund
+        self.m_VisionModifier           = warConfiguration.visionModifier
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmExitWar"))
 
@@ -1006,6 +1054,7 @@ function ModelWarConfigurator:onButtonBackTouched()
     elseif (state == "stateRankMatch")          then setStateAdvancedSettings(self)
     elseif (state == "stateSkillConfiguration") then setStateMain(            self)
     elseif (state == "stateStartingFund")       then setStateAdvancedSettings(self)
+    elseif (state == "stateVisionModifier")     then setStateAdvancedSettings(self)
     elseif (self.m_OnButtonBackTouched)         then self.m_OnButtonBackTouched()
     end
 

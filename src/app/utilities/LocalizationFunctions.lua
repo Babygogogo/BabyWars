@@ -981,6 +981,7 @@ local s_Texts = {
             elseif (textType == "SkillConfiguration")           then return "我方技能配置"
             elseif (textType == "Starting Fund")                then return "初 始 资 金"
             elseif (textType == "StartingFund")                 then return "初始资金"
+            elseif (textType == "VisionModifier")               then return "视野加成"
             elseif (textType == "WarFieldName")                 then return "地图名称"
             elseif (textType == "Yes")                          then return "是"
             else                                                     return "未知14:" .. (textType or "")
@@ -1027,6 +1028,7 @@ local s_Texts = {
             elseif (textType == "SkillConfiguration")           then return "Skill Configuration"
             elseif (textType == "Starting Fund")                then return "StartingFund"
             elseif (textType == "StartingFund")                 then return "StartingFund"
+            elseif (textType == "VisionModifier")               then return "VisionModifier"
             elseif (textType == "WarFieldName")                 then return "Map"
             elseif (textType == "Yes")                          then return "Yes"
             else                                                     return "Unknown14:" .. (textType or "")

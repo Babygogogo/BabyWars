@@ -5,6 +5,7 @@ local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 
 local getModelTileMap = SingletonGetters.getModelTileMap
+local math            = math
 
 VisionOwner.EXPORTED_METHODS = {
     "getVisionForPlayerIndex",
@@ -45,18 +46,18 @@ function VisionOwner:getVisionForPlayerIndex(playerIndex, gridIndex)
         return nil
     else
         local modelSceneWar           = self.m_ModelSceneWar
-        local baseVision              = template.vision
+        local baseVision              = template.vision + modelSceneWar:getVisionModifier()
         local modelSkillConfiguration = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex):getModelSkillConfiguration()
         if (owner.getTileType) then
             if (ownerPlayerIndex == playerIndex) then
-                return baseVision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration)
+                return math.max(1, baseVision + SkillModifierFunctions.getVisionModifierForTiles(modelSkillConfiguration))
             else
-                return baseVision
+                return math.max(1, baseVision)
             end
         else
             local tileType = getModelTileMap(modelSceneWar):getModelTile(gridIndex or owner:getGridIndex()):getTileType()
             local bonus    = (template.bonusOnTiles) and (template.bonusOnTiles[tileType] or 0) or (0)
-            return baseVision + bonus + SkillModifierFunctions.getVisionModifierForUnits(modelSkillConfiguration)
+            return math.max(1, baseVision + bonus + SkillModifierFunctions.getVisionModifierForUnits(modelSkillConfiguration))
         end
     end
 end

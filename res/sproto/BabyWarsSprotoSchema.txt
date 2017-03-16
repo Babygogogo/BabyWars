@@ -181,6 +181,7 @@
     energyGainModifier   16 : integer
     moveRangeModifier    17 : integer
     attackModifier       18 : integer
+    visionModifier       19 : integer
 }
 
 .ActionRegister {
@@ -783,6 +784,7 @@
     energyGainModifier    22 :  integer
     moveRangeModifier     23 :  integer
     attackModifier        24 :  integer
+    visionModifier        25 :  integer
 }
 
 .WarIdForIndexing {
@@ -863,4 +865,5 @@
     energyGainModifier  16 :  integer
     moveRangeModifier   17 :  integer
     attackModifier      18 :  integer
+    visionModifier      19 :  integer
 }
