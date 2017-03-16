@@ -26,6 +26,7 @@ local GameConstantFunctions     = requireBW("src.app.utilities.GameConstantFunct
 local GridIndexFunctions        = requireBW("src.app.utilities.GridIndexFunctions")
 local SingletonGetters          = requireBW("src.app.utilities.SingletonGetters")
 local SkillDescriptionFunctions = requireBW("src.app.utilities.SkillDescriptionFunctions")
+local WarFieldManager           = requireBW("src.app.utilities.WarFieldManager")
 local WebSocketManager          = requireBW("src.app.utilities.WebSocketManager")
 local Actor                     = requireBW("src.global.actors.Actor")
 local ActorManager              = requireBW("src.global.actors.ActorManager")
@@ -72,6 +73,13 @@ end
 --------------------------------------------------------------------------------
 -- The dynamic text generator for war info.
 --------------------------------------------------------------------------------
+local function generateMapTitle(warFieldFileName)
+    return string.format("%s: %s      %s: %s",
+        getLocalizedText(65, "MapName"), WarFieldManager.getWarFieldName(warFieldFileName),
+        getLocalizedText(65, "Author"),  WarFieldManager.getWarFieldAuthorName(warFieldFileName)
+    )
+end
+
 local function generateEmptyDataForEachPlayer(self)
     local modelWar            = self.m_ModelWar
     local modelPlayerManager  = getModelPlayerManager(modelWar)
@@ -132,34 +140,19 @@ end
 
 local function getMapInfo(self)
     local modelWar = self.m_ModelWar
-    local modelWarField = SingletonGetters.getModelWarField(modelWar)
-    local modelTileMap  = getModelTileMap(modelWar)
-    local tileTypeCounters = {
-        Headquarters = 0,
-        City         = 0,
-        Factory      = 0,
-        Airport      = 0,
-        Seaport      = 0,
-        TempAirport  = 0,
-        TempSeaport  = 0,
-        CommandTower = 0,
-        Radar        = 0,
+    local textList = {
+        string.format("%s\n%s: %s      %s: %d      %s: %d",
+            generateMapTitle(SingletonGetters.getModelWarField(modelWar):getWarFieldFileName()),
+            getLocalizedText(65, "WarID"),             AuxiliaryFunctions.getWarNameWithWarId(SingletonGetters.getWarId(modelWar)),
+            getLocalizedText(65, "TurnIndex"),         getModelTurnManager(modelWar):getTurnIndex(),
+            getLocalizedText(65, "ActionID"),          getActionId(modelWar)
+        ),
+        string.format("%s: %d%%",
+            getLocalizedText(14, "IncomeModifier"), modelWar:getIncomeModifier()
+        ),
     }
-    modelTileMap:forEachModelTile(function(modelTile)
-        local tileType = modelTile:getTileType()
-        if (tileTypeCounters[tileType]) then
-            tileTypeCounters[tileType] = tileTypeCounters[tileType] + 1
-        end
-    end)
 
-    return string.format("%s: %s      %s: %s\n%s: %s      %s: %d      %s: %d\n%s: %d%%",
-        getLocalizedText(65, "MapName"),        modelWarField:getWarFieldDisplayName(),
-        getLocalizedText(65, "Author"),         modelWarField:getWarFieldAuthorName(),
-        getLocalizedText(65, "WarID"),          AuxiliaryFunctions.getWarNameWithWarId(SingletonGetters.getWarId(modelWar)),
-        getLocalizedText(65, "TurnIndex"),      getModelTurnManager(modelWar):getTurnIndex(),
-        getLocalizedText(65, "ActionID"),       getActionId(modelWar),
-        getLocalizedText(14, "IncomeModifier"), modelWar:getIncomeModifier()
-    )
+    return table.concat(textList, "\n--------------------\n")
 end
 
 local function getInTurnDescription(modelWar)
@@ -214,6 +207,72 @@ local function createTextSkillInfo(self)
     end)
 
     return table.concat(stringList, "\n--------------------\n")
+end
+
+--------------------------------------------------------------------------------
+-- The dynamic text generator for tile info.
+--------------------------------------------------------------------------------
+local function generateTileInfoWithCounters(tileCounters)
+    return string.format("%s: %d\n%s: %d%s%s: %d%s%s: %d%s%s: %d%s%s: %d\n%s: %d%s%s: %d%s%s: %d%s%s: %d",
+        getLocalizedText(65,  "TilesCount"),   tileCounters.total,
+        getLocalizedText(116, "Headquarters"), tileCounters.Headquarters, "        ",
+        getLocalizedText(116, "City"),         tileCounters.City,         "        ",
+        getLocalizedText(116, "Factory"),      tileCounters.Factory,      "        ",
+        getLocalizedText(116, "Airport"),      tileCounters.Airport,      "        ",
+        getLocalizedText(116, "Seaport"),      tileCounters.Seaport,
+        getLocalizedText(116, "CommandTower"), tileCounters.CommandTower, "        ",
+        getLocalizedText(116, "Radar"),        tileCounters.Radar,        "        ",
+        getLocalizedText(116, "TempAirport"),  tileCounters.TempAirport,  "        ",
+        getLocalizedText(116, "TempSeaport"),  tileCounters.TempSeaport
+    )
+end
+
+local function generateTextTileInfo(self)
+    local modelWar           = self.m_ModelWar
+    local modelPlayerManager = SingletonGetters.getModelPlayerManager(modelWar)
+    local tileCounters       = {}
+    for playerIndex = 0, modelPlayerManager:getPlayersCount() do
+        tileCounters[playerIndex] = {
+            total        = 0,
+            Headquarters = 0,
+            City         = 0,
+            Factory      = 0,
+            Airport      = 0,
+            Seaport      = 0,
+            TempAirport  = 0,
+            TempSeaport  = 0,
+            CommandTower = 0,
+            Radar        = 0,
+        }
+    end
+
+    SingletonGetters.getModelTileMap(modelWar):forEachModelTile(function(modelTile)
+        local tileType = modelTile:getTileType()
+        if (tileCounters[0][tileType]) then
+            tileCounters[0][tileType] = tileCounters[0][tileType] + 1
+            tileCounters[0].total     = tileCounters[0].total     + 1
+
+            local playerIndex = modelTile:getPlayerIndex()
+            if (playerIndex ~= 0) then
+                tileCounters[playerIndex][tileType] = tileCounters[playerIndex][tileType] + 1
+                tileCounters[playerIndex].total     = tileCounters[playerIndex].total     + 1
+            end
+        end
+    end)
+
+    local textList = {string.format("%s\n%s",
+        generateMapTitle(SingletonGetters.getModelWarField(modelWar):getWarFieldFileName()),
+        generateTileInfoWithCounters(tileCounters[0])
+    )}
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if (not modelPlayer:isAlive()) then
+            textList[#textList + 1] = string.format("%s %d: %s (%s)", getLocalizedText(65, "Player"), playerIndex, modelPlayer:getNickname(), getLocalizedText(65, "Lost"))
+        else
+            textList[#textList + 1] = string.format("%s %d: %s\n%s", getLocalizedText(65, "Player"), playerIndex, modelPlayer:getNickname(), generateTileInfoWithCounters(tileCounters[playerIndex]))
+        end
+    end)
+
+    return table.concat(textList, "\n--------------------\n")
 end
 
 --------------------------------------------------------------------------------
@@ -397,6 +456,8 @@ local function createItemsForStateAuxiliaryCommands(self)
             items[#items + 1] = self.m_ItemDestroyOwnedUnit
         end
     end
+
+    items[#items + 1] = self.m_ItemTileInfo
     items[#items + 1] = self.m_ItemHelp
     items[#items + 1] = self.m_ItemHideUI
     items[#items + 1] = self.m_ItemSetMessageIndicator
@@ -908,7 +969,7 @@ local function initItemSetMusic(self)
 end
 
 local function initItemSurrender(self)
-    local item = {
+    self.m_ItemSurrender = {
         name     = getLocalizedText(65, "Surrender"),
         callback = function()
             local modelConfirmBox = getModelConfirmBox(self.m_ModelWar)
@@ -921,19 +982,24 @@ local function initItemSurrender(self)
                 :setEnabled(true)
         end,
     }
+end
 
-    self.m_ItemSurrender = item
+local function initItemTileInfo(self)
+    self.m_ItemTileInfo = {
+        name     = getLocalizedText(65, "TileInfo"),
+        callback = function()
+            self.m_View:setOverviewString(generateTextTileInfo(self))
+        end,
+    }
 end
 
 local function initItemWarControl(self)
-    local item = {
+    self.m_ItemWarControl = {
         name     = getLocalizedText(1, "WarControl"),
         callback = function()
             self.m_View:setOverviewString(getLocalizedText(2, 2))
         end,
     }
-
-    self.m_ItemWarControl = item
 end
 
 local function initItemsForStateUnitPropertyList(self)
@@ -982,6 +1048,7 @@ function ModelWarCommandMenu:ctor(param)
     initItemSetMessageIndicator(self)
     initItemSetMusic(           self)
     initItemSurrender(          self)
+    initItemTileInfo(           self)
     initItemUnitPropertyList(   self)
     initItemWarControl(         self)
 
