@@ -54,6 +54,7 @@ local OVERVIEW_FONT_SIZE = 18
 local ITEM_WIDTH              = MENU_BACKGROUND_WIDTH - 20
 local ITEM_HEIGHT             = 50
 local ITEM_CAPINSETS          = {x = 1, y = ITEM_HEIGHT, width = 1, height = 1}
+local ITEM_DISABLED_COLOR     = {r = 180, g = 180, b = 180}
 local ITEM_FONT_NAME          = "res/fonts/msyhbd.ttc"
 local ITEM_FONT_SIZE          = 25
 local ITEM_FONT_COLOR         = {r = 255, g = 255, b = 255}
@@ -83,12 +84,21 @@ local function createViewItem(item)
 
         :setZoomScale(-0.05)
 
+        :setCascadeColorEnabled(true)
+
         :addTouchEventListener(function(sender, eventType)
             if (eventType == ccui.TouchEventType.ended) then
                 item.callback()
             end
         end)
-    view:getRendererNormal():addChild(label)
+
+    view:getRendererNormal():setCascadeColorEnabled(true)
+        :addChild(label)
+
+    if (item.isAvailable == false) then
+        view:setColor(ITEM_DISABLED_COLOR)
+            :setEnabled(false)
+    end
 
     return view
 end
