@@ -1064,7 +1064,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
         self.m_StartingFund             = warConfiguration.startingFund
-        self.m_TeamIndex                = getFirstUnusedTeamIndex(warConfiguration)
+        self.m_TeamIndex                = getTeamIndexForWarConfiguration(warConfiguration)
         self.m_VisionModifier           = warConfiguration.visionModifier
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmContinueWar"))
@@ -1085,7 +1085,7 @@ function ModelWarConfigurator:resetWithWarConfiguration(warConfiguration)
         self.m_PlayerIndex              = getPlayerIndexForWarConfiguration(warConfiguration)
         self.m_SkillConfigurationID     = nil
         self.m_StartingFund             = warConfiguration.startingFund
-        self.m_TeamIndex                = getFirstUnusedTeamIndex(warConfiguration)
+        self.m_TeamIndex                = getTeamIndexForWarConfiguration(warConfiguration)
         self.m_VisionModifier           = warConfiguration.visionModifier
 
         self.m_View:setButtonConfirmText(getLocalizedText(14, "ConfirmExitWar"))

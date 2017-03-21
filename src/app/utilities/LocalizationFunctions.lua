@@ -1083,12 +1083,22 @@ local s_Texts = {
             return "Are you sure to register with the following account and password:\n" .. account .. "\n" .. password
         end,
     },
-    --[[
     [25] = {
-        [1] = function() return "该账号已被注册，请使用其他账号。"                                  end,
-        [2] = function() return "The account is registered already. Please use another account." end,
+        [1] = function(textType)
+            if     (textType == "Energy") then return "能量"
+            elseif (textType == "Player") then return "玩家"
+            elseif (textType == "Fund")   then return "金钱"
+            else                               return "未知25:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Energy") then return "Energy"
+            elseif (textType == "Player") then return "Player"
+            elseif (textType == "Fund")   then return "Fund"
+            else                               return "Unknown25:" .. (textType or "")
+            end
+        end,
     },
-    --]]
     [26] = {
         [1] = function(account) return "欢迎登陆，【" .. account .. "】！" end,
         [2] = function(account) return "Welcome, " .. account .. "!"      end,
