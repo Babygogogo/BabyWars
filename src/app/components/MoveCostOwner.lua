@@ -52,17 +52,15 @@ end
 -- The exported functions.
 --------------------------------------------------------------------------------
 function MoveCostOwner:getMoveCostWithMoveType(moveType)
-    -- TODO: take the skills of the players into account.
-
     return self.m_Template[moveType]
 end
 
 function MoveCostOwner:getMoveCostWithModelUnit(modelUnit)
     local owner    = self.m_Owner
     local tileType = owner:getTileType()
-    if (((tileType == "Seaport") or (tileType == "TempSeaport"))                              and
-        (owner:getPlayerIndex() ~= modelUnit:getPlayerIndex())                                and
-        (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "LargeNavalUnits"))) then
+    if (((tileType == "Seaport") or (tileType == "TempSeaport"))                                                                               and
+        (not SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):isSameTeamIndex(owner:getPlayerIndex(), modelUnit:getPlayerIndex())) and
+        (GameConstantFunctions.isTypeInCategory(modelUnit:getUnitType(), "LargeNavalUnits")))                                                  then
         return nil
     else
         local baseCost = self:getMoveCostWithMoveType(modelUnit:getMoveType())

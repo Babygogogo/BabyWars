@@ -51,7 +51,8 @@ local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
         return nil
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+        if ((existingModelUnit)                                                                                                                and
+            (not getModelPlayerManager(self.m_ModelSceneWar):isSameTeamIndex(existingModelUnit:getPlayerIndex(), modelUnit:getPlayerIndex()))) then
             return nil
         else
             return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(modelUnit)
@@ -869,7 +870,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
 
     updateMovePathWithDestinationGrid(self, destination)
     self.m_State              = "choosingAction"
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_PathNodes, launchUnitID)
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_ModelSceneWar, self.m_PathNodes, launchUnitID)
     self.m_LaunchUnitID       = launchUnitID
 
     if (self.m_View) then

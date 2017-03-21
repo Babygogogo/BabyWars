@@ -34,14 +34,15 @@ local DAMAGE_COST_GROWTH_RATES           = SkillDataAccessors.getDamageCostGrowt
 -- The constructor.
 --------------------------------------------------------------------------------
 function ModelPlayer:ctor(param)
-    self.m_PlayerIndex             = param.playerIndex
     self.m_Account                 = param.account
-    self.m_Nickname                = param.nickname
-    self.m_Fund                    = param.fund
-    self.m_IsAlive                 = param.isAlive
     self.m_DamageCost              = param.damageCost
-    self.m_SkillActivatedCount     = param.skillActivatedCount
+    self.m_Fund                    = param.fund
     self.m_HasVotedForDraw         = param.hasVotedForDraw
+    self.m_IsAlive                 = param.isAlive
+    self.m_Nickname                = param.nickname
+    self.m_PlayerIndex             = param.playerIndex
+    self.m_SkillActivatedCount     = param.skillActivatedCount
+    self.m_TeamIndex               = param.teamIndex
     self.m_ModelSkillConfiguration = ModelSkillConfiguration:create(param.skillConfiguration)
 
     return self
@@ -56,29 +57,31 @@ end
 --------------------------------------------------------------------------------
 function ModelPlayer:toSerializableTable()
     return {
-        playerIndex         = self.m_PlayerIndex,
         account             = self:getAccount(),
-        nickname            = self:getNickname(),
-        fund                = self:getFund(),
-        isAlive             = self:isAlive(),
         damageCost          = self.m_DamageCost,
-        skillActivatedCount = self.m_SkillActivatedCount,
+        fund                = self:getFund(),
         hasVotedForDraw     = self:hasVotedForDraw(),
+        isAlive             = self:isAlive(),
+        nickname            = self:getNickname(),
+        playerIndex         = self.m_PlayerIndex,
+        skillActivatedCount = self.m_SkillActivatedCount,
         skillConfiguration  = self:getModelSkillConfiguration():toSerializableTable(),
+        teamIndex           = self.m_TeamIndex,
     }
 end
 
 function ModelPlayer:toSerializableReplayData()
     return {
-        playerIndex         = self.m_PlayerIndex,
         account             = self:getAccount(),
-        nickname            = self:getNickname(),
-        fund                = self.m_ModelSceneWar:getStartingFund(),
-        isAlive             = true,
         damageCost          = 0,
-        skillActivatedCount = 0,
+        fund                = self.m_ModelSceneWar:getStartingFund(),
         hasVotedForDraw     = nil,
+        isAlive             = true,
+        nickname            = self:getNickname(),
+        playerIndex         = self.m_PlayerIndex,
+        skillActivatedCount = 0,
         skillConfiguration  = self:getModelSkillConfiguration():toSerializableReplayData(),
+        teamIndex           = self.m_TeamIndex,
     }
 end
 
@@ -203,6 +206,10 @@ end
 
 function ModelPlayer:getModelSkillConfiguration()
     return self.m_ModelSkillConfiguration
+end
+
+function ModelPlayer:getTeamIndex()
+    return self.m_TeamIndex
 end
 
 return ModelPlayer

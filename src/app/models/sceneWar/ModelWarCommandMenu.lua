@@ -91,19 +91,20 @@ local function generateEmptyDataForEachPlayer(self)
     modelPlayerManager:forEachModelPlayer(function(modelPlayer, playerIndex)
         if (modelPlayer:isAlive()) then
             local energy, req1, req2 = modelPlayer:getEnergy()
-            local shouldShowFund     = (isReplay) or (not isFogOfWar) or (playerIndex == playerIndexLoggedIn)
+            local shouldShowFund     = (isReplay) or (not isFogOfWar) or (modelPlayerManager:isSameTeamIndex(playerIndex, playerIndexLoggedIn))
             dataForEachPlayer[playerIndex] = {
-                nickname            = modelPlayer:getNickname(),
-                fund                = (shouldShowFund) and ("" .. modelPlayer:getFund()) or ("--"),
                 energy              = energy,
+                damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement(),
+                fund                = (shouldShowFund) and ("" .. modelPlayer:getFund()) or ("--"),
+                idleUnitsCount      = 0,
+                income              = 0,
+                nickname            = modelPlayer:getNickname(),
                 req1                = req1,
                 req2                = req2,
-                damageCostPerEnergy = modelPlayer:getCurrentDamageCostPerEnergyRequirement(),
-                idleUnitsCount      = 0,
+                tilesCount          = 0,
+                teamIndex           = modelPlayer:getTeamIndex(),
                 unitsCount          = 0,
                 unitsValue          = 0,
-                tilesCount          = 0,
-                income              = 0,
             }
         end
     end)
@@ -182,8 +183,9 @@ local function createTextForWarInfo(self)
         else
             local d                  = dataForEachPlayer[i]
             local isPlayerInTurn     = i == playerIndexInTurn
-            stringList[#stringList + 1] = string.format("%s %d: %s%s\n%s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %s      %s: %d\n%s: %d%s      %s: %d",
+            stringList[#stringList + 1] = string.format("%s %d: %s%s\n%s: %s      %s: %.2f / %s / %s      %s: %d\n%s: %d      %s: %s      %s: %d\n%s: %d%s      %s: %d",
                 getLocalizedText(65, "Player"),               i, d.nickname, ((isPlayerInTurn) and (getInTurnDescription(modelWar)) or ("")),
+                getLocalizedText(14, "TeamIndex"),            AuxiliaryFunctions.getTeamNameWithTeamIndex(d.teamIndex),
                 getLocalizedText(65, "Energy"),               d.energy,    "" .. (d.req1 or "--"), "" .. (d.req2 or "--"),
                 getLocalizedText(65, "DamageCostPerEnergy"),  d.damageCostPerEnergy,
                 getLocalizedText(65, "TilesCount"),           d.tilesCount,

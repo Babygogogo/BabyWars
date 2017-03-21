@@ -86,9 +86,9 @@ local function getDefenseBonusMultiplier(attacker, attackerGridIndex, target, ta
 end
 
 local function canAttack(attacker, attackerMovePath, target, targetMovePath)
-    if ((not attacker)                                          or
-        (not target)                                            or
-        (attacker:getPlayerIndex() == target:getPlayerIndex())) then
+    if ((not attacker)                                      or
+        (not target)                                        or
+        (attacker:getTeamIndex() == target:getTeamIndex())) then
         return false
     end
 

@@ -31,18 +31,18 @@ local function isModelUnitDiving(modelUnit)
     return (modelUnit.isDiving) and (modelUnit:isDiving())
 end
 
-local function isUnitHiddenByTileToPlayerIndex(modelSceneWar, modelUnit, playerIndex)
+local function isUnitHiddenByTileToTeamIndex(modelSceneWar, modelUnit, teamIndex)
     local modelTile = getModelTileMap(modelSceneWar):getModelTile(modelUnit:getGridIndex())
-    return (modelTile:getPlayerIndex() ~= playerIndex)       and
+    return (modelTile:getTeamIndex() ~= teamIndex)           and
         (modelTile.canHideUnitType)                          and
         (modelTile:canHideUnitType(modelUnit:getUnitType()))
 end
 
-local function hasUnitWithPlayerIndexOnAdjacentGrid(modelSceneWar, gridIndex, playerIndex)
+local function hasUnitWithTeamIndexOnAdjacentGrid(modelSceneWar, gridIndex, teamIndex)
     local modelUnitMap = getModelUnitMap(modelSceneWar)
     for _, adjacentGridIndex in ipairs(getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
         local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
-        if ((adjacentModelUnit) and (adjacentModelUnit:getPlayerIndex() == playerIndex)) then
+        if ((adjacentModelUnit) and (adjacentModelUnit:getTeamIndex() == teamIndex)) then
             return true
         end
     end
@@ -50,9 +50,9 @@ local function hasUnitWithPlayerIndexOnAdjacentGrid(modelSceneWar, gridIndex, pl
     return false
 end
 
-local function hasUnitWithPlayerIndexOnGrid(modelSceneWar, gridIndex, playerIndex)
+local function hasUnitWithTeamIndexOnGrid(modelSceneWar, gridIndex, teamIndex)
     local modelUnit = getModelUnitMap(modelSceneWar):getModelUnit(gridIndex)
-    return (modelUnit) and (modelUnit:getPlayerIndex() == playerIndex)
+    return (modelUnit) and (modelUnit:getPlayerIndex() == teamIndex)
 end
 
 local function createEmptyMap(mapSize)
@@ -172,24 +172,28 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(modelSceneWar, grid
     assert(type(unitType)          == "string", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitType: " .. (unitType or ""))
     assert(type(unitPlayerIndex)   == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid unitPlayerIndex: " .. (unitPlayerIndex or ""))
     assert(type(targetPlayerIndex) == "number", "VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex() invalid targetPlayerIndex: " .. (targetPlayerIndex or ""))
-    if ((isTotalReplay(modelSceneWar)) or (unitPlayerIndex == targetPlayerIndex)) then
+
+    local targetTeamIndex = modelPlayerManager:getModelPlayer(targetPlayerIndex):getTeamIndex()
+    if ((isTotalReplay(modelSceneWar)) or (modelPlayerManager:isSameTeamIndex(unitPlayerIndex, targetPlayerIndex))) then
         return true
     elseif (isDiving) then
-        return hasUnitWithPlayerIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetPlayerIndex)
+        return hasUnitWithTeamIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetTeamIndex)
+    elseif (not modelFogMap:isFogOfWarCurrently()) then
+        return true
     end
 
     local modelTile = getModelTileMap(modelSceneWar):getModelTile(gridIndex)
-    if (modelTile:getPlayerIndex() == targetPlayerIndex) then
+    if (modelTile:getTeamIndex() == targetTeamIndex) then
         return true
     else
-        local visibilityForPaths, visibilityForTiles, visibilityForUnits = getModelFogMap(modelSceneWar):getVisibilityOnGridForPlayerIndex(gridIndex, targetPlayerIndex)
+        local visibilityForPaths, visibilityForTiles, visibilityForUnits = getModelFogMap(modelSceneWar):getVisibilityOnGridForTeamIndex(gridIndex, targetTeamIndex)
         if (visibilityForPaths == 2) then
             return true
         elseif ((visibilityForPaths == 0) and (visibilityForTiles == 0) and (visibilityForUnits == 0)) then
             return false
         elseif ((not modelTile.canHideUnitType) or (not modelTile:canHideUnitType(unitType))) then
             return true
-        elseif (hasUnitWithPlayerIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetPlayerIndex)) then
+        elseif (hasUnitWithTeamIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetTeamIndex)) then
             return true
         else
             local skillConfiguration = getModelPlayerManager(modelSceneWar):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
@@ -202,19 +206,25 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(modelSceneWar, grid
 end
 
 function VisibilityFunctions.isTileVisibleToPlayerIndex(modelSceneWar, gridIndex, targetPlayerIndex, canRevealWithTiles, canRevealWithUnits)
-    local modelTile     = getModelTileMap(modelSceneWar):getModelTile(gridIndex)
-    if (modelTile:getPlayerIndex() == targetPlayerIndex) then
+    local modelFogMap = SingletonGetters.getModelFogMap(modelSceneWar)
+    if (not modelFogMap:isFogOfWarCurrently()) then
+        return true
+    end
+
+    local modelTile       = getModelTileMap(modelSceneWar):getModelTile(gridIndex)
+    local targetTeamIndex = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(targetPlayerIndex):getTeamIndex()
+    if (modelTile:getTeamIndex() == targetTeamIndex) then
         return true
     else
-        local visibilityForPaths, visibilityForTiles, visibilityForUnits = getModelFogMap(modelSceneWar):getVisibilityOnGridForPlayerIndex(gridIndex, targetPlayerIndex)
+        local visibilityForPaths, visibilityForTiles, visibilityForUnits = modelFogMap:getVisibilityOnGridForTeamIndex(gridIndex, targetTeamIndex)
         if (visibilityForPaths == 2) then
             return true
         elseif ((visibilityForPaths == 0) and (visibilityForTiles == 0) and (visibilityForUnits == 0)) then
             return false
         elseif (not modelTile.canHideUnitType) then
             return true
-        elseif ((hasUnitWithPlayerIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetPlayerIndex))  or
-            (    hasUnitWithPlayerIndexOnGrid(        modelSceneWar, gridIndex, targetPlayerIndex))) then
+        elseif ((hasUnitWithTeamIndexOnAdjacentGrid(modelSceneWar, gridIndex, targetTeamIndex))  or
+            (    hasUnitWithTeamIndexOnGrid(        modelSceneWar, gridIndex, targetTeamIndex))) then
             return true
         else
             local skillConfiguration = getModelPlayerManager(modelSceneWar):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
@@ -230,11 +240,12 @@ local isUnitVisible = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 local isTileVisible = VisibilityFunctions.isTileVisibleToPlayerIndex
 
 function VisibilityFunctions.getRevealedTilesAndUnitsData(modelSceneWar, pathNodes, modelUnit, isModelUnitDestroyed)
-    local modelTileMap  = getModelTileMap(modelSceneWar)
-    local modelUnitMap  = getModelUnitMap(modelSceneWar)
-    local mapSize       = modelUnitMap:getMapSize()
-    local playerIndex   = modelUnit:getPlayerIndex()
-    local visibilityMap = createVisibilityMapWithPathNodes(modelSceneWar, pathNodes, modelUnit)
+    local modelTileMap    = getModelTileMap(modelSceneWar)
+    local modelUnitMap    = getModelUnitMap(modelSceneWar)
+    local mapSize         = modelUnitMap:getMapSize()
+    local playerIndex     = modelUnit:getPlayerIndex()
+    local targetTeamIndex = SingletonGetters.getModelPlayerManager(modelWar):getModelPlayer(playerIndex):getTeamIndex()
+    local visibilityMap   = createVisibilityMapWithPathNodes(modelSceneWar, pathNodes, modelUnit)
     local revealedTiles, revealedUnits
 
     for x = 1, mapSize.width do
@@ -253,7 +264,7 @@ function VisibilityFunctions.getRevealedTilesAndUnitsData(modelSceneWar, pathNod
                 if ((revealUnit)                                                                                                                 and
                     (not isModelUnitDiving(revealUnit))                                                                                          and
                     (not isUnitVisible(modelSceneWar, gridIndex, revealUnit:getUnitType(), false, revealUnit:getPlayerIndex(), playerIndex))) then
-                    if ((visibility == 2) or (not isUnitHiddenByTileToPlayerIndex(modelSceneWar, revealUnit, playerIndex))) then
+                    if ((visibility == 2) or (not isUnitHiddenByTileToTeamIndex(modelSceneWar, revealUnit, targetTeamIndex))) then
                         revealedUnits = TableFunctions.union(revealedUnits, generateUnitsData(modelSceneWar, revealUnit))
                     end
                 end

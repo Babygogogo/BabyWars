@@ -171,7 +171,7 @@ local function runTurnPhaseConsumeUnitFuel(self)
         local dispatcher          = getScriptEventDispatcher(modelSceneWar)
         local isReplay            = isTotalReplay(modelSceneWar)
         local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
-        local shouldUpdateFogMap  = (IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)
+        local shouldUpdateFogMap  = (IS_SERVER) or (isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))
 
         modelUnitMap:forEachModelUnitOnMap(function(modelUnit)
             if ((modelUnit:getPlayerIndex() == playerIndexActing) and
@@ -302,7 +302,7 @@ local function runTurnPhaseResetVisionForEndingTurnPlayer(self)
     local playerIndex   = self:getPlayerIndex()
     if (IS_SERVER) then
         getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
-    elseif ((isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+    elseif ((isTotalReplay(modelSceneWar)) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))) then
         getModelFogMap(modelSceneWar):resetMapForPathsForPlayerIndex(playerIndex)
         resetVisionOnClient(self)
     end
@@ -348,7 +348,7 @@ local function runTurnPhaseResetVisionForBeginningTurnPlayer(self)
     if (IS_SERVER) then
         getModelFogMap(modelSceneWar):resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
-    elseif ((isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+    elseif ((isTotalReplay(modelSceneWar)) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))) then
         getModelFogMap(modelSceneWar):resetMapForTilesForPlayerIndex(playerIndex)
             :resetMapForUnitsForPlayerIndex(playerIndex)
         resetVisionOnClient(self)

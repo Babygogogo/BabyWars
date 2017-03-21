@@ -204,7 +204,7 @@ local function moveModelUnitWithAction(action, modelSceneWar)
     local launchUnitID       = action.launchUnitID
     local focusModelUnit     = modelUnitMap:getFocusModelUnit(beginningGridIndex, launchUnitID)
     local playerIndex        = focusModelUnit:getPlayerIndex()
-    local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))
+    local shouldUpdateFogMap = (IS_SERVER) or (isTotalReplay(modelSceneWar)) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))
     if (shouldUpdateFogMap) then
         modelFogMap:updateMapForPathsWithModelUnitAndPath(focusModelUnit, pathNodes)
     end
@@ -751,7 +751,7 @@ local function executeAttack(action, modelSceneWar)
         end
         if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(modelSceneWar, lostPlayerIndex)
-            if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+            if (modelPlayerManager:getAliveTeamsCount() <= 1) then
                 modelSceneWar:setEnded(true)
             elseif (isInTurnPlayerLost) then
                 modelTurnManager:endTurnPhaseMain()
@@ -766,8 +766,8 @@ local function executeAttack(action, modelSceneWar)
         if (not isReplay) then
             cleanupOnReceivingResponseFromServer(modelSceneWar)
         end
-        if ((isLoggedInPlayerLost)                                                    or
-            ((lostPlayerIndex) and (modelPlayerManager:getAlivePlayersCount() <= 2))) then
+        if ((isLoggedInPlayerLost)                                                                 or
+            ((lostPlayerIndex) and (modelPlayerManager:getAliveTeamsCount(lostPlayerIndex) <= 1))) then
             modelSceneWar:setEnded(true)
         end
 
@@ -799,8 +799,8 @@ local function executeAttack(action, modelSceneWar)
                 end
             end
 
-            if ((targetVision)                                              and
-                ((isReplay) or (targetPlayerIndex == playerIndexLoggedIn))) then
+            if ((targetVision)                                                                                                  and
+                ((isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(targetPlayerIndex, playerIndexLoggedIn)))) then
                 getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitLeave(targetPlayerIndex, targetGridIndex, targetVision)
             end
             if (lostPlayerIndex) then
@@ -838,20 +838,17 @@ local function executeBeginTurn(action, modelSceneWar)
     end
 
     if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
-        if (not lostPlayerIndex) then
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
-                modelSceneWar:setExecutingAction(false)
-            end)
-        else
-            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 2)
-            modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData, function()
-                Destroyers.destroyPlayerForce(modelSceneWar, lostPlayerIndex)
-                if (not modelSceneWar:isEnded()) then
-                    modelTurnManager:endTurnPhaseMain()
-                end
-                modelSceneWar:setExecutingAction(false)
-            end)
+        modelTurnManager:beginTurnPhaseBeginning(action.income, action.repairData, action.supplyData)
+        if (lostPlayerIndex) then
+            Destroyers.destroyPlayerForce(modelSceneWar, lostPlayerIndex)
+            if (modelPlayerManager:getAliveTeamsCount() <= 1) then
+                modelWarOnline:setEnded(true)
+            else
+                modelTurnManager:endTurnPhaseMain()
+            end
         end
+        modelSceneWar:setExecutingAction(false)
+
     else
         local isReplay = isTotalReplay(modelSceneWar)
         if (not isReplay) then
@@ -865,7 +862,7 @@ local function executeBeginTurn(action, modelSceneWar)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = (not isReplay) and (lostModelPlayer:getAccount() == getLoggedInAccountAndPassword(modelSceneWar))
-            if ((modelPlayerManager:getAlivePlayersCount() <= 2) or (isLoggedInPlayerLost)) then
+            if ((modelPlayerManager:getAliveTeamsCount(lostPlayerIndex) <= 1) or (isLoggedInPlayerLost)) then
                 modelSceneWar:setEnded(true)
             end
 
@@ -917,7 +914,7 @@ local function executeBuildModelTile(action, modelSceneWar)
         modelTile:updateWithObjectAndBaseId(focusModelUnit:getBuildTiledIdWithTileType(modelTile:getTileType()))
 
         local playerIndex = focusModelUnit:getPlayerIndex()
-        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))) then
             getModelFogMap(modelSceneWar):updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndex, endingGridIndex, modelTile:getVisionForPlayerIndex(playerIndex))
         end
     end
@@ -975,7 +972,7 @@ local function executeCaptureModelTile(action, modelSceneWar)
         modelTile:setCurrentCapturePoint(modelTile:getMaxCapturePoint())
             :updateWithPlayerIndex(playerIndexActing)
 
-        if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+        if ((IS_SERVER) or (isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
             modelFogMap:updateMapForTilesForPlayerIndexOnGettingOwnership(playerIndexActing, endingGridIndex, modelTile:getVisionForPlayerIndex(playerIndexActing))
         end
     end
@@ -992,7 +989,7 @@ local function executeCaptureModelTile(action, modelSceneWar)
         end
         if (lostPlayerIndex) then
             Destroyers.destroyPlayerForce(modelSceneWar, lostPlayerIndex)
-            modelSceneWar:setEnded(modelPlayerManager:getAlivePlayersCount() <= 1)
+            modelSceneWar:setEnded(modelPlayerManager:getAliveTeamsCount() <= 1)
         end
         modelSceneWar:setExecutingAction(false)
     else
@@ -1006,8 +1003,8 @@ local function executeCaptureModelTile(action, modelSceneWar)
                     :showNormalAnimation()
                 modelTile:updateView()
 
-                if ((capturePoint <= 0)                                           and
-                    ((isReplay) or (previousPlayerIndex == playerIndexLoggedIn))) then
+                if ((capturePoint <= 0)                                                                             and
+                    ((isReplay) or (modelPlayerManager:isSameTeamIndex(previousPlayerIndex, playerIndexLoggedIn)))) then
                     modelFogMap:updateMapForTilesForPlayerIndexOnLosingOwnership(previousPlayerIndex, endingGridIndex, previousVision)
                 end
                 updateTileAndUnitMapOnVisibilityChanged(modelSceneWar)
@@ -1017,7 +1014,7 @@ local function executeCaptureModelTile(action, modelSceneWar)
         else
             local lostModelPlayer      = modelPlayerManager:getModelPlayer(lostPlayerIndex)
             local isLoggedInPlayerLost = (not isReplay) and (lostModelPlayer:getAccount() == getLoggedInAccountAndPassword())
-            if ((isLoggedInPlayerLost) or (modelPlayerManager:getAlivePlayersCount() <= 2)) then
+            if ((isLoggedInPlayerLost) or (modelPlayerManager:getAliveTeamsCount(lostPlayerIndex) <= 1)) then
                 modelSceneWar:setEnded(true)
             end
 
@@ -1056,7 +1053,7 @@ local function executeDestroyOwnedModelUnit(action, modelSceneWar)
     local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
 
     if (gridIndex) then
-        if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+        if ((IS_SERVER) or (isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
             getModelFogMap(modelSceneWar):updateMapForPathsWithModelUnitAndPath(modelUnitMap:getModelUnit(gridIndex), {gridIndex})
         end
         destroyActorUnitOnMap(modelSceneWar, gridIndex, true)
@@ -1074,7 +1071,7 @@ local function executeDestroyOwnedModelUnit(action, modelSceneWar)
         if (gridIndex) then
             getModelGridEffect(modelSceneWar):showAnimationExplosion(gridIndex)
 
-            if (playerIndexActing == playerIndexLoggedIn) then
+            if ((not isReplay) and (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
                 for _, adjacentGridIndex in pairs(GridIndexFunctions.getAdjacentGrids(gridIndex, modelUnitMap:getMapSize())) do
                     local adjacentModelUnit = modelUnitMap:getModelUnit(adjacentGridIndex)
                     if ((adjacentModelUnit)                                                                                                                                                                     and
@@ -1152,7 +1149,7 @@ local function executeDropModelUnit(action, modelSceneWar)
 
     local isReplay           = isTotalReplay(modelSceneWar)
     local playerIndex        = focusModelUnit:getPlayerIndex()
-    local shouldUpdateFogMap = (IS_SERVER) or (isReplay) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))
+    local shouldUpdateFogMap = (IS_SERVER) or (isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))
     local modelFogMap        = getModelFogMap(modelSceneWar)
     local dropModelUnits     = {}
     for _, dropDestination in ipairs(action.dropDestinations) do
@@ -1342,7 +1339,7 @@ local function executeLaunchFlare(action, modelSceneWar)
 
     local isReplay            = isTotalReplay(modelSceneWar)
     local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
-    if ((IS_SERVER) or (isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+    if ((IS_SERVER) or (isReplay) or (getModelPlayerManager:isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
         getModelFogMap(modelSceneWar):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
     end
 
@@ -1357,7 +1354,7 @@ local function executeLaunchFlare(action, modelSceneWar)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            if ((isReplay) or (playerIndexActing == playerIndexLoggedIn)) then
+            if ((isReplay) or (getModelPlayerManager:isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
                 local modelGridEffect = getModelGridEffect(modelSceneWar)
                 for _, gridIndex in pairs(getGridsWithinDistance(targetGridIndex, 0, flareAreaRadius, modelUnitMap:getMapSize())) do
                     modelGridEffect:showAnimationFlare(gridIndex)
@@ -1487,7 +1484,7 @@ local function executeProduceModelUnitOnTile(action, modelSceneWar)
         local producedActorUnit = produceActorUnit(modelSceneWar, action.tiledID, producedUnitID, gridIndex)
         modelUnitMap:addActorUnitOnMap(producedActorUnit)
 
-        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
+        if ((IS_SERVER) or (isTotalReplay(modelSceneWar)) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndex, getPlayerIndexLoggedIn(modelSceneWar)))) then
             getModelFogMap(modelSceneWar):updateMapForUnitsForPlayerIndexOnUnitArrive(playerIndex, gridIndex, producedActorUnit:getModel():getVisionForPlayerIndex(playerIndex))
         end
     end
@@ -1645,7 +1642,7 @@ local function executeSurrender(action, modelSceneWar)
     Destroyers.destroyPlayerForce(modelSceneWar, playerIndex)
 
     if ((IS_SERVER) or (modelSceneWar:isFastExecutingActions())) then
-        if (modelPlayerManager:getAlivePlayersCount() <= 1) then
+        if (modelPlayerManager:getAliveTeamsCount() <= 1) then
             modelSceneWar:setEnded(true)
         else
             modelTurnManager:endTurnPhaseMain()
@@ -1658,7 +1655,7 @@ local function executeSurrender(action, modelSceneWar)
         end
 
         local isLoggedInPlayerLost = (not isReplay) and (modelPlayer:getAccount() == getLoggedInAccountAndPassword(modelSceneWar))
-        if ((modelPlayerManager:getAlivePlayersCount() <= 1) or (isLoggedInPlayerLost)) then
+        if ((modelPlayerManager:getAliveTeamsCount() <= 1) or (isLoggedInPlayerLost)) then
             modelSceneWar:setEnded(true)
         end
 

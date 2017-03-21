@@ -7,7 +7,6 @@ local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
 local getLocalizedText       = LocalizationFunctions.getLocalizedText
 local getModelFogMap         = SingletonGetters.getModelFogMap
 local getPlayerIndexLoggedIn = SingletonGetters.getPlayerIndexLoggedIn
-local isTotalReplay          = SingletonGetters.isTotalReplay
 
 local LABEL_Z_ORDER      = 1
 local BACKGROUND_Z_ORDER = 0
@@ -103,12 +102,6 @@ function ViewMoneyEnergyInfo:ctor(param)
     return self
 end
 
-function ViewMoneyEnergyInfo:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
@@ -125,18 +118,10 @@ function ViewMoneyEnergyInfo:adjustPositionOnTouch(touch)
     return self
 end
 
-function ViewMoneyEnergyInfo:updateWithModelPlayer(modelPlayer, playerIndex)
-    assert(type(playerIndex) == "number", "ViewMoneyEnergyInfo:updateWithModelPlayer() invalid playerIndex: " .. (playerIndex or ""))
-
-    local modelSceneWar      = self.m_ModelSceneWar
-    local label              = self.m_Label
-    local energy, req1, req2 = modelPlayer:getEnergy()
-    label:setString(string.format("%s\n%s\n%s",
-        getLocalizedText(62, modelPlayer:getNickname()),
-        getLocalizedText(63, ((not isTotalReplay(modelSceneWar)) and (getModelFogMap(modelSceneWar):isFogOfWarCurrently()) and (playerIndex ~= getPlayerIndexLoggedIn(modelSceneWar))) and ("--") or (modelPlayer:getFund())),
-        getLocalizedText(64, string.format("%.2f/%s/%s", energy, "" .. (req1 or "--"), "" .. (req2 or "--")))
-    ))
-    label:setScaleX(math.min(1, LABEL_MAX_WIDTH / label:getContentSize().width))
+function ViewMoneyEnergyInfo:setInfoText(text)
+    local label = self.m_Label
+    label:setString(text)
+        :setScaleX(math.min(1, LABEL_MAX_WIDTH / label:getContentSize().width))
 
     return self
 end

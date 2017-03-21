@@ -12,6 +12,7 @@
 
 local Capturer = requireBW("src.global.functions.class")("Capturer")
 
+local AuxiliaryFunctions     = requireBW("src.app.utilities.AuxiliaryFunctions")
 local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 
@@ -21,13 +22,6 @@ Capturer.EXPORTED_METHODS = {
     "canCaptureModelTile",
     "getCaptureAmount",
 }
-
---------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function round(num)
-    return math.floor(num + 0.5)
-end
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -47,8 +41,8 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function Capturer:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+function Capturer:onStartRunning(modelWar)
+    self.m_ModelWar = modelWar
 
     return self
 end
@@ -80,14 +74,15 @@ function Capturer:setCapturingModelTile(capturing)
 end
 
 function Capturer:canCaptureModelTile(modelTile)
-    return (self.m_Owner:getPlayerIndex() ~= modelTile:getPlayerIndex() and (modelTile.getCurrentCapturePoint))
+    return (modelTile.getCurrentCapturePoint) and
+        (not SingletonGetters.getModelPlayerManager(self.m_ModelWar):isSameTeamIndex(self.m_Owner:getPlayerIndex(), modelTile:getPlayerIndex()))
 end
 
 function Capturer:getCaptureAmount()
     local capturer    = self.m_Owner
-    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(capturer:getPlayerIndex())
+    local modelPlayer = SingletonGetters.getModelPlayerManager(self.m_ModelWar):getModelPlayer(capturer:getPlayerIndex())
     local modifier    = SkillModifierFunctions.getCaptureAmountModifier(modelPlayer:getModelSkillConfiguration())
-    return round(capturer:getNormalizedCurrentHP() * (100 + modifier) / 100)
+    return AuxiliaryFunctions.round(capturer:getNormalizedCurrentHP() * (100 + modifier) / 100)
 end
 
 return Capturer

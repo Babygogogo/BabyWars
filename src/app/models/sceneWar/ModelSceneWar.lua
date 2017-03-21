@@ -226,6 +226,9 @@ function ModelSceneWar:ctor(sceneData)
     self.m_WarID                 = sceneData.warID
     self.m_WarPassword           = sceneData.warPassword
     setActionId(self, sceneData.actionID)
+    for playerIndex, playerData in pairs(sceneData.players) do
+        playerData.teamIndex = playerData.teamIndex or playerIndex
+    end
 
     initScriptEventDispatcher(self)
     initActorChatManager(     self, sceneData.chatData)

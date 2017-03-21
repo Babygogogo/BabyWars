@@ -23,6 +23,8 @@ local SingletonGetters       = requireBW("src.app.utilities.SingletonGetters")
 local SkillModifierFunctions = requireBW("src.app.utilities.SkillModifierFunctions")
 local ComponentManager       = requireBW("src.global.components.ComponentManager")
 
+local ipairs = ipairs
+
 RepairDoer.EXPORTED_METHODS = {
     "getRepairTargetCategoryFullName",
     "getRepairTargetCategory",
@@ -70,7 +72,7 @@ end
 
 function RepairDoer:canRepairTarget(target)
     local targetTiledID = target:getTiledId()
-    if (GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID) ~= self.m_Owner:getPlayerIndex()) then
+    if (not SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):isSameTeamIndex(GameConstantFunctions.getPlayerIndexWithTiledId(targetTiledID), self.m_Owner:getPlayerIndex())) then
         return false
     end
 

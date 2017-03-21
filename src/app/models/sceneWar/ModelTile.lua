@@ -259,6 +259,15 @@ function ModelTile:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self:getTiledId())
 end
 
+function ModelTile:getTeamIndex()
+    local playerIndex = self:getPlayerIndex()
+    if (playerIndex == 0) then
+        return nil
+    else
+        return SingletonGetters.getModelPlayerManager(self.m_ModelSceneWar):getModelPlayer(playerIndex):getTeamIndex()
+    end
+end
+
 function ModelTile:getTileType()
     return GameConstantFunctions.getTileTypeWithObjectAndBaseId(self:getObjectAndBaseId())
 end
