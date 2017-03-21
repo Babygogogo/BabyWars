@@ -154,15 +154,21 @@ end
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewWarFieldPreviewer:setViewTileAndUnitMap(viewTileMap, viewUnitMap, mapSize)
-    if (self.m_ViewTileMap) then
-        self.m_ZoomableNode:removeChild(self.m_ViewTileMap)
-        self.m_ViewTileMap = nil
+function ViewWarFieldPreviewer:setIsRandomWarField(isRandom)
+    self.m_IsRandomWarField = isRandom
+
+    return self
+end
+
+function ViewWarFieldPreviewer:setViewTilesAndUnits(viewTiles, viewUnits, mapSize)
+    if (self.m_ViewTiles) then
+        self.m_ZoomableNode:removeChild(self.m_ViewTiles)
+        self.m_ViewTiles = nil
     end
 
-    viewTileMap:addChild(viewUnitMap)
-    self.m_ViewTileMap = viewTileMap
-    self.m_ZoomableNode:setContentAndSize(viewTileMap, {
+    viewTiles:addChild(viewUnits)
+    self.m_ViewTiles = viewTiles
+    self.m_ZoomableNode:setContentAndSize(viewTiles, {
         width  = mapSize.width  * GRID_SIZE.width,
         height = mapSize.height * GRID_SIZE.height,
     })
@@ -182,9 +188,15 @@ function ViewWarFieldPreviewer:setAuthorName(name)
     return self
 end
 
-function ViewWarFieldPreviewer:setPlayerNicknames(names, count)
+function ViewWarFieldPreviewer:setPlayersCount(playersCount)
+    self.m_PlayersCount = playersCount
+
+    return self
+end
+
+function ViewWarFieldPreviewer:setPlayerNicknames(names)
     local text = getLocalizedText(48, "Players")
-    for i = 1, count do
+    for i = 1, self.m_PlayersCount do
         text = string.format("%s\n%d. %s", text, i, names[i] or getLocalizedText(48, "Empty"))
     end
 
@@ -199,10 +211,10 @@ function ViewWarFieldPreviewer:setPlayerNicknames(names, count)
     return self
 end
 
-function ViewWarFieldPreviewer:setEnabled(enabled, randomPlayersCount)
+function ViewWarFieldPreviewer:setEnabled(enabled)
     if (enabled) then
-        if (randomPlayersCount) then
-            self.m_LabelRandom:setString("??(" .. randomPlayersCount .. "P)")
+        if (self.m_IsRandomWarField) then
+            self.m_LabelRandom:setString("??(" .. self.m_PlayersCount .. "P)")
                 :setVisible(true)
             self.m_ZoomableNode:setEnabled(false)
         else

@@ -18,26 +18,16 @@ local ACTION_CODE_GET_WAITING_WAR_CONFIGURATIONS = ActionCodeFunctions.getAction
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function getWarFieldName(fileName)
-    return requireBW("res.data.templateWarField." .. fileName).warFieldName
-end
-
 local function getPlayerNicknames(warConfiguration, currentTime)
-    local playersCount = requireBW("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
-    local players      = warConfiguration.players
-    local names        = {}
-
-    for i = 1, playersCount do
+    local players = warConfiguration.players
+    local names   = {}
+    for i = 1, WarFieldManager.getPlayersCount(warConfiguration.warFieldFileName) do
         if (players[i]) then
-            names[i] = players[i].account
-            if (i == warConfiguration.playerIndexInTurn) then
-                names[i] = names[i] .. string.format("(%s: %s)", getLocalizedText(34, "BootCountdown"),
-                    AuxiliaryFunctions.formatTimeInterval(warConfiguration.intervalUntilBoot - currentTime + warConfiguration.enterTurnTime))
-            end
+            names[i] = string.format("%s (%s: %s)", players[i].account, getLocalizedText(14, "TeamIndex"), AuxiliaryFunctions.getTeamNameWithTeamIndex(players[i].teamIndex))
         end
     end
 
-    return names, playersCount
+    return names
 end
 
 --------------------------------------------------------------------------------

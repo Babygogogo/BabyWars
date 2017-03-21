@@ -1,12 +1,13 @@
 
 local ModelJoinWarSelector = class("ModelJoinWarSelector")
 
-local ActionCodeFunctions       = requireBW("src.app.utilities.ActionCodeFunctions")
-local AuxiliaryFunctions        = requireBW("src.app.utilities.AuxiliaryFunctions")
-local LocalizationFunctions     = requireBW("src.app.utilities.LocalizationFunctions")
-local SingletonGetters          = requireBW("src.app.utilities.SingletonGetters")
-local WebSocketManager          = requireBW("src.app.utilities.WebSocketManager")
-local Actor                     = requireBW("src.global.actors.Actor")
+local ActionCodeFunctions   = requireBW("src.app.utilities.ActionCodeFunctions")
+local AuxiliaryFunctions    = requireBW("src.app.utilities.AuxiliaryFunctions")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+local WarFieldManager       = requireBW("src.app.utilities.WarFieldManager")
+local WebSocketManager      = requireBW("src.app.utilities.WebSocketManager")
+local Actor                 = requireBW("src.global.actors.Actor")
 
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
@@ -16,17 +17,15 @@ local ACTION_CODE_GET_JOINABLE_WAR_CONFIGURATIONS = ActionCodeFunctions.getActio
 -- The util functions.
 --------------------------------------------------------------------------------
 local function getPlayerNicknames(warConfiguration)
-    local playersCount = requireBW("res.data.templateWarField." .. warConfiguration.warFieldFileName).playersCount
-    local names = {}
     local players = warConfiguration.players
-
-    for i = 1, playersCount do
+    local names   = {}
+    for i = 1, WarFieldManager.getPlayersCount(warConfiguration.warFieldFileName) do
         if (players[i]) then
-            names[i] = players[i].account
+            names[i] = string.format("%s (%s: %s)", players[i].account, getLocalizedText(14, "TeamIndex"), AuxiliaryFunctions.getTeamNameWithTeamIndex(players[i].teamIndex))
         end
     end
 
-    return names, playersCount
+    return names
 end
 
 --------------------------------------------------------------------------------
