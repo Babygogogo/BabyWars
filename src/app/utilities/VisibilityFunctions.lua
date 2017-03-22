@@ -198,9 +198,12 @@ function VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex(modelWar, gridIndex
         elseif (hasUnitWithTeamIndexOnAdjacentGrid(modelWar, gridIndex, targetTeamIndex)) then
             return true
         else
-            local skillConfiguration = modelPlayerManager:getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
-            canRevealWithTiles = (not canRevealWithTiles) and (canRevealHidingPlacesWithTiles(skillConfiguration)) or (canRevealWithTiles)
-            canRevealWithUnits = (not canRevealWithUnits) and (canRevealHidingPlacesWithUnits(skillConfiguration)) or (canRevealWithUnits)
+            modelPlayerManager:forEachModelPlayer(function(modelPlayer)
+                if ((modelPlayer:isAlive()) and (modelPlayer:getTeamIndex() == targetTeamIndex)) then
+                    canRevealWithTiles = (canRevealWithTiles) or (canRevealHidingPlacesWithTiles(modelPlayer:getModelSkillConfiguration()))
+                    canRevealWithUnits = (canRevealWithUnits) or (canRevealHidingPlacesWithUnits(modelPlayer:getModelSkillConfiguration()))
+                end
+            end)
             return ((visibilityForTiles == 1) and (canRevealWithTiles)) or
                 (   (visibilityForUnits == 1) and (canRevealWithUnits))
         end
@@ -229,9 +232,12 @@ function VisibilityFunctions.isTileVisibleToPlayerIndex(modelWar, gridIndex, tar
             (    hasUnitWithTeamIndexOnGrid(        modelWar, gridIndex, targetTeamIndex))) then
             return true
         else
-            local skillConfiguration = getModelPlayerManager(modelWar):getModelPlayer(targetPlayerIndex):getModelSkillConfiguration()
-            canRevealWithTiles = (not canRevealWithTiles) and (canRevealHidingPlacesWithTiles(skillConfiguration)) or (canRevealWithTiles)
-            canRevealWithUnits = (not canRevealWithUnits) and (canRevealHidingPlacesWithUnits(skillConfiguration)) or (canRevealWithUnits)
+            getModelPlayerManager(modelWar):forEachModelPlayer(function(modelPlayer)
+                if ((modelPlayer:isAlive()) and (modelPlayer:getTeamIndex() == targetTeamIndex)) then
+                    canRevealWithTiles = (canRevealWithTiles) or (canRevealHidingPlacesWithTiles(modelPlayer:getModelSkillConfiguration()))
+                    canRevealWithUnits = (canRevealWithUnits) or (canRevealHidingPlacesWithUnits(modelPlayer:getModelSkillConfiguration()))
+                end
+            end)
             return ((visibilityForTiles == 1) and (canRevealWithTiles)) or
                 (   (visibilityForUnits == 1) and (canRevealWithUnits))
         end
