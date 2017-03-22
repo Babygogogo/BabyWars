@@ -46,12 +46,16 @@ local function getPathNodesDestination(pathNodes)
     return pathNodes[#pathNodes]
 end
 
-local function getMoveCost(gridIndex, modelUnit, modelUnitMap, modelTileMap)
+local function getMoveCost(self, gridIndex, modelUnit)
+    local modelSceneWar = self.m_ModelSceneWar
+    local modelUnitMap  = SingletonGetters.getModelUnitMap(modelSceneWar)
+    local modelTileMap  = SingletonGetters.getModelTileMap(modelSceneWar)
     if (not GridIndexFunctions.isWithinMap(gridIndex, modelUnitMap:getMapSize())) then
         return nil
     else
         local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-        if ((existingModelUnit) and (existingModelUnit:getPlayerIndex() ~= modelUnit:getPlayerIndex())) then
+        if ((existingModelUnit)                                                                                                                and
+            (not getModelPlayerManager(self.m_ModelSceneWar):isSameTeamIndex(existingModelUnit:getPlayerIndex(), modelUnit:getPlayerIndex()))) then
             return nil
         else
             return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(modelUnit)
@@ -164,7 +168,7 @@ end
 --------------------------------------------------------------------------------
 local function updateMovePathWithDestinationGrid(self, gridIndex)
     local maxRange     = math.min(self.m_FocusModelUnit:getMoveRange(), self.m_FocusModelUnit:getCurrentFuel())
-    local nextMoveCost = getMoveCost(gridIndex, self.m_FocusModelUnit, getModelUnitMap(self.m_ModelSceneWar), getModelTileMap(self.m_ModelSceneWar))
+    local nextMoveCost = getMoveCost(self, gridIndex, self.m_FocusModelUnit)
 
     if ((not MovePathFunctions.truncateToGridIndex(self.m_PathNodes, gridIndex))                        and
         (not MovePathFunctions.extendToGridIndex(self.m_PathNodes, gridIndex, nextMoveCost, maxRange))) then
@@ -192,7 +196,7 @@ local function resetReachableArea(self, focusModelUnit)
         focusModelUnit:getGridIndex(),
         math.min(focusModelUnit:getMoveRange(), focusModelUnit:getCurrentFuel()),
         function(gridIndex)
-            return getMoveCost(gridIndex, focusModelUnit, getModelUnitMap(self.m_ModelSceneWar), getModelTileMap(self.m_ModelSceneWar))
+            return getMoveCost(self, gridIndex, focusModelUnit)
         end
     )
 
@@ -767,7 +771,7 @@ setStatePreviewingReachableArea = function(self, gridIndex)
         gridIndex,
         math.min(modelUnit:getMoveRange(), modelUnit:getCurrentFuel()),
         function(gridIndex)
-            return getMoveCost(gridIndex, modelUnit, getModelUnitMap(self.m_ModelSceneWar), getModelTileMap(self.m_ModelSceneWar))
+            return getMoveCost(self, gridIndex, modelUnit)
         end
     )
 
@@ -869,7 +873,7 @@ setStateChoosingAction = function(self, destination, launchUnitID)
 
     updateMovePathWithDestinationGrid(self, destination)
     self.m_State              = "choosingAction"
-    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_PathNodes, launchUnitID)
+    self.m_AttackableGridList = AttackableGridListFunctions.createList(self.m_ModelSceneWar, self.m_PathNodes, launchUnitID)
     self.m_LaunchUnitID       = launchUnitID
 
     if (self.m_View) then

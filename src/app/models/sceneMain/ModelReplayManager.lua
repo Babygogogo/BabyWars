@@ -13,6 +13,7 @@ local WebSocketManager       = requireBW("src.app.utilities.WebSocketManager")
 
 local getLocalizedText         = LocalizationFunctions.getLocalizedText
 local getModelMessageIndicator = SingletonGetters.getModelMessageIndicator
+local string                   = string
 
 local ACTION_CODE_DOWNLOAD_REPLAY_DATA      = ActionCodeFunctions.getActionCode("ActionDownloadReplayData")
 local ACTION_CODE_GET_REPLAY_CONFIGURATIONS = ActionCodeFunctions.getActionCode("ActionGetReplayConfigurations")
@@ -80,8 +81,9 @@ local function generateReplayConfiguration(warData)
     local players = {}
     for playerIndex, player in pairs(warData.players) do
         players[playerIndex] = {
-            account  = player.account,
-            nickname = player.nickname,
+            account   = player.account,
+            nickname  = player.nickname,
+            teamIndex = player.teamIndex or playerIndex,
         }
     end
 
@@ -93,17 +95,17 @@ local function generateReplayConfiguration(warData)
 end
 
 local function getPlayerNicknames(replayConfiguration)
-    local playersCount = WarFieldManager.getPlayersCount(replayConfiguration.warFieldFileName)
-    local names        = {}
-    local players      = replayConfiguration.players
-
-    for i = 1, playersCount do
-        if (players[i]) then
-            names[i] = players[i].account
-        end
+    local names   = {}
+    local players = replayConfiguration.players
+    for i = 1, WarFieldManager.getPlayersCount(replayConfiguration.warFieldFileName) do
+        names[i] = string.format("%s (%s: %s)",
+            players[i].account,
+            getLocalizedText(14, "TeamIndex"),
+            AuxiliaryFunctions.getTeamNameWithTeamIndex((players[i].teamIndex) or (i))
+        )
     end
 
-    return names, playersCount
+    return names
 end
 
 local function getActorWarFieldPreviewer(self)

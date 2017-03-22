@@ -981,6 +981,7 @@ local s_Texts = {
             elseif (textType == "SkillConfiguration")           then return "我方技能配置"
             elseif (textType == "Starting Fund")                then return "初 始 资 金"
             elseif (textType == "StartingFund")                 then return "初始资金"
+            elseif (textType == "TeamIndex")                    then return "所属队伍"
             elseif (textType == "VisionModifier")               then return "视野加成"
             elseif (textType == "WarFieldName")                 then return "地图名称"
             elseif (textType == "Yes")                          then return "是"
@@ -1028,6 +1029,7 @@ local s_Texts = {
             elseif (textType == "SkillConfiguration")           then return "Skill Configuration"
             elseif (textType == "Starting Fund")                then return "StartingFund"
             elseif (textType == "StartingFund")                 then return "StartingFund"
+            elseif (textType == "TeamIndex")                    then return "Team"
             elseif (textType == "VisionModifier")               then return "VisionModifier"
             elseif (textType == "WarFieldName")                 then return "Map"
             elseif (textType == "Yes")                          then return "Yes"
@@ -1081,12 +1083,22 @@ local s_Texts = {
             return "Are you sure to register with the following account and password:\n" .. account .. "\n" .. password
         end,
     },
-    --[[
     [25] = {
-        [1] = function() return "该账号已被注册，请使用其他账号。"                                  end,
-        [2] = function() return "The account is registered already. Please use another account." end,
+        [1] = function(textType)
+            if     (textType == "Energy") then return "能量"
+            elseif (textType == "Player") then return "玩家"
+            elseif (textType == "Fund")   then return "金钱"
+            else                               return "未知25:" .. (textType or "")
+            end
+        end,
+        [2] = function(textType)
+            if     (textType == "Energy") then return "Energy"
+            elseif (textType == "Player") then return "Player"
+            elseif (textType == "Fund")   then return "Fund"
+            else                               return "Unknown25:" .. (textType or "")
+            end
+        end,
     },
-    --]]
     [26] = {
         [1] = function(account) return "欢迎登陆，【" .. account .. "】！" end,
         [2] = function(account) return "Welcome, " .. account .. "!"      end,

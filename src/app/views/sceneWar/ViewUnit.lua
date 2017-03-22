@@ -12,7 +12,6 @@ local getModelMapCursor        = SingletonGetters.getModelMapCursor
 local getModelPlayerManager    = SingletonGetters.getModelPlayerManager
 local getPlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn
 local getScriptEventDispatcher = SingletonGetters.getScriptEventDispatcher
-local isTotalReplay            = SingletonGetters.isTotalReplay
 local isUnitVisible            = VisibilityFunctions.isUnitOnMapVisibleToPlayerIndex
 
 local GRID_SIZE              = GameConstantFunctions.getGridSize()
@@ -35,16 +34,16 @@ local UNIT_SPRITE_Z_ORDER     = 0
 -- The util functions.
 --------------------------------------------------------------------------------
 local function createStepsForActionMoveAlongPath(self, path, isDiving)
-    local modelSceneWar       = self.m_Model:getModelSceneWar()
-    local isReplay            = isTotalReplay(modelSceneWar)
+    local modelWar            = self.m_Model:getModelSceneWar()
+    local isReplay            = SingletonGetters.isTotalReplay(modelWar)
     local playerIndex         = self.m_Model:getPlayerIndex()
     local playerIndexMod      = playerIndex % 2
-    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
+    local playerIndexLoggedIn = (not isReplay) and (getPlayerIndexLoggedIn(modelWar)) or (nil)
     local unitType            = self.m_Model:getUnitType()
     local isAlwaysVisible     = (isReplay) or (playerIndex == playerIndexLoggedIn)
 
     local steps               = {cc.CallFunc:create(function()
-        getModelMapCursor(modelSceneWar):setMovableByPlayer(false)
+        getModelMapCursor(modelWar):setMovableByPlayer(false)
         if (isAlwaysVisible) then
             self:setVisible(true)
         end
@@ -65,14 +64,14 @@ local function createStepsForActionMoveAlongPath(self, path, isDiving)
         if (not isAlwaysVisible) then
             if (isDiving) then
                 if ((i == #path)                                                                                      and
-                    (isUnitVisible(modelSceneWar, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
+                    (isUnitVisible(modelWar, path[i], unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()
                 end
             else
-                if ((isUnitVisible(modelSceneWar, path[i - 1], unitType, isDiving, playerIndex, playerIndexLoggedIn))  or
-                    (isUnitVisible(modelSceneWar, path[i],     unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
+                if ((isUnitVisible(modelWar, path[i - 1], unitType, isDiving, playerIndex, playerIndexLoggedIn))  or
+                    (isUnitVisible(modelWar, path[i],     unitType, isDiving, playerIndex, playerIndexLoggedIn))) then
                     steps[#steps + 1] = cc.Show:create()
                 else
                     steps[#steps + 1] = cc.Hide:create()
@@ -98,19 +97,19 @@ local function createActionMoveAlongPath(self, path, isDiving, callback)
 end
 
 local function createActionMoveAlongPathAndFocusOnTarget(self, path, isDiving, targetGridIndex, callback)
-    local modelSceneWar = self.m_Model:getModelSceneWar()
+    local modelWar = self.m_Model:getModelSceneWar()
     local steps         = createStepsForActionMoveAlongPath(self, path, isDiving)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getScriptEventDispatcher(modelSceneWar):dispatchEvent({
+        getScriptEventDispatcher(modelWar):dispatchEvent({
             name      = "EvtMapCursorMoved",
             gridIndex = targetGridIndex,
         })
-        getModelMapCursor(modelSceneWar):setNormalCursorVisible(false)
+        getModelMapCursor(modelWar):setNormalCursorVisible(false)
             :setTargetCursorVisible(true)
     end)
     steps[#steps + 1] = cc.DelayTime:create(0.5)
     steps[#steps + 1] = cc.CallFunc:create(function()
-        getModelMapCursor(modelSceneWar):setMovableByPlayer(true)
+        getModelMapCursor(modelWar):setMovableByPlayer(true)
             :setNormalCursorVisible(true)
             :setTargetCursorVisible(false)
 
@@ -123,14 +122,10 @@ end
 
 local function getSkillIndicatorFrame(self, unit)
     local playerIndex = unit:getPlayerIndex()
-    local modelPlayer = getModelPlayerManager(unit:getModelSceneWar()):getModelPlayer(playerIndex)
-    local id          = modelPlayer:getModelSkillConfiguration():getActivatingSkillGroupId()
-    if (not id) then
-        return nil
-    elseif (id == 1) then
-        return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s08_f0" .. playerIndex .. ".png")
-    else
+    if (getModelPlayerManager(unit:getModelSceneWar()):getModelPlayer(playerIndex):getModelSkillConfiguration():getActivatingSkillGroupId()) then
         return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s07_f0" .. playerIndex .. ".png")
+    else
+        return nil
     end
 end
 
@@ -187,10 +182,10 @@ local function getLoadIndicatorFrame(self, unit)
     if (not unit.getCurrentLoadCount) then
         return nil
     else
-        local modelSceneWar = unit:getModelSceneWar()
+        local modelWar  = unit:getModelSceneWar()
         local loadCount = unit:getCurrentLoadCount()
-        if ((not isTotalReplay(modelSceneWar)) and (getModelFogMap(modelSceneWar):isFogOfWarCurrently())) then
-            if ((unit:getPlayerIndex() ~= getPlayerIndexLoggedIn(modelSceneWar)) or (loadCount > 0)) then
+        if ((not SingletonGetters.isTotalReplay(modelWar)) and (getModelFogMap(modelWar):isFogOfWarCurrently())) then
+            if ((not SingletonGetters.getModelPlayerManager(modelWar):isSameTeamIndex(unit:getPlayerIndex(), getPlayerIndexLoggedIn(modelWar))) or (loadCount > 0)) then
                 return cc.SpriteFrameCache:getInstance():getSpriteFrame("c02_t99_s06_f0" .. unit:getPlayerIndex() .. ".png")
             else
                 return nil
@@ -264,15 +259,6 @@ local function updateUnitSprite(self, tiledID)
     end
 end
 
-local function updateHpIndicator(indicator, hp)
-    if ((hp >= 10) or (hp < 0)) then
-        indicator:setVisible(false)
-    else
-        indicator:setVisible(true)
-            :setSpriteFrame("c02_t99_s01_f0" .. hp .. ".png")
-    end
-end
-
 local function updateUnitState(self, isStateIdle)
     if (self.m_IsStateIdle ~= isStateIdle) then
         if (isStateIdle) then
@@ -280,6 +266,15 @@ local function updateUnitState(self, isStateIdle)
         else
             self:setColor(COLOR_ACTIONED)
         end
+    end
+end
+
+local function updateHpIndicator(indicator, hp)
+    if ((hp >= 10) or (hp < 0)) then
+        indicator:setVisible(false)
+    else
+        indicator:setVisible(true)
+            :setSpriteFrame("c02_t99_s01_f0" .. hp .. ".png")
     end
 end
 

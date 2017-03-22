@@ -13,9 +13,12 @@ local ModelPlayerManager = requireBW("src.global.functions.class")("ModelPlayerM
 
 local ModelPlayer      = requireBW("src.app.models.sceneWar.ModelPlayer")
 local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
+local TableFunctions   = requireBW("src.app.utilities.TableFunctions")
 
 local IS_SERVER        = requireBW("src.app.utilities.GameConstantFunctions").isServer()
 local WebSocketManager = (not IS_SERVER) and (requireBW("src.app.utilities.WebSocketManager")) or (nil)
+
+local assert, ipairs = assert, ipairs
 
 --------------------------------------------------------------------------------
 -- The constructor and initializers.
@@ -42,7 +45,6 @@ function ModelPlayerManager:toSerializableTable()
 end
 
 function ModelPlayerManager:toSerializableTableForPlayerIndex(playerIndex)
-    --TODO: deal with the fog of war.
     return self:toSerializableTable()
 end
 
@@ -58,13 +60,13 @@ end
 --------------------------------------------------------------------------------
 -- The public callback function on start running.
 --------------------------------------------------------------------------------
-function ModelPlayerManager:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
+function ModelPlayerManager:onStartRunning(modelWar)
+    self.m_IsWarReplay = SingletonGetters.isTotalReplay(modelWar)
     self:forEachModelPlayer(function(modelPlayer)
-        modelPlayer:onStartRunning(modelSceneWar)
+        modelPlayer:onStartRunning(modelWar)
     end)
 
-    if ((not IS_SERVER) and (not SingletonGetters.isTotalReplay(modelSceneWar))) then
+    if ((not IS_SERVER) and (not self.m_IsWarReplay)) then
         self.m_ModelPlayerLoggedIn, self.m_PlayerIndexLoggedIn = self:getModelPlayerWithAccount(WebSocketManager.getLoggedInAccountAndPassword())
     end
 
@@ -93,9 +95,20 @@ function ModelPlayerManager:getAlivePlayersCount()
     return count
 end
 
+function ModelPlayerManager:getAliveTeamsCount(ignoredPlayerIndex)
+    local aliveTeamIndices = {}
+    self:forEachModelPlayer(function(modelPlayer, playerIndex)
+        if ((modelPlayer:isAlive()) and (playerIndex ~= ignoredPlayerIndex)) then
+            aliveTeamIndices[modelPlayer:getTeamIndex()] = true
+        end
+    end)
+
+    return TableFunctions.getPairsCount(aliveTeamIndices)
+end
+
 function ModelPlayerManager:getPlayerIndexLoggedIn()
-    assert(not IS_SERVER,                                            "ModelPlayerManager:getPlayerIndexLoggedIn() this shouldn't be called on the server.")
-    assert(not SingletonGetters.isTotalReplay(self.m_ModelSceneWar), "ModelPlayerManager:getPlayerIndexLoggedIn() this shouldn't be called in replay.")
+    assert((not IS_SERVER) and (not self.m_IsWarReplay), "ModelPlayerManager:getPlayerIndexLoggedIn() this shouldn't be called on the server or in replay.")
+    assert(self.m_PlayerIndexLoggedIn,                   "ModelPlayerManager:getPlayerIndexLoggedIn() the index hasn't been initialized yet.")
 
     return self.m_PlayerIndexLoggedIn, self.m_ModelPlayerLoggedIn
 end
@@ -116,6 +129,14 @@ function ModelPlayerManager:forEachModelPlayer(func)
     end
 
     return self
+end
+
+function ModelPlayerManager:isSameTeamIndex(playerIndex1, playerIndex2)
+    if ((playerIndex1 == 0) or (playerIndex2 == 0)) then
+        return false
+    else
+        return self.m_ModelPlayers[playerIndex1]:getTeamIndex() == self.m_ModelPlayers[playerIndex2]:getTeamIndex()
+    end
 end
 
 return ModelPlayerManager

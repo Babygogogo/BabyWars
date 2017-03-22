@@ -1,5 +1,5 @@
 
-local ViewFogMap = class("ViewFogMap", cc.Node)
+local ViewFogMap = requireBW("src.global.functions.class")("ViewFogMap", cc.Node)
 
 local GridIndexFunctions  = requireBW("src.app.utilities.GridIndexFunctions")
 local SingletonGetters    = requireBW("src.app.utilities.SingletonGetters")
@@ -45,25 +45,25 @@ function ViewFogMap:setMapSize(mapSize)
     return self
 end
 
-function ViewFogMap:setModelSceneWar(modelSceneWar)
-    self.m_ModelSceneWar = modelSceneWar
-
-    return self
-end
-
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
-function ViewFogMap:updateWithModelFogMap()
-    local modelSceneWar = self.m_ModelSceneWar
-    local playerIndex   = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
-    local width, height = self.m_MapSize.width, self.m_MapSize.height
-    local map           = self.m_Map
+function ViewFogMap:updateWithModelFogMap(modelFogMap)
+    if (not modelFogMap:isFogOfWarCurrently()) then
+        self:setVisible(false)
+    else
+        self:setVisible(true)
 
-    for x = 1, width do
-        local column = map[x]
-        for y = 1, height do
-            column[y]:setVisible(not isTileVisible(modelSceneWar, {x = x, y = y}, playerIndex))
+        local modelWarReplay = modelFogMap:getModelWar()
+        local playerIndex    = SingletonGetters.getModelTurnManager(modelWarReplay):getPlayerIndex()
+        local width, height  = self.m_MapSize.width, self.m_MapSize.height
+        local map            = self.m_Map
+
+        for x = 1, width do
+            local column = map[x]
+            for y = 1, height do
+                column[y]:setVisible(not isTileVisible(modelWarReplay, {x = x, y = y}, playerIndex))
+            end
         end
     end
 

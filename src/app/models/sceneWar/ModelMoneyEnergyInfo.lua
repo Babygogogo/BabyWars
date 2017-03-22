@@ -11,33 +11,62 @@
 
 local ModelMoneyEnergyInfo = class("ModelMoneyEnergyInfo")
 
-local SingletonGetters = requireBW("src.app.utilities.SingletonGetters")
+local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
+
+local getLocalizedText = LocalizationFunctions.getLocalizedText
+local string           = string
+
+--------------------------------------------------------------------------------
+-- The util functions.
+--------------------------------------------------------------------------------
+local function generateInfoText(self)
+    local playerIndex        = self.m_PlayerIndexInTurn
+    local modelPlayerManager = self.m_ModelPlayerManager
+    local shouldShowFund     = (self.m_IsWarReplay)                                   or
+        (not self.m_ModelFogManager:isFogOfWarCurrently())                            or
+        (modelPlayerManager:isSameTeamIndex(playerIndex, self.m_PlayerIndexLoggedIn))
+
+    local modelPlayer        = modelPlayerManager:getModelPlayer(playerIndex)
+    local energy, req1, req2 = modelPlayer:getEnergy()
+    return string.format("%s: %s\n%s: %s\n%s: %.2f / %s / %s",
+        getLocalizedText(25, "Player"),  modelPlayer:getNickname(),
+        getLocalizedText(25, "Fund"),    (shouldShowFund) and (modelPlayer:getFund()) or ("--"),
+        getLocalizedText(25, "Energy"),  modelPlayer:getEnergy(), (req1) or ("--"), (req2) or ("--")
+    )
+end
 
 --------------------------------------------------------------------------------
 -- The private callback functions on script events.
 --------------------------------------------------------------------------------
 local function onEvtChatManagerUpdated(self, event)
-    local menu = self.m_ModelWarCommandMenu
-    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()) and (not self.m_ModelChatManager:isEnabled()))
+    self.m_View:setVisible(
+        (not self.m_ModelWarCommandMenu:isEnabled())                                and
+        (not self.m_ModelWarCommandMenu:isHiddenWithHideUI())                       and
+        ((not self.m_ModelChatManager) or (not self.m_ModelChatManager:isEnabled()))
+    )
 end
 
 local function onEvtPlayerIndexUpdated(self, event)
     local playerIndex = event.playerIndex
-    self.m_PlayerIndex = playerIndex
+    self.m_PlayerIndexInTurn = playerIndex
 
-    self.m_View:updateWithModelPlayer(event.modelPlayer, playerIndex)
+    self.m_View:setInfoText(generateInfoText(self))
         :updateWithPlayerIndex(playerIndex)
 end
 
 local function onEvtModelPlayerUpdated(self, event)
-    if ((self.m_PlayerIndex == event.playerIndex) and (self.m_View)) then
-        self.m_View:updateWithModelPlayer(event.modelPlayer, event.playerIndex)
+    if (self.m_PlayerIndexInTurn == event.playerIndex) then
+        self.m_View:setInfoText(generateInfoText(self))
     end
 end
 
 local function onEvtWarCommandMenuUpdated(self, event)
-    local menu = self.m_ModelWarCommandMenu
-    self.m_View:setVisible((not menu:isEnabled()) and (not menu:isHiddenWithHideUI()) and (not self.m_ModelChatManager:isEnabled()))
+    self.m_View:setVisible(
+        (not self.m_ModelWarCommandMenu:isEnabled())                                and
+        (not self.m_ModelWarCommandMenu:isHiddenWithHideUI())                       and
+        ((not self.m_ModelChatManager) or (not self.m_ModelChatManager:isEnabled()))
+    )
 end
 
 --------------------------------------------------------------------------------
@@ -50,23 +79,28 @@ end
 --------------------------------------------------------------------------------
 -- The callback functions on start running/script events.
 --------------------------------------------------------------------------------
-function ModelMoneyEnergyInfo:onStartRunning(modelSceneWar)
-    self.m_ModelSceneWar       = modelSceneWar
-    self.m_ModelChatManager    = SingletonGetters.getModelChatManager(   modelSceneWar)
-    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelSceneWar)
+function ModelMoneyEnergyInfo:onStartRunning(modelWar)
+    self.m_ModelWar            = modelWar
+    self.m_IsWarReplay         = SingletonGetters.isTotalReplay(         modelWar)
+    self.m_ModelFogManager     = SingletonGetters.getModelFogMap(        modelWar)
+    self.m_ModelWarCommandMenu = SingletonGetters.getModelWarCommandMenu(modelWar)
+    self.m_PlayerIndexInTurn   = SingletonGetters.getModelTurnManager(   modelWar):getPlayerIndex()
+    self.m_ModelPlayerManager  = SingletonGetters.getModelPlayerManager( modelWar)
+    if (self.m_IsWarReplay) then
+        self.m_ModelReplayController = SingletonGetters.getModelReplayController(modelWar)
+    else
+        self.m_ModelChatManager      = SingletonGetters.getModelChatManager(     modelWar)
+        self.m_PlayerIndexLoggedIn   = SingletonGetters.getPlayerIndexLoggedIn(  modelWar)
+    end
 
-    SingletonGetters.getScriptEventDispatcher(modelSceneWar)
+    SingletonGetters.getScriptEventDispatcher(modelWar)
         :addEventListener("EvtChatManagerUpdated",    self)
         :addEventListener("EvtModelPlayerUpdated",    self)
         :addEventListener("EvtPlayerIndexUpdated",    self)
         :addEventListener("EvtWarCommandMenuUpdated", self)
 
-    local playerIndex  = SingletonGetters.getModelTurnManager(modelSceneWar):getPlayerIndex()
-    self.m_PlayerIndex = playerIndex
-
-    self.m_View:setModelSceneWar(modelSceneWar)
-        :updateWithModelPlayer(SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(playerIndex), playerIndex)
-        :updateWithPlayerIndex(playerIndex)
+    self.m_View:setInfoText(generateInfoText(self))
+        :updateWithPlayerIndex(self.m_PlayerIndexInTurn)
 
     return self
 end
@@ -86,20 +120,18 @@ end
 -- The public functions.
 --------------------------------------------------------------------------------
 function ModelMoneyEnergyInfo:onPlayerTouch()
-    local modelSceneWar = self.m_ModelSceneWar
-    if ((modelSceneWar:isTotalReplay()) and (modelSceneWar:isAutoReplay())) then
-        modelSceneWar:setAutoReplay(false)
-        SingletonGetters.getModelReplayController(modelSceneWar):setButtonPlayVisible(true)
+    if ((self.m_IsWarReplay) and (self.m_ModelWar:isAutoReplay())) then
+        self.m_ModelWar:setAutoReplay(false)
+        self.m_ModelReplayController:setButtonPlayVisible(true)
     end
-    SingletonGetters.getModelWarCommandMenu(modelSceneWar):setEnabled(true)
+
+    self.m_ModelWarCommandMenu:setEnabled(true)
 
     return self
 end
 
 function ModelMoneyEnergyInfo:adjustPositionOnTouch(touch)
-    if (self.m_View) then
-        self.m_View:adjustPositionOnTouch(touch)
-    end
+    self.m_View:adjustPositionOnTouch(touch)
 
     return self
 end

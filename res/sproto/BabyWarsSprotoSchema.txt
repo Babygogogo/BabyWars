@@ -133,6 +133,7 @@
     skillConfigurationID 5 : integer
     warPassword          6 : string
     isWarStarted         7 : boolean
+    teamIndex            8 : integer
 }
 
 .ActionLogin {
@@ -182,6 +183,7 @@
     moveRangeModifier    17 : integer
     attackModifier       18 : integer
     visionModifier       19 : integer
+    teamIndex            20 : integer
 }
 
 .ActionRegister {
@@ -633,6 +635,7 @@
     playerIndex 0 : integer
     account     1 : string
     nickname    2 : string
+    teamIndex   3 : integer
 }
 
 .PlayerProfile {
@@ -715,6 +718,7 @@
         skillActivatedCount 6 : integer
         skillConfiguration  7 : SingleSkillConfiguration
         hasVotedForDraw     8 : boolean
+        teamIndex           9 : integer
     }
 
     .TurnData {

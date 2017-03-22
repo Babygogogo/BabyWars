@@ -165,25 +165,17 @@ s_Executors.execute26 = function(modelSceneWar, level)
 end
 
 s_Executors.execute55 = function(modelSceneWar, level)
-    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
-    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
-        modelSceneWar:getModelWarField():getModelFogMap():resetMapForUnitsForPlayerIndex(playerIndex)
-    end
+    modelSceneWar:getModelWarField():getModelFogMap():resetMapForUnitsForPlayerIndex(modelSceneWar:getModelTurnManager():getPlayerIndex())
 end
 
 s_Executors.execute56 = function(modelSceneWar, level)
-    local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
-    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
-        modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
-    end
+    modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(modelSceneWar:getModelTurnManager():getPlayerIndex())
 end
 
 s_Executors.execute57 = function(modelSceneWar, level)
     local playerIndex = modelSceneWar:getModelTurnManager():getPlayerIndex()
-    if ((IS_SERVER) or (modelSceneWar:isTotalReplay()) or (playerIndex == getPlayerIndexLoggedIn(modelSceneWar))) then
-        modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
-            :resetMapForUnitsForPlayerIndex(playerIndex)
-    end
+    modelSceneWar:getModelWarField():getModelFogMap():resetMapForTilesForPlayerIndex(playerIndex)
+        :resetMapForUnitsForPlayerIndex(playerIndex)
 end
 
 s_Executors.execute61 = function(modelSceneWar, level)

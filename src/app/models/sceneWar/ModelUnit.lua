@@ -16,6 +16,7 @@ local Destroyers            = requireBW("src.app.utilities.Destroyers")
 local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
 local GridIndexFunctions    = requireBW("src.app.utilities.GridIndexFunctions")
 local LocalizationFunctions = requireBW("src.app.utilities.LocalizationFunctions")
+local SingletonGetters      = requireBW("src.app.utilities.SingletonGetters")
 local ComponentManager      = requireBW("src.global.components.ComponentManager")
 
 local UNIT_STATE_CODE = {
@@ -106,6 +107,7 @@ end
 function ModelUnit:onStartRunning(modelSceneWar)
     assert(modelSceneWar.isModelSceneWar, "ModelUnit:onStartRunning() invalid modelSceneWar.")
     self.m_ModelSceneWar = modelSceneWar
+    self.m_TeamIndex     = SingletonGetters.getModelPlayerManager(modelSceneWar):getModelPlayer(self:getPlayerIndex()):getTeamIndex()
 
     ComponentManager.callMethodForAllComponents(self, "onStartRunning", modelSceneWar)
     self:updateView()
@@ -192,6 +194,11 @@ end
 
 function ModelUnit:getPlayerIndex()
     return GameConstantFunctions.getPlayerIndexWithTiledId(self.m_TiledID)
+end
+
+function ModelUnit:getTeamIndex()
+    assert(self.m_TeamIndex, "ModelUnit:getTeamIndex() the index hasn't been initialized yet.")
+    return self.m_TeamIndex
 end
 
 function ModelUnit:isStateIdle()

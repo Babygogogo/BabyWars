@@ -16,9 +16,9 @@ local AttackableGridListFunctions = {}
 local DamageCalculator       = requireBW("src.app.utilities.DamageCalculator")
 local GridIndexFunctions     = requireBW("src.app.utilities.GridIndexFunctions")
 local ReachableAreaFunctions = requireBW("src.app.utilities.ReachableAreaFunctions")
-local ActorManager           = requireBW("src.global.actors.ActorManager")
 
-local isWithinMap            = GridIndexFunctions.isWithinMap
+local pairs       = pairs
+local isWithinMap = GridIndexFunctions.isWithinMap
 
 --------------------------------------------------------------------------------
 -- The util functions.
@@ -54,12 +54,11 @@ function AttackableGridListFunctions.getListNode(list, gridIndex)
     return nil
 end
 
-function AttackableGridListFunctions.createList(pathNodes, launchUnitID)
-    local modelSceneWar = ActorManager.getRootActor():getModel()
-    local modelWarField = modelSceneWar:getModelWarField()
+function AttackableGridListFunctions.createList(modelWar, pathNodes, launchUnitID)
+    local modelWarField = modelWar:getModelWarField()
     local modelUnitMap  = modelWarField:getModelUnitMap()
     local attacker      = modelUnitMap:getFocusModelUnit(pathNodes[1], launchUnitID)
-    if ((not attacker.canAttackAfterMove)                          or
+    if ((not attacker.canAttackAfterMove)                           or
         ((not attacker:canAttackAfterMove()) and (#pathNodes > 1))) then
         return {}
     end
@@ -74,7 +73,7 @@ function AttackableGridListFunctions.createList(pathNodes, launchUnitID)
         mapSize,
         function(targetGridIndex)
             targetGridIndex.estimatedAttackDamage, targetGridIndex.estimatedCounterDamage =
-                DamageCalculator.getEstimatedBattleDamage(pathNodes, launchUnitID, targetGridIndex, modelSceneWar)
+                DamageCalculator.getEstimatedBattleDamage(pathNodes, launchUnitID, targetGridIndex, modelWar)
 
             return targetGridIndex.estimatedAttackDamage ~= nil
         end
@@ -83,7 +82,7 @@ end
 
 function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, modelTileMap, modelUnitMap, existingArea)
     local attacker            = modelUnitMap:getModelUnit(attackerGridIndex)
-    local attackerPlayerIndex = attacker:getPlayerIndex()
+    local attackerTeamIndex   = attacker:getTeamIndex()
     local mapSize             = modelTileMap:getMapSize()
     local minRange, maxRange  = attacker:getAttackRangeMinMax()
     existingArea              = existingArea or {}
@@ -100,8 +99,7 @@ function AttackableGridListFunctions.createAttackableArea(attackerGridIndex, mod
                     return nil
                 else
                     local existingModelUnit = modelUnitMap:getModelUnit(gridIndex)
-                    if ((existingModelUnit)                                          and
-                        (existingModelUnit:getPlayerIndex() ~= attackerPlayerIndex)) then
+                    if ((existingModelUnit) and (existingModelUnit:getTeamIndex() ~= attackerTeamIndex)) then
                         return nil
                     else
                         return modelTileMap:getModelTile(gridIndex):getMoveCostWithModelUnit(attacker)
