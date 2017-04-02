@@ -9,19 +9,6 @@ local Actor                 = requireBW("src.global.actors.Actor")
 local getLocalizedText = LocalizationFunctions.getLocalizedText
 
 --------------------------------------------------------------------------------
--- The util functions.
---------------------------------------------------------------------------------
-local function showMenuItems(self, ...)
-    local view = self.m_View
-    assert(view, "ModelMainMenu-showMenuItems() no view is attached to the owner actor of the model.")
-
-    view:removeAllItems()
-    for _, item in ipairs({...}) do
-        view:createAndPushBackItem(item)
-    end
-end
-
---------------------------------------------------------------------------------
 -- The composition actors.
 --------------------------------------------------------------------------------
 local function getActorNewWarCreator(self)

@@ -20,7 +20,7 @@ local GAME_VERSION         = requireBW("src.app.utilities.GameConstantFunctions"
 --------------------------------------------------------------------------------
 -- The util functions.
 --------------------------------------------------------------------------------
-local function validateAccountOrPassword(str)
+local function validateAccountOrPassword(str)--验证str作为账户密码的合法性
     return (#str >= 6) and (not string.find(str, "[^%w_]"))
 end
 

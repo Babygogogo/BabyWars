@@ -7,7 +7,6 @@ local CLEAR_COLOR         = {r = 255, g = 255, b = 255}
 local FOG_COLOR           = {r = 160, g = 160, b = 160}
 
 local ComponentManager      = requireBW("src.global.components.ComponentManager")
-local TypeChecker           = requireBW("src.app.utilities.TypeChecker")
 local AnimationLoader       = requireBW("src.app.utilities.AnimationLoader")
 local GameConstantFunctions = requireBW("src.app.utilities.GameConstantFunctions")
 

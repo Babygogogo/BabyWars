@@ -14,7 +14,6 @@
 local ModelConfirmBox = class("ModelConfirmBox")
 
 local Actor           = requireBW("src.global.actors.Actor")
-local TypeChecker     = requireBW("src.app.utilities.TypeChecker")
 
 local function createDefaultCallbackOnConfirm(self)
     return function()

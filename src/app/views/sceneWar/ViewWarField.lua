@@ -1,8 +1,6 @@
 
 local ViewWarField = class("ViewWarField", cc.Node)
 
-local TypeChecker = requireBW("src.app.utilities.TypeChecker")
-
 local GRID_SIZE = requireBW("src.app.utilities.GameConstantFunctions").getGridSize()
 
 local ORIGIN = {x = 0, y = 0}
