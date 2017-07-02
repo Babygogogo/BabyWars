@@ -24,6 +24,7 @@ return {
     "SiPanDao_2",
     "SiTongBaDa",
     "TanXinWan",
+    "TianHe",
     "WangPaiKongJun",
     "WeiJiSiFu_2",
     "WuGuangDeWuTai",
