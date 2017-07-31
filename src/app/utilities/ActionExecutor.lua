@@ -1339,7 +1339,7 @@ local function executeLaunchFlare(action, modelSceneWar)
 
     local isReplay            = isTotalReplay(modelSceneWar)
     local playerIndexLoggedIn = ((not IS_SERVER) and (not isReplay)) and (getPlayerIndexLoggedIn(modelSceneWar)) or (nil)
-    if ((IS_SERVER) or (isReplay) or (getModelPlayerManager:isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
+    if ((IS_SERVER) or (isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
         getModelFogMap(modelSceneWar):updateMapForPathsForPlayerIndexWithFlare(playerIndexActing, targetGridIndex, flareAreaRadius)
     end
 
@@ -1354,7 +1354,7 @@ local function executeLaunchFlare(action, modelSceneWar)
             focusModelUnit:updateView()
                 :showNormalAnimation()
 
-            if ((isReplay) or (getModelPlayerManager:isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
+            if ((isReplay) or (getModelPlayerManager(modelSceneWar):isSameTeamIndex(playerIndexActing, playerIndexLoggedIn))) then
                 local modelGridEffect = getModelGridEffect(modelSceneWar)
                 for _, gridIndex in pairs(getGridsWithinDistance(targetGridIndex, 0, flareAreaRadius, modelUnitMap:getMapSize())) do
                     modelGridEffect:showAnimationFlare(gridIndex)
