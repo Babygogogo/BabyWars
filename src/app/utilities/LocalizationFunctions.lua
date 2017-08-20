@@ -1,7 +1,13 @@
 
 local LocalizationFunctions = {}
 
-local s_LanguageCode = 1
+local s_LanguageCodes = {
+    Chinese = 1,
+    English = 2,
+}
+local s_LanguageNames
+
+local s_LanguageCode
 
 local s_LongText1_1 = [[
 --- 注：游戏尚有部分功能未完成开发，请谅解。---
@@ -369,6 +375,7 @@ local s_Texts = {
             if     (textType == "About")               then return "关 于 本 作"
             elseif (textType == "AuxiliaryCommands")   then return "辅 助 功 能"
             elseif (textType == "Back")                then return "返 回"
+            elseif (textType == "ChangeLanguage")      then return "English"
             elseif (textType == "Close")               then return "关 闭"
             elseif (textType == "ConfigSkills")        then return "配 置 技 能"
             elseif (textType == "Confirm")             then return "确 定"
@@ -399,6 +406,7 @@ local s_Texts = {
             if     (textType == "About")               then return "About"
             elseif (textType == "AuxiliaryCommands")   then return "AuxiliaryCmds"
             elseif (textType == "Back")                then return "Back"
+            elseif (textType == "ChangeLanguage")      then return "中 文"
             elseif (textType == "Close")               then return "Close"
             elseif (textType == "ConfigSkills")        then return "Config Skills"
             elseif (textType == "Confirm")             then return "Confirm"
@@ -411,14 +419,14 @@ local s_Texts = {
             elseif (textType == "JoinWar")             then return "Join"
             elseif (textType == "Login")               then return "Login"
             elseif (textType == "MainMenu")            then return "Main Menu"
-            elseif (textType == "ManageReplay")        then return "ManageReplay"
-            elseif (textType == "ManageWar")           then return "ManageWar"
+            elseif (textType == "ManageReplay")        then return "Replay"
+            elseif (textType == "ManageWar")           then return "Wars"
             elseif (textType == "MyProfile")           then return "My Profile"
             elseif (textType == "NewGame")             then return "New Game"
             elseif (textType == "RankingList")         then return "RankingList"
             elseif (textType == "Save")                then return "Save"
-            elseif (textType == "SetMessageIndicator") then return "Set Message"
-            elseif (textType == "SetMusic")            then return "Set Music"
+            elseif (textType == "SetMessageIndicator") then return "Message on/off"
+            elseif (textType == "SetMusic")            then return "Music on/off"
             elseif (textType == "SkillSystem")         then return "Skills"
             elseif (textType == "ViewGameRecord")      then return "View Records"
             elseif (textType == "WarControl")          then return "Controlling"
@@ -485,6 +493,7 @@ local s_Texts = {
             elseif (textType == "ActiveSkill")            then return "Active"
             elseif (textType == "Skill")                  then return "Skill"
             elseif (textType == "MaxPoints")              then return "Max Skill Points"
+            elseif (textType == "BasePoints")             then return "BasePoints"
             elseif (textType == "TotalPoints")            then return "Total Points"
             elseif (textType == "SkillPoints")            then return "Points"
             elseif (textType == "EnergyRequirement")      then return "Energy Requirement"
@@ -1072,11 +1081,11 @@ local s_Texts = {
         [1] = function(account) return "您已使用账号【" .. account .. "】进行了登陆。"      end,
         [2] = function(account) return "You have already logged in as " .. account .. "." end,
     },
-    --[[
     [22] = {
-        [1] = function() return "账号或密码错误，请重试。"    end,
-        [2] = function() return "Invalid account/password." end,
+        [1] = function() return "已切换到中文。请重启游戏。"      end,
+        [2] = function() return "Done. Please reboot the game." end,
     },
+    --[[
     [23] = {
         [1] = function(account) return "您的账号【" .. account .. "】在另一台设备上被登陆，您已被迫下线！"     end,
         [2] = function(account) return "Another device is logging in with your account!" .. account .. "." end,
@@ -1312,7 +1321,7 @@ local s_Texts = {
             else                                return "未知48:" .. (textType or "")
             end
         end,
-        [2] = function()
+        [2] = function(textType)
             if     (textType == "Author")  then return "Author: "
             elseif (textType == "Players") then return "Players: "
             elseif (textType == "Empty")   then return "(Empty)"
@@ -2248,15 +2257,38 @@ local s_Texts = {
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
+function LocalizationFunctions.init()
+    if (not s_LanguageNames) then
+        s_LanguageNames = {}
+        for name, code in pairs(s_LanguageCodes) do
+            s_LanguageNames[code] = name
+        end
+    end
+
+    if (not s_LanguageCode) then
+        if (requireBW("src.app.utilities.GameConstantFunctions").isServer()) then
+            s_LanguageCode = 1
+        else
+            local code = cc.UserDefault:getInstance():getIntegerForKey("LanguageCode");
+            s_LanguageCode = (s_LanguageNames[code]) and (code) or (1);
+        end
+    end
+end
+
 function LocalizationFunctions.setLanguageCode(languageCode)
-    assert((languageCode == 1) or (languageCode == 2), "LocalizationFunctions.setLanguageCode() the param is invalid.")
+    assert(s_LanguageNames[languageCode], "LocalizationFunctions.setLanguageCode() the param is invalid.")
     s_LanguageCode = languageCode
+    cc.UserDefault:getInstance():setIntegerForKey("LanguageCode", s_LanguageCode);
 
     return LocalizationFunctions
 end
 
 function LocalizationFunctions.getLanguageCode()
     return s_LanguageCode
+end
+
+function LocalizationFunctions.getLanguageCodes()
+    return s_LanguageCodes
 end
 
 function LocalizationFunctions.getLocalizedText(textCode, ...)

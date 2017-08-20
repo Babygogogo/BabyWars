@@ -49,6 +49,7 @@ local function main()
 
     requireBW("src.app.utilities.AnimationLoader")       .load()
     requireBW("src.app.utilities.GameConstantFunctions") .init()
+    requireBW("src.app.utilities.LocalizationFunctions") .init()
     requireBW("src.app.utilities.SerializationFunctions").init()
     requireBW("src.app.utilities.WarFieldManager")       .init()
 

@@ -154,6 +154,7 @@ local function setStateMain(self, isPlayerLoggedIn)
             self.m_ItemConfigSkills,
             self.m_ItemManageReplay,
             self.m_ItemViewGameRecord,
+            self.m_ItemChangeLanguage,
             self.m_ItemLogin,
             self.m_ItemAuxiliaryCommands,
             self.m_ItemHelp,
@@ -161,6 +162,7 @@ local function setStateMain(self, isPlayerLoggedIn)
     else
         self.m_View:setItems({
             self.m_ItemLogin,
+            self.m_ItemChangeLanguage,
             self.m_ItemManageReplay,
             self.m_ItemAuxiliaryCommands,
             self.m_ItemHelp,
@@ -189,6 +191,22 @@ local function initItemAuxiliaryCommands(self)
         name     = getLocalizedText(1, "AuxiliaryCommands"),
         callback = function()
             setStateAuxiliaryCommands(self)
+        end,
+    }
+end
+
+local function initItemChangeLanguage(self)
+    self.m_ItemChangeLanguage = {
+        name     = getLocalizedText(1, "ChangeLanguage"),
+        callback = function()
+            local codes = LocalizationFunctions.getLanguageCodes()
+            if (LocalizationFunctions.getLanguageCode() == codes.Chinese) then
+                LocalizationFunctions.setLanguageCode(codes.English)
+                SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(22, codes.English))
+            else
+                LocalizationFunctions.setLanguageCode(codes.Chinese)
+                SingletonGetters.getModelMessageIndicator(self.m_ModelSceneMain):showMessage(getLocalizedText(22, codes.Chinese))
+            end
         end,
     }
 end
@@ -338,6 +356,7 @@ end
 --------------------------------------------------------------------------------
 function ModelMainMenu:ctor(param)
     initItemAuxiliaryCommands(  self)
+    initItemChangeLanguage(     self)
     initItemConfigSkills(       self)
     initItemContinue(           self)
     initItemExitWar(            self)
