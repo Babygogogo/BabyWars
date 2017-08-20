@@ -166,13 +166,13 @@ SkillData.categories = {
     },
 
     ["SkillCategoryActiveEnergy"] = {
-        13,
+        64,
         61,
     },
 
     ["SkillCategoryActiveHP"] = {
         4,
-        5,
+        62,
     },
 
     ["SkillCategoryPassivePromotion"] = {
@@ -184,7 +184,7 @@ SkillData.categories = {
     },
 
     ["SkillCategoryActiveLogistics"] = {
-        9,
+        63,
         16,
     },
 
@@ -340,7 +340,7 @@ SkillData.skills = {
         },
     },
 
-    -- Instant: Modify HPs of all units of the opponents.
+    -- Instant (deprecated): Modify HPs of all units of the opponents and teammates.
     [5] = {
         minLevelActive     = 1,
         maxLevelActive     = 9,
@@ -398,7 +398,7 @@ SkillData.skills = {
         },
     },
 
-    -- Instant: Modify the fuel of the opponents' units.
+    -- Instant (deprecated): Modify the fuel of the opponents and teammates' units.
     [9] = {
         minLevelActive     = 1,
         maxLevelActive     = 10,
@@ -479,7 +479,7 @@ SkillData.skills = {
         },
     },
 
-    -- Instant: Modify the energy of the opponent player.
+    -- Instant (deprecated): Modify the energy of the opponents and teammates.
     [13] = {
         minLevelActive     = 1,
         maxLevelActive     = 10,
@@ -1721,6 +1721,62 @@ SkillData.skills = {
             [4] = {modifierPassive = nil, pointsPassive = nil, modifierActive = 1, pointsActive = 100, minEnergy = 8},
         },
     },
+
+    -- Instant: Modify HPs of all units of the opponents.
+    [62] = {
+        minLevelActive     = 1,
+        maxLevelActive     = 9,
+        modifierUnit = "HP",
+        levels = {
+            [1] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -1, pointsActive = 350, minEnergy = 3},
+            [2] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -2, pointsActive = 675, minEnergy = 6},
+            [3] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -3, pointsActive = 975, minEnergy = 9},
+            [4] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -4, pointsActive = 1250, minEnergy = 12},
+            [5] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -5, pointsActive = 1500, minEnergy = 15},
+            [6] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -6, pointsActive = 1725, minEnergy = 18},
+            [7] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -7, pointsActive = 1925, minEnergy = 21},
+            [8] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -8, pointsActive = 2100, minEnergy = 24},
+            [9] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -9, pointsActive = 2250, minEnergy = 27},
+        },
+    },
+
+    -- Instant: Modify the fuel of the opponents' units.
+    [63] = {
+        minLevelActive     = 1,
+        maxLevelActive     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -50, pointsActive = 50, minEnergy = 1},
+            [2] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -100, pointsActive = 100, minEnergy = 2},
+            [3] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -150, pointsActive = 150, minEnergy = 3},
+            [4] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -200, pointsActive = 200, minEnergy = 4},
+            [5] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -250, pointsActive = 250, minEnergy = 5},
+            [6] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -300, pointsActive = 300, minEnergy = 6},
+            [7] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -350, pointsActive = 350, minEnergy = 7},
+            [8] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -400, pointsActive = 400, minEnergy = 8},
+            [9] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -450, pointsActive = 450, minEnergy = 9},
+            [10] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -500, pointsActive = 500, minEnergy = 10},
+        },
+    },
+
+    -- Instant: Modify the energy of the opponents.
+    [64] = {
+        minLevelActive     = 1,
+        maxLevelActive     = 10,
+        modifierUnit = "%",
+        levels       = {
+            [1] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -4, pointsActive = 50, minEnergy = 1},
+            [2] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -8, pointsActive = 100, minEnergy = 1},
+            [3] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -12, pointsActive = 150, minEnergy = 2},
+            [4] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -16, pointsActive = 200, minEnergy = 2},
+            [5] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -20, pointsActive = 250, minEnergy = 3},
+            [6] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -24, pointsActive = 300, minEnergy = 3},
+            [7] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -28, pointsActive = 350, minEnergy = 4},
+            [8] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -32, pointsActive = 400, minEnergy = 4},
+            [9] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -36, pointsActive = 450, minEnergy = 5},
+            [10] = {modifierPassive = nil, pointsPassive = nil, modifierActive = -40, pointsActive = 500, minEnergy = 5},
+        },
+    },
 }
 
 SkillData.skillPresets = {
@@ -1848,11 +1904,11 @@ SkillData.skillPresets = {
             energyRequirement = 4,
             skills            = {
                 {
-                    id    = 5,
+                    id    = 62,
                     level = 1,
                 },
                 {
-                    id    = 9,
+                    id    = 63,
                     level = 2,
                 },
             },
@@ -1861,11 +1917,11 @@ SkillData.skillPresets = {
             energyRequirement = 7,
             skills            = {
                 {
-                    id    = 5,
+                    id    = 62,
                     level = 2,
                 },
                 {
-                    id    = 9,
+                    id    = 63,
                     level = 4,
                 },
             },
@@ -2016,7 +2072,7 @@ SkillData.skillPresets = {
                     level = 1,
                 },
                 {
-                    id    = 5,
+                    id    = 62,
                     level = 1,
                 },
             },
@@ -2029,7 +2085,7 @@ SkillData.skillPresets = {
                     level = 2,
                 },
                 {
-                    id    = 5,
+                    id    = 62,
                     level = 2,
                 },
             },
@@ -2276,7 +2332,7 @@ SkillData.skillPresets = {
             energyRequirement = 2,
             skills            = {
                 {
-                    id    = 13,
+                    id    = 64,
                     level = 5,
                 },
             },

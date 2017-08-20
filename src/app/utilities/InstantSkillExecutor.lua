@@ -192,6 +192,64 @@ s_Executors.execute61 = function(modelSceneWar, level)
     ))
 end
 
+s_Executors.execute62 = function(modelSceneWar, level)
+    local modifier     = getSkillModifier(62, level, true) * 10
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    local teamIndex    = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex):getTeamIndex()
+    local func         = function(modelUnit)
+        if (modelUnit:getTeamIndex() ~= teamIndex) then
+            modifyModelUnitHp(modelUnit, modifier)
+        end
+    end
+
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
+s_Executors.execute63 = function(modelSceneWar, level)
+    local playerIndex  = modelSceneWar:getModelTurnManager():getPlayerIndex()
+    local teamIndex    = modelSceneWar:getModelPlayerManager():getModelPlayer(playerIndex):getTeamIndex()
+    local baseModifier = getSkillModifier(63, level, true)
+    local modifier     = (baseModifier >= 0) and ((100 + baseModifier) / 100) or (100 / (100 - baseModifier))
+    local func         = function(modelUnit)
+        if (modelUnit:getTeamIndex() ~= teamIndex) then
+            modelUnit:setCurrentFuel(math.min(modelUnit:getMaxFuel(), round(modelUnit:getCurrentFuel() * modifier)))
+                :updateView()
+        end
+    end
+
+    modelSceneWar:getModelWarField():getModelUnitMap():forEachModelUnitOnMap(func)
+        :forEachModelUnitLoaded(func)
+
+    modelSceneWar:getScriptEventDispatcher():dispatchEvent({name = "EvtModelUnitMapUpdated"})
+end
+
+s_Executors.execute64 = function(modelSceneWar, level)
+    local modelPlayerManager = modelSceneWar:getModelPlayerManager()
+    local currentModelPlayer = modelPlayerManager:getmodelPlayer(modelSceneWar:getModelTurnManager():getPlayerIndex())
+    local teamIndex          = currentModelPlayer:getTeamIndex()
+    local fund               = currentModelPlayer:getFund()
+    local modifier           = getSkillModifier(64, level, true) * fund / 1000000
+
+    modelPlayerManager:forEachModelPlayer(function(modelPlayer, index)
+        if ((modelPlayer:isAlive()) and (modelPlayer:getTeamIndex() ~= teamIndex)) then
+            local _, req1, req2 = modelPlayer:getEnergy()
+            if (req2) then
+                local maxDamageCost = round(req2 * modelPlayer:getCurrentDamageCostPerEnergyRequirement())
+                modelPlayer:setDamageCost(math.max(
+                    0,
+                    math.min(
+                        round(modelPlayer:getDamageCost() + maxDamageCost * modifier),
+                        maxDamageCost
+                    )
+                ))
+            end
+        end
+    end)
+end
+
 --------------------------------------------------------------------------------
 -- The public functions.
 --------------------------------------------------------------------------------
