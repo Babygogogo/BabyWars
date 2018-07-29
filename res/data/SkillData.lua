@@ -2261,7 +2261,7 @@ SkillData.skillPresets = {
         passive = {
             {
                 id    = 15,
-                level = 5,
+                level = 3,
             },
             {
                 id    = 34,
@@ -2294,7 +2294,7 @@ SkillData.skillPresets = {
             skills            = {
                 {
                     id    = 15,
-                    level = 5,
+                    level = 2,
                 },
                 {
                     id    = 34,
