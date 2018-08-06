@@ -61,12 +61,16 @@ function ModelSkillGroupPassive:isValid()
     local slots       = self.m_Slots
     local totalPoints = 0
     local maxPoints   = self:getMaxSkillPoints()
+    local hasSkill3   = false
+    local hasSkill17  = false
 
     for i = 1, SLOTS_COUNT do
         local skill = slots[i]
         if (skill) then
             local id    = skill.id
             totalPoints = totalPoints + getSkillPoints(id, skill.level, false)
+            hasSkill3   = (hasSkill3)  or (id == 3);
+            hasSkill17  = (hasSkill17) or (id == 17);
 
             for j = i + 1, SLOTS_COUNT do
                 if ((slots[j]) and (slots[j].id == id)) then
@@ -74,6 +78,10 @@ function ModelSkillGroupPassive:isValid()
                 end
             end
         end
+    end
+
+    if ((hasSkill3) and (hasSkill17)) then
+        return false, "日常收入技能与日常造价技能无法同时选择，请去掉其中一个"
     end
 
     if (totalPoints > self:getMaxSkillPoints()) then
