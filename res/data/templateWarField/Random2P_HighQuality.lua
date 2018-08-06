@@ -7,7 +7,7 @@ return {
         "DuoYanPingYuan_2",
         "ManShouXueXing",
         "ShenSeYanCaoZhanZheng_2",
-        "TanXinWan",
+        "TanXinWan_2",
         "WangPaiKongJun",
     },
 }
