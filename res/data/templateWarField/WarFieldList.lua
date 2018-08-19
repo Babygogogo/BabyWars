@@ -6,48 +6,53 @@ return {
     "ChaZuoShanMai_3",
     "CuiMian",
     "DiBiao",
+    "DiXiaShui",
+    "DuanLian",
     "DuoYanPingYuan_2",
     "FangBaoPingZhang",
     "FeiXu_2",
-    "GaoLaMiJia",
+    "GaoLaMiJia_2",
     "GanHeZhiJing",
     "HaiAnTuJi",
     "HeiSenLin",
-    "Ling",
+    "Ling_2",
     "ManShouXueXing",
     "MiZongGang_3",
     "SanHeGu",
     "ShenSeYanCaoZhanZheng_2",
     "ShuiXingYaoSai",
     "SiPanDao_2",
-    "TanXinWan_2",
-    "TianHe",
+    "TanXinWan_3",
+    "TianHe_2",
     "WangPaiKongJun",
-    "WeiJiSiFu_2",
-    "WuGuangDeWuTai",
+    "WeiJiSiFu_3",
+    "WuGuangDeWuTai_2",
     "WuShangZhiAi",
-    "XiangGeLiLa",
+    "XiangGeLiLa_2",
     "YangFanYuanHang_3",
-    "YanMo_2",
+    "YanMo_3",
     "YongZheShiShi",
     "YunShiQun",
     "ZhengZhengFangFang",
 
     "ZuJiZhaoTianTong_2",         -- Fun 2p maps
 
-    "JuWaiRen_2",                 -- 3p
+    "HuPanJiZhan",                 -- 3p
+    "JiaJi",
+    "JuWaiRen_3",
 
     "BeiPan_2",                   -- 4p
     "DuiKangZhaoTianTong",
     "HuiLangYu",
     "ShiJieDaZhan",
-    "XiaoGuoZhengBaSai",
+    "XiaoGuoZhengBaSai_2",
     "XuanZe_2",
-    "XueZhanDaoDi",
+    "XueZhanDaoDi_2",
     "YingXiongLei",
 
     "Random2P",                  -- random maps
     "Random2P_HighQuality",
+    "Random2P_Pending"
 
     "JiangQi",                   -- test maps
     "QuanMianCeShi",
