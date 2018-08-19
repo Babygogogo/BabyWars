@@ -52,7 +52,7 @@ return {
 
     "Random2P",                  -- random maps
     "Random2P_HighQuality",
-    "Random2P_Pending"
+    "Random2P_Pending",
 
     "JiangQi",                   -- test maps
     "QuanMianCeShi",
