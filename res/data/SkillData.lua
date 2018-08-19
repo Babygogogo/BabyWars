@@ -537,8 +537,8 @@ SkillData.skills = {
             [2] = {modifierPassive = 40, pointsPassive = 50, modifierActive = 2000, pointsActive = 500, minEnergy = 6},
             [3] = {modifierPassive = 60, pointsPassive = 75, modifierActive = nil, pointsActive = nil, minEnergy = nil},
             [4] = {modifierPassive = 80, pointsPassive = 100, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [5] = {modifierPassive = 100, pointsPassive = 350, modifierActive = nil, pointsActive = nil, minEnergy = nil},
-            [6] = {modifierPassive = 2000, pointsPassive = 475, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [5] = {modifierPassive = 100, pointsPassive = 375, modifierActive = nil, pointsActive = nil, minEnergy = nil},
+            [6] = {modifierPassive = 2000, pointsPassive = 500, modifierActive = nil, pointsActive = nil, minEnergy = nil},
         },
     },
 
@@ -2336,6 +2336,48 @@ SkillData.skillPresets = {
                 {
                     id    = 22,
                     level = 10,
+                },
+            },
+        },
+    },
+
+    -- RushFTK
+    {
+        name       = "RushFTK",
+        basePoints = 100,
+        passive    = {
+            {
+                id    = 3,
+                level = 2,
+            },
+            {
+                id    = 1,
+                level = 2,
+            },
+        },
+        active1 = {
+            energyRequirement = 5,
+            skills            = {
+                {
+                    id    = 6,
+                    level = 1,
+                },
+                {
+                    id    = 4,
+                    level = 2,
+                },
+            },
+        },
+        active2 = {
+            energyRequirement = 14,
+            skills            = {
+                {
+                    id    = 8,
+                    level = 1,
+                },
+                {
+                    id    = 4,
+                    level = 5,
                 },
             },
         },
