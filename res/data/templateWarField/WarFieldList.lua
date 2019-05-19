@@ -37,6 +37,10 @@ return {
     "ZuJiZhaoTianTong_2",         -- Fun 2p maps
 
     "JuWaiRen_2",                 -- 3p
+    "SanJiao",
+    "SanJunLuanZhan",
+    "SanRenHaiZhan",
+    "WeiKun",
 
     "BeiPan_2",                   -- 4p
     "DuiKangZhaoTianTong",
