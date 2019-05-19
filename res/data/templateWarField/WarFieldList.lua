@@ -40,6 +40,10 @@ return {
     "HuPanJiZhan",                 -- 3p
     "JiaJi",
     "JuWaiRen_3",
+    "SanJiao",
+    "SanJunLuanZhan",
+    "SanRenHaiZhan",
+    "WeiKun",
 
     "BeiPan_2",                   -- 4p
     "DuiKangZhaoTianTong",
